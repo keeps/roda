@@ -184,7 +184,7 @@ public class DipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.deleteDIPs(user, SelectedItemsList.create(IndexedDIP.class, dipId), details);
+    Dips.deleteDIPs(user, SelectedItemsList.create(IndexedDIP.class, dipId), details);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "DIP deleted"), mediaType).build();
   }

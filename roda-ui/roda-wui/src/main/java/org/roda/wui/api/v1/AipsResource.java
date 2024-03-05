@@ -29,7 +29,6 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPs;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataList;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadataList;
@@ -37,7 +36,9 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.UserUtility;
+import org.roda.wui.api.controllers.Aips;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.controllers.DescriptiveMetadata;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
@@ -159,7 +160,7 @@ public class AipsResource {
     aip = JsonUtils.getObjectFromJson(sanitize, AIP.class);
 
     // delegate action to controller
-    AIP updatedAIP = Browser.updateAIP(user, aip);
+    AIP updatedAIP = Aips.updateAIP(user, aip);
     return Response.ok(updatedAIP, mediaType).build();
   }
 
@@ -181,7 +182,7 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    AIP aip = Browser.createAIP(user, parentId, type);
+    AIP aip = Aips.createAIP(user, parentId, type);
     return Response.ok(aip, mediaType).build();
   }
 
@@ -206,7 +207,7 @@ public class AipsResource {
     // delegate action to controller
     SelectedItems<IndexedAIP> aips = new SelectedItemsList<>(Collections.singletonList(aipId),
       IndexedAIP.class.getName());
-    Browser.deleteAIP(user, aips, details);
+    Aips.deleteAIP(user, aips, details);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "AIP deleted"), mediaType).build();
   }
 
@@ -249,7 +250,7 @@ public class AipsResource {
     MediaType.APPLICATION_OCTET_STREAM, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @Operation(summary = "Get descriptive metadata", description = "Get descriptive metadata", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DescriptiveMetadata.class))),
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = org.roda.core.data.v2.ip.metadata.DescriptiveMetadata.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response retrieveDescriptiveMetadataFromAIP(
     @Parameter(description = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
@@ -274,7 +275,7 @@ public class AipsResource {
     }
 
     if (aipDescriptiveMetadata instanceof ObjectResponse) {
-      ObjectResponse<DescriptiveMetadata> dm = (ObjectResponse<DescriptiveMetadata>) aipDescriptiveMetadata;
+      ObjectResponse<org.roda.core.data.v2.ip.metadata.DescriptiveMetadata> dm = (ObjectResponse<org.roda.core.data.v2.ip.metadata.DescriptiveMetadata>) aipDescriptiveMetadata;
       return Response.ok(dm.getObject(), mediaType).build();
     } else {
       return ApiUtils.okResponse((StreamResponse) aipDescriptiveMetadata);
@@ -287,7 +288,7 @@ public class AipsResource {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @Operation(summary = "Update descriptive metadata", description = "Upload a descriptive metadata file to update an existing one", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DescriptiveMetadata.class))),
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = org.roda.core.data.v2.ip.metadata.DescriptiveMetadata.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response updateDescriptiveMetadataOnAIP(
     @Parameter(description = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
@@ -305,7 +306,7 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DescriptiveMetadata dm = Browser.updateAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
+    org.roda.core.data.v2.ip.metadata.DescriptiveMetadata dm = Browser.updateAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
       metadataVersion, inputStream);
 
     return Response.ok(dm, mediaType).build();
@@ -317,7 +318,7 @@ public class AipsResource {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @Operation(summary = "Create descriptive metadata", description = "Upload a new descriptive metadata file", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DescriptiveMetadata.class))),
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = org.roda.core.data.v2.ip.metadata.DescriptiveMetadata.class))),
     @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response createDescriptiveMetadataOnAIP(
     @Parameter(description = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
@@ -335,7 +336,7 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DescriptiveMetadata dm = Browser.createAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
+    org.roda.core.data.v2.ip.metadata.DescriptiveMetadata dm = Browser.createAIPDescriptiveMetadataFile(user, aipId, metadataId, metadataType,
       metadataVersion, inputStream);
 
     return Response.ok(dm, mediaType).build();
@@ -361,7 +362,7 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.deleteDescriptiveMetadataFile(user, aipId, null, metadataId);
+    DescriptiveMetadata.deleteDescriptiveMetadataFile(user, aipId, null, metadataId);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Descriptive metadata deleted"), mediaType)
       .build();
@@ -514,7 +515,7 @@ public class AipsResource {
     }
 
     if (filePreservationMetadata instanceof ObjectResponse) {
-      ObjectResponse<DescriptiveMetadata> dm = (ObjectResponse<DescriptiveMetadata>) filePreservationMetadata;
+      ObjectResponse<org.roda.core.data.v2.ip.metadata.DescriptiveMetadata> dm = (ObjectResponse<org.roda.core.data.v2.ip.metadata.DescriptiveMetadata>) filePreservationMetadata;
       return Response.ok(dm.getObject(), mediaType).build();
     } else {
       return ApiUtils.okResponse((StreamResponse) filePreservationMetadata);

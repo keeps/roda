@@ -164,7 +164,7 @@ public class TransferredResource {
         transferredResource = Browser.createTransferredResourceFile(user, parentUUID, fileName, inputStream,
           forceCommit);
       } else {
-        transferredResource = Browser.createTransferredResourcesFolder(user, parentUUID, name, forceCommit);
+        transferredResource = org.roda.wui.api.controllers.TransferredResources.createTransferredResourcesFolder(user, parentUUID, name, forceCommit);
       }
 
       return Response.ok(transferredResource, mediaType).build();
@@ -222,7 +222,7 @@ public class TransferredResource {
     // delegate action to controller
     SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<>(
       Collections.singletonList(path), org.roda.core.data.v2.ip.TransferredResource.class.getName());
-    Browser.deleteTransferredResources(user, selected);
+    org.roda.wui.api.controllers.TransferredResources.deleteTransferredResources(user, selected);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred resource deleted"), mediaType)
       .build();
@@ -247,7 +247,7 @@ public class TransferredResource {
     // delegate action to controller
     SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<>(paths,
       org.roda.core.data.v2.ip.TransferredResource.class.getName());
-    Browser.deleteTransferredResources(user, selected);
+    org.roda.wui.api.controllers.TransferredResources.deleteTransferredResources(user, selected);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred resources deleted"), mediaType)
       .build();

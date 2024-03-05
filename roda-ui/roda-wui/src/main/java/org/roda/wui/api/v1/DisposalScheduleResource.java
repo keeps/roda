@@ -71,7 +71,7 @@ public class DisposalScheduleResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
-    DisposalSchedules disposalSchedules = Browser.listDisposalSchedules(user);
+    DisposalSchedules disposalSchedules = Disposals.listDisposalSchedules(user);
 
     return Response.ok(disposalSchedules, mediaType).build();
   }
@@ -94,7 +94,7 @@ public class DisposalScheduleResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DisposalSchedule schedule = Browser.retrieveDisposalSchedule(user, scheduleId);
+    DisposalSchedule schedule = Disposals.retrieveDisposalSchedule(user, scheduleId);
 
     return Response.ok(schedule, mediaType).build();
   }

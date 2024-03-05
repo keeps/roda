@@ -4,6 +4,8 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
@@ -12,10 +14,14 @@ import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.common.ControllerAssistant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,5 +74,27 @@ public class RepresentationTypes {
     }
 
     return Pair.of(isControlled, types);
+  }
+
+  public static Job changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
+    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    controllerAssistant.checkObjectPermissions(user, selected);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return BrowserHelper.changeRepresentationType(user, selected, newType, details);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
+        RodaConstants.CONTROLLER_TYPE_PARAM, newType, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
+    }
   }
 }

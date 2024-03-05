@@ -15,9 +15,13 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 import org.roda.wui.common.server.ServerTools;
@@ -42,7 +46,7 @@ public class RepresentationInformations extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static RepresentationInformation createRepresentationInformation(User user, RepresentationInformation ri)
+  public static RepresentationInformation createRepresentationInformation(User user, org.roda.core.data.v2.ri.RepresentationInformation ri)
     throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -63,7 +67,7 @@ public class RepresentationInformations extends RodaWuiController {
     }
   }
 
-  public static RepresentationInformation updateRepresentationInformation(User user, RepresentationInformation ri)
+  public static RepresentationInformation updateRepresentationInformation(User user, org.roda.core.data.v2.ri.RepresentationInformation ri)
     throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -125,6 +129,113 @@ public class RepresentationInformations extends RodaWuiController {
     return familyAndTranslation;
   }
 
+  public static RepresentationInformation createRepresentationInformation(User user, RepresentationInformation ri,
+    RepresentationInformationExtraBundle extra) throws AuthorizationDeniedException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      return BrowserHelper.createRepresentationInformation(ri, extra, user.getName(), true);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM,
+        ri.getId());
+    }
+  }
+
+  public static void updateRepresentationInformation(User user, RepresentationInformation ri,
+    RepresentationInformationExtraBundle extra) throws AuthorizationDeniedException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      BrowserHelper.updateRepresentationInformation(ri, extra, user.getName(), true);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, ri.getId(), state,
+        RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM, ri.getId());
+    }
+  }
+
+  public static Job updateRepresentationInformationListWithFilter(User user,
+    SelectedItems<RepresentationInformation> representationInformationItems, String filterToAdd)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      return BrowserHelper.updateRepresentationInformationListWithFilter(representationInformationItems, filterToAdd,
+        user);
+    } catch (RequestNotValidException | GenericException | NotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM,
+        representationInformationItems);
+    }
+  }
+
+  public static Job deleteRepresentationInformation(User user, SelectedItems<RepresentationInformation> selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      return BrowserHelper.deleteRepresentationInformation(user, selected);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected);
+    }
+  }
+
+  public static Pair<String, Integer> retrieveRepresentationInformationWithFilter(User user, String riFilter)
+    throws RODAException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      return BrowserHelper.retrieveRepresentationInformationWithFilter(riFilter);
+    } catch (GenericException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_FILTER_PARAM,
+        riFilter);
+    }
+  }
   /*
    * ---------------------------------------------------------------------------
    * ---------------- REST related methods - end -------------------------------

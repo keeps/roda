@@ -223,7 +223,7 @@ public class FilesResource {
     String eventDetails = details == null ? "" : details;
 
     // delegate action to controller
-    Browser.deleteFile(user, fileUUID, eventDetails);
+    org.roda.wui.api.controllers.Files.deleteFile(user, fileUUID, eventDetails);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "File deleted"), mediaType).build();
   }
 

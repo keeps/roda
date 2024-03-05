@@ -25,6 +25,7 @@ import org.roda.core.data.v2.ri.RepresentationInformationList;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.controllers.RepresentationInformations;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
@@ -109,7 +110,7 @@ public class RepresentationInformationResource {
     ri = JsonUtils.getObjectFromJson(sanitize, RepresentationInformation.class);
 
     // delegate action to controller
-    RepresentationInformation newRepresentationInformation = org.roda.wui.api.controllers.RepresentationInformations
+    RepresentationInformation newRepresentationInformation = RepresentationInformations
       .createRepresentationInformation(user, ri);
     return Response.ok(newRepresentationInformation, mediaType).build();
   }
@@ -135,7 +136,7 @@ public class RepresentationInformationResource {
     ri = JsonUtils.getObjectFromJson(sanitize, RepresentationInformation.class);
 
     // delegate action to controller
-    RepresentationInformation updatedRepresentationInformation = org.roda.wui.api.controllers.RepresentationInformations
+    RepresentationInformation updatedRepresentationInformation = RepresentationInformations
       .updateRepresentationInformation(user, ri);
     return Response.ok(updatedRepresentationInformation, mediaType).build();
   }
@@ -187,7 +188,7 @@ public class RepresentationInformationResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    org.roda.wui.api.controllers.RepresentationInformations.deleteRepresentationInformation(user,
+    RepresentationInformations.deleteRepresentationInformation(user,
       representationInformationId);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Representation information deleted"), mediaType)
       .build();

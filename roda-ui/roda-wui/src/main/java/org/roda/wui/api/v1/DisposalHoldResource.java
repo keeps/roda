@@ -71,7 +71,7 @@ public class DisposalHoldResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
-    DisposalHolds disposalHolds = Browser.listDisposalHolds(user);
+    DisposalHolds disposalHolds = Disposals.listDisposalHolds(user);
 
     return Response.ok(disposalHolds, mediaType).build();
   }
@@ -94,7 +94,7 @@ public class DisposalHoldResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DisposalHold hold = Browser.retrieveDisposalHold(user, holdId);
+    DisposalHold hold = Disposals.retrieveDisposalHold(user, holdId);
 
     return Response.ok(hold, mediaType).build();
   }

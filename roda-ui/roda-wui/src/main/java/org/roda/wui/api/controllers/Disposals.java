@@ -9,6 +9,7 @@ package org.roda.wui.api.controllers;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -24,10 +25,13 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
@@ -71,6 +75,46 @@ public class Disposals extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_PARAM,
         disposalSchedule);
+    }
+  }
+
+  public static DisposalSchedule retrieveDisposalSchedule(User user, String scheduleId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().retrieveDisposalSchedule(scheduleId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, scheduleId, state, RodaConstants.DISPOSAL_SCHEDULE_ID, scheduleId);
+    }
+  }
+
+  public static DisposalSchedules listDisposalSchedules(User user)
+    throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listDisposalSchedules();
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
     }
   }
 
@@ -142,6 +186,46 @@ public class Disposals extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM, disposalHold);
+    }
+  }
+
+  public static DisposalHold retrieveDisposalHold(User user, String holdId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().retrieveDisposalHold(holdId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, holdId, state, RodaConstants.DISPOSAL_HOLD_ID, holdId);
+    }
+  }
+
+  public static DisposalHolds listDisposalHolds(User user)
+    throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listDisposalHolds();
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
     }
   }
 
@@ -480,7 +564,7 @@ public class Disposals extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // validate disposal rule
-    DisposalSchedules schedules = Browser.listDisposalSchedules(user);
+    DisposalSchedules schedules = Disposals.listDisposalSchedules(user);
     DisposalsHelper.validateDisposalRule(disposalRule, schedules);
 
     LogEntryState state = LogEntryState.SUCCESS;
@@ -567,6 +651,26 @@ public class Disposals extends RodaWuiController {
     }
   }
 
+  public static DisposalRules listDisposalRules(User user)
+    throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listDisposalRules();
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
+  }
+
   public static Job applyDisposalRules(User user, boolean applyToManuallyInclusive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -627,6 +731,46 @@ public class Disposals extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, ruleId, state, RodaConstants.DISPOSAL_RULE_ID, ruleId);
+    }
+  }
+
+  public static List<DisposalHoldAIPMetadata> listDisposalHoldsAssociation(User user, String aipId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listDisposalHoldsAssociation(aipId);
+    } catch (NotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(User user, String aipId)
+    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listTransitiveDisposalHolds(aipId);
+    } catch (NotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
     }
   }
 }

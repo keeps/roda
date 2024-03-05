@@ -70,7 +70,7 @@ public class DisposalRuleResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
-    DisposalRules disposalRules = Browser.listDisposalRules(user);
+    DisposalRules disposalRules = Disposals.listDisposalRules(user);
 
     return Response.ok(disposalRules, mediaType).build();
   }

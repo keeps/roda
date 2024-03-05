@@ -40,6 +40,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.UserUtility;
+import org.roda.wui.api.controllers.Aips;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -265,7 +266,7 @@ public class RepresentationsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Representation rep = Browser.createRepresentation(user, aipId, representationId, type, details);
+    Representation rep = org.roda.wui.api.controllers.Representations.createRepresentation(user, aipId, representationId, type, details);
     return Response.ok(rep, mediaType).build();
   }
 
@@ -289,7 +290,7 @@ public class RepresentationsResource {
     String eventDetails = details == null ? "" : details;
 
     // delegate action to controller
-    Browser.deleteRepresentation(user, SelectedItemsList.create(IndexedRepresentation.class, representationId),
+    org.roda.wui.api.controllers.Representations.deleteRepresentation(user, SelectedItemsList.create(IndexedRepresentation.class, representationId),
       eventDetails);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Representation deleted"), mediaType).build();
   }
