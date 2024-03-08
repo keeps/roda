@@ -1,5 +1,20 @@
 # Changelog
 
+## v5.5.1 (08/03/2024)
+#### Bug fixes
+- Remove "opt-in" from roda-core.properties #3113
+- Fix ns2 namespace in premis.xml when creating technical metadata  #3114 
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+
+---
+
 ## v5.5.0 (04/03/2024)
 #### New features
 -  Support for generic technical metadata creation and visualization #3097
@@ -491,16 +506,4 @@ docker pull keeps/roda:v3.6.2
 Install for demonstration:
 ```
 docker pull keeps/roda:v4.2.1
-```
-
----
-
-## v3.6.1 (26/01/2022)
-### Bug fixes:
-
-- Update Dockerfile base image
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.6.1
 ```
