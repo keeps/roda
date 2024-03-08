@@ -133,8 +133,8 @@ public class RepresentationsResource {
   }
 
   @GET
-  @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID + "}/"
-    + RodaConstants.API_REST_V1_REPRESENTATION_OTHER_METADATA + "}/")
+  @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID + "}/{"
+    + RodaConstants.API_REST_V1_REPRESENTATION_OTHER_METADATA + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_ZIP,
     ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
