@@ -13,9 +13,12 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-
+import org.glassfish.jaxb.runtime.api.JAXBRIContext;
+import org.roda.core.common.characterization.model.TechnicalMetadata;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -46,7 +49,7 @@ public final class MetadataUtils {
 
   }
 
-  public static ContentPayload saveToContentPayload(final JAXBElement<?> object, final Class<?> tClass) {
+  public static ContentPayload saveToContentPayload(final JAXBElement<?> object, final Class<?>... tClass) {
     return new InputStreamContentPayload(() -> {
       try {
         return createInputStream(object, tClass);
@@ -56,22 +59,13 @@ public final class MetadataUtils {
     });
   }
 
-  public static InputStream createInputStream(final JAXBElement<?> object, final Class<?> tClass)
+  public static InputStream createInputStream(final JAXBElement<?> object, final Class<?>... tClass)
     throws ValidationException {
     try {
       StringWriter writer = new StringWriter();
 
-      //Add tClass to class list
-      additionalClasses.add(tClass);
-
-      // Copy existing classes to the new array
-      Class<?>[] classesArray = additionalClasses.toArray(new Class<?>[0]);
-
-      //clean array
-      additionalClasses.clear();
-
-      // Add the new class to the end of the new array
-      JAXBContext jaxbContext = JAXBContext.newInstance(classesArray);
+      final Map<String, String> props = Collections.singletonMap(JAXBRIContext.DEFAULT_NAMESPACE_REMAP, "http://www.loc.gov/premis/v3");
+      final JAXBContext jaxbContext = JAXBContext.newInstance(tClass, props);
       Marshaller marshaller = jaxbContext.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
       marshaller.marshal(object, writer);
@@ -96,11 +90,5 @@ public final class MetadataUtils {
 
     report.setIssues(issues);
     return report;
-  }
-
-  public static void addAdditionalClasses(Class additionalClass) {
-    additionalClasses.add(TechnicalMetadataElement.class);
-    additionalClasses.add(TechnicalMetadata.class);
-    additionalClasses.add(additionalClass);
   }
 }

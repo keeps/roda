@@ -5,21 +5,19 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.common;
+package org.roda.core.common.characterization.model;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlSeeAlso;
 
 /**
  * @author Carlos Afonso <cafonso@keep.pt>
  */
-@XmlRootElement(name = "metadata")
+@XmlRootElement(name = "featureExtractor")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlSeeAlso({TechnicalMetadataElement.class})
 public class TechnicalMetadata {
 
   @XmlAttribute
@@ -32,6 +30,7 @@ public class TechnicalMetadata {
   private String digest;
   @XmlAttribute
   private String algorithm;
+
   @XmlElement(name = "metadata")
   private TechnicalMetadataElement technicalMetadataElement;
 
@@ -112,5 +111,4 @@ public class TechnicalMetadata {
   public void setTechnicalMetadataElement(TechnicalMetadataElement technicalMetadataElement) {
     this.technicalMetadataElement = technicalMetadataElement;
   }
-
 }

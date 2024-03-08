@@ -40,6 +40,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.characterization.model.TechnicalMetadata;
+import org.roda.core.common.characterization.model.TechnicalMetadataField;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -202,8 +204,8 @@ public final class PremisV3Utils {
     }
 
     // Create element based on the class technicalMetadata
-    JAXBElement<TechnicalMetadata> dataElement = new JAXBElement<>(new QName("metadata", type), TechnicalMetadata.class,
-      technicalMetadata.getTechnicalMetadataElement().getSubClass(), technicalMetadata);
+    JAXBElement<TechnicalMetadata> dataElement = new JAXBElement<>(new QName("", type),
+      TechnicalMetadata.class, null, technicalMetadata);
 
     // Add to objectCharacteristicsExtension
     ect.getAny().add(dataElement);
@@ -1056,6 +1058,17 @@ public final class PremisV3Utils {
     }
   }
 
+  public static ContentPayload fileToBinary(gov.loc.premis.v3.File file, Class<?>... additionalClass)
+    throws GenericException, ValidationException {
+    if (additionalClass == null || additionalClass.length == 0) {
+      return MetadataUtils.saveToContentPayload(FACTORY.createObject(file), gov.loc.premis.v3.File.class);
+    }
+
+    List<Class<?>> tClasses = new ArrayList<>(Arrays.asList(additionalClass));
+    tClasses.add(gov.loc.premis.v3.File.class);
+    return MetadataUtils.saveToContentPayload(FACTORY.createObject(file), tClasses.toArray(new Class<?>[0]));
+  }
+
   public static ContentPayload fileToBinary(gov.loc.premis.v3.File file) throws GenericException, ValidationException {
     return MetadataUtils.saveToContentPayload(FACTORY.createObject(file), gov.loc.premis.v3.File.class);
   }
@@ -1118,8 +1131,8 @@ public final class PremisV3Utils {
       PremisV3Utils.updateTechnicalMetadata(premisFile, technicalMetadata);
       PreservationMetadataType pmtype = PreservationMetadataType.FILE;
       String id = IdUtils.getPreservationFileId(fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
-      MetadataUtils.addAdditionalClasses(technicalMetadata.getTechnicalMetadataElement().getSubClass());
-      ContentPayload premisFilePayload = fileToBinary(premisFile);
+      ContentPayload premisFilePayload = fileToBinary(premisFile, TechnicalMetadata.class,
+        TechnicalMetadataField.class);
       model.updatePreservationMetadata(id, pmtype, aipId, representationId, fileDirectoryPath, fileId,
         premisFilePayload, username, notify);
     } catch (RODAException | IOException | JAXBException e) {
