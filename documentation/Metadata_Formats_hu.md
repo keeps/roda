@@ -558,7 +558,7 @@ A következő példa azt mutatja be, hogyan lehet egy Simple Dublin Core fájlt 
 A _Editing_ tevékenységet egy konfigurációs fájl támogatja, amely utasítja a repozóriumot, hogyan jelenítsen meg egy űrlapot a meglévő metaadatok szerkesztéséhez. A konfigurációs fájl azt a célt is szolgálja, hogy egy sablont adjon egy új metaadatelem létrehozásához, néhány előre definiált attribútumot már kitöltve.
 
 Az űrlap sablonokat a konfigurációhoz a `[RODA_HOME]/config/templates/` mappában kell hozzáadni. A következő példa azt mutatja, hogyan lehet egy sablonfájlt olyan megjegyzésekkel kombinálni, amelyek a metaadat-szerkesztő megjelenítésére szolgálnak.
-
+<!--- {% raw %} --->
 ```
 {{~field name="title"   order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title/string()"}}
 {{~field name="id"      order='1' auto-generate='id' label="{'en': 'ID'}" xpath="//*:identifier/string()"}}
@@ -586,7 +586,7 @@ Az űrlap sablonokat a konfigurációhoz a `[RODA_HOME]/config/templates/` mapp�
 ```
 
 A Form sablon fájlok a nagy teljesítményű [Handlebars engine](http://handlebarsjs.com) alapján készültek. Minden egyes mezőt, amelyet a metaadat-szerkesztőben várhatóan megjelenítünk, a fájl elején egy _mező_ handle-lel kell azonosítani (pl. `{{~field name="title"~}}`). Az egyes mezők megjelenítésének módját több opcióval is módosíthatjuk. Ezek az opciók kulcs-érték párok, pl. `címke="A munka címe"`, ahol a kulcs az opció neve, az érték pedig az opciónak adott érték.
-
+<!--- {% endraw %} --->
 A rendelkezésre álló, a mezők viselkedését megváltoztató beállítások a következők:
 
 *   **sorrend** - a sorrend, amely szerint a mezőt a metaadat-szerkesztőben meg kell jeleníteni.
@@ -643,7 +643,7 @@ A rendelkezésre álló, a mezők viselkedését megváltoztató beállítások 
         </select>
 
 #### Teljes példa egy "lista" mezőre
-
+<!--- {% raw %} --->
     {{~field
       name="statusDescription"
       order="470"
@@ -659,7 +659,7 @@ A rendelkezésre álló, a mezők viselkedését megváltoztató beállítások 
 Az alábbiakban egy példát mutatunk be a címkék használatára:
 
     {{~file name="title" order="1" type="text" label="Template title" mandatory="true" auto-generate="title"~}}
-
+<!--- {% endraw %} --->
 ## Az új formátum aktiválása
 
 Miután az előző szakaszban leírt összes fájlt hozzáadtuk, engedélyeznünk kell őket a repozitóriumban. Ehhez a következő műveleteket kell elvégezni.
