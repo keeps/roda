@@ -1,5 +1,19 @@
 # Changelog
 
+## v5.5.2 (11/03/2024)
+#### Bug fixes
+- Fixed other metadata download #3117
+
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+
+---
+
 ## v5.5.1 (08/03/2024)
 #### Bug fixes
 - Remove "opt-in" from roda-core.properties #3113
@@ -490,20 +504,4 @@ docker pull keeps/roda:v3.6.3
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.6.2
-```
----
-
-## v4.2.1 (15/02/2022)
-### Bug fixes:
-
-- CAS Login issue when user with the same email already exists #1988
-
-### Enhancements:
-
-- Add under appraisel status to transferred resources deletion #1989
-- Replace embed marked.js by webjar #1983
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.2.1
 ```
