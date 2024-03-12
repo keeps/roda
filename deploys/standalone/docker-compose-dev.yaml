@@ -65,6 +65,22 @@ services:
     ports:
       - "1025:1025" # smtp server
       - "8025:8025" # web ui
+
+  openldap:
+    image: docker.io/bitnami/openldap:2.6
+    user: 1001:root
+    ports:
+      - "1389:1389"
+      - "1636:1636"
+    environment:
+      - BITNAMI_DEBUG=true
+      - LDAP_ROOT=dc=roda,dc=org
+      - LDAP_SKIP_DEFAULT_TREE=yes
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=roda
+      - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
+    volumes:
+      - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 volumes:
   zookeeper_data:
   zookeeper_datalog:
