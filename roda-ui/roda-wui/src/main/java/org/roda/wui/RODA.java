@@ -11,9 +11,12 @@ import org.apereo.cas.client.session.SingleSignOutHttpSessionListener;
 import org.roda.wui.filter.OnOffFilter;
 import org.roda.wui.servlets.ContextListener;
 import org.roda.wui.servlets.RodaWuiServlet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +32,8 @@ import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.http.HttpServlet;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "org.roda.wui.api.v2")
+@ComponentScan(basePackages = {"org.roda.*"})
+@ServletComponentScan
 public class RODA {
   public static void main(String[] args) {
     SpringApplication.run(RODA.class, args);
@@ -40,10 +44,16 @@ public class RODA {
     return new ServletListenerRegistrationBean<>(new ContextListener());
   }
 
+  @Autowired
+  AutowireCapableBeanFactory beanFactory;
+
   @Bean
   public ServletRegistrationBean<HttpServlet> initService() {
-    ServletRegistrationBean<HttpServlet> bean;
-    bean = new ServletRegistrationBean<>(new RodaWuiServlet(), "/info");
+    ServletRegistrationBean<HttpServlet> bean = new ServletRegistrationBean<>();
+    final RodaWuiServlet servlet = new RodaWuiServlet();
+    beanFactory.autowireBean(servlet);
+    bean.setServlet(servlet);
+    bean.addUrlMappings("/info");
     bean.setLoadOnStartup(1);
     return bean;
   }

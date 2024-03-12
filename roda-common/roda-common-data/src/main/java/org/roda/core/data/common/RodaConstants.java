@@ -812,6 +812,7 @@ public final class RodaConstants {
   public static final String CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PRIORITY = "internal_jobs_priority";
   public static final String CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PARALLELISM = "internal_jobs_parallelism";
 
+  public static final String CORE_LDAP_DEFAULT_URL = "ldap://localhost";
   public static final int CORE_LDAP_DEFAULT_PORT = 10389;
   public static final String CORE_LDAP_BACKEND_JDBM = "JDBM";
   public static final String CORE_LDAP_BACKEND_LDIF = "LDIF";

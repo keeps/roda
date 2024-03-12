@@ -69,9 +69,16 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${springboot.version}</version>
                         <configuration>
+                            <skip>false</skip>
                             <mainClass>org.roda.wui.RODA</mainClass>
                             <layout>WAR</layout>
                             <excludeDevtools>true</excludeDevtools>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.project</groupId>
+                                    <artifactId>gwt-dev</artifactId>
+                                </exclude>
+                            </excludes>
                         </configuration>
                         <executions>
                             <execution>
@@ -83,7 +90,6 @@
                     </plugin>
                 </plugins>
             </build>
-
             <properties>
                 <!-- The main class to start by executing java -jar -->
                 <start-class>org.roda.wui.RODA</start-class>
@@ -222,7 +228,7 @@
                                 <!-- Remove after upgrade to spring-boot 3-->
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
                                 <!-- Remove -->
-                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
+                                -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005
                                 -Droda.environment.collect.version=false
                                 --add-opens java.base/java.util=ALL-UNNAMED
                                 --add-opens java.base/java.lang=ALL-UNNAMED
