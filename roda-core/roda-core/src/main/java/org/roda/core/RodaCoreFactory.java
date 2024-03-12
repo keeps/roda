@@ -140,6 +140,7 @@ import org.roda.core.index.utils.ZkController;
 import org.roda.core.migration.MigrationManager;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ApacheLdapUtility;
 import org.roda.core.model.utils.LdapUtility;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginManager;
@@ -177,7 +178,6 @@ import io.prometheus.client.hotspot.DefaultExports;
  */
 public class RodaCoreFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaCoreFactory.class);
-
   private static boolean instantiated = false;
   private static boolean instantiatedWithoutErrors = true;
   private static NodeType nodeType;
@@ -291,8 +291,7 @@ public class RodaCoreFactory {
             }
           }
 
-          List<String> properties = RodaCoreFactory
-            .getRodaConfigurationAsList("ui.display.properties.tika.fixed");
+          List<String> properties = RodaCoreFactory.getRodaConfigurationAsList("ui.display.properties.tika.fixed");
           for (String propertyKey : properties) {
             if (messages.containsTranslation(propertyKey)) {
               sharedProperties.put("i18n." + propertyKey,
@@ -379,6 +378,11 @@ public class RodaCoreFactory {
 
   public static boolean checkIfWriteIsAllowed(NodeType nodeType) {
     return nodeType != NodeType.REPLICA;
+  }
+
+  public static void instantiate(LdapUtility ldapUtility) {
+    RodaCoreFactory.ldapUtility = ldapUtility;
+    RodaCoreFactory.instantiate();
   }
 
   public static void instantiate() {
@@ -1704,11 +1708,13 @@ public class RodaCoreFactory {
       final String rodaAdministratorsDN = rodaConfig.getString("core.ldap.rodaAdministratorsDN",
         rodaConfig.getString("ldap.rodaAdministratorsDN", "cn=administrators,ou=groups,dc=roda,dc=org"));
 
-      RodaCoreFactory.ldapUtility = new LdapUtility(ldapStartServer, ldapPort, ldapBaseDN, ldapPeopleDN, ldapGroupsDN,
-        ldapRolesDN, ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers,
-        ldapProtectedGroups, rodaGuestDN, rodaAdminDN, rodaApacheDSDataDirectory);
-      ldapUtility.setRODAAdministratorsDN(rodaAdministratorsDN);
+      if (RodaCoreFactory.ldapUtility == null) {
+        RodaCoreFactory.ldapUtility = new ApacheLdapUtility(ldapStartServer, ldapPort, ldapBaseDN, ldapPeopleDN,
+          ldapGroupsDN, ldapRolesDN, ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers,
+          ldapProtectedGroups, rodaGuestDN, rodaAdminDN, rodaApacheDSDataDirectory);
+      }
 
+      ldapUtility.setRODAAdministratorsDN(rodaAdministratorsDN);
       UserUtility.setLdapUtility(ldapUtility);
 
       if (!FSUtils.exists(rodaApacheDSDataDirectory) || FSUtils.isDirEmpty(rodaApacheDSDataDirectory)) {

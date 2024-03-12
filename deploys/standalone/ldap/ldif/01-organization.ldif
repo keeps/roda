@@ -1,0 +1,19 @@
+version: 1
+
+dn: dc=roda,dc=org
+objectClass: dcObject
+objectClass: organization
+dc: roda
+o: roda
+
+dn: ou=groups,dc=roda,dc=org
+objectClass: organizationalUnit
+ou: groups
+
+dn: ou=users,dc=roda,dc=org
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=roles,dc=roda,dc=org
+objectClass: organizationalUnit
+ou: users

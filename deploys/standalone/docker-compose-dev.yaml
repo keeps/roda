@@ -59,6 +59,21 @@ services:
       - URL=http://localhost:8080/api/openapi.json
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
+
+  openldap:
+    image: bitnami/openldap:latest
+    user: 1001:root
+    ports:
+      - "1389:1389"
+      - "1636:1636"
+    environment:
+      - BITNAMI_DEBUG=true
+      - LDAP_ROOT=dc=roda,dc=org
+      - LDAP_SKIP_DEFAULT_TREE=yes
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=roda
+    volumes:
+      - ./ldap/ldif:/ldifs
 volumes:
   zookeeper_data:
   zookeeper_datalog:

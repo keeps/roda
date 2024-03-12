@@ -1,0 +1,35 @@
+package org.roda.core.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.ldap.repository.config.EnableLdapRepositories;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
+
+/**
+ * @author Gabriel Barros <gbarros@keep.pt>
+ */
+@Configuration
+@EnableLdapRepositories(basePackages = {"org.roda.*"})
+public class LdapConfig {
+
+  @Autowired
+  ApplicationContext applicationContext;
+
+  @Bean
+  public LdapContextSource contextSource() {
+    LdapContextSource contextSource = new LdapContextSource();
+    contextSource.setUrl("ldap://localhost:1389");
+    contextSource.setBase("dc=roda,dc=org");
+    contextSource.setUserDn("cn=admin,dc=roda,dc=org");
+    contextSource.setPassword("roda");
+    return contextSource;
+  }
+
+  @Bean
+  public LdapTemplate ldapTemplate() {
+    return new LdapTemplate(contextSource());
+  }
+}
