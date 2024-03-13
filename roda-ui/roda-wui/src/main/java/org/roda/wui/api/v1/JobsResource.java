@@ -10,8 +10,8 @@ package org.roda.wui.api.v1;
 import java.util.ArrayList;
 
 import org.glassfish.jersey.server.JSONP;
-import org.roda.core.common.EntityResponse;
-import org.roda.core.common.StreamResponse;
+import org.roda.core.data.v2.EntityResponse;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.select.SelectedItems;

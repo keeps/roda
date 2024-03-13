@@ -14,9 +14,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -41,6 +43,7 @@ import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -210,8 +213,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     this.dataProvider = new MyAsyncDataProvider<T>(display, fieldsToReturn, new IndexResultDataProvider<T>() {
 
       @Override
-      public void getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn,
-        final AsyncCallback<IndexResult<T>> callback) {
+      public void getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn, final AsyncCallback<IndexResult<T>> callback) {
         AsyncTableCell.this.getData(AsyncTableCell.this.getFilter(), sublist, sorter, fieldsToReturn,
           new AsyncCallback<IndexResult<T>>() {
 
@@ -606,8 +608,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     };
   }
 
-  private void getData(Filter filter, Sublist sublist, Sorter sorter, List<String> fieldsToReturn,
-    AsyncCallback<IndexResult<T>> callback) {
+  private void getData(Filter filter, Sublist sublist, Sorter sorter, List<String> fieldsToReturn, AsyncCallback<IndexResult<T>> callback) {
     if (isSearchRestricted()) {
       callback.onSuccess(null);
     } else {
@@ -615,10 +616,15 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     }
   }
 
-  private void getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn,
-    AsyncCallback<IndexResult<T>> callback) {
+  private void getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn, AsyncCallback<IndexResult<T>> callback) {
     BrowserService.Util.getInstance().find(getClassToReturn().getName(), getFilter(), sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), fieldsToReturn, callback);
+  }
+
+  private CompletableFuture<Object> getData2(Sublist sublist, Sorter sorter, List<String> fieldsToReturn) {
+    FindRequest findRequest = new FindRequest(getClassToReturn().getName(), getFilter(), sorter, sublist, getFacets(), getJustActive());
+    findRequest.fieldsToReturn = fieldsToReturn;
+    return Services.index(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()));
   }
 
   protected abstract Sorter getSorter(ColumnSortList columnSortList);

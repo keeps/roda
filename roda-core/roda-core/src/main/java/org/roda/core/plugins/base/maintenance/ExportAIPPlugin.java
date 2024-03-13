@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.common.DownloadUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.ExportType;

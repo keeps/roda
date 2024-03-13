@@ -19,11 +19,11 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.ConsumesOutputStream;
-import org.roda.core.common.ConsumesSkipableOutputStream;
+import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.ConsumesSkipableOutputStream;
 import org.roda.core.common.DownloadUtils;
-import org.roda.core.common.EntityResponse;
-import org.roda.core.common.StreamResponse;
+import org.roda.core.data.v2.EntityResponse;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -136,7 +136,9 @@ public class ApiUtils {
     } else if (StringUtils.isNotBlank(acceptHeaders)) {
       if (acceptHeaders.contains(MediaType.APPLICATION_XML)) {
         mediaType = MediaType.APPLICATION_XML;
-      } else if (acceptHeaders.contains(applicationJs)
+      } else  if (acceptHeaders.contains(MediaType.APPLICATION_JSON)) {
+        mediaType = MediaType.APPLICATION_JSON;
+      } else  if (acceptHeaders.contains(applicationJs)
         || acceptHeaders.contains(ExtraMediaType.APPLICATION_JAVASCRIPT)) {
         mediaType = applicationJs;
       } else if (acceptHeaders.contains(ExtraMediaType.TEXT_CSV)) {

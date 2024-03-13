@@ -5,13 +5,21 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.common;
+package org.roda.core.data.v2;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 
-public interface ConsumesSkipableOutputStream extends ConsumesOutputStream {
+public interface ConsumesOutputStream {
+  void consumeOutputStream(OutputStream out) throws IOException;
 
-  void consumeOutputStream(OutputStream output, int from, int len) throws IOException;
+  long getSize();
+
+  Date getLastModified();
+
+  String getFileName();
+
+  String getMediaType();
 
 }

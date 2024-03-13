@@ -20,11 +20,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.server.JSONP;
-import org.roda.core.common.EntityResponse;
-import org.roda.core.common.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.EntityResponse;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -100,6 +100,28 @@ public class TransferredResource {
   }
 
   @GET
+  @Path("/binary/{" + RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID + "}")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @Operation(summary = "Get transferred resource", description = "Gets a particular transferred resource", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TransferredResource.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
+  public Response getResourceBinary(
+    @Parameter(description = "The resource id", required = false) @PathParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String resourceId)
+    throws RODAException {
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    EntityResponse response = Browser.retrieveTransferredResourceBinary(user, resourceId);
+
+
+    return ApiUtils.okResponse((StreamResponse) response);
+
+  }
+
+  @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
@@ -107,24 +129,17 @@ public class TransferredResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TransferredResource.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response getResource(
-    @Parameter(description = "The resource id", required = false) @PathParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String resourceId,
-    @Parameter(description = "Choose format in which to get the resource", schema = @Schema(implementation = RodaConstants.GetFileMediaTypes.class, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    @Parameter(description = "The resource id", required = false) @PathParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String resourceId)
     throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    EntityResponse response = Browser.retrieveTransferredResource(user, resourceId, acceptFormat);
+    org.roda.core.data.v2.ip.TransferredResource tr = Browser.retrieveTransferredResource(user, resourceId);
 
-    if (response instanceof ObjectResponse) {
-      ObjectResponse<org.roda.core.data.v2.ip.TransferredResource> tr = (ObjectResponse<org.roda.core.data.v2.ip.TransferredResource>) response;
-      return Response.ok(tr.getObject(), mediaType).build();
-    } else {
-      return ApiUtils.okResponse((StreamResponse) response);
-    }
+    return Response.ok(tr).build();
+
   }
 
   /*

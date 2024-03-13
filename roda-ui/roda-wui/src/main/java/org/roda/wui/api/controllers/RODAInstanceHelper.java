@@ -18,7 +18,7 @@ import org.glassfish.jersey.media.multipart.BodyPartEntity;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.EntityResponse;
+import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.common.synchronization.BundleManifestCreator;
 import org.roda.core.data.common.RodaConstants;

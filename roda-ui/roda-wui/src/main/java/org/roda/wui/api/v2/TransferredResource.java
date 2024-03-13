@@ -1,0 +1,274 @@
+
+package org.roda.wui.api.v2;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import org.apache.commons.lang3.StringUtils;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.server.JSONP;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.user.User;
+import org.roda.core.model.utils.UserUtility;
+import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.v1.utils.ApiResponseMessage;
+import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.ExtraMediaType;
+import org.roda.wui.client.services.TransferredResourceService;
+import org.roda.wui.common.I18nUtility;
+
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+
+/**
+ * @author António Lindo <alindo@keep.pt>
+ */
+
+@Path(TransferredResource.ENDPOINT)
+@Tag(name = TransferredResource.SWAGGER_ENDPOINT)
+public class TransferredResource implements TransferredResourceService {
+  public static final String ENDPOINT = "/v2/transfers";
+  public static final String SWAGGER_ENDPOINT = "v2 transfers";
+  @Context
+  private HttpServletRequest request;
+
+  @Override
+  public List<org.roda.core.data.v2.ip.TransferredResource> listTransferredResources(String start, String limit, String acceptFormat,
+                                                                                     String jsonpCallbackName) throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    boolean justActive = false;
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+
+    IndexResult<org.roda.core.data.v2.ip.TransferredResource> result = Browser.find(org.roda.core.data.v2.ip.TransferredResource.class, Filter.ALL, Sorter.NONE,
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
+    return result.getResults();
+
+  }
+
+  @Override
+  public List<org.roda.core.data.v2.ip.TransferredResource> getSelectedTransferredResources(SelectedItems<org.roda.core.data.v2.ip.TransferredResource> selected)
+    throws RODAException {
+    User user = UserUtility.getApiUser(request);
+
+    return Browser.retrieveSelectedTransferredResource(user, selected);
+  }
+
+  @Override
+  public Job moveTransferredResources(SelectedItems<org.roda.core.data.v2.ip.TransferredResource> items, String resourceId) throws RODAException {
+    User user = UserUtility.getApiUser(request);
+    if (resourceId != null) {
+      return Browser.moveTransferredResource(user, items, getResource(resourceId));
+    } else {
+      return Browser.moveTransferredResource(user, items, null);
+    }
+
+  }
+
+  @Override
+  public org.roda.core.data.v2.ip.TransferredResource getResource(String resourceId) {
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    try {
+      // delegate action to controller
+      return Browser.retrieveTransferredResource(user, resourceId);
+    } catch (RODAException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @GET
+  @Path("/binary/{" + RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID + "}")
+  @Produces({MediaType.APPLICATION_OCTET_STREAM})
+  @Operation(summary = "Get transferred resource", description = "Gets a particular transferred resource", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = org.roda.wui.api.v1.TransferredResource.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
+  public Response getResourceBinary(
+    @Parameter(description = "The resource id", required = false) @PathParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String resourceId) {
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    try {
+      // delegate action to controller
+      return ApiUtils.okResponse((StreamResponse) Browser.retrieveTransferredResourceBinary(user, resourceId));
+    } catch (RODAException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @POST
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @Operation(summary = "Create transferred resource", description = "Creates a new transferred resource", responses = {
+    @ApiResponse(responseCode = "201", description = "OK", content = @Content(schema = @Schema(implementation = org.roda.core.data.v2.ip.TransferredResource.class))),
+    @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
+  public Response createResource(
+    @Parameter(description = "The id of the parent") @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID) String parentUUID,
+    @Parameter(description = "The name of the directory to create") @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_DIRECTORY_NAME) String name,
+    @Parameter(description = "Locale") @QueryParam(RodaConstants.LOCALE) String localeString,
+    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
+    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
+    @Parameter(description = "Commit after creation", schema = @Schema(defaultValue = "false")) @QueryParam(RodaConstants.API_QUERY_PARAM_COMMIT) String commitString)
+    throws RODAException {
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    try {
+      org.roda.core.data.v2.ip.TransferredResource transferredResource;
+      String fileName = fileDetail.getFileName();
+      boolean forceCommit = false;
+      if (StringUtils.isNotBlank(commitString)) {
+        forceCommit = Boolean.parseBoolean(commitString);
+      }
+
+      if (name == null) {
+        transferredResource = Browser.createTransferredResourceFile(user, parentUUID, fileName, inputStream,
+          forceCommit);
+      } else {
+        transferredResource = Browser.createTransferredResourcesFolder(user, parentUUID, name, forceCommit);
+      }
+
+      return Response.ok(transferredResource).build();
+    } catch (AlreadyExistsException e) {
+      return Response.status(Response.Status.CONFLICT).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+        I18nUtility.getMessage("ui.upload.error.alreadyexists", e.getMessage(), localeString))).build();
+    }
+  }
+
+
+
+  @PUT
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @Operation(summary = "Update transferred resource", description = "Updates an existing transferred resource", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = org.roda.wui.api.v1.TransferredResource.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
+  public Response updateTransferredResource(
+    @Parameter(description = "The relative path of the resource") @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH) String relativePath,
+    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
+    @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
+    @Parameter(description = "Choose format in which to get the response", schema = @Schema(implementation = RodaConstants.APIMediaTypes.class)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    try {
+      Browser.updateTransferredResource(user, Optional.of(relativePath), inputStream, fileDetail.getFileName(), false);
+      return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred resources updated"), mediaType)
+        .build();
+    } catch (IOException e) {
+      return ApiUtils.errorResponse(new TransformerException(e.getMessage()));
+    }
+  }
+
+  @Override
+  public void deleteResource(String path, String acceptFormat, String jsonpCallbackName) throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<>(
+      Collections.singletonList(path), org.roda.core.data.v2.ip.TransferredResource.class.getName());
+    Browser.deleteTransferredResources(user, selected);
+  }
+
+  @Override
+  public Void deleteMultipleResources(List<String> paths)
+    throws RODAException {
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<>(paths,
+      org.roda.core.data.v2.ip.TransferredResource.class.getName());
+
+    Browser.deleteTransferredResources(user, selected);
+
+    return null;
+  }
+
+  @Override
+  public org.roda.core.data.v2.ip.TransferredResource renameTransferredResource(String resourceId, String newName, Boolean replaceExisting) throws RODAException {
+    User user = UserUtility.getApiUser(request);
+    return getResource(Browser.renameTransferredResource(user, resourceId, newName, replaceExisting));
+  }
+
+  @Override
+  public org.roda.core.data.v2.ip.TransferredResource createTransferredResourcesFolder(String parentUUID, String folderName, String commitString) throws RODAException {
+    User user = UserUtility.getApiUser(request);
+
+    return Browser.createTransferredResourcesFolder(user, parentUUID, folderName, Boolean.parseBoolean(commitString));
+  }
+
+
+
+
+  @Override
+  public Void refreshTransferResource(String transferredResourceRelativePath) throws RODAException {
+    User user = UserUtility.getApiUser(request);
+    Browser.updateTransferredResources(user,
+      transferredResourceRelativePath != null ? Optional.of(transferredResourceRelativePath) : Optional.empty(),
+      true);
+    return null;
+  }
+
+  @Override
+  public org.roda.core.data.v2.ip.TransferredResource reindexResources(String path, String acceptFormat, String jsonpCallbackName)
+    throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    org.roda.core.data.v2.ip.TransferredResource resource = Browser.reindexTransferredResource(user, path);
+    return resource;
+
+  }
+}
+

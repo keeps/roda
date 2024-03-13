@@ -17,8 +17,8 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import org.roda.core.common.ConsumesOutputStream;
-import org.roda.core.common.StreamResponse;
+import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;

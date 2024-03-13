@@ -24,10 +24,10 @@ import java.util.Optional;
 import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.ConsumesOutputStream;
-import org.roda.core.common.EntityResponse;
+import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.common.Messages;
-import org.roda.core.common.StreamResponse;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -2150,7 +2150,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static EntityResponse retrieveTransferredResource(User user, String resourceId, String acceptFormat)
+  public static TransferredResource retrieveTransferredResource(User user, String resourceId)
     throws RODAException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2160,8 +2160,29 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return BrowserHelper.retrieveTransferredResource(
-        BrowserHelper.retrieve(TransferredResource.class, resourceId, new ArrayList<>()), acceptFormat);
+      return  BrowserHelper.retrieve(TransferredResource.class, resourceId, new ArrayList<>());
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, resourceId, state, RodaConstants.CONTROLLER_RESOURCE_ID_PARAM,
+        resourceId);
+    }
+  }
+
+  public static EntityResponse retrieveTransferredResourceBinary(User user, String resourceId)
+    throws RODAException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return BrowserHelper.retrieveTransferredResourceBinary(
+        BrowserHelper.retrieve(TransferredResource.class, resourceId, new ArrayList<>()));
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -2605,7 +2626,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static String renameTransferredResource(User user, String transferredResourceId, String newName)
+  public static String renameTransferredResource(User user, String transferredResourceId, String newName, Boolean replaceExisting)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2617,7 +2638,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      return BrowserHelper.renameTransferredResource(transferredResourceId, newName);
+      return BrowserHelper.renameTransferredResource(transferredResourceId, newName, replaceExisting);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
