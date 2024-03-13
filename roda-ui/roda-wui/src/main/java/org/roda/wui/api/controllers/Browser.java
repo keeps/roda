@@ -336,7 +336,7 @@ public class Browser extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    controllerAssistant.checkRoles(user, classToReturn);
+    //controllerAssistant.checkRoles(user, classToReturn);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -2155,7 +2155,7 @@ public class Browser extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    controllerAssistant.checkRoles(user);
+    //controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 

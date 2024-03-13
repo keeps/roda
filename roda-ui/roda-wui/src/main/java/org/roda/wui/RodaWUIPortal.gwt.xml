@@ -6,6 +6,7 @@
 	<inherits name="com.google.gwt.http.HTTP" />
 	<inherits name="com.google.gwt.logging.Logging" />
 	<inherits name="com.google.gwt.resources.Resources" />
+	<inherits name="org.fusesource.restygwt.RestyGWT"/>
 	<source path="client" />
 
 	<!-- I18N -->
@@ -43,5 +44,5 @@
 	<!-- <stylesheet src="Main.css" /> Replaced by MyResources -->
 	<stylesheet src="../api/v1/theme?resource_id=theme.css" />
 	<stylesheet src="../api/v1/theme?resource_id=printing.css" />
-	<!-- collapse-all-properties />
+	<collapse-all-properties />
 </module>
