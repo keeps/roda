@@ -13,7 +13,7 @@ import java.io.OutputStream;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
-import org.roda.core.common.ConsumesSkipableOutputStream;
+import org.roda.core.data.v2.ConsumesSkipableOutputStream;
 
 public class BinaryConsumesOutputStream implements ConsumesSkipableOutputStream {
 

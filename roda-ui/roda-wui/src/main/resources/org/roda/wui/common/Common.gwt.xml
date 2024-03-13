@@ -3,6 +3,7 @@
 	<!-- Inherit the core Web Toolkit stuff. -->
 	<inherits name="com.google.gwt.user.User" />
 	<inherits name="com.google.gwt.i18n.I18N" />
+	<inherits name="org.fusesource.restygwt.RestyGWT"/>
 	<!-- Inherit data model -->
 	<inherits name="org.roda.core.Core" />
 	<!-- Inherit translation -->

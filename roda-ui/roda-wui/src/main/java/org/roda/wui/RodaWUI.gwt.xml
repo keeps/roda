@@ -4,8 +4,10 @@
 	<inherits name='com.google.gwt.user.User' />
 	<inherits name="com.google.gwt.http.HTTP" />
 	<inherits name="com.google.gwt.logging.Logging" />
-	<inherits name="com.google.gwt.resources.Resources" />
+	<inherits name="org.fusesource.restygwt.RestyGWT"/>
+	<inherits name='com.ekotrope.gwt.CompletableFuture'/>
 	<source path="client" />
+	<source path="api" />
 
 	<!-- I18N -->
 	<extend-property name="locale" values="en" />
@@ -30,6 +32,7 @@
 
 	<!-- Inherit required libraries -->
 	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
+	<set-property name="restygwt.encodeDecode.useGwtJackson" value="true" />
 
 	<!-- Inherit sub-projects -->
 	<!-- TODO: Remove the Common sub-module -->
@@ -44,5 +47,5 @@
 	<!-- <stylesheet src="Main.css" /> Replaced by MyResources -->
 	<stylesheet src="../api/v1/theme?resource_id=theme.css" />
 	<stylesheet src="../api/v1/theme?resource_id=printing.css" />
-	<collapse-all-properties />
+	<collapse-all-properties/>
 </module>

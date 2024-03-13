@@ -346,6 +346,8 @@ public final class RodaConstants {
 
   public static final String API_REST_V1_REPRESENTATION_OTHER_METADATA = "otherMetadata";
 
+  public static final String API_REST_V2_RESOURCES = "api/v2/transfers/";
+
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";
@@ -358,6 +360,7 @@ public final class RodaConstants {
   public static final String API_REPORTS = "reports";
 
   // "http query string" related strings
+  public static final String API_PARAM_BINARY = "binary/";
   public static final String API_QUERY_START = "?";
   public static final String API_QUERY_ASSIGN_SYMBOL = "=";
   public static final String API_QUERY_SEP = "&";
@@ -1135,6 +1138,7 @@ public final class RodaConstants {
   public static final String TRANSFERRED_RESOURCE_LAST_SCAN_DATE = "lastScanDate";
   // REST
   public static final String TRANSFERRED_RESOURCE_DIRECTORY_NAME = "name";
+  public static final String TRANSFERRED_RESOURCE_REPLACE_EXISTING = "replace_existing";
   public static final String TRANSFERRED_RESOURCE_RESOURCE_ID = "resourceId";
 
   public static final String JOB_ID = "id";

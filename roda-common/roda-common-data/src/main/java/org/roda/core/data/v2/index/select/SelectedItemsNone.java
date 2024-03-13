@@ -7,8 +7,10 @@
  */
 package org.roda.core.data.v2.index.select;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.roda.core.data.v2.IsRODAObject;
 
+@JsonTypeName("SelectedItemsNone")
 public class SelectedItemsNone<T extends IsRODAObject> implements SelectedItems<T> {
 
   private static final long serialVersionUID = -5364779540199737165L;

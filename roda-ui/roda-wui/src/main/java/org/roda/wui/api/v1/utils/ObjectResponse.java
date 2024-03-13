@@ -9,7 +9,7 @@ package org.roda.wui.api.v1.utils;
 
 import java.io.Serializable;
 
-import org.roda.core.common.EntityResponse;
+import org.roda.core.data.v2.EntityResponse;
 
 public class ObjectResponse<T extends Serializable> implements EntityResponse {
   private String mediaType;

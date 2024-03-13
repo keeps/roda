@@ -722,6 +722,11 @@
                 <artifactId>cas-client-core</artifactId>
                 <version>${cas.client.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.fusesource.restygwt</groupId>
+                <artifactId>restygwt</artifactId>
+                <version>2.2.8-keeps</version>
+            </dependency>
             <!-- CAS related dependencies - end -->
             <!-- ApacheDS related dependencies - start -->
             <dependency>

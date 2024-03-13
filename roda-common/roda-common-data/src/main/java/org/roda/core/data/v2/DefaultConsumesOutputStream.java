@@ -5,7 +5,9 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.common;
+package org.roda.core.data.v2;
+
+import org.roda.core.data.v2.ConsumesOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;

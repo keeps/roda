@@ -974,7 +974,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.renameTransferredResource(user, transferredResourceId, newName);
+    return Browser.renameTransferredResource(user, transferredResourceId, newName, true);
   }
 
   @Override

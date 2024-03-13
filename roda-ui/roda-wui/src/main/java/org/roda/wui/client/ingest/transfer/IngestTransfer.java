@@ -12,6 +12,8 @@ package org.roda.wui.client.ingest.transfer;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -19,7 +21,6 @@ import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
@@ -28,10 +29,10 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.TransferredResourceActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.search.TransferredResourceSearch;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -80,39 +81,27 @@ public class IngestTransfer extends Composite {
       } else {
         String transferredResourceUUID = historyTokens.get(0);
         if (transferredResourceUUID != null) {
-          BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
-            fieldsToReturn, new AsyncCallback<TransferredResource>() {
+          Services.transferredResource(s -> s.getResource(transferredResourceUUID))
+            .whenComplete((value,error) -> {
+              if (value != null) {
+                callback.onSuccess(new IngestTransfer(value));
+              } else if (error != null) {
+                Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
+                  messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
+                  false, new AsyncCallback<Void>() {
 
-              @Override
-              public void onFailure(Throwable caught) {
-                if (caught instanceof NotFoundException) {
-                  Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
-                    messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
-                    false, new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      // do nothing
+                    }
 
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        // do nothing
-                      }
-
-                      @Override
-                      public void onSuccess(Void result) {
-                        HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-                      }
-                    });
-                } else {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                  HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-                }
-
-                callback.onSuccess(null);
+                    @Override
+                    public void onSuccess(Void result) {
+                      HistoryUtils.newHistory(IngestTransfer.RESOLVER);
+                    }
+                  });
               }
-
-              @Override
-              public void onSuccess(TransferredResource resource) {
-                callback.onSuccess(new IngestTransfer(resource));
-              }
-            });
+          });
         } else {
           callback.onSuccess(new IngestTransfer());
         }

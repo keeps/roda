@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -23,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransferredResource implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private static final long serialVersionUID = 7931609057644098879L;
-
   private String uuid;
   private String id;
   private String fullPath;

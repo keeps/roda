@@ -8,7 +8,7 @@
 package org.roda.wui.api.v1.utils;
 
 import org.apache.commons.csv.CSVFormat;
-import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.data.v2.ConsumesOutputStream;
 
 /**
  * Abstract CSV output stream.

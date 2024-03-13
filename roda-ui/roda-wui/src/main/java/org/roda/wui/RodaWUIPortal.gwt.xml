@@ -6,6 +6,8 @@
 	<inherits name="com.google.gwt.http.HTTP" />
 	<inherits name="com.google.gwt.logging.Logging" />
 	<inherits name="com.google.gwt.resources.Resources" />
+	<inherits name="org.fusesource.restygwt.RestyGWT"/>
+	<inherits name='com.ekotrope.gwt.CompletableFuture'/>
 	<source path="client" />
 
 	<!-- I18N -->
@@ -29,6 +31,7 @@
 
 	<!-- Inherit required libraries -->
 	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
+	<set-property name="restygwt.encodeDecode.useGwtJackson" value="true" />
 
 	<!-- Inherit sub-projects -->
 	<!-- TODO: Remove the Common sub-module -->

@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.EntityResponse;
+import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
