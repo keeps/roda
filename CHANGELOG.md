@@ -1,5 +1,14 @@
 # Changelog
 
+## v5.5.3 (13/03/2024)
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.5.2 (11/03/2024)
 #### Bug fixes
 - Fixed other metadata download #3117
@@ -492,16 +501,4 @@ docker pull keeps/roda:v3.6.4
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.6.3
-```
-
----
-
-## v3.6.2 (17/02/2022)
-### Bug fixes:
-
-- CAS Login issue when user with the same email already exists #1988
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.6.2
 ```
