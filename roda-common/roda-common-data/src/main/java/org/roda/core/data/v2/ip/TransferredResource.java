@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransferredResource implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private static final long serialVersionUID = 7931609057644098879L;
-
   private String uuid;
   private String id;
   private String fullPath;

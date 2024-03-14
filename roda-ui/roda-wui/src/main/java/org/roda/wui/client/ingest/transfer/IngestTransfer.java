@@ -32,6 +32,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.search.TransferredResourceSearch;
+import org.roda.wui.client.services.TransferredResourceService;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -80,39 +81,9 @@ public class IngestTransfer extends Composite {
       } else {
         String transferredResourceUUID = historyTokens.get(0);
         if (transferredResourceUUID != null) {
-          BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
-            fieldsToReturn, new AsyncCallback<TransferredResource>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                if (caught instanceof NotFoundException) {
-                  Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
-                    messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
-                    false, new AsyncCallback<Void>() {
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        // do nothing
-                      }
-
-                      @Override
-                      public void onSuccess(Void result) {
-                        HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-                      }
-                    });
-                } else {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                  HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-                }
-
-                callback.onSuccess(null);
-              }
-
-              @Override
-              public void onSuccess(TransferredResource resource) {
-                callback.onSuccess(new IngestTransfer(resource));
-              }
-            });
+          TransferredResourceService.Util.call((TransferredResource result) -> {
+            callback.onSuccess(new IngestTransfer(result));
+          }).getResource(transferredResourceUUID, "json", "");
         } else {
           callback.onSuccess(new IngestTransfer());
         }

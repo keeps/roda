@@ -19,6 +19,11 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.ingest.transfer.IngestTransfer;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 /**
  * Asynchronous callback with a default failure handler
@@ -32,8 +37,25 @@ public abstract class DefaultMethodCallback<T> implements MethodCallback<T> {
     return new DefaultMethodCallback<T>() {
       @Override
       public void onFailure(Method method, Throwable throwable) {
-        GWT.log(throwable.getMessage());
-        GWT.log(method.getResponse().getText());
+        if (throwable instanceof NotFoundException) {
+          Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
+            messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
+            false, new AsyncCallback<Void>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                // do nothing
+              }
+
+              @Override
+              public void onSuccess(Void result) {
+                HistoryUtils.newHistory(IngestTransfer.RESOLVER);
+              }
+            });
+        } else {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          HistoryUtils.newHistory(IngestTransfer.RESOLVER);
+        }
       }
       @Override
       public void onSuccess(Method method, T t) {
