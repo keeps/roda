@@ -112,6 +112,10 @@ public final class RodaConstants {
   public static final String UI_DATE_TIME_FORMAT_UTC = "ui.dateTime.format.UTC";
 
   public static final String UI_COOKIES_ACTIVE_PROPERTY = "ui.cookies.active";
+
+  public static final String UI_EXPIRED_SESSION_DETECTOR_ACTIVE = "ui.expired.session.detector.active";
+  public static final String UI_EXPIRED_SESSION_DETECTOR_TIME = "ui.expired.session.detector.time";
+
   public static final String UI_GOOGLE_ANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
   public static final String UI_GOOGLE_RECAPTCHA_CODE_PROPERTY = "ui.google.recaptcha.code";
 
