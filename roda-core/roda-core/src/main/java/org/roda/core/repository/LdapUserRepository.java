@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LdapUserRepository extends LdapRepository<LdapUser> {
   LdapUser findByCommonName(String commonName);
-
   LdapUser findByUid(String uid);
+  LdapUser findFirstByEmail(String email);
 }

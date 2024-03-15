@@ -1712,27 +1712,43 @@ public class RodaCoreFactory {
         RodaCoreFactory.ldapUtility = new ApacheLdapUtility(ldapStartServer, ldapPort, ldapBaseDN, ldapPeopleDN,
           ldapGroupsDN, ldapRolesDN, ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers,
           ldapProtectedGroups, rodaGuestDN, rodaAdminDN, rodaApacheDSDataDirectory);
-      }
 
-      ldapUtility.setRODAAdministratorsDN(rodaAdministratorsDN);
-      UserUtility.setLdapUtility(ldapUtility);
+        ldapUtility.setRODAAdministratorsDN(rodaAdministratorsDN);
+        UserUtility.setLdapUtility(ldapUtility);
 
-      if (!FSUtils.exists(rodaApacheDSDataDirectory) || FSUtils.isDirEmpty(rodaApacheDSDataDirectory)) {
-        Files.createDirectories(rodaApacheDSDataDirectory);
+        if (!FSUtils.exists(rodaApacheDSDataDirectory) || FSUtils.isDirEmpty(rodaApacheDSDataDirectory)) {
+          Files.createDirectories(rodaApacheDSDataDirectory);
+          final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
+          final List<String> ldifs = new ArrayList<>();
+          for (String ldifFileName : ldifFileNames) {
+            final InputStream ldifInputStream = RodaCoreFactory.getConfigurationFileAsStream(getConfigPath(),
+              RodaConstants.CORE_LDAP_FOLDER + "/" + ldifFileName);
+            if (ldifInputStream != null) {
+              ldifs.add(IOUtils.toString(ldifInputStream, RodaConstants.DEFAULT_ENCODING));
+              RodaUtils.closeQuietly(ldifInputStream);
+            }
+          }
+
+          RodaCoreFactory.ldapUtility.initDirectoryService(ldifs);
+        } else {
+          RodaCoreFactory.ldapUtility.initDirectoryService();
+        }
+      } else {
+        // TODO: configure spring ldap to consume provided ldif files
         final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
         final List<String> ldifs = new ArrayList<>();
         for (String ldifFileName : ldifFileNames) {
-          final InputStream ldifInputStream = RodaCoreFactory.getConfigurationFileAsStream(getConfigPath(),
-            RodaConstants.CORE_LDAP_FOLDER + "/" + ldifFileName);
-          if (ldifInputStream != null) {
-            ldifs.add(IOUtils.toString(ldifInputStream, RodaConstants.DEFAULT_ENCODING));
-            RodaUtils.closeQuietly(ldifInputStream);
+          URL ldifResourceURL = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_LDAP_FOLDER + "/" + ldifFileName);
+          if (ldifResourceURL != null) {
+            ldifs.add(ldifResourceURL.getPath());
           }
         }
 
+        RodaCoreFactory.ldapUtility.setRODAAdministratorsDN(rodaAdministratorsDN);
+        RodaCoreFactory.ldapUtility.setup(rodaGuestDN, rodaAdminDN);
+        UserUtility.setLdapUtility(ldapUtility);
+
         RodaCoreFactory.ldapUtility.initDirectoryService(ldifs);
-      } else {
-        RodaCoreFactory.ldapUtility.initDirectoryService();
       }
 
       createRoles(rodaConfig);

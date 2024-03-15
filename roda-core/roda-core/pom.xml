@@ -432,5 +432,9 @@
 			<groupId>org.springframework.ldap</groupId>
 			<artifactId>spring-ldap-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.ldap</groupId>
+			<artifactId>spring-ldap-ldif-core</artifactId>
+		</dependency>
 	</dependencies>
 </project>

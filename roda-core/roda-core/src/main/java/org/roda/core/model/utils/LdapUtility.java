@@ -19,6 +19,8 @@ import java.util.List;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public interface LdapUtility {
+  void setup(String rodaGuestDN, String rodaAdminDN);
+
   void setRODAAdministratorsDN(String rodaAdministratorsDN);
 
   void stopService() throws GenericException;
