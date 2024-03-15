@@ -141,6 +141,12 @@ public class Main extends Composite implements EntryPoint {
       JavascriptUtils.setCookieOptions(messages.cookiesMessage(), messages.cookiesDismisse(),
         messages.cookiesLearnMore(), "#" + Theme.RESOLVER.getHistoryToken() + "/CookiesPolicy.html");
     }
+
+    if (ConfigurationManager.getBoolean(true, RodaConstants.UI_EXPIRED_SESSION_DETECTOR_ACTIVE)) {
+      ExpiredSessionDetector expiredSessionDetector = new ExpiredSessionDetector();
+      expiredSessionDetector.setScheduleTime(ConfigurationManager.getInt(RodaConstants.UI_EXPIRED_SESSION_DETECTOR_TIME));
+    }
+
   }
 
   private void onHistoryChanged(String historyToken) {
