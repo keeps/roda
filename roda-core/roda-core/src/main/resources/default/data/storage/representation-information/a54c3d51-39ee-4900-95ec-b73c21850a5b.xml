@@ -23,10 +23,10 @@
     <title>https://portal.opengeospatial.org/files/?artifact_id=56357</title>
   </relation>
   <relation>
-    <link> http://www.opengis.net/doc/IS/geopackage/1.0</link>
+    <link>http://www.opengis.net/doc/IS/geopackage/1.0</link>
     <objectType>WEB</objectType>
     <relationType>SPECIFIED_BY</relationType>
-    <title> http://www.opengis.net/doc/IS/geopackage/1.0</title>
+    <title>http://www.opengis.net/doc/IS/geopackage/1.0</title>
   </relation>
   <relation>
     <link>http://www.opengeospatial.org/standards/geopackage</link>

@@ -19,10 +19,10 @@
     <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
   </relation>
   <relation>
-    <link>http://www.pkware.com/documents/APPNOTE/APPNOTE-6.3.3.TXT </link>
+    <link>http://www.pkware.com/documents/APPNOTE/APPNOTE-6.3.3.TXT</link>
     <objectType>WEB</objectType>
     <relationType>SPECIFIED_BY</relationType>
-    <title>http://www.pkware.com/documents/APPNOTE/APPNOTE-6.3.3.TXT </title>
+    <title>http://www.pkware.com/documents/APPNOTE/APPNOTE-6.3.3.TXT</title>
   </relation>
   <relation>
     <link>http://www.ietf.org/rfc/rfc1951.txt</link>

@@ -17,10 +17,10 @@
     <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
   </relation>
   <relation>
-    <link>http://www.pkware.com/documents/APPNOTE/APPNOTE-6.2.0.txt </link>
+    <link>http://www.pkware.com/documents/APPNOTE/APPNOTE-6.2.0.txt</link>
     <objectType>WEB</objectType>
     <relationType>SPECIFIED_BY</relationType>
-    <title>http://www.pkware.com/documents/APPNOTE/APPNOTE-6.2.0.txt </title>
+    <title>http://www.pkware.com/documents/APPNOTE/APPNOTE-6.2.0.txt</title>
   </relation>
   <support>KNOWN</support>
   <tags>aggregate</tags>

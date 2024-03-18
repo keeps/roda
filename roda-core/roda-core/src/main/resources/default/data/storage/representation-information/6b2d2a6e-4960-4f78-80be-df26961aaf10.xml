@@ -17,10 +17,10 @@
     <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
   </relation>
   <relation>
-    <link>http://matroska.org/technical/specs/index.html </link>
+    <link>http://matroska.org/technical/specs/index.html</link>
     <objectType>WEB</objectType>
     <relationType>SPECIFIED_BY</relationType>
-    <title>http://matroska.org/technical/specs/index.html </title>
+    <title>http://matroska.org/technical/specs/index.html</title>
   </relation>
   <support>KNOWN</support>
   <tags>moving-image</tags>
