@@ -386,6 +386,11 @@
             <artifactId>gwt-servlet-jakarta</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.ekotrope</groupId>
+            <artifactId>gwt-completablefuture</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.gwtproject</groupId>
             <artifactId>gwt-dev</artifactId>
             <exclusions>

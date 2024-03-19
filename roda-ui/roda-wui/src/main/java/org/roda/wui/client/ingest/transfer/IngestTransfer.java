@@ -12,6 +12,8 @@ package org.roda.wui.client.ingest.transfer;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -32,6 +34,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.search.TransferredResourceSearch;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.client.services.TransferredResourceService;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -81,9 +84,16 @@ public class IngestTransfer extends Composite {
       } else {
         String transferredResourceUUID = historyTokens.get(0);
         if (transferredResourceUUID != null) {
-          TransferredResourceService.Util.call((TransferredResource result) -> {
-            callback.onSuccess(new IngestTransfer(result));
-          }).getResource(transferredResourceUUID, "json", "");
+          Services.transferredResource(s -> s.listTransferredResources(null, null, null, null))
+            .thenCompose(l -> Services.transferredResource(s -> s.getResource(l.get(0).getUUID(),"json", null)))
+            .whenComplete((value,error) -> {
+              if(value != null) {
+                GWT.log(value.toString());
+                callback.onSuccess(new IngestTransfer(value));
+              } else if(error != null) {
+                GWT.log(error.getMessage());
+              }
+          });
         } else {
           callback.onSuccess(new IngestTransfer());
         }

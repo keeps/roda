@@ -100,6 +100,22 @@ public abstract class DefaultMethodCallback<T> implements MethodCallback<T> {
     } else if (method.getResponse().getStatusCode() == Response.SC_NOT_FOUND) {
       GWT.log(message);
     }
+  }
+
+  public static <T> MethodCallback<T> get(final AsyncCallback<T> callback) {
+    return new MethodCallback<T>() {
+
+      @Override
+      public void onFailure(Method method, Throwable throwable) {
+        callback.onFailure(throwable);
+      }
+
+      @Override
+      public void onSuccess(Method method, T t) {
+          callback.onSuccess(t);
+      }
+    };
 
   }
+
 }

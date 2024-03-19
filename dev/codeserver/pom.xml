@@ -49,6 +49,11 @@
             <version>${roda.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.ekotrope</groupId>
+            <artifactId>gwt-completablefuture</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.roda-project</groupId>
             <artifactId>roda-common-data</artifactId>
             <version>${roda.version}</version>
