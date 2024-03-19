@@ -84,14 +84,25 @@ public class IngestTransfer extends Composite {
       } else {
         String transferredResourceUUID = historyTokens.get(0);
         if (transferredResourceUUID != null) {
-          Services.transferredResource(s -> s.listTransferredResources(null, null, null, null))
-            .thenCompose(l -> Services.transferredResource(s -> s.getResource(l.get(0).getUUID(),"json", null)))
+          Services.transferredResource(s -> s.getResource(transferredResourceUUID,"json", null))
             .whenComplete((value,error) -> {
-              if(value != null) {
-                GWT.log(value.toString());
+              if (value != null) {
                 callback.onSuccess(new IngestTransfer(value));
-              } else if(error != null) {
-                GWT.log(error.getMessage());
+              } else if (error != null) {
+                Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
+                  messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
+                  false, new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      // do nothing
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                      HistoryUtils.newHistory(IngestTransfer.RESOLVER);
+                    }
+                  });
               }
           });
         } else {
