@@ -2,16 +2,22 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
+ * https://github.com/keeps/roda
+ * <p>
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ * <p>
  * https://github.com/keeps/roda
  */
 /**
-* The contents of this file are subject to the license and copyright
-* detailed in the LICENSE file at the root of the source
-* tree and available online at
-*
-* https://github.com/keeps/roda
-*/
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.common;
 
 import java.io.IOException;
@@ -41,6 +47,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.characterization.model.TechnicalMetadata;
+import org.roda.core.common.characterization.model.TechnicalMetadataElement;
 import org.roda.core.common.characterization.model.TechnicalMetadataField;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
@@ -131,7 +138,7 @@ public final class PremisV3Utils {
   }
 
   public static List<Fixity> calculateFixities(Binary binary, Collection<String> algorithms, String originator)
-    throws IOException, NoSuchAlgorithmException {
+      throws IOException, NoSuchAlgorithmException {
     List<Fixity> ret = new ArrayList<>();
     try (InputStream stream = binary.getContent().createInputStream()) {
       Map<String, String> checksums = FileUtility.checksums(stream, algorithms);
@@ -149,7 +156,7 @@ public final class PremisV3Utils {
   public static boolean isPremisV2(Binary binary) throws IOException, SAXException {
     boolean premisV2 = true;
     try (InputStream inputStream = binary.getContent().createInputStream();
-      InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/premis-v2-0.xsd")) {
+         InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/premis-v2-0.xsd")) {
       Source xmlFile = new StreamSource(inputStream);
       SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
       Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
@@ -171,7 +178,7 @@ public final class PremisV3Utils {
   }
 
   public static void updateFileFormat(gov.loc.premis.v3.File file, String formatDesignationName,
-    String formatDesignationVersion, String pronom, String mimeType) {
+                                      String formatDesignationVersion, String pronom, String mimeType) {
 
     if (StringUtils.isNotBlank(formatDesignationName)) {
       FormatDesignationComplexType fdct = getFormatDesignation(file);
@@ -195,7 +202,7 @@ public final class PremisV3Utils {
   }
 
   public static void updateTechnicalMetadata(gov.loc.premis.v3.File file, TechnicalMetadata technicalMetadata)
-    throws JAXBException {
+      throws JAXBException {
 
     String type = technicalMetadata.getType();
     ExtensionComplexType ect = null;
@@ -204,15 +211,15 @@ public final class PremisV3Utils {
     }
 
     // Create element based on the class technicalMetadata
-    JAXBElement<TechnicalMetadata> dataElement = new JAXBElement<>(new QName("", type),
-      TechnicalMetadata.class, null, technicalMetadata);
+    JAXBElement<TechnicalMetadata> dataElement = new JAXBElement<>(new QName("http://www.loc.gov/premis/v3", type),
+        TechnicalMetadata.class, null, technicalMetadata);
 
     // Add to objectCharacteristicsExtension
     ect.getAny().add(dataElement);
   }
 
   public static void updateCreatingApplication(gov.loc.premis.v3.File file, String creatingApplicationName,
-    String creatingApplicationVersion, String dateCreatedByApplication) {
+                                               String creatingApplicationVersion, String dateCreatedByApplication) {
     if (StringUtils.isNotBlank(creatingApplicationName)) {
       CreatingApplicationComplexType cact = getCreatingApplication(file);
       cact.getCreatingApplicationName().add(getStringPlusAuthority(creatingApplicationName));
@@ -334,8 +341,8 @@ public final class PremisV3Utils {
   }
 
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
-    List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, String outcome, String detailNote,
-    String detailExtension, List<LinkingIdentifier> agentIds) {
+                                                       List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, String outcome, String detailNote,
+                                                       String detailExtension, List<LinkingIdentifier> agentIds) {
     EventComplexType ect = FACTORY.createEventComplexType();
     ect.setEventDateTime(DateTime.parse(date.toInstant().toString()).toString());
     ect.setEventType(getStringPlusAuthority(type));
@@ -401,8 +408,8 @@ public final class PremisV3Utils {
   }
 
   public static ContentPayload retrievePremisEventBinary(String eventID, Date date, String type, String details,
-    List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, String outcome, String detailNote,
-    String detailExtension, List<LinkingIdentifier> agentIds) throws GenericException, ValidationException {
+                                                         List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, String outcome, String detailNote,
+                                                         String detailExtension, List<LinkingIdentifier> agentIds) throws GenericException, ValidationException {
 
     EventComplexType eventComplexType = FACTORY.createEventComplexType();
     EventIdentifierComplexType eventIdentifier = FACTORY.createEventIdentifierComplexType();
@@ -442,7 +449,7 @@ public final class PremisV3Utils {
       for (LinkingIdentifier agentId : agentIds) {
         LinkingAgentIdentifierComplexType linkingAgentIdentifier = FACTORY.createLinkingAgentIdentifierComplexType();
         linkingAgentIdentifier
-          .setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+            .setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
         linkingAgentIdentifier.setLinkingAgentIdentifierValue(agentId.getValue());
         if (agentId.getRoles() != null) {
           linkingAgentIdentifier.getLinkingAgentRole().addAll(getStringPlusAuthorityArray(agentId.getRoles()));
@@ -468,7 +475,7 @@ public final class PremisV3Utils {
   }
 
   public static ContentPayload createPremisAgentBinary(String id, String name, PreservationAgentType type,
-    String extension, String note, String version) {
+                                                       String extension, String note, String version) {
     AgentComplexType agent = FACTORY.createAgentComplexType();
     AgentIdentifierComplexType agentIdentifier = FACTORY.createAgentIdentifierComplexType();
     agentIdentifier.setAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
@@ -499,7 +506,7 @@ public final class PremisV3Utils {
     ObjectIdentifierComplexType objectIdentifier = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
     objectIdentifier.setObjectIdentifierValue(
-      IdUtils.getRepresentationPreservationId(aipId, representationId, RODAInstanceUtils.getLocalInstanceIdentifier()));
+        IdUtils.getRepresentationPreservationId(aipId, representationId, RODAInstanceUtils.getLocalInstanceIdentifier()));
     representation.getObjectIdentifier().add(objectIdentifier);
     PreservationLevelComplexType preservationLevelComplexType = FACTORY.createPreservationLevelComplexType();
     preservationLevelComplexType.setPreservationLevelValue(getStringPlusAuthority(""));
@@ -509,8 +516,8 @@ public final class PremisV3Utils {
   }
 
   public static ContentPayload createBaseFile(File originalFile, ModelService model,
-    Collection<String> fixityAlgorithms)
-    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+                                              Collection<String> fixityAlgorithms)
+      throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
 
     gov.loc.premis.v3.File file = FACTORY.createFile();
     PreservationLevelComplexType preservationLevel = FACTORY.createPreservationLevelComplexType();
@@ -520,14 +527,14 @@ public final class PremisV3Utils {
     // URN-local identifier
     ObjectIdentifierComplexType objectIdentifier = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier.setObjectIdentifierValue(URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE,
-      originalFile.getId(), RODAInstanceUtils.getLocalInstanceIdentifier()));
+        originalFile.getId(), RODAInstanceUtils.getLocalInstanceIdentifier()));
     objectIdentifier.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN_LOCAL));
     file.getObjectIdentifier().add(objectIdentifier);
 
     // URN identifier (UUID)
     ObjectIdentifierComplexType objectIdentifier2 = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier2.setObjectIdentifierValue(URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE,
-      IdUtils.getFileId(originalFile), RODAInstanceUtils.getLocalInstanceIdentifier()));
+        IdUtils.getFileId(originalFile), RODAInstanceUtils.getLocalInstanceIdentifier()));
     objectIdentifier2.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
     file.getObjectIdentifier().add(objectIdentifier2);
 
@@ -577,7 +584,7 @@ public final class PremisV3Utils {
     String contentLocation;
     try {
       contentLocation = String
-        .valueOf(model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile)).getContent().getURI());
+          .valueOf(model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile)).getContent().getURI());
     } catch (IOException e) {
       LOGGER.debug(String.format("Can't create URI, %s: %s", e.getCause(), e.getMessage()));
       contentLocation = ModelUtils.getFileStoragePath(originalFile).asString("/", null, null, false);
@@ -707,23 +714,23 @@ public final class PremisV3Utils {
           }
 
           FormatRegistryComplexType pronomRegistry = getFormatRegistry(premisFile,
-            RodaConstants.PRESERVATION_REGISTRY_PRONOM);
+              RodaConstants.PRESERVATION_REGISTRY_PRONOM);
           if (pronomRegistry.getFormatRegistryKey() != null) {
             doc.addField(RodaConstants.FILE_PRONOM, pronomRegistry.getFormatRegistryKey().getValue());
           }
           FormatRegistryComplexType mimeRegistry = getFormatRegistry(premisFile,
-            RodaConstants.PRESERVATION_REGISTRY_MIME);
+              RodaConstants.PRESERVATION_REGISTRY_MIME);
           if (mimeRegistry.getFormatRegistryKey() != null) {
             doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, mimeRegistry.getFormatRegistryKey().getValue());
           }
           // TODO extension
         }
         if (objectCharacteristics.getCreatingApplication() != null
-          && !objectCharacteristics.getCreatingApplication().isEmpty()) {
+            && !objectCharacteristics.getCreatingApplication().isEmpty()) {
           CreatingApplicationComplexType cact = objectCharacteristics.getCreatingApplication().get(0);
           if (cact.getCreatingApplicationName() != null && !cact.getCreatingApplicationName().isEmpty()) {
             doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME,
-              cact.getCreatingApplicationName().get(0).getValue());
+                cact.getCreatingApplicationName().get(0).getValue());
           }
           doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, cact.getCreatingApplicationVersion());
           doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, cact.getDateCreatedByApplication());
@@ -744,17 +751,17 @@ public final class PremisV3Utils {
   }
 
   public static PreservationMetadata createPremisAgentBinary(Plugin<?> plugin, ModelService model, boolean notify)
-    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
-    ValidationException, AlreadyExistsException {
+      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
+      ValidationException, AlreadyExistsException {
     String id = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
-      RODAInstanceUtils.getLocalInstanceIdentifier());
+        RODAInstanceUtils.getLocalInstanceIdentifier());
     ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(), "",
-      plugin.getDescription(), plugin.getVersion());
+        plugin.getDescription(), plugin.getVersion());
     return model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
   }
 
   public static void linkFileToRepresentation(String fileId, List<String> filePath, String relationshipType,
-    String relationshipSubType, Representation representation) {
+                                              String relationshipSubType, Representation representation) {
     RelationshipComplexType relationship = FACTORY.createRelationshipComplexType();
     relationship.setRelationshipType(getStringPlusAuthority(relationshipType));
     relationship.setRelationshipSubType(getStringPlusAuthority(relationshipSubType));
@@ -767,7 +774,7 @@ public final class PremisV3Utils {
   }
 
   public static List<LinkingIdentifier> extractAgentsFromEvent(Binary binary)
-    throws ValidationException, GenericException {
+      throws ValidationException, GenericException {
     List<LinkingIdentifier> identifiers = new ArrayList<>();
     EventComplexType event = PremisV3Utils.binaryToEvent(binary.getContent(), true);
     if (event.getLinkingObjectIdentifier() != null && !event.getLinkingObjectIdentifier().isEmpty()) {
@@ -792,7 +799,7 @@ public final class PremisV3Utils {
   }
 
   public static List<LinkingIdentifier> extractObjectFromEvent(Binary binary)
-    throws ValidationException, GenericException {
+      throws ValidationException, GenericException {
     List<LinkingIdentifier> identifiers = new ArrayList<>();
     EventComplexType event = PremisV3Utils.binaryToEvent(binary.getContent(), true);
     if (event.getLinkingObjectIdentifier() != null && !event.getLinkingObjectIdentifier().isEmpty()) {
@@ -841,12 +848,12 @@ public final class PremisV3Utils {
   }
 
   public static void updatePremisEventInstanceId(PreservationMetadata pm, ModelService model, IndexService index,
-    String instanceId, String username) throws AuthorizationDeniedException, RequestNotValidException, GenericException,
-    ValidationException, AlreadyExistsException, AlreadyHasInstanceIdentifier, InstanceIdNotUpdated {
+                                                 String instanceId, String username) throws AuthorizationDeniedException, RequestNotValidException, GenericException,
+      ValidationException, AlreadyExistsException, AlreadyHasInstanceIdentifier, InstanceIdNotUpdated {
 
     if (URNUtils.verifyInstanceIdentifier(pm.getId(), instanceId)) {
       throw new AlreadyHasInstanceIdentifier(
-        "The preservation event (" + pm.getId() + ") already has instance identifier");
+          "The preservation event (" + pm.getId() + ") already has instance identifier");
     }
 
     String updatedId = IdUtils.updatePreservationMetadataInstanceId(pm.getId(), instanceId);
@@ -855,24 +862,24 @@ public final class PremisV3Utils {
       IndexedPreservationEvent event = null;
       try {
         Binary binary = model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
-          pm.getFileDirectoryPath(), pm.getFileId(), pm.getId());
+            pm.getFileDirectoryPath(), pm.getFileId(), pm.getId());
 
         model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
-          pm.getFileDirectoryPath(), pm.getFileId(), binary.getContent(), username, true);
+            pm.getFileDirectoryPath(), pm.getFileId(), binary.getContent(), username, true);
 
         model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(),
-          pm.getFileDirectoryPath(), true);
+            pm.getFileDirectoryPath(), true);
       } catch (NotFoundException e) {
         throw new InstanceIdNotUpdated(e);
       }
     } else if (pm.getType().equals(PreservationMetadataType.REPRESENTATION)
-      || pm.getType().equals(PreservationMetadataType.FILE)) {
+        || pm.getType().equals(PreservationMetadataType.FILE)) {
       try {
         StoragePath path = ModelUtils.getPreservationMetadataStoragePath(pm);
         ContentPayload payload = model.getStorage().getBinary(path).getContent();
 
         model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
-          pm.getFileDirectoryPath(), pm.getFileId(), payload, username, false);
+            pm.getFileDirectoryPath(), pm.getFileId(), payload, username, false);
 
         model.deletePreservationMetadata(pm, false);
       } catch (NotFoundException e) {
@@ -882,8 +889,8 @@ public final class PremisV3Utils {
   }
 
   public static void updatePremisUserAgentId(PreservationMetadata pm, ModelService model, IndexService index,
-    String instanceId) throws GenericException, AuthorizationDeniedException, RequestNotValidException,
-    AlreadyExistsException, ValidationException, NotFoundException {
+                                             String instanceId) throws GenericException, AuthorizationDeniedException, RequestNotValidException,
+      AlreadyExistsException, ValidationException, NotFoundException {
 
     String updatedId = IdUtils.updatePreservationMetadataInstanceId(pm.getId(), instanceId);
 
@@ -892,42 +899,42 @@ public final class PremisV3Utils {
       agent = index.retrieve(IndexedPreservationAgent.class, pm.getId(), new ArrayList<>());
 
       ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(updatedId, agent.getName(),
-        PreservationAgentType.valueOf(agent.getType().toUpperCase()), agent.getExtension(), agent.getNote(),
-        agent.getVersion());
+          PreservationAgentType.valueOf(agent.getType().toUpperCase()), agent.getExtension(), agent.getNote(),
+          agent.getVersion());
 
       model.createPreservationMetadata(PreservationMetadataType.AGENT, updatedId, agentPayload, true);
 
       model.deletePreservationMetadata(PreservationMetadataType.AGENT, pm.getAipId(), pm.getRepresentationId(),
-        pm.getId(), pm.getFileDirectoryPath(), true);
+          pm.getId(), pm.getFileDirectoryPath(), true);
 
     } catch (NotFoundException e) {
       RODAMember member = index.retrieve(RODAMember.class,
-        IdUtils.getUserId(URNUtils.getAgentUsernameFromURN(pm.getId())),
-        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
+          IdUtils.getUserId(URNUtils.getAgentUsernameFromURN(pm.getId())),
+          Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
       if (member instanceof User) {
         User user = (User) member;
         String note = user.getEmail();
         ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(updatedId, member.getFullName(),
-          PreservationAgentType.PERSON, null, note, null);
+            PreservationAgentType.PERSON, null, note, null);
 
         model.createPreservationMetadata(PreservationMetadataType.AGENT, updatedId, agentPayload, true);
 
         model.deletePreservationMetadata(PreservationMetadataType.AGENT, pm.getAipId(), pm.getRepresentationId(),
-          pm.getId(), pm.getFileDirectoryPath(), true);
+            pm.getId(), pm.getFileDirectoryPath(), true);
       }
     }
 
   }
 
   public static PreservationMetadata createOrUpdatePremisUserAgentBinary(String username, ModelService model,
-    IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException,
-    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+                                                                         IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException,
+      RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     return createOrUpdatePremisUserAgentBinary(username, model, index, notify, null);
   }
 
   public static PreservationMetadata createOrUpdatePremisUserAgentBinary(String username, ModelService model,
-    IndexService index, boolean notify, Job job) throws GenericException, ValidationException, NotFoundException,
-    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+                                                                         IndexService index, boolean notify, Job job) throws GenericException, ValidationException, NotFoundException,
+      RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     PreservationMetadata pm = null;
 
     if (StringUtils.isNotBlank(username)) {
@@ -947,7 +954,7 @@ public final class PremisV3Utils {
       } else {
         try {
           RODAMember member = index.retrieve(RODAMember.class, IdUtils.getUserId(username),
-            Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
+              Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
 
           fullName = member.getFullName();
           if (member instanceof User) {
@@ -960,7 +967,7 @@ public final class PremisV3Utils {
       }
 
       ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, fullName, PreservationAgentType.PERSON,
-        extension, note, version);
+          extension, note, version);
 
       try {
         if (model.retrievePreservationAgent(id) != null) {
@@ -977,8 +984,8 @@ public final class PremisV3Utils {
   }
 
   public static void updateFormatPreservationMetadata(ModelService model, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId, String format, String version, String pronom, String mime,
-    String username, boolean notify) {
+                                                      List<String> fileDirectoryPath, String fileId, String format, String version, String pronom, String mime,
+                                                      String username, boolean notify) {
     Binary premisBin;
 
     try {
@@ -990,7 +997,7 @@ public final class PremisV3Utils {
 
         if (fileId == null) {
           PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms,
-            username);
+              username);
         } else {
           // File file;
           // if (shallow) {
@@ -1016,14 +1023,14 @@ public final class PremisV3Utils {
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
-        username, notify);
+          username, notify);
     } catch (RODAException | IOException e) {
       LOGGER.error("PREMIS will not be updated due to an error", e);
     }
   }
 
   public static Representation binaryToRepresentation(ContentPayload payload, boolean validate)
-    throws ValidationException, GenericException {
+      throws ValidationException, GenericException {
     try (InputStream inputStream = payload.createInputStream()) {
       return binaryToRepresentation(inputStream, validate);
     } catch (IOException e) {
@@ -1032,7 +1039,7 @@ public final class PremisV3Utils {
   }
 
   public static gov.loc.premis.v3.File binaryToFile(ContentPayload payload, boolean validate)
-    throws ValidationException, GenericException {
+      throws ValidationException, GenericException {
     try (InputStream inputStream = payload.createInputStream()) {
       return binaryToFile(inputStream, validate);
     } catch (IOException e) {
@@ -1041,7 +1048,7 @@ public final class PremisV3Utils {
   }
 
   public static EventComplexType binaryToEvent(ContentPayload payload, boolean validate)
-    throws ValidationException, GenericException {
+      throws ValidationException, GenericException {
     try (InputStream inputStream = payload.createInputStream()) {
       return binaryToEvent(inputStream, validate);
     } catch (IOException e) {
@@ -1050,7 +1057,7 @@ public final class PremisV3Utils {
   }
 
   public static AgentComplexType binaryToAgent(ContentPayload payload, boolean validate)
-    throws ValidationException, GenericException {
+      throws ValidationException, GenericException {
     try (InputStream inputStream = payload.createInputStream()) {
       return binaryToAgent(inputStream, validate);
     } catch (IOException e) {
@@ -1059,7 +1066,7 @@ public final class PremisV3Utils {
   }
 
   public static ContentPayload fileToBinary(gov.loc.premis.v3.File file, Class<?>... additionalClass)
-    throws GenericException, ValidationException {
+      throws GenericException, ValidationException {
     if (additionalClass == null || additionalClass.length == 0) {
       return MetadataUtils.saveToContentPayload(FACTORY.createObject(file), gov.loc.premis.v3.File.class);
     }
@@ -1078,8 +1085,8 @@ public final class PremisV3Utils {
   }
 
   public static void updateCreatingApplicationPreservationMetadata(ModelService model, String aipId,
-    String representationId, List<String> fileDirectoryPath, String fileId, String creatingApplicationName,
-    String creatingApplicationVersion, String dateCreatedByApplication, String username, boolean notify) {
+                                                                   String representationId, List<String> fileDirectoryPath, String fileId, String creatingApplicationName,
+                                                                   String creatingApplicationVersion, String dateCreatedByApplication, String username, boolean notify) {
     Binary premisBin;
 
     try {
@@ -1089,29 +1096,29 @@ public final class PremisV3Utils {
         LOGGER.debug("PREMIS object skeleton does not exist yet. Creating PREMIS object!");
         List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
         PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms,
-          username);
+            username);
         premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
         LOGGER.debug("PREMIS object skeleton created");
       }
 
       gov.loc.premis.v3.File premisFile = binaryToFile(premisBin.getContent(), false);
       PremisV3Utils.updateCreatingApplication(premisFile, creatingApplicationName, creatingApplicationVersion,
-        dateCreatedByApplication);
+          dateCreatedByApplication);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
       String id = IdUtils.getPreservationFileId(fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
-        username, notify);
+          username, notify);
     } catch (RODAException | IOException e) {
       LOGGER.error("PREMIS will not be updated due to an error", e);
     }
   }
 
   public static void updateCreatingApplicationTechnicalMetadata(ModelService model, String aipId,
-    String representationId, List<String> fileDirectoryPath, String fileId, String username, boolean notify,
-    TechnicalMetadata technicalMetadata) {
+                                                                String representationId, List<String> fileDirectoryPath, String fileId, String username, boolean notify,
+                                                                TechnicalMetadata technicalMetadata) {
     Binary premisBin;
 
     try {
@@ -1121,7 +1128,7 @@ public final class PremisV3Utils {
         LOGGER.debug("PREMIS object skeleton does not exist yet. Creating PREMIS object!");
         List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
         PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms,
-          username);
+            username);
         premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
         LOGGER.debug("PREMIS object skeleton created");
       }
@@ -1131,17 +1138,16 @@ public final class PremisV3Utils {
       PremisV3Utils.updateTechnicalMetadata(premisFile, technicalMetadata);
       PreservationMetadataType pmtype = PreservationMetadataType.FILE;
       String id = IdUtils.getPreservationFileId(fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
-      ContentPayload premisFilePayload = fileToBinary(premisFile, TechnicalMetadata.class,
-        TechnicalMetadataField.class);
+      ContentPayload premisFilePayload = fileToBinary(premisFile, TechnicalMetadata.class, TechnicalMetadataElement.class, TechnicalMetadataField.class);
       model.updatePreservationMetadata(id, pmtype, aipId, representationId, fileDirectoryPath, fileId,
-        premisFilePayload, username, notify);
+          premisFilePayload, username, notify);
     } catch (RODAException | IOException | JAXBException e) {
       LOGGER.error("PREMIS will not be updated due to an error", e);
     }
   }
 
   public static List<String> getApplicationTechnicalMetadataParameters(ModelService model, String aipId,
-    String representationId, List<String> fileDirectoryPath, String fileId) {
+                                                                       String representationId, List<String> fileDirectoryPath, String fileId) {
     Binary premisBin = null;
     List<String> parameters = null;
     try {
@@ -1162,11 +1168,11 @@ public final class PremisV3Utils {
   private static List<String> getTechnicalMetadataParameters(Binary premisFile) throws IOException {
 
     return XMLUtility.getListString(premisFile.getContent().createInputStream(),
-      "//featureExtractor/@featureExtractorType | //@featureExtractorVersion");
+        "//featureExtractor/@featureExtractorType | //@featureExtractorVersion");
   }
 
   private static Representation binaryToRepresentation(InputStream binaryInputStream, boolean validate)
-    throws GenericException, ValidationException {
+      throws GenericException, ValidationException {
     JAXBContext jaxbContext;
     ValidationEventCollector validationCollector = new ValidationEventCollector();
 
@@ -1177,7 +1183,7 @@ public final class PremisV3Utils {
       if (validate) {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         StreamSource source = new StreamSource(
-          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
+            PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
         Schema schema = sf.newSchema(source);
         jaxbUnmarshaller.setSchema(schema);
         jaxbUnmarshaller.setEventHandler(validationCollector);
@@ -1196,7 +1202,7 @@ public final class PremisV3Utils {
   }
 
   private static AgentComplexType binaryToAgent(InputStream binaryInputStream, boolean validate)
-    throws IOException, GenericException, ValidationException {
+      throws IOException, GenericException, ValidationException {
     JAXBContext jaxbContext;
     ValidationEventCollector validationCollector = new ValidationEventCollector();
 
@@ -1207,7 +1213,7 @@ public final class PremisV3Utils {
       if (validate) {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         StreamSource source = new StreamSource(
-          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
+            PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
         Schema schema = sf.newSchema(source);
         jaxbUnmarshaller.setSchema(schema);
         jaxbUnmarshaller.setEventHandler(validationCollector);
@@ -1226,7 +1232,7 @@ public final class PremisV3Utils {
   }
 
   private static gov.loc.premis.v3.File binaryToFile(InputStream binaryInputStream, boolean validate)
-    throws GenericException, ValidationException {
+      throws GenericException, ValidationException {
     JAXBContext jaxbContext;
     ValidationEventCollector validationCollector = new ValidationEventCollector();
 
@@ -1237,7 +1243,7 @@ public final class PremisV3Utils {
       if (validate) {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         StreamSource source = new StreamSource(
-          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
+            PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
         Schema schema = sf.newSchema(source);
         jaxbUnmarshaller.setSchema(schema);
         jaxbUnmarshaller.setEventHandler(validationCollector);
@@ -1256,7 +1262,7 @@ public final class PremisV3Utils {
   }
 
   private static EventComplexType binaryToEvent(InputStream binaryInputStream, boolean validate)
-    throws GenericException, ValidationException {
+      throws GenericException, ValidationException {
     JAXBContext jaxbContext;
     ValidationEventCollector validationCollector = new ValidationEventCollector();
 
@@ -1267,7 +1273,7 @@ public final class PremisV3Utils {
       if (validate) {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         StreamSource source = new StreamSource(
-          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
+            PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
         Schema schema = sf.newSchema(source);
         jaxbUnmarshaller.setSchema(schema);
         jaxbUnmarshaller.setEventHandler(validationCollector);

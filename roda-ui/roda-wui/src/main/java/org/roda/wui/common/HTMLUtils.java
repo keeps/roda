@@ -12,6 +12,7 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -86,7 +87,7 @@ public final class HTMLUtils {
     }
   }
 
-  public static Map<String, String> getTranslations(String descriptiveMetadataType, String descriptiveMetadataVersion,
+  public static Map<String, String>   getTranslations(String descriptiveMetadataType, String descriptiveMetadataVersion,
     final Locale locale) {
     Map<String, String> translations = null;
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
