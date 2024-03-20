@@ -10,15 +10,14 @@ package org.roda.core.common.characterization.model;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.XmlValue;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "metadata")
-
+@XmlType(namespace = "http://www.loc.gov/premis/v3")
 public class TechnicalMetadataField {
 
   public TechnicalMetadataField() {

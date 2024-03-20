@@ -52,6 +52,7 @@ import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmAtomicValue;
+import net.sf.saxon.s9api.XdmMap;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.s9api.XsltCompiler;
 import net.sf.saxon.s9api.XsltExecutable;
@@ -216,6 +217,10 @@ public class RodaUtils {
         XdmValue xdmValue = new XdmAtomicValue(parameter.getValue());
         transformer.setParameter(qName, xdmValue);
       }
+
+      QName qNameMap = new QName("i18n");
+      XdmMap xdmMap = XdmMap.makeMap(parameters);
+      transformer.setParameter(qNameMap, xdmMap);
 
       transformer.transform();
 

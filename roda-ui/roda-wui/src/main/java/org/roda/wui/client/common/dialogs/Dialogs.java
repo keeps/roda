@@ -162,12 +162,12 @@ public class Dialogs {
     layout.add(verticalPanel);
     layout.addStyleName("wui-dialog-message");
 
-    footer.add(downloadButton);
     footer.add(closeButton);
+    footer.add(downloadButton);
     footer.addStyleName("wui-dialog-layout-footer");
 
     downloadButton.addStyleName("btn btn-download");
-    closeButton.addStyleName("btn btn-default btn-times-circle btn-separator");
+    closeButton.addStyleName("btn btn-link");
     main.addStyleName("wui-dialog-layout");
     main.add(layout);
     main.add(footer);

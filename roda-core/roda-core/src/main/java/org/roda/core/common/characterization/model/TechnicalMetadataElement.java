@@ -10,6 +10,7 @@ package org.roda.core.common.characterization.model;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,10 @@ import java.util.List;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(namespace = "http://www.loc.gov/premis/v3")
 public class TechnicalMetadataElement {
 
-  @XmlElement(name = "field")
+  @XmlElement(name = "field", namespace = "http://www.loc.gov/premis/v3")
   private List<TechnicalMetadataField> technicalMetadataFields = new ArrayList<>();
 
   public TechnicalMetadataElement() {
