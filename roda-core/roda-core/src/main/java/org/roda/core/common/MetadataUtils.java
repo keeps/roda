@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.glassfish.jaxb.runtime.api.JAXBRIContext;
-import org.roda.core.common.characterization.model.TechnicalMetadata;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
