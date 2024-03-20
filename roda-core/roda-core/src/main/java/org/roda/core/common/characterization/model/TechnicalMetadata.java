@@ -12,12 +12,14 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * @author Carlos Afonso <cafonso@keep.pt>
  */
 @XmlRootElement(name = "featureExtractor")
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(namespace = "http://www.loc.gov/premis/v3")
 public class TechnicalMetadata {
 
   @XmlAttribute
@@ -31,7 +33,7 @@ public class TechnicalMetadata {
   @XmlAttribute
   private String algorithm;
 
-  @XmlElement(name = "metadata")
+  @XmlElement(name = "metadata", namespace = "http://www.loc.gov/premis/v3")
   private TechnicalMetadataElement technicalMetadataElement;
 
   public TechnicalMetadata() {
