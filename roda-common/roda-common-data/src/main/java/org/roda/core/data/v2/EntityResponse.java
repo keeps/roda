@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.common;
+package org.roda.core.data.v2;
 
 public interface EntityResponse {
 

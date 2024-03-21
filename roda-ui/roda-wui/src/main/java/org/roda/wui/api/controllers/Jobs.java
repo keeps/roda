@@ -10,7 +10,7 @@ package org.roda.wui.api.controllers;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.EntityResponse;
+import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;

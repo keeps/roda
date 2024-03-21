@@ -39,15 +39,15 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ClassificationPlanUtils;
-import org.roda.core.common.ConsumesOutputStream;
-import org.roda.core.common.DefaultConsumesOutputStream;
+import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.DefaultConsumesOutputStream;
 import org.roda.core.common.DownloadUtils;
-import org.roda.core.common.EntityResponse;
+import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.common.HandlebarsUtility;
 import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
-import org.roda.core.common.StreamResponse;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
@@ -208,7 +208,6 @@ import org.xmlunit.diff.ElementSelectors;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
-import com.google.gwt.core.shared.GWT;
 
 import gov.loc.premis.v3.EventComplexType;
 import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
@@ -2229,11 +2228,12 @@ public class BrowserHelper {
     return supportedMetadata;
   }
 
-  public static EntityResponse retrieveTransferredResource(final TransferredResource transferredResource,
-    String acceptFormat) throws GenericException, NotFoundException, RequestNotValidException {
+  public static EntityResponse retrieveTransferredResource(final TransferredResource transferredResource, String acceptFormat) throws GenericException, NotFoundException, RequestNotValidException {
+      return new ObjectResponse<>(acceptFormat, transferredResource);
+  }
 
-    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
 
+  public static EntityResponse retrieveTransferredResourceBinary(final TransferredResource transferredResource) throws GenericException, NotFoundException, RequestNotValidException {
       final Path filePath = RodaCoreFactory.getTransferredResourcesScanner()
         .retrieveFilePath(transferredResource.getFullPath());
 
@@ -2279,13 +2279,6 @@ public class BrowserHelper {
       };
 
       return new StreamResponse(stream);
-    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
-      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
-      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {
-      return new ObjectResponse<>(acceptFormat, transferredResource);
-    } else {
-      throw new GenericException("Unsupported accept format: " + acceptFormat);
-    }
   }
 
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)

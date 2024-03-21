@@ -6,13 +6,9 @@ import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.REST;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.common.DefaultMethodCallback;
-import org.roda.wui.client.ingest.transfer.CheckedFunction;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 /**

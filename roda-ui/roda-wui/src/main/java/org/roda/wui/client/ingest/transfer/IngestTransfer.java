@@ -84,7 +84,7 @@ public class IngestTransfer extends Composite {
       } else {
         String transferredResourceUUID = historyTokens.get(0);
         if (transferredResourceUUID != null) {
-          Services.transferredResource(s -> s.getResource(transferredResourceUUID,"json", null))
+          Services.transferredResource(s -> s.getResource(transferredResourceUUID))
             .whenComplete((value,error) -> {
               if (value != null) {
                 callback.onSuccess(new IngestTransfer(value));

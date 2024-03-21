@@ -1,4 +1,4 @@
-package org.roda.wui.client.ingest.transfer;
+package org.roda.wui.client.services;
 
 import org.roda.core.data.exceptions.RODAException;
 
