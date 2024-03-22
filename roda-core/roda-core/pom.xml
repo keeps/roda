@@ -436,5 +436,9 @@
 			<groupId>org.springframework.ldap</groupId>
 			<artifactId>spring-ldap-ldif-core</artifactId>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+    </dependencies>
 </project>

@@ -61,7 +61,7 @@ services:
       - VALIDATOR_URL=none
 
   openldap:
-    image: bitnami/openldap:latest
+    image: docker.io/bitnami/openldap:2.6
     user: 1001:root
     ports:
       - "1389:1389"
@@ -72,8 +72,9 @@ services:
       - LDAP_SKIP_DEFAULT_TREE=yes
       - LDAP_ADMIN_USERNAME=admin
       - LDAP_ADMIN_PASSWORD=roda
-#    volumes:
-#      - ./ldap/ldif:/ldifs
+      - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
+    volumes:
+      - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 volumes:
   zookeeper_data:
   zookeeper_datalog:

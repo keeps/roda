@@ -12,4 +12,6 @@ import java.util.Set;
 @Repository
 public interface LdapRoleRepository extends LdapRepository<LdapRole> {
     Set<LdapRole> findAllByRoleOccupants(String RoleOccupant);
+
+
 }

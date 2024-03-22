@@ -142,6 +142,7 @@ import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ApacheLdapUtility;
 import org.roda.core.model.utils.LdapUtility;
+import org.roda.core.model.utils.SpringLdapUtility;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginManagerException;
@@ -404,6 +405,11 @@ public class RodaCoreFactory {
     }
 
     Runtime.getRuntime().addShutdownHook(new Thread(RodaCoreFactory::shutdown));
+  }
+
+  public static void instantiateTest(LdapUtility ldapUtility) {
+    RodaCoreFactory.ldapUtility = ldapUtility;
+    instantiateTest(false, true, false, false, false, false, false);
   }
 
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
@@ -1669,6 +1675,9 @@ public class RodaCoreFactory {
       final boolean ldapStartServer = rodaConfig.getBoolean("core.ldap.startServer",
         rodaConfig.getBoolean("ldap.startServer", false));
 
+      final String ldapUrl = rodaConfig.getString("core.ldap.url",
+        rodaConfig.getString("ldap.url", RodaConstants.CORE_LDAP_DEFAULT_URL));
+
       final int ldapPort = rodaConfig.getInt("core.ldap.port",
         rodaConfig.getInt("ldap.port", RodaConstants.CORE_LDAP_DEFAULT_PORT));
 
@@ -1734,21 +1743,13 @@ public class RodaCoreFactory {
           RodaCoreFactory.ldapUtility.initDirectoryService();
         }
       } else {
-        // TODO: configure spring ldap to consume provided ldif files
-        final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
-        final List<String> ldifs = new ArrayList<>();
-        for (String ldifFileName : ldifFileNames) {
-          URL ldifResourceURL = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_LDAP_FOLDER + "/" + ldifFileName);
-          if (ldifResourceURL != null) {
-            ldifs.add(ldifResourceURL.getPath());
-          }
-        }
+        ((SpringLdapUtility) RodaCoreFactory.ldapUtility).setup(ldapUrl, ldapPort, ldapBaseDN, ldapPeopleDN,
+          ldapGroupsDN, ldapRolesDN, ldapAdminDN, ldapAdminPassword, ldapPasswordDigestAlgorithm, ldapProtectedUsers,
+          ldapProtectedGroups, rodaGuestDN, rodaAdminDN);
 
         RodaCoreFactory.ldapUtility.setRODAAdministratorsDN(rodaAdministratorsDN);
-        RodaCoreFactory.ldapUtility.setup(rodaGuestDN, rodaAdminDN);
         UserUtility.setLdapUtility(ldapUtility);
-
-        RodaCoreFactory.ldapUtility.initDirectoryService(ldifs);
+        RodaCoreFactory.ldapUtility.initDirectoryService(getDefaultLdifFiles());
       }
 
       createRoles(rodaConfig);
@@ -1759,6 +1760,18 @@ public class RodaCoreFactory {
       LOGGER.error("Error starting up embedded ApacheDS", e);
       instantiatedWithoutErrors = false;
     }
+  }
+
+  public static List<String> getDefaultLdifFiles() {
+    final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
+    final List<String> ldifs = new ArrayList<>();
+    for (String ldifFileName : ldifFileNames) {
+      URL ldifResourceURL = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_LDAP_FOLDER + "/" + ldifFileName);
+      if (ldifResourceURL != null) {
+        ldifs.add(ldifResourceURL.getPath());
+      }
+    }
+    return ldifs;
   }
 
   private static void stopApacheDS() {

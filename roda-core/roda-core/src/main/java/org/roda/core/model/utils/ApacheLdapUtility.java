@@ -2135,9 +2135,4 @@ public class ApacheLdapUtility implements LdapUtility {
     }
 
   }
-
-  @Override
-  public void setup(String rodaGuestDN, String rodaAdminDN) {
-    // do nothing
-  }
 }
