@@ -1,20 +1,15 @@
 package org.roda.core.security;
 
-import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Collection;
-import java.util.List;
 
-import io.jsonwebtoken.lang.Collections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.config.LdapConfig;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.GroupAlreadyExistsException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
@@ -26,10 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -82,32 +75,20 @@ public class LdapUtilityTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
-  public void addUser() throws EmailAlreadyExistsException, UserAlreadyExistsException, GenericException, NotFoundException, IllegalOperationException {
-    User user = new User("testUser", "testUser", "test@roda-org", false);
-    HashSet<String> groups = new HashSet<>();
-    groups.add("users");
-
-    HashSet<String> roles = new HashSet<>();
-    roles.add("access_key.manage");
-
-    user.setGroups(groups);
-    user.setDirectRoles(roles);
+  public User addUser() throws EmailAlreadyExistsException, UserAlreadyExistsException, GenericException,
+    NotFoundException, IllegalOperationException {
+    User user = getTestUser();
     springLdapUtility.addUser(user);
     springLdapUtility.setUserPassword(user.getName(), new SecureString("123456".toCharArray()));
+
+    return user;
   }
 
   @Test
-  public void modifyUser() throws EmailAlreadyExistsException, UserAlreadyExistsException, GenericException, NotFoundException, IllegalOperationException {
-    User user = new User("testUser", "testUser", "newTest@roda-org", false);
-    HashSet<String> groups = new HashSet<>();
-    groups.add("users");
-    groups.add("administrators");
-
-    HashSet<String> roles = new HashSet<>();
-    roles.add("access_key.manage");
-
-    user.setGroups(groups);
-    user.setDirectRoles(roles);
+  public void modifyUser() throws EmailAlreadyExistsException, UserAlreadyExistsException, GenericException,
+    NotFoundException, IllegalOperationException {
+    User user = addUser();
+    user.addGroup("administrators");
     springLdapUtility.modifyUser(user);
   }
 
@@ -119,5 +100,47 @@ public class LdapUtilityTest extends AbstractTestNGSpringContextTests {
     } else {
       LOGGER.info(authenticatedUser.toString());
     }
+  }
+
+  @Test
+  public void removeUser() throws EmailAlreadyExistsException, UserAlreadyExistsException, GenericException,
+    NotFoundException, IllegalOperationException {
+    User user = addUser();
+    springLdapUtility.removeUser(user.getName());
+  }
+
+  @Test
+  public void addGroup() throws GenericException, GroupAlreadyExistsException {
+    Group group = getTestGroup();
+    springLdapUtility.addGroup(group);
+  }
+
+  @Test
+  public void modifyGroup() throws GenericException, GroupAlreadyExistsException, NotFoundException, IllegalOperationException {
+    Group group = getTestGroup();
+    springLdapUtility.addGroup(group);
+
+    group.addMemberUser("guest");
+    springLdapUtility.modifyGroup(group);
+  }
+
+  private static User getTestUser() {
+    User user = new User("testUser", "testUser", "test@roda-org", false);
+    HashSet<String> groups = new HashSet<>();
+    groups.add("users");
+
+    HashSet<String> roles = new HashSet<>();
+    roles.add("access_key.manage");
+
+    user.setGroups(groups);
+    user.setDirectRoles(roles);
+    return user;
+  }
+
+  private static Group getTestGroup() {
+    Group testGroup = new Group("test group");
+    testGroup.addMemberUser("admin");
+
+    return testGroup;
   }
 }

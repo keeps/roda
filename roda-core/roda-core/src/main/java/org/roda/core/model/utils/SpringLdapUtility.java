@@ -578,12 +578,39 @@ public class SpringLdapUtility implements LdapUtility {
   @Override
   public User modifySelfUser(User modifiedUser, SecureString newPassword)
     throws NotFoundException, EmailAlreadyExistsException, IllegalOperationException, GenericException {
-    return null;
+    modifyUser(modifiedUser, newPassword, false, false);
+    return getUser(modifiedUser.getName());
   }
 
   @Override
   public void removeUser(String username) throws IllegalOperationException, GenericException {
+    LdapUser ldapUser = ldapUserRepository.findByUid(username);
+    if (ldapUser == null) {
+      throw new GenericException("User not found: " + username);
+    }
 
+    String userDN = ldapUser.getDn().toString();
+    if (this.rodaAdminDN.equals(userDN) || this.rodaGuestDN.equals(userDN)
+      || this.ldapProtectedUsers.contains(username)) {
+      throw new IllegalOperationException("User " + username + " is protected and cannot be removed.");
+    }
+    removeMember(ldapUser.getDn());
+  }
+
+  private void removeMember(Name memberDN) {
+    // For each group the member is in, remove that member from the group
+    for (LdapGroup ldapGroup : ldapGroupRepository.findAllByUniqueMember(memberDN.toString())) {
+      ldapGroup.getUniqueMember().remove(memberDN);
+      ldapGroupRepository.save(ldapGroup);
+    }
+
+    // For each role the member owns, remove that member from the
+    // roleOccupant
+    for (LdapRole ldapRole : ldapRoleRepository.findAllByRoleOccupants(memberDN.toString())) {
+      ldapRole.getRoleOccupants().remove(memberDN);
+      ldapRoleRepository.save(ldapRole);
+    }
+    ldapUserRepository.deleteById(memberDN);
   }
 
   @Override
@@ -608,12 +635,51 @@ public class SpringLdapUtility implements LdapUtility {
 
   @Override
   public Group addGroup(Group group) throws GroupAlreadyExistsException, GenericException {
-    return null;
+    if (!group.isNameValid()) {
+      throw new GenericException("'" + group.getName() + "' is not a valid group name.");
+    }
+
+    LdapGroup ldapGroup = getLdapGroupFromGroup(group);
+    ldapGroup.setNew(true);
+    ldapGroupRepository.save(ldapGroup);
+
+    setMemberDirectRoles(ldapGroup.getId(), group.getDirectRoles());
+
+    final Group newGroup;
+
+    try {
+      newGroup = getGroup(group.getName());
+    } catch (NotFoundException e) {
+      throw new GenericException("The group was not created! " + e.getMessage());
+    }
+    if (newGroup == null) {
+      throw new GenericException("The group was not created!");
+    } else {
+      return newGroup;
+    }
   }
 
   @Override
   public Group modifyGroup(Group modifiedGroup) throws NotFoundException, IllegalOperationException, GenericException {
-    return null;
+    return modifyGroup(modifiedGroup, false);
+  }
+
+  private Group modifyGroup(final Group modifiedGroup, final boolean force)
+    throws NotFoundException, IllegalOperationException, GenericException {
+    if (!force && this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
+      throw new IllegalOperationException(
+        String.format("Group (%s) is protected and cannot be modified.", modifiedGroup.getName()));
+    }
+
+    LdapGroup ldapGroup = ldapGroupRepository.findByCommonName(modifiedGroup.getName());
+    LdapGroup modifiedLdapGroup = getLdapGroupFromGroup(modifiedGroup);
+
+    // 20160906 hsilva: cannot change CN as it is used as id (as well as the name)
+    modifiedLdapGroup.setId(ldapGroup.getId());
+    modifiedLdapGroup.setNew(false);
+    ldapGroupRepository.save(modifiedLdapGroup);
+
+    return getGroup(modifiedGroup.getName());
   }
 
   @Override
@@ -754,6 +820,29 @@ public class SpringLdapUtility implements LdapUtility {
     ldapUser.setInfo(String.join(";", infoParts));
 
     return ldapUser;
+  }
+
+  private LdapGroup getLdapGroupFromGroup(Group group) {
+    LdapGroup ldapGroup = new LdapGroup();
+    LdapName groupDN = LdapNameBuilder.newInstance(ldapGroupsOU).add(CN, group.getName()).build();
+    ldapGroup.setId(groupDN);
+    ldapGroup.setCommonName(group.getName());
+    ldapGroup.setOu(group.getFullName());
+    ldapGroup.setShadowInactive(group.isActive() ? "0" : "1");
+
+    // 20160906 hsilva: this is needed because at least one UNIQUE_MEMBER must
+    // be added to the entry
+    HashSet<Name> uniqueMembers = new HashSet<>();
+    uniqueMembers.add(LdapUtils.newLdapName(RODA_DUMMY_USER));
+
+    for (String memberName : group.getUsers()) {
+      LdapUser ldapUser = ldapUserRepository.findByUid(memberName);
+      uniqueMembers.add(ldapUser.getDn());
+    }
+
+    ldapGroup.setUniqueMember(uniqueMembers);
+
+    return ldapGroup;
   }
 
   private Group getGroupFromEntry(final LdapGroup ldapGroup) {
