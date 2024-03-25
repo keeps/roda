@@ -9,6 +9,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.wui.client.common.DefaultMethodCallback;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 
 /**

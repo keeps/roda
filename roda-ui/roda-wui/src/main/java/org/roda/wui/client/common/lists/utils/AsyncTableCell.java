@@ -31,6 +31,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.wui.api.v1.IndexResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
@@ -41,6 +42,7 @@ import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -620,7 +622,9 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     BrowserService.Util.getInstance().find(getClassToReturn().getName(), getFilter(), sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), fieldsToReturn, callback);
   }
-
+/*  private ComposableFuture<IndexResult<T>> getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn) {
+    Services.future(IndexResource.class, s -> s.)
+  }*/
   protected abstract Sorter getSorter(ColumnSortList columnSortList);
 
   public Sorter getSorter() {

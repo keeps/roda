@@ -21,7 +21,9 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -218,18 +220,14 @@ public class TransferUpload extends Composite {
       // Upload to directory
       String transferredResourceUUID = historyTokens.get(0);
       if (transferredResourceUUID != null) {
-        BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
-          fieldsToReturn, new AsyncCallback<TransferredResource>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
-            }
-
-            @Override
-            public void onSuccess(TransferredResource r) {
-              resource = r;
+        Services.transferredResource(s -> s.getResource(transferredResourceUUID))
+          .whenComplete((value,error) -> {
+            if (value != null) {
+              resource = value;
               callback.onSuccess(TransferUpload.this);
               updateUploadForm();
+            } else if (error != null) {
+              callback.onFailure(error);
             }
           });
       } else {

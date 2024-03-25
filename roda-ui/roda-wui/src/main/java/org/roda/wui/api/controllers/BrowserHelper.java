@@ -2768,7 +2768,7 @@ public class BrowserHelper {
     return result;
   }
 
-  public static String renameTransferredResource(String transferredResourceId, String newName)
+  public static String renameTransferredResource(String transferredResourceId, String newName, Boolean replaceExisting)
     throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException,
     NotFoundException, AuthorizationDeniedException {
     List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH,
@@ -2780,7 +2780,7 @@ public class BrowserHelper {
 
     if (!resources.getResults().isEmpty()) {
       TransferredResource resource = resources.getResults().get(0);
-      return RodaCoreFactory.getTransferredResourcesScanner().renameTransferredResource(resource, newName, true, true);
+      return RodaCoreFactory.getTransferredResourcesScanner().renameTransferredResource(resource, newName, replaceExisting, true);
     } else {
       return transferredResourceId;
     }

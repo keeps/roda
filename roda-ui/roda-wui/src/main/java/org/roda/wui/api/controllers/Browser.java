@@ -2626,7 +2626,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static String renameTransferredResource(User user, String transferredResourceId, String newName)
+  public static String renameTransferredResource(User user, String transferredResourceId, String newName, Boolean replaceExisting)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2638,7 +2638,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      return BrowserHelper.renameTransferredResource(transferredResourceId, newName);
+      return BrowserHelper.renameTransferredResource(transferredResourceId, newName, replaceExisting);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
