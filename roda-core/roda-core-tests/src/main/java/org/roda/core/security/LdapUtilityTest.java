@@ -58,6 +58,33 @@ public class LdapUtilityTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
+  public void addUser() throws EmailAlreadyExistsException, UserAlreadyExistsException, GenericException,
+    NotFoundException, IllegalOperationException {
+    User user = getTestUser();
+    springLdapUtility.addUser(user);
+    springLdapUtility.setUserPassword(user.getName(), new SecureString("123456".toCharArray()));
+  }
+
+  @Test
+  public void modifyUser() throws EmailAlreadyExistsException, UserAlreadyExistsException, GenericException,
+    NotFoundException, IllegalOperationException {
+    User user = getTestUser();
+    springLdapUtility.addUser(user);
+
+    user.addGroup("administrators");
+    springLdapUtility.modifyUser(user);
+  }
+
+  @Test
+  public void removeUser()
+    throws EmailAlreadyExistsException, UserAlreadyExistsException, GenericException, IllegalOperationException {
+    User user = getTestUser();
+    springLdapUtility.addUser(user);
+
+    springLdapUtility.removeUser(user.getName());
+  }
+
+  @Test
   public void listLdapGroups() throws GenericException {
     for (Group group : springLdapUtility.getGroups()) {
       LOGGER.info(group.toString());
@@ -75,21 +102,19 @@ public class LdapUtilityTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
-  public User addUser() throws EmailAlreadyExistsException, UserAlreadyExistsException, GenericException,
-    NotFoundException, IllegalOperationException {
-    User user = getTestUser();
-    springLdapUtility.addUser(user);
-    springLdapUtility.setUserPassword(user.getName(), new SecureString("123456".toCharArray()));
-
-    return user;
+  public void addGroup() throws GenericException, GroupAlreadyExistsException {
+    Group group = getTestGroup();
+    springLdapUtility.addGroup(group);
   }
 
   @Test
-  public void modifyUser() throws EmailAlreadyExistsException, UserAlreadyExistsException, GenericException,
-    NotFoundException, IllegalOperationException {
-    User user = addUser();
-    user.addGroup("administrators");
-    springLdapUtility.modifyUser(user);
+  public void modifyGroup()
+    throws GenericException, GroupAlreadyExistsException, NotFoundException, IllegalOperationException {
+    Group group = getTestGroup();
+    springLdapUtility.addGroup(group);
+
+    group.addMemberUser("guest");
+    springLdapUtility.modifyGroup(group);
   }
 
   @Test
@@ -100,28 +125,6 @@ public class LdapUtilityTest extends AbstractTestNGSpringContextTests {
     } else {
       LOGGER.info(authenticatedUser.toString());
     }
-  }
-
-  @Test
-  public void removeUser() throws EmailAlreadyExistsException, UserAlreadyExistsException, GenericException,
-    NotFoundException, IllegalOperationException {
-    User user = addUser();
-    springLdapUtility.removeUser(user.getName());
-  }
-
-  @Test
-  public void addGroup() throws GenericException, GroupAlreadyExistsException {
-    Group group = getTestGroup();
-    springLdapUtility.addGroup(group);
-  }
-
-  @Test
-  public void modifyGroup() throws GenericException, GroupAlreadyExistsException, NotFoundException, IllegalOperationException {
-    Group group = getTestGroup();
-    springLdapUtility.addGroup(group);
-
-    group.addMemberUser("guest");
-    springLdapUtility.modifyGroup(group);
   }
 
   private static User getTestUser() {
