@@ -13,14 +13,14 @@ RUN \
 	DEBIAN_FRONTEND=noninteractive \
 	apt-get autoremove -y --purge *python*
 
-COPY clamd.conf /etc/clamav/clamd.conf
+COPY ./docker-files/clamd.conf /etc/clamav/clamd.conf
 
 # setup remove old ROOT folder from tomcat
 RUN set -ex; \
     rm -rf /usr/local/tomcat/webapps/ROOT
 
 # Install web application
-COPY /ROOT /usr/local/tomcat/webapps/ROOT
+COPY ./target/  /usr/local/tomcat/webapps/ROOT
 
 # Fix configuration & do some final cleanup
 RUN mkdir -p /usr/local/tomcat/conf/Catalina/localhost
@@ -46,8 +46,8 @@ ENV RODA_HOME=/roda \
     RODA_GROUP="roda" \
     RODA_GID="1000"
 
-COPY /docker-entrypoint.sh /
-COPY /docker-entrypoint.d/* /docker-entrypoint.d/
+COPY ./docker-files/docker-entrypoint.sh /
+COPY ./docker-files/docker-entrypoint.d/* /docker-entrypoint.d/
 
 RUN set -ex; \
   groupadd -r --gid "$RODA_GID" "$RODA_GROUP"; \
