@@ -48,14 +48,14 @@
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
-        <developer>
+        <!--developer>
             <id>hsilva</id>
             <name>Helder Silva</name>
             <email>hsilva@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
-        </developer>
+        </developer-->
         <developer>
             <id>mguimaraes</id>
             <name>Miguel Guimarães</name>
@@ -72,18 +72,34 @@
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
-        <developer>
+        <!--developer>
             <id>jgomes</id>
             <name>João Gomes</name>
             <email>jgomes@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
-        </developer>
-        <developer>
+        </developer-->
+        <!--developer>
             <id>syusupov</id>
             <name>Shahzod Yusupov</name>
             <email>syusupov@keep.pt</email>
+            <organization>KEEP SOLUTIONS</organization>
+            <organizationUrl>https://www.keep.pt</organizationUrl>
+            <timezone>0</timezone>
+        </developer-->
+        <developer>
+            <id>alindo</id>
+            <name>António Lindo</name>
+            <email>alindo@keep.pt</email>
+            <organization>KEEP SOLUTIONS</organization>
+            <organizationUrl>https://www.keep.pt</organizationUrl>
+            <timezone>0</timezone>
+        </developer>
+        <developer>
+            <id>cafonso</id>
+            <name>Carlos Afonso</name>
+            <email>cafonso@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
@@ -377,9 +393,9 @@
                     <version>3.2.4</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.spotify</groupId>
+                    <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
-                    <version>1.2.2</version>
+                    <version>0.44.0</version>
                 </plugin>
                 <plugin>
                     <groupId>pl.project13.maven</groupId>

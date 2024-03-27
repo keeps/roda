@@ -49,6 +49,14 @@ mvn -f dev/codeserver gwt:codeserver -DrodaPath=$(pwd)
 
 Optional: Check Google Chrome "RemoteLiveReload" extension for automatic reloading with spring boot.
 
+## Build local docker image
+
+```bash
+cd docker
+
+./build.sh
+```
+
 ## Release new version
 
 Before releasing:
