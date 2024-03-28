@@ -24,6 +24,10 @@ Additional support for internal plugins:
 TCPAddr localhost" | sudo tee /etc/clamav/clamd.conf
  ```
 
+### Sign Github commits
+
+Follow the official documentation page: <https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits>
+
 ## Debug WUI
 
 ```bash
