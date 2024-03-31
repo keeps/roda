@@ -116,7 +116,7 @@
         <cas.client.version>4.0.4</cas.client.version>
         <jersey.version>3.1.5</jersey.version>
         <swagger.version>2.2.20</swagger.version>
-        <jackson.version>2.16.1</jackson.version>
+        <jackson.version>2.16.2</jackson.version>
         <spring.version>6.1.5</spring.version>
         <solr.version>9.5.0</solr.version>
         <akka.version>2.8.5</akka.version>
