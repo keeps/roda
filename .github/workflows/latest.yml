@@ -36,7 +36,7 @@ jobs:
       - name: Set up Maven
         uses: hb0730/maven-action@v1
         with:
-          maven-version: 3.9.2
+          maven-version: 3.9.6
       - name: Cache
         uses: actions/cache@v4
         with:
@@ -45,7 +45,7 @@ jobs:
       - name: Set up GO
         uses: actions/setup-go@v5
         with:
-          go-version: '^1.19.5'
+          go-version: '^1.22.1'
           check-latest: true
       - name: Install siegfried
         run: |
@@ -58,7 +58,7 @@ jobs:
           sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan
       - name: Run tests & install
         run:
-          mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Proda-wui-docker -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
+          mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RODA_CORE_SOLR_TYPE: CLOUD
@@ -67,16 +67,33 @@ jobs:
         run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Copy target to docker context
+        run: |
+          mkdir -p docker/target
+          cp -r roda-ui/roda-wui/target/roda-wui-$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)/* docker/target
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3 
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Deploy to GitHub Container Registry
-        run: |
-          docker tag keeps/roda:latest ghcr.io/keeps/roda:latest
-          docker push ghcr.io/keeps/roda:latest
+      - name: Login to DockerHub container registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          context: docker
+          tags: |
+            ghcr.io/keeps/roda:latest
+            keeps/roda:latest
+          sbom: true
+          provenance: mode=max
       - name: Trigger KEEPS GitLab CI/CD
         run: |
           curl --progress-bar -o /dev/null -L --request POST \
