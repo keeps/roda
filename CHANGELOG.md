@@ -1,5 +1,22 @@
 # Changelog
 
+## v5.6.0 (04/04/2024)
+#### New features 
+
+- Auto refresh after the session expires
+
+#### Enhancements 
+
+- Update representation information links
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.5.3 (13/03/2024)
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities
@@ -484,21 +501,4 @@ docker pull keeps/roda:v3.7.0
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.6.4
-```
-
----
-
-## v3.6.3 (11/03/2022)
-
-#### Enhancements:
-
--  Remove trace logs from logback configuration [#1994](https://github.com/keeps/roda/issues/1994)
-
-#### Bug Fixes:
-
--  Generalized noneselect option when building search filter [#1995](https://github.com/keeps/roda/issues/1995)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.6.3
 ```
