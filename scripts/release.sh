@@ -36,10 +36,10 @@ mvn versions:set versions:commit -DnewVersion=$RELEASE_VERSION
 
 # Commit Maven version update
 git add -u
-git commit -m "Setting version $RELEASE_VERSION"
+git commit -S -m "Setting version $RELEASE_VERSION"
 
 # Create tag
-git tag -a "$RELEASE_TAG" -m "Version $RELEASE_VERSION"
+git tag -s -a "$RELEASE_TAG" -m "Version $RELEASE_VERSION"
 
 # Push tag
 git push origin "$RELEASE_TAG"

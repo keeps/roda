@@ -32,7 +32,7 @@ mvn -f dev/codeserver versions:set-property versions:commit -Dproperty=roda.vers
 
 # Commit Maven version update
 git add -u
-git commit -m "Setting version $NEXT_VERSION-SNAPSHOT"
+git commit -S -m "Setting version $NEXT_VERSION-SNAPSHOT"
 
 # Push commits
 git push
