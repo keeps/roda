@@ -1,6 +1,6 @@
 services:
   zoo:
-    image: docker.io/zookeeper:3.9-jre-17
+    image: docker.io/zookeeper:3.9.2-jre-17
     restart: unless-stopped
     ports:
       - "2181:2181"
@@ -10,7 +10,7 @@ services:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
   solr:
-    image: docker.io/solr:9
+    image: docker.io/solr:9.5.0
     restart: unless-stopped
     ports:
       - "8983:8983"
@@ -25,7 +25,7 @@ services:
     volumes:
       - solr_data:/var/solr
   clamd:
-    image: docker.io/clamav/clamav:stable
+    image: docker.io/clamav/clamav:1.2.2
     restart: unless-stopped
     ports:
       - "3310:3310"
@@ -51,7 +51,7 @@ services:
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp:ro
   swagger:
-    image: docker.io/swaggerapi/swagger-ui:latest
+    image: docker.io/swaggerapi/swagger-ui:v5.13.0
     restart: on-failure
     ports:
       - "8081:8080"

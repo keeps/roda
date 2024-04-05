@@ -1,7 +1,6 @@
-version: '3.3'
 services:
   zoo:
-    image: docker.io/zookeeper:3.8
+    image: docker.io/zookeeper:3.9.2-jre-17
     restart: unless-stopped
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
@@ -9,7 +8,7 @@ services:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
   solr:
-    image: docker.io/solr:9
+    image: docker.io/solr:9.5.0
     restart: unless-stopped
     ports:
       - "8983:8983"
@@ -21,13 +20,13 @@ services:
       - solr_data:/var/solr
 
   clamd:
-    image: docker.io/clamav/clamav:stable
+    image: docker.io/clamav/clamav:1.2.2
     restart: unless-stopped
     volumes:
       - clam_data:/var/lib/clamav
       - roda_data:/roda/data/
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.10.1
+    image: ghcr.io/keeps/siegfried:v1.11.0
     restart: unless-stopped
     environment:
       SIEGFRIED_HOST: 0.0.0.0
@@ -36,7 +35,7 @@ services:
       - siegfried_data:/root/siegfried/
       - roda_data:/roda/data/
   swagger:
-    image: docker.io/swaggerapi/swagger-ui:latest
+    image: docker.io/swaggerapi/swagger-ui:v5.13.0
     restart: on-failure
     ports:
       - "8081:8080"
