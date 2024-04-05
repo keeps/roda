@@ -13,10 +13,12 @@ package org.roda.wui.client.main;
 import java.util.List;
 import java.util.Map;
 
+import org.fusesource.restygwt.client.Defaults;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.resources.MyResources;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.services.RODADispatcher;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -109,6 +111,8 @@ public class Main extends Composite implements EntryPoint {
    */
   public void init() {
     MyResources.INSTANCE.css().ensureInjected();
+
+    Defaults.setDispatcher(RODADispatcher.INSTANCE);
 
     // Remove loading image
     RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));

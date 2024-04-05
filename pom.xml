@@ -7,7 +7,7 @@
     <url>https://roda.keep.pt/</url>
     <groupId>org.roda-project</groupId>
     <artifactId>roda</artifactId>
-    <version>5.7.0-SNAPSHOT</version>
+    <version>6.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>RODA is a full-featured open-source digital preservation repository providing all the
         functionality
@@ -48,14 +48,14 @@
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
-        <!--developer>
+        <developer>
             <id>hsilva</id>
             <name>Helder Silva</name>
             <email>hsilva@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
-        </developer-->
+        </developer>
         <developer>
             <id>mguimaraes</id>
             <name>Miguel Guimarães</name>
@@ -72,34 +72,18 @@
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
-        <!--developer>
+        <developer>
             <id>jgomes</id>
             <name>João Gomes</name>
             <email>jgomes@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
-        </developer-->
-        <!--developer>
+        </developer>
+        <developer>
             <id>syusupov</id>
             <name>Shahzod Yusupov</name>
             <email>syusupov@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer-->
-        <developer>
-            <id>alindo</id>
-            <name>António Lindo</name>
-            <email>alindo@keep.pt</email>
-            <organization>KEEP SOLUTIONS</organization>
-            <organizationUrl>https://www.keep.pt</organizationUrl>
-            <timezone>0</timezone>
-        </developer>
-        <developer>
-            <id>cafonso</id>
-            <name>Carlos Afonso</name>
-            <email>cafonso@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
@@ -116,17 +100,17 @@
         <cas.client.version>4.0.4</cas.client.version>
         <jersey.version>3.1.6</jersey.version>
         <swagger.version>2.2.20</swagger.version>
-        <jackson.version>2.17.0</jackson.version>
-        <spring.version>6.1.5</spring.version>
-        <solr.version>9.5.0</solr.version>
+        <jackson.version>2.16.1</jackson.version>
+        <spring.version>6.1.4</spring.version>
+        <solr.version>9.4.1</solr.version>
         <akka.version>2.8.5</akka.version>
         <apacheds.version>2.0.0.AM27</apacheds.version>
         <httpcomponents.version>4.5.14</httpcomponents.version>
-        <commons_ip2.version>2.6.2</commons_ip2.version>
+        <commons_ip2.version>2.6.1</commons_ip2.version>
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
-        <springboot.version>3.2.4</springboot.version>
+        <springboot.version>3.2.3</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
     </properties>
     <profiles>
@@ -348,7 +332,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>2.22.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -393,9 +377,9 @@
                     <version>3.2.4</version>
                 </plugin>
                 <plugin>
-                    <groupId>io.fabric8</groupId>
+                    <groupId>com.spotify</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
-                    <version>0.44.0</version>
+                    <version>1.2.2</version>
                 </plugin>
                 <plugin>
                     <groupId>pl.project13.maven</groupId>
@@ -469,7 +453,7 @@
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jakarta.xml.bind-api</artifactId>
-                <version>4.0.2</version>
+                <version>4.0.1</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
@@ -579,13 +563,13 @@
             <dependency>
                 <groupId>jakarta.mail</groupId>
                 <artifactId>jakarta.mail-api</artifactId>
-                <version>2.1.3</version>
+                <version>2.1.2</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/org.eclipse.angus/angus-mail -->
             <dependency>
                 <groupId>org.eclipse.angus</groupId>
                 <artifactId>angus-mail</artifactId>
-                <version>2.0.3</version>
+                <version>2.0.2</version>
             </dependency>
             <dependency>
                 <groupId>javax.transaction</groupId>
@@ -616,12 +600,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.5.3</version>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-core</artifactId>
-                <version>1.5.3</version>
+                <version>1.4.14</version>
             </dependency>
             <dependency>
                 <groupId>org.bluestemsoftware.open.maven.plugin</groupId>
@@ -639,34 +618,34 @@
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-common-data</artifactId>
                 <classifier>sources</classifier>
-                <version>5.7.0-SNAPSHOT</version>
+                <version>6.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-common-data</artifactId>
-                <version>5.7.0-SNAPSHOT</version>
+                <version>6.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-common-utils</artifactId>
-                <version>5.7.0-SNAPSHOT</version>
+                <version>6.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-core</artifactId>
-                <version>5.7.0-SNAPSHOT</version>
+                <version>6.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-core-tests</artifactId>
-                <version>5.7.0-SNAPSHOT</version>
+                <version>6.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-core-tests</artifactId>
                 <type>test-jar</type>
                 <scope>test</scope>
-                <version>5.7.0-SNAPSHOT</version>
+                <version>6.0.0-SNAPSHOT</version>
             </dependency>
             <!-- RODA own modules dependencies - end -->
             <dependency>
@@ -899,7 +878,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.11.0</version>
+                <version>5.10.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -1069,7 +1048,7 @@
             <dependency>
                 <groupId>com.github.jknack</groupId>
                 <artifactId>handlebars</artifactId>
-                <version>4.4.0</version>
+                <version>4.3.1</version>
             </dependency>
             <dependency>
                 <groupId>xmlunit</groupId>
@@ -1089,7 +1068,7 @@
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-java</artifactId>
-                <version>4.18.1</version>
+                <version>4.17.0</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
