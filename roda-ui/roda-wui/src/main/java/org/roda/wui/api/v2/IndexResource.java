@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -73,6 +74,13 @@ public class IndexResource implements IndexService {
 
     return I18nUtility.translate(result, getClass(findRequest.classToReturn), localeString);
 
+  }
+
+  @Override
+  public Long count(CountRequest countRequest) throws RODAException {
+    final User user = UserUtility.getApiUser(request);
+    return Browser.count(user, getClass(countRequest.classToReturn), countRequest.filter,
+      countRequest.onlyActive);
   }
 
   /**

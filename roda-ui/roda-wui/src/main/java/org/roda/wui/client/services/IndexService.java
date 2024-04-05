@@ -19,6 +19,7 @@ import org.fusesource.restygwt.client.Options;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -69,5 +70,14 @@ public interface IndexService extends DirectRestService {
   <T extends IsIndexed> Object find(
     @Parameter(name = "find request", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON)) FindRequest findRequest,
     @Parameter(description = "language") @QueryParam("lang") String localeString)
+    throws RODAException;
+
+  @POST
+  @Path("/count")
+  @Consumes({MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Operation(summary = "Count indexed resources", description = "Counts indexed resources", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class)))})
+  public Long count(@Parameter(description = "Count parameters") final CountRequest countRequest)
     throws RODAException;
 }
