@@ -220,7 +220,8 @@ public class TransferUpload extends Composite {
       // Upload to directory
       String transferredResourceUUID = historyTokens.get(0);
       if (transferredResourceUUID != null) {
-        Services.transferredResource(s -> s.getResource(transferredResourceUUID))
+        Services ss = new Services("Upload resource", "Upload");
+        ss.transferredResource(s -> s.getResource(transferredResourceUUID))
           .whenComplete((value,error) -> {
             if (value != null) {
               resource = value;
