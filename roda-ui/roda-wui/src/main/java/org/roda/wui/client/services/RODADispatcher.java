@@ -6,11 +6,16 @@ import com.google.gwt.http.client.RequestException;
 import org.fusesource.restygwt.client.Dispatcher;
 import org.fusesource.restygwt.client.Method;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * @author António Lindo <alindo@keep.pt>
  */
-public class RODADispatcher implements Dispatcher {
+public class RODADispatcher implements Dispatcher, Serializable {
   public static final RODADispatcher INSTANCE = new RODADispatcher();
+  @Serial
+  private static final long serialVersionUID = 5986891772131391945L;
 
   public String getOperationUUID() {
     return operationUUID;
@@ -46,6 +51,8 @@ public class RODADispatcher implements Dispatcher {
   @Override
   public Request send(Method method, RequestBuilder requestBuilder) throws RequestException {
     requestBuilder.setHeader("X-REQUEST-UUID", operationUUID);
+    requestBuilder.setHeader("X-REQUEST-REASON", operationReason);
+    requestBuilder.setHeader("X-REQUEST-TYPE", operationType);
 
     return requestBuilder.send();
   }

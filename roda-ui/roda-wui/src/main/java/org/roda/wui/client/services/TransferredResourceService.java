@@ -1,5 +1,17 @@
 package org.roda.wui.client.services;
 
+import java.util.List;
+
+import org.fusesource.restygwt.client.DirectRestService;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.TransferredResources;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.wui.api.v1.utils.ApiResponseMessage;
+import org.roda.wui.api.v1.utils.ExtraMediaType;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -9,7 +21,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -17,24 +28,13 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-import org.fusesource.restygwt.client.DirectRestService;
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.TransferredResources;
-import org.roda.core.data.v2.jobs.Job;
-import org.roda.wui.api.v1.utils.ApiResponseMessage;
-import org.roda.wui.api.v1.utils.ExtraMediaType;
-
-import java.util.List;
 
 /**
  * @author António Lindo <alindo@keep.pt>
  */
 @Path("../api/v2/transfers/")
 @Tag(name = "v2")
+//@Options(dispatcher = RODADispatcher.class)
 public interface TransferredResourceService extends DirectRestService {
 
   @GET
@@ -58,7 +58,6 @@ public interface TransferredResourceService extends DirectRestService {
   List<org.roda.core.data.v2.ip.TransferredResource> getSelectedTransferredResources(
     @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON)) SelectedItems<org.roda.core.data.v2.ip.TransferredResource> selected)
     throws RODAException;
-
 
   @POST
   @Path("/move")
@@ -86,10 +85,10 @@ public interface TransferredResourceService extends DirectRestService {
     @ApiResponse(responseCode = "204", description = "OK"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   void deleteResource(
-      @Parameter(description = "The id of the resource", required = true) @PathParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String path,
-      @Parameter(description = "Choose format in which to get the response", schema = @Schema(implementation = RodaConstants.APIMediaTypes.class)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-      @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
-      throws RODAException;
+    @Parameter(description = "The id of the resource", required = true) @PathParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String path,
+    @Parameter(description = "Choose format in which to get the response", schema = @Schema(implementation = RodaConstants.APIMediaTypes.class)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException;
 
   @DELETE
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
@@ -146,7 +145,3 @@ public interface TransferredResourceService extends DirectRestService {
     @Parameter(description = "Transfer resource relative path") @QueryParam("path") String transferredResourceRelativePath)
     throws RODAException;
 }
-
-
-
-

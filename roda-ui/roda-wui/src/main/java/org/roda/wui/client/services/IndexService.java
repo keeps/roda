@@ -66,7 +66,7 @@ public interface IndexService extends DirectRestService {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.TEXT_CSV})
   @Operation(summary = "Find indexed resources", description = "Finds existing indexed resources", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = IsIndexed.class)))})
-  <T extends IsIndexed> IndexResult<T> find(
+  <T extends IsIndexed> Object find(
     @Parameter(name = "find request", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON)) FindRequest findRequest,
     @Parameter(description = "language") @QueryParam("lang") String localeString)
     throws RODAException;

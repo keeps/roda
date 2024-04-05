@@ -74,6 +74,7 @@ public class IngestTransfer extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+      Services ss = new Services("History reason", "get");
       if (historyTokens.isEmpty()) {
         callback.onSuccess(new IngestTransfer());
       } else if (historyTokens.get(0).equals(TransferUpload.INGEST_RESOLVER.getHistoryToken())) {
@@ -81,7 +82,7 @@ public class IngestTransfer extends Composite {
       } else {
         String transferredResourceUUID = historyTokens.get(0);
         if (transferredResourceUUID != null) {
-          Services.transferredResource(s -> s.getResource(transferredResourceUUID))
+          ss.transferredResource(s -> s.getResource(transferredResourceUUID))
             .whenComplete((value,error) -> {
               if (value != null) {
                 callback.onSuccess(new IngestTransfer(value));

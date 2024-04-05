@@ -12,7 +12,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.user.client.History;
+import org.bouncycastle.cert.ocsp.Req;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.v2.common.Pair;
@@ -34,6 +36,7 @@ import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.RODADispatcher;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -201,7 +204,9 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   }
 
   private void rename(TransferredResource object, AsyncCallback<ActionImpact> callback) {
-    Services.transferredResource(s -> s.getResource(object.getUUID()))
+    Services ss = new Services("Renaming transferred resource", "rename");
+
+    ss.transferredResource(s -> s.getResource(object.getUUID()))
       .whenComplete((value, error) -> {
         if (value != null) {
           Dialogs.showPromptDialog(messages.renameTransferredResourcesDialogTitle(), null, value.getName(),
@@ -210,7 +215,8 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
 
               @Override
               public void onSuccess(String result) {
-                Services.transferredResource(s -> s.renameTransferredResource(object.getUUID(), result, true))
+                //GWT.log(rodaDispatcher.getOperationReason());
+                ss.transferredResource(s -> s.renameTransferredResource(object.getUUID(), result, true))
                   .whenComplete((value, error) -> {
                     if (value != null) {
                       Toast.showInfo(messages.dialogSuccess(), messages.renameSIPSuccessful());
@@ -231,7 +237,9 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   }
 
   private void move(SelectedItems<TransferredResource> objects, AsyncCallback<ActionImpact> callback) {
-    Services.transferredResource(s -> s.getSelectedTransferredResources(objects))
+    Services ss = new Services("Moving transferred resource", "move");
+
+    ss.transferredResource(s -> s.getSelectedTransferredResources(objects))
       .whenComplete((resources, error) -> {
         if (resources != null) {
           Filter filter = new Filter();
@@ -256,7 +264,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
             TransferredResource transferredResource = event.getValue();
             String resourceId = transferredResource == null ?  null :  transferredResource.getUUID();
             GWT.log(resourceId);
-            Services.transferredResource(s -> s.moveTransferredResources(objects, resourceId))
+            ss.transferredResource(s -> s.moveTransferredResources(objects, resourceId))
               .whenComplete((result, err) -> {
                 if (result != null) {
                   Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
@@ -302,7 +310,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
 
   private void remove(SelectedItems<TransferredResource> objects, AsyncCallback<ActionImpact> callback) {
     ClientSelectedItemsUtils.size(TransferredResource.class, objects, new ActionNoAsyncCallback<Long>(callback) {
-
+      Services ss = new Services("Remove transferred resource", "remove");
       @Override
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
@@ -313,7 +321,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
             public void onSuccess(Boolean confirmed) {
               SelectedItemsList<TransferredResource> list = (SelectedItemsList<TransferredResource>) objects;
               if (confirmed) {
-                Services.transferredResource(s -> s.deleteMultipleResources(list.getIds()))
+                ss.transferredResource(s -> s.deleteMultipleResources(list.getIds()))
                   .whenComplete((value,error) -> {
                     if (error == null) {
                       Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
@@ -335,7 +343,8 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
 
   private void refresh(TransferredResource object, AsyncCallback<ActionImpact> callback) {
     String relativePath = object != NO_TRANSFERRED_RESOURCE ? object.getRelativePath() : null;
-    Services.transferredResource(s -> s.refreshTransferResource(relativePath))
+    Services ss = new Services("Refresh transferred resource", "refresh");
+    ss.transferredResource(s -> s.refreshTransferResource(relativePath))
       .whenComplete((value,error) -> {
         if (error == null) {
           Toast.showInfo(messages.dialogRefresh(), messages.updatedFilesUnderFolder());
@@ -369,12 +378,13 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   }
 
   private void newFolder(TransferredResource object, AsyncCallback<ActionImpact> callback) {
+    Services ss = new Services("Renaming transferred resource", "rename");
     Dialogs.showPromptDialog(messages.ingestTransferCreateFolderTitle(), messages.ingestTransferCreateFolderMessage(),
       null, null, RegExp.compile("^[^/]+$"), messages.dialogCancel(), messages.dialogOk(), true, false,
       new ActionNoAsyncCallback<String>(callback) {
         @Override
         public void onSuccess(String folderName) {
-          Services.transferredResource(s -> s.createTransferredResourcesFolder(
+          ss.transferredResource(s -> s.createTransferredResourcesFolder(
               object != NO_TRANSFERRED_RESOURCE ? object.getUUID() : null, folderName, "true"))
             .whenComplete((value, error) -> {
               if (value != null) {

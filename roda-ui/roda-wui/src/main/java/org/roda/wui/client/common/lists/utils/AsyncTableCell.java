@@ -624,7 +624,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private CompletableFuture<Object> getData2(Sublist sublist, Sorter sorter, List<String> fieldsToReturn) {
     FindRequest findRequest = new FindRequest(getClassToReturn().getName(), getFilter(), sorter, sublist, getFacets(), getJustActive());
     findRequest.fieldsToReturn = fieldsToReturn;
-    return Services.index(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()));
+    Services ss = new Services("Get data", "get");
+    return ss.index(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()));
   }
 
   protected abstract Sorter getSorter(ColumnSortList columnSortList);
