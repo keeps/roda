@@ -8,6 +8,7 @@
 package org.roda.core.plugins;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,6 +46,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -82,47 +84,6 @@ public class EARKSIPPluginsTest {
 
   private Path corporaPath;
 
-  @BeforeClass
-  public void setUp() throws Exception {
-    basePath = TestsHelper.createBaseTempDir(getClass(), true);
-
-    boolean deploySolr = true;
-    boolean deployLdap = true;
-    boolean deployFolderMonitor = true;
-    boolean deployOrchestrator = true;
-    boolean deployPluginManager = true;
-    boolean deployDefaultResources = false;
-    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false);
-    model = RodaCoreFactory.getModelService();
-    index = RodaCoreFactory.getIndexService();
-
-    URL corporaURL = EARKSIPPluginsTest.class.getResource("/corpora");
-    corporaPath = Paths.get(corporaURL.toURI());
-
-    LOGGER.info("Running E-ARK SIP plugins tests under storage {}", basePath);
-  }
-
-  @AfterClass
-  public void tearDown() throws Exception {
-    IndexTestUtils.resetIndex();
-    RodaCoreFactory.shutdown();
-    FSUtils.deletePath(basePath);
-  }
-
-  @AfterMethod
-  public void cleanUp() throws RODAException {
-    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), item -> {
-      try {
-        model.deleteAIP(item.getId());
-      } catch (NotFoundException e) {
-        // do nothing
-      }
-    }, e -> Assert.fail("Error cleaning up", e));
-
-    TestsHelper.releaseAllLocks();
-  }
-
   private static TransferredResource createIngestCorpora(Path corporaPath, IndexService index, String sipFileInCorpora,
     String renameSipFileTo) throws IOException, NotFoundException, GenericException, IsStillUpdatingException,
     AlreadyExistsException, AuthorizationDeniedException {
@@ -156,6 +117,35 @@ public class EARKSIPPluginsTest {
   }
 
   protected static <T extends Plugin<TransferredResource>> AIP ingestCorpora(Class<T> pluginClass, ModelService model,
+    IndexService index, TransferredResource transferredResource, boolean failIfReportNotSucceeded)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
+    String aipType = RodaConstants.AIP_TYPE_MIXED;
+    AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN);
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
+    parameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "true");
+
+    Assert.assertNotNull(transferredResource);
+
+    Job job = TestsHelper.executeJob(pluginClass, parameters, PluginType.SIP_TO_AIP,
+      SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
+
+    TestsHelper.getJobReports(index, job, failIfReportNotSucceeded);
+    index.commitAIPs();
+
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10),
+      new ArrayList<>());
+
+    Assert.assertEquals(find.getTotalCount(), 1L);
+    IndexedAIP indexedAIP = find.getResults().getFirst();
+
+    return model.retrieveAIP(indexedAIP.getId());
+  }
+
+  protected static <T extends Plugin<TransferredResource>> AIP ingestCorpora(Class<T> pluginClass, ModelService model,
     IndexService index, Path corporaPath, boolean failIfReportNotSucceeded)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, IOException, IsStillUpdatingException {
@@ -180,15 +170,63 @@ public class EARKSIPPluginsTest {
       new ArrayList<>());
 
     Assert.assertEquals(find.getTotalCount(), 1L);
-    IndexedAIP indexedAIP = find.getResults().get(0);
+    IndexedAIP indexedAIP = find.getResults().getFirst();
 
     return model.retrieveAIP(indexedAIP.getId());
   }
 
   protected static <T extends Plugin<TransferredResource>> AIP ingestCorpora(Class<T> pluginClass, ModelService model,
+    IndexService index, TransferredResource transferredResource) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
+    return ingestCorpora(pluginClass, model, index, transferredResource, false);
+  }
+
+  protected static <T extends Plugin<TransferredResource>> AIP ingestCorpora(Class<T> pluginClass, ModelService model,
     IndexService index, Path corporaPath) throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, IOException, IsStillUpdatingException {
-    return ingestCorpora(pluginClass, model, index, corporaPath, false);
+    TransferredResource ingestCorpora = createIngestCorpora(corporaPath, index);
+    return ingestCorpora(pluginClass, model, index, ingestCorpora, false);
+  }
+
+  @BeforeClass
+  public void setUp() throws IOException, URISyntaxException {
+    basePath = TestsHelper.createBaseTempDir(getClass(), true);
+
+    boolean deploySolr = true;
+    boolean deployLdap = true;
+    boolean deployFolderMonitor = true;
+    boolean deployOrchestrator = true;
+    boolean deployPluginManager = true;
+    boolean deployDefaultResources = false;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager, deployDefaultResources, false);
+    model = RodaCoreFactory.getModelService();
+    index = RodaCoreFactory.getIndexService();
+
+    URL corporaURL = EARKSIPPluginsTest.class.getResource("/corpora");
+    corporaPath = Paths.get(corporaURL.toURI());
+
+    LOGGER.info("Running E-ARK SIP plugins tests under storage {}", basePath);
+  }
+
+  @AfterClass
+  public void tearDown() throws IOException, NotFoundException, GenericException {
+    IndexTestUtils.resetIndex();
+    RodaCoreFactory.shutdown();
+    FSUtils.deletePath(basePath);
+  }
+
+  @AfterMethod
+  public void cleanUp() throws RODAException {
+    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), item -> {
+      try {
+        model.deleteAIP(item.getId());
+      } catch (NotFoundException e) {
+        // do nothing
+      }
+    }, e -> Assert.fail("Error cleaning up", e));
+
+    TestsHelper.releaseAllLocks();
   }
 
   private AIP ingestUpdateCorpora(AIP aip) throws RequestNotValidException, NotFoundException, GenericException,
@@ -208,7 +246,7 @@ public class EARKSIPPluginsTest {
       new ArrayList<>());
 
     Assert.assertEquals(find.getTotalCount(), 1L);
-    IndexedAIP indexedAIP = find.getResults().get(0);
+    IndexedAIP indexedAIP = find.getResults().getFirst();
 
     return model.retrieveAIP(indexedAIP.getId());
   }
@@ -219,7 +257,7 @@ public class EARKSIPPluginsTest {
     Assert.assertEquals(aip.getRepresentations().size(), 1);
 
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
+      aip.getRepresentations().getFirst().getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
     Iterables.addAll(reusableAllFiles,
       Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent).map(OptionalWithCause::get).toList());
@@ -243,6 +281,22 @@ public class EARKSIPPluginsTest {
     Assert.assertEquals(aipUpdated.getIngestSIPIds().size(), 2);
   }
 
+  @Test
+  public void testIngestEARKSIP2WithOtherRepresentationType()
+    throws AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    IOException, IsStillUpdatingException, GenericException {
+    String expectedRepresentationType = "SVG";
+    TransferredResource ingestCorpora = createIngestCorpora(corporaPath, index,
+      "e-ark-sip-2.1.0-with-custom-representation-type.zip");
+
+    AIP aip = ingestCorpora(EARKSIP2ToAIPPlugin.class, model, index, ingestCorpora);
+    Assert.assertEquals(aip.getRepresentations().size(), 1);
+
+    Representation representation = aip.getRepresentations().getFirst();
+    String type = representation.getType();
+    Assert.assertEquals(type, expectedRepresentationType);
+  }
+
   private List<String> createCorporaAncestors()
     throws IOException, GenericException, IsStillUpdatingException, AuthorizationDeniedException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
@@ -258,7 +312,7 @@ public class EARKSIPPluginsTest {
             resultIDs.add(tr.getUUID());
           } catch (GenericException | NotFoundException | AlreadyExistsException | IOException
             | AuthorizationDeniedException e) {
-            LOGGER.error("Error creating file: " + filePath, e);
+            LOGGER.error("Error creating file: {}", filePath, e);
           }
         }
       });
@@ -318,7 +372,7 @@ public class EARKSIPPluginsTest {
       new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, "026106")), null, new Sublist(0, 1),
       new ArrayList<>());
     Assert.assertEquals(findSpecificAIP.getTotalCount(), 1L);
-    IndexedAIP specificAIP = findSpecificAIP.getResults().get(0);
+    IndexedAIP specificAIP = findSpecificAIP.getResults().getFirst();
     Assert.assertEquals(specificAIP.getAncestors().size(), 4);
   }
 

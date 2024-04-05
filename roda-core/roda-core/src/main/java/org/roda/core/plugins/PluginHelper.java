@@ -739,7 +739,7 @@ public final class PluginHelper {
 
   // FIXME 20161128 hsilva: rename this to force search scope
   public static <T extends IsRODAObject> boolean getForceParentIdFromParameters(Plugin<T> plugin) {
-    return new Boolean(plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID));
+    return Boolean.parseBoolean(plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID));
   }
 
   /*********************************/
