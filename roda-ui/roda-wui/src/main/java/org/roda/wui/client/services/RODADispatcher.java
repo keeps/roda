@@ -1,21 +1,21 @@
 package org.roda.wui.client.services;
 
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestException;
 import org.fusesource.restygwt.client.Dispatcher;
 import org.fusesource.restygwt.client.Method;
 
-import java.io.Serial;
-import java.io.Serializable;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestException;
 
 /**
  * @author António Lindo <alindo@keep.pt>
  */
-public class RODADispatcher implements Dispatcher, Serializable {
+public class RODADispatcher implements Dispatcher {
   public static final RODADispatcher INSTANCE = new RODADispatcher();
-  @Serial
-  private static final long serialVersionUID = 5986891772131391945L;
+
+  private String operationUUID;
+  private String operationReason;
+  private String operationType;
 
   public String getOperationUUID() {
     return operationUUID;
@@ -40,13 +40,6 @@ public class RODADispatcher implements Dispatcher, Serializable {
   public void setOperationType(String operationType) {
     this.operationType = operationType;
   }
-
-  private String operationUUID;
-  private String operationReason;
-
-  private String operationType;
-
-
 
   @Override
   public Request send(Method method, RequestBuilder requestBuilder) throws RequestException {

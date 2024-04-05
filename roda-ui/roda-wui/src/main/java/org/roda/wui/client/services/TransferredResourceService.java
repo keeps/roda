@@ -34,7 +34,6 @@ import jakarta.ws.rs.core.MediaType;
  */
 @Path("../api/v2/transfers/")
 @Tag(name = "v2")
-//@Options(dispatcher = RODADispatcher.class)
 public interface TransferredResourceService extends DirectRestService {
 
   @GET
