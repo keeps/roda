@@ -372,6 +372,10 @@ public class EARKSIP2ToAIPPluginUtils {
   }
 
   private static String getType(IPRepresentation sr) {
-    return sr.getContentInformationType().asString();
+    if (sr.getContentType().isOtherAndOtherTypeIsDefined()) {
+      return sr.getContentType().getOtherType();
+    } else {
+      return sr.getContentType().getType().asString();
+    }
   }
 }
