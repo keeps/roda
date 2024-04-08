@@ -253,7 +253,8 @@ public class ShowDisposalHold extends Composite {
           SelectedItemsFilter<IndexedAIP> selectedItemsFilter = new SelectedItemsFilter<>(filter,
             IndexedAIP.class.getName(), true);
           CountRequest countRequest = new CountRequest(IndexedAIP.class.getName(), filter, true);
-          Services.index(s -> s.count(countRequest))
+          Services services = new Services("Count disposal hold items", "post");
+          services.index(s -> s.count(countRequest))
             .whenComplete((size, error) -> {
               if (size != null) {
                 if (size != 0) {

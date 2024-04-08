@@ -215,7 +215,6 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
 
               @Override
               public void onSuccess(String result) {
-                //GWT.log(rodaDispatcher.getOperationReason());
                 ss.transferredResource(s -> s.renameTransferredResource(object.getUUID(), result, true))
                   .whenComplete((value, error) -> {
                     if (value != null) {

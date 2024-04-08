@@ -29,6 +29,7 @@ import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
+import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.client.services.IndexService;
 import org.roda.wui.common.I18nUtility;
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ import java.util.Set;
 @Path(IndexResource.ENDPOINT)
 @Tag(name = IndexResource.SWAGGER_ENDPOINT)
 public class IndexResource implements IndexService {
-  public static final String ENDPOINT = "/v2/index";
+  public static final String ENDPOINT = "/index";
   public static final String SWAGGER_ENDPOINT = "v2 index";
   /**
    * Logger.
@@ -77,10 +78,15 @@ public class IndexResource implements IndexService {
   }
 
   @Override
-  public Long count(CountRequest countRequest) throws RODAException {
+  public Long count(CountRequest countRequest) {
     final User user = UserUtility.getApiUser(request);
-    return Browser.count(user, getClass(countRequest.classToReturn), countRequest.filter,
-      countRequest.onlyActive);
+    try {
+      return Browser.count(user, getClass(countRequest.classToReturn), countRequest.filter,
+        countRequest.onlyActive);
+    } catch (RODAException e) {
+      throw new RESTException(e);
+    }
+
   }
 
   /**

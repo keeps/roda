@@ -238,7 +238,8 @@ public class ListSelectionUtils {
       if (last != null) {
         if (last.getSelected().getUUID().equals(object.getUUID())) {
           CountRequest countRequest = new CountRequest(objectClass.getName(), last.getFilter(), last.getJustActive());
-          Services.index(s -> s.count(countRequest))
+          Services services = new Services("Count items", "post");
+          services.index(s -> s.count(countRequest))
             .whenComplete((size, error) -> {
               if (size != null) {
                 Integer lastIndex = last.getIndex();
