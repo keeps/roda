@@ -21,6 +21,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.roda.core.RodaCoreFactory;
@@ -39,6 +41,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -100,6 +103,7 @@ import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
+import org.roda.wui.common.model.RequestController;
 
 public class Browser extends RodaWuiController {
 
@@ -331,8 +335,36 @@ public class Browser extends RodaWuiController {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final Filter filter,
+    final Sorter sorter, final Sublist sublist, final Facets facets, final RequestController requestController,
+    final boolean justActive, final List<String> fieldsToReturn)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(requestController.getUser(), classToReturn);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      return BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, requestController.getUser(), justActive,
+        fieldsToReturn);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestController.getUser(), state, RodaConstants.CONTROLLER_CLASS_PARAM,
+        classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, filter,
+        RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
+    }
+  }
+
+  public static <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final Filter filter,
     final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
     final List<String> fieldsToReturn) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -584,7 +616,8 @@ public class Browser extends RodaWuiController {
 
       controllerAssistant.checkObjectPermissions(user, representation);
 
-      return BrowserHelper.retrieveAIPRepresentationOthermetadataFile(representation, acceptFormat, filename, extension, type);
+      return BrowserHelper.retrieveAIPRepresentationOthermetadataFile(representation, acceptFormat, filename, extension,
+        type);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -774,8 +807,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static EntityResponse retrieveFilePreservationMetadata(User user, String aipId, String fileId,
-    String acceptFormat, String language)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException, TechnicalMetadataNotFoundException {
+    String acceptFormat, String language) throws AuthorizationDeniedException, GenericException, NotFoundException,
+    RequestNotValidException, TechnicalMetadataNotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
@@ -2172,8 +2205,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static TransferredResource retrieveTransferredResource(User user, String resourceId)
-    throws RODAException {
+  public static TransferredResource retrieveTransferredResource(User user, String resourceId) throws RODAException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -2182,7 +2214,7 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return  BrowserHelper.retrieve(TransferredResource.class, resourceId, new ArrayList<>());
+      return BrowserHelper.retrieve(TransferredResource.class, resourceId, new ArrayList<>());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -2193,8 +2225,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static EntityResponse retrieveTransferredResourceBinary(User user, String resourceId)
-    throws RODAException {
+  public static EntityResponse retrieveTransferredResourceBinary(User user, String resourceId) throws RODAException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -2648,9 +2679,9 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static String renameTransferredResource(User user, String transferredResourceId, String newName, Boolean replaceExisting)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
-    IsStillUpdatingException, NotFoundException {
+  public static String renameTransferredResource(User user, String transferredResourceId, String newName,
+    Boolean replaceExisting) throws GenericException, RequestNotValidException, AuthorizationDeniedException,
+    AlreadyExistsException, IsStillUpdatingException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
