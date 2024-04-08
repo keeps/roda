@@ -78,6 +78,5 @@ public interface IndexService extends DirectRestService {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Operation(summary = "Count indexed resources", description = "Counts indexed resources", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class)))})
-  Long count(@Parameter(description = "Count parameters") final CountRequest countRequest)
-    throws RODAException;
+  Long count(@Parameter(description = "Count parameters") final CountRequest countRequest);
 }

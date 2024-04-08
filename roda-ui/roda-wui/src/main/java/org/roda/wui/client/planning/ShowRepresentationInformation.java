@@ -311,7 +311,8 @@ public class ShowRepresentationInformation extends Composite {
       Filter aipFilter = new Filter();
       aipFilter.add(new OrFiltersParameters(aipParams));
       CountRequest countRequest = new CountRequest(IndexedAIP.class.getName(), aipFilter, true);
-      Services.index(s -> s.count(countRequest))
+      Services services = new Services("Count aip items", "post");
+      services.index(s -> s.count(countRequest))
         .whenComplete((size, error) -> {
           if (size != null) {
             initEntityFiltersObjectPanel(IndexedAIP.class.getSimpleName(), size);
@@ -323,7 +324,8 @@ public class ShowRepresentationInformation extends Composite {
       Filter representationFilter = new Filter();
       representationFilter.add(new OrFiltersParameters(representationParams));
       CountRequest countRequest = new CountRequest(IndexedRepresentation.class.getName(), representationFilter, true);
-      Services.index(s -> s.count(countRequest))
+      Services services = new Services("Count representation items", "post");
+      services.index(s -> s.count(countRequest))
         .whenComplete((size, error) -> {
           if (size != null) {
             initEntityFiltersObjectPanel(IndexedRepresentation.class.getSimpleName(), size);
@@ -335,7 +337,8 @@ public class ShowRepresentationInformation extends Composite {
       Filter fileFilter = new Filter();
       fileFilter.add(new OrFiltersParameters(fileParams));
       CountRequest countRequest = new CountRequest(IndexedFile.class.getName(), fileFilter, true);
-      Services.index(s -> s.count(countRequest))
+      Services services = new Services("Count file items", "post");
+      services.index(s -> s.count(countRequest))
         .whenComplete((size, error) -> {
           if (size != null) {
             initEntityFiltersObjectPanel(IndexedFile.class.getName(), size);

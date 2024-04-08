@@ -161,7 +161,8 @@ public class BrowseFile extends Composite {
               Filter filter = new Filter(
                 new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
               CountRequest countRequest = new CountRequest(IndexedDIP.class.getName(), filter, justActive);
-              Services.index(s -> s.count(countRequest))
+              Services services = new Services("Count dip items", "post");
+              services.index(s -> s.count(countRequest))
                 .whenComplete((size, error) -> {
                   if (size != null) {
                     if (size > 0) {

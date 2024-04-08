@@ -39,8 +39,9 @@ public class ClientSelectedItemsUtils {
       SelectedItemsFilter<T> selectedItemsFilter = (SelectedItemsFilter<T>) selected;
       Filter filter = selectedItemsFilter.getFilter();
       boolean justActive = selectedItemsFilter.justActive();
+      Services services = new Services("Count selected items", "post");
       CountRequest countRequest = new CountRequest(classToReturn.getName(), filter, justActive);
-      Services.index(s -> s.count(countRequest))
+      services.index(s -> s.count(countRequest))
         .whenComplete((size, error) -> {
           if (size != null) {
             callback.onSuccess(size);

@@ -2149,6 +2149,28 @@ public class Browser extends RodaWuiController {
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.LOCALE, locale);
     }
   }
+  @Deprecated
+  public static EntityResponse retrieveTransferredResourcev1(User user, String resourceId, String acceptFormat)
+    throws RODAException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return BrowserHelper.retrieveTransferredResource(
+        BrowserHelper.retrieve(TransferredResource.class, resourceId, new ArrayList<>()), acceptFormat);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, resourceId, state, RodaConstants.CONTROLLER_RESOURCE_ID_PARAM,
+        resourceId);
+    }
+  }
 
   public static TransferredResource retrieveTransferredResource(User user, String resourceId)
     throws RODAException {
