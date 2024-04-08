@@ -15,6 +15,7 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.moxy.xml.MoxyXmlFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.roda.wui.api.v1.utils.ApiOriginFilter;
+import org.roda.wui.api.v2.exceptions.RESTExceptionMapper;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.servlets.ContextListener;
 
@@ -73,6 +74,7 @@ public class RestApplication extends ResourceConfig {
     register(MultiPartFeature.class);
     register(ApiOriginFilter.class);
     register(SwaggerSerializers.class);
+    register(RESTExceptionMapper.class);
     packages("org.roda.wui.api.v2");
     packages("io.swagger.v3.jaxrs2.integration.resources");
   }
