@@ -179,7 +179,18 @@ public class RODA {
     bean.addInitParameter("jakarta.ws.rs.Application", "org.roda.wui.api.RestApplication");
 
     bean.setLoadOnStartup(2);
-    bean.addUrlMappings("/api/*");
+    bean.addUrlMappings("/api/v1/*");
+    return bean;
+  }
+
+  @Bean
+  public ServletRegistrationBean<HttpServlet> restAPIV2() {
+    ServletRegistrationBean<HttpServlet> bean;
+    bean = new ServletRegistrationBean<>(new org.glassfish.jersey.servlet.ServletContainer());
+    bean.addInitParameter("jakarta.ws.rs.Application", "org.roda.wui.api.v2.RestApplication");
+
+    bean.setLoadOnStartup(2);
+    bean.addUrlMappings("/api/v2/*");
     return bean;
   }
 
