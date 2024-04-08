@@ -10,7 +10,6 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 /**
  * @author António Lindo <alindo@keep.pt>
  */
