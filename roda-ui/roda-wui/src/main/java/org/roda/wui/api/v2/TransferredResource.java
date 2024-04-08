@@ -1,6 +1,7 @@
 
 package org.roda.wui.api.v2;
 
+import com.google.gwt.core.client.GWT;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -114,6 +115,36 @@ public class TransferredResource implements TransferredResourceService {
     } catch (RODAException e) {
       throw new RESTException(e);
     }
+
+
+  }
+
+  @Override
+  public List<org.roda.core.data.v2.ip.TransferredResource> getSelectedTransferredResources(SelectedItems<org.roda.core.data.v2.ip.TransferredResource> selected) {
+    User user = UserUtility.getApiUser(request);
+
+    try {
+      return Browser.retrieveSelectedTransferredResource(user, selected);
+    } catch (RODAException e) {
+      throw new RESTException(e);
+    }
+
+  }
+
+  @Override
+  public Job moveTransferredResources(SelectedItems<org.roda.core.data.v2.ip.TransferredResource> items, String resourceId) {
+    User user = UserUtility.getApiUser(request);
+
+    try {
+      if (resourceId != null) {
+        return Browser.moveTransferredResource(user, items, getResource(resourceId));
+      } else {
+        return Browser.moveTransferredResource(user, items, null);
+      }
+    } catch (RODAException e) {
+      throw new RESTException(e);
+    }
+
 
   }
 

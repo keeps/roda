@@ -54,7 +54,7 @@ public interface TransferredResourceService extends DirectRestService {
   @POST
   @Path("/selected")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
-  @Operation(summary = "List transferred resources", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectedItems.class))), description = "Gets a list of transferred resources", responses = {
+  @Operation(summary = "List selected transferred resources", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectedItems.class))), description = "Gets a list of transferred resources", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TransferredResources.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   List<org.roda.core.data.v2.ip.TransferredResource> getSelectedTransferredResources(
@@ -62,7 +62,7 @@ public interface TransferredResourceService extends DirectRestService {
 
   @POST
   @Path("/move")
-  @Operation(summary = "List transferred resources", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectedItems.class))), description = "Gets a list of transferred resources", responses = {
+  @Operation(summary = "Move transferred resources", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectedItems.class))) ,description = "Gets a list of transferred resources", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   Job moveTransferredResources(
@@ -98,7 +98,7 @@ public interface TransferredResourceService extends DirectRestService {
   @PUT
   @Path("/rename")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
-  @Operation(summary = "Rename transferred resource folder", description = "Renames a transferred resource", responses = {
+  @Operation(summary = "Rename transferred resource", description = "Renames a transferred resource", responses = {
     @ApiResponse(responseCode = "201", description = "OK", content = @Content(schema = @Schema(implementation = TransferredResource.class))),
     @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   TransferredResource renameTransferredResource(
