@@ -176,7 +176,7 @@ public class RODA {
   public ServletRegistrationBean<HttpServlet> restAPI() {
     ServletRegistrationBean<HttpServlet> bean;
     bean = new ServletRegistrationBean<>(new org.glassfish.jersey.servlet.ServletContainer());
-    bean.addInitParameter("jakarta.ws.rs.Application", "org.roda.wui.api.RestApplication");
+    bean.addInitParameter("jakarta.ws.rs.Application", "org.roda.wui.api.v1.RestApplication");
 
     bean.setLoadOnStartup(2);
     bean.addUrlMappings("/api/v1/*");

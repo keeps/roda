@@ -52,10 +52,14 @@ public class RestApplication extends ResourceConfig {
     }
 
     Components components = new Components();
-    SecurityScheme securityScheme = new SecurityScheme().type(Type.HTTP).scheme("basic");
-    components.addSecuritySchemes("basicAuth", securityScheme);
+    SecurityScheme basicAuthScheme = new SecurityScheme().type(Type.HTTP).scheme("basic");
+    SecurityScheme bearerScheme = new SecurityScheme().type(Type.HTTP).scheme("bearer");
+
+    components.addSecuritySchemes("basicAuth", basicAuthScheme);
+    components.addSecuritySchemes("bearerAuth", bearerScheme);
 
     oas.addSecurityItem(new SecurityRequirement().addList("basicAuth"));
+    oas.addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
 
     oas.components(components);
 
