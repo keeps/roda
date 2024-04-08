@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api;
+package org.roda.wui.api.v2;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,7 +33,7 @@ import io.swagger.v3.oas.models.servers.Server;
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.ApplicationPath;
 
-@ApplicationPath("/api")
+@ApplicationPath("/api/v2")
 public class RestApplication extends ResourceConfig {
   public RestApplication() {
     super();
@@ -42,7 +42,7 @@ public class RestApplication extends ResourceConfig {
     Info info = new Info().title("RODA API").description("REST AIP for RODA")
       .contact(new Contact().email("info@keep.pt").name("KEEP SOLUTIONS")
         .url("https://www.keep.pt/en/contacts-proposals-information-telephone-address"))
-      .license(new License().name("LGPLv3").url("http://www.gnu.org/licenses/lgpl-3.0.html")).version("1.0.0");
+      .license(new License().name("LGPLv3").url("http://www.gnu.org/licenses/lgpl-3.0.html")).version("2.0.0");
 
     oas.info(info);
 
@@ -61,7 +61,7 @@ public class RestApplication extends ResourceConfig {
 
     OpenApiResource openApiResource = new OpenApiResource();
     SwaggerConfiguration oasConfig = new SwaggerConfiguration().openAPI(oas).prettyPrint(true)
-      .resourcePackages(Stream.of("org.roda.wui.api.v1").collect(Collectors.toSet()));
+      .resourcePackages(Stream.of("org.roda.wui.api.v2").collect(Collectors.toSet()));
     openApiResource.setOpenApiConfiguration(oasConfig);
     register(openApiResource);
     register(JacksonFeature.class);
@@ -69,7 +69,7 @@ public class RestApplication extends ResourceConfig {
     register(MultiPartFeature.class);
     register(ApiOriginFilter.class);
     register(SwaggerSerializers.class);
-    packages("org.roda.wui.api");
+    packages("org.roda.wui.api.v2");
     packages("io.swagger.v3.jaxrs2.integration.resources");
   }
 }
