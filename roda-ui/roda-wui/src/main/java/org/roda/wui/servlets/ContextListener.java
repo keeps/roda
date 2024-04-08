@@ -20,16 +20,23 @@ public class ContextListener implements ServletContextListener {
 
   @Override
   public void contextInitialized(ServletContextEvent servletContextEvent) {
-    context = servletContextEvent.getServletContext();
+    setServletContext(servletContextEvent);
   }
 
   @Override
   public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    context = null;
+    destroy();
   }
 
   public static ServletContext getServletContext() {
     return context;
   }
 
+  private static void setServletContext(ServletContextEvent servletContextEvent) {
+    ContextListener.context = servletContextEvent.getServletContext();
+  }
+
+  private static void destroy() {
+    context = null;
+  }
 }
