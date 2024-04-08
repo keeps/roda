@@ -56,7 +56,7 @@ import jakarta.ws.rs.core.Response;
 @Path(UsersResource.ENDPOINT)
 @Tag(name = UsersResource.SWAGGER_ENDPOINT)
 public class UsersResource {
-  public static final String ENDPOINT = "/v1/users";
+  public static final String ENDPOINT = "/users";
   public static final String SWAGGER_ENDPOINT = "v1 users";
 
   @Context

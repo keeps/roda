@@ -41,7 +41,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path(PreservationMetadataEventsResource.ENDPOINT)
 @Tag(name = PreservationMetadataEventsResource.SWAGGER_ENDPOINT)
 public class PreservationMetadataEventsResource {
-  public static final String ENDPOINT = "/v1/events";
+  public static final String ENDPOINT = "/events";
   public static final String SWAGGER_ENDPOINT = "v1 events";
 
   @Context

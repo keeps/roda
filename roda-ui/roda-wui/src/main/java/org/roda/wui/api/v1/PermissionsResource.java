@@ -39,7 +39,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path(PermissionsResource.ENDPOINT)
 @Tag(name = PermissionsResource.SWAGGER_ENDPOINT)
 public class PermissionsResource {
-  public static final String ENDPOINT = "/v1/permissions";
+  public static final String ENDPOINT = "/permissions";
   public static final String SWAGGER_ENDPOINT = "v1 permissions";
 
   @Context

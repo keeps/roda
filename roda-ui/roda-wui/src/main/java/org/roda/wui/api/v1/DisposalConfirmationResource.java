@@ -49,7 +49,7 @@ import jakarta.ws.rs.core.Response;
 @Path(DisposalConfirmationResource.ENDPOINT)
 @Tag(name = DisposalConfirmationResource.SWAGGER_ENDPOINT)
 public class DisposalConfirmationResource {
-  public static final String ENDPOINT = "/v1/disposal/confirmation";
+  public static final String ENDPOINT = "/disposal/confirmation";
   public static final String SWAGGER_ENDPOINT = "v1 disposal";
 
   @Context

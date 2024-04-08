@@ -44,7 +44,7 @@ import jakarta.ws.rs.core.Response;
 @Path(LocalInstanceResource.ENDPOINT)
 @Tag(name = LocalInstanceResource.SWAGGER_ENDPOINT)
 public class LocalInstanceResource {
-  public static final String ENDPOINT = "/v1/instance";
+  public static final String ENDPOINT = "/instance";
   public static final String SWAGGER_ENDPOINT = "v1 instance";
 
   @Context

@@ -43,7 +43,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path(ReportsResource.ENDPOINT)
 @Tag(name = ReportsResource.SWAGGER_ENDPOINT)
 public class ReportsResource {
-  public static final String ENDPOINT = "/v1/reports";
+  public static final String ENDPOINT = "/reports";
   public static final String SWAGGER_ENDPOINT = "v1 reports";
 
   @Context

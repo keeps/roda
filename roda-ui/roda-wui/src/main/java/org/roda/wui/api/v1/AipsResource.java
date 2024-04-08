@@ -68,7 +68,7 @@ import jakarta.ws.rs.core.Response;
 @Path(AipsResource.ENDPOINT)
 @Tag(name = AipsResource.SWAGGER_ENDPOINT)
 public class AipsResource {
-  public static final String ENDPOINT = "/v1/aips";
+  public static final String ENDPOINT = "/aips";
   public static final String SWAGGER_ENDPOINT = "v1 aips";
 
   @Context

@@ -35,7 +35,7 @@ import jakarta.ws.rs.core.Response;
 @Path(MetricsResource.ENDPOINT)
 @Tag(name = MetricsResource.SWAGGER_ENDPOINT)
 public class MetricsResource {
-  public static final String ENDPOINT = "/v1/metrics";
+  public static final String ENDPOINT = "/metrics";
   public static final String SWAGGER_ENDPOINT = "v1 metrics";
 
   @Context

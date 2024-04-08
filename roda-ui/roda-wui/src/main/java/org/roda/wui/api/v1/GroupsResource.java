@@ -56,7 +56,7 @@ import jakarta.ws.rs.core.Response;
 @Path(GroupsResource.ENDPOINT)
 @Tag(name = GroupsResource.SWAGGER_ENDPOINT)
 public class GroupsResource {
-  public static final String ENDPOINT = "/v1/groups";
+  public static final String ENDPOINT = "/groups";
   public static final String SWAGGER_ENDPOINT = "v1 groups";
 
   @Context

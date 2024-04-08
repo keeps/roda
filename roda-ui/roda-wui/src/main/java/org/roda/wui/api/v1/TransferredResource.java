@@ -65,7 +65,7 @@ import jakarta.ws.rs.core.Response.Status;
 @Path(TransferredResource.ENDPOINT)
 @Tag(name = TransferredResource.SWAGGER_ENDPOINT)
 public class TransferredResource {
-  public static final String ENDPOINT = "/v1/transfers";
+  public static final String ENDPOINT = "/transfers";
   public static final String SWAGGER_ENDPOINT = "v1 transfers";
 
   @Context

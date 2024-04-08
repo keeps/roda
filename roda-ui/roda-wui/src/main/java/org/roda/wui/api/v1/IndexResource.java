@@ -74,7 +74,7 @@ import jakarta.ws.rs.core.Response;
  *
  * @author Rui Castro <rui.castro@gmail.com>
  */
-@Path("/v1/index")
+@Path("/index")
 @Tag(name = "v1 index")
 public class IndexResource {
   /**

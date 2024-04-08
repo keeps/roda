@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path(ThemeResource.ENDPOINT)
 @Tag(name = ThemeResource.SWAGGER_ENDPOINT)
 public class ThemeResource {
-  public static final String ENDPOINT = "/v1/theme";
+  public static final String ENDPOINT = "/theme";
   public static final String SWAGGER_ENDPOINT = "v1 theme";
 
   @GET

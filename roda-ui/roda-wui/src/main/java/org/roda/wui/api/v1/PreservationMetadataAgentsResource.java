@@ -40,7 +40,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path(PreservationMetadataAgentsResource.ENDPOINT)
 @Tag(name = PreservationMetadataAgentsResource.SWAGGER_ENDPOINT)
 public class PreservationMetadataAgentsResource {
-  public static final String ENDPOINT = "/v1/agents";
+  public static final String ENDPOINT = "/agents";
   public static final String SWAGGER_ENDPOINT = "v1 agents";
 
   @Context

@@ -69,7 +69,7 @@ import javax.xml.transform.TransformerException;
 @Path(FilesResource.ENDPOINT)
 @Tag(name = FilesResource.SWAGGER_ENDPOINT)
 public class FilesResource {
-  public static final String ENDPOINT = "/v1/files";
+  public static final String ENDPOINT = "/files";
   public static final String SWAGGER_ENDPOINT = "v1 files";
 
   @Context

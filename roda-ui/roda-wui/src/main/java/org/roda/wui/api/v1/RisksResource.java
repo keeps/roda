@@ -53,7 +53,7 @@ import jakarta.ws.rs.core.Response;
 @Path(RisksResource.ENDPOINT)
 @Tag(name = RisksResource.SWAGGER_ENDPOINT)
 public class RisksResource {
-  public static final String ENDPOINT = "/v1/risks";
+  public static final String ENDPOINT = "/risks";
   public static final String SWAGGER_ENDPOINT = "v1 risks";
 
   @Context

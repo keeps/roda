@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api;
+package org.roda.wui.api.v1;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -69,7 +69,7 @@ public class RestApplication extends ResourceConfig {
     register(MultiPartFeature.class);
     register(ApiOriginFilter.class);
     register(SwaggerSerializers.class);
-    packages("org.roda.wui.api");
+    packages("org.roda.wui.api.v1");
     packages("io.swagger.v3.jaxrs2.integration.resources");
   }
 }
