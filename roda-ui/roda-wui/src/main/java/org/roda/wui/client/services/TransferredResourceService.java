@@ -48,7 +48,7 @@ public interface TransferredResourceService extends DirectRestService {
   @POST
   @Path("/selected")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
-  @Operation(summary = "List transferred resources", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON)), description = "Gets a list of transferred resources", responses = {
+  @Operation(summary = "List transferred resources", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectedItems.class))), description = "Gets a list of transferred resources", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TransferredResources.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   List<org.roda.core.data.v2.ip.TransferredResource> getSelectedTransferredResources(
@@ -56,7 +56,7 @@ public interface TransferredResourceService extends DirectRestService {
 
   @POST
   @Path("/move")
-  @Operation(summary = "List transferred resources", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON)) ,description = "Gets a list of transferred resources", responses = {
+  @Operation(summary = "List transferred resources", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectedItems.class))) ,description = "Gets a list of transferred resources", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   Job moveTransferredResources(
@@ -83,7 +83,7 @@ public interface TransferredResourceService extends DirectRestService {
 
   @DELETE
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
-  @Operation(summary = "Delete multiple transferred resource", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON)), description = "Deletes more than one transferred resource", responses = {
+  @Operation(summary = "Delete multiple transferred resource", description = "Deletes more than one transferred resource", responses = {
     @ApiResponse(responseCode = "204", description = "No Content"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   Void deleteMultipleResources(
