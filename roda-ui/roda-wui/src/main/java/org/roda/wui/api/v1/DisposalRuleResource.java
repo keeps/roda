@@ -49,7 +49,7 @@ import jakarta.ws.rs.core.Response;
 @Path(DisposalRuleResource.ENDPOINT)
 @Tag(name = DisposalRuleResource.SWAGGER_ENDPOINT)
 public class DisposalRuleResource {
-  public static final String ENDPOINT = "/v1/disposal/rule";
+  public static final String ENDPOINT = "/disposal/rule";
   public static final String SWAGGER_ENDPOINT = "v1 rule";
 
   @Context

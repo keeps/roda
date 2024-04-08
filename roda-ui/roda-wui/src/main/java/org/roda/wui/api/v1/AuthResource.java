@@ -43,7 +43,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  *
  * @author Rui Castro <rui.castro@gmail.com>
  */
-@Path("/v1/auth")
+@Path("/auth")
 @Tag(name = "v1 auth")
 public class AuthResource {
   /** Logger. */

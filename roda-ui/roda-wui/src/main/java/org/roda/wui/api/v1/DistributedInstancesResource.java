@@ -53,7 +53,7 @@ import jakarta.ws.rs.core.Response;
 @Path(DistributedInstancesResource.ENDPOINT)
 @Tag(name = DistributedInstancesResource.SWAGGER_ENDPOINT)
 public class DistributedInstancesResource {
-  public static final String ENDPOINT = "/v1/distributed_instances";
+  public static final String ENDPOINT = "/distributed_instances";
   public static final String SWAGGER_ENDPOINT = "v1 distributed instances";
 
   @Context

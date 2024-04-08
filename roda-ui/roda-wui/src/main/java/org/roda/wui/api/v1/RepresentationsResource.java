@@ -72,7 +72,7 @@ import jakarta.ws.rs.core.Response;
 @Path(RepresentationsResource.ENDPOINT)
 @Tag(name = RepresentationsResource.SWAGGER_ENDPOINT)
 public class RepresentationsResource {
-  public static final String ENDPOINT = "/v1/representations";
+  public static final String ENDPOINT = "/representations";
   public static final String SWAGGER_ENDPOINT = "v1 representations";
 
   @Context

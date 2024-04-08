@@ -50,7 +50,7 @@ import jakarta.ws.rs.core.Response;
 @Path(DisposalScheduleResource.ENDPOINT)
 @Tag(name = DisposalScheduleResource.SWAGGER_ENDPOINT)
 public class DisposalScheduleResource {
-  public static final String ENDPOINT = "/v1/disposal/schedule";
+  public static final String ENDPOINT = "/disposal/schedule";
   public static final String SWAGGER_ENDPOINT = "v1 disposal";
 
   @Context

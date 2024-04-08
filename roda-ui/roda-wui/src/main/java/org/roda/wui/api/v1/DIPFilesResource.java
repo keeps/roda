@@ -61,7 +61,7 @@ import jakarta.ws.rs.core.Response;
 @Path(DIPFilesResource.ENDPOINT)
 @Tag(name = DIPFilesResource.SWAGGER_ENDPOINT)
 public class DIPFilesResource {
-  public static final String ENDPOINT = "/v1/dipfiles";
+  public static final String ENDPOINT = "/dipfiles";
   public static final String SWAGGER_ENDPOINT = "v1 dipfiles";
 
   @Context

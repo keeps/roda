@@ -47,7 +47,7 @@ import jakarta.ws.rs.core.Response;
 @Path(JobsResource.ENDPOINT)
 @Tag(name = JobsResource.SWAGGER_ENDPOINT)
 public class JobsResource {
-  public static final String ENDPOINT = "/v1/jobs";
+  public static final String ENDPOINT = "/jobs";
   public static final String SWAGGER_ENDPOINT = "v1 jobs";
 
   @Context

@@ -32,7 +32,7 @@ import jakarta.ws.rs.core.Response;
 @Path(LogEntriesResource.ENDPOINT)
 @Tag(name = LogEntriesResource.SWAGGER_ENDPOINT)
 public class LogEntriesResource {
-  public static final String ENDPOINT = "/v1/log_entries";
+  public static final String ENDPOINT = "/log_entries";
   public static final String SWAGGER_ENDPOINT = "v1 log entries";
 
   @Context

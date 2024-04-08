@@ -52,7 +52,7 @@ import jakarta.ws.rs.core.Response;
 @Path(NotificationsResource.ENDPOINT)
 @Tag(name = NotificationsResource.SWAGGER_ENDPOINT)
 public class NotificationsResource {
-  public static final String ENDPOINT = "/v1/notifications";
+  public static final String ENDPOINT = "/notifications";
   public static final String SWAGGER_ENDPOINT = "v1 notifications";
 
   @Context
