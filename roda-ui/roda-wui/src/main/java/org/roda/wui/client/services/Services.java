@@ -15,7 +15,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public class Services implements DirectRestService {
 
-  public Services() {}
+  public Services() {
+  }
 
   public Services(String operationReason, String operationType) {
     RODADispatcher.INSTANCE.setOperationUUID(UUID.randomUUID().toString());
@@ -26,14 +27,13 @@ public class Services implements DirectRestService {
   public <S extends DirectRestService> S get(Class<S> serviceClass) {
     if (TransferredResourceService.class.equals(serviceClass)) {
       return GWT.create(TransferredResourceService.class);
-    } else if (IndexService.class.equals(serviceClass)) {
-      return GWT.create(IndexService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
   }
 
-  public <S extends DirectRestService, T> CompletableFuture<T> future(Class<S> serviceClass, CheckedFunction<S, T> method) {
+  public <S extends DirectRestService, T> CompletableFuture<T> future(Class<S> serviceClass,
+    CheckedFunction<S, T> method) {
 
     CompletableFuture<T> result = new CompletableFuture<>();
     try {
@@ -49,19 +49,13 @@ public class Services implements DirectRestService {
         }
       }).call(get(serviceClass)));
     } catch (RODAException e) {
-     result.completeExceptionally(e);
+      result.completeExceptionally(e);
     }
     return result;
 
   }
 
-
   public <T> CompletableFuture<T> transferredResource(CheckedFunction<TransferredResourceService, T> method) {
     return future(TransferredResourceService.class, method);
   }
-
-  public <T> CompletableFuture<T> index(CheckedFunction<IndexService, T> method) {
-    return future(IndexService.class, method);
-  }
-
 }
