@@ -830,7 +830,7 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().retrieveAncestors(aip, user, fieldsToReturn);
   }
 
-  protected static <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
+  public static <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, User user, boolean justActive, List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().find(returnClass, filter, sorter, sublist, facets, user, justActive,
@@ -843,7 +843,7 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().findAll(returnClass, filter, user, justActive, fieldsToReturn);
   }
 
-  protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, boolean justActive, User user)
+  public static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, boolean justActive, User user)
     throws GenericException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().count(returnClass, filter, user, justActive);
   }
@@ -1183,8 +1183,8 @@ public class BrowserHelper {
   }
 
   public static EntityResponse retrieveFilePreservationMetadata(String aipId, String fileId, String acceptFormat,
-    String language)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, TechnicalMetadataNotFoundException {
+    String language) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+    TechnicalMetadataNotFoundException {
 
     final String filename;
     final ConsumesOutputStream stream;
@@ -2051,12 +2051,15 @@ public class BrowserHelper {
 
   public static TransferredResource createTransferredResourcesFolder(String parentUUID, String folderName,
     boolean forceCommit)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
     TransferredResource transferredResource = RodaCoreFactory.getTransferredResourcesScanner().createFolder(parentUUID,
       folderName);
     if (forceCommit) {
       RodaCoreFactory.getTransferredResourcesScanner().commit();
     }
+
+    transferredResource.setFullPath("");
+
     return transferredResource;
   }
 
@@ -2079,6 +2082,12 @@ public class BrowserHelper {
     }
 
     return ret;
+  }
+
+  public static Job deleteTransferredResourcesByJob(SelectedItems<TransferredResource> selected, User user)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    return createAndExecuteInternalJob("Delete transferred resources", selected, DeleteRODAObjectPlugin.class, user,
+      Collections.emptyMap(), "Could not execute delete transferred resources action");
   }
 
   public static void deleteTransferredResources(SelectedItems<TransferredResource> selected, User user)
@@ -2228,57 +2237,58 @@ public class BrowserHelper {
     return supportedMetadata;
   }
 
-  public static EntityResponse retrieveTransferredResource(final TransferredResource transferredResource, String acceptFormat) throws GenericException, NotFoundException, RequestNotValidException {
-      return new ObjectResponse<>(acceptFormat, transferredResource);
+  public static EntityResponse retrieveTransferredResource(final TransferredResource transferredResource,
+    String acceptFormat) throws GenericException, NotFoundException, RequestNotValidException {
+    return new ObjectResponse<>(acceptFormat, transferredResource);
   }
 
+  public static EntityResponse retrieveTransferredResourceBinary(final TransferredResource transferredResource)
+    throws GenericException, NotFoundException, RequestNotValidException {
+    final Path filePath = RodaCoreFactory.getTransferredResourcesScanner()
+      .retrieveFilePath(transferredResource.getFullPath());
 
-  public static EntityResponse retrieveTransferredResourceBinary(final TransferredResource transferredResource) throws GenericException, NotFoundException, RequestNotValidException {
-      final Path filePath = RodaCoreFactory.getTransferredResourcesScanner()
-        .retrieveFilePath(transferredResource.getFullPath());
+    ConsumesOutputStream stream = new ConsumesOutputStream() {
 
-      ConsumesOutputStream stream = new ConsumesOutputStream() {
+      @Override
+      public String getMediaType() {
+        return RodaConstants.MEDIA_TYPE_APPLICATION_OCTET_STREAM;
+      }
 
-        @Override
-        public String getMediaType() {
-          return RodaConstants.MEDIA_TYPE_APPLICATION_OCTET_STREAM;
+      @Override
+      public String getFileName() {
+        return transferredResource.getName();
+      }
+
+      @Override
+      public void consumeOutputStream(OutputStream out) throws IOException {
+        Files.copy(filePath, out);
+      }
+
+      @Override
+      public Date getLastModified() {
+        Date ret;
+        try {
+          ret = new Date(Files.getLastModifiedTime(filePath).toMillis());
+        } catch (IOException e) {
+          ret = null;
+        }
+        return ret;
+      }
+
+      @Override
+      public long getSize() {
+        long size;
+        try {
+          size = Files.size(filePath);
+        } catch (IOException e) {
+          size = -1;
         }
 
-        @Override
-        public String getFileName() {
-          return transferredResource.getName();
-        }
+        return size;
+      }
+    };
 
-        @Override
-        public void consumeOutputStream(OutputStream out) throws IOException {
-          Files.copy(filePath, out);
-        }
-
-        @Override
-        public Date getLastModified() {
-          Date ret;
-          try {
-            ret = new Date(Files.getLastModifiedTime(filePath).toMillis());
-          } catch (IOException e) {
-            ret = null;
-          }
-          return ret;
-        }
-
-        @Override
-        public long getSize() {
-          long size;
-          try {
-            size = Files.size(filePath);
-          } catch (IOException e) {
-            size = -1;
-          }
-
-          return size;
-        }
-      };
-
-      return new StreamResponse(stream);
+    return new StreamResponse(stream);
   }
 
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
@@ -2780,7 +2790,8 @@ public class BrowserHelper {
 
     if (!resources.getResults().isEmpty()) {
       TransferredResource resource = resources.getResults().get(0);
-      return RodaCoreFactory.getTransferredResourcesScanner().renameTransferredResource(resource, newName, replaceExisting, true);
+      return RodaCoreFactory.getTransferredResourcesScanner().renameTransferredResource(resource, newName,
+        replaceExisting, true);
     } else {
       return transferredResourceId;
     }
@@ -2886,18 +2897,16 @@ public class BrowserHelper {
 
   public static List<TransferredResource> retrieveSelectedTransferredResource(
     SelectedItems<TransferredResource> selected) throws GenericException, RequestNotValidException {
-    if (selected instanceof SelectedItemsList) {
-      SelectedItemsList<TransferredResource> selectedList = (SelectedItemsList<TransferredResource>) selected;
+    if (selected instanceof SelectedItemsList<TransferredResource> selectedList) {
       Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
-      IndexResult<TransferredResource> iresults = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+      IndexResult<TransferredResource> results = RodaCoreFactory.getIndexService().find(TransferredResource.class,
         filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()), new ArrayList<>());
-      return iresults.getResults();
-    } else if (selected instanceof SelectedItemsFilter) {
-      SelectedItemsFilter<TransferredResource> selectedFilter = (SelectedItemsFilter<TransferredResource>) selected;
+      return results.getResults();
+    } else if (selected instanceof SelectedItemsFilter<TransferredResource> selectedFilter) {
       Long counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, selectedFilter.getFilter());
-      IndexResult<TransferredResource> iresults = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+      IndexResult<TransferredResource> results = RodaCoreFactory.getIndexService().find(TransferredResource.class,
         selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter.intValue()), new ArrayList<>());
-      return iresults.getResults();
+      return results.getResults();
     } else {
       return new ArrayList<>();
     }

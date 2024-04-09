@@ -37,6 +37,7 @@ public class ClientSelectedItemsUtils {
       SelectedItemsFilter<T> selectedItemsFilter = (SelectedItemsFilter<T>) selected;
       Filter filter = selectedItemsFilter.getFilter();
       boolean justActive = selectedItemsFilter.justActive();
+
       BrowserService.Util.getInstance().count(classToReturn.getName(), filter, justActive, new AsyncCallback<Long>() {
 
         @Override

@@ -21,8 +21,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.roda.core.RodaCoreFactory;
@@ -41,7 +39,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -103,7 +100,7 @@ import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
-import org.roda.wui.common.model.RequestController;
+import org.roda.wui.common.model.RequestContext;
 
 public class Browser extends RodaWuiController {
 
@@ -335,27 +332,27 @@ public class Browser extends RodaWuiController {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final Facets facets, final RequestController requestController,
+    final Sorter sorter, final Sublist sublist, final Facets facets, final RequestContext requestContext,
     final boolean justActive, final List<String> fieldsToReturn)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
 
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    controllerAssistant.checkRoles(requestController.getUser(), classToReturn);
+    controllerAssistant.checkRoles(requestContext.getUser(), classToReturn);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
-      return BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, requestController.getUser(), justActive,
+      return BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, requestContext.getUser(), justActive,
         fieldsToReturn);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(requestController.getUser(), state, RodaConstants.CONTROLLER_CLASS_PARAM,
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_CLASS_PARAM,
         classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, filter,
         RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
     }
@@ -1969,7 +1966,7 @@ public class Browser extends RodaWuiController {
 
   public static TransferredResource createTransferredResourcesFolder(User user, String parentUUID, String folderName,
     boolean forceCommit)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -2183,7 +2180,7 @@ public class Browser extends RodaWuiController {
     }
   }
   @Deprecated
-  public static EntityResponse retrieveTransferredResourcev1(User user, String resourceId, String acceptFormat)
+  public static EntityResponse retrieveTransferredResource(User user, String resourceId, String acceptFormat)
     throws RODAException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2195,47 +2192,6 @@ public class Browser extends RodaWuiController {
     try {
       return BrowserHelper.retrieveTransferredResource(
         BrowserHelper.retrieve(TransferredResource.class, resourceId, new ArrayList<>()), acceptFormat);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, resourceId, state, RodaConstants.CONTROLLER_RESOURCE_ID_PARAM,
-        resourceId);
-    }
-  }
-
-  public static TransferredResource retrieveTransferredResource(User user, String resourceId) throws RODAException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      return BrowserHelper.retrieve(TransferredResource.class, resourceId, new ArrayList<>());
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, resourceId, state, RodaConstants.CONTROLLER_RESOURCE_ID_PARAM,
-        resourceId);
-    }
-  }
-
-  public static EntityResponse retrieveTransferredResourceBinary(User user, String resourceId) throws RODAException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      return BrowserHelper.retrieveTransferredResourceBinary(
-        BrowserHelper.retrieve(TransferredResource.class, resourceId, new ArrayList<>()));
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

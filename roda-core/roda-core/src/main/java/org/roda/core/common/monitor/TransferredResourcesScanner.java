@@ -30,6 +30,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.LiteRODAObjectFactory;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
@@ -60,7 +61,7 @@ public class TransferredResourcesScanner {
   }
 
   public TransferredResource createFolder(String parentUUID, String folderName)
-    throws GenericException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
     Path parentPath;
 
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
@@ -74,7 +75,12 @@ public class TransferredResourcesScanner {
 
     try {
       String sanitizedFolderName = folderName.replaceAll("/", "");
-      Path createdPath = Files.createDirectories(parentPath.resolve(sanitizedFolderName));
+
+      if (Files.exists(parentPath.resolve(sanitizedFolderName))) {
+        throw new AlreadyExistsException("Directory already exists");
+      }
+
+      Path createdPath = Files.createDirectory(parentPath.resolve(sanitizedFolderName));
       BasicFileAttributes attrs = Files.readAttributes(createdPath, BasicFileAttributes.class);
       TransferredResource resource = createTransferredResource(createdPath, attrs, 0L, basePath, new Date());
       index.create(TransferredResource.class, resource);

@@ -28,6 +28,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -189,6 +190,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     list.add(RiskIncidence.class);
     list.add(DIP.class);
     list.add(DIPFile.class);
+    list.add(TransferredResource.class);
     return (List) list;
   }
 }

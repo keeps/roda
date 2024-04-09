@@ -1,0 +1,44 @@
+package org.roda.wui.api.v2.controller;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.roda.core.common.ProvidesInputStream;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.wui.api.controllers.Theme;
+import org.roda.wui.api.v2.utils.ApiUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@RestController
+@RequestMapping(path = "/api/v2/themes")
+@Tag(name = ThemesController.SWAGGER_ENDPOINT)
+public class ThemesController {
+  public static final String SWAGGER_ENDPOINT = "v2 themes";
+
+  @GetMapping()
+  public ResponseEntity<StreamingResponseBody> getResource(
+    @Parameter(description = "The resource id", required = true) @RequestParam(RodaConstants.API_QUERY_PARAM_RESOURCE_ID) String resourceId,
+    @Parameter(description = "The default resource id") @RequestParam(value = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_ID, required = false) String fallbackResourceId,
+    @Parameter(description = "If the resource is served inline") @RequestParam(value = RodaConstants.API_QUERY_PARAM_INLINE, required = false, defaultValue = "false") boolean inline,
+    @Parameter(description = "The resource type, can be internal or plugin", schema = @Schema(implementation = RodaConstants.ResourcesTypes.class, defaultValue = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_TYPE)) @RequestParam(defaultValue = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_TYPE, name = RodaConstants.API_QUERY_PARAM_RESOURCE_TYPE, required = false) String type,
+    WebRequest request) {
+
+    Pair<String, ProvidesInputStream> themeResource = Theme.getThemeResource(resourceId, fallbackResourceId, type);
+
+    if (themeResource.getSecond() != null) {
+      return ApiUtils.okResponse(Theme.getThemeResourceStreamResponse(themeResource, type), request);
+    } else {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found: " + resourceId);
+    }
+  }
+}

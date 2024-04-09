@@ -83,6 +83,12 @@
 		<appender-ref ref="METRICS" />
 	</logger>
 
+	<logger name="org.roda.wui.api.v2" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="CORE_FILEOUT" />
+		<appender-ref ref="METRICS" />
+	</logger>
+
 	<logger name="org.roda" additivity="false">
 		<level value="INFO" />
 		<appender-ref ref="CORE_FILEOUT" />

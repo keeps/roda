@@ -32,7 +32,6 @@ import io.swagger.v3.oas.models.security.SecurityScheme.Type;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.ApplicationPath;
-import org.roda.wui.api.v2.exceptions.RESTExceptionMapper;
 
 @ApplicationPath("/api/v1")
 public class RestApplication extends ResourceConfig {

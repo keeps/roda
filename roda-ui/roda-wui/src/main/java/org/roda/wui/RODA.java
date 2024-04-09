@@ -17,8 +17,10 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -27,6 +29,7 @@ import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.http.HttpServlet;
 
 @SpringBootApplication
+@ComponentScan(basePackages = "org.roda.wui.api.v2")
 public class RODA {
   public static void main(String[] args) {
     SpringApplication.run(RODA.class, args);
@@ -120,7 +123,8 @@ public class RODA {
     FilterRegistrationBean<OnOffFilter> registrationBean = new FilterRegistrationBean<>();
     registrationBean.setFilter(new OnOffFilter());
     registrationBean.setName("CasAuthenticationFilter");
-    registrationBean.addInitParameter("inner-filter-class", "org.apereo.cas.client.authentication.AuthenticationFilter");
+    registrationBean.addInitParameter("inner-filter-class",
+      "org.apereo.cas.client.authentication.AuthenticationFilter");
     registrationBean.addInitParameter("config-prefix", "ui.filter.cas");
     registrationBean.addInitParameter("casServerLoginUrl", "https://localhost:8443/cas/login");
     registrationBean.addUrlPatterns("/login");
@@ -150,7 +154,7 @@ public class RODA {
     registrationBean.addInitParameter("config-prefix", "ui.filter.cas");
     registrationBean.addInitParameter("casServerUrlPrefix", "https://localhost:8443/cas");
     registrationBean.addInitParameter("exclusions", "^/swagger.json,^/v1/theme/?,^/v1/auth/ticket?");
-    registrationBean.addUrlPatterns("/api/v1/*");
+    registrationBean.addUrlPatterns("/api/v1/*", "/api/v2/*");
 
     return registrationBean;
   }
@@ -180,17 +184,6 @@ public class RODA {
 
     bean.setLoadOnStartup(2);
     bean.addUrlMappings("/api/v1/*");
-    return bean;
-  }
-
-  @Bean
-  public ServletRegistrationBean<HttpServlet> restAPIV2() {
-    ServletRegistrationBean<HttpServlet> bean;
-    bean = new ServletRegistrationBean<>(new org.glassfish.jersey.servlet.ServletContainer());
-    bean.addInitParameter("jakarta.ws.rs.Application", "org.roda.wui.api.v2.RestApplication");
-
-    bean.setLoadOnStartup(2);
-    bean.addUrlMappings("/api/v2/*");
     return bean;
   }
 

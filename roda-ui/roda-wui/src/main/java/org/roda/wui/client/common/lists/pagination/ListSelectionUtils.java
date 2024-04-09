@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.github.nmorel.gwtjackson.client.exception.JsonSerializationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
@@ -22,7 +21,6 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -31,6 +29,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.github.nmorel.gwtjackson.client.exception.JsonDeserializationException;
+import com.github.nmorel.gwtjackson.client.exception.JsonSerializationException;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.dom.client.NativeEvent;
@@ -234,7 +233,6 @@ public class ListSelectionUtils {
       final ListSelectionState<T> last = last(objectClass);
       if (last != null) {
         if (last.getSelected().getUUID().equals(object.getUUID())) {
-
           BrowserService.Util.getInstance().count(objectClass.getName(), last.getFilter(), last.getJustActive(),
             new AsyncCallback<Long>() {
 

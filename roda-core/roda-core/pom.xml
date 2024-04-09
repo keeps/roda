@@ -144,6 +144,10 @@
 		</profile>
 	</profiles>
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api -->
 		<dependency>
 			<groupId>jakarta.servlet</groupId>

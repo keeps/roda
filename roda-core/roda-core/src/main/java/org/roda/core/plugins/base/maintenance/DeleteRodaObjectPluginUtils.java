@@ -46,6 +46,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationLink;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
@@ -99,6 +100,8 @@ public class DeleteRodaObjectPluginUtils {
       processDIP(model, report, jobPluginInfo, cachedJob, plugin, (DIP) object, doReport);
     } else if (object instanceof DIPFile) {
       processDIPFile(model, report, jobPluginInfo, cachedJob, plugin, (DIPFile) object, doReport);
+    } else if (object instanceof TransferredResource transferredResource) {
+      processTransferredResource(model, report, jobPluginInfo, cachedJob, plugin, transferredResource, doReport);
     }
   }
 
@@ -586,6 +589,25 @@ public class DeleteRodaObjectPluginUtils {
     try {
       model.deleteDIPFile(dipFile.getDipId(), dipFile.getPath(), dipFile.getId(), false);
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      state = PluginState.FAILURE;
+      reportItem.addPluginDetails("Could not delete DIP file: " + e.getMessage());
+    }
+
+    if (doReport) {
+      report.addReport(reportItem.setPluginState(state));
+      PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+    }
+    jobPluginInfo.incrementObjectsProcessed(state);
+  }
+
+  private static void processTransferredResource(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+                                     final Plugin<? extends IsRODAObject> plugin, TransferredResource transferredResource, final boolean doReport) {
+    PluginState state = PluginState.SUCCESS;
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, transferredResource.getId(), TransferredResource.class);
+
+    try {
+      model.deleteTransferredResource(transferredResource);
+    } catch (GenericException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
       reportItem.addPluginDetails("Could not delete DIP file: " + e.getMessage());
     }

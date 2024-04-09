@@ -239,7 +239,7 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_FILES = "files";
   public static final String RODA_OBJECT_DIPS = "dips";
   public static final String RODA_OBJECT_DIPFILES = "dip_files";
-  public static final String RODA_OBJECT_TRANSFERRED_RESOURCES = "transferred_resources";
+  public static final String RODA_OBJECT_TRANSFERRED_RESOURCES = "transferredResources";
   public static final String RODA_OBJECT_REPRESENTATION_INFORMATION_LIST = "representation_information_list";
 
   public static final String RODA_OBJECT_PERMISSION = "permission";
@@ -348,6 +348,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_REPRESENTATION_OTHER_METADATA = "otherMetadata";
 
   public static final String API_REST_V2_RESOURCES = "api/v2/transfers/";
+  public static final String API_REST_V2_TRANSFERRED_RESOURCE_CREATE_RESOURCE = "create/resource";
 
   // sub-resources strings
   public static final String API_DATA = "data";
@@ -655,6 +656,10 @@ public final class RodaConstants {
   public static final String CONTROLLER_NOTIFICATION_TOKEN_PARAM = "token";
   public static final String CONTROLLER_JOB_PARAM = "job";
   public static final String CONTROLLER_JOB_ID_PARAM = "jobId";
+  public static final String CONTROLLER_JOB_JUST_FAILED_PARAM = "justFailed";
+  public static final String CONTROLLER_JOB_REPORT_ID_PARAM = "jobReportId";
+  public static final String CONTROLLER_JOB_ATTACHMENT_ID_PARAM = "attachmentId";
+
   public static final String CONTROLLER_REPRESENTATION_INFORMATION_PARAM = RODA_OBJECT_REPRESENTATION_INFORMATION;
   public static final String CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM = "representationInformationId";
 
@@ -674,6 +679,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_PARENT_PARAM = "parent";
   public static final String CONTROLLER_PARENT_ID_PARAM = "parentId";
   public static final String CONTROLLER_FOLDERNAME_PARAM = "folderName";
+  public static final String CONTROLLER_FORCE_COMMIT_PARAM = "forceCommit";
   public static final String CONTROLLER_FOLDER_RELATIVEPATH_PARAM = "folderRelativePath";
   public static final String CONTROLLER_FILENAME_PARAM = "filename";
   public static final String CONTROLLER_PATH_PARAM = "path";

@@ -4,12 +4,22 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.common.model.RequestHeaders;
-import org.roda.wui.common.model.RequestController;
+import org.roda.wui.common.model.RequestContext;
+import org.springframework.web.context.request.WebRequest;
 
 public class RequestUtils {
 
-  public static RequestController parseHTTPRequest(HttpServletRequest request) {
-    RequestController requestController = new RequestController();
+  public static RequestContext parseWebRequest(WebRequest request) {
+    RequestContext requestContext = new RequestContext();
+
+    // get user
+
+
+    return requestContext;
+  }
+
+  public static RequestContext parseHTTPRequest(HttpServletRequest request) {
+    RequestContext requestContext = new RequestContext();
 
     // get user
     User user = UserUtility.getApiUser(request);
@@ -20,10 +30,10 @@ public class RequestUtils {
     headers.setReason(request.getHeader("x-request-reason"));
     headers.setType(request.getHeader("x-request-type"));
 
-    requestController.setUser(user);
-    requestController.setRequestHeaders(headers);
+    requestContext.setUser(user);
+    requestContext.setRequestHeaders(headers);
 
-    return requestController;
+    return requestContext;
   }
 
   private RequestUtils() {

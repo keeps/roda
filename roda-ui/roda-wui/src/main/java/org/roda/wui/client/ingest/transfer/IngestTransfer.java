@@ -12,11 +12,8 @@ package org.roda.wui.client.ingest.transfer;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -82,6 +79,8 @@ public class IngestTransfer extends Composite {
       } else {
         String transferredResourceUUID = historyTokens.get(0);
         if (transferredResourceUUID != null) {
+          GWT.log("HERE!!!");
+          GWT.log("uuid: " + transferredResourceUUID);
           services.transferredResource(s -> s.getResource(transferredResourceUUID))
             .whenComplete((value,error) -> {
               if (value != null) {

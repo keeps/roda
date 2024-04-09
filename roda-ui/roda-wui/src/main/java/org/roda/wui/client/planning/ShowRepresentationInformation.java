@@ -81,6 +81,9 @@ import config.i18n.client.ClientMessages;
  */
 public class ShowRepresentationInformation extends Composite {
 
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final List<String> fieldsToReturn = new ArrayList<>();
+  private static ShowRepresentationInformation instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -103,69 +106,41 @@ public class ShowRepresentationInformation extends Composite {
       return "representation_information";
     }
   };
-
-  private static ShowRepresentationInformation instance = null;
-
-  interface MyUiBinder extends UiBinder<Widget, ShowRepresentationInformation> {
-  }
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private static final List<String> fieldsToReturn = new ArrayList<>();
-
-  private RepresentationInformation ri;
-
   @UiField
   Label representationInformationId;
-
   @UiField
   Label dateCreated, dateUpdated;
-
   @UiField
   TitlePanel title;
-
   @UiField
   Label representationInformationDescriptionKey;
-
   @UiField
   HTML representationInformationDescriptionValue;
-
   @UiField
   Label representationInformationFamilyKey, representationInformationFamilyValue;
-
   @UiField
   Label representationInformationTagKey;
-
   @UiField
   FlowPanel representationInformationTagValue;
-
   @UiField
   Label representationInformationSupportKey, representationInformationSupportValue;
-
   @UiField
   FlowPanel representationInformationRelationsValue;
-
   @UiField
   FlowPanel objectPanel;
-
   @UiField
   FlowPanel additionalSeparator;
-
   @UiField
   FlowPanel extras;
-
   @UiField
   SimplePanel actionsSidebar;
-
   @UiField
   FlowPanel contentFlowPanel;
-
   @UiField
   FlowPanel sidebarFlowPanel;
-
+  private RepresentationInformation ri;
   private ActionableWidgetBuilder<RepresentationInformation> actionableWidgetBuilder;
-
   private List<FilterParameter> aipParams = new ArrayList<>();
   private List<FilterParameter> representationParams = new ArrayList<>();
   private List<FilterParameter> fileParams = new ArrayList<>();
@@ -182,6 +157,13 @@ public class ShowRepresentationInformation extends Composite {
     initEntityFilters();
     objectPanel.addStyleName("ri-entity-relation-section");
     initElements();
+  }
+
+  public static ShowRepresentationInformation getInstance() {
+    if (instance == null) {
+      instance = new ShowRepresentationInformation();
+    }
+    return instance;
   }
 
   public void initElements() {
@@ -531,13 +513,6 @@ public class ShowRepresentationInformation extends Composite {
     return widgetToAdd;
   }
 
-  public static ShowRepresentationInformation getInstance() {
-    if (instance == null) {
-      instance = new ShowRepresentationInformation();
-    }
-    return instance;
-  }
-
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -570,5 +545,8 @@ public class ShowRepresentationInformation extends Composite {
       HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER);
       callback.onSuccess(null);
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowRepresentationInformation> {
   }
 }
