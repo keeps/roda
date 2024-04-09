@@ -7,11 +7,13 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -20,7 +22,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonTypeName("TransferredResource")
 public class TransferredResource implements IsModelObject, IsIndexed, HasId, SetsUUID {
+  @Serial
   private static final long serialVersionUID = 7931609057644098879L;
   private String uuid;
   private String id;

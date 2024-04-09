@@ -17,5 +17,4 @@ mkdir -p "$SCRIPT_DIR"/target
 # Copy target
 cp -r "$PROJECT_DIR"/roda-ui/roda-wui/target/roda-wui-"$VERSION"/* "$SCRIPT_DIR"/target/
 
-# Build docker image
-docker build -t keeps/roda:latest -t keeps/roda:"$VERSION" .
+docker build -t keeps/roda:latest -t keeps/roda:"$VERSION" "$SCRIPT_DIR"

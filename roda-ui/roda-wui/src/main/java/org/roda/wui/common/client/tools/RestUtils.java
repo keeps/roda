@@ -104,7 +104,13 @@ public class RestUtils {
   }
 
   public static SafeUri createRepresentationFileDownloadUri(String fileUuid) {
-    return createRepresentationFileDownloadUri(fileUuid, false);
+    return createRepresentationFileDownloadUriV2(fileUuid, false);
+  }
+
+  public static SafeUri createRepresentationFileDownloadUriV2(String fileUuid, boolean contentDispositionInline) {
+
+    // api/v2/files/{file_uuid}
+    return UriUtils.fromSafeConstant("api/v2/files/binary/" + URL.encodeQueryString(fileUuid));
   }
 
   public static SafeUri createRepresentationFileDownloadUri(String fileUuid, boolean contentDispositionInline) {
@@ -405,10 +411,12 @@ public class RestUtils {
   }
 
   public static String createTransferredResourceUploadUri(String parentUUID, String locale) {
-    // api/v2/transfers/?parentUUID={parentUUID}&locale={locale}&commit=true
+    // api/v2/transfers/create/resource?parentUUID={parentUUID}&locale={locale}&commit=true
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V2_RESOURCES);
+
+    b.append(RodaConstants.API_REST_V2_TRANSFERRED_RESOURCE_CREATE_RESOURCE);
 
     if (parentUUID != null || locale != null) {
       b.append(RodaConstants.API_QUERY_START);
@@ -509,7 +517,7 @@ public class RestUtils {
     // api/v1/theme/?resource_id={resourceId}&default_resource_od={defaultResourceId}&resource_type={resourceType}
     StringBuilder b = new StringBuilder();
 
-    b.append(RodaConstants.API_REST_V1_THEME).append(RodaConstants.API_QUERY_START)
+    b.append("api/v2/themes").append(RodaConstants.API_QUERY_START)
       .append(RodaConstants.API_QUERY_PARAM_RESOURCE_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
       .append(URL.encode(resourceId));
 

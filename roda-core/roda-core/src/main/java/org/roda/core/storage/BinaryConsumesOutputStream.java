@@ -7,12 +7,21 @@
  */
 package org.roda.core.storage;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.nio.file.Paths;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ConsumesSkipableOutputStream;
 
 public class BinaryConsumesOutputStream implements ConsumesSkipableOutputStream {
@@ -45,6 +54,27 @@ public class BinaryConsumesOutputStream implements ConsumesSkipableOutputStream 
   }
 
   @Override
+  public void consumeOutputStream(OutputStream out, long from, long end) {
+    try {
+      File file = RodaCoreFactory.getStorageService().getDirectAccess(binary.getStoragePath()).getPath().toFile();
+      byte[] buffer = new byte[1024];
+      try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r")) {
+        long pos = from;
+        randomAccessFile.seek(pos);
+        while (pos < end) {
+          randomAccessFile.read(buffer);
+          out.write(buffer);
+          pos += buffer.length;
+        }
+        out.flush();
+      }
+    } catch (IOException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | NotFoundException e) {
+      // ignore
+    }
+  }
+
+  @Override
   public Date getLastModified() {
     return null;
   }
@@ -63,5 +93,4 @@ public class BinaryConsumesOutputStream implements ConsumesSkipableOutputStream 
   public String getMediaType() {
     return mediaType;
   }
-
 }

@@ -2,12 +2,12 @@ package org.roda.wui.common.model;
 
 import org.roda.core.data.v2.user.User;
 
-public class RequestController {
+public class RequestContext {
 
   private User user;
   private RequestHeaders request;
 
-  public RequestController() {
+  public RequestContext() {
     //empty constructor
   }
 

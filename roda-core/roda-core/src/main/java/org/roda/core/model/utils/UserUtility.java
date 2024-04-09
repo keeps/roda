@@ -44,6 +44,7 @@ import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.WebRequest;
 
 import com.google.common.collect.Sets;
 
@@ -74,6 +75,10 @@ public class UserUtility {
   public static boolean isUserInSession(final HttpServletRequest request) {
     User user = (User) request.getSession().getAttribute(UserUtility.RODA_USER);
     return user != null && !user.isGuest();
+  }
+
+  public static User getApiUserByWebRequest(WebRequest request) {
+    return null;
   }
 
   public static User getApiUser(final HttpServletRequest request) {

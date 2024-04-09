@@ -17,11 +17,9 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowseTop;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -268,7 +266,7 @@ public class TransferUpload extends Composite {
       SafeHtml html = SafeHtmlUtils.fromSafeConstant("<form id='upload' method='post' action='" + uploadUrl
         + "' enctype='multipart/form-data'>" + "<div id='drop'><h4>" + messages.ingestTransferUploadDropHere()
         + "</h4><a>" + messages.ingestTransferUploadBrowseFiles() + "</a>" + "<input title='"
-        + RodaConstants.API_PARAM_UPLOAD + "' type='file' name='" + RodaConstants.API_PARAM_UPLOAD
+        + RodaConstants.API_PARAM_UPLOAD + "' type='file' name='" + "resource"
         + "' multiple='true' />" + " </div>" + "<input title='hiddenSubmit' type='submit' hidden/> </form>");
 
       uploadForm.setHTML(html);

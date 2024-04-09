@@ -117,7 +117,7 @@ public class TransferredResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    EntityResponse response = Browser.retrieveTransferredResourcev1(user, resourceId, acceptFormat);
+    EntityResponse response = Browser.retrieveTransferredResource(user, resourceId, acceptFormat);
 
     if (response instanceof ObjectResponse) {
       ObjectResponse<org.roda.core.data.v2.ip.TransferredResource> tr = (ObjectResponse<org.roda.core.data.v2.ip.TransferredResource>) response;
@@ -163,6 +163,7 @@ public class TransferredResource {
       if (name == null) {
         transferredResource = Browser.createTransferredResourceFile(user, parentUUID, fileName, inputStream,
           forceCommit);
+
       } else {
         transferredResource = Browser.createTransferredResourcesFolder(user, parentUUID, name, forceCommit);
       }

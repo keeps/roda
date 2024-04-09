@@ -9,12 +9,11 @@ import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.REST;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Report;
 
 import com.google.gwt.core.client.GWT;
-import org.roda.core.data.v2.jobs.Report;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -31,40 +30,41 @@ public class Services implements DirectRestService {
   }
 
   public <S extends DirectRestService> S get(Class<S> serviceClass) {
-    if (TransferredResourceService.class.equals(serviceClass)) {
-      return GWT.create(TransferredResourceService.class);
-    } else if (JobsService.class.equals(serviceClass)) {
-      return GWT.create(JobsService.class);
-    } else if (JobReportService.class.equals(serviceClass)) {
-      return GWT.create(JobReportService.class);
+    if (TransferredResourceRestService.class.equals(serviceClass)) {
+      return GWT.create(TransferredResourceRestService.class);
+    } else if (JobsRestService.class.equals(serviceClass)) {
+      return GWT.create(JobsRestService.class);
+    } else if (JobReportRestService.class.equals(serviceClass)) {
+      return GWT.create(JobReportRestService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
   }
 
-  public <S extends RODAEntityService<O>, O extends IsIndexed> S getFromObjectClass(Class<O> objectClass) {
+  public <S extends RODAEntityRestService<O>, O extends IsIndexed> S getFromObjectClass(Class<O> objectClass) {
     if (TransferredResource.class.equals(objectClass)) {
-      return GWT.create(TransferredResourceService.class);
+      return GWT.create(TransferredResourceRestService.class);
     } else if (Job.class.equals(objectClass)) {
-      return GWT.create(JobsService.class);
+      return GWT.create(JobsRestService.class);
     } else if (Report.class.equals(objectClass)) {
-      return GWT.create(JobReportService.class);
+      return GWT.create(JobReportRestService.class);
     } else {
       throw new IllegalArgumentException(objectClass.getName() + " not supported");
     }
   }
 
-//  public <S extends RODAEntityService<O>, O extends IsIndexed> S getFromObjectClass(String objectClass) {
-//    try {
-//      if (objectClass.equals("org.roda.core.data.v2.jobs.IndexedReport")) {
-//        return GWT.create(IndexedReport.class);
-//      }
-//      Class<O> clazz = (Class<O>) Class.forName(objectClass);
-//      return getFromObjectClass(clazz);
-//    } catch (ClassNotFoundException e) {
-//      throw new IllegalArgumentException(objectClass + " not supported");
-//    }
-//  }
+  // public <S extends RODAEntityService<O>, O extends IsIndexed> S
+  // getFromObjectClass(String objectClass) {
+  // try {
+  // if (objectClass.equals("org.roda.core.data.v2.jobs.IndexedReport")) {
+  // return GWT.create(IndexedReport.class);
+  // }
+  // Class<O> clazz = (Class<O>) Class.forName(objectClass);
+  // return getFromObjectClass(clazz);
+  // } catch (ClassNotFoundException e) {
+  // throw new IllegalArgumentException(objectClass + " not supported");
+  // }
+  // }
 
   public <S extends DirectRestService, T> CompletableFuture<T> future(Class<S> serviceClass,
     CheckedFunction<S, T> method) {
@@ -86,49 +86,17 @@ public class Services implements DirectRestService {
       result.completeExceptionally(e);
     }
     return result;
-
   }
 
-
-  public <S extends RODAEntityService<O>, O extends IsIndexed, T> CompletableFuture<T> futureFromObjectClass(String objectClassString,
-                                                                                                                            CheckedFunction<S, T> method) {
-    S service;
-    if (objectClassString.equals("org.roda.core.data.v2.jobs.IndexedReport")) {
-      service = GWT.create(TransferredResourceService.class);
-    } else {
-      throw new IllegalArgumentException(objectClassString + " not supported");
-    }
-
-    CompletableFuture<T> result = new CompletableFuture<>();
-    try {
-      method.apply(REST.withCallback(new MethodCallback<T>() {
-        @Override
-        public void onFailure(Method method, Throwable throwable) {
-          result.completeExceptionally(throwable);
-        }
-
-        @Override
-        public void onSuccess(Method method, T t) {
-          result.complete(t);
-        }
-      }).call(service));
-    } catch (RODAException e) {
-      result.completeExceptionally(e);
-    }
-    return result;
-
+  public <T> CompletableFuture<T> transferredResource(CheckedFunction<TransferredResourceRestService, T> method) {
+    return future(TransferredResourceRestService.class, method);
   }
 
-  public <T> CompletableFuture<T> transferredResource(CheckedFunction<TransferredResourceService, T> method) {
-    return future(TransferredResourceService.class, method);
+  public <T> CompletableFuture<T> jobsResource(CheckedFunction<JobsRestService, T> method) {
+    return future(JobsRestService.class, method);
   }
 
-  public <T> CompletableFuture<T> jobsResource(CheckedFunction<JobsService, T> method) {
-    return future(JobsService.class, method);
+  public <T> CompletableFuture<T> jobReportResource(CheckedFunction<JobReportRestService, T> method) {
+    return future(JobReportRestService.class, method);
   }
-
-  public <T> CompletableFuture<T> jobReportResource(CheckedFunction<JobReportService, T> method) {
-    return future(JobReportService.class, method);
-  }
-
 }
