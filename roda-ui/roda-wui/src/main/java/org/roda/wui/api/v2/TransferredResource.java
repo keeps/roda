@@ -1,7 +1,6 @@
 
 package org.roda.wui.api.v2;
 
-import com.google.gwt.core.client.GWT;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,13 +23,14 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.CountRequest;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -48,14 +48,12 @@ import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.client.services.TransferredResourceService;
 import org.roda.wui.common.I18nUtility;
 
-import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -79,18 +77,19 @@ public class TransferredResource implements TransferredResourceService {
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
 
     try {
-      IndexResult<org.roda.core.data.v2.ip.TransferredResource> result = Browser.find(org.roda.core.data.v2.ip.TransferredResource.class, Filter.ALL, Sorter.NONE,
+      IndexResult<org.roda.core.data.v2.ip.TransferredResource> result = Browser.find(
+        org.roda.core.data.v2.ip.TransferredResource.class, Filter.ALL, Sorter.NONE,
         new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
       return result.getResults();
     } catch (RODAException e) {
       throw new RESTException(e);
     }
 
-
   }
 
   @Override
-  public List<org.roda.core.data.v2.ip.TransferredResource> getSelectedTransferredResources(SelectedItems<org.roda.core.data.v2.ip.TransferredResource> selected) {
+  public List<org.roda.core.data.v2.ip.TransferredResource> getSelectedTransferredResources(
+    SelectedItems<org.roda.core.data.v2.ip.TransferredResource> selected) {
     User user = UserUtility.getApiUser(request);
 
     try {
@@ -102,7 +101,8 @@ public class TransferredResource implements TransferredResourceService {
   }
 
   @Override
-  public Job moveTransferredResources(SelectedItems<org.roda.core.data.v2.ip.TransferredResource> items, String resourceId) {
+  public Job moveTransferredResources(SelectedItems<org.roda.core.data.v2.ip.TransferredResource> items,
+    String resourceId) {
     User user = UserUtility.getApiUser(request);
 
     try {
@@ -114,7 +114,6 @@ public class TransferredResource implements TransferredResourceService {
     } catch (RODAException e) {
       throw new RESTException(e);
     }
-
 
   }
 
@@ -188,8 +187,6 @@ public class TransferredResource implements TransferredResourceService {
     }
   }
 
-
-
   @PUT
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
@@ -207,8 +204,7 @@ public class TransferredResource implements TransferredResourceService {
     // delegate action to controller
     try {
       Browser.updateTransferredResource(user, Optional.of(relativePath), inputStream, fileDetail.getFileName(), false);
-      return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred resources updated"))
-        .build();
+      return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred resources updated")).build();
     } catch (RODAException | IOException e) {
       throw new RESTException(e);
     }
@@ -247,12 +243,12 @@ public class TransferredResource implements TransferredResourceService {
       throw new RESTException(e);
     }
 
-
     return null;
   }
 
   @Override
-  public org.roda.core.data.v2.ip.TransferredResource renameTransferredResource(String resourceId, String newName, Boolean replaceExisting) {
+  public org.roda.core.data.v2.ip.TransferredResource renameTransferredResource(String resourceId, String newName,
+    Boolean replaceExisting) {
     User user = UserUtility.getApiUser(request);
     try {
       return getResource(Browser.renameTransferredResource(user, resourceId, newName, replaceExisting));
@@ -263,7 +259,8 @@ public class TransferredResource implements TransferredResourceService {
   }
 
   @Override
-  public org.roda.core.data.v2.ip.TransferredResource createTransferredResourcesFolder(String parentUUID, String folderName, String commitString) {
+  public org.roda.core.data.v2.ip.TransferredResource createTransferredResourcesFolder(String parentUUID,
+    String folderName, String commitString) {
     User user = UserUtility.getApiUser(request);
     try {
       return Browser.createTransferredResourcesFolder(user, parentUUID, folderName, Boolean.parseBoolean(commitString));
@@ -272,9 +269,6 @@ public class TransferredResource implements TransferredResourceService {
     }
 
   }
-
-
-
 
   @Override
   public Void refreshTransferResource(String transferredResourceRelativePath) {
@@ -297,13 +291,40 @@ public class TransferredResource implements TransferredResourceService {
 
     try {
       // delegate action to controller
-      org.roda.core.data.v2.ip.TransferredResource resource = Browser.reindexTransferredResource(user, path);
-      return resource;
+      return Browser.reindexTransferredResource(user, path);
     } catch (RODAException e) {
       throw new RESTException(e);
     }
+  }
 
+  @Override
+  public IndexResult<org.roda.core.data.v2.ip.TransferredResource> find(FindRequest findRequest, String localeString) {
+    if (findRequest.filter == null || findRequest.filter.getParameters().isEmpty()) {
+      return new IndexResult<>();
+    }
 
+    final User user = UserUtility.getApiUser(request);
+
+    try {
+      final IndexResult<org.roda.core.data.v2.ip.TransferredResource> result = Browser.find(
+        org.roda.core.data.v2.ip.TransferredResource.class, findRequest.filter, findRequest.sorter, findRequest.sublist,
+        findRequest.facets, user, findRequest.onlyActive, findRequest.fieldsToReturn);
+
+      return I18nUtility.translate(result, org.roda.core.data.v2.ip.TransferredResource.class, localeString);
+    } catch (GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      throw new RESTException(e);
+    }
+  }
+
+  @Override
+  public Long count(CountRequest countRequest) {
+    final User user = UserUtility.getApiUser(request);
+
+    try {
+      return Browser.count(user, org.roda.core.data.v2.ip.TransferredResource.class, countRequest.filter,
+        countRequest.onlyActive);
+    } catch (RODAException e) {
+      throw new RESTException(e);
+    }
   }
 }
-

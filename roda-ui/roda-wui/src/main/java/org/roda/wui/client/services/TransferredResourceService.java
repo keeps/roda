@@ -3,8 +3,14 @@ package org.roda.wui.client.services;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.ws.rs.Consumes;
 import org.fusesource.restygwt.client.DirectRestService;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.CountRequest;
+import org.roda.core.data.v2.index.FindRequest;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.TransferredResources;
@@ -56,7 +62,7 @@ public interface TransferredResourceService extends DirectRestService {
 
   @POST
   @Path("/move")
-  @Operation(summary = "List transferred resources", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectedItems.class))) ,description = "Gets a list of transferred resources", responses = {
+  @Operation(summary = "List transferred resources", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectedItems.class))), description = "Gets a list of transferred resources", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   Job moveTransferredResources(
@@ -128,4 +134,23 @@ public interface TransferredResourceService extends DirectRestService {
     @ApiResponse(responseCode = "204", description = "No Content")})
   Void refreshTransferResource(
     @Parameter(description = "Transfer resource relative path") @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH) String transferredResourceRelativePath);
+
+  @POST
+  @Path("/find")
+  @Consumes({MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON})
+  @Operation(summary = "Find indexed resources", description = "Finds existing indexed resources", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = IndexResult.class)))})
+  IndexResult<TransferredResource> find(
+    @Parameter(name = "find request", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON)) FindRequest findRequest,
+    @Parameter(description = "language") @QueryParam("lang") String localeString);
+
+  @POST
+  @Path("/count")
+  @Consumes({MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON})
+  @Operation(summary = "Count indexed resources", description = "Counts indexed resources", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class)))})
+  Long count(
+    @Parameter(description = "Count parameters", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON)) final CountRequest countRequest);
 }
