@@ -848,7 +848,7 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().count(returnClass, filter, user, justActive);
   }
 
-  protected static <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn)
+  public static <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn)
     throws GenericException, NotFoundException {
     return RodaCoreFactory.getIndexService().retrieve(returnClass, id, fieldsToReturn);
   }

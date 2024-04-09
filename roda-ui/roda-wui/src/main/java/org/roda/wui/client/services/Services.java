@@ -27,6 +27,8 @@ public class Services implements DirectRestService {
   public <S extends DirectRestService> S get(Class<S> serviceClass) {
     if (TransferredResourceService.class.equals(serviceClass)) {
       return GWT.create(TransferredResourceService.class);
+    } else if (JobsService.class.equals(serviceClass)) {
+      return GWT.create(JobsService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
@@ -58,4 +60,9 @@ public class Services implements DirectRestService {
   public <T> CompletableFuture<T> transferredResource(CheckedFunction<TransferredResourceService, T> method) {
     return future(TransferredResourceService.class, method);
   }
+
+  public <T> CompletableFuture<T> jobsResource(CheckedFunction<JobsService, T> method) {
+    return future(JobsService.class, method);
+  }
+
 }

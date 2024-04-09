@@ -15,11 +15,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
@@ -29,7 +27,6 @@ import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.slider.SliderPanel;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -160,16 +157,19 @@ public class BrowseFile extends Composite {
             public void execute() {
               Filter filter = new Filter(
                 new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
-              CountRequest countRequest = new CountRequest(IndexedDIP.class.getName(), filter, justActive);
-              Services services = new Services("Count dip items", "post");
-              services.index(s -> s.count(countRequest))
-                .whenComplete((size, error) -> {
-                  if (size != null) {
-                    if (size > 0) {
+              BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, justActive,
+                new AsyncCallback<Long>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                  }
+
+                  @Override
+                  public void onSuccess(Long dipCount) {
+                    if (dipCount > 0) {
                       disseminationsSlider.open();
                     }
-                  } else if (error != null) {
-                    AsyncCallbackUtils.defaultFailureTreatment(error);
                   }
                 });
             }
