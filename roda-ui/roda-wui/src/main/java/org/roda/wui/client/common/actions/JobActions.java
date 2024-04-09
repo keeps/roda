@@ -17,7 +17,6 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
@@ -29,6 +28,7 @@ import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.process.CreateDefaultJob;
 import org.roda.wui.client.search.Search;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
@@ -171,17 +171,12 @@ public class JobActions extends AbstractActionable<Job> {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            BrowserService.Util.getInstance().stopJob(object.getId(), new ActionAsyncCallback<Void>(callback) {
-              @Override
-              public void onFailure(Throwable caught) {
-                // FIXME 20160826 hsilva: do proper handling of the failure
-                super.onFailure(caught);
+            Services services = new Services("Stop job", "Stop");
+            services.jobsResource(s -> s.stopJob(object.getId())).whenComplete((value, error) -> {
+              if (error == null) {
                 doActionCallbackDestroyed();
-              }
-
-              @Override
-              public void onSuccess(Void result) {
-                // FIXME 20160826 hsilva: do proper handling of the success
+              } else {
+                callback.onFailure(error);
                 doActionCallbackDestroyed();
               }
             });
@@ -199,18 +194,14 @@ public class JobActions extends AbstractActionable<Job> {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            BrowserService.Util.getInstance().approveJob(objectToSelectedItems(object, Job.class),
-              new ActionAsyncCallback<Void>(callback) {
-                @Override
-                public void onFailure(Throwable caught) {
+            Services services = new Services("Approve job", "Approve");
+            services.jobsResource(s -> s.approveJob((SelectedItems<Job>) object)).whenComplete((value, error) -> {
+              if (error == null) {
+                // FIXME 20160826 hsilva: do proper handling of the success
+                doActionCallbackDestroyed();
+              } else {
                   // FIXME 20160826 hsilva: do proper handling of the failure
-                  super.onFailure(caught);
-                  doActionCallbackDestroyed();
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                  // FIXME 20160826 hsilva: do proper handling of the success
+                callback.onFailure(error);
                   doActionCallbackDestroyed();
                 }
               });
@@ -238,15 +229,12 @@ public class JobActions extends AbstractActionable<Job> {
 
                     @Override
                     public void onSuccess(final String details) {
-                      BrowserService.Util.getInstance().approveJob(objects, new ActionAsyncCallback<Void>(callback) {
-
-                        @Override
-                        public void onSuccess(Void unused) {
+                      Services services = new Services("Approve selected jobs", "Approve");
+                      services.jobsResource(s -> s.approveJob(objects)).whenComplete((value, error) -> {
+                        if (error == null) {
                           doActionCallbackDestroyed();
-                        }
-
-                        public void onFailure(Throwable caught) {
-                          super.onFailure(caught);
+                        } else {
+                          callback.onFailure(error);
                           doActionCallbackDestroyed();
                         }
                       });
@@ -273,19 +261,16 @@ public class JobActions extends AbstractActionable<Job> {
               new ActionNoAsyncCallback<String>(callback) {
 
                 public void onSuccess(final String details) {
-                  BrowserService.Util.getInstance().rejectJob(objectToSelectedItems(object, Job.class), details,
-                    new ActionAsyncCallback<Void>(callback) {
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        // FIXME 20160826 hsilva: do proper handling of the failure
-                        super.onFailure(caught);
-                        doActionCallbackNone();
-                      }
-
-                      @Override
-                      public void onSuccess(Void result) {
+                  Services services = new Services("Reject job", "Reject");
+                  services.jobsResource(s -> s.rejectJob((SelectedItems<Job>) object, details))
+                    .whenComplete((value, error) -> {
+                      if (error == null) {
                         // FIXME 20160826 hsilva: do proper handling of the success
                         doActionCallbackUpdated();
+                      } else {
+                        // FIXME 20160826 hsilva: do proper handling of the failure
+                        super.onFailure(error);
+                        doActionCallbackNone();
                       }
                     });
                 }
@@ -313,16 +298,12 @@ public class JobActions extends AbstractActionable<Job> {
 
                     @Override
                     public void onSuccess(final String details) {
-                      BrowserService.Util.getInstance().rejectJob(objects, details,
-                        new ActionAsyncCallback<Void>(callback) {
-
-                          @Override
-                          public void onSuccess(Void unused) {
+                      Services services = new Services("Reject selected jobs", "Reject");
+                      services.jobsResource(s -> s.rejectJob(objects, details)).whenComplete((value, error) -> {
+                        if (error == null) {
                             doActionCallbackDestroyed();
-                          }
-
-                          public void onFailure(Throwable caught) {
-                            super.onFailure(caught);
+                          } else {
+                            callback.onFailure(error);
                             doActionCallbackDestroyed();
                           }
                         });

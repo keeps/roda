@@ -60,7 +60,7 @@ public class JobsHelper {
     // do nothing
   }
 
-  protected static void validateAndSetJobInformation(User user, Job job) throws RequestNotValidException {
+  public static void validateAndSetJobInformation(User user, Job job) throws RequestNotValidException {
     LOGGER.debug("Job being validated: {}", job);
     validateJobPluginInformation(job);
 
@@ -82,7 +82,7 @@ public class JobsHelper {
     job.getJobUsersDetails().add(jobUserDetails);
   }
 
-  protected static void validateJobInformation(User user, Job job)
+  public static void validateJobInformation(User user, Job job)
     throws RequestNotValidException, JobStateNotPendingException {
     LOGGER.debug("Job being validated: {}", job);
     validateJobPluginInformation(job);
@@ -133,7 +133,7 @@ public class JobsHelper {
     }
   }
 
-  protected static Job createJob(Job job, boolean async) throws NotFoundException, GenericException,
+  public static Job createJob(Job job, boolean async) throws NotFoundException, GenericException,
     JobAlreadyStartedException, RequestNotValidException, AuthorizationDeniedException {
     Job updatedJob = new Job(job);
 
@@ -145,7 +145,7 @@ public class JobsHelper {
     return updatedJob;
   }
 
-  protected static Job rejectJob(Job job, String details) throws NotFoundException, GenericException,
+  public static Job rejectJob(Job job, String details) throws NotFoundException, GenericException,
     JobAlreadyStartedException, RequestNotValidException, AuthorizationDeniedException {
 
     job.setState(Job.JOB_STATE.REJECTED);
