@@ -195,16 +195,17 @@ public class JobActions extends AbstractActionable<Job> {
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Services services = new Services("Approve job", "Approve");
-            services.jobsResource(s -> s.approveJob((SelectedItems<Job>) object)).whenComplete((value, error) -> {
+            services.jobsResource(s -> s.approveJob(objectToSelectedItems(object, Job.class)))
+              .whenComplete((value, error) -> {
               if (error == null) {
                 // FIXME 20160826 hsilva: do proper handling of the success
                 doActionCallbackDestroyed();
               } else {
-                  // FIXME 20160826 hsilva: do proper handling of the failure
+                // FIXME 20160826 hsilva: do proper handling of the failure
                 callback.onFailure(error);
-                  doActionCallbackDestroyed();
-                }
-              });
+                doActionCallbackDestroyed();
+              }
+            });
           } else {
             doActionCallbackNone();
           }
@@ -262,7 +263,7 @@ public class JobActions extends AbstractActionable<Job> {
 
                 public void onSuccess(final String details) {
                   Services services = new Services("Reject job", "Reject");
-                  services.jobsResource(s -> s.rejectJob((SelectedItems<Job>) object, details))
+                  services.jobsResource(s -> s.rejectJob(objectToSelectedItems(object, Job.class), details))
                     .whenComplete((value, error) -> {
                       if (error == null) {
                         // FIXME 20160826 hsilva: do proper handling of the success
