@@ -226,8 +226,10 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     jobReport.setPlugin(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN), null));
     jobReport.setPluginName(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_NAME), null));
     jobReport.setPluginVersion(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_VERSION), null));
-    jobReport.setPluginState(
-      PluginState.valueOf(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_STATE), null)));
+    if (doc.containsKey(RodaConstants.JOB_REPORT_PLUGIN_STATE)) {
+      jobReport.setPluginState(
+        PluginState.valueOf(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_STATE), null)));
+    }
     jobReport
       .setPluginIsMandatory(SolrUtils.objectToBoolean(doc.get(RodaConstants.JOB_REPORT_PLUGIN_IS_MANDATORY), null));
     jobReport.setPluginDetails(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_DETAILS), null));
