@@ -290,7 +290,7 @@ public class JobsResource implements JobsService {
         JobsHelper.deleteJob(jobId);
       } catch (RODAException e) {
         state = LogEntryState.FAILURE;
-        throw e;
+        throw new RESTException(e);
       } finally {
         // register action
         controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
