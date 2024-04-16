@@ -13,6 +13,8 @@ package org.roda.wui.client.ingest.process;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
@@ -140,15 +142,16 @@ public class ShowJobReport extends Composite {
 
   private static void retrieveJobReport(String jobId, String jobReportId, AsyncCallback<Widget> callback) {
     Services services = new Services("Get job report items", "get");
+
     services.jobsResource(s -> s.getJobReport(jobId, jobReportId)).thenCompose(report -> services.futureFromObjectClass(report.getOutcomeObjectClass(), s -> s.findByUuid(report.getOutcomeObjectId())))
       .whenComplete((o, error) -> {
         if (o != null) {
-          //GWT.log("OBJECT: " + o);
+          GWT.log("OBJECT: " + o);
 
 
 
         } else if (error != null) {
-
+          GWT.log("error" + error);
           callback.onFailure(error);
         }
       });

@@ -12,21 +12,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.HasId;
 import org.roda.core.data.v2.ip.HasInstanceID;
 import org.roda.core.data.v2.ip.SIPInformation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPORT)
-@JsonInclude(JsonInclude.Include.ALWAYS)
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Report implements IsModelObject, HasId, HasInstanceID {
   @Serial
   private static final long serialVersionUID = 4316398565678538090L;
@@ -446,6 +441,7 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
     this.lineSeparator = lineSeparator;
   }
 
+  @JsonIgnore
   public String getLineSeparator() {
     return lineSeparator;
   }

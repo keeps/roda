@@ -28,6 +28,4 @@ public interface RODAEntityService<T extends IsIndexed> extends DirectRestServic
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   T findByUuid(
     @Parameter(description = "The id", required = false) @PathParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String uuid);
-
-
 }

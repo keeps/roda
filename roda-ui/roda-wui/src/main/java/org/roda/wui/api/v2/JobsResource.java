@@ -2,17 +2,6 @@ package org.roda.wui.api.v2;
 
 import java.util.ArrayList;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -40,10 +29,21 @@ import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.client.services.JobsService;
 import org.roda.wui.common.ControllerAssistant;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -338,26 +338,21 @@ public class JobsResource implements JobsService {
   public Report getJobReport(String jobId, String jobReportId) {
     // get user
     User user = UserUtility.getApiUser(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
     try {
-      final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
       // check permissions
       controllerAssistant.checkRoles(user);
-      LogEntryState state = LogEntryState.SUCCESS;
       ModelService model = RodaCoreFactory.getModelService();
-
-      try {
-        return model.retrieveJobReport(jobId, jobReportId);
-      } catch (RODAException e) {
-        state = LogEntryState.FAILURE;
-        throw e;
-      } finally {
-        // register action
-        controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
-      }
+      return model.retrieveJobReport(jobId, jobReportId);
     } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
       throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
     }
-
   }
 
   @Override

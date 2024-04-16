@@ -89,12 +89,12 @@ public class Services implements DirectRestService {
 
   public <S extends RODAEntityService<O>, O extends IsIndexed, T> CompletableFuture<T> futureFromObjectClass(String objectClassString,
                                                                                                                             CheckedFunction<S, T> method) {
-    Class<O> objectClass;
+    S service;
     if (objectClassString.equals("org.roda.core.data.v2.jobs.IndexedReport")) {
-      objectClass = GWT.create(IndexedReport.class).getClass();
+      service = GWT.create(TransferredResourceService.class);
     } else if (objectClassString.equals("org.roda.core.data.v2.ip.AIP")) {
-      objectClass = GWT.create(IndexedAIP.class);
-    } else {
+      service = GWT.create(TransferredResourceService.class);
+    }else {
       throw new IllegalArgumentException(objectClassString + " not supported");
     }
 
@@ -110,7 +110,7 @@ public class Services implements DirectRestService {
         public void onSuccess(Method method, T t) {
           result.complete(t);
         }
-      }).call(getFromObjectClass(objectClass)));
+      }).call(service));
     } catch (RODAException e) {
       result.completeExceptionally(e);
     }
