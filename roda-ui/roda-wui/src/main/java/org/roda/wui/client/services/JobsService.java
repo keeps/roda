@@ -4,8 +4,10 @@ import org.fusesource.restygwt.client.DirectRestService;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Jobs;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
@@ -118,4 +120,23 @@ public interface JobsService extends DirectRestService {
     @Parameter(description = "If just the failed reports should be included in the response or all the job reports", schema = @Schema(defaultValue = "false")) @QueryParam(RodaConstants.API_PATH_PARAM_JOB_JUST_FAILED) boolean justFailed,
     @Parameter(description = "Index of the first element to return", schema = @Schema(defaultValue = "0")) @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @Parameter(description = "Maximum number of elements to return", schema = @Schema(defaultValue = "100")) @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit);
+
+  @GET
+  @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/report/{" + RodaConstants.API_PATH_PARAM_JOB_REPORT_ID + "}")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @Operation(summary = "Get job reports items", description = "Gets job report items", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Reports.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
+  Report getJobReport(
+    @PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
+    @PathParam(RodaConstants.API_PATH_PARAM_JOB_REPORT_ID) String jobReportId);
+
+  @GET
+  @Path("/report/{" + RodaConstants.API_PATH_PARAM_JOB_REPORT_ID + "}/indexed")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @Operation(summary = "Get job reports items", description = "Gets job report items", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Reports.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
+  IndexedReport getIndexedJobReport(
+    @PathParam(RodaConstants.API_PATH_PARAM_JOB_REPORT_ID) String jobReportId);
 }

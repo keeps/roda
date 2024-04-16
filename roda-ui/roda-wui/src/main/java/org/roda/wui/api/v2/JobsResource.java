@@ -21,9 +21,11 @@ import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.Jobs;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
@@ -327,6 +329,64 @@ public class JobsResource implements JobsService {
     try {
       // delegate action to controller
       return JobsHelper.getJobReportsFromIndexResult(user, jobId, justFailed, start, limit, new ArrayList<>());
+    } catch (RODAException e) {
+      throw new RESTException(e);
+    }
+  }
+
+  @Override
+  public Report getJobReport(String jobId, String jobReportId) {
+    // get user
+    User user = UserUtility.getApiUser(request);
+    try {
+      final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+      // check permissions
+      controllerAssistant.checkRoles(user);
+      LogEntryState state = LogEntryState.SUCCESS;
+      ModelService model = RodaCoreFactory.getModelService();
+
+      try {
+        return model.retrieveJobReport(jobId, jobReportId);
+      } catch (RODAException e) {
+        state = LogEntryState.FAILURE;
+        throw e;
+      } finally {
+        // register action
+        controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+      }
+    } catch (RODAException e) {
+      throw new RESTException(e);
+    }
+
+  }
+
+  @Override
+  public IndexedReport getIndexedJobReport(String jobReportId) {
+    User user = UserUtility.getApiUser(request);
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(user, IndexedReport.class);
+
+      LogEntryState state = LogEntryState.SUCCESS;
+
+      try {
+        // delegate
+        final IndexedReport ret = BrowserHelper.retrieve(IndexedReport.class, jobReportId, new ArrayList<>());
+
+        // checking object permissions
+        controllerAssistant.checkObjectPermissions(user, ret, IndexedReport.class);
+
+        return ret;
+      } catch (RODAException e) {
+        state = LogEntryState.FAILURE;
+        throw e;
+      } finally {
+        // register action
+        controllerAssistant.registerAction(user, jobReportId, state, RodaConstants.CONTROLLER_CLASS_PARAM,
+          IndexedReport.class.getSimpleName());
+      }
     } catch (RODAException e) {
       throw new RESTException(e);
     }

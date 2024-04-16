@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -382,7 +383,8 @@ public class HistoryUtils {
       path = HistoryUtils.getHistory(ShowJob.RESOLVER.getHistoryPath(), job.getUUID());
     } else if (object instanceof IndexedReport) {
       IndexedReport report = (IndexedReport) object;
-      path = HistoryUtils.getHistory(ShowJobReport.RESOLVER.getHistoryPath(), report.getUUID());
+      List<String> jobPath = HistoryUtils.getHistory(ShowJob.RESOLVER.getHistoryPath(), report.getJobId());
+      path = HistoryUtils.getHistory(jobPath, ShowJobReport.RESOLVER.getHistoryToken(), report.getUUID());
     } else if (object instanceof RODAMember) {
       RODAMember member = (RODAMember) object;
       HistoryUtils.newHistory(member.isUser() ? ShowUser.RESOLVER : ShowGroup.RESOLVER, member.getId());

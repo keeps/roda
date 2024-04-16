@@ -21,6 +21,7 @@ import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.process.IngestProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -57,9 +58,10 @@ public class ShowJobReport extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 1) {
-        String jobReportId = historyTokens.get(0);
-        retrieveJobReport(jobReportId, callback);
+      if (historyTokens.size() == 3) {
+        String jobId = historyTokens.get(0);
+        String jobReportId = historyTokens.get(2);
+        retrieveJobReport(jobId, jobReportId, callback);
       } else {
         HistoryUtils.newHistory(IngestProcess.RESOLVER);
         callback.onSuccess(null);
@@ -92,7 +94,7 @@ public class ShowJobReport extends Composite {
   // empty to get all report information
   private static final List<String> fieldsToReturn = new ArrayList<>();
 
-  private final IndexedReport jobReport;
+  private static IndexedReport jobReport = new IndexedReport();
 
   @UiField
   Label instanceIdLabel;
@@ -136,7 +138,20 @@ public class ShowJobReport extends Composite {
   @UiField
   FocusPanel keyboardFocus;
 
-  private static void retrieveJobReport(String jobReportId, AsyncCallback<Widget> callback) {
+  private static void retrieveJobReport(String jobId, String jobReportId, AsyncCallback<Widget> callback) {
+    Services services = new Services("Get job report items", "get");
+    services.jobsResource(s -> s.getJobReport(jobId, jobReportId)).thenCompose(report -> services.futureFromObjectClass(report.getOutcomeObjectClass(), s -> s.findByUuid(report.getOutcomeObjectId())))
+      .whenComplete((o, error) -> {
+        if (o != null) {
+          //GWT.log("OBJECT: " + o);
+
+
+
+        } else if (error != null) {
+
+          callback.onFailure(error);
+        }
+      });
     BrowserService.Util.getInstance().retrieve(IndexedReport.class.getName(), jobReportId, fieldsToReturn,
       new AsyncCallback<IndexedReport>() {
         @Override
@@ -146,6 +161,7 @@ public class ShowJobReport extends Composite {
 
         @Override
         public void onSuccess(IndexedReport jobReport) {
+          GWT.log("INDEXED REPORT: " + jobReport.getOutcomeObjectLabel());
           retrieveJobReportItems(jobReport, callback);
         }
       });
@@ -212,7 +228,6 @@ public class ShowJobReport extends Composite {
 
     boolean hasOutcome = StringUtils.isNotBlank(jobReport.getOutcomeObjectId())
       && !jobReport.getOutcomeObjectId().equals(jobReport.getSourceObjectId());
-
     if (hasOutcome) {
       if (jobReport.getOutcomeObjectLabel() != null) {
         outcomeObject.setText(jobReport.getOutcomeObjectLabel());
@@ -232,7 +247,6 @@ public class ShowJobReport extends Composite {
     outcomeObject.setVisible(hasOutcome);
     outcomeObjectState.setVisible(hasOutcome);
     outcomeObjectLabel.setVisible(hasOutcome);
-
     dateCreated.setText(Humanize.formatDateTime(jobReport.getDateCreated()));
     dateUpdated.setText(Humanize.formatDateTime(jobReport.getDateUpdated()));
     duration.setText(Humanize.durationInDHMS(jobReport.getDateCreated(), jobReport.getDateUpdated(), DHMSFormat.LONG));

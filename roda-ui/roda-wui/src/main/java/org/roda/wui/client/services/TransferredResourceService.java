@@ -40,7 +40,7 @@ import jakarta.ws.rs.core.MediaType;
  */
 @Path("../api/v2/transfers/")
 @Tag(name = "v2")
-public interface TransferredResourceService extends DirectRestService {
+public interface TransferredResourceService extends RODAEntityService<TransferredResource> {
 
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})

@@ -1,24 +1,13 @@
 
 package org.roda.wui.api.v2;
 
-import com.google.gwt.core.client.GWT;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -26,9 +15,9 @@ import org.glassfish.jersey.server.JSONP;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.StreamResponse;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
@@ -49,12 +38,23 @@ import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.client.services.TransferredResourceService;
 import org.roda.wui.common.I18nUtility;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -119,34 +119,6 @@ public class TransferredResource implements TransferredResourceService {
 
   }
 
-  @Override
-  public List<org.roda.core.data.v2.ip.TransferredResource> getSelectedTransferredResources(SelectedItems<org.roda.core.data.v2.ip.TransferredResource> selected) {
-    User user = UserUtility.getApiUser(request);
-
-    try {
-      return Browser.retrieveSelectedTransferredResource(user, selected);
-    } catch (RODAException e) {
-      throw new RESTException(e);
-    }
-
-  }
-
-  @Override
-  public Job moveTransferredResources(SelectedItems<org.roda.core.data.v2.ip.TransferredResource> items, String resourceId) {
-    User user = UserUtility.getApiUser(request);
-
-    try {
-      if (resourceId != null) {
-        return Browser.moveTransferredResource(user, items, getResource(resourceId));
-      } else {
-        return Browser.moveTransferredResource(user, items, null);
-      }
-    } catch (RODAException e) {
-      throw new RESTException(e);
-    }
-
-
-  }
 
   @Override
   public org.roda.core.data.v2.ip.TransferredResource getResource(String resourceId) {
@@ -357,5 +329,10 @@ public class TransferredResource implements TransferredResourceService {
     } catch (RODAException e) {
       throw new RESTException(e);
     }
+  }
+
+  @Override
+  public org.roda.core.data.v2.ip.TransferredResource findByUuid(String uuid) {
+    return null;
   }
 }

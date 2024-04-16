@@ -467,6 +467,7 @@ public final class RodaConstants {
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
   // job related params
   public static final String API_PATH_PARAM_JOB_ID = "jobId";
+  public static final String API_PATH_PARAM_JOB_REPORT_ID = "jobReportId";
   public static final String API_PATH_PARAM_JOB_JUST_FAILED = "jobJustFailed";
   public static final String API_PATH_PARAM_JOB_ATTACHMENT_ID = "attachmentId";
 

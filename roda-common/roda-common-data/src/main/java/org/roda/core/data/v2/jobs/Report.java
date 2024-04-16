@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.HasId;
 import org.roda.core.data.v2.ip.HasInstanceID;

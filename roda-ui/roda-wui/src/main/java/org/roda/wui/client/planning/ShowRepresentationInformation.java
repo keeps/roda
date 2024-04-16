@@ -20,7 +20,6 @@ import java.util.TreeMap;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
-import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -51,7 +50,6 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.search.Search;
-import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -310,106 +308,27 @@ public class ShowRepresentationInformation extends Composite {
     if (!aipParams.isEmpty()) {
       Filter aipFilter = new Filter();
       aipFilter.add(new OrFiltersParameters(aipParams));
-      CountRequest countRequest = new CountRequest(IndexedAIP.class.getName(), aipFilter, true);
-      Services services = new Services("Count aip items", "post");
-      services.index(s -> s.count(countRequest))
-        .whenComplete((size, error) -> {
-          if (size != null) {
-            initEntityFiltersObjectPanel(IndexedAIP.class.getSimpleName(), size);
-          } else if (error != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(error);
-          }
-        });
+
+      BrowserService.Util.getInstance().count(IndexedAIP.class.getName(), aipFilter, true,
+        initEntityFiltersObjectPanel(IndexedAIP.class.getSimpleName()));
     } else if (!representationParams.isEmpty()) {
       Filter representationFilter = new Filter();
       representationFilter.add(new OrFiltersParameters(representationParams));
-      CountRequest countRequest = new CountRequest(IndexedRepresentation.class.getName(), representationFilter, true);
-      Services services = new Services("Count representation items", "post");
-      services.index(s -> s.count(countRequest))
-        .whenComplete((size, error) -> {
-          if (size != null) {
-            initEntityFiltersObjectPanel(IndexedRepresentation.class.getSimpleName(), size);
-          } else if (error != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(error);
-          }
-        });
+
+      BrowserService.Util.getInstance().count(IndexedRepresentation.class.getName(), representationFilter, true,
+        initEntityFiltersObjectPanel(IndexedRepresentation.class.getSimpleName()));
     } else if (!fileParams.isEmpty()) {
       Filter fileFilter = new Filter();
       fileFilter.add(new OrFiltersParameters(fileParams));
-      CountRequest countRequest = new CountRequest(IndexedFile.class.getName(), fileFilter, true);
-      Services services = new Services("Count file items", "post");
-      services.index(s -> s.count(countRequest))
-        .whenComplete((size, error) -> {
-          if (size != null) {
-            initEntityFiltersObjectPanel(IndexedFile.class.getName(), size);
-          } else if (error != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(error);
-          }
-        });
+
+      BrowserService.Util.getInstance().count(IndexedFile.class.getName(), fileFilter, true,
+        initEntityFiltersObjectPanel(IndexedFile.class.getSimpleName()));
     } else {
-      initEntityFiltersObjectPanel(IndexedAIP.class.getSimpleName(), 0L);
+      initEntityFiltersObjectPanel(IndexedAIP.class.getSimpleName()).onSuccess(0L);
     }
   }
 
-  private void initEntityFiltersObjectPanel(final String searchType, Long size) {
-    ShowRepresentationInformation.this.objectPanel.clear();
-
-    String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(
-      ShowRepresentationInformation.this.ri.getFilters(), searchType);
-
-    InlineHTML label = new InlineHTML();
-    label.addStyleName("ri-form-label-inline");
-
-    if (IndexedAIP.class.getSimpleName().equals(searchType)) {
-      label.setHTML(messages.representationInformationIntellectualEntities(size.intValue(), url));
-    } else if (IndexedRepresentation.class.getSimpleName().equals(searchType)) {
-      label.setHTML(messages.representationInformationRepresentations(size.intValue(), url));
-    } else if (IndexedFile.class.getSimpleName().equals(searchType)) {
-      label.setHTML(messages.representationInformationFiles(size.intValue(), url));
-    }
-
-    ShowRepresentationInformation.this.objectPanel.add(label);
-
-    InlineHTML edit = new InlineHTML("<i class='fa fa-pencil' aria-hidden='true'></i>");
-    edit.setTitle("Edit association rules");
-    edit.addStyleName("ri-category link-color");
-
-    edit.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
-          messages.representationInformationEditAssociations(), messages.cancelButton(), messages.confirmButton(),
-          messages.searchButton(), ShowRepresentationInformation.this.ri,
-          new AsyncCallback<RepresentationInformation>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              // do nothing
-            }
-
-            @Override
-            public void onSuccess(RepresentationInformation result) {
-              // result is ri with updated filters
-              BrowserService.Util.getInstance().updateRepresentationInformation(result, null,
-                new AsyncCallback<Void>() {
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                  }
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    ShowRepresentationInformation.getInstance().updateLists();
-                  }
-                });
-            }
-          });
-      }
-    });
-
-    ShowRepresentationInformation.this.objectPanel.add(edit);
-  }
-
-  private AsyncCallback<Long> initEntityFiltersObjectPanel2(final String searchType) {
+  private AsyncCallback<Long> initEntityFiltersObjectPanel(final String searchType) {
     return new AsyncCallback<Long>() {
       @Override
       public void onFailure(Throwable caught) {

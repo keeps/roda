@@ -113,8 +113,8 @@ public class ShowJob extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
-        ShowJobReport.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      if (historyTokens.size() > 1 && historyTokens.get(1).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
+        ShowJobReport.RESOLVER.resolve(historyTokens, callback);
       } else if (historyTokens.size() >= 1) {
         String jobId = historyTokens.get(0);
         BrowserService.Util.getInstance().retrieveJobBundle(jobId, new ArrayList<>(), new AsyncCallback<JobBundle>() {
