@@ -8,7 +8,6 @@
 package org.roda.wui.client.common.lists.utils;
 
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -17,7 +16,6 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import org.roda.wui.client.services.Services;
 
 public class ClientSelectedItemsUtils {
 
@@ -39,16 +37,18 @@ public class ClientSelectedItemsUtils {
       SelectedItemsFilter<T> selectedItemsFilter = (SelectedItemsFilter<T>) selected;
       Filter filter = selectedItemsFilter.getFilter();
       boolean justActive = selectedItemsFilter.justActive();
-      Services services = new Services("Count selected items", "post");
-      CountRequest countRequest = new CountRequest(classToReturn.getName(), filter, justActive);
-      services.index(s -> s.count(countRequest))
-        .whenComplete((size, error) -> {
-          if (size != null) {
-            callback.onSuccess(size);
-          } else if (error != null) {
-            callback.onFailure(error);
-          }
-        });
+      BrowserService.Util.getInstance().count(classToReturn.getName(), filter, justActive, new AsyncCallback<Long>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+
+        @Override
+        public void onSuccess(Long result) {
+          callback.onSuccess(result);
+        }
+      });
     } else {
       callback.onFailure(new RequestNotValidException("Unsupported type: " + selected.getClass().getName()));
     }

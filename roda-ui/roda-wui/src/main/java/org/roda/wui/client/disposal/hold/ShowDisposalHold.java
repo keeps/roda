@@ -11,12 +11,10 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
-import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.core.data.v2.jobs.Job;
@@ -36,7 +34,6 @@ import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
-import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -252,11 +249,12 @@ public class ShowDisposalHold extends Composite {
             new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId()));
           SelectedItemsFilter<IndexedAIP> selectedItemsFilter = new SelectedItemsFilter<>(filter,
             IndexedAIP.class.getName(), true);
-          CountRequest countRequest = new CountRequest(IndexedAIP.class.getName(), filter, true);
-          Services services = new Services("Count disposal hold items", "post");
-          services.index(s -> s.count(countRequest))
-            .whenComplete((size, error) -> {
-              if (size != null) {
+
+          BrowserService.Util.getInstance().count(IndexedAIP.class.getName(), filter, true,
+            new NoAsyncCallback<Long>() {
+              @Override
+              public void onSuccess(Long size) {
+                GWT.log("" + size);
                 if (size != 0) {
                   BrowserService.Util.getInstance().liftDisposalHold(selectedItemsFilter, disposalHold.getId(),
                     new AsyncCallback<Job>() {
@@ -308,8 +306,6 @@ public class ShowDisposalHold extends Composite {
                     }
                   });
                 }
-              } else if (error != null) {
-                //TODO handle error
               }
             });
         }
