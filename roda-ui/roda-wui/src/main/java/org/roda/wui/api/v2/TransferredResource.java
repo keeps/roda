@@ -28,14 +28,17 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.controllers.BrowserHelper;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.client.services.TransferredResourceService;
+import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.I18nUtility;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -333,7 +336,36 @@ public class TransferredResource implements TransferredResourceService {
 
   @Override
   public org.roda.core.data.v2.ip.TransferredResource findByUuid(String uuid) {
-    System.out.println("HERE!!!");
-    return null;
+
+    return new org.roda.core.data.v2.ip.TransferredResource();
+//    final User user = UserUtility.getApiUser(request);
+//    try {
+//      final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+//
+//      // check user permissions
+//      controllerAssistant.checkRoles(user, org.roda.core.data.v2.ip.TransferredResource.class);
+//
+//      LogEntryState state = LogEntryState.SUCCESS;
+//
+//      try {
+//        // delegate
+//        final org.roda.core.data.v2.ip.TransferredResource ret = BrowserHelper.retrieve(org.roda.core.data.v2.ip.TransferredResource.class, uuid, new ArrayList<>());
+//
+//        // checking object permissions
+//        controllerAssistant.checkObjectPermissions(user, ret, org.roda.core.data.v2.ip.TransferredResource.class);
+//
+//        return ret;
+//      } catch (RODAException e) {
+//        state = LogEntryState.FAILURE;
+//        throw new RESTException(e);
+//      } finally {
+//        // register action
+//        controllerAssistant.registerAction(user, uuid, state, RodaConstants.CONTROLLER_CLASS_PARAM,
+//          org.roda.core.data.v2.ip.TransferredResource.class.getSimpleName());
+//      }
+//    } catch (RODAException e) {
+//      throw new RESTException(e);
+//    }
+
   }
 }

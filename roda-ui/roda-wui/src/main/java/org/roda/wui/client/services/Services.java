@@ -1,21 +1,20 @@
 package org.roda.wui.client.services;
 
-import com.google.gwt.core.client.GWT;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
 import org.fusesource.restygwt.client.DirectRestService;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.REST;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import com.google.gwt.core.client.GWT;
+import org.roda.core.data.v2.jobs.Report;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -36,6 +35,8 @@ public class Services implements DirectRestService {
       return GWT.create(TransferredResourceService.class);
     } else if (JobsService.class.equals(serviceClass)) {
       return GWT.create(JobsService.class);
+    } else if (JobReportService.class.equals(serviceClass)) {
+      return GWT.create(JobReportService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
@@ -46,6 +47,8 @@ public class Services implements DirectRestService {
       return GWT.create(TransferredResourceService.class);
     } else if (Job.class.equals(objectClass)) {
       return GWT.create(JobsService.class);
+    } else if (Report.class.equals(objectClass)) {
+      return GWT.create(JobReportService.class);
     } else {
       throw new IllegalArgumentException(objectClass.getName() + " not supported");
     }
@@ -92,9 +95,7 @@ public class Services implements DirectRestService {
     S service;
     if (objectClassString.equals("org.roda.core.data.v2.jobs.IndexedReport")) {
       service = GWT.create(TransferredResourceService.class);
-    } else if (objectClassString.equals("org.roda.core.data.v2.ip.AIP")) {
-      service = GWT.create(TransferredResourceService.class);
-    }else {
+    } else {
       throw new IllegalArgumentException(objectClassString + " not supported");
     }
 
@@ -124,6 +125,10 @@ public class Services implements DirectRestService {
 
   public <T> CompletableFuture<T> jobsResource(CheckedFunction<JobsService, T> method) {
     return future(JobsService.class, method);
+  }
+
+  public <T> CompletableFuture<T> jobReportResource(CheckedFunction<JobReportService, T> method) {
+    return future(JobReportService.class, method);
   }
 
 }

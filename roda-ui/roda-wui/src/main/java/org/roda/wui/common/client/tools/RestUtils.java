@@ -534,7 +534,7 @@ public class RestUtils {
   public static SafeUri createJobAttachmentDownloadUri(String jobId, String attachmentId) {
     StringBuilder b = new StringBuilder();
     // api/v1/jobs/{jobId}/attachment/{attachmentId}
-    b.append(RodaConstants.API_REST_V1_JOBS).append(jobId).append("/attachment/").append(attachmentId);
+    b.append(RodaConstants.API_REST_V2_JOBS).append(jobId).append("/attachment/").append(attachmentId);
     return UriUtils.fromSafeConstant(b.toString());
   }
 
