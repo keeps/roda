@@ -397,15 +397,29 @@ public class JobsResource implements JobsService {
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response retrieveJobAttachment(
     @Parameter(description = "The ID of the existing job", required = true) @PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
-    @Parameter(description = "The ID of the existing attachment", required = true) @PathParam(RodaConstants.API_PATH_PARAM_JOB_ATTACHMENT_ID) String attachmentId,
-    @Parameter(description = "Choose format in which to get the attachments", schema = @Schema(allowableValues = {
-      ExtraMediaType.APPLICATION_ZIP}, defaultValue = ExtraMediaType.APPLICATION_ZIP)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-    throws RODAException {
+    @Parameter(description = "The ID of the existing attachment", required = true) @PathParam(RodaConstants.API_PATH_PARAM_JOB_ATTACHMENT_ID) String attachmentId) {
 
     // get user
     User user = UserUtility.getApiUser(request);
 
-    EntityResponse response = org.roda.wui.api.controllers.Jobs.retrieveJobAttachment(user, jobId, attachmentId);
-    return ApiUtils.okResponse((StreamResponse) response);
+    try {
+      final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+      // check permissions
+      controllerAssistant.checkRoles(user);
+      LogEntryState state = LogEntryState.SUCCESS;
+      try {
+
+        EntityResponse response = JobsHelper.retrieveJobAttachment(jobId, attachmentId);
+        return ApiUtils.okResponse((StreamResponse) response);
+      } catch (RODAException e) {
+        state = LogEntryState.FAILURE;
+        throw new RESTException(e);
+      } finally {
+        // register action
+        controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+      }
+    } catch (RODAException e) {
+      throw new RESTException(e);
+    }
   }
 }

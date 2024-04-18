@@ -343,6 +343,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_AUTH = "api/v1/auth/";
   public static final String API_REST_V1_DISTRIBUTED_INSTANCE = "api/v1/distributed_instances/";
   public static final String API_REST_V1_JOBS = "api/v1/jobs/";
+  public static final String API_REST_V2_JOBS = "api/v2/jobs/";
 
   public static final String API_REST_V1_REPRESENTATION_OTHER_METADATA = "otherMetadata";
 

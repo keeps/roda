@@ -13,11 +13,8 @@ package org.roda.wui.client.ingest.process;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.json.client.JSONValue;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -63,7 +60,7 @@ public class ShowJobReport extends Composite {
       if (historyTokens.size() == 3) {
         String jobId = historyTokens.get(0);
         String jobReportId = historyTokens.get(2);
-        retrieveJobReport(jobId, jobReportId, callback);
+        retrieveJobReport(jobReportId, callback);
       } else {
         HistoryUtils.newHistory(IngestProcess.RESOLVER);
         callback.onSuccess(null);
@@ -140,51 +137,19 @@ public class ShowJobReport extends Composite {
   @UiField
   FocusPanel keyboardFocus;
 
-  private static void retrieveJobReport(String jobId, String jobReportId, AsyncCallback<Widget> callback) {
+  private static void retrieveJobReport(String jobReportId, AsyncCallback<Widget> callback) {
     Services services = new Services("Get job report items", "get");
 
-    services.jobsResource(s -> s.getJobReport(jobId, jobReportId)).thenCompose(report -> services.futureFromObjectClass(report.getOutcomeObjectClass(), s -> s.findByUuid(report.getOutcomeObjectId())))
-      .whenComplete((o, error) -> {
-        if (o != null) {
-          GWT.log("OBJECT: " + o);
-
-
-
+    services.jobReportResource(s -> s.findByUuid(jobReportId)).thenCompose(indexedReport -> services
+      .jobsResource(s -> s.getJobReport(indexedReport.getJobId(), jobReportId)).whenComplete((reports, error) -> {
+        if (reports != null) {
+          indexedReport.setReports(reports.getReports());
+          ShowJobReport showJob = new ShowJobReport(indexedReport);
+          callback.onSuccess(showJob);
         } else if (error != null) {
-          GWT.log("error" + error);
           callback.onFailure(error);
         }
-      });
-    BrowserService.Util.getInstance().retrieve(IndexedReport.class.getName(), jobReportId, fieldsToReturn,
-      new AsyncCallback<IndexedReport>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
-        @Override
-        public void onSuccess(IndexedReport jobReport) {
-          GWT.log("INDEXED REPORT: " + jobReport.getOutcomeObjectLabel());
-          retrieveJobReportItems(jobReport, callback);
-        }
-      });
-  }
-
-  private static void retrieveJobReportItems(IndexedReport jobReport, AsyncCallback<Widget> callback) {
-    BrowserService.Util.getInstance().retrieveJobReportItems(jobReport.getJobId(), jobReport.getId(),
-      new AsyncCallback<List<Report>>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
-        @Override
-        public void onSuccess(List<Report> reports) {
-          jobReport.setReports(reports);
-          ShowJobReport showJob = new ShowJobReport(jobReport);
-          callback.onSuccess(showJob);
-        }
-      });
+      }));
   }
 
   public ShowJobReport(IndexedReport jobReport) {
