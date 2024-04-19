@@ -40,7 +40,7 @@ $(document).ready(function () {
         elem = e.target;
         if ($(elem).find('.footer').length > 0) {
             brandingsToInsert.forEach(function (branding) {
-                $("head").append('<link rel="stylesheet" type="text/css" href="api/v2/themes?resource_id=' + branding + '">');
+                $("head").append('<link rel="stylesheet" type="text/css" href="api/v2/themes?resource-id=' + branding + '">');
             });
         }
     });

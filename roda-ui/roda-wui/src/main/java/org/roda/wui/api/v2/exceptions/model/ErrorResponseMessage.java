@@ -1,45 +1,30 @@
 package org.roda.wui.api.v2.exceptions.model;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 public class ErrorResponseMessage {
 
   private int status;
   private String errorId;
   private String message;
-  private LocalDateTime timestamp;
+  private Instant timestamp;
   private String instance;
 
-  public ErrorResponseMessage(int status, String errorId, String message, LocalDateTime timestamp, String instance) {
+  public ErrorResponseMessage(int status, String errorId, String message, String instance) {
     this.status = status;
     this.errorId = errorId;
     this.message = message;
-    this.timestamp = timestamp;
-    this.instance = instance;
-  }
-
-  public void setStatus(int status) {
-    this.status = status;
-  }
-
-  public void setErrorId(String errorId) {
-    this.errorId = errorId;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
-
-  public void setTimestamp(LocalDateTime timestamp) {
-    this.timestamp = timestamp;
-  }
-
-  public void setInstance(String instance) {
+    this.timestamp = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     this.instance = instance;
   }
 
   public int getStatus() {
     return status;
+  }
+
+  public void setStatus(int status) {
+    this.status = status;
   }
 
   public String getErrorId() {
@@ -50,7 +35,7 @@ public class ErrorResponseMessage {
     return message;
   }
 
-  public LocalDateTime getTimestamp() {
+  public Instant getTimestamp() {
     return timestamp;
   }
 

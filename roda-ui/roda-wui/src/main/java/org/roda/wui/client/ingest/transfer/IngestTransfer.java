@@ -79,8 +79,6 @@ public class IngestTransfer extends Composite {
       } else {
         String transferredResourceUUID = historyTokens.get(0);
         if (transferredResourceUUID != null) {
-          GWT.log("HERE!!!");
-          GWT.log("uuid: " + transferredResourceUUID);
           services.transferredResource(s -> s.getResource(transferredResourceUUID))
             .whenComplete((value,error) -> {
               if (value != null) {

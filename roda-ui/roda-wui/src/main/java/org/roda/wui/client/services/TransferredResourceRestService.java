@@ -1,9 +1,5 @@
 package org.roda.wui.client.services;
 
-import org.fusesource.restygwt.client.DirectRestService;
-import org.roda.core.data.v2.index.CountRequest;
-import org.roda.core.data.v2.index.FindRequest;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.TransferredResources;
@@ -30,7 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(name = "v2 transfers")
 @RequestMapping(path = "../api/v2/transfers")
-public interface TransferredResourceRestService extends DirectRestService {
+public interface TransferredResourceRestService extends RODAEntityRestService<TransferredResource> {
 
   @RequestMapping(path = "/selected", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "List selected transferred resources", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), description = "Gets a list of transferred resources", responses = {
@@ -94,17 +90,4 @@ public interface TransferredResourceRestService extends DirectRestService {
     @Parameter(description = "The id of the parent") @RequestParam(name = "parent-uuid") String parentUUID,
     @Parameter(description = "The name of the directory to create") @RequestParam(name = "name") String folderName,
     @Parameter(description = "Commit after creation", content = @Content(schema = @Schema(defaultValue = "false", implementation = Boolean.class))) @RequestParam(name = "commit") boolean commit);
-
-  @RequestMapping(path = "/find", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Find indexed resources", description = "Finds existing indexed resources", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = IndexResult.class)))})
-  IndexResult<TransferredResource> find(
-    @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = FindRequest.class))) FindRequest findRequest,
-    @Parameter(description = "language", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
-
-  @RequestMapping(path = "/count", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Count indexed resources", description = "Counts indexed resources", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class)))})
-  Long count(
-    @RequestBody(description = "Count parameters", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CountRequest.class))) CountRequest countRequest);
 }

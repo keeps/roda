@@ -44,7 +44,7 @@
 	<!-- Specify the app entry point class. -->
 	<entry-point class='org.roda.wui.client.portal.MainPortal' />
 	<!-- <stylesheet src="Main.css" /> Replaced by MyResources -->
-	<stylesheet src="../api/v2/themes?resource_id=theme.css" />
-	<stylesheet src="../api/v2/themes?resource_id=printing.css" />
+	<stylesheet src="../api/v2/themes?resource-id=theme.css" />
+	<stylesheet src="../api/v2/themes?resource-id=printing.css" />
 	<collapse-all-properties />
 </module>

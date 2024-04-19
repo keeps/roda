@@ -117,23 +117,8 @@ public class TransferredResourceController implements TransferredResourceRestSer
 
   @Override
   public TransferredResource getResource(String resourceId) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      return indexService.retrieve(TransferredResource.class, resourceId, new ArrayList<>());
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), resourceId, state,
-        RodaConstants.CONTROLLER_RESOURCE_ID_PARAM, resourceId);
-    }
+    return indexService.retrieve(requestContext.getUser(), TransferredResource.class, resourceId, new ArrayList<>());
   }
 
   @Override
@@ -245,8 +230,8 @@ public class TransferredResourceController implements TransferredResourceRestSer
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      TransferredResource transferredResource = indexService.retrieve(TransferredResource.class, uuid,
-        new ArrayList<>());
+      TransferredResource transferredResource = indexService.retrieve(requestContext.getUser(),
+        TransferredResource.class, uuid, new ArrayList<>());
 
       StreamResponse streamResponse = transferredResourceService.createStreamResponse(transferredResource);
 
@@ -314,58 +299,31 @@ public class TransferredResourceController implements TransferredResourceRestSer
   }
 
   @Override
-  public IndexResult<TransferredResource> find(@RequestBody FindRequest findRequest, String localeString) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      if (findRequest.filter == null || findRequest.filter.getParameters().isEmpty()) {
-        return new IndexResult<>();
-      }
-
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser(), TransferredResource.class);
-
-      // delegate
-      IndexResult<TransferredResource> result = indexService.find(TransferredResource.class, findRequest.filter,
-        findRequest.sorter, findRequest.sublist, findRequest.facets, requestContext.getUser(), findRequest.onlyActive,
-        findRequest.fieldsToReturn);
-
-      return I18nUtility.translate(result, TransferredResource.class, localeString);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        TransferredResource.class.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, findRequest.filter,
-        RodaConstants.CONTROLLER_SORTER_PARAM, findRequest.sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM,
-        findRequest.sublist);
-    }
+  public TransferredResource findByUuid(String uuid) {
+    return null;
   }
 
   @Override
-  public Long count(@RequestBody CountRequest countRequest) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+  public IndexResult<TransferredResource> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser(), TransferredResource.class);
-
-      // delegate
-      return indexService.count(TransferredResource.class, countRequest.filter, countRequest.onlyActive,
-        requestContext.getUser());
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        TransferredResource.class.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM,
-        countRequest.filter.toString());
+    if (findRequest.filter == null || findRequest.filter.getParameters().isEmpty()) {
+      return new IndexResult<>();
     }
+
+    // delegate
+    IndexResult<TransferredResource> result = indexService.find(TransferredResource.class, findRequest.filter,
+      findRequest.sorter, findRequest.sublist, findRequest.facets, requestContext.getUser(), findRequest.onlyActive,
+      findRequest.fieldsToReturn);
+
+    return I18nUtility.translate(result, TransferredResource.class, localeString);
+  }
+
+  @Override
+  public String count(@RequestBody CountRequest countRequest) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    return String.valueOf(indexService.count(TransferredResource.class, countRequest.filter, countRequest.onlyActive,
+      requestContext.getUser()));
   }
 }

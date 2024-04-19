@@ -17,7 +17,7 @@ public abstract class RodaWuiController {
     super();
   }
 
-  protected static MetricRegistry getMetricRegistry() {
+  public static MetricRegistry getMetricRegistry() {
     return RodaCoreFactory.getMetrics();
   }
 }

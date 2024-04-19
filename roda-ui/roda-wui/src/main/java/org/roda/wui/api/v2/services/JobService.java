@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -38,6 +39,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +73,28 @@ public class JobService {
     return job;
   }
 
+  public void validateAndSetJobInformation(User user, Job job) throws RequestNotValidException {
+    LOGGER.debug("Job being validated: {}", job);
+    validateJobPluginInformation(job);
+
+    // always set a new UUID (even if job already brings one)
+    job.setId(IdUtils.createUUID());
+
+    // set "missing" information whenever it is not impeditive for job creation
+    if (StringUtils.isBlank(job.getName())) {
+      job.setName(job.getId());
+    }
+    job.setUsername(user.getName());
+
+    // Set the JobUserDetails in Job creation
+    JobUserDetails jobUserDetails = new JobUserDetails();
+    jobUserDetails.setUsername(user.getName());
+    jobUserDetails.setEmail(user.getEmail());
+    jobUserDetails.setFullname(user.getFullName());
+    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.IMPLEMENTER.toString());
+    job.getJobUsersDetails().add(jobUserDetails);
+  }
+
   public Job stopJob(String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     // retrieve job
@@ -82,8 +106,8 @@ public class JobService {
     return job;
   }
 
-  public Job rejectJob(Job job, String details) throws NotFoundException, GenericException, JobAlreadyStartedException,
-    RequestNotValidException, AuthorizationDeniedException {
+  public Job rejectJob(Job job, String details)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
 
     job.setState(Job.JOB_STATE.REJECTED);
     job.setStateDetails(details);

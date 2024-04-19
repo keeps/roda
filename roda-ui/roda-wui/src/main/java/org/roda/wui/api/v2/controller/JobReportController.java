@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.CountRequest;
+import org.roda.core.data.v2.index.FindRequest;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -27,7 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(path = "/api/v2/job-report")
 @Tag(name = JobReportController.SWAGGER_ENDPOINT)
 public class JobReportController implements JobReportRestService {
-  public static final String SWAGGER_ENDPOINT = "v2 job reports";
+  public static final String SWAGGER_ENDPOINT = "v2 job-reports";
 
   @Autowired
   private HttpServletRequest request;
@@ -46,7 +49,8 @@ public class JobReportController implements JobReportRestService {
       controllerAssistant.checkRoles(requestContext.getUser(), TransferredResource.class);
 
       // delegate
-      final IndexedReport ret = indexService.retrieve(IndexedReport.class, uuid, new ArrayList<>());
+      final IndexedReport ret = indexService.retrieve(requestContext.getUser(), IndexedReport.class, uuid,
+        new ArrayList<>());
 
       // checking object permissions
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), ret, IndexedReport.class);
@@ -60,5 +64,15 @@ public class JobReportController implements JobReportRestService {
       controllerAssistant.registerAction(requestContext.getUser(), uuid, state, RodaConstants.CONTROLLER_CLASS_PARAM,
         IndexedReport.class.getSimpleName(), RodaConstants.CONTROLLER_ID_PARAM, uuid);
     }
+  }
+
+  @Override
+  public IndexResult<IndexedReport> find(FindRequest findRequest, String localeString) {
+    return null;
+  }
+
+  @Override
+  public String count(CountRequest countRequest) {
+    return "0";
   }
 }

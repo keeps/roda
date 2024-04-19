@@ -36,6 +36,8 @@ public class Services implements DirectRestService {
       return GWT.create(JobsRestService.class);
     } else if (JobReportRestService.class.equals(serviceClass)) {
       return GWT.create(JobReportRestService.class);
+    } else if (NotificationRestService.class.equals(serviceClass)) {
+      return GWT.create(NotificationRestService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
@@ -98,5 +100,9 @@ public class Services implements DirectRestService {
 
   public <T> CompletableFuture<T> jobReportResource(CheckedFunction<JobReportRestService, T> method) {
     return future(JobReportRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> notificationResource(CheckedFunction<NotificationRestService, T> method) {
+    return future(NotificationRestService.class, method);
   }
 }
