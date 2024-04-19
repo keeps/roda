@@ -10,6 +10,7 @@ import org.fusesource.restygwt.client.REST;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.notifications.Notification;
 
 import com.google.gwt.core.client.GWT;
 
@@ -68,6 +69,8 @@ public class Services implements DirectRestService {
     S service;
     if (TransferredResource.class.getName().equals(objectClassString)) {
       service = GWT.create(TransferredResourceRestService.class);
+    } else if (Notification.class.getName().equals(objectClassString)) {
+      service = GWT.create(NotificationRestService.class);
     } else {
       throw new IllegalArgumentException(objectClassString + " not supported");
     }
