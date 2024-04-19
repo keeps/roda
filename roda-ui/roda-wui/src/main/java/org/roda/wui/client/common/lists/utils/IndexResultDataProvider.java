@@ -9,17 +9,17 @@ package org.roda.wui.client.common.lists.utils;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 
 import com.google.gwt.user.cellview.client.ColumnSortList;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface IndexResultDataProvider<T extends Serializable> {
 
-  void getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn, AsyncCallback<IndexResult<T>> callback);
+  CompletableFuture<IndexResult<T>> getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn);
 
   Sorter getSorter(ColumnSortList columnSortList);
 

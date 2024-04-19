@@ -8,25 +8,27 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.I18nUtility;
 import org.springframework.stereotype.Service;
 
 @Service
 public class IndexService {
 
-  public <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
-    final List<String> fieldsToReturn) {
+  public <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final FindRequest findRequest,
+    User user) {
+    return find(classToReturn, findRequest, null, user);
+  }
 
+  public <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final FindRequest findRequest,
+    String locale, User user) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -35,8 +37,15 @@ public class IndexService {
       controllerAssistant.checkRoles(user, classToReturn);
 
       // delegate
-      return RodaCoreFactory.getIndexService().find(classToReturn, filter, sorter, sublist, facets, user, justActive,
-        fieldsToReturn);
+      IndexResult<T> result = RodaCoreFactory.getIndexService().find(classToReturn, findRequest.filter,
+        findRequest.sorter, findRequest.sublist, findRequest.facets, user, findRequest.onlyActive,
+        findRequest.fieldsToReturn);
+
+      if (locale == null) {
+        return result;
+      }
+
+      return I18nUtility.translate(result, classToReturn, locale);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -46,8 +55,9 @@ public class IndexService {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, filter,
-        RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
+        classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, findRequest.filter,
+        RodaConstants.CONTROLLER_SORTER_PARAM, findRequest.sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM,
+        findRequest.sublist);
     }
   }
 

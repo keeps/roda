@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import org.fusesource.restygwt.client.MethodCallback;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.FindRequest;
@@ -115,28 +114,20 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final ClientLogger LOGGER = new ClientLogger(AsyncTableCell.class.getName());
-
+  private final List<CheckboxSelectionListener<T>> listeners = new ArrayList<>();
   private AsyncTableCellOptions<T> options;
-
   private Class<T> classToReturn;
   private String listId;
   private Actionable<T> actionable;
-
   private FlowPanel mainPanel;
   private FlowPanel sidePanel;
-
   private MyAsyncDataProvider<T> dataProvider;
   private SingleSelectionModel<T> selectionModel;
-
   private AccessibleSimplePager resultsPager;
   private RodaPageSizePager pageSizePager;
-
   private CellTable<T> display;
-
   private RadioButton selectAllRadioButton = null;
   private Set<T> selected = new HashSet<>();
-  private final List<CheckboxSelectionListener<T>> listeners = new ArrayList<>();
-
   private Filter filter;
   private boolean justActive;
   private Facets facets;
@@ -153,11 +144,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private boolean redirectOnSingleResult;
   private Filter originalFilter;
   private HandlerRegistration selectAllPopupHistoryChangedHandler = null;
-
-  enum AutoUpdateState {
-    AUTO_UPDATE_OFF, AUTO_UPDATE_ON, AUTO_UPDATE_ERROR, AUTO_UPDATE_PAUSED, AUTO_UPDATE_WORKING
-  }
-
   private Timer autoUpdateTimer = null;
   private int autoUpdateTimerMillis = 0;
   private AutoUpdateState autoUpdateState = AutoUpdateState.AUTO_UPDATE_OFF;
@@ -165,12 +151,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private InlineHTML autoUpdateSignal = new InlineHTML("");
   private HandlerRegistration autoUpdateHandler;
 
-  // private List<Consumer<AutoUpdateState>> autoUpdateConsumers = new
-  // ArrayList<>();
-
   public AsyncTableCell() {
     super();
   }
+
+  // private List<Consumer<AutoUpdateState>> autoUpdateConsumers = new
+  // ArrayList<>();
 
   AsyncTableCell<T> initialize(AsyncTableCellOptions<T> options) {
     adjustOptions(options);
@@ -214,32 +200,22 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     this.dataProvider = new MyAsyncDataProvider<T>(display, fieldsToReturn, new IndexResultDataProvider<T>() {
 
       @Override
-      public void getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn, final AsyncCallback<IndexResult<T>> callback) {
-        AsyncTableCell.this.getData(AsyncTableCell.this.getFilter(), sublist, sorter, fieldsToReturn,
-          new AsyncCallback<IndexResult<T>>() {
+      public CompletableFuture<IndexResult<T>> getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn) {
+        return AsyncTableCell.this.getData(sublist, sorter, fieldsToReturn).thenApply(tIndexResult -> {
+          setResult(tIndexResult);
+          if (redirectOnSingleResult && originalFilter.equals(AsyncTableCell.this.getFilter())
+            && getVisibleItems().size() == 1) {
+            HistoryUtils.resolve(getVisibleItems().get(0), true);
+          }
 
-            @Override
-            public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
-            }
-
-            @Override
-            public void onSuccess(IndexResult<T> result) {
-              setResult(result);
-              callback.onSuccess(result);
-              if (redirectOnSingleResult && originalFilter.equals(AsyncTableCell.this.getFilter())
-                && getVisibleItems().size() == 1) {
-                HistoryUtils.resolve(getVisibleItems().get(0), true);
-              }
-
-              if (getVisibleItems().isEmpty()) {
-                AsyncTableCell.this.addStyleName("table-empty");
-              } else {
-                AsyncTableCell.this.removeStyleName("table-empty");
-              }
-              clearSelected();
-            }
-          });
+          if (getVisibleItems().isEmpty()) {
+            AsyncTableCell.this.addStyleName("table-empty");
+          } else {
+            AsyncTableCell.this.removeStyleName("table-empty");
+          }
+          clearSelected();
+          return tIndexResult;
+        });
       }
 
       @Override
@@ -609,17 +585,13 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     };
   }
 
-  private void getData(Filter filter, Sublist sublist, Sorter sorter, List<String> fieldsToReturn, AsyncCallback<IndexResult<T>> callback) {
-    if (isSearchRestricted()) {
-      callback.onSuccess(null);
-    } else {
-      getData(sublist, sorter, fieldsToReturn, callback);
-    }
-  }
-
-  private void getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn, AsyncCallback<IndexResult<T>> callback) {
-    BrowserService.Util.getInstance().find(getClassToReturn().getName(), getFilter(), sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), fieldsToReturn, callback);
+  private CompletableFuture<IndexResult<T>> getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn) {
+    Services services = new Services("Get data", "get");
+    FindRequest findRequest = new FindRequest.FindRequestBuilder(getClassToReturn().getName(), getFilter(),
+      getJustActive()).withSubList(sublist).withFacets(getFacets()).shouldExportFacets(false).withSorter(sorter)
+      .withFieldsToReturn(fieldsToReturn).build();
+    return services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
+      getClassToReturn());
   }
 
   protected abstract Sorter getSorter(ColumnSortList columnSortList);
@@ -665,18 +637,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       public void run() {
         setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_WORKING);
 
-        dataProvider.update(fieldsToReturn, new AsyncCallback<Void>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            // disable auto-update
+        dataProvider.update(fieldsToReturn).whenComplete((result, error) -> {
+          if (error != null) {
             autoUpdateTimer.cancel();
             setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_ERROR);
-            LOGGER.error("Could not auto-update table " + listId, caught);
-          }
-
-          @Override
-          public void onSuccess(Void result) {
+            LOGGER.error("Could not auto-update table " + listId, error);
+          } else {
             setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_ON);
           }
         });
@@ -712,6 +678,11 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     return filter;
   }
 
+  public void setFilter(Filter filter) {
+    this.filter = filter;
+    refresh();
+  }
+
   public boolean isSearchRestricted() {
     return !isAttached() || !isVisible();
   }
@@ -722,11 +693,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   public void setJustActive(boolean justActive) {
     this.justActive = justActive;
-    refresh();
-  }
-
-  public void setFilter(Filter filter) {
-    this.filter = filter;
     refresh();
   }
 
@@ -920,12 +886,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
         getResult().getTotalCount());
     }
     return ret;
-  }
-
-  // LISTENER
-  @FunctionalInterface
-  public interface CheckboxSelectionListener<T extends IsIndexed> {
-    public void onSelectionChange(SelectedItems<T> selected);
   }
 
   public void addCheckboxSelectionListener(CheckboxSelectionListener<T> checkboxSelectionListener) {
@@ -1262,5 +1222,15 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       originalFilter = this.getFilter();
       refresh();
     }
+  }
+
+  enum AutoUpdateState {
+    AUTO_UPDATE_OFF, AUTO_UPDATE_ON, AUTO_UPDATE_ERROR, AUTO_UPDATE_PAUSED, AUTO_UPDATE_WORKING
+  }
+
+  // LISTENER
+  @FunctionalInterface
+  public interface CheckboxSelectionListener<T extends IsIndexed> {
+    public void onSelectionChange(SelectedItems<T> selected);
   }
 }

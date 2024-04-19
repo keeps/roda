@@ -10,7 +10,6 @@ import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.Notification;
@@ -56,9 +55,10 @@ public class NotificationController implements NotificationRestService {
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
 
-    IndexResult<Notification> result = indexService.find(Notification.class, Filter.ALL, Sorter.NONE,
-      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, requestContext.getUser(), justActive,
-      new ArrayList<>());
+    FindRequest findRequest = new FindRequest.FindRequestBuilder(Notification.class.getName(), Filter.ALL, justActive).withSubList(new Sublist(pagingParams.getFirst(), pagingParams.getSecond()))
+        .build();
+
+    IndexResult<Notification> result = indexService.find(Notification.class, findRequest, requestContext.getUser());
 
     return new Notifications(result.getResults());
   }
@@ -106,8 +106,7 @@ public class NotificationController implements NotificationRestService {
   public IndexResult<Notification> find(FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
-    return indexService.find(Notification.class, findRequest.filter, findRequest.sorter, findRequest.sublist,
-      findRequest.facets, requestContext.getUser(), findRequest.onlyActive, findRequest.fieldsToReturn);
+    return indexService.find(Notification.class, findRequest, localeString, requestContext.getUser());
   }
 
   @Override
