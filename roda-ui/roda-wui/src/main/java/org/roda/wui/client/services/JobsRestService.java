@@ -75,7 +75,7 @@ public interface JobsRestService extends DirectRestService {
     @Parameter(name = "jobId", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<Job> selectedJobs,
     @RequestParam(name = RodaConstants.API_QUERY_JOB_DETAILS) String details);
 
-  @RequestMapping(method = RequestMethod.POST, path = "/{jobId}")
+  @RequestMapping(method = RequestMethod.DELETE, path = "/{jobId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete job", description = "Deletes a job, stopping it if still running", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),

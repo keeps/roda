@@ -16,8 +16,6 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.model.ModelService;
-import org.roda.wui.api.controllers.BrowserHelper;
-import org.roda.wui.api.controllers.JobsHelper;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
@@ -73,7 +71,7 @@ public class JobsController implements JobsRestService {
 
     try {
       // validate input and set missing information when possible
-      JobsHelper.validateAndSetJobInformation(requestContext.getUser(), job);
+      jobService.validateAndSetJobInformation(requestContext.getUser(), job);
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
 
@@ -109,29 +107,8 @@ public class JobsController implements JobsRestService {
 
   @Override
   public Job getJob(String jobId) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser(), Job.class);
-
-      // delegate
-      final Job job = BrowserHelper.retrieve(Job.class, jobId, new ArrayList<>());
-
-      // checking object permissions
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), job, Job.class);
-
-      return job;
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), jobId, state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        Job.class.getSimpleName());
-    }
+    return indexService.retrieve(requestContext.getUser(), Job.class, jobId, new ArrayList<>());
   }
 
   @Override
@@ -262,6 +239,8 @@ public class JobsController implements JobsRestService {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
       // delegate action to controller
       return jobService.getJobReportsFromIndexResult(requestContext.getUser(), jobId, justFailed, start, limit,
         new ArrayList<>());
@@ -308,7 +287,8 @@ public class JobsController implements JobsRestService {
       controllerAssistant.checkRoles(requestContext.getUser(), IndexedReport.class);
 
       // delegate
-      final IndexedReport ret = indexService.retrieve(IndexedReport.class, jobReportId, new ArrayList<>());
+      final IndexedReport ret = indexService.retrieve(requestContext.getUser(), IndexedReport.class, jobReportId,
+        new ArrayList<>());
 
       // checking object permissions
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), ret, IndexedReport.class);

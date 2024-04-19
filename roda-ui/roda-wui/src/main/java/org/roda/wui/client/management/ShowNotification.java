@@ -16,10 +16,10 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -52,20 +52,16 @@ public class ShowNotification extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String notificationId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieve(Notification.class.getName(), notificationId, fieldsToReturn,
-          new AsyncCallback<Notification>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
-            }
-
-            @Override
-            public void onSuccess(Notification notification) {
-              ShowNotification notificationPanel = new ShowNotification(notification);
-              callback.onSuccess(notificationPanel);
-            }
-          });
+        Services services = new Services("Get notification", "get");
+        services.notificationResource(s -> s.getNotification(notificationId)).whenComplete((notification, throwable) -> {
+          if (throwable != null) {
+            GWT.log("" + throwable);
+            callback.onFailure(throwable);
+          } else {
+            ShowNotification notificationPanel = new ShowNotification(notification);
+            callback.onSuccess(notificationPanel);
+          }
+        });
       } else {
         HistoryUtils.newHistory(NotificationRegister.RESOLVER);
         callback.onSuccess(null);

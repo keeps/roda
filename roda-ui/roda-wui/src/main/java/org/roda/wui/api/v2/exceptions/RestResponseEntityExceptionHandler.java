@@ -1,5 +1,7 @@
 package org.roda.wui.api.v2.exceptions;
 
+import java.util.UUID;
+
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -18,9 +20,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
@@ -54,7 +53,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     LoggerFactory.getLogger(RestResponseEntityExceptionHandler.class).warn(warn);
 
     ErrorResponseMessage body = new ErrorResponseMessage(httpStatus.value(), errorID.toString(), message,
-      LocalDateTime.now(), ((ServletWebRequest) request).getRequest().getRequestURI());
+      ((ServletWebRequest) request).getRequest().getRequestURI());
 
     HttpHeaders responseHeaders = new HttpHeaders();
     responseHeaders.setContentType(MediaType.APPLICATION_JSON);

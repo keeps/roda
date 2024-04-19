@@ -27,10 +27,10 @@ public class ThemesController {
 
   @GetMapping()
   public ResponseEntity<StreamingResponseBody> getResource(
-    @Parameter(description = "The resource id", required = true) @RequestParam(RodaConstants.API_QUERY_PARAM_RESOURCE_ID) String resourceId,
-    @Parameter(description = "The default resource id") @RequestParam(value = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_ID, required = false) String fallbackResourceId,
+    @Parameter(description = "The resource id", required = true) @RequestParam("resource-id") String resourceId,
+    @Parameter(description = "The default resource id") @RequestParam(value = "default-resource-id", required = false) String fallbackResourceId,
     @Parameter(description = "If the resource is served inline") @RequestParam(value = RodaConstants.API_QUERY_PARAM_INLINE, required = false, defaultValue = "false") boolean inline,
-    @Parameter(description = "The resource type, can be internal or plugin", schema = @Schema(implementation = RodaConstants.ResourcesTypes.class, defaultValue = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_TYPE)) @RequestParam(defaultValue = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_TYPE, name = RodaConstants.API_QUERY_PARAM_RESOURCE_TYPE, required = false) String type,
+    @Parameter(description = "The resource type, can be internal or plugin", schema = @Schema(implementation = RodaConstants.ResourcesTypes.class, defaultValue = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_TYPE)) @RequestParam(defaultValue = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_TYPE, name = "resource-type", required = false) String type,
     WebRequest request) {
 
     Pair<String, ProvidesInputStream> themeResource = Theme.getThemeResource(resourceId, fallbackResourceId, type);

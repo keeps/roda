@@ -34,6 +34,8 @@ import com.google.gwt.user.client.ui.RootPanel;
 
 public class RestUtils {
 
+  private static FindRequestMapper FIND_REQUEST_MAPPER = GWT.create(FindRequestMapper.class);
+
   private RestUtils() {
     // do nothing
   }
@@ -514,26 +516,25 @@ public class RestUtils {
 
   public static SafeUri createThemeResourceUri(String resourceId, String defaultResourceId, String resourceType,
     boolean inline) {
-    // api/v1/theme/?resource_id={resourceId}&default_resource_od={defaultResourceId}&resource_type={resourceType}
+    // api/v2/themes/?resource-id={resourceId}&default-resource-id={defaultResourceId}&resource-type={resourceType}
     StringBuilder b = new StringBuilder();
 
-    b.append("api/v2/themes").append(RodaConstants.API_QUERY_START)
-      .append(RodaConstants.API_QUERY_PARAM_RESOURCE_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(URL.encode(resourceId));
+    b.append("api/v2/themes").append(RodaConstants.API_QUERY_START).append(RodaConstants.API_V2_QUERY_PARAM_RESOURCE_ID)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encode(resourceId));
 
     if (defaultResourceId != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_ID)
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_V2_QUERY_PARAM_DEFAULT_RESOURCE_ID)
         .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(defaultResourceId);
     }
 
     if (resourceType != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_RESOURCE_TYPE)
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_V2_QUERY_PARAM_RESOURCE_TYPE)
         .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(resourceType);
     }
 
     if (inline) {
       b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_INLINE)
-        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(inline);
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(true);
     }
 
     return UriUtils.fromSafeConstant(b.toString());
@@ -545,11 +546,6 @@ public class RestUtils {
     b.append(RodaConstants.API_REST_V2_JOBS).append(jobId).append("/attachment/").append(attachmentId);
     return UriUtils.fromSafeConstant(b.toString());
   }
-
-  public static interface FindRequestMapper extends ObjectMapper<FindRequest> {
-  }
-
-  private static FindRequestMapper FIND_REQUEST_MAPPER = GWT.create(FindRequestMapper.class);
 
   public static <T extends IsIndexed> void requestCSVExport(Class<T> classToReturnName, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, boolean onlyActive, boolean exportFacets, String filename) {
@@ -597,6 +593,9 @@ public class RestUtils {
     });
 
     form.submit();
+  }
+
+  public static interface FindRequestMapper extends ObjectMapper<FindRequest> {
   }
 
 }

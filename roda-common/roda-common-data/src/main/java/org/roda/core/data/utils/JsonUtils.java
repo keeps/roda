@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataMixIn;
@@ -37,10 +36,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public final class JsonUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtils.class);
   private static final String JSON_ERROR_MESSAGE = "Error while parsing JSON";
+  private static final String ERROR_TRANSFORMING_OBJECT_TO_JSON_STRING = "Error transforming object '{}' to json string";
 
   private JsonUtils() {
     // do nothing
@@ -93,10 +94,11 @@ public final class JsonUtils {
     String ret = null;
     try {
       ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-      mapper = addMixinsToMapper(mapper, object, mixin);
+      mapper.registerModule(new JavaTimeModule());
+      addMixinsToMapper(mapper, object, mixin);
       ret = mapper.writeValueAsString(object);
     } catch (IOException e) {
-      LOGGER.error("Error transforming object '{}' to json string", object, e);
+      LOGGER.error(ERROR_TRANSFORMING_OBJECT_TO_JSON_STRING, object, e);
     }
     return ret;
   }
@@ -113,17 +115,16 @@ public final class JsonUtils {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         ret.append(mapper.writer().writeValueAsString(object));
       } catch (IOException e) {
-        LOGGER.error("Error transforming object '{}' to json string", object, e);
+        LOGGER.error(ERROR_TRANSFORMING_OBJECT_TO_JSON_STRING, object, e);
       }
     }
     return ret.toString();
   }
 
-  private static ObjectMapper addMixinsToMapper(ObjectMapper mapper, Object object, Class<?> mixin) {
+  private static void addMixinsToMapper(ObjectMapper mapper, Object object, Class<?> mixin) {
     if (!(object instanceof DescriptiveMetadata)) {
-      if (object instanceof List<?>) {
-        List<?> objectList = (List<?>) object;
-        if (!objectList.isEmpty() && !(objectList.get(0) instanceof DescriptiveMetadata)) {
+      if (object instanceof List<?> objectList) {
+        if (!objectList.isEmpty() && !(objectList.getFirst() instanceof DescriptiveMetadata)) {
           mapper.addMixIn(DescriptiveMetadata.class, DescriptiveMetadataMixIn.class);
         }
       } else {
@@ -134,8 +135,6 @@ public final class JsonUtils {
     if (mixin != null) {
       mapper.addMixIn(object.getClass(), mixin);
     }
-
-    return mapper;
   }
 
   public static <T> T getObjectFromJson(Path json, Class<T> objectClass) throws GenericException {
@@ -143,7 +142,7 @@ public final class JsonUtils {
     InputStream stream = null;
     try {
       stream = Files.newInputStream(json);
-      String jsonString = IOUtils.toString(stream, RodaConstants.DEFAULT_ENCODING);
+      String jsonString = IOUtils.toString(stream, StandardCharsets.UTF_8);
       ret = getObjectFromJson(jsonString, objectClass);
     } catch (IOException e) {
       throw new GenericException(JSON_ERROR_MESSAGE, e);
@@ -156,7 +155,7 @@ public final class JsonUtils {
   public static <T> T getObjectFromJson(InputStream json, Class<T> objectClass) throws GenericException {
     T ret;
     try {
-      String jsonString = IOUtils.toString(json, RodaConstants.DEFAULT_ENCODING);
+      String jsonString = IOUtils.toString(json, StandardCharsets.UTF_8);
       ret = getObjectFromJson(jsonString, objectClass);
     } catch (IOException e) {
       throw new GenericException(e);
@@ -226,7 +225,7 @@ public final class JsonUtils {
       ObjectMapper mapper = new ObjectMapper(new JsonFactory());
       ret = mapper.writeValueAsString(node);
     } catch (IOException e) {
-      LOGGER.error("Error transforming object '{}' to json string", node, e);
+      LOGGER.error(ERROR_TRANSFORMING_OBJECT_TO_JSON_STRING, node, e);
     }
     return ret;
   }
@@ -260,8 +259,8 @@ public final class JsonUtils {
 
       // make it easy for the optimizer to tune this loop
       while (readChars == 1024) {
-        for (int i = 0; i < 1024;) {
-          if (c[i++] == '\n') {
+        for (int i = 0; i < 1024; i++) {
+          if (c[i] == '\n') {
             ++res;
           }
         }

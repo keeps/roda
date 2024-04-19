@@ -3,97 +3,97 @@
   font-style: normal;
   font-weight: 300;
   /* Some Chrome browsers load an incorrect Ubuntu Light font from local*/
-/*   src: local('Ubuntu Light'), local('Ubuntu-Light'), url(../../api/v2/themes?resource_id=fonts/Ubuntu/Ubuntu-Light.ttf) format("truetype"); */
-  src: url(../../api/v2/themes?resource_id=fonts/Ubuntu/Ubuntu-Light.ttf) format("truetype");
+/*   src: local('Ubuntu Light'), local('Ubuntu-Light'), url(../../api/v2/themes?resource-id=fonts/Ubuntu/Ubuntu-Light.ttf) format("truetype"); */
+  src: url(../../api/v2/themes?resource-id=fonts/Ubuntu/Ubuntu-Light.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "Ubuntu";
   font-style: italic;
   font-weight: 300;
-  src: local('Ubuntu Light Italic'), local('Ubuntu-LightItalic'), url(../../api/v2/themes?resource_id=fonts/Ubuntu/Ubuntu-LightItalic.ttf) format("truetype");
+  src: local('Ubuntu Light Italic'), local('Ubuntu-LightItalic'), url(../../api/v2/themes?resource-id=fonts/Ubuntu/Ubuntu-LightItalic.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "Ubuntu";
   font-style: normal;
   font-weight: 400;
-  src: local('Ubuntu'), url(../../api/v2/themes?resource_id=fonts/Ubuntu/Ubuntu-Regular.ttf) format("truetype");
+  src: local('Ubuntu'), url(../../api/v2/themes?resource-id=fonts/Ubuntu/Ubuntu-Regular.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "Ubuntu";
   font-style: italic;
   font-weight: 400;
-  src: local('Ubuntu Italic'), local('Ubuntu-Italic'), url(../../api/v2/themes?resource_id=fonts/Ubuntu/Ubuntu-Italic.ttf) format("truetype");
+  src: local('Ubuntu Italic'), local('Ubuntu-Italic'), url(../../api/v2/themes?resource-id=fonts/Ubuntu/Ubuntu-Italic.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "Ubuntu";
   font-style: normal;
   font-weight: 500;
-  src: local('Ubuntu Medium'), local('Ubuntu-Medium'), url(../../api/v2/themes?resource_id=fonts/Ubuntu/Ubuntu-Medium.ttf) format("truetype");
+  src: local('Ubuntu Medium'), local('Ubuntu-Medium'), url(../../api/v2/themes?resource-id=fonts/Ubuntu/Ubuntu-Medium.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "Ubuntu";
   font-style: italic;
   font-weight: 500;
-  src: local('Ubuntu Medium Italic'), local('Ubuntu-MediumItalic'), url(../../api/v2/themes?resource_id=fonts/Ubuntu/Ubuntu-MediumItalic.ttf) format("truetype");
+  src: local('Ubuntu Medium Italic'), local('Ubuntu-MediumItalic'), url(../../api/v2/themes?resource-id=fonts/Ubuntu/Ubuntu-MediumItalic.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "Ubuntu";
   font-style: normal;
   font-weight: 700;
-  src: local('Ubuntu Bold'), local('Ubuntu-Bold'), url(../../api/v2/themes?resource_id=fonts/Ubuntu/Ubuntu-Bold.ttf) format("truetype");
+  src: local('Ubuntu Bold'), local('Ubuntu-Bold'), url(../../api/v2/themes?resource-id=fonts/Ubuntu/Ubuntu-Bold.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "Ubuntu";
   font-style: italic;
   font-weight: 700;
-  src: local('Ubuntu Bold Italic'), local('Ubuntu-BoldItalic'), url(../../api/v2/themes?resource_id=fonts/Ubuntu/Ubuntu-BoldItalic.ttf) format("truetype");
+  src: local('Ubuntu Bold Italic'), local('Ubuntu-BoldItalic'), url(../../api/v2/themes?resource-id=fonts/Ubuntu/Ubuntu-BoldItalic.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "UbuntuCondensed";
   font-style: normal;
   font-weight: 400;
-  src: local('UbuntuCondensed'), url(../../api/v2/themes?resource_id=fonts/Ubuntu_Condensed/UbuntuCondensed-Regular.ttf) format("truetype");
+  src: local('UbuntuCondensed'), url(../../api/v2/themes?resource-id=fonts/Ubuntu_Condensed/UbuntuCondensed-Regular.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "UbuntuMono";
   font-style: normal;
   font-weight: 400;
-  src: local('UbuntuMono'), url(../../api/v2/themes?resource_id=fonts/Ubuntu_Mono/UbuntuMono-Regular.ttf) format("truetype");
+  src: local('UbuntuMono'), url(../../api/v2/themes?resource-id=fonts/Ubuntu_Mono/UbuntuMono-Regular.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "UbuntuMono";
   font-style: italic;
   font-weight: 400;
-  src: local('UbuntuMono Italic'), local('UbuntuMono-Italic'), url(../../api/v2/themes?resource_id=fonts/Ubuntu_Mono/UbuntuMono-Italic.ttf) format("truetype");
+  src: local('UbuntuMono Italic'), local('UbuntuMono-Italic'), url(../../api/v2/themes?resource-id=fonts/Ubuntu_Mono/UbuntuMono-Italic.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "UbuntuMono";
   font-style: normal;
   font-weight: 700;
-  src: local('UbuntuMono Bold'), local('UbuntuMono-Bold'), url(../../api/v2/themes?resource_id=fonts/Ubuntu_Mono/UbuntuMono-Bold.ttf) format("truetype");
+  src: local('UbuntuMono Bold'), local('UbuntuMono-Bold'), url(../../api/v2/themes?resource-id=fonts/Ubuntu_Mono/UbuntuMono-Bold.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "UbuntuMono";
   font-style: italic;
   font-weight: 700;
-  src: local('UbuntuMono Bold Italic'), local('UbuntuMono-BoldItalic'), url(../../api/v2/themes?resource_id=fonts/Ubuntu_Mono/UbuntuMono-BoldItalic.ttf) format("truetype");
+  src: local('UbuntuMono Bold Italic'), local('UbuntuMono-BoldItalic'), url(../../api/v2/themes?resource-id=fonts/Ubuntu_Mono/UbuntuMono-BoldItalic.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "RODALogo";
   font-style: normal;
   font-weight: 300;
-  src: url(../../api/v2/themes?resource_id=fonts/RODA_logo/RODA_logo.ttf) format("truetype");
+  src: url(../../api/v2/themes?resource-id=fonts/RODA_logo/RODA_logo.ttf) format("truetype");
 }

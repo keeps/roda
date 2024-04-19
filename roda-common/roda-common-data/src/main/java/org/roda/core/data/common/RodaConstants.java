@@ -477,6 +477,13 @@ public final class RodaConstants {
   public static final String API_DEFAULT_JSON_FILENAME = "export.json";
   public static final String API_NOTIFICATION_DEFAULT_TEMPLATE = "test-email-template";
 
+  // REST API V2
+  public static final String API_V2_QUERY_PARAM_RESOURCE_ID = "resource-id";
+  public static final String API_V2_QUERY_PARAM_DEFAULT_RESOURCE_ID = "default-resource-id";
+  public static final String API_V2_QUERY_PARAM_RESOURCE_TYPE = "resource-type";
+
+
+
   // api method allowable values
   public enum ListMediaTypes {
     JSON("json"), XML("xml"), JSONP("jsonp");
@@ -714,6 +721,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_ACTIVATE_PARAM = "activate";
   public static final String CONTROLLER_DETAILS_PARAM = "details";
 
+  public static final String CONTROLLER_REQUEST_METRICS_PARAM = "metricsToObtain";
   /*
    * Core (storage, index, orchestrator, etc.)
    */
