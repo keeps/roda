@@ -22,7 +22,6 @@ import org.roda.wui.api.v2.services.TransferredResourceService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.client.services.TransferredResourceRestService;
 import org.roda.wui.common.ControllerAssistant;
-import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -312,11 +311,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
     }
 
     // delegate
-    IndexResult<TransferredResource> result = indexService.find(TransferredResource.class, findRequest.filter,
-      findRequest.sorter, findRequest.sublist, findRequest.facets, requestContext.getUser(), findRequest.onlyActive,
-      findRequest.fieldsToReturn);
-
-    return I18nUtility.translate(result, TransferredResource.class, localeString);
+    return indexService.find(TransferredResource.class, findRequest, localeString, requestContext.getUser());
   }
 
   @Override

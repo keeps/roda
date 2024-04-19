@@ -11,15 +11,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.ColumnSortList;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
@@ -44,21 +43,10 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
 
   @Override
   protected void onRangeChanged(final HasData<T> display) {
-    fetch(display, fieldsToReturn, new AsyncCallback<Void>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(Void result) {
-        // do nothing
-      }
-    });
+    fetch(display, fieldsToReturn);
   }
 
-  private void fetch(final HasData<T> display, final List<String> fieldsToReturn, final AsyncCallback<Void> callback) {
+  private CompletableFuture<Void> fetch(final HasData<T> display, final List<String> fieldsToReturn) {
     // Get the new range.
     final Range range = display.getVisibleRange();
 
@@ -70,49 +58,30 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
     int length = range.getLength();
     sublist = new Sublist(start, length);
     sorter = dataProvider.getSorter(columnSortList);
-    dataProvider.getData(sublist, sorter, fieldsToReturn, new AsyncCallback<IndexResult<T>>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      @Override
-      public void onSuccess(IndexResult<T> result) {
-        if (result != null) {
-          rowCount = (int) result.getTotalCount();
-          date = result.getDate();
-          updateRowData((int) result.getOffset(), result.getResults());
-          updateRowCount(rowCount, true);
-          // ValueChangeEvent.fire(AsyncTableCell.this, result);
-          fireChangeEvent(result);
-        } else {
-          // search not yet ready, deliver empty result
-        }
-        callback.onSuccess(null);
+    CompletableFuture<Void> ret = new CompletableFuture<>();
+    dataProvider.getData(sublist, sorter, fieldsToReturn).whenComplete((result, throwable) -> {
+      if (result != null) {
+        rowCount = (int) result.getTotalCount();
+        date = result.getDate();
+        updateRowData((int) result.getOffset(), result.getResults());
+        updateRowCount(rowCount, true);
+        // ValueChangeEvent.fire(AsyncTableCell.this, result);
+        fireChangeEvent(result);
+      } else if (throwable != null) {
+        // to do send error
+        ret.completeExceptionally(throwable);
+      } else {
+        // search not yet ready, deliver empty result
+        ret.complete(null);
       }
     });
+    return ret;
   }
 
   protected abstract void fireChangeEvent(IndexResult<T> result);
 
-  public void update(List<String> fieldsToReturn, final AsyncCallback<Void> callback) {
-    fetch(display, fieldsToReturn, callback);
-  }
-
-  public void update(final List<String> fieldsToReturn) {
-    update(fieldsToReturn, new AsyncCallback<Void>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(Void result) {
-        // do nothing
-      }
-    });
+  public CompletableFuture<Void> update(List<String> fieldsToReturn) {
+    return fetch(display, fieldsToReturn);
   }
 
   public int getRowCount() {
@@ -130,5 +99,4 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
   public Sorter getSorter() {
     return sorter;
   }
-
 }
