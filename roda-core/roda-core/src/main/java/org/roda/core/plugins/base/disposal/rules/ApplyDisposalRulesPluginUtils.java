@@ -13,14 +13,14 @@ import java.util.Optional;
 
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalScheduleAIPMetadata;
+import org.roda.core.data.v2.disposal.rule.ConditionType;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.ConditionType;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata;
 import org.roda.core.index.IndexService;
 
 /**

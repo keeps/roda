@@ -13,6 +13,13 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHoldAssociation;
+import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
+import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.ip.AIP;
@@ -20,20 +27,12 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.jobs.CertificateInfo;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
-import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -49,7 +48,6 @@ import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
-import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -79,25 +77,21 @@ import config.i18n.client.ClientMessages;
 
 public class HtmlSnippetUtils {
 
+  public static final SafeHtml LOADING = SafeHtmlUtils.fromSafeConstant(
+    "<div class='spinner'><div class='double-bounce1'></div><div class='double-bounce2'></div></div>");
   private static final String OPEN_SPAN_CLASS_LABEL_INFO = "<span class='label-info'>";
   private static final String OPEN_SPAN_CLASS_LABEL_DEFAULT = "<span class='label-default'>";
   private static final String OPEN_SPAN_CLASS_LABEL_DANGER = "<span class='label-danger'>";
   private static final String OPEN_SPAN_CLASS_LABEL_WARNING = "<span class='label-warning'>";
   private static final String OPEN_SPAN_CLASS_LABEL_SUCCESS = "<span class='label-success'>";
-
   private static final String OPEN_SPAN_ORIGINAL_LABEL_SUCCESS = "<span class='label-success browseRepresentationOriginalIcon'>";
   private static final String OPEN_H2_CLASS_LABEL_SUCCESS = "<span class='h2'>";
   private static final String OPEN_SPAN = "<span>";
   private static final String CLOSE_SPAN = "</span>";
-
   private static final String OPEN_DIV_FONT_STYLE_1_REM = "<div style='font-size: 1rem; padding-top:0.5rem;'>";
   private static final String OPEN_DIV = "<div>";
   private static final String ClOSE_DIV = "</div>";
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  public static final SafeHtml LOADING = SafeHtmlUtils.fromSafeConstant(
-    "<div class='spinner'><div class='double-bounce1'></div><div class='double-bounce2'></div></div>");
 
   private HtmlSnippetUtils() {
     // do nothing

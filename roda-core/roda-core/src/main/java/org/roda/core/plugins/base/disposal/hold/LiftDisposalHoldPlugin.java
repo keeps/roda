@@ -9,6 +9,7 @@ package org.roda.core.plugins.base.disposal.hold;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +24,10 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -39,9 +40,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +59,9 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
-        PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal hold identifier"));
+      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
+        PluginParameter.PluginParameterType.STRING).isMandatory(true).isReadOnly(false)
+        .withDescription("Disposal hold identifier").build());
   }
 
   @Override
@@ -147,6 +149,19 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
   private void processAIP(IndexService index, ModelService model, Report report, Job cachedJob,
     JobPluginInfo jobPluginInfo, List<AIP> aips) {
 
+    if (StringUtils.isNotBlank(disposalHoldId)) {
+      try {
+        DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
+        disposalHold.setState(DisposalHoldState.LIFTED);
+        disposalHold.setLiftedBy(cachedJob.getUsername());
+        disposalHold.setLiftedOn(new Date());
+        model.updateDisposalHold(disposalHold, cachedJob.getUsername());
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+        | IllegalOperationException e) {
+        LOGGER.error("Unable to update disposal hold {}: {}", disposalHoldId, e.getMessage(), e);
+      }
+    }
+
     for (AIP aip : aips) {
       String outcomeText;
       PluginState state = PluginState.SUCCESS;
@@ -155,16 +170,6 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
       LOGGER.debug("Processing AIP {}", aip.getId());
 
       try {
-        if (StringUtils.isNotBlank(disposalHoldId)) {
-          try {
-            DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
-            disposalHold.setState(DisposalHoldState.LIFTED);
-            model.updateDisposalHold(disposalHold, cachedJob.getUsername());
-          } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-            | IllegalOperationException e) {
-            LOGGER.error("Unable to update disposal hold {}: {}", disposalHoldId, e.getMessage(), e);
-          }
-        }
         outcomeText = DisposalHoldPluginUtils.liftDisposalHoldFromAIP(aip, disposalHoldId, reportItem);
         processTransitiveAIP(model, index, cachedJob, aip, disposalHoldId, jobPluginInfo, report);
         model.updateAIP(aip, cachedJob.getUsername());

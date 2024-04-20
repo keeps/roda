@@ -19,6 +19,16 @@ import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.common.ConversionProfile;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHolds;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -33,15 +43,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
@@ -62,7 +63,6 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -357,20 +357,20 @@ public interface BrowserServiceAsync {
   void disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
 
   void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
-    DisposalConfirmationExtraBundle metadata, AsyncCallback<Job> async);
+    DisposalConfirmationForm metadata, AsyncCallback<Job> async);
 
   void listDisposalHoldsAssociation(String aipId, AsyncCallback<List<DisposalHoldAIPMetadata>> async);
 
   void deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmation> selectedItems, String details,
-    AsyncCallback<Job> async);
+                                        AsyncCallback<Job> async);
 
   void destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
-    AsyncCallback<Job> async);
+                                                  AsyncCallback<Job> async);
 
   void permanentlyDeleteRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
     AsyncCallback<Job> async);
 
-  void retrieveDisposalConfirmationExtraBundle(AsyncCallback<DisposalConfirmationExtraBundle> async);
+  void retrieveDisposalConfirmationExtraBundle(AsyncCallback<DisposalConfirmationForm> async);
 
   void applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean override,
     AsyncCallback<Job> async);

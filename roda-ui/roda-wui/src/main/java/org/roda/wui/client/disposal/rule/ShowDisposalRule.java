@@ -10,19 +10,19 @@ package org.roda.wui.client.disposal.rule;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.disposal.ConditionType;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
+import org.roda.core.data.v2.disposal.rule.ConditionType;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.wui.client.browse.BrowseTop;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalRuleActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -33,11 +33,11 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -203,29 +203,17 @@ public class ShowDisposalRule extends Composite {
           @Override
           public void onSuccess(Boolean confirm) {
             if (confirm) {
-              BrowserService.Util.getInstance().deleteDisposalRule(disposalRule.getId(), new NoAsyncCallback<Void>() {
-                @Override
-                public void onSuccess(Void unused) {
-                  Toast.showInfo(messages.deleteDisposalRuleSuccessTitle(),
-                    messages.deleteDisposalRuleSuccessMessage(disposalRule.getTitle()));
-                  BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
-                    @Override
-                    public void onSuccess(DisposalRules disposalRules) {
-                      int index = 0;
-                      for (DisposalRule disposalRule : disposalRules.getObjects()) {
-                        disposalRule.setOrder(index);
-                        index++;
-                      }
-                      BrowserService.Util.getInstance().updateDisposalRules(disposalRules, new NoAsyncCallback<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-                          DisposalRuleActions.applyDisposalRulesAction();
-                        }
-                      });
-                    }
-                  });
-                }
-              });
+              Services services = new Services("Delete disposal rule", "deletion");
+              services.disposalRuleResource(s -> s.deleteDisposalRule(disposalRule.getId()))
+                .whenComplete((unused, throwable) -> {
+                  if (throwable != null) {
+                    AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                  } else {
+                    Toast.showInfo(messages.deleteDisposalRuleSuccessTitle(),
+                      messages.deleteDisposalRuleSuccessMessage(disposalRule.getTitle()));
+                    DisposalRuleActions.applyDisposalRulesAction();
+                  }
+                });
             }
           }
         }));
@@ -242,13 +230,16 @@ public class ShowDisposalRule extends Composite {
 
   public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
-      BrowserService.Util.getInstance().retrieveDisposalRule(historyTokens.get(0), new NoAsyncCallback<DisposalRule>() {
-        @Override
-        public void onSuccess(DisposalRule result) {
-          ShowDisposalRule panel = new ShowDisposalRule(result);
-          callback.onSuccess(panel);
-        }
-      });
+      Services services = new Services("Retrieve disposal rule", "get");
+      services.disposalRuleResource(s -> s.retrieveDisposalRule(historyTokens.get(0)))
+        .whenComplete((result, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            ShowDisposalRule panel = new ShowDisposalRule(result);
+            callback.onSuccess(panel);
+          }
+        });
     }
   }
 

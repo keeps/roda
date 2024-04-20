@@ -18,19 +18,19 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
@@ -218,8 +218,8 @@ public class Disposals extends RodaWuiController {
     return null;
   }
 
-  public static Job createDisposalConfirmation(User user, String title,
-    DisposalConfirmationExtraBundle confirmationMetadata, SelectedItems<IndexedAIP> objects)
+  public static Job createDisposalConfirmation(User user, String title, DisposalConfirmationForm confirmationMetadata,
+    SelectedItems<IndexedAIP> objects)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -240,7 +240,7 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle(User user)
+  public static DisposalConfirmationForm retrieveDisposalConfirmationExtraBundle(User user)
     throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -555,7 +555,7 @@ public class Disposals extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.deleteDisposalRule(disposalRuleId);
+      BrowserHelper.deleteDisposalRule(disposalRuleId, user);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

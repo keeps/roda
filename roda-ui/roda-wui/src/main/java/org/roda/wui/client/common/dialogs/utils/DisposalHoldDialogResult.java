@@ -7,15 +7,17 @@
  */
 package org.roda.wui.client.common.dialogs.utils;
 
-import java.io.Serializable;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
 
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class DisposalHoldDialogResult implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 2998935986470083956L;
 
   public enum ActionType {

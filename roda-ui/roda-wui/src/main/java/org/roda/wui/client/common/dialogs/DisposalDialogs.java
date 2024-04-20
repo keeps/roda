@@ -7,10 +7,11 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import com.google.gwt.user.cellview.client.TextColumn;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHolds;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult.ActionType;
 import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogResult;
@@ -24,7 +25,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;

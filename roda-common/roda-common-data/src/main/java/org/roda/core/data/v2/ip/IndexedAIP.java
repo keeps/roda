@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -16,10 +17,10 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.descriptionlevels.DescriptionLevel;
+import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
+import org.roda.core.data.v2.disposal.schedule.RetentionPeriodCalculation;
+import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -32,7 +33,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, HasDisposal, HasInstanceID, HasInstanceName {
+public class IndexedAIP
+  implements IsIndexed, HasId, HasPermissions, HasState, HasDisposal, HasInstanceID, HasInstanceName {
+
+  @Serial
   private static final long serialVersionUID = 38813680938917204L;
 
   private String id;

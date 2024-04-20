@@ -13,14 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
-import org.roda.core.data.v2.jobs.Job;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -28,9 +24,12 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogResult;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmationDataPanel;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.DisposalScheduleRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -49,22 +48,6 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
 
   private static final Set<DisposalCreateConfirmationDestroyAction> POSSIBLE_ACTIONS_WITH_RECORDS = new HashSet<>(Arrays
     .asList(DisposalCreateConfirmationDestroyAction.DESTROY, DisposalCreateConfirmationDestroyAction.CHANGE_SCHEDULE));
-
-  public enum DisposalCreateConfirmationDestroyAction implements Action<IndexedAIP> {
-    DESTROY(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION),
-    CHANGE_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE);
-
-    private List<String> methods;
-
-    DisposalCreateConfirmationDestroyAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
-  }
 
   private DisposalCreateConfirmationDestroyActions() {
   }
@@ -143,29 +126,34 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
     ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
       @Override
       public void onSuccess(final Long size) {
-        BrowserService.Util.getInstance().listDisposalSchedules(new ActionNoAsyncCallback<DisposalSchedules>(callback) {
-          @Override
-          public void onSuccess(DisposalSchedules schedules) {
-            // Show the active disposal schedules only
-            schedules.getObjects().removeIf(schedule -> DisposalScheduleState.INACTIVE.equals(schedule.getState()));
-            DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(), schedules,
-              new ActionNoAsyncCallback<DisposalScheduleDialogResult>(callback) {
-                @Override
-                public void onFailure(Throwable caught) {
-                  doActionCallbackNone();
-                }
-
-                @Override
-                public void onSuccess(DisposalScheduleDialogResult result) {
-                  if (DisposalScheduleDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
-                    associateDisposalSchedule(aips, size, result, callback);
-                  } else if (DisposalScheduleDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
-                    disassociateDisposalSchedule(aips, size, result, callback);
+        Services services = new Services("List disposal schedules", "get");
+        services.disposalScheduleResource(DisposalScheduleRestService::listDisposalSchedules)
+          .whenComplete((disposalSchedules, caught) -> {
+            if (caught != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+              callback.onFailure(caught);
+            } else {
+              // Show the active disposal schedules only
+              disposalSchedules.getObjects()
+                .removeIf(schedule -> DisposalScheduleState.INACTIVE.equals(schedule.getState()));
+              DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(),
+                disposalSchedules, new ActionNoAsyncCallback<DisposalScheduleDialogResult>(callback) {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    doActionCallbackNone();
                   }
-                }
-              });
-          }
-        });
+
+                  @Override
+                  public void onSuccess(DisposalScheduleDialogResult result) {
+                    if (DisposalScheduleDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
+                      associateDisposalSchedule(aips, size, result, callback);
+                    } else if (DisposalScheduleDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
+                      disassociateDisposalSchedule(aips, size, result, callback);
+                    }
+                  }
+                });
+            }
+          });
       }
     });
   }
@@ -179,16 +167,13 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().disassociateDisposalSchedule(aips,
-              new ActionAsyncCallback<Job>(callback) {
-                @Override
-                public void onFailure(Throwable caught) {
-                  callback.onFailure(caught);
+            Services services = new Services("Disassociate disposal schedule from AIP", "job");
+            services.disposalScheduleResource(s -> s.disassociatedDisposalSchedule(aips))
+              .whenComplete((job, throwable) -> {
+                if (throwable != null) {
+                  callback.onFailure(throwable);
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                }
-
-                @Override
-                public void onSuccess(Job job) {
+                } else {
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
@@ -230,17 +215,13 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().associateDisposalSchedule(aips, disposalSchedule.getId(),
-              new ActionAsyncCallback<Job>(callback) {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  callback.onFailure(caught);
+            Services services = new Services("Associated disposal schedule", "job");
+            services.disposalScheduleResource(s -> s.associatedDisposalSchedule(aips, disposalSchedule.getId()))
+              .whenComplete((job, throwable) -> {
+                if (throwable != null) {
+                  callback.onFailure(throwable);
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                }
-
-                @Override
-                public void onSuccess(Job job) {
+                } else {
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
@@ -288,5 +269,21 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
     confirmationActionableBundle.addGroup(actionsGroup);
 
     return confirmationActionableBundle;
+  }
+
+  public enum DisposalCreateConfirmationDestroyAction implements Action<IndexedAIP> {
+    DESTROY(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION),
+    CHANGE_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE);
+
+    private List<String> methods;
+
+    DisposalCreateConfirmationDestroyAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 }

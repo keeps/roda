@@ -28,14 +28,14 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.disposal.metadata.DisposalDestructionAIPMetadata;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationAIPEntry;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalDestructionAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -47,9 +47,9 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
@@ -63,22 +63,11 @@ import org.slf4j.LoggerFactory;
 public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DestroyRecordsPlugin.class);
   private static final String EVENT_DESCRIPTION = "AIP destroyed by disposal confirmation";
-
-  private boolean processedWithErrors = false;
   private final Date executionDate = new Date();
-
-  @Override
-  public String getVersionImpl() {
-    return "1.0";
-  }
+  private boolean processedWithErrors = false;
 
   public static String getStaticName() {
     return "Destroy records under disposal confirmation report";
-  }
-
-  @Override
-  public String getName() {
-    return getStaticName();
   }
 
   public static String getStaticDescription() {
@@ -86,6 +75,16 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       + "them to a disposal bin structure so they can be later on restored or "
       + "permanently deleted from the storage. This process marks the AIP as "
       + "destroyed and a PREMIS event is recorded after finishing the task.";
+  }
+
+  @Override
+  public String getVersionImpl() {
+    return "1.0";
+  }
+
+  @Override
+  public String getName() {
+    return getStaticName();
   }
 
   @Override

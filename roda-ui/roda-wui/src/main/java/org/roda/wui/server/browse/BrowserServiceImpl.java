@@ -49,6 +49,15 @@ import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.ConversionProfile;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHolds;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -68,15 +77,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobMixIn;
 import org.roda.core.data.v2.jobs.JobParallelism;
@@ -116,7 +117,6 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -209,7 +209,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public void deleteDisposalRule(String disposalRuleId)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException, IOException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Disposals.deleteDisposalRule(user, disposalRuleId);
   }
@@ -486,7 +486,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public String createTransferredResourcesFolder(String parent, String folderName, boolean commit)
-      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException {
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.createTransferredResourcesFolder(user, parent, folderName, commit).getUUID();
   }
@@ -1329,14 +1330,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
-    DisposalConfirmationExtraBundle metadata)
+    DisposalConfirmationForm metadata)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.createDisposalConfirmation(user, title, metadata, selectedItems);
   }
 
   @Override
-  public DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle() throws RODAException {
+  public DisposalConfirmationForm retrieveDisposalConfirmationExtraBundle() throws RODAException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.retrieveDisposalConfirmationExtraBundle(user);
   }

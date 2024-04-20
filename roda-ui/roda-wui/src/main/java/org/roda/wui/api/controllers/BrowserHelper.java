@@ -33,21 +33,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.ws.rs.core.MultivaluedMap;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ClassificationPlanUtils;
-import org.roda.core.data.v2.ConsumesOutputStream;
-import org.roda.core.data.v2.DefaultConsumesOutputStream;
 import org.roda.core.common.DownloadUtils;
-import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.common.HandlebarsUtility;
 import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
-import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
@@ -68,12 +62,22 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.DefaultConsumesOutputStream;
+import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.common.ObjectPermission;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -105,10 +109,6 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataList;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -179,7 +179,6 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ObjectResponse;
-import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
@@ -188,7 +187,6 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
-import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -213,6 +211,7 @@ import gov.loc.premis.v3.EventComplexType;
 import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
 import gov.loc.premis.v3.LinkingObjectIdentifierComplexType;
 import gov.loc.premis.v3.StringPlusAuthority;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
@@ -3615,7 +3614,7 @@ public class BrowserHelper {
   }
 
   public static Job createDisposalConfirmationReport(User user, SelectedItems<IndexedAIP> selectedItems, String title,
-    DisposalConfirmationExtraBundle confirmationMetadata)
+    DisposalConfirmationForm confirmationMetadata)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> extraInformation = DisposalsHelper.getDisposalConfirmationExtra(confirmationMetadata);
     String extraInformationJson = JsonUtils.getJsonFromObject(extraInformation);
@@ -3629,7 +3628,7 @@ public class BrowserHelper {
       "Could not execute create disposal confirmation report action");
   }
 
-  public static DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle() {
+  public static DisposalConfirmationForm retrieveDisposalConfirmationExtraBundle() {
     String template = null;
 
     try (InputStream templateStream = RodaCoreFactory
@@ -3675,7 +3674,7 @@ public class BrowserHelper {
       // do nothing
     }
 
-    return new DisposalConfirmationExtraBundle(values);
+    return new DisposalConfirmationForm(values);
   }
 
   public static Job destroyRecordsInDisposalConfirmation(User user,
@@ -3720,9 +3719,13 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().updateDisposalRule(disposalRule, user.getName());
   }
 
-  public static void deleteDisposalRule(String disposalRuleId)
+  public static void deleteDisposalRule(String disposalRuleId, User user)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deleteDisposalRule(disposalRuleId);
+    try {
+      RodaCoreFactory.getModelService().deleteDisposalRule(disposalRuleId, user.getName());
+    } catch (IOException e) {
+      throw new GenericException(e.getMessage(), e);
+    }
   }
 
   public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,

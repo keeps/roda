@@ -105,7 +105,6 @@ public class NotificationController implements NotificationRestService {
   @Override
   public IndexResult<Notification> find(FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
     return indexService.find(Notification.class, findRequest, localeString, requestContext.getUser());
   }
 

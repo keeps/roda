@@ -7,6 +7,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -17,6 +18,7 @@ import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -67,8 +69,9 @@ public class JobReportController implements JobReportRestService {
   }
 
   @Override
-  public IndexResult<IndexedReport> find(FindRequest findRequest, String localeString) {
-    return null;
+  public IndexResult<IndexedReport> find(@RequestBody FindRequest findRequest, String localeString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.find(IndexedReport.class, findRequest, localeString, requestContext.getUser());
   }
 
   @Override

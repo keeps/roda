@@ -10,7 +10,7 @@ package org.roda.wui.client.browse.bundle;
 import java.util.Set;
 
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.wui.client.browse.MetadataValue;
+import org.roda.core.data.v2.generics.MetadataValue;
 
 public class DescriptiveMetadataEditBundle implements Bundle {
 

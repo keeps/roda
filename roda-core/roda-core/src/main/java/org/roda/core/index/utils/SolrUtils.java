@@ -76,6 +76,10 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.RetentionPeriodCalculation;
+import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -113,10 +117,6 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ri.RelationObjectType;
@@ -144,17 +144,14 @@ import dev.failsafe.Fallback;
  * @author Sébastien Leroux <sleroux@keep.pt>
  */
 public class SolrUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
-
-  private static final String DEFAULT_QUERY_PARSER_OPERATOR = "AND";
-  private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
-    RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
-
-  private static Map<String, List<String>> liteFieldsForEachClass = new HashMap<>();
-
   public static final String COMMON = "common";
   public static final String CONF = "conf";
   public static final String SCHEMA = "managed-schema.xml";
+  private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
+  private static final String DEFAULT_QUERY_PARSER_OPERATOR = "AND";
+  private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
+    RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
+  private static Map<String, List<String>> liteFieldsForEachClass = new HashMap<>();
 
   private SolrUtils() {
     // do nothing
@@ -751,9 +748,8 @@ public class SolrUtils {
     return doc == null ? new SolrInputDocument() : validateDescriptiveMetadataFields(doc);
   }
 
-
-  public static SolrInputDocument getTechnicalMetadataFields(Binary binary, String metadataType,
-                                                               String metadataVersion) throws GenericException {
+  public static SolrInputDocument getTechnicalMetadataFields(Binary binary, String metadataType, String metadataVersion)
+    throws GenericException {
     SolrInputDocument doc;
 
     Map<String, String> parameters = new HashMap<>();
@@ -799,7 +795,6 @@ public class SolrUtils {
 
     return doc == null ? new SolrInputDocument() : validateDescriptiveMetadataFields(doc);
   }
-
 
   private static SolrInputDocument validateDescriptiveMetadataFields(SolrInputDocument doc) {
     if (doc.get(RodaConstants.AIP_DATE_INITIAL) != null) {
@@ -876,9 +871,8 @@ public class SolrUtils {
         prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof OrFiltersParameters || parameter instanceof AndFiltersParameters) {
       FiltersParameters filters = (FiltersParameters) parameter;
-      appendFiltersWithOperator(ret, parameter instanceof OrFiltersParameters ? "OR" : "AND",
-          filters.getValues(),
-          prefixWithANDOperatorIfBuilderNotEmpty);
+      appendFiltersWithOperator(ret, parameter instanceof OrFiltersParameters ? "OR" : "AND", filters.getValues(),
+        prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof AllFilterParameter) {
       appendSelectAll(ret, prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
@@ -1123,8 +1117,7 @@ public class SolrUtils {
 
         if (facetParameter instanceof SimpleFacetParameter) {
           setQueryFacetParameter(query, (SimpleFacetParameter) facetParameter);
-          appendValuesUsingOROperator(filterQuery, facetParameter.getName(),
-            facetParameter.getValues(), true);
+          appendValuesUsingOROperator(filterQuery, facetParameter.getName(), facetParameter.getValues(), true);
         } else {
           LOGGER.error("Unsupported facet parameter class: {}", facetParameter.getClass().getName());
         }
@@ -1214,7 +1207,8 @@ public class SolrUtils {
     boolean waitSearcher = true;
     boolean softCommit = true;
 
-    Fallback<Object> fallback = Fallback.of(e -> {});
+    Fallback<Object> fallback = Fallback.of(e -> {
+    });
 
     for (String collection : collections) {
       Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {

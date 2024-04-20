@@ -13,9 +13,9 @@ import java.util.MissingResourceException;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.disposal.rule.ConditionType;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.ConditionType;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.StringUtils;
 
@@ -43,16 +43,11 @@ import config.i18n.client.ClientMessages;
 public class MetadataFieldsPanel extends Composite implements HasValueChangeHandlers<Pair<String, String>> {
 
   public static final String IS_WRONG = "isWrong";
-
-  interface MyUiBinder extends UiBinder<Widget, MetadataFieldsPanel> {
-  }
-
-  private static MetadataFieldsPanel.MyUiBinder uiBinder = GWT.create(MetadataFieldsPanel.MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static MetadataFieldsPanel.MyUiBinder uiBinder = GWT.create(MetadataFieldsPanel.MyUiBinder.class);
+  private final boolean editMode;
 
   // METADATA_FIELD
-
   @UiField
   Label metadataFieldLabel;
 
@@ -67,16 +62,10 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
 
   @UiField
   TextBox fieldValue;
-
-  private final boolean editMode;
-
   private String conditionKey;
-
   private int selectedConditionIndex;
-
   private boolean changed = false;
   private boolean checked = false;
-
   public MetadataFieldsPanel(String conditionKey, String conditionValue, boolean editMode, DisposalRule disposalRule) {
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -92,16 +81,6 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
       fieldsList.setSelectedIndex(selectedConditionIndex);
       fieldValue.setText(conditionValue);
     }
-  }
-
-  private void initHandler() {
-    ChangeHandler changeHandler = event -> MetadataFieldsPanel.this.onChange();
-
-    KeyUpHandler keyUpHandler = event -> MetadataFieldsPanel.this.onChange();
-
-    fieldsList.addChangeHandler(changeHandler);
-    fieldValue.addChangeHandler(changeHandler);
-    fieldValue.addKeyUpHandler(keyUpHandler);
   }
 
   private static List<Pair<String, String>> getElementsFromConfig() {
@@ -134,6 +113,16 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
   private static boolean showField(String fieldsName) {
     List<String> blackList = ConfigurationManager.getStringList(RodaConstants.DISPOSAL_RULE_BLACKLIST_CONDITION);
     return !blackList.contains(fieldsName);
+  }
+
+  private void initHandler() {
+    ChangeHandler changeHandler = event -> MetadataFieldsPanel.this.onChange();
+
+    KeyUpHandler keyUpHandler = event -> MetadataFieldsPanel.this.onChange();
+
+    fieldsList.addChangeHandler(changeHandler);
+    fieldValue.addChangeHandler(changeHandler);
+    fieldValue.addKeyUpHandler(keyUpHandler);
   }
 
   private void initList() {
@@ -214,6 +203,9 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
     metadataFields.setFirst(fieldsList.getSelectedValue());
     metadataFields.setSecond(fieldValue.getText());
     return metadataFields;
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, MetadataFieldsPanel> {
   }
 
 }

@@ -7,19 +7,22 @@
  */
 package org.roda.wui.client.disposal.association;
 
+import static org.roda.core.data.common.RodaConstants.SEARCH_WITH_PREFILTER_HANDLER;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHolds;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.search.Search;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -38,19 +41,14 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
-import static org.roda.core.data.common.RodaConstants.SEARCH_WITH_PREFILTER_HANDLER;
-
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class TransitiveDisposalHoldsPanel extends Composite {
-  interface MyUiBinder extends UiBinder<Widget, TransitiveDisposalHoldsPanel> {
-  }
-
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static TransitiveDisposalHoldsPanel.MyUiBinder uiBinder = GWT
     .create(TransitiveDisposalHoldsPanel.MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private final DisposalHolds disposalHoldList = new DisposalHolds();
   @UiField
   FlowPanel transitiveDisposalHoldsPanel;
 
@@ -60,23 +58,21 @@ public class TransitiveDisposalHoldsPanel extends Composite {
   @UiField
   FlowPanel panel;
 
-  private final IndexedAIP indexedAip;
-  private final DisposalHolds disposalHoldList = new DisposalHolds();
-
   public TransitiveDisposalHoldsPanel(IndexedAIP indexedAip) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.indexedAip = indexedAip;
 
-    BrowserService.Util.getInstance().listTransitiveDisposalHolds(indexedAip.getId(),
-      new NoAsyncCallback<List<DisposalTransitiveHoldAIPMetadata>>() {
-        @Override
-        public void onSuccess(List<DisposalTransitiveHoldAIPMetadata> transitiveDisposalHolds) {
-          init(indexedAip.getDisposalConfirmationId() != null, transitiveDisposalHolds);
+    Services services = new Services("List transitive disposal holds", "get");
+    services.disposalHoldResource(s -> s.listTransitiveHolds(indexedAip.getId()))
+      .whenComplete((disposalTransitiveHoldsAIPMetadata, throwable) -> {
+        if (throwable != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
+        } else {
+          init(disposalTransitiveHoldsAIPMetadata);
         }
       });
   }
 
-  private void init(boolean onDisposalConfirmation, List<DisposalTransitiveHoldAIPMetadata> transitiveDisposalHolds) {
+  private void init(DisposalTransitiveHoldsAIPMetadata transitiveDisposalHolds) {
     if (transitiveDisposalHolds.isEmpty()) {
       transitiveDisposalHoldsPanel.remove(panel);
     } else {
@@ -84,20 +80,22 @@ public class TransitiveDisposalHoldsPanel extends Composite {
     }
   }
 
-  private void createTransitiveDisposalHoldsTable(List<DisposalTransitiveHoldAIPMetadata> transitiveDisposalHolds) {
-    for (DisposalTransitiveHoldAIPMetadata transitiveHold : transitiveDisposalHolds) {
-      BrowserService.Util.getInstance().retrieveDisposalHold(transitiveHold.getId(),
-        new NoAsyncCallback<DisposalHold>() {
-          @Override
-          public void onSuccess(DisposalHold disposalHold) {
-            disposalHoldList.addObject(disposalHold);
+  private void createTransitiveDisposalHoldsTable(DisposalTransitiveHoldsAIPMetadata transitiveDisposalHolds) {
+    for (DisposalTransitiveHoldAIPMetadata transitiveHold : transitiveDisposalHolds.getObjects()) {
+      Services services = new Services("Retrieve disposal hold", "get");
+      services.disposalHoldResource(s -> s.retrieveDisposalHold(transitiveHold.getId()))
+        .whenComplete((hold, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            disposalHoldList.addObject(hold);
             getTransitiveDisposalHoldList(transitiveDisposalHolds);
           }
         });
     }
   }
 
-  private void getTransitiveDisposalHoldList(List<DisposalTransitiveHoldAIPMetadata> transitiveDisposalHolds) {
+  private void getTransitiveDisposalHoldList(DisposalTransitiveHoldsAIPMetadata transitiveDisposalHolds) {
     panelBody.clear();
     BasicTablePanel<DisposalTransitiveHoldAIPMetadata> tableTransitiveHolds = getBasicTablePanelForTransitiveDisposalHolds(
       transitiveDisposalHolds);
@@ -123,11 +121,12 @@ public class TransitiveDisposalHoldsPanel extends Composite {
   }
 
   private BasicTablePanel<DisposalTransitiveHoldAIPMetadata> getBasicTablePanelForTransitiveDisposalHolds(
-    List<DisposalTransitiveHoldAIPMetadata> transitiveDisposalHolds) {
+    DisposalTransitiveHoldsAIPMetadata transitiveDisposalHolds) {
     Label headerHolds = new Label();
     HTMLPanel info = new HTMLPanel(SafeHtmlUtils.EMPTY_SAFE_HTML);
 
-    return new BasicTablePanel<DisposalTransitiveHoldAIPMetadata>(headerHolds, info, transitiveDisposalHolds.iterator(),
+    return new BasicTablePanel<DisposalTransitiveHoldAIPMetadata>(headerHolds, info,
+      transitiveDisposalHolds.getObjects().iterator(),
 
       new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 0,
         new TextColumn<DisposalTransitiveHoldAIPMetadata>() {
@@ -164,5 +163,8 @@ public class TransitiveDisposalHoldsPanel extends Composite {
         })
 
     );
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, TransitiveDisposalHoldsPanel> {
   }
 }

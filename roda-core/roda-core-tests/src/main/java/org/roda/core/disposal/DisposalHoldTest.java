@@ -29,11 +29,11 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
@@ -58,12 +58,11 @@ import org.testng.annotations.Test;
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class DisposalHoldTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(DisposalHoldTest.class);
-  private Path basePath;
-  private Path storagePath;
-
-  private ModelService model;
   private static StorageService corporaService;
   private static IndexService index;
+  private Path basePath;
+  private Path storagePath;
+  private ModelService model;
 
   @BeforeClass
   public void setUp() throws Exception {
@@ -114,10 +113,10 @@ public class DisposalHoldTest {
   public void testDisposalHoldDeletionWhenNeverUsed() throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, IllegalOperationException, AlreadyExistsException {
     DisposalHold disposalHold = createDisposalHold();
-    model.createDisposalHold(disposalHold, "admin");
+    DisposalHold createdDisposalHold = model.createDisposalHold(disposalHold, "admin");
     StoragePath disposalHoldStoragePath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
 
-    model.deleteDisposalHold(disposalHold.getId());
+    model.deleteDisposalHold(createdDisposalHold.getId());
 
     assertFalse(Files.exists(FSUtils.getEntityPath(storagePath, disposalHoldStoragePath)));
   }
@@ -130,7 +129,7 @@ public class DisposalHoldTest {
 
     disposalHold.setFirstTimeUsed(new Date());
 
-    model.updateDisposalHold(disposalHold, "admin");
+    model.updateDisposalHoldFirstUseDate(disposalHold, "admin");
     StoragePath disposalScheduleStoragePath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
     try {
       model.deleteDisposalHold(disposalHold.getId());

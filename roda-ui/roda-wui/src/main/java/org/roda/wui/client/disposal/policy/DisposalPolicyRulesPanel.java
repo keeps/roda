@@ -9,17 +9,16 @@ package org.roda.wui.client.disposal.policy;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.disposal.ConditionType;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.core.data.v2.disposal.rule.ConditionType;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.rule.ShowDisposalRule;
+import org.roda.wui.client.services.DisposalRuleRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
@@ -44,19 +43,27 @@ import config.i18n.client.ClientMessages;
 
 public class DisposalPolicyRulesPanel extends Composite {
 
-  interface MyUiBinder extends UiBinder<Widget, DisposalPolicyRulesPanel> {
-  }
-
-  private static DisposalPolicyRulesPanel.MyUiBinder uiBinder = GWT.create(DisposalPolicyRulesPanel.MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static DisposalPolicyRulesPanel.MyUiBinder uiBinder = GWT.create(DisposalPolicyRulesPanel.MyUiBinder.class);
   // Disposal Rules
   @UiField
   FlowPanel disposalRulesDescription;
-
   @UiField
   ScrollPanel disposalRulesTablePanel;
+
+  public DisposalPolicyRulesPanel() {
+    initWidget(uiBinder.createAndBindUi(this));
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_RULES)) {
+      Services services = new Services("List disposal rules", "get");
+      services.disposalRuleResource(DisposalRuleRestService::listDisposalRules).whenComplete((result, throwable) -> {
+        if (throwable != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
+        } else {
+          init(disposalRulesDescription, disposalRulesTablePanel, result);
+        }
+      });
+    }
+  }
 
   private void createDisposalRulesDescription(FlowPanel disposalRulesDescription) {
     Label header = new Label(messages.disposalRulesTitle());
@@ -94,18 +101,6 @@ public class DisposalPolicyRulesPanel extends Composite {
       rulesPanel.add(tableRules);
       disposalRulesTablePanel.add(rulesPanel);
       disposalRulesTablePanel.addStyleName("disposalPolicyScrollPanel");
-    }
-  }
-
-  public DisposalPolicyRulesPanel() {
-    initWidget(uiBinder.createAndBindUi(this));
-    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_RULES)) {
-      BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
-        @Override
-        public void onSuccess(DisposalRules disposalRules) {
-          init(disposalRulesDescription, disposalRulesTablePanel, disposalRules);
-        }
-      });
     }
   }
 
@@ -168,5 +163,8 @@ public class DisposalPolicyRulesPanel extends Composite {
           }
         }));
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, DisposalPolicyRulesPanel> {
   }
 }

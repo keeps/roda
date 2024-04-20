@@ -36,6 +36,7 @@ import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -45,7 +46,6 @@ import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -62,7 +62,6 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.ExternalFileManifestContentPayload;
 import org.roda.core.storage.InputStreamContentPayload;
 import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
@@ -458,19 +457,6 @@ public class ResourceParseUtils {
       || classToReturn.equals(DisposalConfirmation.class);
   }
 
-  @FunctionalInterface
-  interface ResourceParser<T extends IsRODAObject, R extends Serializable> {
-
-    OptionalWithCause<R> parse(StorageService storage, Resource resource, Class<T> classToReturn);
-
-    default <V extends IsRODAObject> ResourceParser<T, V> andThen(
-      Function<OptionalWithCause<R>, OptionalWithCause<V>> after) {
-      Objects.requireNonNull(after);
-      return (StorageService storage, Resource resource, Class<T> classToReturn) -> after
-        .apply(parse(storage, resource, classToReturn));
-    }
-  }
-
   public static <T extends IsRODAObject> CloseableIterable<OptionalWithCause<T>> convert(final StorageService storage,
     final CloseableIterable<Resource> iterable, final Class<T> classToReturn) {
     return convert(storage, iterable, classToReturn, (s, r, c) -> ResourceParseUtils.convertResourceTo(s, r, c));
@@ -528,6 +514,19 @@ public class ResourceParseUtils {
     };
 
     return it;
+  }
+
+  @FunctionalInterface
+  interface ResourceParser<T extends IsRODAObject, R extends Serializable> {
+
+    OptionalWithCause<R> parse(StorageService storage, Resource resource, Class<T> classToReturn);
+
+    default <V extends IsRODAObject> ResourceParser<T, V> andThen(
+      Function<OptionalWithCause<R>, OptionalWithCause<V>> after) {
+      Objects.requireNonNull(after);
+      return (StorageService storage, Resource resource, Class<T> classToReturn) -> after
+        .apply(parse(storage, resource, classToReturn));
+    }
   }
 
 }

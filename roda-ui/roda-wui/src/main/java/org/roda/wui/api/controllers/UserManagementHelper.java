@@ -44,7 +44,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.data.common.SecureString;
-import org.roda.wui.client.browse.MetadataValue;
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;

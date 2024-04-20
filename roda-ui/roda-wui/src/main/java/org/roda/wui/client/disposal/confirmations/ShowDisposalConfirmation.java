@@ -7,19 +7,18 @@
  */
 package org.roda.wui.client.disposal.confirmations;
 
-import java.util.Collections;
 import java.util.List;
 
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalConfirmationReportActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.disposal.DisposalConfirmations;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -41,6 +40,8 @@ import config.i18n.client.ClientMessages;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class ShowDisposalConfirmation extends Composite {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static ShowDisposalConfirmation instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -62,23 +63,17 @@ public class ShowDisposalConfirmation extends Composite {
       return "confirmation";
     }
   };
-
-  private static ShowDisposalConfirmation instance = null;
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  interface MyUiBinder extends UiBinder<Widget, ShowDisposalConfirmation> {
-  }
-
   private static ShowDisposalConfirmation.MyUiBinder uiBinder = GWT.create(ShowDisposalConfirmation.MyUiBinder.class);
-
   @UiField
   SimplePanel actionsSidebar;
-
   @UiField
   FlowPanel contentFlowPanel;
-
   @UiField
   FlowPanel sidebarFlowPanel;
+
+  private ShowDisposalConfirmation() {
+    initWidget(uiBinder.createAndBindUi(this));
+  }
 
   public static ShowDisposalConfirmation getInstance() {
     if (instance == null) {
@@ -87,34 +82,28 @@ public class ShowDisposalConfirmation extends Composite {
     return instance;
   }
 
-  private ShowDisposalConfirmation() {
-    initWidget(uiBinder.createAndBindUi(this));
-  }
-
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       String confirmationId = historyTokens.get(0);
-      BrowserService.Util.getInstance().retrieve(DisposalConfirmation.class.getName(), confirmationId,
-        Collections.emptyList(), new NoAsyncCallback<DisposalConfirmation>() {
-          @Override
-          public void onSuccess(DisposalConfirmation confirmation) {
-            BrowserService.Util.getInstance().retrieveDisposalConfirmationReport(confirmationId, false,
-              new NoAsyncCallback<String>() {
-                @Override
-                public void onSuccess(String report) {
-                  final DisposalConfirmationReportActions confirmationActions = DisposalConfirmationReportActions.get();
-                  instance = new ShowDisposalConfirmation();
-                  SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
-                  instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions).withBackButton()
-                    .buildListWithObjects(new ActionableObject<>(confirmation)));
-                  HTML reportHtml = new HTML(SafeHtmlUtils.fromSafeConstant(report));
-                  instance.contentFlowPanel.add(reportHtml);
-                  callback.onSuccess(instance);
-                }
-              });
+      Services services = new Services("Retrieve the disposal confirmation", "get");
+      services.rodaEntityRestService(s -> s.findByUuid(confirmationId), DisposalConfirmation.class)
+        .thenCompose(disposalConfirmation -> services
+          .disposalConfirmationResource(s -> s.retrieveDisposalConfirmationReport(disposalConfirmation.getId(), false))
+          .whenComplete((report, throwable) -> {
+            if (throwable != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(throwable);
+            } else {
+              final DisposalConfirmationReportActions confirmationActions = DisposalConfirmationReportActions.get();
+              instance = new ShowDisposalConfirmation();
+              SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
+              instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions).withBackButton()
+                .buildListWithObjects(new ActionableObject<>(disposalConfirmation)));
+              HTML reportHtml = new HTML(SafeHtmlUtils.fromSafeConstant(report));
+              instance.contentFlowPanel.add(reportHtml);
+              callback.onSuccess(instance);
+            }
 
-          }
-        });
+          }));
     } else {
       HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
       callback.onSuccess(null);
@@ -125,5 +114,8 @@ public class ShowDisposalConfirmation extends Composite {
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.stickSidebar();
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowDisposalConfirmation> {
   }
 }

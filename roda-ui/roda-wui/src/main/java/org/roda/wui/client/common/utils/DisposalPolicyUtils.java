@@ -9,10 +9,10 @@ package org.roda.wui.client.common.utils;
 
 import java.util.Date;
 
+import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
+import org.roda.core.data.v2.disposal.schedule.RetentionPeriodCalculation;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;

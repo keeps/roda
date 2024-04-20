@@ -9,15 +9,17 @@ package org.roda.wui.client.disposal.rule;
 
 import java.util.List;
 
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalRuleActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
+import org.roda.wui.client.services.DisposalScheduleRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -44,19 +46,18 @@ public class EditDisposalRule extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        BrowserService.Util.getInstance().retrieveDisposalRule(historyTokens.get(0),
-          new NoAsyncCallback<DisposalRule>() {
-            @Override
-            public void onSuccess(DisposalRule disposalRule) {
-              BrowserService.Util.getInstance().listDisposalSchedules(new NoAsyncCallback<DisposalSchedules>() {
-                @Override
-                public void onSuccess(DisposalSchedules disposalSchedules) {
-                  EditDisposalRule panel = new EditDisposalRule(disposalRule, disposalSchedules);
-                  callback.onSuccess(panel);
-                }
-              });
-            }
-          });
+
+        Services services = new Services("List disposal schedules", "get");
+        services.disposalRuleResource(s -> s.retrieveDisposalRule(historyTokens.get(0)))
+          .thenCompose(rule -> services.disposalScheduleResource(DisposalScheduleRestService::listDisposalSchedules)
+            .whenComplete((disposalSchedules, throwable) -> {
+              if (throwable != null) {
+                AsyncCallbackUtils.defaultFailureTreatment(throwable);
+              } else {
+                EditDisposalRule panel = new EditDisposalRule(rule, disposalSchedules);
+                callback.onSuccess(panel);
+              }
+            }));
       }
     }
 
@@ -146,10 +147,12 @@ public class EditDisposalRule extends Composite {
       }
 
       if (!runApplyRulesPlugin) {
-        BrowserService.Util.getInstance().updateDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
-          @Override
-          public void onSuccess(DisposalRule disposalRule) {
-            HistoryUtils.newHistory(ShowDisposalRule.RESOLVER, disposalRule.getId());
+        Services services = new Services("Update disposal rule", "update");
+        services.disposalRuleResource(s -> s.updateDisposalRule(disposalRule)).whenComplete((result, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            HistoryUtils.newHistory(ShowDisposalRule.RESOLVER, result.getId());
           }
         });
       } else {
@@ -158,12 +161,15 @@ public class EditDisposalRule extends Composite {
             @Override
             public void onSuccess(Boolean confirm) {
               if (confirm) {
-                BrowserService.Util.getInstance().updateDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
-                  @Override
-                  public void onSuccess(DisposalRule disposalRule) {
-                    DisposalRuleActions.applyDisposalRulesAction();
-                  }
-                });
+                Services services = new Services("Update disposal rule", "update");
+                services.disposalRuleResource(s -> s.updateDisposalRule(disposalRule))
+                  .whenComplete((result, throwable) -> {
+                    if (throwable != null) {
+                      AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                    } else {
+                      DisposalRuleActions.applyDisposalRulesAction();
+                    }
+                  });
               }
             }
           });

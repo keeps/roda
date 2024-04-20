@@ -18,8 +18,8 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -43,23 +43,23 @@ import org.slf4j.LoggerFactory;
 public class PermanentlyDeleteRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PermanentlyDeleteRecordsPlugin.class);
 
-  @Override
-  public String getVersionImpl() {
-    return "1.0";
-  }
-
   public static String getStaticName() {
     return "Permanently delete records from disposal confirmation report";
-  }
-
-  @Override
-  public String getName() {
-    return getStaticName();
   }
 
   public static String getStaticDescription() {
     return "Permanently deletes from the disposal bin the original records destroyed releasing storage space from the repository."
       + "A PREMIS event is recorded after finishing the task.";
+  }
+
+  @Override
+  public String getVersionImpl() {
+    return "1.0";
+  }
+
+  @Override
+  public String getName() {
+    return getStaticName();
   }
 
   @Override

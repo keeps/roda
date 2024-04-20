@@ -32,10 +32,10 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -69,7 +69,7 @@ public class SolrRetryTest {
     boolean deployPluginManager = false;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-        deployPluginManager, deployDefaultResources);
+      deployPluginManager, deployDefaultResources);
 
     URL corporaURL = IndexServiceTest.class.getResource("/corpora");
     corporaService = new FileStorageService(Paths.get(corporaURL.toURI()));
@@ -90,7 +90,7 @@ public class SolrRetryTest {
     SolrClient spy = Mockito.spy(solrClient);
 
     Mockito.doThrow(new SolrServerException("test")).when(spy).commit(anyString(), anyBoolean(), anyBoolean(),
-        anyBoolean());
+      anyBoolean());
 
     SolrUtils.commit(spy, IndexedAIP.class);
 
@@ -110,7 +110,7 @@ public class SolrRetryTest {
 
   @Test
   public void testSolrRetryGetObjectLabel() throws SolrServerException, IOException, RequestNotValidException,
-      AuthorizationDeniedException, ValidationException, AlreadyExistsException, NotFoundException, GenericException {
+    AuthorizationDeniedException, ValidationException, AlreadyExistsException, NotFoundException, GenericException {
     SolrClient solrClient = index.getSolrClient();
     SolrClient spy = Mockito.spy(solrClient);
 
@@ -119,8 +119,8 @@ public class SolrRetryTest {
     String aipId = IdUtils.createUUID();
 
     model.createAIP(aipId, corporaService,
-        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-        RodaConstants.ADMIN);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
 
     Assert.assertEquals("My example", SolrUtils.getObjectLabel(spy, AIP.class.getName(), aipId));
 
@@ -129,12 +129,12 @@ public class SolrRetryTest {
 
   @Test
   public void testSolrRetryCreate2() throws IOException, SolrServerException, GenericException,
-      AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
+    AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
     SolrClient solrClient = index.getSolrClient();
     SolrClient spy = Mockito.spy(solrClient);
 
     Mockito.doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doCallRealMethod()
-        .when(spy).add(anyString(), any(SolrInputDocument.class));
+      .when(spy).add(anyString(), any(SolrInputDocument.class));
 
     DisposalConfirmation confirmation = new DisposalConfirmation();
     confirmation.setTitle("Confirmation");
@@ -149,28 +149,28 @@ public class SolrRetryTest {
     Mockito.verify(spy, times(3)).add(anyString(), any(SolrInputDocument.class));
 
     DisposalConfirmation retrieve = index.retrieve(DisposalConfirmation.class, disposalConfirmation.getId(),
-        new ArrayList<>());
+      new ArrayList<>());
 
     Assert.assertEquals(retrieve, disposalConfirmation);
   }
 
   @Test
   public void testSolrRetryDelete() throws SolrServerException, IOException, RequestNotValidException,
-      AuthorizationDeniedException, ValidationException, AlreadyExistsException, GenericException, NotFoundException {
+    AuthorizationDeniedException, ValidationException, AlreadyExistsException, GenericException, NotFoundException {
     SolrClient solrClient = index.getSolrClient();
     SolrClient spy = Mockito.spy(solrClient);
 
     Mockito
-        .doThrow(new SolrServerException("test"), new SolrServerException("test"), new SolrServerException("test"),
-            new SolrServerException("test"), new SolrServerException("test"), new SolrServerException("test"),
-            new SolrServerException("test"), new SolrServerException("test"), new SolrServerException("test"))
-        .doCallRealMethod().when(spy).deleteById(anyString(), anyList());
+      .doThrow(new SolrServerException("test"), new SolrServerException("test"), new SolrServerException("test"),
+        new SolrServerException("test"), new SolrServerException("test"), new SolrServerException("test"),
+        new SolrServerException("test"), new SolrServerException("test"), new SolrServerException("test"))
+      .doCallRealMethod().when(spy).deleteById(anyString(), anyList());
 
     String aipId = IdUtils.createUUID();
 
     model.createAIP(aipId, corporaService,
-        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-        RodaConstants.ADMIN);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
 
     SolrUtils.delete(spy, IndexedAIP.class, Collections.singletonList(aipId), this, false);
 
@@ -181,8 +181,8 @@ public class SolrRetryTest {
 
   @Test
   public void testEnsureReturnWithExceptionHaveExceptionsForDelete()
-      throws SolrServerException, IOException, RequestNotValidException, AuthorizationDeniedException,
-      ValidationException, AlreadyExistsException, NotFoundException, GenericException {
+    throws SolrServerException, IOException, RequestNotValidException, AuthorizationDeniedException,
+    ValidationException, AlreadyExistsException, NotFoundException, GenericException {
     SolrClient solrClient = index.getSolrClient();
     SolrClient spy = Mockito.spy(solrClient);
 
@@ -191,11 +191,11 @@ public class SolrRetryTest {
     String aipId = IdUtils.createUUID();
 
     model.createAIP(aipId, corporaService,
-        DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-        RodaConstants.ADMIN);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
 
     ReturnWithExceptions<Void, SolrRetryTest> returnWithExceptions = SolrUtils.delete(spy, IndexedAIP.class,
-        Collections.singletonList(aipId), this, false);
+      Collections.singletonList(aipId), this, false);
 
     Assert.assertFalse(returnWithExceptions.getExceptions().isEmpty());
 
@@ -204,8 +204,8 @@ public class SolrRetryTest {
 
   @Test
   public void testEnsureReturnWithExceptionHaveExceptionsForCreate2()
-      throws IOException, SolrServerException, GenericException, AuthorizationDeniedException, RequestNotValidException,
-      AlreadyExistsException, NotFoundException {
+    throws IOException, SolrServerException, GenericException, AuthorizationDeniedException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException {
     SolrClient solrClient = index.getSolrClient();
     SolrClient spy = Mockito.spy(solrClient);
 
@@ -220,7 +220,7 @@ public class SolrRetryTest {
     DisposalConfirmation disposalConfirmation = model.createDisposalConfirmation(confirmation, "admin");
 
     ReturnWithExceptions<Void, SolrRetryTest> returnWithExceptions = SolrUtils.create2(spy, this,
-        DisposalConfirmation.class, disposalConfirmation);
+      DisposalConfirmation.class, disposalConfirmation);
 
     Assert.assertFalse(returnWithExceptions.getExceptions().isEmpty());
 

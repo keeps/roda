@@ -9,14 +9,16 @@ package org.roda.wui.client.disposal.rule;
 
 import java.util.List;
 
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
+import org.roda.wui.client.services.DisposalRuleRestService;
+import org.roda.wui.client.services.DisposalScheduleRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -42,20 +44,18 @@ public class CreateDisposalRule extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().listDisposalSchedules(new NoAsyncCallback<DisposalSchedules>() {
-        @Override
-        public void onSuccess(DisposalSchedules disposalSchedules) {
-          BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
-            @Override
-            public void onSuccess(DisposalRules disposalRules) {
+      Services services = new Services("List disposal schedules", "get");
+      services.disposalScheduleResource(DisposalScheduleRestService::listDisposalSchedules)
+        .thenCompose(disposalSchedules -> services.disposalRuleResource(DisposalRuleRestService::listDisposalRules)
+          .whenComplete((disposalRulesResult, throwable) -> {
+            if (throwable != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(throwable);
+            } else {
               CreateDisposalRule createDisposalRule = new CreateDisposalRule(new DisposalRule(), disposalSchedules,
-                disposalRules);
+                disposalRulesResult);
               callback.onSuccess(createDisposalRule);
             }
-          });
-        }
-      });
-
+          }));
     }
 
     @Override
@@ -105,12 +105,13 @@ public class CreateDisposalRule extends Composite {
     if (disposalRuleDataPanel.isValid()) {
       disposalRule = disposalRuleDataPanel.getDisposalRule();
       disposalRule.setOrder(disposalRules.getObjects().size());
-      BrowserService.Util.getInstance().createDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
-        @Override
-        public void onSuccess(DisposalRule createdDisposalSchedule) {
+      Services services = new Services("Create disposal rule", "create");
+      services.disposalRuleResource(s -> s.createDisposalRule(disposalRule)).whenComplete((result, throwable) -> {
+        if (throwable != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
+        } else {
           HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
         }
-
       });
     }
   }
@@ -122,5 +123,4 @@ public class CreateDisposalRule extends Composite {
 
   interface MyUiBinder extends UiBinder<Widget, CreateDisposalRule> {
   }
-
 }

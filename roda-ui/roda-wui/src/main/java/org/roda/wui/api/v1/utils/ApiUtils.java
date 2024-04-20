@@ -19,20 +19,22 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.v2.ConsumesOutputStream;
-import org.roda.core.data.v2.ConsumesSkipableOutputStream;
 import org.roda.core.common.DownloadUtils;
-import org.roda.core.data.v2.EntityResponse;
-import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.ConsumesSkipableOutputStream;
+import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.common.RODAObjectList;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmations;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
@@ -46,8 +48,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representations;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmations;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -136,9 +136,9 @@ public class ApiUtils {
     } else if (StringUtils.isNotBlank(acceptHeaders)) {
       if (acceptHeaders.contains(MediaType.APPLICATION_XML)) {
         mediaType = MediaType.APPLICATION_XML;
-      } else  if (acceptHeaders.contains(MediaType.APPLICATION_JSON)) {
+      } else if (acceptHeaders.contains(MediaType.APPLICATION_JSON)) {
         mediaType = MediaType.APPLICATION_JSON;
-      } else  if (acceptHeaders.contains(applicationJs)
+      } else if (acceptHeaders.contains(applicationJs)
         || acceptHeaders.contains(ExtraMediaType.APPLICATION_JAVASCRIPT)) {
         mediaType = applicationJs;
       } else if (acceptHeaders.contains(ExtraMediaType.TEXT_CSV)) {

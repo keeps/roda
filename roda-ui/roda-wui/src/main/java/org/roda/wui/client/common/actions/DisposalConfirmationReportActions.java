@@ -18,19 +18,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.jobs.Job;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -61,27 +59,6 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_EXECUTION_FAILED = new HashSet<>(
     Arrays.asList(DisposalConfirmationReportAction.RE_EXECUTE, DisposalConfirmationReportAction.RECOVER_STATE));
-
-  public enum DisposalConfirmationReportAction implements Action<DisposalConfirmation> {
-    PRINT(PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT),
-    DESTROY(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
-    DELETE_REPORT(PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION),
-    REMOVE_FROM_BIN(PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION),
-    RESTORE_FROM_BIN(PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION),
-    RE_EXECUTE(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
-    RECOVER_STATE(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION);
-
-    private List<String> methods;
-
-    DisposalConfirmationReportAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
-  }
 
   private DisposalConfirmationReportActions() {
   }
@@ -147,12 +124,15 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
   private void retrieveDisposalConfirmationReportForPrint(DisposalConfirmation confirmation,
     AsyncCallback<ActionImpact> callback) {
-    BrowserService.Util.getInstance().retrieveDisposalConfirmationReport(confirmation.getId(), true,
-      new ActionNoAsyncCallback<String>(callback) {
-        @Override
-        public void onSuccess(String report) {
+    Services services = new Services("Retrieve disposal confirmation report", "get");
+    services.disposalConfirmationResource(s -> s.retrieveDisposalConfirmationReport(confirmation.getId(), true))
+      .whenComplete((report, throwable) -> {
+        if (throwable != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          callback.onFailure(throwable);
+        } else {
           JavascriptUtils.print(report);
-          doActionCallbackNone();
+          callback.onSuccess(Actionable.ActionImpact.NONE);
         }
       });
   }
@@ -169,10 +149,14 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().recoverRecordsInDisposalConfirmationReport(
-              objectToSelectedItems(confirmation, DisposalConfirmation.class), new ActionAsyncCallback<Job>(callback) {
-                @Override
-                public void onSuccess(Job job) {
+            Services services = new Services("Recovers disposal confirmation", "recover");
+            services
+              .disposalConfirmationResource(
+                s -> s.recoverDisposalConfirmation(objectToSelectedItems(confirmation, DisposalConfirmation.class)))
+              .whenComplete((job, throwable) -> {
+                if (throwable != null) {
+                  callback.onFailure(throwable);
+                } else {
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
                     @Override
                     public void onFailure(Throwable caught) {
@@ -204,11 +188,14 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().restoreRecordsInDisposalConfirmationReport(
-              objectToSelectedItems(confirmation, DisposalConfirmation.class), new ActionAsyncCallback<Job>(callback) {
-
-                @Override
-                public void onSuccess(Job result) {
+            Services services = new Services("Recover disposal confirmation", "recover");
+            services
+              .disposalConfirmationResource(
+                s -> s.restoreDisposalConfirmation(objectToSelectedItems(confirmation, DisposalConfirmation.class)))
+              .whenComplete((job, throwable) -> {
+                if (throwable != null) {
+                  callback.onFailure(throwable);
+                } else {
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
@@ -222,7 +209,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
                     @Override
                     public void onSuccess(final Void nothing) {
                       doActionCallbackUpdated();
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
                     }
                   });
                 }
@@ -242,11 +229,12 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().permanentlyDeleteRecordsInDisposalConfirmationReport(
-              objectToSelectedItems(confirmation, DisposalConfirmation.class), new ActionAsyncCallback<Job>(callback) {
-
-                @Override
-                public void onSuccess(Job result) {
+            Services services = new Services("Permanently deletes records in disposal confirmation", "delete");
+            services.disposalConfirmationResource(s -> s.permanentlyDeleteRecordsInDisposalConfirmation(
+              objectToSelectedItems(confirmation, DisposalConfirmation.class))).whenComplete((job, throwable) -> {
+                if (throwable != null) {
+                  callback.onFailure(throwable);
+                } else {
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
@@ -260,7 +248,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
                     @Override
                     public void onSuccess(final Void nothing) {
                       doActionCallbackUpdated();
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
                     }
                   });
                 }
@@ -279,11 +267,14 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().destroyRecordsInDisposalConfirmationReport(
-              objectToSelectedItems(report, DisposalConfirmation.class), new ActionAsyncCallback<Job>(callback) {
-
-                @Override
-                public void onSuccess(Job result) {
+            Services services = new Services("Destroy records in disposal confirmation", "delete");
+            services
+              .disposalConfirmationResource(
+                s -> s.destroyRecordsInDisposalConfirmation(objectToSelectedItems(report, DisposalConfirmation.class)))
+              .whenComplete((job, throwable) -> {
+                if (throwable != null) {
+                  callback.onFailure(throwable);
+                } else {
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
@@ -297,7 +288,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
                     @Override
                     public void onSuccess(final Void nothing) {
                       doActionCallbackUpdated();
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
                     }
                   });
                 }
@@ -323,12 +314,14 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
                 @Override
                 public void onSuccess(final String details) {
-                  BrowserService.Util.getInstance().deleteDisposalConfirmationReport(
-                    objectToSelectedItems(report, DisposalConfirmation.class), details,
-                    new ActionAsyncCallback<Job>(callback) {
-
-                      @Override
-                      public void onSuccess(Job result) {
+                  Services services = new Services("Delete disposal confirmation", "delete");
+                  services
+                    .disposalConfirmationResource(s -> s
+                      .deleteDisposalConfirmation(objectToSelectedItems(report, DisposalConfirmation.class), details))
+                    .whenComplete((job, throwable) -> {
+                      if (throwable != null) {
+                        callback.onFailure(throwable);
+                      } else {
                         Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
 
                           @Override
@@ -342,7 +335,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
                           @Override
                           public void onSuccess(final Void nothing) {
                             doActionCallbackNone();
-                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
                           }
                         });
                       }
@@ -388,5 +381,26 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     confirmationActionableBundle.addGroup(scheduleGroup).addGroup(confirmationGroup).addGroup(disposalBinGroup);
 
     return confirmationActionableBundle;
+  }
+
+  public enum DisposalConfirmationReportAction implements Action<DisposalConfirmation> {
+    PRINT(PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT),
+    DESTROY(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
+    DELETE_REPORT(PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION),
+    REMOVE_FROM_BIN(PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION),
+    RESTORE_FROM_BIN(PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION),
+    RE_EXECUTE(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
+    RECOVER_STATE(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION);
+
+    private List<String> methods;
+
+    DisposalConfirmationReportAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 }

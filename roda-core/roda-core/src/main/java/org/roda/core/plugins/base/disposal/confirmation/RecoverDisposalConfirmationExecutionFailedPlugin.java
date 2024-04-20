@@ -22,11 +22,11 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationAIPEntry;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -37,9 +37,9 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -56,22 +56,22 @@ public class RecoverDisposalConfirmationExecutionFailedPlugin extends AbstractPl
 
   private boolean processedWithErrors = false;
 
+  public static String getStaticName() {
+    return "Recover records from disposal confirmation execution error";
+  }
+
+  public static String getStaticDescription() {
+    return "Disposals confirmation that executed with an error can be reverted and recovered to its previous";
+  }
+
   @Override
   public String getVersionImpl() {
     return "1.0";
   }
 
-  public static String getStaticName() {
-    return "Recover records from disposal confirmation execution error";
-  }
-
   @Override
   public String getName() {
     return getStaticName();
-  }
-
-  public static String getStaticDescription() {
-    return "Disposals confirmation that executed with an error can be reverted and recovered to its previous";
   }
 
   @Override

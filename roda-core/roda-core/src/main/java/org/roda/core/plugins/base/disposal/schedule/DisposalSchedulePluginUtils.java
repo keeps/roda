@@ -9,17 +9,21 @@ package org.roda.core.plugins.base.disposal.schedule;
 
 import java.util.Date;
 
+import org.roda.core.data.v2.disposal.metadata.DisposalScheduleAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveScheduleAIPMetadata;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveScheduleAIPMetadata;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class DisposalSchedulePluginUtils {
+  private DisposalSchedulePluginUtils() {
+    // empty constructor (private)
+  }
+
   public static DisposalScheduleAIPMetadata createDisposalScheduleAIPMetadata(DisposalSchedule disposalSchedule,
     String associatedBy, AIPDisposalScheduleAssociationType flow) {
     DisposalScheduleAIPMetadata disposalScheduleAIPMetadata = new DisposalScheduleAIPMetadata();

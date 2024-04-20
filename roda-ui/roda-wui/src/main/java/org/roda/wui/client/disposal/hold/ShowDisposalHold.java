@@ -11,13 +11,12 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
@@ -29,11 +28,13 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -42,12 +43,12 @@ import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -61,6 +62,8 @@ import config.i18n.client.ClientMessages;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class ShowDisposalHold extends Composite {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static ShowDisposalHold instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -83,60 +86,36 @@ public class ShowDisposalHold extends Composite {
       return "disposal_hold";
     }
   };
-
-  private static ShowDisposalHold instance = null;
-
-  interface MyUiBinder extends UiBinder<Widget, ShowDisposalHold> {
-  }
-
   private static ShowDisposalHold.MyUiBinder uiBinder = GWT.create(ShowDisposalHold.MyUiBinder.class);
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private DisposalHold disposalHold;
-
   @UiField
   Label disposalHoldId;
-
   @UiField
   Label dateCreated, dateUpdated;
-
   @UiField
   TitlePanel title;
-
   @UiField
   Label disposalHoldMandateKey;
-
   @UiField
   HTML disposalHoldMandateValue;
-
   @UiField
   Label disposalHoldDescriptionKey;
-
   @UiField
   HTML disposalHoldDescriptionValue;
-
   @UiField
   Label disposalHoldNotesKey;
-
   @UiField
   HTML disposalHoldNotesValue;
-
   @UiField
   Label disposalHoldStateKey;
-
   @UiField
   HTML disposalHoldStateValue;
-
   @UiField
   FlowPanel buttonsPanel;
-
   @UiField
   FlowPanel aipListTitle;
-
   @UiField
   SimplePanel aipsListCard;
-
+  private DisposalHold disposalHold;
   private SearchWrapper aipsSearchWrapper;
 
   public ShowDisposalHold() {
@@ -151,6 +130,13 @@ public class ShowDisposalHold extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     initElements();
     initButtons();
+  }
+
+  public static ShowDisposalHold getInstance() {
+    if (instance == null) {
+      instance = new ShowDisposalHold();
+    }
+    return instance;
   }
 
   private void initAipsList() {
@@ -238,9 +224,11 @@ public class ShowDisposalHold extends Composite {
       liftHoldBtn.addClickHandler(clickEvent -> {
         if (disposalHold.getFirstTimeUsed() == null) {
           disposalHold.setState(DisposalHoldState.LIFTED);
-          BrowserService.Util.getInstance().updateDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
-            @Override
-            public void onSuccess(DisposalHold disposalHold) {
+          Services services = new Services("Update disposal hold", "update");
+          services.disposalHoldResource(s -> s.updateDisposalHold(disposalHold)).whenComplete((hold, throwable) -> {
+            if (throwable != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(throwable);
+            } else {
               HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
             }
           });
@@ -254,17 +242,15 @@ public class ShowDisposalHold extends Composite {
             new NoAsyncCallback<Long>() {
               @Override
               public void onSuccess(Long size) {
-                GWT.log("" + size);
                 if (size != 0) {
-                  BrowserService.Util.getInstance().liftDisposalHold(selectedItemsFilter, disposalHold.getId(),
-                    new AsyncCallback<Job>() {
-                      @Override
-                      public void onFailure(Throwable throwable) {
+                  Services services = new Services("Lift disposal hold", "job");
+                  services
+                    .disposalHoldResource(
+                      s -> s.liftDisposalHoldBySelectedItems(selectedItemsFilter, disposalHold.getId()))
+                    .whenComplete((job, throwable) -> {
+                      if (throwable != null) {
                         HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                      }
-
-                      @Override
-                      public void onSuccess(Job job) {
+                      } else {
                         Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                           @Override
@@ -290,21 +276,23 @@ public class ShowDisposalHold extends Composite {
                       }
                     });
                 } else {
-                  disposalHold.setState(DisposalHoldState.LIFTED);
-                  BrowserService.Util.getInstance().liftDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
-                    @Override
-                    public void onSuccess(DisposalHold result) {
-                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.updateDisposalHoldMessage());
-                      Timer timer = new Timer() {
-                        @Override
-                        public void run() {
-                          refresh();
-                        }
-                      };
+                  Services services = new Services("Lift disposal hold", "lift");
+                  services.disposalHoldResource(s -> s.liftDisposalHold(disposalHold.getId()))
+                    .whenComplete((result, throwable) -> {
+                      if (throwable != null) {
+                        AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                      } else {
+                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.updateDisposalHoldMessage());
+                        Timer timer = new Timer() {
+                          @Override
+                          public void run() {
+                            refresh();
+                          }
+                        };
 
-                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                    }
-                  });
+                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                      }
+                    });
                 }
               }
             });
@@ -320,13 +308,6 @@ public class ShowDisposalHold extends Composite {
     buttonsPanel.add(backBtn);
   }
 
-  public static ShowDisposalHold getInstance() {
-    if (instance == null) {
-      instance = new ShowDisposalHold();
-    }
-    return instance;
-  }
-
   private void errorMessage(Throwable caught) {
     if (caught instanceof DisposalHoldAlreadyExistsException) {
       Toast.showError(messages.createDisposalHoldAlreadyExists(disposalHold.getTitle()));
@@ -336,10 +317,12 @@ public class ShowDisposalHold extends Composite {
   }
 
   private void refresh() {
-    BrowserService.Util.getInstance().retrieveDisposalHold(disposalHold.getId(), new NoAsyncCallback<DisposalHold>() {
-      @Override
-      public void onSuccess(DisposalHold result) {
-        disposalHold = result;
+    Services services = new Services("Retrieve disposal hold", "get");
+    services.disposalHoldResource(s -> s.retrieveDisposalHold(disposalHold.getId())).whenComplete((hold, throwable) -> {
+      if (throwable != null) {
+        AsyncCallbackUtils.defaultFailureTreatment(throwable);
+      } else {
+        disposalHold = hold;
         initElements();
         initAipsList();
         initButtons();
@@ -349,13 +332,19 @@ public class ShowDisposalHold extends Composite {
 
   private void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
-      BrowserService.Util.getInstance().retrieveDisposalHold(historyTokens.get(0), new NoAsyncCallback<DisposalHold>() {
-        @Override
-        public void onSuccess(DisposalHold result) {
-          ShowDisposalHold panel = new ShowDisposalHold(result);
-          callback.onSuccess(panel);
-        }
-      });
+      Services services = new Services("Retrieve disposal hold", "get");
+      services.disposalHoldResource(s -> s.retrieveDisposalHold(historyTokens.get(0)))
+        .whenComplete((hold, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            ShowDisposalHold panel = new ShowDisposalHold(hold);
+            callback.onSuccess(panel);
+          }
+        });
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowDisposalHold> {
   }
 }

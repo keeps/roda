@@ -13,15 +13,15 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.disposal.rule.ConditionType;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.ConditionType;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -55,52 +55,37 @@ import config.i18n.client.ClientMessages;
  */
 public class DisposalRuleDataPanel extends Composite implements HasValueChangeHandlers<DisposalRule> {
 
-  interface MyUiBinder extends UiBinder<Widget, DisposalRuleDataPanel> {
-  }
-
-  private static DisposalRuleDataPanel.MyUiBinder uiBinder = GWT.create(DisposalRuleDataPanel.MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  @UiField
-  TextBox title;
-
-  @UiField
-  Label titleError;
-
-  @UiField
-  TextArea description;
-
-  // disposal schedules list
-  @UiField
-  ListBox disposalSchedulesList;
-
-  @UiField
-  Label disposalSchedulesListError;
-
-  // condition type
-  @UiField
-  ListBox conditionTypeList;
-
-  @UiField
-  Label conditionTypeListError;
-
-  @UiField(provided = true)
-  MetadataFieldsPanel metadataFieldsPanel;
-
-  @UiField(provided = true)
-  ChildOfPanel childOfPanel;
-
-  @UiField
-  FlowPanel previewAIPListHeader;
-
-  @UiField
-  SimplePanel previewAIPListCard;
-
+  private static DisposalRuleDataPanel.MyUiBinder uiBinder = GWT.create(DisposalRuleDataPanel.MyUiBinder.class);
   private final DisposalRule disposalRule;
   private final DisposalSchedules disposalSchedules;
   private final boolean editMode;
-
+  @UiField
+  TextBox title;
+  @UiField
+  Label titleError;
+  @UiField
+  TextArea description;
+  // disposal schedules list
+  @UiField
+  ListBox disposalSchedulesList;
+  @UiField
+  Label disposalSchedulesListError;
+  // condition type
+  @UiField
+  ListBox conditionTypeList;
+  @UiField
+  Label conditionTypeListError;
+  @UiField(provided = true)
+  MetadataFieldsPanel metadataFieldsPanel;
+  @UiField(provided = true)
+  ChildOfPanel childOfPanel;
+  @UiField
+  FlowPanel previewAIPListHeader;
+  @UiField
+  SimplePanel previewAIPListCard;
+  @UiField
+  HTML errors;
   private int selectedScheduleIndex;
   private int selectedTypeIndex;
 
@@ -111,13 +96,6 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
   private Button btnPreview;
   private Label previewHelpText;
-
-  @UiField
-  HTML errors;
-
-  private enum SelectionMethod {
-    CHILD_OF, METADATA_FIELD, NONE
-  }
 
   public DisposalRuleDataPanel(DisposalRule disposalRule, DisposalSchedules disposalSchedules, boolean editMode) {
     metadataFieldsPanel = new MetadataFieldsPanel(disposalRule.getConditionKey(), disposalRule.getConditionValue(),
@@ -245,11 +223,11 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
   private void initDisposalSchedulesList() {
     disposalSchedulesList.addItem("", "");
+    disposalSchedules.getObjects().removeIf(p -> p.getState().equals(DisposalScheduleState.INACTIVE));
+
     if (!editMode) {
       for (DisposalSchedule schedule : disposalSchedules.getObjects()) {
-        if (schedule.getState().equals(DisposalScheduleState.ACTIVE)) {
-          disposalSchedulesList.addItem(schedule.getTitle(), schedule.getId());
-        }
+        disposalSchedulesList.addItem(schedule.getTitle(), schedule.getId());
       }
     } else {
       int index = 1;
@@ -415,6 +393,13 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
   public DisposalRule getValue() {
     return getDisposalRule();
+  }
+
+  private enum SelectionMethod {
+    CHILD_OF, METADATA_FIELD, NONE
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, DisposalRuleDataPanel> {
   }
 
 }

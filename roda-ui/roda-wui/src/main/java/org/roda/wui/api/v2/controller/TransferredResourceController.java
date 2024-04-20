@@ -305,11 +305,9 @@ public class TransferredResourceController implements TransferredResourceRestSer
   @Override
   public IndexResult<TransferredResource> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
     if (findRequest.filter == null || findRequest.filter.getParameters().isEmpty()) {
       return new IndexResult<>();
     }
-
     // delegate
     return indexService.find(TransferredResource.class, findRequest, localeString, requestContext.getUser());
   }

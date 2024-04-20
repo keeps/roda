@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.v2.ip.*;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;

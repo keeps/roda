@@ -19,6 +19,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -38,16 +39,13 @@ public class DisposalRuleActions {
             DisposalDialogs.showApplyRules(messages.applyDisposalRulesDialogTitle(), new NoAsyncCallback<Boolean>() {
               @Override
               public void onSuccess(Boolean applyToManuallyInclusive) {
-                BrowserService.Util.getInstance().applyDisposalRules(applyToManuallyInclusive,
-                  new AsyncCallback<Job>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                Services services = new Services("Apply disposal rules", "job");
+                services.disposalRuleResource(s -> s.applyDisposalRules(applyToManuallyInclusive))
+                  .whenComplete((job, throwable) -> {
+                    if (throwable != null) {
+                      AsyncCallbackUtils.defaultFailureTreatment(throwable);
                       HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                    }
-
-                    @Override
-                    public void onSuccess(Job job) {
+                    } else {
                       Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
                         @Override
                         public void onFailure(Throwable caught) {
