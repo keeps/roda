@@ -10,14 +10,15 @@ package org.roda.wui.client.disposal.policy;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHolds;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
+import org.roda.wui.client.services.DisposalHoldRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
@@ -45,19 +46,28 @@ import config.i18n.client.ClientMessages;
 
 public class DisposalPolicyHoldsPanel extends Composite {
 
-  interface MyUiBinder extends UiBinder<Widget, DisposalPolicyHoldsPanel> {
-  }
-
-  private static DisposalPolicyHoldsPanel.MyUiBinder uiBinder = GWT.create(DisposalPolicyHoldsPanel.MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static DisposalPolicyHoldsPanel.MyUiBinder uiBinder = GWT.create(DisposalPolicyHoldsPanel.MyUiBinder.class);
   // Disposal Holds
   @UiField
   FlowPanel disposalHoldsDescription;
-
   @UiField
   ScrollPanel disposalHoldsTablePanel;
+
+  public DisposalPolicyHoldsPanel() {
+    initWidget(uiBinder.createAndBindUi(this));
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
+      Services services = new Services("List disposal holds", "get");
+      services.disposalHoldResource(DisposalHoldRestService::listDisposalHolds)
+        .whenComplete((disposalHolds, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            init(disposalHoldsDescription, disposalHoldsTablePanel, disposalHolds);
+          }
+        });
+    }
+  }
 
   private void createDisposalHoldsDescription(FlowPanel disposalHoldsDescription) {
     Label header = new Label(messages.disposalHoldsTitle());
@@ -94,18 +104,6 @@ public class DisposalPolicyHoldsPanel extends Composite {
       holdsPanel.add(tableHolds);
       disposalHoldsTablePanel.add(holdsPanel);
       disposalHoldsTablePanel.addStyleName("disposalPolicyScrollPanel");
-    }
-  }
-
-  public DisposalPolicyHoldsPanel() {
-    initWidget(uiBinder.createAndBindUi(this));
-    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
-      BrowserService.Util.getInstance().listDisposalHolds(new NoAsyncCallback<DisposalHolds>() {
-        @Override
-        public void onSuccess(DisposalHolds disposalHolds) {
-          init(disposalHoldsDescription, disposalHoldsTablePanel, disposalHolds);
-        }
-      });
     }
   }
 
@@ -146,5 +144,8 @@ public class DisposalPolicyHoldsPanel extends Composite {
             }
           }));
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, DisposalPolicyHoldsPanel> {
   }
 }

@@ -9,10 +9,10 @@ package org.roda.wui.client.common.dialogs.utils;
 
 import java.io.Serializable;
 
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 
 /**
- * @author Gabriel Barros <gbarrps@keep.pt>
+ * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class DisposalScheduleDialogResult implements Serializable {
   private static final long serialVersionUID = -967014998203940151L;

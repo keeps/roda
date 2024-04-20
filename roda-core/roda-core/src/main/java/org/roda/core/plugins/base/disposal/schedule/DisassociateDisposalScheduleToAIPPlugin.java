@@ -16,12 +16,11 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -45,22 +44,22 @@ import org.slf4j.LoggerFactory;
 public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DisassociateDisposalScheduleToAIPPlugin.class);
 
+  public static String getStaticName() {
+    return "Disassociate disposal schedule";
+  }
+
+  public static String getStaticDescription() {
+    return "";
+  }
+
   @Override
   public String getVersionImpl() {
     return "1.0";
   }
 
-  public static String getStaticName() {
-    return "Disassociate disposal schedule";
-  }
-
   @Override
   public String getName() {
     return getStaticName();
-  }
-
-  public static String getStaticDescription() {
-    return "";
   }
 
   @Override
@@ -148,7 +147,6 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
             disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
             if (aip.getDisposal() != null) {
               aip.getDisposal().setSchedule(null);
-              model.updateDisposalSchedule(disposalSchedule, cachedJob.getUsername());
               model.updateAIP(aip, cachedJob.getUsername());
               reportItem.setPluginState(state).setPluginDetails(
                 "Disposal schedule '" + aip.getDisposalScheduleId() + "' was successfully disassociated from AIP");
@@ -163,8 +161,7 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
                 disposalSchedule.getId(), disposalSchedule.getTitle());
             }
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
-            | IllegalOperationException e) {
+          } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
             LOGGER.error("Error disassociating disposal schedule {} from AIP {}: {}", aip.getDisposalScheduleId(),
               aip.getId(), e.getMessage(), e);
             state = PluginState.FAILURE;

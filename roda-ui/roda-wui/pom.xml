@@ -247,6 +247,10 @@
                                     --add-opens java.base/java.util=ALL-UNNAMED
                                 </JDK_JAVA_OPTIONS>
                             </environmentVariables>
+                            <compilerArgs>
+                                <arg>-gen</arg>
+                                <arg>/home/mguimaraes/Desktop/gwt</arg>
+                            </compilerArgs>
                         </configuration>
                         <executions>
                             <execution>

@@ -24,6 +24,8 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -34,8 +36,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -132,11 +132,10 @@ import org.slf4j.LoggerFactory;
  *
  */
 public final class LiteRODAObjectFactory {
-  private static final Logger LOGGER = LoggerFactory.getLogger(LiteRODAObjectFactory.class);
-
   public static final String SEPARATOR = "|";
   public static final String SEPARATOR_REGEX = "\\|";
   public static final String SEPARATOR_URL_ENCODED = "%7C";
+  private static final Logger LOGGER = LoggerFactory.getLogger(LiteRODAObjectFactory.class);
 
   private LiteRODAObjectFactory() {
     // do nothing

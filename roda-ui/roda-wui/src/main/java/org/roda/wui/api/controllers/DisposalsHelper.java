@@ -9,12 +9,14 @@ package org.roda.wui.api.controllers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,25 +31,24 @@ import org.roda.core.data.exceptions.DisposalRuleNotValidException;
 import org.roda.core.data.exceptions.DisposalScheduleNotValidException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.disposal.ConditionType;
-import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.ConditionType;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
+import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
-import org.roda.wui.client.browse.MetadataValue;
-import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.common.client.tools.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
@@ -58,8 +59,6 @@ import com.github.jknack.handlebars.Template;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class DisposalsHelper {
-  private static final Logger LOGGER = LoggerFactory.getLogger(DisposalsHelper.class);
-
   private static final String DISPOSAL_CONFIRMATION_COMMAND_PROPERTY = "core.confirmation.generate.report.command";
 
   private static final String METADATA_FILE_PLACEHOLDER = "metadataFile";
@@ -73,7 +72,7 @@ public class DisposalsHelper {
   private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
   private static final String HBS_DATEFORMAT_HELPER_NAME = "humanize";
 
-  public DisposalsHelper() {
+  private DisposalsHelper() {
     // do nothing
   }
 
@@ -90,7 +89,6 @@ public class DisposalsHelper {
     if (!isRuleScheduleValid(disposalRule, disposalSchedules)) {
       throw new DisposalRuleNotValidException("The disposal rule schedule is not valid");
     }
-
   }
 
   private static boolean isConditionTypeValid(ConditionType type) {
@@ -202,7 +200,7 @@ public class DisposalsHelper {
     return false;
   }
 
-  public static Map<String, String> getDisposalConfirmationExtra(DisposalConfirmationExtraBundle extra) {
+  public static Map<String, String> getDisposalConfirmationExtra(DisposalConfirmationForm extra) {
     Map<String, String> data = new HashMap<>();
 
     if (extra != null) {
@@ -212,7 +210,7 @@ public class DisposalsHelper {
           String val = metadataValue.get("value");
           if (val != null) {
             val = val.replaceAll("\\s", "");
-            if (!"".equals(val)) {
+            if (!val.isEmpty()) {
               data.put(metadataValue.get("name"), metadataValue.get("value"));
             }
           }
@@ -229,9 +227,7 @@ public class DisposalsHelper {
 
     Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
 
-    Path metadataFile = entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
-
-    return metadataFile;
+    return entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
   }
 
   public static Path getDisposalConfirmationAIPsPath(String confirmationId) throws RequestNotValidException {
@@ -240,9 +236,7 @@ public class DisposalsHelper {
 
     Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
 
-    Path aipsFile = entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
-
-    return aipsFile;
+    return entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
   }
 
   public static Path getDisposalConfirmationSchedulesPath(String confirmationId) throws RequestNotValidException {
@@ -251,9 +245,7 @@ public class DisposalsHelper {
 
     Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
 
-    Path schedulesFile = entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME);
-
-    return schedulesFile;
+    return entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME);
   }
 
   public static Path getDisposalConfirmationHoldsPath(String confirmationId) throws RequestNotValidException {
@@ -262,9 +254,7 @@ public class DisposalsHelper {
 
     Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
 
-    Path holdsFile = entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
-
-    return holdsFile;
+    return entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
   }
 
   public static String createDisposalConfirmationReport(String confirmationId, boolean isToPrint)
@@ -286,9 +276,7 @@ public class DisposalsHelper {
     String jqCommandParams = HandlebarsUtility.executeHandlebars(jqCommandTemplate, values);
 
     List<String> jqCommand = new ArrayList<>();
-    for (String param : jqCommandParams.split(" ")) {
-      jqCommand.add(param);
-    }
+    Collections.addAll(jqCommand, jqCommandParams.split(" "));
 
     String output = null;
     try {
@@ -296,8 +284,8 @@ public class DisposalsHelper {
     } catch (CommandException e) {
       throw new RODAException(e);
     }
-
-    Map<String, Object> confirmationValues = new ObjectMapper().readValue(output, HashMap.class);
+    TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
+    Map<String, Object> confirmationValues = new ObjectMapper().readValue(output, typeRef);
     InputStream templateStream;
 
     if (isToPrint) {
@@ -308,21 +296,17 @@ public class DisposalsHelper {
         RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + DISPOSAL_CONFIRMATION_REPORT_HBS);
     }
 
-    String reportTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+    String reportTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
 
     Handlebars handlebars = new Handlebars();
     handlebars.registerHelper(HBS_DATEFORMAT_HELPER_NAME, new Helper<Long>() {
       @Override
       public Object apply(Long value, Options options) throws IOException {
         ZonedDateTime date = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
-        String result = DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(date);
-        return result;
+        return DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(date);
       }
     });
     Template template = handlebars.compileInline(reportTemplate);
-    String report = template.apply(confirmationValues);
-
-    return report;
+    return template.apply(confirmationValues);
   }
-
 }

@@ -9,13 +9,13 @@ package org.roda.wui.client.disposal.schedule;
 
 import java.util.List;
 
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -42,10 +42,12 @@ public class EditDisposalSchedule extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        BrowserService.Util.getInstance().retrieveDisposalSchedule(historyTokens.get(0),
-          new NoAsyncCallback<DisposalSchedule>() {
-            @Override
-            public void onSuccess(DisposalSchedule result) {
+        Services services = new Services("Retrieve disposal schedule", "get");
+        services.disposalScheduleResource(s -> s.retrieveDisposalSchedule(historyTokens.get(0)))
+          .whenComplete((result, throwable) -> {
+            if (throwable != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(throwable);
+            } else {
               if (DisposalScheduleState.INACTIVE.equals(result.getState())) {
                 HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
               } else {
@@ -110,19 +112,20 @@ public class EditDisposalSchedule extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    GWT.log("" + disposalScheduleDataPanel.isChanged());
-    GWT.log("" + disposalScheduleDataPanel.isValid());
     if (disposalScheduleDataPanel.isChanged() && disposalScheduleDataPanel.isValid()) {
       DisposalSchedule disposalScheduleUpdated = disposalScheduleDataPanel.getDisposalSchedule();
       disposalSchedule.setTitle(disposalScheduleUpdated.getTitle());
       disposalSchedule.setMandate(disposalScheduleUpdated.getMandate());
       disposalSchedule.setDescription(disposalScheduleUpdated.getDescription());
       disposalSchedule.setScopeNotes(disposalScheduleUpdated.getScopeNotes());
-      BrowserService.Util.getInstance().updateDisposalSchedule(disposalSchedule,
-        new NoAsyncCallback<DisposalSchedule>() {
-          @Override
-          public void onSuccess(DisposalSchedule disposalSchedule) {
-            HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, disposalSchedule.getId());
+
+      Services services = new Services("Update disposal schedule", "update");
+      services.disposalScheduleResource(s -> s.updateDisposalSchedule(disposalSchedule))
+        .whenComplete((updatedDisposalSchedule, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, updatedDisposalSchedule.getId());
           }
         });
     } else {

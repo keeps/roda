@@ -10,10 +10,14 @@ package org.roda.wui.client.common.actions;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -23,11 +27,6 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
-import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
@@ -45,10 +44,14 @@ import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
 import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogResult;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.DisposalHoldRestService;
+import org.roda.wui.client.services.DisposalScheduleRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -71,28 +74,22 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   public static final IndexedAIP NO_AIP_OBJECT = null;
   public static final String NO_AIP_PARENT = null;
   public static final AIPState NO_AIP_STATE = null;
-
+  public static final String BTN_EDIT = "btn-edit";
   private static final AipActions GENERAL_INSTANCE = new AipActions(NO_AIP_PARENT, NO_AIP_STATE, null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP_TOP = new HashSet<>(
     Arrays.asList(AipAction.NEW_CHILD_AIP_TOP));
-
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
     Arrays.asList(AipAction.NEW_CHILD_AIP_BELOW));
-
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(Arrays.asList(AipAction.DOWNLOAD,
     AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
     AipAction.DOWNLOAD_EVENTS, AipAction.DOWNLOAD_DOCUMENTATION, AipAction.DOWNLOAD_SUBMISSIONS, AipAction.CHANGE_TYPE,
     AipAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipAction.ASSOCIATE_DISPOSAL_HOLD));
-
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
       AipAction.CHANGE_TYPE, AipAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipAction.ASSOCIATE_DISPOSAL_HOLD));
-
   private static final Set<AipAction> APPRAISAL_ACTIONS = new HashSet<>(
     Arrays.asList(AipAction.APPRAISAL_ACCEPT, AipAction.APPRAISAL_REJECT));
-
   private final String parentAipId;
   private final AIPState parentAipState;
   private final Permissions permissions;
@@ -101,40 +98,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     this.parentAipId = parentAipId;
     this.parentAipState = parentAipState;
     this.permissions = permissions;
-  }
-
-  public enum AipAction implements Action<IndexedAIP> {
-    NEW_CHILD_AIP_BELOW(RodaConstants.PERMISSION_METHOD_CREATE_AIP_BELOW),
-    NEW_CHILD_AIP_TOP(RodaConstants.PERMISSION_METHOD_CREATE_AIP_TOP), DOWNLOAD(),
-    MOVE_IN_HIERARCHY(RodaConstants.PERMISSION_METHOD_MOVE_AIP_IN_HIERARCHY),
-    UPDATE_PERMISSIONS(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS),
-    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_AIP), NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    DOWNLOAD_EVENTS(), DOWNLOAD_SUBMISSIONS(), APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
-    APPRAISAL_REJECT(RodaConstants.PERMISSION_METHOD_APPRAISAL), DOWNLOAD_DOCUMENTATION(),
-    CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_AIP_TYPE),
-    ASSOCIATE_DISPOSAL_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE),
-    ASSOCIATE_DISPOSAL_HOLD(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD);
-
-    private List<String> methods;
-
-    AipAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
-  }
-
-  @Override
-  public AipAction[] getActions() {
-    return AipAction.values();
-  }
-
-  @Override
-  public AipAction actionForName(String name) {
-    return AipAction.valueOf(name);
   }
 
   public static AipActions get() {
@@ -156,9 +119,19 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
+  public AipAction[] getActions() {
+    return AipAction.values();
+  }
+
+  @Override
+  public AipAction actionForName(String name) {
+    return AipAction.valueOf(name);
+  }
+
+  @Override
   public boolean canAct(Action<IndexedAIP> action) {
     if (!AIPState.UNDER_APPRAISAL.equals(parentAipState)) {
-      if (parentAipId == NO_AIP_PARENT) {
+      if (Objects.equals(parentAipId, NO_AIP_PARENT)) {
         return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_TOP.contains(action);
       } else {
         return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
@@ -739,35 +712,40 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
       @Override
       public void onSuccess(final Long size) {
-        BrowserService.Util.getInstance().listDisposalSchedules(new ActionNoAsyncCallback<DisposalSchedules>(callback) {
-          @Override
-          public void onSuccess(DisposalSchedules schedules) {
-            // Show the active disposal schedules only
-            schedules.getObjects().removeIf(schedule -> DisposalScheduleState.INACTIVE.equals(schedule.getState()));
-            DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(), schedules,
-              new ActionNoAsyncCallback<DisposalScheduleDialogResult>(callback) {
-                @Override
-                public void onFailure(Throwable caught) {
-                  doActionCallbackNone();
-                }
-
-                @Override
-                public void onSuccess(DisposalScheduleDialogResult result) {
-                  if (DisposalScheduleDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
-                    associateDisposalSchedule(aips, size, result, callback);
-                  } else if (DisposalScheduleDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
-                    disassociateDisposalSchedule(aips, size, result, callback);
+        Services services = new Services("List disposal schedules", "get");
+        services.disposalScheduleResource(DisposalScheduleRestService::listDisposalSchedules)
+          .whenComplete((disposalSchedules, caught) -> {
+            if (caught != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+              callback.onFailure(caught);
+            } else {
+              // Show the active disposal schedules only
+              disposalSchedules.getObjects()
+                .removeIf(schedule -> DisposalScheduleState.INACTIVE.equals(schedule.getState()));
+              DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(),
+                disposalSchedules, new ActionNoAsyncCallback<DisposalScheduleDialogResult>(callback) {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    doActionCallbackNone();
                   }
-                }
-              });
-          }
-        });
+
+                  @Override
+                  public void onSuccess(DisposalScheduleDialogResult result) {
+                    if (DisposalScheduleDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
+                      associateDisposalSchedule(aips, size, result, callback);
+                    } else if (DisposalScheduleDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
+                      disassociateDisposalSchedule(aips, size, callback);
+                    }
+                  }
+                });
+            }
+          });
       }
     });
   }
 
   private void disassociateDisposalSchedule(SelectedItems<IndexedAIP> aips, Long size,
-    DisposalScheduleDialogResult dialogResult, AsyncCallback<ActionImpact> callback) {
+    AsyncCallback<ActionImpact> callback) {
 
     Dialogs.showConfirmDialog(messages.dissociateDisposalScheduleDialogTitle(),
       messages.dissociateDisposalScheduleDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
@@ -775,16 +753,13 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().disassociateDisposalSchedule(aips,
-              new ActionAsyncCallback<Job>(callback) {
-                @Override
-                public void onFailure(Throwable caught) {
-                  callback.onFailure(caught);
+            Services services = new Services("Disassociate disposal schedule from AIP", "job");
+            services.disposalScheduleResource(s -> s.disassociatedDisposalSchedule(aips))
+              .whenComplete((job, throwable) -> {
+                if (throwable != null) {
+                  callback.onFailure(throwable);
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                }
-
-                @Override
-                public void onSuccess(Job job) {
+                } else {
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
@@ -826,17 +801,13 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().associateDisposalSchedule(aips, disposalSchedule.getId(),
-              new ActionAsyncCallback<Job>(callback) {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  callback.onFailure(caught);
+            Services services = new Services("Associate disposal schedule", "job");
+            services.disposalScheduleResource(s -> s.associatedDisposalSchedule(aips, disposalSchedule.getId()))
+              .whenComplete((job, throwable) -> {
+                if (throwable != null) {
+                  callback.onFailure(throwable);
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                }
-
-                @Override
-                public void onSuccess(Job job) {
+                } else {
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
@@ -876,30 +847,34 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
       @Override
       public void onSuccess(final Long size) {
-        BrowserService.Util.getInstance().listDisposalHolds(new ActionNoAsyncCallback<DisposalHolds>(callback) {
-          @Override
-          public void onSuccess(DisposalHolds holds) {
-            holds.getObjects().removeIf(p -> DisposalHoldState.LIFTED.equals(p.getState()));
-            DisposalDialogs.showDisposalHoldSelection(messages.disposalHoldSelectionDialogTitle(), holds,
-              new ActionNoAsyncCallback<DisposalHoldDialogResult>(callback) {
-                @Override
-                public void onFailure(Throwable caught) {
-                  doActionCallbackNone();
-                }
-
-                @Override
-                public void onSuccess(DisposalHoldDialogResult result) {
-                  if (DisposalHoldDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
-                    clearDisposalHolds(aips, size, callback);
-                  } else if (DisposalHoldDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
-                    applyDisposalHold(aips, size, result, false, callback);
-                  } else if (DisposalHoldDialogResult.ActionType.OVERRIDE.equals(result.getActionType())) {
-                    applyDisposalHold(aips, size, result, true, callback);
+        Services services = new Services("Get disposal holds", "get");
+        services.disposalHoldResource(DisposalHoldRestService::listDisposalHolds)
+          .whenComplete((disposalHolds, throwable) -> {
+            if (throwable != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(throwable);
+              callback.onFailure(throwable);
+            } else {
+              disposalHolds.getObjects().removeIf(p -> DisposalHoldState.LIFTED.equals(p.getState()));
+              DisposalDialogs.showDisposalHoldSelection(messages.disposalHoldSelectionDialogTitle(), disposalHolds,
+                new ActionNoAsyncCallback<DisposalHoldDialogResult>(callback) {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    doActionCallbackNone();
                   }
-                }
-              });
-          }
-        });
+
+                  @Override
+                  public void onSuccess(DisposalHoldDialogResult result) {
+                    if (DisposalHoldDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
+                      clearDisposalHolds(aips, size, callback);
+                    } else if (DisposalHoldDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
+                      applyDisposalHold(aips, size, result, false, callback);
+                    } else if (DisposalHoldDialogResult.ActionType.OVERRIDE.equals(result.getActionType())) {
+                      applyDisposalHold(aips, size, result, true, callback);
+                    }
+                  }
+                });
+            }
+          });
       }
     });
   }
@@ -912,18 +887,16 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(),
-              override, new ActionAsyncCallback<Job>(callback) {
-                @Override
-                public void onFailure(Throwable caught) {
-                  callback.onFailure(caught);
+            Services services = new Services("Apply disposal hold", "job");
+            services
+              .disposalHoldResource(
+                s -> s.applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(), override))
+              .whenComplete((job, throwable) -> {
+                if (throwable != null) {
+                  callback.onFailure(null);
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                }
-
-                @Override
-                public void onSuccess(Job job) {
+                } else {
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-
                     @Override
                     public void onFailure(Throwable caught) {
                       Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
@@ -934,7 +907,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                           doActionCallbackUpdated();
                         }
                       };
-
                       timer.schedule(RodaConstants.ACTION_TIMEOUT);
                     }
 
@@ -961,16 +933,13 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().disassociateDisposalHold(aips, null, true,
-              new ActionAsyncCallback<Job>(callback) {
-                @Override
-                public void onFailure(Throwable caught) {
-                  callback.onFailure(caught);
+            Services services = new Services("Disassociate disposal holds", "job");
+            services.disposalHoldResource(s -> s.disassociateDisposalHold(aips, null, true))
+              .whenComplete((job, throwable) -> {
+                if (throwable != null) {
+                  callback.onFailure(throwable);
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                }
-
-                @Override
-                public void onSuccess(Job job) {
+                } else {
                   Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
@@ -1012,11 +981,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       "btn-plus-circle");
     managementGroup.addButton(messages.newSublevel(), AipAction.NEW_CHILD_AIP_BELOW, ActionImpact.UPDATED,
       "btn-plus-circle");
-    managementGroup.addButton(messages.changeTypeButton(), AipAction.CHANGE_TYPE, ActionImpact.UPDATED, "btn-edit");
+    managementGroup.addButton(messages.changeTypeButton(), AipAction.CHANGE_TYPE, ActionImpact.UPDATED, BTN_EDIT);
     managementGroup.addButton(messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, ActionImpact.UPDATED,
-      "btn-edit");
+      BTN_EDIT);
     managementGroup.addButton(messages.archivalPackagePermissions(), AipAction.UPDATE_PERMISSIONS, ActionImpact.UPDATED,
-      "btn-edit");
+      BTN_EDIT);
     managementGroup.addButton(messages.removeArchivalPackage(), AipAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
     // PRESERVATION
@@ -1050,5 +1019,29 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     aipActionableBundle.addGroup(managementGroup).addGroup(disposalGroup).addGroup(preservationGroup)
       .addGroup(appraisalGroup).addGroup(downloadGroup);
     return aipActionableBundle;
+  }
+
+  public enum AipAction implements Action<IndexedAIP> {
+    NEW_CHILD_AIP_BELOW(RodaConstants.PERMISSION_METHOD_CREATE_AIP_BELOW),
+    NEW_CHILD_AIP_TOP(RodaConstants.PERMISSION_METHOD_CREATE_AIP_TOP), DOWNLOAD(),
+    MOVE_IN_HIERARCHY(RodaConstants.PERMISSION_METHOD_MOVE_AIP_IN_HIERARCHY),
+    UPDATE_PERMISSIONS(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS),
+    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_AIP), NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    DOWNLOAD_EVENTS(), DOWNLOAD_SUBMISSIONS(), APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
+    APPRAISAL_REJECT(RodaConstants.PERMISSION_METHOD_APPRAISAL), DOWNLOAD_DOCUMENTATION(),
+    CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_AIP_TYPE),
+    ASSOCIATE_DISPOSAL_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE),
+    ASSOCIATE_DISPOSAL_HOLD(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD);
+
+    private List<String> methods;
+
+    AipAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 }

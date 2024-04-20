@@ -52,6 +52,7 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -66,7 +67,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -793,8 +793,8 @@ public final class PluginHelper {
     Permissions permissions = new Permissions();
 
     boolean isGhost = true;
-    AIP ghostAIP = model.createAIP(parent.orElse(null), "", permissions, Arrays.asList(ancestor), jobId, true,
-      username, isGhost);
+    AIP ghostAIP = model.createAIP(parent.orElse(null), "", permissions, Arrays.asList(ancestor), jobId, true, username,
+      isGhost);
 
     return Optional.ofNullable(ghostAIP.getId());
   }

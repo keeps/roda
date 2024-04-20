@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateRequest;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -24,6 +24,7 @@ import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -74,35 +75,23 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
   };
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  interface MyUiBinder extends UiBinder<Widget, CreateDisposalConfirmationDataPanel> {
-  }
-
   private static CreateDisposalConfirmationDataPanel.MyUiBinder uiBinder = GWT
     .create(CreateDisposalConfirmationDataPanel.MyUiBinder.class);
-
   @UiField
   FlowPanel createDisposalConfirmationFormDescription;
-
   @UiField
   FlowPanel content;
-
   @UiField
   FlowPanel extra;
-
   @UiField
   HTML errors;
-
   @UiField
   TextBox title;
-
   @UiField
   Label titleError;
-
   @UiField
   FlowPanel buttonsPanel;
-
-  private DisposalConfirmationExtraBundle disposalConfirmationExtra = null;
+  private DisposalConfirmationForm disposalConfirmationForm = null;
 
   /**
    * Create a new panel to create a disposal confirmation
@@ -117,7 +106,7 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
     errors.setVisible(false);
 
     BrowserService.Util.getInstance()
-      .retrieveDisposalConfirmationExtraBundle(new AsyncCallback<DisposalConfirmationExtraBundle>() {
+      .retrieveDisposalConfirmationExtraBundle(new AsyncCallback<DisposalConfirmationForm>() {
 
         @Override
         public void onFailure(Throwable throwable) {
@@ -125,9 +114,9 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
         }
 
         @Override
-        public void onSuccess(DisposalConfirmationExtraBundle result) {
-          disposalConfirmationExtra = result;
-          FormUtilities.create(extra, disposalConfirmationExtra.getValues(), true);
+        public void onSuccess(DisposalConfirmationForm result) {
+          disposalConfirmationForm = result;
+          FormUtilities.create(extra, disposalConfirmationForm.getValues(), true);
         }
       });
 
@@ -165,15 +154,14 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
       Toast.showInfo("Error", "Error");
       HistoryUtils.newHistory(ShowDisposalConfirmation.RESOLVER);
     } else {
-      BrowserService.Util.getInstance().createDisposalConfirmationReport(selectedItemsList, title.getText(),
-        disposalConfirmationExtra, new AsyncCallback<Job>() {
-          @Override
-          public void onFailure(Throwable throwable) {
+      DisposalConfirmationCreateRequest request = new DisposalConfirmationCreateRequest(title.getText(), selectedItemsList,
+        disposalConfirmationForm);
+      Services services = new Services("Create disposal confirmation", "create");
+      services.disposalConfirmationResource(s -> s.createDisposalConfirmation(request))
+        .whenComplete((job, throwable) -> {
+          if (throwable != null) {
             HistoryUtils.newHistory(InternalProcess.RESOLVER);
-          }
-
-          @Override
-          public void onSuccess(Job job) {
+          } else {
             Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
               @Override
@@ -201,7 +189,7 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
    */
   private boolean isValid() {
     List<String> errorList = new ArrayList<>();
-    if (title.getText().length() == 0) {
+    if (title.getText().isEmpty()) {
       title.addStyleName("isWrong");
       titleError.setText(messages.mandatoryField());
       titleError.setVisible(true);
@@ -212,7 +200,7 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
       titleError.setVisible(false);
     }
 
-    List<String> extraErrors = FormUtilities.validate(disposalConfirmationExtra.getValues(), extra);
+    List<String> extraErrors = FormUtilities.validate(disposalConfirmationForm.getValues(), extra);
     errorList.addAll(extraErrors);
 
     if (!errorList.isEmpty()) {
@@ -227,5 +215,8 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
       errors.setVisible(false);
     }
     return errorList.isEmpty();
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, CreateDisposalConfirmationDataPanel> {
   }
 }

@@ -107,6 +107,8 @@ import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.exceptions.RoleAlreadyExistsException;
 import org.roda.core.data.utils.YamlUtils;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
@@ -118,8 +120,6 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
@@ -291,8 +291,7 @@ public class RodaCoreFactory {
             }
           }
 
-          List<String> properties = RodaCoreFactory
-            .getRodaConfigurationAsList("ui.display.properties.tika.fixed");
+          List<String> properties = RodaCoreFactory.getRodaConfigurationAsList("ui.display.properties.tika.fixed");
           for (String propertyKey : properties) {
             if (messages.containsTranslation(propertyKey)) {
               sharedProperties.put("i18n." + propertyKey,

@@ -30,6 +30,9 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -45,9 +48,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -817,15 +817,15 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
-  public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId, String fileName, String type, String fileSuffix) throws RequestNotValidException {
+  public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId, String fileName,
+    String type, String fileSuffix) throws RequestNotValidException {
 
     List<String> path;
     if (aipId != null && representationId != null && fileName != null && fileSuffix != null && type != null) {
       // other metadata pertaining to a file
       path = getRepresentationOtherMetadataPath(aipId, representationId, type);
       path.add(fileName + fileSuffix);
-    }
-    else if (aipId != null && representationId != null) {
+    } else if (aipId != null && representationId != null) {
       path = getRepresentationOtherMetadataPath(aipId, representationId, "");
     } else {
       throw new RequestNotValidException("AIP id cannot be null");

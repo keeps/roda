@@ -30,6 +30,16 @@ import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.ConversionProfile;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHolds;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -44,15 +54,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
@@ -74,7 +75,6 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -99,29 +99,6 @@ public interface BrowserService extends RemoteService {
    * Service location
    */
   static final String SERVICE_URI = "browserservice";
-
-  /**
-   * Utilities
-   *
-   */
-  public static class Util {
-
-    private Util() {
-      // do nothing
-    }
-
-    /**
-     * Get singleton instance
-     *
-     * @return the instance
-     */
-    public static BrowserServiceAsync getInstance() {
-      BrowserServiceAsync instance = (BrowserServiceAsync) GWT.create(BrowserService.class);
-      ServiceDefTarget target = (ServiceDefTarget) instance;
-      target.setServiceEntryPoint(GWT.getHostPageBaseURL() + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
-      return instance;
-    }
-  }
 
   BrowseAIPBundle retrieveBrowseAIPBundle(String aipId, String localeString, List<String> aipFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
@@ -173,7 +150,8 @@ public interface BrowserService extends RemoteService {
     GenericException, ValidationException, NotFoundException, RequestNotValidException;
 
   String createTransferredResourcesFolder(String parent, String folderName, boolean commit)
-      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException;
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException;
 
   void deleteTransferredResources(SelectedItems<TransferredResource> selected)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
@@ -427,7 +405,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   void deleteDisposalRule(String disposalRuleId)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException;
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException, IOException;
 
   Job applyDisposalRules(boolean applyToManuallyInclusive)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
@@ -481,10 +459,10 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
-    DisposalConfirmationExtraBundle metadata)
+    DisposalConfirmationForm metadata)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
-  DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle() throws RODAException;
+  DisposalConfirmationForm retrieveDisposalConfirmationExtraBundle() throws RODAException;
 
   Job deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmation> selectedItems, String details)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException;
@@ -584,4 +562,27 @@ public interface BrowserService extends RemoteService {
 
   List<Report> retrieveJobReportItems(String jobId, String jobReportId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  /**
+   * Utilities
+   *
+   */
+  public static class Util {
+
+    private Util() {
+      // do nothing
+    }
+
+    /**
+     * Get singleton instance
+     *
+     * @return the instance
+     */
+    public static BrowserServiceAsync getInstance() {
+      BrowserServiceAsync instance = (BrowserServiceAsync) GWT.create(BrowserService.class);
+      ServiceDefTarget target = (ServiceDefTarget) instance;
+      target.setServiceEntryPoint(GWT.getHostPageBaseURL() + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
+      return instance;
+    }
+  }
 }

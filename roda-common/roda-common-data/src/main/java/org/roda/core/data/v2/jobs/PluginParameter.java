@@ -432,7 +432,7 @@ public class PluginParameter implements Serializable {
     private final PluginParameter.PluginParameterType type;
 
     // optional parameters
-    private String defaultValue;
+    private String defaultValue = "";
     private List<String> possibleValues = new ArrayList<>();
     private boolean mandatory = true;
     private boolean readOnly = false;

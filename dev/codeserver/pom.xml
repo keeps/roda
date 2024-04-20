@@ -45,6 +45,11 @@
         <dependency>
             <groupId>org.roda-project</groupId>
             <artifactId>roda-common-data</artifactId>
+            <version>${roda.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.roda-project</groupId>
+            <artifactId>roda-common-data</artifactId>
             <classifier>sources</classifier>
             <version>${roda.version}</version>
         </dependency>
@@ -52,11 +57,6 @@
             <groupId>com.ekotrope</groupId>
             <artifactId>gwt-completablefuture</artifactId>
             <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.roda-project</groupId>
-            <artifactId>roda-common-data</artifactId>
-            <version>${roda.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -72,7 +72,7 @@
         <dependency>
             <groupId>org.fusesource.restygwt</groupId>
             <artifactId>restygwt</artifactId>
-            <version>2.2.10-keeps</version>
+            <version>2.2.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>

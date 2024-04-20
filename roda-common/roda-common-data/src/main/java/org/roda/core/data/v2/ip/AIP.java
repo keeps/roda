@@ -14,9 +14,10 @@ import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
+
+import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -70,8 +71,8 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
     this(id, parentId, type, null, state, permissions, new ArrayList<DescriptiveMetadata>(),
-      new ArrayList<Representation>(), new AIPFormat(), new ArrayList<>(), new Date(), createdBy,
-      new Date(), createdBy, new DisposalAIPMetadata());
+      new ArrayList<Representation>(), new AIPFormat(), new ArrayList<>(), new Date(), createdBy, new Date(), createdBy,
+      new DisposalAIPMetadata());
   }
 
   public AIP(String id, String parentId, String type, String instanceId, AIPState state, Permissions permissions,

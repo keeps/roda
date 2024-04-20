@@ -9,7 +9,7 @@ package org.roda.wui.client.disposal;
 
 import java.util.List;
 
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalConfirmationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -40,6 +40,8 @@ import config.i18n.client.ClientMessages;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class DisposalConfirmations extends Composite {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static DisposalConfirmations instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -62,27 +64,15 @@ public class DisposalConfirmations extends Composite {
       return "confirmations";
     }
   };
-
-  private static DisposalConfirmations instance = null;
-
-  interface MyUiBinder extends UiBinder<Widget, DisposalConfirmations> {
-  }
-
   private static DisposalConfirmations.MyUiBinder uiBinder = GWT.create(DisposalConfirmations.MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   @UiField
   FlowPanel disposalConfirmationDescription;
-
   @UiField(provided = true)
   SearchWrapper searchWrapper;
-
   @UiField
   SimplePanel actionsSidebar;
-
   @UiField
   FlowPanel contentFlowPanel;
-
   @UiField
   FlowPanel sidebarFlowPanel;
 
@@ -136,5 +126,8 @@ public class DisposalConfirmations extends Composite {
         CreateDisposalConfirmation.RESOLVER.resolve(historyTokens, callback);
       }
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, DisposalConfirmations> {
   }
 }

@@ -15,6 +15,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -29,15 +31,15 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalScheduleAIPMetadata;
+import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
@@ -62,13 +64,11 @@ import org.testng.annotations.Test;
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class DisposalScheduleTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(DisposalScheduleTest.class);
-
-  private Path basePath;
-  private Path storagePath;
-
-  private ModelService model;
   private static StorageService corporaService;
   private static IndexService index;
+  private Path basePath;
+  private Path storagePath;
+  private ModelService model;
 
   @BeforeClass
   public void setUp() throws Exception {
@@ -122,6 +122,22 @@ public class DisposalScheduleTest {
     model.deleteDisposalSchedule(disposalSchedule.getId());
 
     assertFalse(Files.exists(FSUtils.getEntityPath(storagePath, disposalScheduleStoragePath)));
+  }
+
+  @Test
+  public void testUpdateDisposalScheduleWithFirstTimeUsedSet() throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException, IllegalOperationException {
+    DisposalSchedule disposalSchedule = createDisposalSchedule();
+    Date firstTimeUsed = new Date();
+    disposalSchedule.setFirstTimeUsed(firstTimeUsed);
+    model.updateDisposalSchedule(disposalSchedule, "admin");
+    LocalDate localDate = LocalDate.of(2014, 2, 14);
+    Date date = Date.from(localDate.atStartOfDay().toInstant(ZoneOffset.UTC));
+
+    disposalSchedule.setFirstTimeUsed(date);
+    DisposalSchedule updatedDisposalSchedule = model.updateDisposalSchedule(disposalSchedule, "admin");
+
+    assertEquals(updatedDisposalSchedule.getFirstTimeUsed(), firstTimeUsed);
   }
 
   @Test

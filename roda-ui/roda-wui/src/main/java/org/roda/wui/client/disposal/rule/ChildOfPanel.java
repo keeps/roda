@@ -10,11 +10,10 @@ package org.roda.wui.client.disposal.rule;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.HTML;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.ip.disposal.ConditionType;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.ConditionType;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.wui.client.ingest.process.PluginParameterPanel;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -42,14 +41,9 @@ import config.i18n.client.ClientMessages;
 public class ChildOfPanel extends Composite implements HasValueChangeHandlers<Pair<String, String>> {
 
   public static final String IS_WRONG = "isWrong";
-
-  interface MyUiBinder extends UiBinder<Widget, ChildOfPanel> {
-  }
-
-  private static ChildOfPanel.MyUiBinder uiBinder = GWT.create(ChildOfPanel.MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static ChildOfPanel.MyUiBinder uiBinder = GWT.create(ChildOfPanel.MyUiBinder.class);
+  private final boolean editMode;
   @UiField
   Label pluginParameterPanelError;
 
@@ -61,12 +55,8 @@ public class ChildOfPanel extends Composite implements HasValueChangeHandlers<Pa
 
   @UiField
   HorizontalPanel editPanel;
-
-  private final boolean editMode;
-
   private String aipId;
   private String aipName;
-
   private boolean changed = false;
   private boolean checked = false;
 
@@ -115,9 +105,10 @@ public class ChildOfPanel extends Composite implements HasValueChangeHandlers<Pa
   }
 
   private void initPluginParameterPanel() {
-    pluginParameterPanel = new PluginParameterPanel(new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
-      messages.selectParentTitle(), PluginParameter.PluginParameterType.AIP_ID, "", false, false,
-      "Use the provided parent node if the SIPs does not provide one."));
+    pluginParameterPanel = new PluginParameterPanel(
+      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_PARENT_ID, messages.selectParentTitle(),
+        PluginParameter.PluginParameterType.AIP_ID).withDescription("").isMandatory(false).isReadOnly(false)
+        .withDescription("Use the provided parent node if the SIPs does not provide one.").build());
     pluginParameterPanel.getLayout().removeStyleName("plugin-options-parameter");
   }
 
@@ -174,4 +165,6 @@ public class ChildOfPanel extends Composite implements HasValueChangeHandlers<Pa
     return childOfFields;
   }
 
+  interface MyUiBinder extends UiBinder<Widget, ChildOfPanel> {
+  }
 }

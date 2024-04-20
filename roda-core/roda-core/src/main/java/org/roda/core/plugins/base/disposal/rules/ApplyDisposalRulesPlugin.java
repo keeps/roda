@@ -25,8 +25,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -50,9 +50,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ApplyDisposalRulesPlugin.class);
-
-  private boolean overrideManualAssociations = false;
-
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
@@ -60,6 +57,16 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL, "Override disposal schedule",
         PluginParameter.PluginParameterType.BOOLEAN, "false", true, false,
         "Overrides disposal schedules manually associated"));
+  }
+
+  private boolean overrideManualAssociations = false;
+
+  public static String getStaticName() {
+    return "Disposal schedule association via disposal rule";
+  }
+
+  public static String getStaticDescription() {
+    return "Associates a disposal schedule to an AIP via rules previously defined for the repository.";
   }
 
   @Override
@@ -83,17 +90,9 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
     return "1.0";
   }
 
-  public static String getStaticName() {
-    return "Disposal schedule association via disposal rule";
-  }
-
   @Override
   public String getName() {
     return getStaticName();
-  }
-
-  public static String getStaticDescription() {
-    return "Associates a disposal schedule to an AIP via rules previously defined for the repository.";
   }
 
   @Override

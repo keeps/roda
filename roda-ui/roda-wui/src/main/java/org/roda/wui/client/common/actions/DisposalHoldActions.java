@@ -13,12 +13,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.jobs.Job;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -27,6 +24,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -42,26 +40,9 @@ import config.i18n.client.ClientMessages;
 public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
   private static final DisposalHoldActions INSTANCE = new DisposalHoldActions();
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private DisposalHold disposalHold;
-
   private static final Set<DisposalHoldAction> POSSIBLE_ACTIONS_ON_DISPOSAL_HOLD = new HashSet<>(
     Arrays.asList(DisposalHoldAction.DISASSOCIATE));
-
-  public enum DisposalHoldAction implements Action<IndexedAIP> {
-    DISASSOCIATE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD);
-
-    private List<String> methods;
-
-    DisposalHoldAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
-  }
+  private DisposalHold disposalHold;
 
   public DisposalHoldActions() {
   }
@@ -121,16 +102,13 @@ public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
             @Override
             public void onSuccess(Boolean result) {
               if (result) {
-                BrowserService.Util.getInstance().liftDisposalHold(aips, disposalHold.getId(),
-                  new ActionAsyncCallback<Job>(callback) {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      callback.onFailure(caught);
+                Services services = new Services("Lift disposal hold", "job");
+                services.disposalHoldResource(s -> s.liftDisposalHoldBySelectedItems(aips, disposalHold.getId()))
+                  .whenComplete((job, throwable) -> {
+                    if (throwable != null) {
+                      callback.onFailure(throwable);
                       HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                    }
-
-                    @Override
-                    public void onSuccess(Job job) {
+                    } else {
                       Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                         @Override
@@ -175,6 +153,21 @@ public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
 
     disposalHoldActionableBundle.addGroup(managementGroup);
     return disposalHoldActionableBundle;
+  }
+
+  public enum DisposalHoldAction implements Action<IndexedAIP> {
+    DISASSOCIATE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD);
+
+    private List<String> methods;
+
+    DisposalHoldAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
 }

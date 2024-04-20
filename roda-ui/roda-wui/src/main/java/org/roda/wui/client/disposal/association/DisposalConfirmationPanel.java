@@ -12,13 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
@@ -41,25 +40,16 @@ import config.i18n.client.ClientMessages;
 public class DisposalConfirmationPanel extends Composite {
   private static final List<String> fieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.DISPOSAL_CONFIRMATION_ID, RodaConstants.DISPOSAL_CONFIRMATION_TITLE));
-
-  interface MyUiBinder extends UiBinder<Widget, DisposalConfirmationPanel> {
-  }
-
-  private static DisposalConfirmationPanel.MyUiBinder uiBinder = GWT.create(DisposalConfirmationPanel.MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static DisposalConfirmationPanel.MyUiBinder uiBinder = GWT.create(DisposalConfirmationPanel.MyUiBinder.class);
   @UiField
   FlowPanel disposalConfirmationPanel;
-
   @UiField
   FlowPanel confirmationInfo;
-
   @UiField
   Label disposalConfirmationCreationDate;
-
   @UiField
   FlowPanel content;
-
   private DisposalConfirmation disposalConfirmation;
 
   public DisposalConfirmationPanel(String disposalConfirmationId) {
@@ -69,11 +59,13 @@ public class DisposalConfirmationPanel extends Composite {
       disposalConfirmationPanel.clear();
     } else {
 
-      BrowserService.Util.getInstance().retrieve(DisposalConfirmation.class.getName(), disposalConfirmationId,
-        fieldsToReturn, new NoAsyncCallback<IsIndexed>() {
-          @Override
-          public void onSuccess(IsIndexed isIndexed) {
-            disposalConfirmation = (DisposalConfirmation) isIndexed;
+      Services services = new Services("Retrieve disposal confirmation", "get");
+      services.rodaEntityRestService(s -> s.findByUuid(disposalConfirmationId), DisposalConfirmation.class)
+        .whenComplete((result, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            disposalConfirmation = result;
             init();
           }
         });
@@ -132,5 +124,8 @@ public class DisposalConfirmationPanel extends Composite {
     panel.add(value);
 
     return panel;
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, DisposalConfirmationPanel> {
   }
 }

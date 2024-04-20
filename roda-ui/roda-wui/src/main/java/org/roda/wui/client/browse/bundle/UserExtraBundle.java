@@ -10,7 +10,7 @@ package org.roda.wui.client.browse.bundle;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.roda.wui.client.browse.MetadataValue;
+import org.roda.core.data.v2.generics.MetadataValue;
 
 public class UserExtraBundle implements Bundle {
 

@@ -36,7 +36,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public final class JsonUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtils.class);
@@ -94,7 +93,6 @@ public final class JsonUtils {
     String ret = null;
     try {
       ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-      mapper.registerModule(new JavaTimeModule());
       addMixinsToMapper(mapper, object, mixin);
       ret = mapper.writeValueAsString(object);
     } catch (IOException e) {

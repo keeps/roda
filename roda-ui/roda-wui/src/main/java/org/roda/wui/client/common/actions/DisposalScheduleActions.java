@@ -27,6 +27,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -119,16 +120,13 @@ public class DisposalScheduleActions extends AbstractActionable<IndexedAIP> {
             @Override
             public void onSuccess(Boolean result) {
               if (result) {
-                BrowserService.Util.getInstance().disassociateDisposalSchedule(items,
-                  new ActionAsyncCallback<Job>(callback) {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      callback.onFailure(caught);
+                Services services = new Services("Disassociate disposal schedule from AIP", "job");
+                services.disposalScheduleResource(s -> s.disassociatedDisposalSchedule(items))
+                  .whenComplete((job, throwable) -> {
+                    if (throwable != null) {
+                      callback.onFailure(throwable);
                       HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                    }
-
-                    @Override
-                    public void onSuccess(Job job) {
+                    } else {
                       Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                         @Override

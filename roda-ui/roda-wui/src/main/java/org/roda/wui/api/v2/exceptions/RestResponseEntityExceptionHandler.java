@@ -4,7 +4,10 @@ import java.util.UUID;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.DisposalHoldNotValidException;
+import org.roda.core.data.exceptions.DisposalScheduleNotValidException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -27,32 +30,43 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
   @ExceptionHandler(value = {RESTException.class})
   protected ResponseEntity<Object> handleRestException(RuntimeException ex, WebRequest request) {
     String message = "Internal server error";
+    String details = "";
     HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     UUID errorID = UUID.randomUUID();
 
     if (ex.getCause() instanceof AuthorizationDeniedException) {
       message = "Unauthorized access";
+      details = ex.getCause().getMessage();
       httpStatus = HttpStatus.UNAUTHORIZED;
     } else if (ex.getCause() instanceof NotFoundException) {
       message = "Resource not found";
+      details = ex.getCause().getMessage();
       httpStatus = HttpStatus.NOT_FOUND;
     } else if (ex.getCause() instanceof AlreadyExistsException) {
       message = "Resource already exists";
+      details = ex.getCause().getMessage();
       httpStatus = HttpStatus.CONFLICT;
     } else if (ex.getCause() instanceof IsStillUpdatingException) {
       message = "Resource still updating";
+      details = ex.getCause().getMessage();
       httpStatus = HttpStatus.CONFLICT;
-    } else if (ex.getCause() instanceof GenericException
-        || ex.getCause() instanceof RequestNotValidException
-        || ex.getCause() instanceof JobStateNotPendingException) {
+    } else if (ex.getCause() instanceof IllegalOperationException) {
+      message = "Operation is forbidden";
+      details = ex.getCause().getMessage();
+      httpStatus = HttpStatus.FORBIDDEN;
+    } else if (ex.getCause() instanceof GenericException || ex.getCause() instanceof RequestNotValidException
+      || ex.getCause() instanceof JobStateNotPendingException
+      || ex.getCause() instanceof DisposalScheduleNotValidException
+      || ex.getCause() instanceof DisposalHoldNotValidException) {
       message = "Request was not valid";
+      details = ex.getCause().getMessage();
       httpStatus = HttpStatus.BAD_REQUEST;
     }
 
     String warn = "ERROR_ID: " + errorID + " - " + ex.getClass().getSimpleName() + ": " + ex.getMessage();
     LoggerFactory.getLogger(RestResponseEntityExceptionHandler.class).warn(warn);
 
-    ErrorResponseMessage body = new ErrorResponseMessage(httpStatus.value(), errorID.toString(), message,
+    ErrorResponseMessage body = new ErrorResponseMessage(httpStatus.value(), errorID.toString(), message, details,
       ((ServletWebRequest) request).getRequest().getRequestURI());
 
     HttpHeaders responseHeaders = new HttpHeaders();

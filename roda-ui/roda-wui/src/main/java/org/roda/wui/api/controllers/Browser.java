@@ -21,13 +21,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import jakarta.ws.rs.core.MultivaluedMap;
-
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.v2.ConsumesOutputStream;
-import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.common.Messages;
-import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -37,8 +32,20 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
+import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.EntityResponse;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHolds;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -57,14 +64,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
@@ -101,6 +100,8 @@ import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 import org.roda.wui.common.model.RequestContext;
+
+import jakarta.ws.rs.core.MultivaluedMap;
 
 public class Browser extends RodaWuiController {
 
@@ -1965,8 +1966,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static TransferredResource createTransferredResourcesFolder(User user, String parentUUID, String folderName,
-    boolean forceCommit)
-      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException {
+    boolean forceCommit) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
+    NotFoundException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -2179,6 +2180,7 @@ public class Browser extends RodaWuiController {
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.LOCALE, locale);
     }
   }
+
   @Deprecated
   public static EntityResponse retrieveTransferredResource(User user, String resourceId, String acceptFormat)
     throws RODAException {
@@ -3699,7 +3701,7 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return RodaCoreFactory.getModelService().listDisposalHoldsAssociation(aipId);
+      return RodaCoreFactory.getModelService().listDisposalHoldsAssociation(aipId).getObjects();
     } catch (NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3759,7 +3761,9 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return RodaCoreFactory.getModelService().listTransitiveDisposalHolds(aipId);
+      DisposalTransitiveHoldsAIPMetadata disposalTransitiveHoldsAIPMetadata = RodaCoreFactory.getModelService()
+        .listTransitiveDisposalHolds(aipId);
+      return disposalTransitiveHoldsAIPMetadata.getObjects();
     } catch (NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw e;

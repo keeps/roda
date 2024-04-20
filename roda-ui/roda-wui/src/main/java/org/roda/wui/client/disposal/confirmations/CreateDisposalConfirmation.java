@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
+import org.roda.core.data.v2.disposal.schedule.RetentionPeriodCalculation;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -18,8 +20,6 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
@@ -71,7 +71,10 @@ public class CreateDisposalConfirmation extends Composite {
 
   private static final Filter SHOW_RECORDS_WITH_RETENTION_PERIOD_ERRORS = new Filter(new SimpleFilterParameter(
     RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.ERROR.name()));
-
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static CreateDisposalConfirmation.MyUiBinder uiBinder = GWT
+    .create(CreateDisposalConfirmation.MyUiBinder.class);
+  private static CreateDisposalConfirmation instance;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -93,15 +96,6 @@ public class CreateDisposalConfirmation extends Composite {
       return "create_confirmation";
     }
   };
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  interface MyUiBinder extends UiBinder<Widget, CreateDisposalConfirmation> {
-  }
-
-  private static CreateDisposalConfirmation.MyUiBinder uiBinder = GWT
-    .create(CreateDisposalConfirmation.MyUiBinder.class);
-
   @UiField(provided = true)
   SearchWrapper overdueRecordsSearch;
 
@@ -119,10 +113,7 @@ public class CreateDisposalConfirmation extends Composite {
 
   @UiField
   FlowPanel content;
-
-  private static CreateDisposalConfirmation instance;
   private SelectedItems<IndexedAIP> selected = null;
-
   private final AsyncCallback<Actionable.ActionImpact> listActionableCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
     @Override
     public void onSuccess(Actionable.ActionImpact impact) {
@@ -131,23 +122,6 @@ public class CreateDisposalConfirmation extends Composite {
       }
     }
   };
-
-  public static CreateDisposalConfirmation getInstance() {
-    if (instance == null) {
-      instance = new CreateDisposalConfirmation();
-    }
-
-    return instance;
-  }
-
-  public SelectedItems<IndexedAIP> getSelected() {
-    return selected;
-  }
-
-  public void clear() {
-    instance = null;
-    selected = null;
-  }
 
   /**
    * Create a new panel to create a disposal confirmation
@@ -164,6 +138,23 @@ public class CreateDisposalConfirmation extends Composite {
     configureDisposalAction();
 
     createDisposalConfirmationDescription.add(new HTMLWidgetWrapper("CreateDisposalConfirmationDescription.html"));
+  }
+
+  public static CreateDisposalConfirmation getInstance() {
+    if (instance == null) {
+      instance = new CreateDisposalConfirmation();
+    }
+
+    return instance;
+  }
+
+  public SelectedItems<IndexedAIP> getSelected() {
+    return selected;
+  }
+
+  public void clear() {
+    instance = null;
+    selected = null;
   }
 
   private void configureDisposalAction() {
@@ -209,5 +200,8 @@ public class CreateDisposalConfirmation extends Composite {
         CreateDisposalConfirmationDataPanel.RESOLVER.resolve(historyTokens, callback);
       }
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, CreateDisposalConfirmation> {
   }
 }

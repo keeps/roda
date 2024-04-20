@@ -10,11 +10,11 @@ package org.roda.wui.client.disposal.hold;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -36,35 +36,24 @@ import config.i18n.client.ClientMessages;
  */
 public class DisposalHoldDataPanel extends Composite implements HasValueChangeHandlers<DisposalHold> {
 
-  interface MyUiBinder extends UiBinder<Widget, DisposalHoldDataPanel> {
-  }
-
-  private static DisposalHoldDataPanel.MyUiBinder uiBinder = GWT.create(DisposalHoldDataPanel.MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static DisposalHoldDataPanel.MyUiBinder uiBinder = GWT.create(DisposalHoldDataPanel.MyUiBinder.class);
   @UiField
   TextBox title;
-
   @UiField
   Label titleError;
-
   @UiField
   TextBox description;
-
   @UiField
   TextBox mandate;
-
   @UiField
   TextArea notes;
-
+  @UiField
+  HTML errors;
   private boolean editMode;
 
   private boolean changed = false;
   private boolean checked = false;
-
-  @UiField
-  HTML errors;
 
   public DisposalHoldDataPanel(DisposalHold disposalHold, boolean editMode) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -84,13 +73,6 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
     }
   }
 
-  public void setDisposalHold(DisposalHold disposalHold) {
-    this.title.setText(disposalHold.getTitle());
-    this.description.setText(disposalHold.getDescription());
-    this.mandate.setText(disposalHold.getMandate());
-    this.notes.setText(disposalHold.getScopeNotes());
-  }
-
   public DisposalHold getDisposalHold() {
     DisposalHold disposalHold = new DisposalHold();
     disposalHold.setTitle(title.getText());
@@ -98,6 +80,13 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
     disposalHold.setMandate(mandate.getText());
     disposalHold.setScopeNotes(notes.getText());
     return disposalHold;
+  }
+
+  public void setDisposalHold(DisposalHold disposalHold) {
+    this.title.setText(disposalHold.getTitle());
+    this.description.setText(disposalHold.getDescription());
+    this.mandate.setText(disposalHold.getMandate());
+    this.notes.setText(disposalHold.getScopeNotes());
   }
 
   /**
@@ -165,6 +154,9 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
 
   public DisposalHold getValue() {
     return getDisposalHold();
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, DisposalHoldDataPanel> {
   }
 
 }

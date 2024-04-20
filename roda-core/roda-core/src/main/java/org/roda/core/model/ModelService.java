@@ -86,20 +86,22 @@ import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
-import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationAIPEntry;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
+import org.roda.core.data.v2.disposal.hold.DisposalHolds;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
+import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -354,11 +356,12 @@ public class ModelService extends ModelObservable {
     User user = this.retrieveUser(createdBy);
     Permissions inheritedPermissions = new Permissions();
 
-    if (parentId!=null) {
+    if (parentId != null) {
       inheritedPermissions = this.retrieveAIP(parentId).getPermissions();
     }
 
-    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions), Optional.of(permissions));
+    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions),
+      Optional.of(permissions));
 
     AIP aip = new AIP(id, parentId, type, state, finalPermissions, createdBy);
 
@@ -404,11 +407,12 @@ public class ModelService extends ModelObservable {
     User user = this.retrieveUser(createdBy);
     Permissions inheritedPermissions = new Permissions();
 
-    if (parentId!=null) {
+    if (parentId != null) {
       inheritedPermissions = this.retrieveAIP(parentId).getPermissions();
     }
 
-    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions), Optional.of(permissions));
+    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions),
+      Optional.of(permissions));
 
     AIP aip = new AIP(id, parentId, type, state, finalPermissions, createdBy);
     // Instance Id Management
@@ -432,11 +436,12 @@ public class ModelService extends ModelObservable {
 
     User user = this.retrieveUser(createdBy);
     Permissions inheritedPermissions = new Permissions();
-    if (parentId!=null) {
+    if (parentId != null) {
       inheritedPermissions = this.retrieveAIP(parentId).getPermissions();
     }
 
-    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions), Optional.of(permissions));
+    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions),
+      Optional.of(permissions));
 
     AIP aip = new AIP(id, parentId, type, state, finalPermissions, createdBy).setIngestSIPIds(ingestSIPIds)
       .setIngestJobId(ingestJobId).setIngestSIPUUID(ingestSIPUUID);
@@ -3716,24 +3721,35 @@ public class ModelService extends ModelObservable {
     AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    if (disposalHold.getId() == null) {
-      disposalHold.setId(IdUtils.createUUID());
-    }
+    DisposalHold newDisposalHold = new DisposalHold(IdUtils.createUUID(), disposalHold.getTitle(),
+      disposalHold.getDescription(), disposalHold.getMandate(), disposalHold.getScopeNotes());
+    newDisposalHold.setCreatedOn(new Date());
+    newDisposalHold.setCreatedBy(createdBy);
+    newDisposalHold.setUpdatedOn(new Date());
+    newDisposalHold.setUpdatedBy(createdBy);
 
-    disposalHold.setCreatedOn(new Date());
-    disposalHold.setCreatedBy(createdBy);
-    disposalHold.setUpdatedOn(new Date());
-    disposalHold.setUpdatedBy(createdBy);
-
-    String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
-    StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
+    String disposalHoldAsJson = JsonUtils.getJsonFromObject(newDisposalHold);
+    StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(newDisposalHold.getId());
     storage.createBinary(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false);
 
-    return disposalHold;
+    return newDisposalHold;
   }
 
-  public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy) throws RequestNotValidException,
-    NotFoundException, GenericException, AuthorizationDeniedException, IllegalOperationException {
+  public DisposalHold updateDisposalHoldFirstUseDate(DisposalHold disposalHold, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, IllegalOperationException,
+    GenericException {
+    return updateDisposalHold(disposalHold, updatedBy, true);
+  }
+
+  public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, IllegalOperationException,
+    GenericException {
+    return updateDisposalHold(disposalHold, updatedBy, false);
+  }
+
+  public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy, boolean updateFirstUseDate)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+    IllegalOperationException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     // Check if disposal hold is ACTIVE to update
@@ -3743,15 +3759,26 @@ public class ModelService extends ModelObservable {
         + ". Reason: Disposal hold is lifted therefore can not change its content");
     }
 
-    disposalHold.setUpdatedOn(new Date());
-    disposalHold.setUpdatedBy(updatedBy);
+    currentDisposalHold.setUpdatedOn(new Date());
+    currentDisposalHold.setUpdatedBy(updatedBy);
+    currentDisposalHold.setTitle(disposalHold.getTitle());
+    currentDisposalHold.setDescription(disposalHold.getDescription());
+    currentDisposalHold.setMandate(disposalHold.getMandate());
+    currentDisposalHold.setScopeNotes(disposalHold.getScopeNotes());
+    currentDisposalHold.setState(disposalHold.getState());
+    currentDisposalHold.setLiftedOn(disposalHold.getLiftedOn());
+    currentDisposalHold.setLiftedBy(disposalHold.getLiftedBy());
 
-    String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
-    StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
+    if (updateFirstUseDate) {
+      currentDisposalHold.setFirstTimeUsed(disposalHold.getFirstTimeUsed());
+    }
+
+    String disposalHoldAsJson = JsonUtils.getJsonFromObject(currentDisposalHold);
+    StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(currentDisposalHold.getId());
 
     storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
 
-    return disposalHold;
+    return currentDisposalHold;
   }
 
   public void deleteDisposalHold(String disposalHoldId) throws RequestNotValidException, NotFoundException,
@@ -3905,14 +3932,35 @@ public class ModelService extends ModelObservable {
         + ". Reason: Disposal schedule is inactive therefore can not change its content");
     }
 
-    disposalSchedule.setUpdatedOn(new Date());
-    disposalSchedule.setUpdatedBy(updatedBy);
+    currentDisposalSchedule.setTitle(disposalSchedule.getTitle());
+    currentDisposalSchedule.setDescription(disposalSchedule.getDescription());
+    currentDisposalSchedule.setMandate(disposalSchedule.getMandate());
+    currentDisposalSchedule.setScopeNotes(disposalSchedule.getScopeNotes());
+    currentDisposalSchedule.setUpdatedOn(new Date());
+    currentDisposalSchedule.setUpdatedBy(updatedBy);
 
-    String disposalScheduleAsJson = JsonUtils.getJsonFromObject(disposalSchedule);
-    StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalSchedule.getId());
+    try {
+      DisposalRules disposalRules = listDisposalRules();
+      Optional<DisposalRule> first = disposalRules.getObjects().stream()
+        .filter(p -> p.getDisposalScheduleId().equals(disposalSchedule.getId())).findFirst();
+
+      if (first.isEmpty() && (currentDisposalSchedule.getApiCounter() <= 0
+        || !DisposalScheduleState.INACTIVE.equals(currentDisposalSchedule.getState()))) {
+        currentDisposalSchedule.setState(disposalSchedule.getState());
+      }
+    } catch (IOException e) {
+      throw new GenericException("Failed to obtain disposal rules", e);
+    }
+
+    if (currentDisposalSchedule.getFirstTimeUsed() == null) {
+      currentDisposalSchedule.setFirstTimeUsed(disposalSchedule.getFirstTimeUsed());
+    }
+
+    String disposalScheduleAsJson = JsonUtils.getJsonFromObject(currentDisposalSchedule);
+    StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(currentDisposalSchedule.getId());
     storage.updateBinaryContent(disposalSchedulePath, new StringContentPayload(disposalScheduleAsJson), false, false);
 
-    return disposalSchedule;
+    return currentDisposalSchedule;
   }
 
   public DisposalSchedule retrieveDisposalSchedule(String disposalScheduleId)
@@ -3965,13 +4013,26 @@ public class ModelService extends ModelObservable {
 
     // check if the disposal schedule was used to destroy an AIP
     // if so, block the action and keep the disposal schedule
-    if (retrieveDisposalSchedule(disposalScheduleId).getFirstTimeUsed() == null) {
-      // remove it from storage
-      storage.deleteResource(disposalSchedulePath);
-    } else {
+    if (retrieveDisposalSchedule(disposalScheduleId).getFirstTimeUsed() != null) {
       throw new IllegalOperationException("Error deleting disposal schedule: " + disposalScheduleId
         + ". Reason: One or more AIPs where destroyed under this disposal schedule");
     }
+
+    // check if the disposal schedule is being used in a disposal rule
+    // if so, block the action and keep the disposal schedule
+    try {
+      DisposalRules disposalRules = listDisposalRules();
+      Optional<DisposalRule> first = disposalRules.getObjects().stream()
+        .filter(p -> p.getDisposalScheduleId().equals(disposalScheduleId)).findFirst();
+      if (first.isPresent()) {
+        throw new IllegalOperationException("Error deleting disposal schedule: " + disposalScheduleId
+          + ". Reason: This schedule is being used in a disposal rule");
+      }
+    } catch (IOException e) {
+      throw new GenericException("Failed to obtain the disposal rules", e);
+    }
+
+    storage.deleteResource(disposalSchedulePath);
   }
 
   /**********************************
@@ -4095,14 +4156,18 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public List<DisposalHoldAIPMetadata> listDisposalHoldsAssociation(String aipId)
+  public DisposalHoldsAIPMetadata listDisposalHoldsAssociation(String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return ResourceParseUtils.getAIPMetadata(getStorage(), aipId).getHolds();
+    DisposalHoldsAIPMetadata disposalHoldsAIPMetadata = new DisposalHoldsAIPMetadata();
+    disposalHoldsAIPMetadata.setObjects(ResourceParseUtils.getAIPMetadata(getStorage(), aipId).getHolds());
+    return disposalHoldsAIPMetadata;
   }
 
-  public List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(String aipId)
+  public DisposalTransitiveHoldsAIPMetadata listTransitiveDisposalHolds(String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return ResourceParseUtils.getAIPMetadata(getStorage(), aipId).getTransitiveHolds();
+    DisposalTransitiveHoldsAIPMetadata list = new DisposalTransitiveHoldsAIPMetadata();
+    list.setObjects(ResourceParseUtils.getAIPMetadata(getStorage(), aipId).getTransitiveHolds());
+    return list;
   }
 
   /************************************
@@ -4143,12 +4208,19 @@ public class ModelService extends ModelObservable {
     return disposalRule;
   }
 
-  public void deleteDisposalRule(String disposalRuleId)
-    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+  public void deleteDisposalRule(String disposalRuleId, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, IOException, GenericException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRuleId);
     storage.deleteResource(disposalRulePath);
+
+    DisposalRules disposalRules = listDisposalRules();
+    int index = 0;
+    for (DisposalRule rule : disposalRules.getObjects()) {
+      rule.setOrder(index++);
+      updateDisposalRule(rule, updatedBy);
+    }
   }
 
   public DisposalRule retrieveDisposalRule(String disposalRuleId)

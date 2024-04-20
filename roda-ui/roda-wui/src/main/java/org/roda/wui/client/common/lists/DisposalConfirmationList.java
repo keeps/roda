@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -42,19 +42,17 @@ import config.i18n.client.ClientMessages;
  */
 public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmation> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.DISPOSAL_CONFIRMATION_TITLE, RodaConstants.DISPOSAL_CONFIRMATION_ID,
+    RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY, RodaConstants.DISPOSAL_CONFIRMATION_STATE,
+    RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON, RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS,
+    RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE);
   private TextColumn<DisposalConfirmation> titleColumn;
   private Column<DisposalConfirmation, Date> createdOnColumn;
   private TextColumn<DisposalConfirmation> createdByColumn;
   private Column<DisposalConfirmation, SafeHtml> stateColumn;
   private TextColumn<DisposalConfirmation> numberOfAIPsColumn;
   private TextColumn<DisposalConfirmation> sizeColumn;
-
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.DISPOSAL_CONFIRMATION_TITLE, RodaConstants.DISPOSAL_CONFIRMATION_ID,
-    RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY, RodaConstants.DISPOSAL_CONFIRMATION_STATE,
-    RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON, RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS,
-    RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE);
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<DisposalConfirmation> options) {

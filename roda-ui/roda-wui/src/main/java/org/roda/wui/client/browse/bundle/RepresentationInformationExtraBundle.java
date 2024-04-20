@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.wui.client.browse.MetadataValue;
+import org.roda.core.data.v2.generics.MetadataValue;
 
 public class RepresentationInformationExtraBundle implements Bundle {
   private static final long serialVersionUID = 3601928680426998750L;

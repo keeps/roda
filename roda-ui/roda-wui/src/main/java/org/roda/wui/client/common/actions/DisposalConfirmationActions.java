@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
@@ -28,21 +28,6 @@ import config.i18n.client.ClientMessages;
 public class DisposalConfirmationActions extends AbstractActionable<DisposalConfirmation> {
   private static final DisposalConfirmationActions INSTANCE = new DisposalConfirmationActions();
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  public enum DisposalConfirmationAction implements Action<DisposalConfirmation> {
-    NEW(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION);
-
-    private List<String> methods;
-
-    DisposalConfirmationAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
-  }
 
   private DisposalConfirmationActions() {
   }
@@ -94,5 +79,20 @@ public class DisposalConfirmationActions extends AbstractActionable<DisposalConf
     confirmationActionableBundle.addGroup(actionsGroup);
 
     return confirmationActionableBundle;
+  }
+
+  public enum DisposalConfirmationAction implements Action<DisposalConfirmation> {
+    NEW(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION);
+
+    private List<String> methods;
+
+    DisposalConfirmationAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 }

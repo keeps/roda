@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -24,7 +24,6 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -77,13 +76,40 @@ public class HistoryUtils {
   public static final String HISTORY_PERMISSION_SEP = ".";
 
   private static boolean USING_PORTAL_UI = false;
+  public static final HistoryResolver UUID_RESOLVER = new HistoryResolver() {
 
-  public static void initEndpoint(boolean usingPortalUI) {
-    HistoryUtils.USING_PORTAL_UI = usingPortalUI;
-  }
+    @Override
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+      if (historyTokens.size() == 2) {
+        String objectClass = historyTokens.get(0);
+        String objectUUID = historyTokens.get(1);
+        HistoryUtils.resolve(objectClass, objectUUID, true);
+      }
+      callback.onSuccess(null);
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      callback.onSuccess(true);
+    }
+
+    @Override
+    public String getHistoryToken() {
+      return "uuid";
+    }
+
+    @Override
+    public List<String> getHistoryPath() {
+      return new ArrayList<>();
+    }
+  };
 
   private HistoryUtils() {
     // do nothing
+  }
+
+  public static void initEndpoint(boolean usingPortalUI) {
+    HistoryUtils.USING_PORTAL_UI = usingPortalUI;
   }
 
   public static <T> List<T> tail(List<T> list) {
@@ -429,34 +455,6 @@ public class HistoryUtils {
       }
     }
   }
-
-  public static final HistoryResolver UUID_RESOLVER = new HistoryResolver() {
-
-    @Override
-    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 2) {
-        String objectClass = historyTokens.get(0);
-        String objectUUID = historyTokens.get(1);
-        HistoryUtils.resolve(objectClass, objectUUID, true);
-      }
-      callback.onSuccess(null);
-    }
-
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      callback.onSuccess(true);
-    }
-
-    @Override
-    public String getHistoryToken() {
-      return "uuid";
-    }
-
-    @Override
-    public List<String> getHistoryPath() {
-      return new ArrayList<>();
-    }
-  };
 
   public static List<String> getHistoryUuidResolver(String objectClass, String objectUUID) {
     return Arrays.asList(UUID_RESOLVER.getHistoryToken(), objectClass, objectUUID);

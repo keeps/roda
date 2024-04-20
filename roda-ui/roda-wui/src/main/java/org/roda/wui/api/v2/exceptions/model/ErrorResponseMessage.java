@@ -8,13 +8,15 @@ public class ErrorResponseMessage {
   private int status;
   private String errorId;
   private String message;
+  private String details;
   private Instant timestamp;
   private String instance;
 
-  public ErrorResponseMessage(int status, String errorId, String message, String instance) {
+  public ErrorResponseMessage(int status, String errorId, String message, String details, String instance) {
     this.status = status;
     this.errorId = errorId;
     this.message = message;
+    this.details = details;
     this.timestamp = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     this.instance = instance;
   }
@@ -23,16 +25,16 @@ public class ErrorResponseMessage {
     return status;
   }
 
-  public void setStatus(int status) {
-    this.status = status;
-  }
-
   public String getErrorId() {
     return errorId;
   }
 
   public String getMessage() {
     return message;
+  }
+
+  public String getDetails() {
+    return details;
   }
 
   public Instant getTimestamp() {

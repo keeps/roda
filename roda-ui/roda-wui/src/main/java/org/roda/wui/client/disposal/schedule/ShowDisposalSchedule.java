@@ -10,18 +10,16 @@ package org.roda.wui.client.disposal.schedule;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
+import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.DisposalPolicySummaryPanel;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalScheduleActions;
@@ -29,9 +27,12 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
+import org.roda.wui.client.services.DisposalRuleRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -40,13 +41,13 @@ import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -256,10 +257,12 @@ public class ShowDisposalSchedule extends Composite {
         deactivateScheduleButton.setText(messages.deactivateButton());
         deactivateScheduleButton.addClickHandler(clickEvent -> {
           disposalSchedule.setState(DisposalScheduleState.INACTIVE);
-          BrowserService.Util.getInstance().updateDisposalSchedule(disposalSchedule,
-            new NoAsyncCallback<DisposalSchedule>() {
-              @Override
-              public void onSuccess(DisposalSchedule disposalSchedule) {
+          Services services = new Services("Update disposal schedule", "update");
+          services.disposalScheduleResource(s -> s.updateDisposalSchedule(disposalSchedule))
+            .whenComplete((disposalSchedule1, throwable) -> {
+              if (throwable != null) {
+                AsyncCallbackUtils.defaultFailureTreatment(throwable);
+              } else {
                 HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
               }
             });
@@ -274,11 +277,14 @@ public class ShowDisposalSchedule extends Composite {
         deleteDisposalSchedule.addStyleName("btn btn-block btn-danger btn-delete");
         deleteDisposalSchedule.setText("Delete");
         deleteDisposalSchedule.addClickHandler(clickEvent -> {
-          BrowserService.Util.getInstance().deleteDisposalSchedule(disposalSchedule.getId(),
-            new NoAsyncCallback<Void>() {
-              @Override
-              public void onSuccess(Void result) {
-                Toast.showInfo("Delete", "Delete");
+          Services services = new Services("Delete disposal schedule", "delete");
+          services.disposalScheduleResource(s -> s.deleteDisposalSchedule(disposalSchedule.getId()))
+            .whenComplete((unused, throwable) -> {
+              if (throwable != null) {
+                AsyncCallbackUtils.defaultFailureTreatment(throwable);
+              } else {
+                Toast.showInfo(messages.disposalSchedulesTitle(),
+                  messages.deleteDisposalSchedule(disposalSchedule.getTitle()));
                 HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
               }
             });
@@ -300,6 +306,7 @@ public class ShowDisposalSchedule extends Composite {
     for (DisposalRule rule : disposalRules.getObjects()) {
       if (rule.getDisposalScheduleId().equals(disposalSchedule.getId())) {
         ret = true;
+        break;
       }
     }
     return ret;
@@ -307,19 +314,17 @@ public class ShowDisposalSchedule extends Composite {
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
-      BrowserService.Util.getInstance().retrieveDisposalSchedule(historyTokens.get(0),
-        new NoAsyncCallback<DisposalSchedule>() {
-          @Override
-          public void onSuccess(DisposalSchedule disposalSchedule) {
-            BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
-              @Override
-              public void onSuccess(DisposalRules disposalRules) {
-                ShowDisposalSchedule panel = new ShowDisposalSchedule(disposalSchedule, disposalRules);
-                callback.onSuccess(panel);
-              }
-            });
-          }
-        });
+      Services services = new Services("Retrieve disposal schedule", "get");
+      services.disposalScheduleResource(s -> s.retrieveDisposalSchedule(historyTokens.get(0)))
+        .thenCompose(schedule -> services.disposalRuleResource(DisposalRuleRestService::listDisposalRules)
+          .whenComplete((rules, throwable) -> {
+            if (throwable != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(throwable);
+            } else {
+              ShowDisposalSchedule panel = new ShowDisposalSchedule(schedule, rules);
+              callback.onSuccess(panel);
+            }
+          }));
     }
   }
 

@@ -8,7 +8,9 @@ import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.REST;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.notifications.Notification;
 
@@ -19,7 +21,8 @@ import com.google.gwt.core.client.GWT;
  */
 public class Services implements DirectRestService {
 
-  public Services() {
+  private Services() {
+    // Empty constructor
   }
 
   public Services(String operationReason, String operationType) {
@@ -37,6 +40,14 @@ public class Services implements DirectRestService {
       return GWT.create(JobReportRestService.class);
     } else if (NotificationRestService.class.equals(serviceClass)) {
       return GWT.create(NotificationRestService.class);
+    } else if (DisposalScheduleRestService.class.equals(serviceClass)) {
+      return GWT.create(DisposalScheduleRestService.class);
+    } else if (DisposalHoldRestService.class.equals(serviceClass)) {
+      return GWT.create(DisposalHoldRestService.class);
+    } else if (DisposalRuleRestService.class.equals(serviceClass)) {
+      return GWT.create(DisposalRuleRestService.class);
+    } else if (DisposalConfirmationRestService.class.equals(serviceClass)) {
+      return GWT.create(DisposalConfirmationRestService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
@@ -71,6 +82,10 @@ public class Services implements DirectRestService {
       service = GWT.create(TransferredResourceRestService.class);
     } else if (Notification.class.getName().equals(objectClassString)) {
       service = GWT.create(NotificationRestService.class);
+    } else if (IndexedAIP.class.getName().equals(objectClassString)) {
+      service = GWT.create(AIPRestService.class);
+    } else if (DisposalConfirmation.class.getName().equals(objectClassString)) {
+      service = GWT.create(DisposalScheduleRestService.class);
     } else {
       throw new IllegalArgumentException(objectClassString + " not supported");
     }
@@ -114,5 +129,22 @@ public class Services implements DirectRestService {
 
   public <T> CompletableFuture<T> notificationResource(CheckedFunction<NotificationRestService, T> method) {
     return future(NotificationRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> disposalScheduleResource(CheckedFunction<DisposalScheduleRestService, T> method) {
+    return future(DisposalScheduleRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> disposalHoldResource(CheckedFunction<DisposalHoldRestService, T> method) {
+    return future(DisposalHoldRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> disposalRuleResource(CheckedFunction<DisposalRuleRestService, T> method) {
+    return future(DisposalRuleRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> disposalConfirmationResource(
+    CheckedFunction<DisposalConfirmationRestService, T> method) {
+    return future(DisposalConfirmationRestService.class, method);
   }
 }

@@ -29,7 +29,7 @@ import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.MetadataValue;
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;

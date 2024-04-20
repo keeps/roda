@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 

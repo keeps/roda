@@ -13,12 +13,12 @@ import java.util.function.Function;
 
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;

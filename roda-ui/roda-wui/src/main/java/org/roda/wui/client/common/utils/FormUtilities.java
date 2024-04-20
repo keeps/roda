@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.roda.wui.client.browse.MetadataValue;
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.wui.client.common.RichTextToolbar;
 
 import com.google.gwt.core.client.GWT;

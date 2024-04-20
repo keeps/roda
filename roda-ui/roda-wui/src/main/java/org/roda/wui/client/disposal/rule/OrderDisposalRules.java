@@ -7,19 +7,24 @@
  */
 package org.roda.wui.client.disposal.rule;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
-import org.roda.core.data.v2.ip.disposal.ConditionType;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.core.data.v2.disposal.rule.ConditionType;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalRuleActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
+import org.roda.wui.client.services.DisposalRuleRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -52,14 +57,15 @@ public class OrderDisposalRules extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
-        @Override
-        public void onSuccess(DisposalRules disposalRules) {
-          OrderDisposalRules orderDisposalRules = new OrderDisposalRules(disposalRules);
+      Services services = new Services("List disposal rules", "get");
+      services.disposalRuleResource(DisposalRuleRestService::listDisposalRules).whenComplete((result, throwable) -> {
+        if (throwable != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
+        } else {
+          OrderDisposalRules orderDisposalRules = new OrderDisposalRules(result);
           callback.onSuccess(orderDisposalRules);
         }
       });
-
     }
 
     @Override
@@ -100,6 +106,7 @@ public class OrderDisposalRules extends Composite {
   private DisposalRule selectedRule;
   private int selectedIndex;
   private BasicTablePanel<DisposalRule> tableRules;
+
   public OrderDisposalRules(DisposalRules disposalRules) {
     initWidget(uiBinder.createAndBindUi(this));
     this.disposalRules = disposalRules;
@@ -279,14 +286,19 @@ public class OrderDisposalRules extends Composite {
       messages.dialogYes(), new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean aBoolean) {
-          BrowserService.Util.getInstance().updateDisposalRules(disposalRules, new NoAsyncCallback<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-              Toast.showInfo(messages.updateDisposalRulesOrderSuccessTitle(),
-                messages.updateDisposalRulesOrderSuccessMessage());
-              DisposalRuleActions.applyDisposalRulesAction();
-            }
-          });
+          Services services = new Services("Update multiple disposal rules", "update");
+          List<CompletableFuture<DisposalRule>> futures = new ArrayList<>();
+          for (DisposalRule rule : disposalRules.getObjects()) {
+            futures.add(services.disposalRuleResource(s -> s.updateDisposalRule(rule)).toCompletableFuture());
+          }
+          CompletableFuture<?>[] futuresArray = futures.toArray(new CompletableFuture<?>[0]);
+          CompletableFuture<List<DisposalRule>> listFuture = CompletableFuture.allOf(futuresArray)
+            .thenApply(v -> futures.stream().map(CompletableFuture::join).collect(Collectors.toList()));
+          listFuture.join();
+
+          Toast.showInfo(messages.updateDisposalRulesOrderSuccessTitle(),
+            messages.updateDisposalRulesOrderSuccessMessage());
+          DisposalRuleActions.applyDisposalRulesAction();
         }
       });
   }

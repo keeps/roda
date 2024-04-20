@@ -33,16 +33,16 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.disposal.confirmation.DestroyedSelectionState;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationAIPEntry;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.metadata.DisposalConfirmationAIPMetadata;
+import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DestroyedSelectionState;
-import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalConfirmationAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -69,17 +69,8 @@ import org.slf4j.LoggerFactory;
 public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(CreateDisposalConfirmationPlugin.class);
   private static final String EVENT_DESCRIPTION = "Disposal confirmation assign";
-
-  private final Set<String> disposalSchedules = new HashSet<>();
-  private final Set<String> disposalHolds = new HashSet<>();
-  private final Set<String> disposalHoldTransitives = new HashSet<>();
-  private long storageSize = 0L;
-  private int aipCounter = 0;
-
-  private String title;
-  private Map<String, String> extraInformation;
-
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
   static {
     pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE,
       new PluginParameter(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE, "Disposal confirmation title",
@@ -87,6 +78,22 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
     pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO,
       new PluginParameter(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO, "Disposal confirmation information",
         PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal confirmation information"));
+  }
+
+  private final Set<String> disposalSchedules = new HashSet<>();
+  private final Set<String> disposalHolds = new HashSet<>();
+  private final Set<String> disposalHoldTransitives = new HashSet<>();
+  private long storageSize = 0L;
+  private int aipCounter = 0;
+  private String title;
+  private Map<String, String> extraInformation;
+
+  public static String getStaticName() {
+    return "Create disposal confirmation report";
+  }
+
+  public static String getStaticDescription() {
+    return "";
   }
 
   @Override
@@ -115,17 +122,9 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
     return "1.0";
   }
 
-  public static String getStaticName() {
-    return "Create disposal confirmation report";
-  }
-
   @Override
   public String getName() {
     return getStaticName();
-  }
-
-  public static String getStaticDescription() {
-    return "";
   }
 
   @Override

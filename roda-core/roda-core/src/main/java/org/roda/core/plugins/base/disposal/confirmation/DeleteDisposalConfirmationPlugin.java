@@ -25,10 +25,10 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -40,9 +40,9 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -54,14 +54,23 @@ import org.slf4j.LoggerFactory;
 public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalConfirmation> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DeleteDisposalConfirmationPlugin.class);
   private static final String EVENT_DESCRIPTION = "Disposal confirmation withdraw";
+  private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
+      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details",
+        PluginParameter.PluginParameterType.STRING).withDefaultValue("").isMandatory(false).isReadOnly(false)
+        .withDescription("Details that will be used when creating event").build());
+  }
 
   private String details;
 
-  private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
-  static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details",
-        PluginParameter.PluginParameterType.STRING, "", false, false, "Details that will be used when creating event"));
+  public static String getStaticName() {
+    return "Delete disposal confirmation report";
+  }
+
+  public static String getStaticDescription() {
+    return "";
   }
 
   @Override
@@ -85,17 +94,9 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
     return "1.0";
   }
 
-  public static String getStaticName() {
-    return "Delete disposal confirmation report";
-  }
-
   @Override
   public String getName() {
     return getStaticName();
-  }
-
-  public static String getStaticDescription() {
-    return "";
   }
 
   @Override
