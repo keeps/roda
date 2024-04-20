@@ -14,7 +14,7 @@ A benyújtási megállapodás aláírása során a gyártónak bele kell egyezni
 
 Az alap osztályozási sémát általában a tárhely hozza létre, és ebben a szakaszban letölthető gépi olvasható formátumban. A letöltött fájl betölthető a RODA-in programba a beviteli információs csomagok jobb elrendezése és előkészítése érdekében, mielőtt azokat az adattárba továbbítanák a bevitel céljából.
 
-[Osztályozási séma letöltése](/api/v1/classification_plans) (megjegyzés: az osztályozási séma letöltéséhez RODA-példányra van szükség)
+[Osztályozási séma letöltése](/api/v2/classification-plans) (megjegyzés: az osztályozási séma letöltéséhez RODA-példányra van szükség)
 
 ## Submission Information Packages (SIP)
 

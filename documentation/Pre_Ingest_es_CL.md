@@ -10,7 +10,7 @@ Esta actividad consiste en la definición de los términos, pre condiciones y re
 
 Esta actividad consiste en la firma de un acuerdo escrito entre el productor y el repositorio que especifica el tipo de contenido y todos los requisitos legales y técnicos que ambas partes esperan cumplir.
 
-[Download classification scheme](/api/v1/classification_plans) (nota: la descarga del esquema de clasificación requiere una instancia de RODA)
+[Download classification scheme](/api/v2/classification-plans) (nota: la descarga del esquema de clasificación requiere una instancia de RODA)
 
 ## Paquetes Presentación de información (SIP)
 

@@ -14,7 +14,7 @@ During the signing of the submission agreement, the Producer must have agreed to
 
 The base Classification Scheme is usually created by the Repository and can be downloaded in this section in machine readable format. The downloaded file can be loaded into RODA-in to better arrange and prepare Submission Information Packages before transferring them to the repository to be ingested.
 
-[Download classification scheme](/api/v1/classification_plans) (note: downloading the classification scheme requires a RODA instance)
+[Download classification scheme](/api/v2/classification-plans) (note: downloading the classification scheme requires a RODA instance)
 
 ## Submission Information Packages (SIP)
 
