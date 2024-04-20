@@ -12,7 +12,7 @@ Durante a assinatura do contrato de submissão, o produtor deve concordar com um
 
 O esquema de classificação básico é geralmente criado pelo Repositório e pode ser descarregado nesta seção num formato legível por máquina. O ficheiro descarregado pode ser carregado no [RODA-in](http://rodain.roda-community.org) para uma melhor organização e preparação dos SIPs, antes de transferi-los para o repositório a ser ingerido.
 
-[Descarregar o esquema de classificação](/api/v1/classification_plans) (nota: apenas é possível descarregar o esquema de classificãção a partir do RODA)
+[Descarregar o esquema de classificação](/api/v2/classification-plans) (nota: apenas é possível descarregar o esquema de classificãção a partir do RODA)
 
 ## Pacotes de informação de submissão (SIP)
 

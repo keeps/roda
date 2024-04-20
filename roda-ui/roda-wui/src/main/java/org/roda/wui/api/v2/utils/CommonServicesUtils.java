@@ -1,4 +1,4 @@
-package org.roda.wui.api.v2.services;
+package org.roda.wui.api.v2.utils;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;

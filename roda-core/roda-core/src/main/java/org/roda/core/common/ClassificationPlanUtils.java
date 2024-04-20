@@ -63,9 +63,8 @@ public class ClassificationPlanUtils {
       boolean justActive = true;
       try (IterableIndexResult<IndexedAIP> res = index.findAll(IndexedAIP.class, allButRepresentationsFilter, user,
         justActive, new ArrayList<>())) {
-        Iterator<IndexedAIP> it = res.iterator();
-        while (it.hasNext()) {
-          array.add(aipToJSON(it.next()));
+        for (IndexedAIP re : res) {
+          array.add(aipToJSON(re));
         }
       }
 

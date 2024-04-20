@@ -27,6 +27,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.base.maintenance.MovePlugin;
 import org.roda.core.util.IdUtils;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;

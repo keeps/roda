@@ -609,7 +609,7 @@ public class DeleteRodaObjectPluginUtils {
       model.deleteTransferredResource(transferredResource);
     } catch (GenericException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
-      reportItem.addPluginDetails("Could not delete DIP file: " + e.getMessage());
+      reportItem.addPluginDetails("Could not delete transferred resource file: " + e.getMessage());
     }
 
     if (doReport) {

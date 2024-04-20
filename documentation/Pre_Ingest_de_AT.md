@@ -14,7 +14,7 @@ Bei der Unterzeichnung des Einreichungsvertrags muss der Hersteller einem Basis-
 
 Das Basis-Klassifikationsschema wird in der Regel vom Repositorium erstellt und kann in diesem Abschnitt in maschinenlesbarem Format heruntergeladen werden. Die heruntergeladene Datei kann in RODA-in geladen werden, um die Einreichungsinformationspakete besser zu ordnen und vorzubereiten, bevor sie an das Repositorium übertragen und dort aufgenommen werden.
 
-[Herunterladen des Klassifikationsschemas](/api/v1/classification_plans) (Hinweis: Das Herunterladen des Klassifikationsschemas erfordert eine RODA-Instanz)
+[Herunterladen des Klassifikationsschemas](/api/v2/classification-plans) (Hinweis: Das Herunterladen des Klassifikationsschemas erfordert eine RODA-Instanz)
 
 ## Einreichungsinformationspakete (SIP)
 
