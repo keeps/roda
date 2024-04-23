@@ -6,6 +6,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Jobs;
+import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
@@ -25,13 +26,15 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.List;
+
 /**
  * @author António Lindo <alindo@keep.pt>
  */
 
 @Tag(name = "v2 jobs")
 @RequestMapping(path = "../api/v2/jobs")
-public interface JobsRestService extends DirectRestService {
+public interface JobsRestService extends RODAEntityRestService<Job> {
 
   @RequestMapping(method = RequestMethod.POST, path = "", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Create job", description = "Creates a new job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {
@@ -105,4 +108,11 @@ public interface JobsRestService extends DirectRestService {
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   IndexedReport getIndexedJobReport(
     @PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_REPORT_ID) String jobReportId);
+
+  @RequestMapping(method = RequestMethod.POST, path = "/pluginInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get job plugin info", description = "Gets job plugin info", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = IndexedReport.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  List<PluginInfo> getJobPluginInfo(
+    @Parameter(name = "job", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Job job);
 }

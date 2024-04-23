@@ -139,7 +139,6 @@ public class ShowJobReport extends Composite {
 
   private static void retrieveJobReport(String jobReportId, AsyncCallback<Widget> callback) {
     Services services = new Services("Get job report items", "get");
-
     services.jobReportResource(s -> s.findByUuid(jobReportId)).thenCompose(indexedReport -> services
       .jobsResource(s -> s.getJobReport(indexedReport.getJobId(), jobReportId)).whenComplete((reports, error) -> {
         if (reports != null) {

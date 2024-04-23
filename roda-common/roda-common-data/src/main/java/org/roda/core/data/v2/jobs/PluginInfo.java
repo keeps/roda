@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.v2.jobs;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,6 +35,7 @@ public class PluginInfo implements Serializable {
   private List<PluginParameter> parameters = new ArrayList<>();
   private Set<String> objectClasses = new HashSet<>();
   private Boolean isVerified = false;
+  @JsonIgnore
   private CertificateInfo certificateInfo = new CertificateInfo();
   private Boolean isInstalled = false;
   private Boolean hasLicenseFile = false;

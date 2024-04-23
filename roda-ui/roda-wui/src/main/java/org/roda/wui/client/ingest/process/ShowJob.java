@@ -63,6 +63,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.process.Process;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -117,37 +118,31 @@ public class ShowJob extends Composite {
         ShowJobReport.RESOLVER.resolve(historyTokens, callback);
       } else if (historyTokens.size() >= 1) {
         String jobId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieveJobBundle(jobId, new ArrayList<>(), new AsyncCallback<JobBundle>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            if (caught instanceof NotFoundException) {
-              Toast.showError(messages.notFoundError(), messages.jobNotFound());
-              HistoryUtils.newHistory(Process.RESOLVER);
-            } else {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
+        Services services = new Services("Get job plugin info", "get");
+        services.jobsResource(s -> s.getJob(jobId)).thenCompose(retrievedJob -> services
+          .jobsResource(s -> s.getJobPluginInfo(retrievedJob)).whenComplete((pluginInfoList, error) -> {
+            if (pluginInfoList != null) {
+              Map<String, PluginInfo> pluginsInfo = new HashMap<>();
+              for (PluginInfo pluginInfo : pluginInfoList) {
+                pluginsInfo.put(pluginInfo.getId(), pluginInfo);
+              }
+              List<FilterParameter> reportFilterParameters = new ArrayList<>();
+              for (int i = 1; i < historyTokens.size() - 1; i += 2) {
+                String key = historyTokens.get(i);
+                String value = historyTokens.get(i + 1);
+                reportFilterParameters.add(new SimpleFilterParameter(key, value));
+              }
+              ShowJob showJob = new ShowJob(retrievedJob, pluginsInfo, reportFilterParameters);
+              callback.onSuccess(showJob);
+            } else if (error != null) {
+              if (error instanceof NotFoundException) {
+                Toast.showError(messages.notFoundError(), messages.jobNotFound());
+                HistoryUtils.newHistory(Process.RESOLVER);
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(error);
+              }
             }
-          }
-
-          @Override
-          public void onSuccess(JobBundle jobBundle) {
-            Map<String, PluginInfo> pluginsInfo = new HashMap<>();
-            for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
-              pluginsInfo.put(pluginInfo.getId(), pluginInfo);
-            }
-
-            List<FilterParameter> reportFilterParameters = new ArrayList<>();
-            for (int i = 1; i < historyTokens.size() - 1; i += 2) {
-              String key = historyTokens.get(i);
-              String value = historyTokens.get(i + 1);
-              reportFilterParameters.add(new SimpleFilterParameter(key, value));
-            }
-
-            ShowJob showJob = new ShowJob(jobBundle.getJob(), pluginsInfo, reportFilterParameters);
-            callback.onSuccess(showJob);
-          }
-
-        });
+          }));
       } else {
         HistoryUtils.newHistory(Process.RESOLVER);
         callback.onSuccess(null);
@@ -368,12 +363,13 @@ public class ShowJob extends Composite {
       .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
         @Override
         public void onSuccess(Actionable.ActionImpact result) {
-          BrowserService.Util.getInstance().retrieve(Job.class.getName(), job.getId(), fieldsToReturn,
-            new NoAsyncCallback<Job>() {
-              @Override
-              public void onSuccess(Job updatedJob) {
+          Services services = new Services("refresh sidebar", "refresh");
+          services.jobsResource(s -> s.getJob(job.getId())).whenComplete((updatedJob, error) -> {
+            if (updatedJob != null) {
                 ShowJob.this.job = updatedJob;
                 update();
+            } else if (error != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(error);
               }
             });
         }
@@ -686,25 +682,24 @@ public class ShowJob extends Composite {
   }
 
   private void refreshJobPluginInfo() {
-    BrowserService.Util.getInstance().retrieveJobBundle(job.getId(), new ArrayList<>(), new AsyncCallback<JobBundle>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        if (caught instanceof NotFoundException) {
-          Toast.showError(messages.notFoundError(), messages.jobNotFound());
-          HistoryUtils.newHistory(Process.RESOLVER);
-        } else {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
+    Services services = new Services("Refresh job plugin info", "update");
+    services.jobsResource(s -> s.getJob(job.getId()))
+      .thenCompose(updateJob -> services.jobsResource(s -> s.getJobPluginInfo(updateJob)))
+      .whenComplete((pluginsInfoList, error) -> {
+        if (pluginsInfoList != null) {
+          pluginsInfo = new HashMap<>();
+          for (PluginInfo pluginInfo : pluginsInfoList) {
+            pluginsInfo.put(pluginInfo.getId(), pluginInfo);
+          }
+        } else if (error != null) {
+          if (error instanceof NotFoundException) {
+            Toast.showError(messages.notFoundError(), messages.jobNotFound());
+            HistoryUtils.newHistory(Process.RESOLVER);
+          } else {
+            AsyncCallbackUtils.defaultFailureTreatment(error);
+          }
         }
-      }
-
-      @Override
-      public void onSuccess(JobBundle jobBundle) {
-        pluginsInfo = new HashMap<>();
-        for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
-          pluginsInfo.put(pluginInfo.getId(), pluginInfo);
-        }
-      }
-    });
+      });
   }
 
   private void scheduleUpdateStatus() {
@@ -714,19 +709,14 @@ public class ShowJob extends Composite {
 
           @Override
           public void run() {
-            BrowserService.Util.getInstance().retrieve(Job.class.getName(), job.getId(), fieldsToReturn,
-              new AsyncCallback<Job>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
-
-                @Override
-                public void onSuccess(Job updatedJob) {
+            Services services = new Services("Update job status", "update");
+            services.jobsResource(s -> s.getJob(job.getId())).whenComplete((updatedJob, error) -> {
+              if (updatedJob != null) {
                   ShowJob.this.job = updatedJob;
                   update();
                   scheduleUpdateStatus();
+              } else if (error != null) {
+                AsyncCallbackUtils.defaultFailureTreatment(error);
                 }
               });
           }

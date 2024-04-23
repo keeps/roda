@@ -6,6 +6,9 @@ import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.client.services.JobReportRestService;
 import org.roda.wui.common.model.RequestContext;
@@ -22,7 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author António Lindo <alindo@keep.pt>
  */
 @RestController
-@RequestMapping(path = "/api/v2/job-report")
+@RequestMapping(path = "/api/v2/job-reports")
 @Tag(name = JobReportController.SWAGGER_ENDPOINT)
 public class JobReportController implements JobReportRestService {
   public static final String SWAGGER_ENDPOINT = "v2 job-reports";
@@ -42,6 +45,12 @@ public class JobReportController implements JobReportRestService {
   @Override
   public IndexResult<IndexedReport> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    if (findRequest.getFilter() == null || findRequest.getFilter().getParameters().isEmpty()) {
+      return new IndexResult<>();
+    }
+
+    // delegate
     return indexService.find(IndexedReport.class, findRequest, localeString, requestContext);
   }
 

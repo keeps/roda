@@ -23,9 +23,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
  */
 public interface RODAEntityRestService<T extends IsIndexed> extends DirectRestService {
 
-  @RequestMapping(method = RequestMethod.GET, path = "/find/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-  T findByUuid(@Parameter(description = "The id", required = true) @PathVariable(name = "uuid") String uuid);
-
   @RequestMapping(path = "/find", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Find indexed resources", description = "Finds existing indexed resources", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = IndexResult.class)))})
@@ -35,7 +32,11 @@ public interface RODAEntityRestService<T extends IsIndexed> extends DirectRestSe
 
   @RequestMapping(path = "/count", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
   @Operation(summary = "Count indexed resources", description = "Counts indexed resources", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class)))})
+      @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class)))})
   Long count(
-    @RequestBody(description = "Count parameters", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CountRequest.class))) CountRequest countRequest);
+      @RequestBody(description = "Count parameters", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CountRequest.class))) CountRequest countRequest);
+
+  @RequestMapping(path = "/find/{uuid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  T findByUuid(@Parameter(description = "The id") @PathVariable(name = "uuid") String uuid);
+
 }
