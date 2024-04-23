@@ -1,17 +1,25 @@
 package org.roda.wui.api.v2.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.v2.index.CountRequest;
+import org.roda.core.data.v2.index.FindRequest;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.Jobs;
+import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -26,6 +34,8 @@ import org.roda.wui.client.services.JobsRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +73,8 @@ public class JobsController implements JobsRestService {
 
   @Autowired
   private IndexService indexService;
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(JobsController.class);
 
   @Override
   public Job createJob(@RequestBody Job job) {
@@ -310,6 +322,59 @@ public class JobsController implements JobsRestService {
       // register action
       controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId,
         RodaConstants.CONTROLLER_JOB_ATTACHMENT_ID_PARAM, attachmentId);
+    }
+  }
+  @Override
+  public List<PluginInfo> getJobPluginInfo(@RequestBody Job job) {
+    List<PluginInfo> pluginsInfo = new ArrayList<>();
+
+    return jobService.getJobPluginInfo(job, pluginsInfo);
+  }
+
+  @Override
+  public IndexResult<Job> find(@RequestBody FindRequest findRequest, String localeString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    if (findRequest.getFilter() == null || findRequest.getFilter().getParameters().isEmpty()) {
+      return new IndexResult<>();
+    }
+
+    // delegate
+    return indexService.find(Job.class, findRequest, localeString, requestContext);
+  }
+
+  @Override
+  public Long count(@RequestBody CountRequest countRequest) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    return indexService.count(Job.class, countRequest, requestContext);
+  }
+
+  @Override
+  public Job findByUuid(String uuid) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser(), Job.class);
+
+      // delegate
+      final Job ret = indexService.retrieve(requestContext, Job.class, uuid,
+        new ArrayList<>());
+
+      // checking object permissions
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), ret, Job.class);
+
+      return ret;
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext.getUser(), uuid, state, RodaConstants.CONTROLLER_CLASS_PARAM,
+        Job.class.getSimpleName(), RodaConstants.CONTROLLER_ID_PARAM, uuid);
     }
   }
 }

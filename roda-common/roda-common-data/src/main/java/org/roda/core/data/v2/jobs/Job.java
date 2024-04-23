@@ -44,7 +44,6 @@ public class Job implements IsModelObject, IsIndexed, HasId, HasInstanceID, HasI
     CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION, FAILED_TO_COMPLETE, STOPPED, STOPPING, TO_BE_CLEANED,
     PENDING_APPROVAL, REJECTED, SCHEDULED;
   }
-
   // job identifier
   private String id = null;
   // job name
@@ -210,6 +209,10 @@ public class Job implements IsModelObject, IsIndexed, HasId, HasInstanceID, HasI
 
   public JobStats getJobStats() {
     return jobStats;
+  }
+
+  public void setJobStats(JobStats jobStats) {
+    this.jobStats = jobStats;
   }
 
   public String getPlugin() {

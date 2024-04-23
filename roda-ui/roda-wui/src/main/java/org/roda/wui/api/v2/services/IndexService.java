@@ -27,6 +27,7 @@ public class IndexService {
     return find(classToReturn, findRequest, null, context);
   }
 
+
   public <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final FindRequest findRequest,
     String locale, RequestContext context) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
