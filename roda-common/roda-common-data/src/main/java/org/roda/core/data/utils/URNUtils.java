@@ -41,7 +41,8 @@ public final class URNUtils {
     sb.append(type);
     sb.append(RodaConstants.URN_SEPARATOR);
     sb.append(id);
-    return sb.toString().toLowerCase();
+    //return sb.toString().toLowerCase();
+    return sb.toString();
   }
 
   public static String createRodaPreservationURN(PreservationMetadataType preservationType, String id,

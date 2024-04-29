@@ -27,7 +27,7 @@ public class PreservationEventsSearch extends SimplePanel {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public PreservationEventsSearch(String eventsListId, String aipId, String representationUUID, String fileUUID) {
-    Filter filter = new Filter(new AllFilterParameter());;
+    Filter filter = new Filter(new AllFilterParameter());
     if (aipId != null) {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
     }

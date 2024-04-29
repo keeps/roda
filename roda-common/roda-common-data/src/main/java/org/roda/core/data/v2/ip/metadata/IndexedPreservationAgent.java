@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +19,11 @@ import org.roda.core.data.v2.ip.HasId;
 import org.roda.core.data.v2.ip.HasInstanceID;
 import org.roda.core.data.v2.ip.HasInstanceName;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class IndexedPreservationAgent implements IsIndexed, HasId, HasInstanceID, HasInstanceName {
+
+  @Serial
   private static final long serialVersionUID = 7864328669898523851L;
   private String id;
   private String name;
@@ -136,6 +141,7 @@ public class IndexedPreservationAgent implements IsIndexed, HasId, HasInstanceID
   }
 
   @Override
+  @JsonIgnore
   public String getUUID() {
     return getId();
   }

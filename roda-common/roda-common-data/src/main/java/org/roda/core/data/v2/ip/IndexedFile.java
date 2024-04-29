@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
@@ -485,15 +486,17 @@ public class IndexedFile
       RodaConstants.FILE_PATH, RodaConstants.INDEX_ID);
   }
 
+  @JsonIgnore
   public String getSHA256Checksum() {
-    if (hash.size() != 0) {
+    if (!hash.isEmpty()) {
       return hash.get(1).split(" ")[0];
     } else
       return null;
   }
 
+  @JsonIgnore
   public String getSHA256Type() {
-    if (hash.size() != 0) {
+    if (!hash.isEmpty()) {
       return hash.get(1).split("\\(")[1].split(",")[0];
     } else
       return null;

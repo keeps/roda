@@ -18,9 +18,9 @@ import java.util.Map;
  */
 public class MetadataValue implements Comparable<MetadataValue>, Serializable {
 
+  public static final String LABEL = "label";
   @Serial
   private static final long serialVersionUID = 51528625577483594L;
-  public static final String LABEL = "label";
   private String id;
   private Map<String, String> options;
 
@@ -56,6 +56,10 @@ public class MetadataValue implements Comparable<MetadataValue>, Serializable {
     return id;
   }
 
+  public void setId(String id) {
+    this.id = id;
+  }
+
   public String get(String key) {
     return options.get(key);
   }
@@ -64,19 +68,15 @@ public class MetadataValue implements Comparable<MetadataValue>, Serializable {
     options.put(key, value);
   }
 
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public void setOptions(Map<String, String> options) {
-    this.options = options;
-  }
-
   /**
    * @return The options of the object.
    */
   public Map<String, String> getOptions() {
     return options;
+  }
+
+  public void setOptions(Map<String, String> options) {
+    this.options = options;
   }
 
   public MetadataValue copy() {
@@ -117,21 +117,6 @@ public class MetadataValue implements Comparable<MetadataValue>, Serializable {
     return 0;
   }
 
-  /**
-   * @Override public int compareTo(MetadataValue o) { if (o == this) { return 0;
-   *           } if (o instanceof MetadataValue) { // Compare the order option
-   *           MetadataValue mv = (MetadataValue) o; Object selfOrder =
-   *           get("order"); Object mvOrder = mv.get("order"); if (selfOrder !=
-   *           null) { if (mvOrder != null) { int selfInt = selfOrder instanceof
-   *           String ? Integer.parseInt((String) selfOrder) : (Integer)
-   *           selfOrder; int mvInt = mvOrder instanceof String ?
-   *           Integer.parseInt((String) mvOrder) : (Integer) mvOrder; int result
-   *           = Integer.compare(selfInt, mvInt); if (result != 0) { return
-   *           result; } } return -1; } else if (mvOrder != null) { return 1; } //
-   *           Compare the labels as a fallback String selfLabel = get("label");
-   *           String mvLabel = mv.get("label"); if (selfLabel != null) { return
-   *           selfLabel.compareTo(mvLabel); } } return 0; }
-   */
   @Override
   public int hashCode() {
     final int prime = 31;

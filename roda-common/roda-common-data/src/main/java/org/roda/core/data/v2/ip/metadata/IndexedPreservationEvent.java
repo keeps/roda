@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -20,14 +21,13 @@ import org.roda.core.data.v2.ip.HasInstanceName;
 import org.roda.core.data.v2.ip.HasPermissionFilters;
 import org.roda.core.data.v2.ip.HasStateFilter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class IndexedPreservationEvent
   implements IsIndexed, HasId, HasPermissionFilters, HasStateFilter, HasInstanceID, HasInstanceName {
+
+  @Serial
   private static final long serialVersionUID = 7328069950706217131L;
-
-  public enum PreservationMetadataEventClass {
-    REPOSITORY, AIP, REPRESENTATION, FILE;
-  }
-
   private String id;
   private String aipID;
   private String representationUUID;
@@ -37,11 +37,8 @@ public class IndexedPreservationEvent
   private String eventDetail;
   private String eventType;
   private String eventOutcome;
-
   private Map<String, Object> fields;
-
   private String instanceId;
-
   private String instanceName;
 
   @Override
@@ -137,24 +134,26 @@ public class IndexedPreservationEvent
   public String toString() {
     return "IndexedPreservationEvent [id=" + id + ", aipID=" + aipID + ", representationUUID=" + representationUUID
       + ", fileUUID=" + fileUUID + ", objectClass=" + objectClass + ", eventDateTime=" + eventDateTime
-      + ", eventDetail=" + eventDetail + ", eventType=" + eventType + ", eventOutcome=" + eventOutcome
-      + ", instanceId=" + instanceId + ", instanceName=" + instanceName + "]";
+      + ", eventDetail=" + eventDetail + ", eventType=" + eventType + ", eventOutcome=" + eventOutcome + ", instanceId="
+      + instanceId + ", instanceName=" + instanceName + "]";
   }
 
   @Override
+  @JsonIgnore
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "aipID", "representationUUID", "fileUUID", "objectClass", "eventDateTime", "eventDetail",
-      "eventType", "eventOutcome", "instanceId",
-      "instanceName");
+      "eventType", "eventOutcome", "instanceId", "instanceName");
   }
 
   @Override
+  @JsonIgnore
   public List<Object> toCsvValues() {
     return Arrays.asList(id, aipID, representationUUID, fileUUID, objectClass, eventDateTime, eventDetail, eventType,
       eventOutcome, instanceId, instanceName);
   }
 
   @Override
+  @JsonIgnore
   public String getUUID() {
     return getId();
   }
@@ -180,4 +179,7 @@ public class IndexedPreservationEvent
     this.fields = fields;
   }
 
+  public enum PreservationMetadataEventClass {
+    REPOSITORY, AIP, REPRESENTATION, FILE;
+  }
 }

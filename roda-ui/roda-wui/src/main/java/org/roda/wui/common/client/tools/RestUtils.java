@@ -361,41 +361,20 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-  public static SafeUri createPreservationEventDetailsUri(String eventId, String aipId, String representationUUID,
-    String fileUUID, boolean onlyDetails, String acceptFormat) {
-    // api/v1/events?id={event_id}&aipId={aip_id}&representationUUID={representationUUID}&
-    // fileUUID={fileUUID}&onlyDetails={onlyDetails}&acceptFormat={format}&lang={lang}
-    StringBuilder b = new StringBuilder();
+  public static SafeUri createPreservationEventDownloadUri(String eventId) {
+    // api/v2/preservation/events/{event_id}/binary
+    String b = "api/v2/preservation/events/" + URL.encodeQueryString(eventId) + "/binary";
 
-    b.append(RodaConstants.API_REST_V1_EVENTS).append(RodaConstants.API_QUERY_START)
-      .append(RodaConstants.API_QUERY_PARAM_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(URL.encodeQueryString(eventId));
+    return UriUtils.fromSafeConstant(b);
+  }
 
-    if (aipId != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_PATH_PARAM_AIP_ID)
-        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(aipId));
-    }
+  public static SafeUri createPreservationEventDetailsUri(String eventId) {
+    // api/v2/preservation/events/{event_id}/details/html?lang={lang}
+    String b = "api/v2/preservation/events/" + URL.encodeQueryString(eventId) + "/details/html"
+      + RodaConstants.API_QUERY_START + RodaConstants.API_QUERY_KEY_LANG + RodaConstants.API_QUERY_ASSIGN_SYMBOL
+      + LocaleInfo.getCurrentLocale().getLocaleName();
 
-    if (representationUUID != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID)
-        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(representationUUID));
-    }
-
-    if (fileUUID != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_PATH_PARAM_FILE_UUID)
-        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(fileUUID));
-    }
-
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_ONLY_DETAILS)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(Boolean.toString(onlyDetails)));
-
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(acceptFormat));
-
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
-
-    return UriUtils.fromSafeConstant(b.toString());
+    return UriUtils.fromSafeConstant(b);
   }
 
   public static SafeUri createPreservationAgentUri(String agentId, String acceptFormat) {
@@ -597,5 +576,4 @@ public class RestUtils {
 
   public static interface FindRequestMapper extends ObjectMapper<FindRequest> {
   }
-
 }
