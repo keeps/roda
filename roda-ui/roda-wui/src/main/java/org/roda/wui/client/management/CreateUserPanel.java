@@ -1,30 +1,4 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
-/**
- *
- */
 package org.roda.wui.client.management;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.v2.generics.MetadataValue;
-import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.FormUtilities;
-import org.roda.wui.client.services.Services;
-import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -46,16 +20,30 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.v2.generics.MetadataValue;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.browse.bundle.UserExtraBundle;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.FormUtilities;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * @author Luis Faria
- *
+ * @author António Lindo <alindo@keep.pt>
  */
-public class UserDataPanel extends Composite implements HasValueChangeHandlers<User> {
+public class CreateUserPanel extends Composite implements HasValueChangeHandlers<User> {
 
-  interface MyUiBinder extends UiBinder<Widget, UserDataPanel> {
+  interface MyUiBinder extends UiBinder<Widget, CreateUserPanel> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -67,12 +55,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   @UiField
   Label usernameError;
-
-  @UiField(provided = true)
-  PasswordPanel password;
-
-  @UiField
-  Label passwordError;
 
   @UiField
   TextBox fullname;
@@ -111,6 +93,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   // has to be true to detected new field changes
   private boolean changed = true;
   private boolean checked = false;
+  private UserExtraBundle userExtraBundle = null;
   private Set<MetadataValue> userExtra;
 
   @UiField
@@ -125,7 +108,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    *          if the list of groups to which the user belong to should be editable
    *
    */
-  public UserDataPanel(boolean editmode, boolean enableGroupSelect) {
+  public CreateUserPanel(boolean editmode, boolean enableGroupSelect) {
     this(true, editmode, enableGroupSelect, true);
   }
 
@@ -138,7 +121,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    *          if the list of groups to which the user belong to should be editable
    *
    */
-  public UserDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect) {
+  public CreateUserPanel(boolean visible, boolean editmode, boolean enableGroupSelect) {
     this(visible, editmode, enableGroupSelect, true);
   }
 
@@ -150,9 +133,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    * @param enableGroupSelect
    * @param enablePermissions
    */
-  public UserDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect, boolean enablePermissions) {
+  public CreateUserPanel(boolean visible, boolean editmode, boolean enableGroupSelect, boolean enablePermissions) {
 
-    password = new PasswordPanel(editmode);
     groupSelect = new GroupSelect();
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -178,7 +160,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
       @Override
       public void onChange(ChangeEvent event) {
-        UserDataPanel.this.onChange();
+        CreateUserPanel.this.onChange();
       }
     };
 
@@ -194,7 +176,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
     username.addChangeHandler(changeHandler);
     username.addKeyUpHandler(keyUpHandler);
-    password.addValueChangeHandler(valueChangedHandler);
     fullname.addChangeHandler(changeHandler);
     fullname.addKeyUpHandler(keyUpHandler);
 
@@ -216,7 +197,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     });
 
     usernameError.setVisible(false);
-    passwordError.setVisible(false);
     fullnameError.setVisible(false);
     emailError.setVisible(false);
   }
@@ -257,10 +237,11 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.setMemberGroups(user.getGroups());
     this.setPermissions(user.getDirectRoles(), user.getAllRoles());
 
+
     Services services = new Services("Get User extra", "get");
     services.membersResource(s -> s.getUserExtra(user.getName())).whenComplete((extra, error) -> {
       if (extra != null) {
-        UserDataPanel.this.userExtra = extra;
+        CreateUserPanel.this.userExtra = extra;
         createForm(userExtra);
       } else if (error != null) {
         if (error instanceof AuthorizationDeniedException) {
@@ -274,10 +255,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     });
   }
 
-  public void setUserExtra(Set<MetadataValue> extra) {
-    UserDataPanel.this.userExtra = extra;
-    createForm(extra);
-  }
 
   private void setPermissions(final Set<String> directRoles, final Set<String> allRoles) {
     permissionsPanel.init(new AsyncCallback<Boolean>() {
@@ -377,23 +354,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     return enableGroupSelect ? groupSelect.getMemberGroups() : null;
   }
 
-  /**
-   * Get the password
-   *
-   * @return the password if changed, or null if it remains the same
-   */
-  public String getPassword() {
-    return password.getValue();
-  }
-
-  /**
-   * Check if password changed
-   *
-   * @return true if password changed, false otherwise
-   */
-  public boolean isPasswordChanged() {
-    return password.isChanged();
-  }
 
   /**
    * Is user data panel valid
@@ -411,18 +371,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     } else {
       username.removeStyleName("isWrong");
       usernameError.setVisible(false);
-    }
-
-    if (!password.matchConfirmation()) {
-      if (errorList.isEmpty()) {
-        Window.scrollTo(password.getAbsoluteLeft(), password.getAbsoluteTop());
-      }
-      errorList.add(messages.passwordDoesNotMatchConfirmation());
-    } else if (password.isSmall()) {
-      if (errorList.isEmpty()) {
-        Window.scrollTo(password.getAbsoluteLeft(), password.getAbsoluteTop());
-      }
-      errorList.add(messages.passwordIsTooSmall());
     }
 
     if (fullname.getText().length() == 0) {
@@ -506,7 +454,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   public void clear() {
     username.setText("");
-    password.clear();
     fullname.setText("");
     email.setText("");
   }
@@ -549,4 +496,9 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   public Set<MetadataValue> getUserExtra() {
     return userExtra;
   }
+
+  public void setUserExtra(Set<MetadataValue> userExtra) {
+    this.userExtra = userExtra;
+  }
 }
+

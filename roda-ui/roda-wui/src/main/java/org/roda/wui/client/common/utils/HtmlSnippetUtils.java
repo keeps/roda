@@ -48,6 +48,7 @@ import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.common.client.tools.HistoryUtils;

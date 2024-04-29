@@ -16,9 +16,11 @@ import java.util.List;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.generics.UserOperations;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -130,27 +132,30 @@ public class Profile extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
+  private SecureString getPassword() {
+    if(userDataPanel.getPassword() != null) {
+      return new SecureString(userDataPanel.getPassword().toCharArray());
+    } else {
+      return null;
+    }
+  }
+
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isChanged()) {
       if (userDataPanel.isValid()) {
         final User user = userDataPanel.getUser();
-        try (SecureString password = new SecureString(userDataPanel.getPassword().toCharArray())) {
-
-          UserManagementService.Util.getInstance().updateMyUser(user, password, userDataPanel.getExtra(),
-            new AsyncCallback<User>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                errorMessage(caught);
-              }
-
-              @Override
-              public void onSuccess(User updatedUser) {
-                UserLogin.getInstance().updateLoggedUser(updatedUser);
-                HistoryUtils.newHistory(Welcome.RESOLVER);
-              }
-            });
+        try (SecureString password = getPassword()) {
+          Services services = new Services("Update User", "update");
+          UserOperations userOperations = new UserOperations(user, password, userDataPanel.getUserExtra());
+          services.membersResource(s -> s.updateMyUser(userOperations)).whenComplete((updatedUser, error) -> {
+            if (error == null) {
+              UserLogin.getInstance().updateLoggedUser(updatedUser);
+              HistoryUtils.newHistory(Welcome.RESOLVER);
+            } else {
+              errorMessage(error);
+            }
+          });
         }
       }
     } else {

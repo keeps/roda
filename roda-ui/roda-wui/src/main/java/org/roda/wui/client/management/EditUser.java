@@ -10,24 +10,6 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.List;
-
-import org.roda.core.data.common.SecureString;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
-import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.management.access.AccessKeyTablePanel;
-import org.roda.wui.client.management.access.CreateAccessKey;
-import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.widgets.Toast;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -38,8 +20,24 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.common.SecureString;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.generics.UserOperations;
+import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.management.access.AccessKeyTablePanel;
+import org.roda.wui.client.management.access.CreateAccessKey;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
+import java.util.List;
 
 /**
  * @author Luis Faria
@@ -53,17 +51,13 @@ public class EditUser extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String username = historyTokens.get(0);
-        UserManagementService.Util.getInstance().retrieveUser(username, new AsyncCallback<User>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
-          @Override
-          public void onSuccess(User user) {
+        Services services = new Services("Get User", "get");
+        services.membersResource(s -> s.getUser(username)).whenComplete((user, error) -> {
+          if (user != null) {
             EditUser editUser = new EditUser(user);
             callback.onSuccess(editUser);
+          } else if (error != null) {
+            callback.onFailure(error);
           }
         });
       } else {
@@ -161,20 +155,15 @@ public class EditUser extends Composite {
       if (userDataPanel.isValid()) {
         final User updatedUser = userDataPanel.getUser();
         try (SecureString password = getPassword()) {
-
-          UserManagementService.Util.getInstance().updateUser(updatedUser, password, userDataPanel.getExtra(),
-            new AsyncCallback<Void>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                errorMessage(caught, updatedUser);
-              }
-
-              @Override
-              public void onSuccess(Void result) {
-                HistoryUtils.newHistory(MemberManagement.RESOLVER);
-              }
-            });
+          Services services = new Services("Update User", "update");
+          UserOperations userOperations = new UserOperations(updatedUser, password, userDataPanel.getUserExtra());
+          services.membersResource(s -> s.updateUser(userOperations)).whenComplete((res, error) -> {
+            if (error == null) {
+              HistoryUtils.newHistory(MemberManagement.RESOLVER);
+            } else {
+              errorMessage(error, updatedUser);
+            }
+          });
         }
       } else {
         HistoryUtils.newHistory(MemberManagement.RESOLVER);
@@ -185,20 +174,15 @@ public class EditUser extends Composite {
   @UiHandler("buttonDeActivate")
   void buttonDeActivateHandler(ClickEvent e) {
     user.setActive(!user.isActive());
-
-    UserManagementService.Util.getInstance().updateUser(user, null, userDataPanel.getExtra(),
-      new AsyncCallback<Void>() {
-
-        @Override
-        public void onSuccess(Void result) {
-          BrowserService.Util.getInstance().deactivateUserAccessKeys(user.getId(), new NoAsyncCallback<Void>());
+    Services services = new Services("Update User", "update");
+    UserOperations userOperations = new UserOperations(user, null, userDataPanel.getUserExtra());
+    services.membersResource(s -> s.updateUser(userOperations)).thenCompose(res -> services.membersResource(s -> s.deactivateUserAccessKeys(user.getId())))
+      .whenComplete((res, error) -> {
+        if (error == null) {
           HistoryUtils.newHistory(MemberManagement.RESOLVER);
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
+        } else {
           user.setActive(!user.isActive());
-          errorMessage(caught, null);
+          errorMessage(error, null);
         }
       });
   }
@@ -215,18 +199,14 @@ public class EditUser extends Composite {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            UserManagementService.Util.getInstance().deleteUser(user.getId(), new AsyncCallback<Void>() {
-
-              @Override
-              public void onSuccess(Void result) {
-                BrowserService.Util.getInstance().deleteUserAccessKeys(user.getId(), new NoAsyncCallback<Void>());
-                HistoryUtils.newHistory(MemberManagement.RESOLVER);
-              }
-
-              @Override
-              public void onFailure(Throwable caught) {
-                errorMessage(caught, null);
-              }
+            Services services = new Services("Delete user", "delete");
+            services.membersResource(s -> s.deleteUser(user.getId()))
+              .whenComplete((res, error) -> {
+                if (error == null) {
+                  HistoryUtils.newHistory(MemberManagement.RESOLVER);
+                } else {
+                  errorMessage(error, null);
+                }
             });
           }
         }
