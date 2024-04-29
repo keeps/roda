@@ -14,10 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+@JsonTypeName("RodaPrincipal")
 public abstract class RodaPrincipal implements Serializable, RODAMember, IsModelObject {
   private static final long serialVersionUID = 8254886345679485761L;
 

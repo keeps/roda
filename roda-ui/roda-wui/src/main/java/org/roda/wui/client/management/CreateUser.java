@@ -10,21 +10,9 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.List;
-
-import org.roda.core.data.common.SecureString;
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.widgets.Toast;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -32,8 +20,20 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.generics.UserOperations;
+import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
+import java.util.List;
 
 /**
  * @author Luis Faria
@@ -81,7 +81,7 @@ public class CreateUser extends Composite {
   Button buttonCancel;
 
   @UiField(provided = true)
-  UserDataPanel userDataPanel;
+  CreateUserPanel userDataPanel;
 
   /**
    * Create a new panel to create a user
@@ -92,9 +92,8 @@ public class CreateUser extends Composite {
   public CreateUser(User user) {
     this.user = user;
 
-    this.userDataPanel = new UserDataPanel(true, false, true);
+    this.userDataPanel = new CreateUserPanel(true, false, true);
     this.userDataPanel.setUser(user);
-
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -108,23 +107,15 @@ public class CreateUser extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isValid()) {
       user = userDataPanel.getUser();
-      try (SecureString password = new SecureString(userDataPanel.getPassword().toCharArray())) {
-
-        UserManagementService.Util.getInstance().createUser(user, password, userDataPanel.getExtra(),
-          new AsyncCallback<User>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              errorMessage(caught);
-            }
-
-            @Override
-            public void onSuccess(User createdUser) {
-              HistoryUtils.newHistory(MemberManagement.RESOLVER);
-            }
-
-          });
-      }
+      Services services = new Services("Create RODA user", "create");
+      UserOperations userOperations = new UserOperations(user, null, userDataPanel.getUserExtra());
+      services.membersResource(s -> s.createUser(userOperations,  LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((createdUser, error) -> {
+        if (createdUser != null) {
+          HistoryUtils.newHistory(MemberManagement.RESOLVER);
+        } else if (error != null) {
+          errorMessage(error);
+        }
+      });
     }
   }
 

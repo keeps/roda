@@ -18,7 +18,6 @@ import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.v2.notifications.NotificationState;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UpSalePanel;
@@ -27,7 +26,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.RecoverLogin;
 import org.roda.wui.client.management.Register;
-import org.roda.wui.client.management.UserManagementService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -227,12 +226,10 @@ public class Login extends Composite {
 
   @UiHandler("resendEmail")
   void handleResendEmail(final ClickEvent e) {
-
-    UserManagementService.Util.getInstance().sendEmailVerification(username.getText(), true,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Notification>() {
-
-        @Override
-        public void onSuccess(final Notification result) {
+    Services services = new Services("Resend email", "resend");
+    services.membersResource(s -> s.sendEmailVerification(username.getText(), true,
+      LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, error) -> {
+        if (result != null) {
           if (result.getState() == NotificationState.COMPLETED) {
             Dialogs.showInformationDialog(messages.loginResendEmailSuccessDialogTitle(),
               messages.loginResendEmailSuccessDialogMessage(), messages.loginResendEmailSuccessDialogButton(), false,
@@ -264,10 +261,7 @@ public class Login extends Composite {
                 }
               });
           }
-        }
-
-        @Override
-        public void onFailure(final Throwable caught) {
+        } else if (error != null) {
           Toast.showError(messages.loginResendEmailVerificationFailure());
         }
       });

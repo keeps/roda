@@ -46,6 +46,8 @@ import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
+import org.roda.core.data.v2.generics.MetadataValue;
+import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;

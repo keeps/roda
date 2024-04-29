@@ -7,24 +7,6 @@
  */
 package org.roda.wui.client.management.access;
 
-import java.util.List;
-
-import org.roda.core.data.v2.accessKey.AccessKey;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
-import org.roda.wui.client.common.TitlePanel;
-import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.AccessKeyDialogs;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.StringUtils;
-import org.roda.wui.common.client.widgets.Toast;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -38,8 +20,24 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.TitlePanel;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.AccessKeyDialogs;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
+import java.util.List;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -50,10 +48,10 @@ public class ShowAccessKey extends Composite {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        BrowserService.Util.getInstance().retrieveAccessKey(historyTokens.get(0), new NoAsyncCallback<AccessKey>() {
-          @Override
-          public void onSuccess(AccessKey result) {
-            ShowAccessKey showAccessKey = new ShowAccessKey(result);
+        Services services = new Services("Get access key", "get");
+        services.membersResource(s -> s.getAccessKey(historyTokens.get(0))).whenComplete((accessKey, error) -> {
+          if (accessKey != null) {
+            ShowAccessKey showAccessKey = new ShowAccessKey(accessKey);
             callback.onSuccess(showAccessKey);
           }
         });
@@ -102,9 +100,9 @@ public class ShowAccessKey extends Composite {
 
   public void refresh() {
     reset();
-    BrowserService.Util.getInstance().retrieveAccessKey(accessKey.getId(), new NoAsyncCallback<AccessKey>() {
-      @Override
-      public void onSuccess(AccessKey accessKey) {
+    Services services = new Services("Get access key", "get");
+    services.membersResource(s -> s.getAccessKey(accessKey.getId())).whenComplete((accessKey, error) -> {
+      if (accessKey != null) {
         initElements(accessKey);
       }
     });
@@ -200,9 +198,9 @@ public class ShowAccessKey extends Composite {
       messages.cancelButton(), messages.confirmButton(), new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean confirm) {
-          BrowserService.Util.getInstance().deleteAccessKey(accessKey.getId(), new NoAsyncCallback<Void>() {
-            @Override
-            public void onSuccess(Void result) {
+          Services services = new Services("Delete access key", "delete");
+          services.membersResource(s -> s.deleteAccessKey(accessKey.getId())).whenComplete((accessKey, error) -> {
+            if (error == null) {
               cancel();
             }
           });
@@ -217,9 +215,9 @@ public class ShowAccessKey extends Composite {
         @Override
         public void onSuccess(Boolean confirm) {
           if (confirm) {
-            BrowserService.Util.getInstance().regenerateAccessKey(accessKey, new NoAsyncCallback<AccessKey>() {
-              @Override
-              public void onSuccess(AccessKey result) {
+            Services services = new Services("Regenerate access key", "regenerate");
+            services.membersResource(s -> s.regenerateAccessKey(accessKey)).whenComplete((accessKey, error) -> {
+              if (accessKey != null) {
                 AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), accessKey,
                   new NoAsyncCallback<Boolean>() {
                     @Override
@@ -242,9 +240,9 @@ public class ShowAccessKey extends Composite {
         @Override
         public void onSuccess(Boolean confirm) {
           if (confirm) {
-            BrowserService.Util.getInstance().revokeAccessKey(accessKey, new NoAsyncCallback<AccessKey>() {
-              @Override
-              public void onSuccess(AccessKey result) {
+            Services services = new Services("Revoke access key", "revoke");
+            services.membersResource(s -> s.revokeAccessKey(accessKey)).whenComplete((accessKey, error) -> {
+              if (accessKey != null) {
                 refresh();
                 Toast.showInfo(messages.accessKeyLabel(), messages.accessKeySuccessfullyRevoked());
               }

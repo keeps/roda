@@ -22,6 +22,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 
 import com.google.gwt.core.client.GWT;
+import org.roda.core.data.v2.user.RODAMember;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -61,6 +62,8 @@ public class Services implements DirectRestService {
       return GWT.create(RiskRestService.class);
     } else if (PreservationEventRestService.class.equals(serviceClass)) {
       return GWT.create(PreservationEventRestService.class);
+    } else if (MembersRestService.class.equals(serviceClass)) {
+      return GWT.create(MembersRestService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
@@ -114,6 +117,8 @@ public class Services implements DirectRestService {
       service = GWT.create(JobsRestService.class);
     } else if (IndexedReport.class.getName().equals(objectClassString)) {
       service = GWT.create(JobReportRestService.class);
+    } else if (RODAMember.class.getName().equals(objectClassString)) {
+      service = GWT.create(MembersRestService.class);
     } else {
       throw new IllegalArgumentException(objectClassString + " not supported");
     }
@@ -187,5 +192,9 @@ public class Services implements DirectRestService {
 
   public <T> CompletableFuture<T> preservationEventsResource(CheckedFunction<PreservationEventRestService, T> method) {
     return future(PreservationEventRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> membersResource(CheckedFunction<MembersRestService, T> method) {
+    return future(MembersRestService.class, method);
   }
 }

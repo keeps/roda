@@ -20,6 +20,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.wui.api.controllers.UserLogin;
+import org.roda.wui.api.v2.controller.MembersController;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +146,7 @@ public class CasWebAuthFilter implements Filter {
 
     } else if (url.endsWith("/logout")) {
 
-      UserLogin.logout(httpRequest, Arrays.asList("edu.yale.its.tp.cas.client.filter.user", "_const_cas_assertion_"));
+      MembersController.logout(httpRequest, Arrays.asList("edu.yale.its.tp.cas.client.filter.user", "_const_cas_assertion_"));
 
       String service;
       try {

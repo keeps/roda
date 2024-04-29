@@ -1702,6 +1702,8 @@ public interface ClientMessages extends Messages {
   // Reset Password
   String resetPasswordTitle();
 
+  String setPasswordTitle();
+
   String resetPasswordUsername();
 
   String resetPasswordToken();
@@ -1711,6 +1713,8 @@ public interface ClientMessages extends Messages {
   String resetPasswordRepeatPassword();
 
   String resetPasswordSubmit();
+
+  String setPasswordSubmit();
 
   String resetPasswordCancel();
 

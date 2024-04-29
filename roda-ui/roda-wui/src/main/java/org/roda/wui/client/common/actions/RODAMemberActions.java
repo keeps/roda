@@ -15,7 +15,6 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -24,7 +23,7 @@ import org.roda.wui.client.management.CreateUser;
 import org.roda.wui.client.management.EditGroup;
 import org.roda.wui.client.management.EditUser;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.UserManagementService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -151,14 +150,13 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   }
 
   private void activate(SelectedItems<RODAMember> objects, AsyncCallback<ActionImpact> callback) {
-    UserManagementService.Util.getInstance().changeActiveRODAMembers(objects, true,
-      new ActionAsyncCallback<Void>(callback) {
-        @Override
-        public void onSuccess(Void result) {
-          doActionCallbackUpdated();
-          HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
-        }
-      });
+    Services services = new Services("Activate RODA member", "activate");
+    services.membersResource(s -> s.changeActive(objects, true)).whenComplete((res, error) -> {
+      if (error == null) {
+        callback.onSuccess(Actionable.ActionImpact.UPDATED);
+        HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
+      }
+    });
   }
 
   private void edit(RODAMember object, AsyncCallback<ActionImpact> callback) {
@@ -171,14 +169,13 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   }
 
   private void deactivate(SelectedItems<RODAMember> objects, AsyncCallback<ActionImpact> callback) {
-    UserManagementService.Util.getInstance().changeActiveRODAMembers(objects, false,
-      new ActionAsyncCallback<Void>(callback) {
-        @Override
-        public void onSuccess(Void result) {
-          doActionCallbackUpdated();
-          HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
-        }
-      });
+    Services services = new Services("Deactivate RODA member", "deactivate");
+    services.membersResource(s -> s.changeActive(objects, false)).whenComplete((res, error) -> {
+      if (error == null) {
+        callback.onSuccess(Actionable.ActionImpact.UPDATED);
+        HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
+      }
+    });
   }
 
   private void remove(SelectedItems<RODAMember> objects, AsyncCallback<ActionImpact> callback) {
@@ -187,13 +184,13 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            UserManagementService.Util.getInstance().deleteRODAMembers(objects,
-              new ActionAsyncCallback<Void>(callback) {
-                @Override
-                public void onSuccess(Void result) {
-                  doActionCallbackDestroyed();
-                }
-              });
+            Services services = new Services("Remove RODA members", "remove");
+            services.membersResource(s -> s.deleteMultipleMembers(objects)).whenComplete((res, error) -> {
+              if (error == null) {
+                callback.onSuccess(Actionable.ActionImpact.DESTROYED);
+                HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
+              }
+            });
           }
         }
 

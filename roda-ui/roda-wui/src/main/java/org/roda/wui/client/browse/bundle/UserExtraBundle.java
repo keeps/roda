@@ -10,9 +10,10 @@ package org.roda.wui.client.browse.bundle;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import org.roda.core.data.v2.generics.MetadataValue;
 
-public class UserExtraBundle implements Bundle {
+public class UserExtraBundle implements IsSerializable, Bundle {
 
   private static final long serialVersionUID = 7732750615662574335L;
 

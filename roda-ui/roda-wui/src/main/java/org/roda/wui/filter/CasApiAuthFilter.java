@@ -22,6 +22,7 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.controllers.UserLogin;
+import org.roda.wui.api.v2.controller.MembersController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +74,7 @@ public class CasApiAuthFilter implements Filter {
     // check CAS auth
     if (request.getUserPrincipal() != null) {
       try {
-        UserLogin.casLogin(request.getUserPrincipal().getName(), request);
+        MembersController.casLogin(request.getUserPrincipal().getName(), request);
         filterChain.doFilter(request, response);
       } catch (InactiveUserException e) {
         LOGGER.error("Inactive user '{}': {}", request.getUserPrincipal().getName(), e.getMessage(), e);

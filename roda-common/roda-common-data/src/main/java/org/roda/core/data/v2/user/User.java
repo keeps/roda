@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -28,6 +30,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
+@JsonTypeName("User")
 public class User extends RodaPrincipal {
   @Serial
   private static final long serialVersionUID = 6514790636010895870L;
@@ -35,6 +38,7 @@ public class User extends RodaPrincipal {
   /** Groups this user belongs to. */
   private Set<String> groups = new HashSet<>();
 
+  private String type = "User";
   /** Email address. */
   private String email;
   /** Is a guest user? */
@@ -91,10 +95,18 @@ public class User extends RodaPrincipal {
     this(id, name, email, guest, ipAddress, allRoles, directRoles, groups, null, null, null, null);
   }
 
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
   public User(final String id, final String name, final String email, final boolean guest, final String ipAddress,
-    final Set<String> allRoles, final Set<String> directRoles, final Set<String> groups,
-    final String resetPasswordToken, final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
-    final String emailConfirmationTokenExpirationDate) {
+              final Set<String> allRoles, final Set<String> directRoles, final Set<String> groups,
+              final String resetPasswordToken, final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
+              final String emailConfirmationTokenExpirationDate) {
     this(id, name, name, true, allRoles, directRoles, groups, email, guest, ipAddress, null, resetPasswordToken,
       resetPasswordTokenExpirationDate, emailConfirmationToken, emailConfirmationTokenExpirationDate);
   }

@@ -10,13 +10,12 @@ package org.roda.wui.client.management.access;
 import java.util.List;
 
 import org.roda.core.data.v2.accessKey.AccessKey;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.EditUser;
 import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -41,10 +40,10 @@ public class EditAccessKey extends Composite {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        BrowserService.Util.getInstance().retrieveAccessKey(historyTokens.get(0), new NoAsyncCallback<AccessKey>() {
-          @Override
-          public void onSuccess(AccessKey result) {
-            EditAccessKey editAccessKey = new EditAccessKey(result);
+        Services services = new Services("Get access key", "get");
+        services.membersResource(s -> s.getAccessKey(historyTokens.get(0))).whenComplete((accessKey, error) -> {
+          if (accessKey != null) {
+            EditAccessKey editAccessKey = new EditAccessKey(accessKey);
             callback.onSuccess(editAccessKey);
           }
         });
@@ -95,9 +94,9 @@ public class EditAccessKey extends Composite {
       AccessKey accessKeyUpdated = accessKeyDataPanel.getAccessKey();
       accessKey.setName(accessKeyUpdated.getName());
       accessKey.setExpirationDate(accessKeyUpdated.getExpirationDate());
-      BrowserService.Util.getInstance().updateAccessKey(this.accessKey, new NoAsyncCallback<AccessKey>() {
-        @Override
-        public void onSuccess(AccessKey accessKey) {
+      Services services = new Services("Update access key", "update");
+      services.membersResource(s -> s.updateAccessKey(this.accessKey)).whenComplete((accessKey, error) -> {
+        if (accessKey != null) {
           HistoryUtils.newHistory(EditUser.RESOLVER, accessKey.getUserName());
         }
       });

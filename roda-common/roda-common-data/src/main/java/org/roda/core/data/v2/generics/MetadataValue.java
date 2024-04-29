@@ -7,10 +7,12 @@
  */
 package org.roda.core.data.v2.generics;
 
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Andre Pereira apereira@keep.pt
@@ -68,6 +70,10 @@ public class MetadataValue implements Comparable<MetadataValue>, Serializable {
     options.put(key, value);
   }
 
+  public void setOptions(Map<String, String> options) {
+    this.options = options;
+  }
+
   /**
    * @return The options of the object.
    */
@@ -75,12 +81,11 @@ public class MetadataValue implements Comparable<MetadataValue>, Serializable {
     return options;
   }
 
-  public void setOptions(Map<String, String> options) {
-    this.options = options;
-  }
-
   public MetadataValue copy() {
-    HashMap<String, String> newOptions = new HashMap<>(options);
+    HashMap<String, String> newOptions = new HashMap<>();
+    for (Map.Entry<String, String> entry : options.entrySet()) {
+      newOptions.put(entry.getKey(), entry.getValue());
+    }
     return new MetadataValue(this.id, newOptions);
   }
 

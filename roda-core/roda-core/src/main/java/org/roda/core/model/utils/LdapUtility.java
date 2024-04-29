@@ -863,6 +863,8 @@ public class LdapUtility {
 
     user.setEmailConfirmationToken(IdUtils.createUUID());
     user.setEmailConfirmationTokenExpirationDate(isoDateNoMillis);
+    user.setResetPasswordToken(IdUtils.createUUID());
+    user.setResetPasswordTokenExpirationDate(isoDateNoMillis);
 
     final User newUser = addUser(user);
     try {
@@ -1553,11 +1555,13 @@ public class LdapUtility {
       // default to PBKDF2-based encryption method
       algorithm = LdapSecurityConstants.HASH_METHOD_PKCS5S2;
     }
-    ByteBuffer passwordByteBuffer = StandardCharsets.UTF_8.encode(CharBuffer.wrap(password.getChars()));
-    byte[] passwordBytes = Arrays.copyOf(passwordByteBuffer.array(), passwordByteBuffer.limit());
-    final String passwordDigest = new String(PasswordUtil.createStoragePassword(passwordBytes, algorithm));
-    session.modify(new Dn(getUserDN(username)),
-      new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, USER_PASSWORD, passwordDigest));
+    if (password != null) {
+      ByteBuffer passwordByteBuffer = StandardCharsets.UTF_8.encode(CharBuffer.wrap(password.getChars()));
+      byte[] passwordBytes = Arrays.copyOf(passwordByteBuffer.array(), passwordByteBuffer.limit());
+      final String passwordDigest = new String(PasswordUtil.createStoragePassword(passwordBytes, algorithm));
+      session.modify(new Dn(getUserDN(username)),
+        new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, USER_PASSWORD, passwordDigest));
+    }
   }
 
   private void addMemberToRoleOrGroup(final CoreSession session, final String dn, final String memberDN,

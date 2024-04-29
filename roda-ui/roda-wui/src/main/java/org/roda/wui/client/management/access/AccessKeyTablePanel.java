@@ -11,10 +11,9 @@ import java.util.List;
 
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
@@ -51,9 +50,9 @@ public class AccessKeyTablePanel extends Composite {
 
   public AccessKeyTablePanel(String username) {
     initWidget(uiBinder.createAndBindUi(this));
-    BrowserService.Util.getInstance().listAccessKeyByUser(username, new NoAsyncCallback<AccessKeys>() {
-      @Override
-      public void onSuccess(AccessKeys accessKeys) {
+    Services services = new Services("Get user access keys", "get");
+    services.membersResource(s -> s.getAccessKeysByUser(username)).whenComplete((accessKeys, error) -> {
+      if (accessKeys != null) {
         contentFlowPanel.clear();
         contentFlowPanel.add(createTable(accessKeys));
       }

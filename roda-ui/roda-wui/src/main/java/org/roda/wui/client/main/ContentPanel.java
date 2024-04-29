@@ -10,10 +10,12 @@
  */
 package org.roda.wui.client.main;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.common.UserLogin;
@@ -28,6 +30,7 @@ import org.roda.wui.client.management.Profile;
 import org.roda.wui.client.management.RecoverLogin;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.ResetPassword;
+import org.roda.wui.client.management.SetPassword;
 import org.roda.wui.client.management.VerifyEmail;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.process.Process;
@@ -41,13 +44,9 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientMessages;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Luis Faria
@@ -109,6 +108,7 @@ public class ContentPanel extends SimplePanel {
     resolvers.add(Register.RESOLVER);
     resolvers.add(RecoverLogin.RESOLVER);
     resolvers.add(ResetPassword.RESOLVER);
+    resolvers.add(SetPassword.RESOLVER);
     resolvers.add(VerifyEmail.RESOLVER);
     resolvers.add(Process.RESOLVER);
 

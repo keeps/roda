@@ -10,25 +10,6 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.main.Login;
-import org.roda.wui.client.management.recaptcha.RecaptchaException;
-import org.roda.wui.client.management.recaptcha.RecaptchaWidget;
-import org.roda.wui.client.welcome.Welcome;
-import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ConfigurationManager;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.StringUtils;
-import org.roda.wui.common.client.widgets.Toast;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -43,8 +24,25 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.main.Login;
+import org.roda.wui.client.management.recaptcha.RecaptchaException;
+import org.roda.wui.client.management.recaptcha.RecaptchaWidget;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.client.welcome.Welcome;
+import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Luis Faria
@@ -182,23 +180,20 @@ public class RecoverLogin extends Composite {
 
   private void doRecover() {
     if (isValid()) {
-      String recaptchaResponse = null;
+      String recaptchaResponse;
       if (recaptchaActive && recaptchaWidget != null) {
         recaptchaResponse = recaptchaWidget.getResponse();
+      } else {
+        recaptchaResponse = null;
       }
-      UserManagementService.Util.getInstance().requestPasswordReset(usernameOrEmail.getValue(), recaptchaResponse,
-              LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Void>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  errorMessage(caught);
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                  showRecoverLoginMessage();
-                }
-              });
+      Services services = new Services("Recover login", "recover");
+      services.membersResource(s -> s.recoverLogin(usernameOrEmail.getValue(), LocaleInfo.getCurrentLocale().getLocaleName(), recaptchaResponse)).whenComplete((res, error) -> {
+        if (error == null) {
+          showRecoverLoginMessage();
+        } else {
+          errorMessage(error);
+        }
+      });
     }
   }
 

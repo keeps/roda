@@ -10,29 +10,6 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.common.SecureString;
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.bundle.UserExtraBundle;
-import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.main.Login;
-import org.roda.wui.client.management.recaptcha.RecaptchaException;
-import org.roda.wui.client.management.recaptcha.RecaptchaWidget;
-import org.roda.wui.client.welcome.Welcome;
-import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ConfigurationManager;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.StringUtils;
-import org.roda.wui.common.client.widgets.Toast;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
@@ -43,8 +20,31 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.generics.MetadataValue;
+import org.roda.core.data.v2.generics.UserOperations;
+import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.main.Login;
+import org.roda.wui.client.management.recaptcha.RecaptchaException;
+import org.roda.wui.client.management.recaptcha.RecaptchaWidget;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.client.welcome.Welcome;
+import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Luis Faria
@@ -112,7 +112,7 @@ public class Register extends Composite {
   FlowPanel registerPanel;
 
   @UiField(provided = true)
-  UserDataPanel userDataPanel;
+  CreateUserPanel userDataPanel;
 
   /**
    * Create a new panel to edit a user
@@ -121,17 +121,13 @@ public class Register extends Composite {
    *          the user to edit
    */
   public Register() {
-    this.userDataPanel = new UserDataPanel(true, false, false, false);
-
-    UserManagementService.Util.getInstance().retrieveDefaultExtraBundle(new AsyncCallback<UserExtraBundle>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        errorMessage(caught);
-      }
-
-      @Override
-      public void onSuccess(UserExtraBundle result) {
-        setExtra(result);
+    this.userDataPanel = new CreateUserPanel(true, false, false, false);
+    Services services = new Services("Get User extra", "get");
+    services.membersResource(s -> s.getDefaultUserExtra()).whenComplete((userExtra, error) -> {
+      if (userExtra != null) {
+        setExtra(userExtra);
+      } else if (error != null) {
+        errorMessage(error);
       }
     });
 
@@ -152,8 +148,8 @@ public class Register extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
-  void setExtra(UserExtraBundle b) {
-    this.userDataPanel.setExtraBundle(b);
+  void setExtra(Set<MetadataValue> b) {
+    this.userDataPanel.setUserExtra(b);
   }
 
   @UiHandler("buttonApply")
@@ -166,54 +162,47 @@ public class Register extends Composite {
 
       User user = userDataPanel.getUser();
       user.setActive(false);
-      String pwd = userDataPanel.getPassword();
-      try (SecureString password = new SecureString(userDataPanel.getPassword().toCharArray())) {
-        final String recaptcha = recaptchaResponse;
+      final String recaptcha = recaptchaResponse;
 
-        UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, userDataPanel.getExtra(),
-          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<User>() {
+      Services services = new Services("Register RODA user", "register");
+      UserOperations userOperations = new UserOperations(user, null, userDataPanel.getUserExtra());
+      services.membersResource(s -> s.registerUser(userOperations,  LocaleInfo.getCurrentLocale().getLocaleName(), recaptcha)).whenComplete((registedUser, error) -> {
+        if (registedUser != null) {
+          if (registedUser.isActive()) {
+              Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(), false,
+                new AsyncCallback<Void>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              errorMessage(caught);
+                  @Override
+                  public void onSuccess(Void result) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
+                });
+            } else {
+              Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(), false,
+                new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
+                });
             }
-
-            @Override
-            public void onSuccess(final User registeredUser) {
-              if (registeredUser.isActive()) {
-                Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                  messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(), false,
-                  new AsyncCallback<Void>() {
-
-                    @Override
-                    public void onSuccess(Void result) {
-                      HistoryUtils.newHistory(Login.RESOLVER);
-                    }
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      HistoryUtils.newHistory(Login.RESOLVER);
-                    }
-                  });
-              } else {
-                Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                  messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(), false,
-                  new AsyncCallback<Void>() {
-
-                    @Override
-                    public void onSuccess(Void result) {
-                      HistoryUtils.newHistory(Login.RESOLVER);
-                    }
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      HistoryUtils.newHistory(Login.RESOLVER);
-                    }
-                  });
-              }
-            }
-          });
-      }
+        } else if (error != null) {
+          errorMessage(error);
+        }
+      });
     }
   }
 
