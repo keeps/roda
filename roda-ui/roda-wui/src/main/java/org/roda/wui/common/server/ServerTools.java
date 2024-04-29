@@ -65,11 +65,11 @@ public class ServerTools {
       String[] localeArgs = localeString.split("_");
 
       if (localeArgs.length == 1) {
-        locale = new Locale(localeArgs[0]);
+        locale = Locale.of(localeArgs[0]);
       } else if (localeArgs.length == 2) {
-        locale = new Locale(localeArgs[0], localeArgs[1]);
+        locale = Locale.of(localeArgs[0], localeArgs[1]);
       } else if (localeArgs.length == 3) {
-        locale = new Locale(localeArgs[0], localeArgs[1], localeArgs[2]);
+        locale = Locale.of(localeArgs[0], localeArgs[1], localeArgs[2]);
       }
     } else {
       locale = Locale.ENGLISH;

@@ -24,17 +24,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 public interface RODAEntityRestService<T extends IsIndexed> extends DirectRestService {
 
   @RequestMapping(method = RequestMethod.GET, path = "/find/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-  T findByUuid(@Parameter(description = "The id", required = true) @PathVariable("uuid") String uuid);
+  T findByUuid(@Parameter(description = "The id", required = true) @PathVariable(name = "uuid") String uuid);
 
   @RequestMapping(path = "/find", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Find indexed resources", description = "Finds existing indexed resources", responses = {
-      @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = IndexResult.class)))})
-  IndexResult<T> find(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = FindRequest.class))) FindRequest findRequest,
-                      @Parameter(description = "language", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = IndexResult.class)))})
+  IndexResult<T> find(
+    @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = FindRequest.class))) FindRequest findRequest,
+    @Parameter(description = "language", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
   @RequestMapping(path = "/count", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
   @Operation(summary = "Count indexed resources", description = "Counts indexed resources", responses = {
-      @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class)))})
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class)))})
   String count(
-      @RequestBody(description = "Count parameters", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CountRequest.class))) CountRequest countRequest);
+    @RequestBody(description = "Count parameters", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CountRequest.class))) CountRequest countRequest);
 }

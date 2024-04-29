@@ -12,9 +12,7 @@ package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -27,8 +25,8 @@ import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.PreservationEventsLinkingObjects;
 import org.roda.core.data.v2.jobs.PluginState;
-import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -38,6 +36,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.planning.ShowPreservationAgent;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -83,27 +82,7 @@ public class ShowPreservationEvent extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        final String eventId = historyTokens.get(0);
-        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(eventId);
-        callback.onSuccess(preservationEvents);
-      } else if (historyTokens.size() == 2) {
-        final String aipId = historyTokens.get(0);
-        final String eventId = historyTokens.get(1);
-        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(aipId, eventId);
-        callback.onSuccess(preservationEvents);
-      } else if (historyTokens.size() == 3) {
-        final String aipId = historyTokens.get(0);
-        final String representationUUID = historyTokens.get(1);
-        final String eventId = historyTokens.get(2);
-        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(aipId, representationUUID, eventId);
-        callback.onSuccess(preservationEvents);
-      } else if (historyTokens.size() == 4) {
-        final String aipId = historyTokens.get(0);
-        final String representationUUID = historyTokens.get(1);
-        final String fileUUID = historyTokens.get(2);
-        final String eventId = historyTokens.get(3);
-        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(aipId, representationUUID, fileUUID,
-          eventId);
+        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(historyTokens.get(0));
         callback.onSuccess(preservationEvents);
       } else {
         HistoryUtils.newHistory(BrowseTop.RESOLVER);
@@ -126,89 +105,48 @@ public class ShowPreservationEvent extends Composite {
       return "event";
     }
   };
-
-  public static final List<String> getViewItemHistoryToken(String id) {
-    return ListUtils.concat(RESOLVER.getHistoryPath(), id);
-  }
-
-  interface MyUiBinder extends UiBinder<Widget, ShowPreservationEvent> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private final ActionableWidgetBuilder<IndexedPreservationEvent> actionableWidgetBuilder;
+  private final PreservationEventActions preservationEventActions;
+  private final String eventId;
   @UiField
   Label eventIdValue;
-
   @UiField
   Label eventDatetimeLabel;
-
   @UiField
   Label eventTypeLabel;
-
   @UiField
   Label eventDetailLabel;
-
   @UiField
   Label agentsHeader;
   @UiField
   FlowPanel agentsPanel;
-
   @UiField
   Label sourceObjectsHeader;
   @UiField
   FlowPanel sourceObjectsPanel;
-
   @UiField
   Label outcomeObjectsHeader;
   @UiField
   FlowPanel outcomeObjectsPanel;
-
   @UiField
   Label eventOutcomeLabel;
-
   @UiField
   Label outcomeDetailHeader;
-
   @UiField
   HTML eventOutcomeDetails;
-
   @UiField
   SimplePanel actionsSidebar;
-
   @UiField
   FlowPanel sidebarFlowPanel;
-
   @UiField
   FlowPanel contentFlowPanel;
-
-  private ActionableWidgetBuilder<IndexedPreservationEvent> actionableWidgetBuilder;
-  private PreservationEventActions preservationEventActions;
-
-  private String aipId;
-  private String representationUUID;
-  private String fileUUID;
-  private String eventId;
-
-  private PreservationEventViewBundle bundle;
+  private IndexedPreservationEvent preservationEvent;
+  private List<IndexedPreservationAgent> agents;
+  private PreservationEventsLinkingObjects linkingObjects;
 
   public ShowPreservationEvent(final String eventId) {
-    this(null, eventId);
-  }
-
-  public ShowPreservationEvent(final String aipId, final String eventId) {
-    this(aipId, null, eventId);
-  }
-
-  public ShowPreservationEvent(final String aipId, final String representationUUID, final String eventId) {
-    this(aipId, representationUUID, null, eventId);
-  }
-
-  public ShowPreservationEvent(final String aipId, final String representationUUID, final String fileUUID,
-    final String eventId) {
-    this.aipId = aipId;
-    this.representationUUID = representationUUID;
-    this.fileUUID = fileUUID;
     this.eventId = eventId;
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -216,25 +154,30 @@ public class ShowPreservationEvent extends Composite {
     preservationEventActions = PreservationEventActions.get();
     actionableWidgetBuilder = new ActionableWidgetBuilder<>(preservationEventActions).withBackButton();
 
-    BrowserService.Util.getInstance().retrievePreservationEventViewBundle(eventId,
-      new AsyncCallback<PreservationEventViewBundle>() {
+    Services services = new Services("Retrieve preservation event", "get");
+    services.rodaEntityRestService(s -> s.findByUuid(eventId), IndexedPreservationEvent.class)
+      .thenCompose(event -> services.preservationEventsResource(s -> s.getPreservationAgents(event.getId()))
+        .thenCompose(indexedPreservationAgents -> services
+          .preservationEventsResource(s -> s.getLinkingIdentifierObjects(event.getId()))
+          .whenComplete((test, throwable) -> {
+            if (throwable != null) {
+              if (throwable instanceof NotFoundException) {
+                Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
+                HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(throwable);
+              }
+            } else {
+              this.preservationEvent = event;
+              this.agents = indexedPreservationAgents;
+              this.linkingObjects = test;
+              viewAction();
+            }
+          })));
+  }
 
-        @Override
-        public void onFailure(Throwable caught) {
-          if (caught instanceof NotFoundException) {
-            Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
-            HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
-          } else {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-        }
-
-        @Override
-        public void onSuccess(PreservationEventViewBundle eventBundle) {
-          ShowPreservationEvent.this.bundle = eventBundle;
-          viewAction();
-        }
-      });
+  public static final List<String> getViewItemHistoryToken(String id) {
+    return ListUtils.concat(RESOLVER.getHistoryPath(), id);
   }
 
   @Override
@@ -244,18 +187,15 @@ public class ShowPreservationEvent extends Composite {
   }
 
   public void viewAction() {
-    IndexedPreservationEvent event = bundle.getEvent();
-
-    eventIdValue.setText(event.getId());
-    eventTypeLabel.setText(event.getEventType());
-    eventDetailLabel.setText(event.getEventDetail());
-    eventDatetimeLabel.setText(Humanize.formatDateTime(event.getEventDateTime()));
+    eventIdValue.setText(preservationEvent.getId());
+    eventTypeLabel.setText(preservationEvent.getEventType());
+    eventDetailLabel.setText(preservationEvent.getEventDetail());
+    eventDatetimeLabel.setText(Humanize.formatDateTime(preservationEvent.getEventDateTime()));
 
     // AGENTS
-    Map<String, IndexedPreservationAgent> agents = bundle.getAgents();
     boolean hasAgents = false;
 
-    for (IndexedPreservationAgent agent : agents.values()) {
+    for (IndexedPreservationAgent agent : agents) {
       FlowPanel layout = createAgentPanel(agent);
       agentsPanel.add(layout);
       hasAgents = true;
@@ -265,12 +205,12 @@ public class ShowPreservationEvent extends Composite {
 
     // Source objects
     boolean showSourceObjects = false;
-    for (LinkingIdentifier sourceObjectId : bundle.getSourcesObjectIds()) {
+    for (LinkingIdentifier sourceObjectId : linkingObjects.getSourceObjectIds()) {
       if (sourceObjectId.getRoles() != null
         && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)
         && (RodaConstants.URN_TYPE.equalsIgnoreCase(sourceObjectId.getType())
           || RodaConstants.URI_TYPE.equalsIgnoreCase(sourceObjectId.getType()))) {
-        addObjectPanel(sourceObjectId, bundle, sourceObjectsPanel);
+        addObjectPanel(sourceObjectId, linkingObjects, sourceObjectsPanel);
         showSourceObjects = true;
       }
     }
@@ -279,12 +219,12 @@ public class ShowPreservationEvent extends Composite {
 
     // Outcome objects
     boolean showOutcomeObjects = false;
-    for (LinkingIdentifier outcomeObjectId : bundle.getOutcomeObjectIds()) {
+    for (LinkingIdentifier outcomeObjectId : linkingObjects.getOutcomeObjectIds()) {
       if (outcomeObjectId.getRoles() != null
         && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)
         && (RodaConstants.URN_TYPE.equalsIgnoreCase(outcomeObjectId.getType())
           || RodaConstants.URI_TYPE.equalsIgnoreCase(outcomeObjectId.getType()))) {
-        addObjectPanel(outcomeObjectId, bundle, outcomeObjectsPanel);
+        addObjectPanel(outcomeObjectId, linkingObjects, outcomeObjectsPanel);
         showOutcomeObjects = true;
       }
     }
@@ -293,8 +233,7 @@ public class ShowPreservationEvent extends Composite {
     outcomeObjectsPanel.setVisible(showOutcomeObjects);
 
     // OUTCOME DETAIL
-
-    PluginState eventOutcome = PluginState.valueOf(event.getEventOutcome());
+    PluginState eventOutcome = PluginState.valueOf(preservationEvent.getEventOutcome());
     eventOutcomeLabel.setText(messages.pluginStateMessage(eventOutcome));
     if (PluginState.SUCCESS.equals(eventOutcome)) {
       eventOutcomeLabel.setStyleName("label-success");
@@ -316,15 +255,16 @@ public class ShowPreservationEvent extends Composite {
       @Override
       public void onSuccess(SafeHtml result) {
         eventOutcomeDetails.setHTML(result);
-        outcomeDetailHeader.setVisible(result.asString().length() > 0);
+        outcomeDetailHeader.setVisible(!result.asString().isEmpty());
       }
     });
 
     SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, preservationEventActions.hasAnyRoles());
-    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(event)));
+    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(preservationEvent)));
   }
 
-  private void addObjectPanel(LinkingIdentifier object, PreservationEventViewBundle bundle, FlowPanel objectsPanel) {
+  private void addObjectPanel(LinkingIdentifier object, PreservationEventsLinkingObjects linkingObjects,
+    FlowPanel objectsPanel) {
     FlowPanel layout = new FlowPanel();
     layout.addStyleName("panel");
     String idValue = object.getValue();
@@ -333,13 +273,13 @@ public class ShowPreservationEvent extends Composite {
       RODA_TYPE type = LinkingObjectUtils.getLinkingIdentifierType(idValue);
 
       if (type == RODA_TYPE.TRANSFERRED_RESOURCE) {
-        addTransferredResourcePanel(bundle, layout, idValue);
+        addTransferredResourcePanel(linkingObjects, layout, idValue);
       } else if (type == RODA_TYPE.FILE) {
-        addFilePanel(bundle, layout, idValue);
+        addFilePanel(linkingObjects, layout, idValue);
       } else if (type == RODA_TYPE.REPRESENTATION) {
-        addRepresentationPanel(bundle, layout, idValue);
+        addRepresentationPanel(linkingObjects, layout, idValue);
       } else if (type == RODA_TYPE.AIP) {
-        addAipPanel(bundle, layout, idValue);
+        addAipPanel(linkingObjects, layout, idValue);
       }
     } else if (RodaConstants.URI_TYPE.equalsIgnoreCase(object.getType())) {
       addUriPanel(layout, idValue);
@@ -458,95 +398,7 @@ public class ShowPreservationEvent extends Composite {
     return layout;
   }
 
-  private FlowPanel createAgentPanel(LinkingIdentifier agentId, IndexedPreservationAgent agent) {
-    FlowPanel layout = new FlowPanel();
-    layout.addStyleName("panel");
-
-    FlowPanel heading = new FlowPanel();
-    heading.addStyleName("panel-heading");
-    layout.add(heading);
-    FlowPanel body = new FlowPanel();
-    body.addStyleName("panel-body");
-    layout.add(body);
-
-    if (StringUtils.isNotBlank(agent.getName())) {
-      Label nameValue = new Label(agent.getName());
-      nameValue.addStyleName("panel-title");
-      heading.add(nameValue);
-    } else {
-      Label idValue = new Label(agent.getId());
-      idValue.addStyleName("panel-title");
-      heading.add(idValue);
-    }
-
-    if (StringUtils.isNotBlank(agent.getId())) {
-      Label idLabel = new Label(messages.preservationEventAgentIdentifier());
-      idLabel.addStyleName("label");
-      Label idValue = new Label(agent.getId());
-      idValue.addStyleName("value");
-      body.add(idLabel);
-      body.add(idValue);
-    }
-
-    if (!agentId.getRoles().isEmpty()) {
-      Label rolesLabel = new Label(messages.preservationEventAgentRoles());
-      rolesLabel.addStyleName("label");
-      // TODO humanize list
-      Label rolesValue = new Label(StringUtils.join(agentId.getRoles(), ", "));
-      rolesValue.addStyleName("value");
-      body.add(rolesLabel);
-      body.add(rolesValue);
-    }
-
-    if (StringUtils.isNotBlank(agent.getType())) {
-      Label typeLabel = new Label(messages.preservationEventAgentType());
-      typeLabel.addStyleName("label");
-      Label typeValue = new Label(agent.getType());
-      typeValue.addStyleName("value");
-      body.add(typeLabel);
-      body.add(typeValue);
-    }
-
-    if (StringUtils.isNotBlank(agent.getVersion())) {
-      Label versionLabel = new Label(messages.preservationEventAgentVersion());
-      versionLabel.addStyleName("label");
-      Label versionValue = new Label(agent.getVersion());
-      versionValue.addStyleName("value");
-      body.add(versionLabel);
-      body.add(versionValue);
-    }
-
-    if (StringUtils.isNotBlank(agent.getNote())) {
-      Label noteLabel = new Label(messages.preservationEventAgentNote());
-      noteLabel.addStyleName("label");
-      Label noteValue = new Label(agent.getNote());
-      noteValue.addStyleName("value");
-      body.add(noteLabel);
-      body.add(noteValue);
-    }
-
-    if (StringUtils.isNotBlank(agent.getExtension())) {
-      Label extensionLabel = new Label(messages.preservationEventAgentExtension());
-      extensionLabel.addStyleName("label");
-      Label extensionValue = new Label(agent.getExtension());
-      extensionValue.addStyleName("value");
-      body.add(extensionLabel);
-      body.add(extensionValue);
-    }
-
-    FlowPanel footer = new FlowPanel();
-    footer.addStyleName("panel-footer");
-    layout.add(footer);
-
-    Anchor link = new Anchor(messages.inspectPreservationAgent(),
-      HistoryUtils.createHistoryHashLink(ShowPreservationAgent.RESOLVER, eventId, agent.getId()));
-
-    link.addStyleName("btn");
-    footer.add(link);
-    return layout;
-  }
-
-  private void addAipPanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
+  private void addAipPanel(PreservationEventsLinkingObjects bundle, FlowPanel layout, String idValue) {
     FlowPanel heading = new FlowPanel();
     heading.addStyleName("panel-heading");
     layout.add(heading);
@@ -592,7 +444,7 @@ public class ShowPreservationEvent extends Composite {
     }
   }
 
-  private void addRepresentationPanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
+  private void addRepresentationPanel(PreservationEventsLinkingObjects bundle, FlowPanel layout, String idValue) {
     FlowPanel heading = new FlowPanel();
     heading.addStyleName("panel-heading");
     layout.add(heading);
@@ -643,7 +495,7 @@ public class ShowPreservationEvent extends Composite {
     }
   }
 
-  private void addFilePanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
+  private void addFilePanel(PreservationEventsLinkingObjects bundle, FlowPanel layout, String idValue) {
     FlowPanel heading = new FlowPanel();
     heading.addStyleName("panel-heading");
     layout.add(heading);
@@ -746,7 +598,7 @@ public class ShowPreservationEvent extends Composite {
     }
   }
 
-  private void addTransferredResourcePanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
+  private void addTransferredResourcePanel(PreservationEventsLinkingObjects bundle, FlowPanel layout, String idValue) {
     FlowPanel heading = new FlowPanel();
     heading.addStyleName("panel-heading");
     layout.add(heading);
@@ -800,9 +652,7 @@ public class ShowPreservationEvent extends Composite {
   }
 
   private void getEventDetailsHTML(final AsyncCallback<SafeHtml> callback) {
-    IndexedPreservationEvent event = bundle.getEvent();
-    SafeUri uri = RestUtils.createPreservationEventDetailsUri(eventId, event.getAipID(), event.getRepresentationUUID(),
-      event.getFileUUID(), true, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML);
+    SafeUri uri = RestUtils.createPreservationEventDetailsUri(eventId);
 
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
     try {
@@ -811,6 +661,7 @@ public class ShowPreservationEvent extends Composite {
         @Override
         public void onResponseReceived(Request request, Response response) {
           if (200 == response.getStatusCode()) {
+
             String html = response.getText();
 
             SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -852,5 +703,8 @@ public class ShowPreservationEvent extends Composite {
     } catch (RequestException e) {
       callback.onFailure(e);
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowPreservationEvent> {
   }
 }

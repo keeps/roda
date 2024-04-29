@@ -12,6 +12,7 @@ import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.notifications.Notification;
 
 import com.google.gwt.core.client.GWT;
@@ -48,6 +49,8 @@ public class Services implements DirectRestService {
       return GWT.create(DisposalRuleRestService.class);
     } else if (DisposalConfirmationRestService.class.equals(serviceClass)) {
       return GWT.create(DisposalConfirmationRestService.class);
+    } else if (PreservationEventRestService.class.equals(serviceClass)) {
+      return GWT.create(PreservationEventRestService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
@@ -86,6 +89,8 @@ public class Services implements DirectRestService {
       service = GWT.create(AIPRestService.class);
     } else if (DisposalConfirmation.class.getName().equals(objectClassString)) {
       service = GWT.create(DisposalScheduleRestService.class);
+    } else if (IndexedPreservationEvent.class.getName().equals(objectClassString)) {
+      service = GWT.create(PreservationEventRestService.class);
     } else {
       throw new IllegalArgumentException(objectClassString + " not supported");
     }
@@ -146,5 +151,9 @@ public class Services implements DirectRestService {
   public <T> CompletableFuture<T> disposalConfirmationResource(
     CheckedFunction<DisposalConfirmationRestService, T> method) {
     return future(DisposalConfirmationRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> preservationEventsResource(CheckedFunction<PreservationEventRestService, T> method) {
+    return future(PreservationEventRestService.class, method);
   }
 }

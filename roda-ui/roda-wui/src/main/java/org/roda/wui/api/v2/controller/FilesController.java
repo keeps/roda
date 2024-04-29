@@ -8,10 +8,10 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.log.LogEntryState;
-import org.roda.wui.api.controllers.BrowserHelper;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.FilesService;
+import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
@@ -47,6 +47,9 @@ public class FilesController {
   @Autowired
   private FilesService filesService;
 
+  @Autowired
+  private IndexService indexService;
+
   @RequestMapping(path = "/binary/{uuid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   @Operation(summary = "Downloads file", description = "Download a particular file", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamingResponseBody.class))),
@@ -64,7 +67,7 @@ public class FilesController {
       controllerAssistant.checkRoles(requestContext.getUser());
       List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
       fileFields.add(RodaConstants.FILE_ISDIRECTORY);
-      IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID, fileFields);
+      IndexedFile file = indexService.retrieve(requestContext.getUser(), IndexedFile.class, fileUUID, fileFields);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
       StreamResponse response = filesService.retrieveAIPRepresentationFile(file);
