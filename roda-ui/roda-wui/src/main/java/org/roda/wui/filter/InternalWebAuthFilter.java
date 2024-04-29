@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.roda.wui.api.controllers.UserLogin;
+import org.roda.wui.api.v2.controller.MembersController;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,7 @@ public class InternalWebAuthFilter implements Filter {
 
       redirect(httpResponse, uri);
     } else if (requestURI.endsWith("/logout")) {
-      UserLogin.logout(httpRequest, Collections.emptyList());
+      MembersController.logout(httpRequest, Collections.emptyList());
 
       redirect(httpResponse, uri.setFragment("welcome"));
     } else {

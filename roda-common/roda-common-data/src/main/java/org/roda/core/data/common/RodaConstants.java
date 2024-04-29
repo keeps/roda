@@ -344,6 +344,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_DISTRIBUTED_INSTANCE = "api/v1/distributed_instances/";
   public static final String API_REST_V1_JOBS = "api/v1/jobs/";
   public static final String API_REST_V2_JOBS = "api/v2/jobs/";
+  public static final String API_REST_V2_MEMBERS = "api/v2/members/";
 
   public static final String API_REST_V1_REPRESENTATION_OTHER_METADATA = "otherMetadata";
 
@@ -1824,7 +1825,9 @@ public final class RodaConstants {
   public static final String VERIFICATION_EMAIL_TEMPLATE_SUBJECT_TRANSLATION = "email.verification.subject";
   public static final String VERIFICATION_EMAIL_TEMPLATE_FROM_TRANSLATION = "email.verification.from";
   public static final String RECOVER_LOGIN_EMAIL_TEMPLATE = "recoverlogin_html.vm";
+  public static final String SET_PASSWORD_TEMPLATE = "setpassword_html.vm";
   public static final String RECOVER_LOGIN_EMAIL_TEMPLATE_SUBJECT_TRANSLATION = "email.recoverlogin.subject";
+  public static final String SET_PASSWORD_EMAIL_TEMPLATE_SUBJECT_TRANSLATION = "email.setpassword.subject";
   public static final String RECOVER_LOGIN_EMAIL_TEMPLATE_FROM_TRANSLATION = "email.recoverlogin.from";
   public static final String NOTIFY_PRODUCER_EMAIL_TEMPLATE = "notifyproducer_html.vm";
   public static final String EMAIL_TEMPLATE_EXTENSION = ".vm";

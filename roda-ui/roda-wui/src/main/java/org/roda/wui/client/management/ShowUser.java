@@ -23,6 +23,7 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -52,17 +53,13 @@ public class ShowUser extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String username = historyTokens.get(0);
-        UserManagementService.Util.getInstance().retrieveUser(username, new AsyncCallback<User>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
-          @Override
-          public void onSuccess(User user) {
+        Services services = new Services("Get User", "get");
+        services.membersResource(s -> s.getUser(username)).whenComplete((user, error) -> {
+          if (user != null) {
             ShowUser showUser = new ShowUser(user);
             callback.onSuccess(showUser);
+          } else if (error != null) {
+            callback.onFailure(error);
           }
         });
       } else {

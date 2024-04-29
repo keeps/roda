@@ -62,7 +62,7 @@ public class TokenManager {
 
   public AccessToken grantToken(LocalInstance localInstance) throws GenericException, AuthenticationDeniedException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-    String url = localInstance.getCentralInstanceURL() + RodaConstants.API_SEP + RodaConstants.API_REST_V1_AUTH
+    String url = localInstance.getCentralInstanceURL() + RodaConstants.API_SEP + RodaConstants.API_REST_V2_MEMBERS
       + RodaConstants.API_PATH_PARAM_AUTH_TOKEN;
     HttpPost httpPost = new HttpPost(url);
     httpPost.addHeader("content-type", "application/json");

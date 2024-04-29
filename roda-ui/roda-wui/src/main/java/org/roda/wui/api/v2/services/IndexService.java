@@ -56,6 +56,7 @@ public class IndexService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
+
       // register action
       controllerAssistant.registerAction(context, state, RodaConstants.CONTROLLER_CLASS_PARAM,
         classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, findRequest.getFilter(),

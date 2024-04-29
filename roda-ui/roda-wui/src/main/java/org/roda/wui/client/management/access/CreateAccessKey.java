@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -19,7 +18,7 @@ import org.roda.wui.client.common.dialogs.AccessKeyDialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.EditUser;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.UserManagementService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -45,9 +44,9 @@ public class CreateAccessKey extends Composite {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        UserManagementService.Util.getInstance().retrieveUser(historyTokens.get(0), new NoAsyncCallback<User>() {
-          @Override
-          public void onSuccess(User user) {
+        Services services = new Services("Get User", "get");
+        services.membersResource(s -> s.getUser(historyTokens.get(0))).whenComplete((user, error) -> {
+          if (user != null) {
             CreateAccessKey createAccessKey = new CreateAccessKey(user);
             callback.onSuccess(createAccessKey);
           }
@@ -119,9 +118,9 @@ public class CreateAccessKey extends Composite {
       AccessKey accessKeyUpdated = accessKeyDataPanel.getAccessKey();
       accessKey.setName(accessKeyUpdated.getName());
       accessKey.setExpirationDate(accessKeyUpdated.getExpirationDate());
-      BrowserService.Util.getInstance().createAccessKey(this.accessKey, new NoAsyncCallback<AccessKey>() {
-        @Override
-        public void onSuccess(AccessKey accessKey) {
+      Services services = new Services("Create access key", "create");
+      services.membersResource(s -> s.createAccessKey(this.accessKey)).whenComplete((accessKey, error) -> {
+        if (accessKey != null) {
           AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), accessKey, new NoAsyncCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {

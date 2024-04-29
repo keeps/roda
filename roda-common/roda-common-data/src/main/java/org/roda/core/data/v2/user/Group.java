@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -25,9 +27,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_GROUP)
 @JsonInclude(JsonInclude.Include.ALWAYS)
+@JsonTypeName("Group")
 public class Group extends RodaPrincipal {
 
   private static final long serialVersionUID = -4051946961307715630L;
+
+  private String type = "Group";
 
   /** Users that belong to this group. */
   private Set<String> users = new HashSet<>();
@@ -37,6 +42,14 @@ public class Group extends RodaPrincipal {
    */
   public Group() {
     super();
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   /**

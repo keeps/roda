@@ -14,13 +14,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
+import java.util.concurrent.CompletableFuture;
 
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.common.UserLoginService;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.welcome.Welcome;
+import org.roda.wui.client.services.MembersRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.LoginStatusListener;
@@ -69,10 +71,20 @@ public class UserLoginPortal {
   }
 
   private final CachedAsynRequest<User> getUserRequest = new CachedAsynRequest<User>() {
-
     @Override
     public void getFromServer(AsyncCallback<User> callback) {
-      UserLoginService.Util.getInstance().getAuthenticatedUser(callback);
+      getFromServer().whenComplete((user, error) -> {
+        if (error == null) {
+          callback.onSuccess(user);
+        } else {
+          callback.onFailure(error);
+        }
+      });
+    }
+
+    public CompletableFuture<User> getFromServer() {
+      Services services = new Services("Get authenticated user", "get");
+      return services.membersResource(MembersRestService::getAuthenticatedUser);
     }
   };
 
@@ -117,20 +129,18 @@ public class UserLoginPortal {
   }
 
   public void login(String username, String password, final AsyncCallback<User> callback) {
-    UserLoginService.Util.getInstance().login(username, password, new AsyncCallback<User>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      @Override
-      public void onSuccess(User newUser) {
-        getUserRequest.setCached(newUser);
-        onLoginStatusChanged(newUser);
-        callback.onSuccess(newUser);
-      }
-    });
+    Services services = new Services("Login", "login");
+    try (SecureString securePassword = new SecureString(password.toCharArray())) {
+      services.membersResource(s -> s.login(username, securePassword)).whenComplete((loggedUser, error) -> {
+        if (loggedUser != null) {
+          getUserRequest.setCached(loggedUser);
+          onLoginStatusChanged(loggedUser);
+          callback.onSuccess(loggedUser);
+        } else if (error != null) {
+          callback.onFailure(error);
+        }
+      });
+    }
   }
 
   public void logout() {

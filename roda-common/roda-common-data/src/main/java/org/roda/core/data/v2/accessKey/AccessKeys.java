@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.accessKey;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import jakarta.xml.bind.annotation.XmlElement;
  */
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_ACCESS_KEYS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AccessKeys implements RODAObjectList<AccessKey> {
+public class AccessKeys implements Serializable, RODAObjectList<AccessKey> {
   @Serial
   private static final long serialVersionUID = -7954551447492822643L;
   private List<AccessKey> accessKeys;

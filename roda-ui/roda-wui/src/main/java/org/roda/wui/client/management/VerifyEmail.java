@@ -19,6 +19,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.main.Login;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -220,32 +221,27 @@ public class VerifyEmail extends Composite {
 
   private void doVerifyEmail() {
     if (isValid()) {
-      UserManagementService.Util.getInstance().confirmUserEmail(username.getValue(), token.getValue(),
-        new AsyncCallback<Void>() {
+      Services services = new Services("Confirm email", "confirm");
+      services.membersResource(s -> s.confirmUserEmail(username.getValue(), token.getValue())).whenComplete((res, error) -> {
+        if (error == null) {
+          Dialogs.showInformationDialog(messages.verifyEmailSuccessDialogTitle(),
+            messages.verifyEmailSuccessDialogMessage(), messages.verifyEmailSuccessDialogButton(), false,
+            new AsyncCallback<Void>() {
 
-          @Override
-          public void onSuccess(Void result) {
-            Dialogs.showInformationDialog(messages.verifyEmailSuccessDialogTitle(),
-              messages.verifyEmailSuccessDialogMessage(), messages.verifyEmailSuccessDialogButton(), false,
-              new AsyncCallback<Void>() {
+              @Override
+              public void onSuccess(Void result) {
+                HistoryUtils.newHistory(Login.RESOLVER);
+              }
 
-                @Override
-                public void onSuccess(Void result) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
-              });
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
-        });
+              @Override
+              public void onFailure(Throwable caught) {
+                HistoryUtils.newHistory(Login.RESOLVER);
+              }
+            });
+        } else {
+          errorMessage(error);
+        }
+      });
     }
   }
 
