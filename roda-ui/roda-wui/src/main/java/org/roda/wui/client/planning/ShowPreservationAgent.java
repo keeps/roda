@@ -28,6 +28,7 @@ import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -105,7 +106,7 @@ public class ShowPreservationAgent extends Composite {
     actionableWidgetBuilder = new ActionableWidgetBuilder<>(PreservationAgentActions.get());
 
     Services services = new Services("Retrieve preservation agent", "get");
-    services.rodaEntityRestService(s -> s.findByUuid(agentId), IndexedPreservationAgent.class)
+    services.rodaEntityRestService(s -> s.findByUuid(agentId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedPreservationAgent.class)
       .whenComplete((preservationAgent, throwable) -> {
         if (throwable != null) {
           if (throwable instanceof NotFoundException) {

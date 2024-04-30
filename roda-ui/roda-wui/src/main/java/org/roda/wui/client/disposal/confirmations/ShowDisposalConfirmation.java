@@ -24,6 +24,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -86,7 +87,7 @@ public class ShowDisposalConfirmation extends Composite {
     if (historyTokens.size() == 1) {
       String confirmationId = historyTokens.get(0);
       Services services = new Services("Retrieve the disposal confirmation", "get");
-      services.rodaEntityRestService(s -> s.findByUuid(confirmationId), DisposalConfirmation.class)
+      services.rodaEntityRestService(s -> s.findByUuid(confirmationId, LocaleInfo.getCurrentLocale().getLocaleName()), DisposalConfirmation.class)
         .thenCompose(disposalConfirmation -> services
           .disposalConfirmationResource(s -> s.retrieveDisposalConfirmationReport(disposalConfirmation.getId(), false))
           .whenComplete((report, throwable) -> {

@@ -31,6 +31,7 @@ import org.roda.wui.common.client.tools.StringUtils;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -139,7 +140,8 @@ public class ShowJobReport extends Composite {
 
   private static void retrieveJobReport(String jobReportId, AsyncCallback<Widget> callback) {
     Services services = new Services("Get job report items", "get");
-    services.jobReportResource(s -> s.findByUuid(jobReportId)).thenCompose(indexedReport -> services
+
+    services.jobReportResource(s -> s.findByUuid(jobReportId, LocaleInfo.getCurrentLocale().getLocaleName())).thenCompose(indexedReport -> services
       .jobsResource(s -> s.getJobReport(indexedReport.getJobId(), jobReportId)).whenComplete((reports, error) -> {
         if (reports != null) {
           indexedReport.setReports(reports.getReports());

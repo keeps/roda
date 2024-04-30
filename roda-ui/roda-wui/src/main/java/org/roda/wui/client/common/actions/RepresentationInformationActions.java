@@ -15,11 +15,9 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.core.data.v2.ri.RepresentationInformationFilterRequest;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
@@ -33,6 +31,7 @@ import org.roda.wui.client.planning.EditRepresentationInformation;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -155,26 +154,29 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
             String filtertoAdd = HistoryUtils.getCurrentHistoryPath()
               .get(HistoryUtils.getCurrentHistoryPath().size() - 1);
 
-            BrowserService.Util.getInstance().updateRepresentationInformationListWithFilter(selectedItems, filtertoAdd,
-              new NoAsyncCallback<Job>() {
-                @Override
-                public void onSuccess(Job result) {
+            Services services = new Services("Update representation information with filter", "update");
+            RepresentationInformationFilterRequest request = new RepresentationInformationFilterRequest();
+            request.setSelectedItems(selectedItems);
+            request.setFilterToAdd(filtertoAdd);
+            services.representationInformationResource(s -> s.addFilterToRepresentationInformation(request))
+              .whenComplete((job, throwable) -> {
+                if (throwable == null) {
                   Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
-                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      doActionCallbackUpdated();
-                    }
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    doActionCallbackUpdated();
+                  }
 
-                    @Override
-                    public void onSuccess(final Void nothing) {
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                    }
-                  });
-                }
-              });
+                  @Override
+                  public void onSuccess(final Void nothing) {
+                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                  }
+                });
+              }
+            });
           } else {
             associateWithNew(callback);
           }
@@ -249,41 +251,37 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().deleteRepresentationInformation(objects, new AsyncCallback<Job>() {
+                Services services = new Services("Delete representation information", "delete");
+                services.representationInformationResource(s -> s.deleteMultipleRepresentationInformation(objects))
+                  .whenComplete((job, throwable) -> {
+                    if (throwable == null) {
+                      Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
+                        new ActionAsyncCallback<Void>(callback) {
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    callback.onFailure(caught);
-                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                  }
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            Timer timer = new Timer() {
+                              @Override
+                              public void run() {
+                                Toast.showInfo(messages.representationInformationRemoveSuccessTitle(),
+                                  messages.representationInformationRemoveSuccessMessage(size));
+                                doActionCallbackDestroyed();
+                              }
+                            };
 
-                  @Override
-                  public void onSuccess(Job result) {
-                    Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
-                      new ActionAsyncCallback<Void>(callback) {
+                            timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                          }
 
-                        @Override
-                        public void onFailure(Throwable caught) {
-                          Timer timer = new Timer() {
-                            @Override
-                            public void run() {
-                              Toast.showInfo(messages.representationInformationRemoveSuccessTitle(),
-                                messages.representationInformationRemoveSuccessMessage(size));
-                              doActionCallbackDestroyed();
-                            }
-                          };
-
-                          timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                        }
-
-                        @Override
-                        public void onSuccess(final Void nothing) {
-                          doActionCallbackNone();
-                          HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                        }
-                      });
-                  }
-                });
+                          @Override
+                          public void onSuccess(final Void nothing) {
+                            doActionCallbackNone();
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                          }
+                        });
+                    } else {
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    }
+                  });
               }
             }
           });

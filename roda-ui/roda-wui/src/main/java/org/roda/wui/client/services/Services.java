@@ -20,6 +20,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 
 import com.google.gwt.core.client.GWT;
 import org.roda.core.data.v2.user.RODAMember;
@@ -62,6 +63,8 @@ public class Services implements DirectRestService {
       return GWT.create(RiskRestService.class);
     } else if (PreservationEventRestService.class.equals(serviceClass)) {
       return GWT.create(PreservationEventRestService.class);
+    } else if (RepresentationInformationRestService.class.equals(serviceClass)) {
+      return GWT.create(RepresentationInformationRestService.class);
     } else if (MembersRestService.class.equals(serviceClass)) {
       return GWT.create(MembersRestService.class);
     } else {
@@ -113,6 +116,8 @@ public class Services implements DirectRestService {
       service = GWT.create(PreservationAgentRestService.class);
     } else if (LogEntry.class.getName().equals(objectClassString)) {
       service = GWT.create(AuditLogRestService.class);
+    } else if (RepresentationInformation.class.getName().equals(objectClassString)) {
+      service = GWT.create(RepresentationInformationRestService.class);
     } else if (Job.class.getName().equals(objectClassString)) {
       service = GWT.create(JobsRestService.class);
     } else if (IndexedReport.class.getName().equals(objectClassString)) {
@@ -196,5 +201,10 @@ public class Services implements DirectRestService {
 
   public <T> CompletableFuture<T> membersResource(CheckedFunction<MembersRestService, T> method) {
     return future(MembersRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> representationInformationResource(
+    CheckedFunction<RepresentationInformationRestService, T> method) {
+    return future(RepresentationInformationRestService.class, method);
   }
 }

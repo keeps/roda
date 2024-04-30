@@ -27,11 +27,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @jakarta.xml.bind.annotation.XmlAccessorType(jakarta.xml.bind.annotation.XmlAccessType.PUBLIC_MEMBER)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepresentationInformation extends NamedIndexedModel implements IsModelObject, IsIndexed, HasInstanceID {
+
   @Serial
   private static final long serialVersionUID = 8766448064705416130L;
 
   private String description = null;
   private String family = null;
+  private String familyI18n = null;
   private List<String> tags = null;
 
   private String extras = null;
@@ -57,6 +59,7 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     super(representationInformation.getId(), representationInformation.getName());
     this.description = representationInformation.getDescription();
     this.family = representationInformation.getFamily();
+    this.familyI18n = representationInformation.getFamilyI18n();
     this.tags = representationInformation.getTags();
     this.extras = representationInformation.getExtras();
     this.support = representationInformation.getSupport();
@@ -99,12 +102,12 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     this.tags = tags;
   }
 
+  @jakarta.xml.bind.annotation.XmlElement(name = "extras")
+  @jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter(value = ExtrasHandler.class)
   public String getExtras() {
     return extras;
   }
 
-  @jakarta.xml.bind.annotation.XmlElement(name = "extras")
-  @jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter(value = ExtrasHandler.class)
   public void setExtras(String extras) {
     this.extras = extras;
   }
@@ -176,6 +179,14 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
 
   public void setInstanceId(String instanceId) {
     this.instanceId = instanceId;
+  }
+
+  public String getFamilyI18n() {
+    return familyI18n;
+  }
+
+  public void setFamilyI18n(String familyI18n) {
+    this.familyI18n = familyI18n;
   }
 
   @Override

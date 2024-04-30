@@ -58,7 +58,7 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details",
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details",
         PluginParameter.PluginParameterType.STRING).withDefaultValue("").isMandatory(false).isReadOnly(false)
         .withDescription("Details that will be used when creating event").build());
   }

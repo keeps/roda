@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.disposal.schedule;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalSchedules implements RODAObjectList<DisposalSchedule> {
+
+  @Serial
   private static final long serialVersionUID = 6731736012367265785L;
   private List<DisposalSchedule> disposalScheduleList;
 

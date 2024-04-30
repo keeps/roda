@@ -11,46 +11,40 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.xml.bind.annotation.XmlElement;
-
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION_LIST)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepresentationInformationList implements RODAObjectList<RepresentationInformation> {
+
   @Serial
   private static final long serialVersionUID = -1500757245278990237L;
-  private List<RepresentationInformation> representationInformationList;
+
+  private List<RepresentationInformation> representationInformation;
 
   public RepresentationInformationList() {
     super();
-    representationInformationList = new ArrayList<>();
+    representationInformation = new ArrayList<>();
   }
 
   public RepresentationInformationList(List<RepresentationInformation> representationInformation) {
     super();
-    this.representationInformationList = representationInformation;
+    this.representationInformation = representationInformation;
   }
 
   @Override
-  @JsonProperty(value = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION_LIST)
-  @XmlElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION)
   public List<RepresentationInformation> getObjects() {
-    return representationInformationList;
+    return representationInformation;
   }
 
   @Override
   public void setObjects(List<RepresentationInformation> representationInformation) {
-    this.representationInformationList = representationInformation;
+    this.representationInformation = representationInformation;
   }
 
   @Override
   public void addObject(RepresentationInformation representationInformation) {
-    this.representationInformationList.add(representationInformation);
+    this.representationInformation.add(representationInformation);
   }
-
 }

@@ -66,7 +66,7 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> T retrieve(RequestContext context, Class<T> returnClass, String id,
-    List<String> fieldsToReturn) {
+    List<String> fieldsToReturn, boolean appendChildren) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -74,7 +74,7 @@ public class IndexService {
       // check user permissions
       controllerAssistant.checkRoles(context.getUser(), returnClass);
       // delegate
-      final T ret = RodaCoreFactory.getIndexService().retrieve(returnClass, id, fieldsToReturn);
+      final T ret = RodaCoreFactory.getIndexService().retrieve(returnClass, id, fieldsToReturn, appendChildren);
 
       // checking object permissions
       controllerAssistant.checkObjectPermissions(context.getUser(), ret, returnClass);
@@ -91,6 +91,11 @@ public class IndexService {
       controllerAssistant.registerAction(context, id, state, RodaConstants.CONTROLLER_CLASS_PARAM,
         returnClass.getSimpleName());
     }
+  }
+
+  public <T extends IsIndexed> T retrieve(RequestContext context, Class<T> returnClass, String id,
+    List<String> fieldsToReturn) {
+    return retrieve(context, returnClass, id, fieldsToReturn, false);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, CountRequest request, RequestContext context) {

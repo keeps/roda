@@ -73,36 +73,33 @@ public class FormUtilities {
           layout.addStyleName("metadata-form-field");
         }
 
-        String controlType = mv.get("type");
-        if (controlType == null) {
-          addTextField(panel, layout, mv, mandatory, onChange);
-        } else {
-          switch (controlType) {
-            case "text":
-              addTextField(panel, layout, mv, mandatory, onChange);
-              break;
-            case "textarea":
-            case "big-text":
-            case "text-area":
-              addTextArea(panel, layout, mv, mandatory, onChange);
-              break;
-            case "rich-text-area":
-              addRichTextArea(panel, layout, mv, mandatory, onChange);
-              break;
-            case "list":
-              addList(panel, layout, mv, mandatory, onChange);
-              break;
-            case "date":
-              addDatePicker(panel, layout, mv, mandatory, onChange);
-              break;
-            case "separator":
-              layout.addStyleName("form-separator");
-              addSeparator(panel, layout, mv);
-              break;
-            default:
-              addTextField(panel, layout, mv, mandatory, onChange);
-              break;
-          }
+      String controlType = mv.get("type");
+      if (controlType == null) {
+        addTextField(panel, layout, mv, mandatory, onChange);
+      } else {
+        switch (controlType) {
+          case "textarea":
+          case "big-text":
+          case "text-area":
+            addTextArea(panel, layout, mv, mandatory, onChange);
+            break;
+          case "rich-text-area":
+            addRichTextArea(panel, layout, mv, mandatory, onChange);
+            break;
+          case "list":
+            addList(panel, layout, mv, mandatory, onChange);
+            break;
+          case "date":
+            addDatePicker(panel, layout, mv, mandatory, onChange);
+            break;
+          case "separator":
+            layout.addStyleName("form-separator");
+            addSeparator(panel, layout, mv);
+            break;
+          case "text":
+          default:
+            addTextField(panel, layout, mv, mandatory, onChange);
+            break;
         }
       }
     }

@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
@@ -14,6 +15,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.TransferredResources;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
@@ -215,7 +217,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
     }
   }
 
-  @GetMapping(path = "/binary/{uuid}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @GetMapping(path = "{uuid}/binary", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   @Operation(summary = "Downloads transferred resource", description = "Download a particular transferred resource", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
@@ -298,8 +300,9 @@ public class TransferredResourceController implements TransferredResourceRestSer
   }
 
   @Override
-  public TransferredResource findByUuid(String uuid) {
-    return null;
+  public TransferredResource findByUuid(String uuid, String localeString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.retrieve(requestContext, TransferredResource.class, uuid, new ArrayList<>());
   }
 
   @Override
@@ -309,8 +312,8 @@ public class TransferredResourceController implements TransferredResourceRestSer
   }
 
   @Override
-  public Long count(@RequestBody CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(TransferredResource.class, countRequest, requestContext);
+    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
   }
 }

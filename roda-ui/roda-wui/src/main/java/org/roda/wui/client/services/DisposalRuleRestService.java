@@ -60,7 +60,7 @@ public interface DisposalRuleRestService extends DirectRestService {
   Void deleteDisposalRule(
     @Parameter(description = "The ID of the disposal rule to delete.", required = true) @PathVariable(name = "id") String id);
 
-  @RequestMapping(method = RequestMethod.POST, path = "/apply")
+  @RequestMapping(method = RequestMethod.POST, path = "/apply", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Apply disposal rule to repository", description = "Applies the set of rules defined to the all repository. AIPs which their disposal schedule was manually associated may it can be override using the query parameter.", responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})

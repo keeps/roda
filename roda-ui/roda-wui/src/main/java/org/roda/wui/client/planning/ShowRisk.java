@@ -28,6 +28,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -129,7 +130,7 @@ public class ShowRisk extends Composite {
       Services services = new Services("Retrieve indexed risk", "get");
       SidebarUtils.showSidebar(contentFlowPanel, sidebarFlowPanel);
 
-      services.rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0)), IndexedRisk.class)
+      services.rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0), LocaleInfo.getCurrentLocale().getLocaleName()), IndexedRisk.class)
         .whenComplete((indexedRisk, throwable) -> {
           if (throwable == null) {
             instance = new ShowRisk(indexedRisk);

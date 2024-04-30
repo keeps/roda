@@ -1,5 +1,6 @@
 package org.roda.wui.api.v2.controller;
 
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
@@ -29,7 +30,7 @@ public class AIPController implements AIPRestService {
   IndexService indexService;
 
   @Override
-  public IndexedAIP findByUuid(String uuid) {
+  public IndexedAIP findByUuid(String uuid, String localeString) {
     return null;
   }
 
@@ -40,8 +41,9 @@ public class AIPController implements AIPRestService {
   }
 
   @Override
-  public Long count(@RequestBody CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(IndexedAIP.class, countRequest, requestContext);
+    Long count = indexService.count(IndexedAIP.class, countRequest, requestContext);
+    return new LongResponse(count);
   }
 }

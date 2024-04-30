@@ -6,10 +6,12 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
@@ -56,7 +58,7 @@ public class PreservationAgentController implements PreservationAgentRestService
   PreservationAgentService preservationAgentService;
 
   @Override
-  public IndexedPreservationAgent findByUuid(String uuid) {
+  public IndexedPreservationAgent findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.PRESERVATION_AGENT_ID,
       RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
@@ -72,9 +74,9 @@ public class PreservationAgentController implements PreservationAgentRestService
   }
 
   @Override
-  public Long count(CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(IndexedPreservationAgent.class, countRequest, requestContext);
+    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
   }
 
   @GetMapping(path = "/{id}/binary", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

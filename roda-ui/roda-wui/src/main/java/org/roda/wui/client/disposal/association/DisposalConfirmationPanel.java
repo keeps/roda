@@ -22,6 +22,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -60,7 +61,7 @@ public class DisposalConfirmationPanel extends Composite {
     } else {
 
       Services services = new Services("Retrieve disposal confirmation", "get");
-      services.rodaEntityRestService(s -> s.findByUuid(disposalConfirmationId), DisposalConfirmation.class)
+      services.rodaEntityRestService(s -> s.findByUuid(disposalConfirmationId, LocaleInfo.getCurrentLocale().getLocaleName()), DisposalConfirmation.class)
         .whenComplete((result, throwable) -> {
           if (throwable != null) {
             AsyncCallbackUtils.defaultFailureTreatment(throwable);

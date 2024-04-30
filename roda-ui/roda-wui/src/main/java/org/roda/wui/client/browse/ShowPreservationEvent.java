@@ -53,6 +53,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -155,7 +156,7 @@ public class ShowPreservationEvent extends Composite {
     actionableWidgetBuilder = new ActionableWidgetBuilder<>(preservationEventActions).withBackButton();
 
     Services services = new Services("Retrieve preservation event", "get");
-    services.rodaEntityRestService(s -> s.findByUuid(eventId), IndexedPreservationEvent.class)
+    services.rodaEntityRestService(s -> s.findByUuid(eventId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedPreservationEvent.class)
       .thenCompose(event -> services.preservationEventsResource(s -> s.getPreservationAgents(event.getId()))
         .thenCompose(indexedPreservationAgents -> services
           .preservationEventsResource(s -> s.getLinkingIdentifierObjects(event.getId()))

@@ -30,7 +30,6 @@ import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateReq
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.ModelUtils;

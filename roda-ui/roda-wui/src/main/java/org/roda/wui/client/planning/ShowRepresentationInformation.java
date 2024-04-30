@@ -11,31 +11,23 @@
 package org.roda.wui.client.planning;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
+import org.roda.core.data.v2.ri.RepresentationInformationCreateRequest;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -50,6 +42,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.search.Search;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -82,7 +75,6 @@ import config.i18n.client.ClientMessages;
 public class ShowRepresentationInformation extends Composite {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static final List<String> fieldsToReturn = new ArrayList<>();
   private static ShowRepresentationInformation instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -106,11 +98,15 @@ public class ShowRepresentationInformation extends Composite {
       return "representation_information";
     }
   };
+
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
   @UiField
   Label representationInformationId;
   @UiField
-  Label dateCreated, dateUpdated;
+  Label dateCreated;
+  @UiField
+  Label dateUpdated;
   @UiField
   TitlePanel title;
   @UiField
@@ -118,13 +114,17 @@ public class ShowRepresentationInformation extends Composite {
   @UiField
   HTML representationInformationDescriptionValue;
   @UiField
-  Label representationInformationFamilyKey, representationInformationFamilyValue;
+  Label representationInformationFamilyKey;
+  @UiField
+  Label representationInformationFamilyValue;
   @UiField
   Label representationInformationTagKey;
   @UiField
   FlowPanel representationInformationTagValue;
   @UiField
-  Label representationInformationSupportKey, representationInformationSupportValue;
+  Label representationInformationSupportKey;
+  @UiField
+  Label representationInformationSupportValue;
   @UiField
   FlowPanel representationInformationRelationsValue;
   @UiField
@@ -139,6 +139,7 @@ public class ShowRepresentationInformation extends Composite {
   FlowPanel contentFlowPanel;
   @UiField
   FlowPanel sidebarFlowPanel;
+
   private RepresentationInformation ri;
   private ActionableWidgetBuilder<RepresentationInformation> actionableWidgetBuilder;
   private List<FilterParameter> aipParams = new ArrayList<>();
@@ -184,19 +185,7 @@ public class ShowRepresentationInformation extends Composite {
     representationInformationDescriptionKey.setVisible(StringUtils.isNotBlank(ri.getDescription()));
 
     representationInformationFamilyKey.setVisible(StringUtils.isNotBlank(ri.getFamily()));
-    BrowserService.Util.getInstance().retrieveRepresentationInformationFamilyOptions(ri.getFamily(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(String familyTranslation) {
-          representationInformationFamilyValue.setText(familyTranslation);
-        }
-      });
+    representationInformationFamilyValue.setText(ri.getFamilyI18n());
 
     List<String> tagsList = ri.getTags();
     representationInformationTagValue.setVisible(tagsList != null && !tagsList.isEmpty());
@@ -207,16 +196,12 @@ public class ShowRepresentationInformation extends Composite {
         InlineHTML parPanel = new InlineHTML();
         parPanel.setHTML("<span class='label label-info btn-separator-right ri-category'>"
           + messages.representationInformationListItems(SafeHtmlUtils.htmlEscape(category)) + "</span>");
-        parPanel.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent event) {
-            List<String> history = new ArrayList<>();
-            history.addAll(RepresentationInformationNetwork.RESOLVER.getHistoryPath());
-            history.add(Search.RESOLVER.getHistoryToken());
-            history.add(RodaConstants.REPRESENTATION_INFORMATION_TAGS);
-            history.add(category);
-            HistoryUtils.newHistory(history);
-          }
+        parPanel.addClickHandler(event -> {
+          List<String> history = new ArrayList<>(RepresentationInformationNetwork.RESOLVER.getHistoryPath());
+          history.add(Search.RESOLVER.getHistoryToken());
+          history.add(RodaConstants.REPRESENTATION_INFORMATION_TAGS);
+          history.add(category);
+          HistoryUtils.newHistory(history);
         });
         representationInformationTagValue.add(parPanel);
       }
@@ -230,19 +215,12 @@ public class ShowRepresentationInformation extends Composite {
       representationInformationSupportKey.setVisible(false);
     }
 
-    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri.getId(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(RepresentationInformationExtraBundle extra) {
-          if (extra != null) {
-            HtmlSnippetUtils.createExtraShow(extras, extra.getFamilyValues().get(ri.getFamily()), false);
-          }
+    Services services = new Services("Retrieve representation information family metadata", "get");
+    services.representationInformationResource(s -> s.retrieveRepresentationInformationFamily(ri.getId(),
+      ri.getFamily(), LocaleInfo.getCurrentLocale().getLocaleName()))
+      .whenComplete((representationInformationFamily, throwable) -> {
+        if (throwable == null) {
+          HtmlSnippetUtils.createExtraShow(extras, representationInformationFamily.getFamilyValues(), false);
         }
       });
 
@@ -290,197 +268,116 @@ public class ShowRepresentationInformation extends Composite {
     if (!aipParams.isEmpty()) {
       Filter aipFilter = new Filter();
       aipFilter.add(new OrFiltersParameters(aipParams));
-
-      BrowserService.Util.getInstance().count(IndexedAIP.class.getName(), aipFilter, true,
-        initEntityFiltersObjectPanel(IndexedAIP.class.getSimpleName()));
+      Services services = new Services("Count AIPs associated with representation information", "count");
+      CountRequest countRequest = new CountRequest(IndexedAIP.class.getName(), aipFilter, true);
+      services.rodaEntityRestService(s -> s.count(countRequest), IndexedAIP.class).whenComplete((count,
+        throwable) -> initEntityFiltersObjectPanel(count.getResult(), throwable, IndexedAIP.class.getSimpleName()));
     } else if (!representationParams.isEmpty()) {
       Filter representationFilter = new Filter();
       representationFilter.add(new OrFiltersParameters(representationParams));
 
-      BrowserService.Util.getInstance().count(IndexedRepresentation.class.getName(), representationFilter, true,
-        initEntityFiltersObjectPanel(IndexedRepresentation.class.getSimpleName()));
+      Services services = new Services("Count Representations associated with representation information", "count");
+      CountRequest countRequest = new CountRequest(IndexedRepresentation.class.getName(), representationFilter, true);
+      services.rodaEntityRestService(s -> s.count(countRequest), IndexedRepresentation.class)
+        .whenComplete((count, throwable) -> initEntityFiltersObjectPanel(count.getResult(), throwable,
+          IndexedRepresentation.class.getSimpleName()));
     } else if (!fileParams.isEmpty()) {
       Filter fileFilter = new Filter();
       fileFilter.add(new OrFiltersParameters(fileParams));
 
-      BrowserService.Util.getInstance().count(IndexedFile.class.getName(), fileFilter, true,
-        initEntityFiltersObjectPanel(IndexedFile.class.getSimpleName()));
+      Services services = new Services("Count Files associated with representation information", "count");
+      CountRequest countRequest = new CountRequest(IndexedFile.class.getName(), fileFilter, true);
+      services.rodaEntityRestService(s -> s.count(countRequest), IndexedFile.class).whenComplete((count,
+        throwable) -> initEntityFiltersObjectPanel(count.getResult(), throwable, IndexedFile.class.getSimpleName()));
     } else {
-      initEntityFiltersObjectPanel(IndexedAIP.class.getSimpleName()).onSuccess(0L);
+      initEntityFiltersObjectPanel(0L, null, IndexedAIP.class.getSimpleName());
     }
   }
 
-  private AsyncCallback<Long> initEntityFiltersObjectPanel(final String searchType) {
-    return new AsyncCallback<Long>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
+  private void initEntityFiltersObjectPanel(final Long count, final Throwable throwable, final String searchType) {
+    if (throwable != null) {
+      AsyncCallbackUtils.defaultFailureTreatment(throwable);
+    } else {
+      ShowRepresentationInformation.this.objectPanel.clear();
+      String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(
+        ShowRepresentationInformation.this.ri.getFilters(), searchType);
+
+      InlineHTML label = new InlineHTML();
+      label.addStyleName("ri-form-label-inline");
+      if (IndexedAIP.class.getSimpleName().equals(searchType)) {
+        label.setHTML(messages.representationInformationIntellectualEntities(count.intValue(), url));
+      } else if (IndexedRepresentation.class.getSimpleName().equals(searchType)) {
+        label.setHTML(messages.representationInformationRepresentations(count.intValue(), url));
+      } else if (IndexedFile.class.getSimpleName().equals(searchType)) {
+        label.setHTML(messages.representationInformationFiles(count.intValue(), url));
       }
 
-      @Override
-      public void onSuccess(Long size) {
-        ShowRepresentationInformation.this.objectPanel.clear();
+      ShowRepresentationInformation.this.objectPanel.add(label);
 
-        String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(
-          ShowRepresentationInformation.this.ri.getFilters(), searchType);
+      InlineHTML edit = new InlineHTML("<i class='fa fa-pencil' aria-hidden='true'></i>");
+      edit.setTitle("Edit association rules");
+      edit.addStyleName("ri-category link-color");
 
-        InlineHTML label = new InlineHTML();
-        label.addStyleName("ri-form-label-inline");
+      edit.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
+            messages.representationInformationEditAssociations(), messages.cancelButton(), messages.confirmButton(),
+            messages.searchButton(), ShowRepresentationInformation.this.ri,
+            new AsyncCallback<RepresentationInformation>() {
+              @Override
+              public void onFailure(Throwable caught) {
+                // do nothing
+              }
 
-        if (IndexedAIP.class.getSimpleName().equals(searchType)) {
-          label.setHTML(messages.representationInformationIntellectualEntities(size.intValue(), url));
-        } else if (IndexedRepresentation.class.getSimpleName().equals(searchType)) {
-          label.setHTML(messages.representationInformationRepresentations(size.intValue(), url));
-        } else if (IndexedFile.class.getSimpleName().equals(searchType)) {
-          label.setHTML(messages.representationInformationFiles(size.intValue(), url));
+              @Override
+              public void onSuccess(RepresentationInformation result) {
+                // result is ri with updated filters
+                Services services = new Services("Update representation information", "update");
+                RepresentationInformationCreateRequest createRequest = new RepresentationInformationCreateRequest();
+                createRequest.setRepresentationInformation(result);
+                services.representationInformationResource(s -> s.updateRepresentationInformation(createRequest))
+                  .whenComplete((representationInformation, throwable1) -> {
+                    if (throwable1 == null) {
+                      ShowRepresentationInformation.getInstance().updateLists();
+                    }
+                  });
+              }
+            });
         }
+      });
 
-        ShowRepresentationInformation.this.objectPanel.add(label);
-
-        InlineHTML edit = new InlineHTML("<i class='fa fa-pencil' aria-hidden='true'></i>");
-        edit.setTitle("Edit association rules");
-        edit.addStyleName("ri-category link-color");
-
-        edit.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent event) {
-            RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
-              messages.representationInformationEditAssociations(), messages.cancelButton(), messages.confirmButton(),
-              messages.searchButton(), ShowRepresentationInformation.this.ri,
-              new AsyncCallback<RepresentationInformation>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
-
-                @Override
-                public void onSuccess(RepresentationInformation result) {
-                  // result is ri with updated filters
-                  BrowserService.Util.getInstance().updateRepresentationInformation(result, null,
-                    new AsyncCallback<Void>() {
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      }
-
-                      @Override
-                      public void onSuccess(Void result) {
-                        ShowRepresentationInformation.getInstance().updateLists();
-                      }
-                    });
-                }
-              });
-          }
-        });
-
-        ShowRepresentationInformation.this.objectPanel.add(edit);
-      }
-    };
+      ShowRepresentationInformation.this.objectPanel.add(edit);
+    }
   }
 
   private void initRelations() {
-    additionalSeparator.setVisible(false);
-    final RepresentationInformation ri = ShowRepresentationInformation.this.ri;
+    additionalSeparator.setVisible(!ri.getRelations().isEmpty());
 
-    BrowserService.Util.getInstance().retrieveRelationTypeTranslations(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<RelationTypeTranslationsBundle>() {
+    ri.getRelations().sort(Comparator.comparingInt(o -> o.getObjectType().getWeight()));
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(final RelationTypeTranslationsBundle bundle) {
-          representationInformationRelationsValue.clear();
-          final Map<String, List<RepresentationInformationRelation>> relationTypeToLink = new TreeMap<>();
-
-          final FlowPanel allPanel = new FlowPanel();
-          representationInformationRelationsValue.add(allPanel);
-
-          if (ri.getRelations() != null) {
-            for (RepresentationInformationRelation relation : ri.getRelations()) {
-              String relationType = bundle.getTranslations().get(relation.getObjectType())
-                .get(relation.getRelationType());
-              if (relationType != null) {
-                if (relationTypeToLink.containsKey(relationType)) {
-                  relationTypeToLink.get(relationType).add(relation);
-                } else {
-                  List<RepresentationInformationRelation> newRelations = new ArrayList<>();
-                  newRelations.add(relation);
-                  relationTypeToLink.put(relationType, newRelations);
-                }
-              }
-            }
-          }
-
-          if (StringUtils.isNotBlank(ri.getId())) {
-            Filter filter = new Filter(
-              new SimpleFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS_WITH_RI, ri.getId()));
-
-            BrowserService.Util.getInstance().find(RepresentationInformation.class.getName(), filter, Sorter.NONE,
-              new Sublist(0, 1000), Facets.NONE, LocaleInfo.getCurrentLocale().toString(), true, new ArrayList<>(),
-              new NoAsyncCallback<IndexResult<RepresentationInformation>>() {
-                @Override
-                public void onSuccess(IndexResult<RepresentationInformation> result) {
-                  for (RepresentationInformation r : result.getResults()) {
-                    if (r.getRelations() != null) {
-                      for (RepresentationInformationRelation relation : r.getRelations()) {
-                        if (relation.getLink() != null && relation.getLink().equals(ri.getId())) {
-                          String inverse = bundle.getInverseTranslations()
-                            .get(bundle.getInverses().get(relation.getRelationType()));
-
-                          if (StringUtils.isNotBlank(inverse)) {
-                            List<RepresentationInformationRelation> existingRelations = relationTypeToLink.get(inverse);
-                            if (existingRelations == null) {
-                              existingRelations = new ArrayList<>();
-                              relationTypeToLink.put(inverse, existingRelations);
-                            }
-
-                            // add new value to the list
-                            RepresentationInformationRelation newRelation = new RepresentationInformationRelation(
-                              inverse, relation.getObjectType(), r.getId(), r.getName());
-                            existingRelations.add(newRelation);
-                          }
-                        }
-                      }
-                    }
-                  }
-
-                  additionalSeparator.setVisible(relationTypeToLink.size() > 0);
-                  createRelationsLayout(relationTypeToLink, allPanel);
-                }
-              });
-          }
-        }
-      });
+    for (RepresentationInformationRelation relation : ri.getRelations()) {
+      representationInformationRelationsValue.add(createRelationsLayout(relation));
+    }
   }
 
-  private void createRelationsLayout(Map<String, List<RepresentationInformationRelation>> relationTypeToLink,
-    FlowPanel allPanel) {
-    for (Entry<String, List<RepresentationInformationRelation>> entry : relationTypeToLink.entrySet()) {
-      Label entryLabel = new Label(entry.getKey());
-      entryLabel.setStyleName("label");
-      allPanel.add(entryLabel);
+  private FlowPanel createRelationsLayout(RepresentationInformationRelation relation) {
+    FlowPanel panel = new FlowPanel();
+    FlowPanel linksPanel = new FlowPanel();
 
-      Collections.sort(entry.getValue(), new Comparator<RepresentationInformationRelation>() {
+    Label entryLabel = new Label(relation.getRelationTypeI18n());
+    entryLabel.setStyleName("label");
+    panel.add(entryLabel);
 
-        @Override
-        public int compare(RepresentationInformationRelation o1, RepresentationInformationRelation o2) {
-          return o1.getObjectType().getWeight() - o2.getObjectType().getWeight();
-        }
-      });
-
-      FlowPanel linksPanel = new FlowPanel();
-      allPanel.add(linksPanel);
-      for (RepresentationInformationRelation relation : entry.getValue()) {
-        Widget w = createRelationViewer(relation);
-        if (w != null) {
-          w.addStyleName("ri-links-panel");
-          linksPanel.add(w);
-        }
-      }
+    Widget w = createRelationViewer(relation);
+    if (w != null) {
+      w.addStyleName("ri-links-panel");
+      linksPanel.add(w);
     }
+
+    panel.add(w);
+
+    return panel;
   }
 
   private Widget createRelationViewer(RepresentationInformationRelation relation) {
@@ -527,17 +424,16 @@ public class ShowRepresentationInformation extends Composite {
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
-      BrowserService.Util.getInstance().retrieve(RepresentationInformation.class.getName(), historyTokens.get(0),
-        fieldsToReturn, new AsyncCallback<RepresentationInformation>() {
+      Services services = new Services("Retrieve representation information", "get");
+      services
+        .rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0), LocaleInfo.getCurrentLocale().getLocaleName()),
+          RepresentationInformation.class)
+        .whenComplete((representationInformation, throwable) -> {
+          if (throwable != null) {
+            callback.onFailure(throwable);
+          } else {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
-          @Override
-          public void onSuccess(RepresentationInformation result) {
-            ShowRepresentationInformation panel = new ShowRepresentationInformation(result);
+            ShowRepresentationInformation panel = new ShowRepresentationInformation(representationInformation);
             callback.onSuccess(panel);
           }
         });

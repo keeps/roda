@@ -2,10 +2,12 @@ package org.roda.wui.api.v2.controller;
 
 import java.util.ArrayList;
 
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
@@ -37,7 +39,7 @@ public class JobReportController implements JobReportRestService {
   private IndexService indexService;
 
   @Override
-  public IndexedReport findByUuid(String uuid) {
+  public IndexedReport findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(requestContext, IndexedReport.class, uuid, new ArrayList<>());
   }
@@ -45,18 +47,12 @@ public class JobReportController implements JobReportRestService {
   @Override
   public IndexResult<IndexedReport> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    if (findRequest.getFilter() == null || findRequest.getFilter().getParameters().isEmpty()) {
-      return new IndexResult<>();
-    }
-
-    // delegate
     return indexService.find(IndexedReport.class, findRequest, localeString, requestContext);
   }
 
   @Override
-  public Long count(@RequestBody CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(IndexedReport.class, countRequest, requestContext);
+    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
   }
 }

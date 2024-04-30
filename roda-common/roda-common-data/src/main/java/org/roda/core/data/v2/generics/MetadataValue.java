@@ -20,9 +20,10 @@ import java.util.Set;
  */
 public class MetadataValue implements Comparable<MetadataValue>, Serializable {
 
-  public static final String LABEL = "label";
   @Serial
   private static final long serialVersionUID = 51528625577483594L;
+
+  public static final String LABEL = "label";
   private String id;
   private Map<String, String> options;
 

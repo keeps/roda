@@ -50,27 +50,27 @@ public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS,
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS,
         "Risk incidence status", PluginParameterType.STRING).withDefaultValue("UNMITIGATED").isMandatory(false)
         .isReadOnly(false).withDescription("Risk incidence status.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY,
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY,
         "Risk incidence severity", PluginParameterType.STRING).withDefaultValue("MODERATE").isMandatory(false)
         .isReadOnly(false).withDescription("Risk incidence severity.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_ON,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_ON,
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_ON,
         "Risk incidence mitigated on", PluginParameterType.STRING).withDefaultValue("").isMandatory(false)
         .isReadOnly(false).withDescription("Risk incidence mitigated on.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_BY,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_BY,
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_BY,
         "Risk incidence mitigated by", PluginParameterType.STRING).withDefaultValue("MODERATE").isMandatory(false)
         .isReadOnly(false).withDescription("Risk incidence mitigated by.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_DESCRIPTION,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_DESCRIPTION,
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_DESCRIPTION,
         "Risk incidence mitigated description", PluginParameterType.STRING).withDefaultValue("MODERATE")
         .isMandatory(false).isReadOnly(false).withDescription("Risk incidence mitigated description.").build());
   }

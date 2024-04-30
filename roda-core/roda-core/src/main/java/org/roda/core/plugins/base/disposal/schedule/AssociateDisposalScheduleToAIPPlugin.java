@@ -58,7 +58,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID,
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID,
         "Disposal schedule id", PluginParameter.PluginParameterType.STRING)
         .withDescription("Disposal schedule identifier").build());
   }

@@ -7,19 +7,17 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.Jobs;
 import org.roda.core.data.v2.jobs.PluginInfo;
-import org.roda.core.data.v2.jobs.PluginParameter;
-import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -332,49 +330,20 @@ public class JobsController implements JobsRestService {
   }
 
   @Override
+  public Job findByUuid(String uuid, String localeString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.retrieve(requestContext, Job.class, uuid, new ArrayList<>());
+  }
+
+  @Override
   public IndexResult<Job> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    if (findRequest.getFilter() == null || findRequest.getFilter().getParameters().isEmpty()) {
-      return new IndexResult<>();
-    }
-
-    // delegate
     return indexService.find(Job.class, findRequest, localeString, requestContext);
   }
 
   @Override
-  public Long count(@RequestBody CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    return indexService.count(Job.class, countRequest, requestContext);
-  }
-
-  @Override
-  public Job findByUuid(String uuid) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser(), Job.class);
-
-      // delegate
-      final Job ret = indexService.retrieve(requestContext, Job.class, uuid,
-        new ArrayList<>());
-
-      // checking object permissions
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), ret, Job.class);
-
-      return ret;
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), uuid, state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        Job.class.getSimpleName(), RodaConstants.CONTROLLER_ID_PARAM, uuid);
-    }
+    return new LongResponse(indexService.count(Job.class, countRequest, requestContext));
   }
 }

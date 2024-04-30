@@ -1380,7 +1380,7 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> representationInformationCreatedOrUpdated(
     RepresentationInformation ri, boolean commit) {
-    return SolrUtils.create(index, RepresentationInformation.class, ri, this, commit);
+    return SolrUtils.create2(index, this, RepresentationInformation.class, ri);
   }
 
   @Override

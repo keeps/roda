@@ -33,6 +33,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
+import org.roda.core.data.v2.ri.RepresentationInformationRelationOptions;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.IncrementalList;
@@ -46,7 +47,7 @@ import org.roda.wui.client.common.search.Dropdown;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.search.SelectedPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
@@ -379,349 +380,349 @@ public class RepresentationInformationDialogs {
     final FlowPanel layout = new FlowPanel();
     layout.addStyleName("wui-dialog-layout");
 
-    BrowserService.Util.getInstance().retrieveRelationTypeTranslations(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<RelationTypeTranslationsBundle>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(final RelationTypeTranslationsBundle relationTypes) {
+    Services services = new Services("Retreive relation type options", "get");
+    services
+      .representationInformationResource(
+        s -> s.retrieveRepresentationInformationRelationOptions(LocaleInfo.getCurrentLocale().toString()))
+      .whenComplete((representationInformationRelationOptions, throwable) -> {
+        if (throwable == null) {
           final FlowPanel content = new FlowPanel();
           content.addStyleName("row skip_padding full_width content");
 
-          final FlowPanel leftSide = new FlowPanel();
-          leftSide.addStyleName("dialog-left-side col_3");
+        final FlowPanel leftSide = new FlowPanel();
+        leftSide.addStyleName("dialog-left-side col_3");
 
-          final FlowPanel rightSide = new FlowPanel();
-          rightSide.addStyleName("dialog-right-side col_9");
+        final FlowPanel rightSide = new FlowPanel();
+        rightSide.addStyleName("dialog-right-side col_9");
 
-          final Label aipLabel = new Label();
-          aipLabel.setText(messages.representationInformationRelationObjectType(RelationObjectType.AIP.toString()));
-          aipLabel.setTitle(messages.representationInformationRelationObjectType(RelationObjectType.AIP.toString()));
-          aipLabel.addStyleName("dialog-left-item-label");
-          leftSide.add(aipLabel);
+        final Label aipLabel = new Label();
+        aipLabel.setText(messages.representationInformationRelationObjectType(RelationObjectType.AIP.toString()));
+        aipLabel.setTitle(messages.representationInformationRelationObjectType(RelationObjectType.AIP.toString()));
+        aipLabel.addStyleName("dialog-left-item-label");
+        leftSide.add(aipLabel);
 
-          final Label riLabel = new Label();
-          riLabel.setText(messages
+        final Label riLabel = new Label();
+        riLabel.setText(messages
             .representationInformationRelationObjectType(RelationObjectType.REPRESENTATION_INFORMATION.toString()));
-          riLabel.setTitle(messages
+        riLabel.setTitle(messages
             .representationInformationRelationObjectType(RelationObjectType.REPRESENTATION_INFORMATION.toString()));
-          riLabel.addStyleName("dialog-left-item-label");
-          leftSide.add(riLabel);
+        riLabel.addStyleName("dialog-left-item-label");
+        leftSide.add(riLabel);
 
-          final Label webLabel = new Label();
-          webLabel.setText(messages.representationInformationRelationObjectType(RelationObjectType.WEB.toString()));
-          webLabel.setTitle(messages.representationInformationRelationObjectType(RelationObjectType.WEB.toString()));
-          webLabel.addStyleName("dialog-left-item-label");
-          leftSide.add(webLabel);
+        final Label webLabel = new Label();
+        webLabel.setText(messages.representationInformationRelationObjectType(RelationObjectType.WEB.toString()));
+        webLabel.setTitle(messages.representationInformationRelationObjectType(RelationObjectType.WEB.toString()));
+        webLabel.addStyleName("dialog-left-item-label");
+        leftSide.add(webLabel);
 
-          final Label txtLabel = new Label();
-          txtLabel.setText(messages.representationInformationRelationObjectType(RelationObjectType.TEXT.toString()));
-          txtLabel.setTitle(messages.representationInformationRelationObjectType(RelationObjectType.TEXT.toString()));
-          txtLabel.addStyleName("dialog-left-item-label");
-          leftSide.add(txtLabel);
+        final Label txtLabel = new Label();
+        txtLabel.setText(messages.representationInformationRelationObjectType(RelationObjectType.TEXT.toString()));
+        txtLabel.setTitle(messages.representationInformationRelationObjectType(RelationObjectType.TEXT.toString()));
+        txtLabel.addStyleName("dialog-left-item-label");
+        leftSide.add(txtLabel);
 
-          content.add(leftSide);
-          content.add(rightSide);
-          layout.add(content);
+        content.add(leftSide);
+        content.add(rightSide);
+        layout.add(content);
 
-          final FlowPanel buttonPanel = new FlowPanel();
-          final Button cancelButton = new Button(cancelButtonText);
-          final Button confirmButton = new Button(confirmButtonText);
-          confirmButton.setEnabled(false);
-          final Label helpLabel = new Label(messages.title("help"));
-          buttonPanel.add(confirmButton);
-          buttonPanel.add(cancelButton);
-          buttonPanel.add(helpLabel);
-          layout.add(buttonPanel);
-          dialogBox.setWidget(layout);
+        final FlowPanel buttonPanel = new FlowPanel();
+        final Button cancelButton = new Button(cancelButtonText);
+        final Button confirmButton = new Button(confirmButtonText);
+        confirmButton.setEnabled(false);
+        final Label helpLabel = new Label(messages.title("help"));
+        buttonPanel.add(confirmButton);
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(helpLabel);
+        layout.add(buttonPanel);
+        dialogBox.setWidget(layout);
 
-          dialogBox.setGlassEnabled(true);
-          dialogBox.setAnimationEnabled(false);
+        dialogBox.setGlassEnabled(true);
+        dialogBox.setAnimationEnabled(false);
 
-          cancelButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-              dialogBox.hide();
-              callback.onFailure(null);
-            }
-          });
+        cancelButton.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            dialogBox.hide();
+            callback.onFailure(null);
+          }
+        });
 
-          cancelButton.addStyleName("pull-right btn btn-link");
-          confirmButton.addStyleName("pull-right btn btn-play");
-          helpLabel.addStyleName("btn btn-link");
+        cancelButton.addStyleName("pull-right btn btn-link");
+        confirmButton.addStyleName("pull-right btn btn-play");
+        helpLabel.addStyleName("btn btn-link");
 
-          AsyncCallback<Void> centerDialogBox = new AsyncCallback<Void>() {
+        AsyncCallback<Void> centerDialogBox = new AsyncCallback<Void>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              dialogBox.center();
-            }
+          @Override
+          public void onFailure(Throwable caught) {
+            dialogBox.center();
+          }
 
-            @Override
-            public void onSuccess(Void result) {
-              dialogBox.center();
-            }
-          };
+          @Override
+          public void onSuccess(Void result) {
+            dialogBox.center();
+          }
+        };
 
-          showAIPDescription(aipLabel, riLabel, txtLabel, webLabel, rightSide, relationTypes, ri, confirmButton,
+        showAIPDescription(aipLabel, riLabel, txtLabel, webLabel, rightSide, representationInformationRelationOptions,
+          ri, confirmButton,
             clickHandlers, dialogBox, callback, centerDialogBox);
 
-          dialogBox.center();
-          dialogBox.show();
+        dialogBox.center();
+        dialogBox.show();
 
-          helpLabel.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-              aipLabel.removeStyleName("dialog-left-item-selected");
-              riLabel.removeStyleName("dialog-left-item-selected");
-              txtLabel.removeStyleName("dialog-left-item-selected");
-              webLabel.removeStyleName("dialog-left-item-selected");
-              rightSide.clear();
+        helpLabel.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            aipLabel.removeStyleName("dialog-left-item-selected");
+            riLabel.removeStyleName("dialog-left-item-selected");
+            txtLabel.removeStyleName("dialog-left-item-selected");
+            webLabel.removeStyleName("dialog-left-item-selected");
+            rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionHelp.html", null,
+            HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionHelp.html", null,
                 RodaConstants.ResourcesTypes.INTERNAL, centerDialogBox);
-              description.addStyleName("page-description");
-              rightSide.add(description);
+            description.addStyleName("page-description");
+            rightSide.add(description);
 
-              confirmButton.setEnabled(false);
-            }
-          });
+            confirmButton.setEnabled(false);
+          }
+        });
 
-          aipLabel.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-              showAIPDescription(aipLabel, riLabel, txtLabel, webLabel, rightSide, relationTypes, ri, confirmButton,
+        aipLabel.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            showAIPDescription(aipLabel, riLabel, txtLabel, webLabel, rightSide,
+              representationInformationRelationOptions, ri, confirmButton,
                 clickHandlers, dialogBox, callback, centerDialogBox);
-            }
-          });
+          }
+        });
 
-          riLabel.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-              riLabel.addStyleName("dialog-left-item-selected");
-              aipLabel.removeStyleName("dialog-left-item-selected");
-              txtLabel.removeStyleName("dialog-left-item-selected");
-              webLabel.removeStyleName("dialog-left-item-selected");
+        riLabel.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            riLabel.addStyleName("dialog-left-item-selected");
+            aipLabel.removeStyleName("dialog-left-item-selected");
+            txtLabel.removeStyleName("dialog-left-item-selected");
+            webLabel.removeStyleName("dialog-left-item-selected");
 
-              rightSide.clear();
+            rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithRI.html", null,
+            HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithRI.html", null,
                 RodaConstants.ResourcesTypes.INTERNAL, centerDialogBox);
-              description.addStyleName("page-description");
-              rightSide.add(description);
+            description.addStyleName("page-description");
+            rightSide.add(description);
 
-              Label selectLabel = new Label(messages.representationInformationRelationType());
-              selectLabel.addStyleName("form-label");
-              rightSide.add(selectLabel);
+            Label selectLabel = new Label(messages.representationInformationRelationType());
+            selectLabel.addStyleName("form-label");
+            rightSide.add(selectLabel);
 
-              final ListBox select = new ListBox();
-              select.addStyleName("form-listbox");
-              for (Entry<String, String> type : relationTypes.getTranslations()
-                .get(RelationObjectType.REPRESENTATION_INFORMATION).entrySet()) {
-                select.addItem(type.getValue(), type.getKey());
-              }
-              rightSide.add(select);
+            final ListBox select = new ListBox();
+            select.addStyleName("form-listbox");
+            for (Entry<String, String> type : representationInformationRelationOptions.getRelationsTranslations()
+              .get(RelationObjectType.REPRESENTATION_INFORMATION.toString()).entrySet()) {
+              select.addItem(type.getValue(), type.getKey());
+            }
+            rightSide.add(select);
 
-              Label linkLabel = new Label(messages.representationInformationRelationLink());
-              linkLabel.addStyleName("form-label");
-              rightSide.add(linkLabel);
+            Label linkLabel = new Label(messages.representationInformationRelationLink());
+            linkLabel.addStyleName("form-label");
+            rightSide.add(linkLabel);
 
-              final Button button = new Button(messages.selectButton());
-              button.addStyleName("btn btn-search");
-              rightSide.add(button);
+            final Button button = new Button(messages.selectButton());
+            button.addStyleName("btn btn-search");
+            rightSide.add(button);
 
-              final ValuedLabel linkText = new ValuedLabel();
-              linkText.setStyleName("label");
-              linkText.setVisible(false);
-              rightSide.add(linkText);
+            final ValuedLabel linkText = new ValuedLabel();
+            linkText.setStyleName("label");
+            linkText.setVisible(false);
+            rightSide.add(linkText);
 
-              Label titleLabel = new Label(messages.representationInformationRelationTitle());
-              titleLabel.addStyleName("form-label");
-              rightSide.add(titleLabel);
+            Label titleLabel = new Label(messages.representationInformationRelationTitle());
+            titleLabel.addStyleName("form-label");
+            rightSide.add(titleLabel);
 
-              final TextBox titleBox = new TextBox();
-              titleBox.addStyleName("form-textbox");
-              rightSide.add(titleBox);
+            final TextBox titleBox = new TextBox();
+            titleBox.addStyleName("form-textbox");
+            rightSide.add(titleBox);
 
-              button.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                  Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, ri.getId()));
-                  SelectRepresentationInformationDialog selectDialog = new SelectRepresentationInformationDialog(
+            button.addClickHandler(new ClickHandler() {
+              @Override
+              public void onClick(ClickEvent event) {
+                Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, ri.getId()));
+                SelectRepresentationInformationDialog selectDialog = new SelectRepresentationInformationDialog(
                     messages.chooseEntityTitle(), filter, false);
-                  selectDialog.setSingleSelectionMode();
-                  selectDialog.showAndCenter();
-                  selectDialog.addValueChangeHandler(new ValueChangeHandler<RepresentationInformation>() {
+                selectDialog.setSingleSelectionMode();
+                selectDialog.showAndCenter();
+                selectDialog.addValueChangeHandler(new ValueChangeHandler<RepresentationInformation>() {
 
-                    @Override
-                    public void onValueChange(ValueChangeEvent<RepresentationInformation> event) {
-                      final RepresentationInformation ri = event.getValue();
-                      button.setVisible(false);
-                      linkText.setVisible(true);
-                      linkText.setText(ri.getName());
-                      linkText.setValue(ri.getId());
+                  @Override
+                  public void onValueChange(ValueChangeEvent<RepresentationInformation> event) {
+                    final RepresentationInformation ri = event.getValue();
+                    button.setVisible(false);
+                    linkText.setVisible(true);
+                    linkText.setText(ri.getName());
+                    linkText.setValue(ri.getId());
 
-                      if (titleBox.getText().isEmpty()) {
-                        titleBox.setText(ri.getName());
-                      }
-
-                      confirmButton.setEnabled(true);
+                    if (titleBox.getText().isEmpty()) {
+                      titleBox.setText(ri.getName());
                     }
-                  });
-                }
-              });
 
-              for (HandlerRegistration handler : clickHandlers) {
-                handler.removeHandler();
+                    confirmButton.setEnabled(true);
+                  }
+                });
               }
+            });
 
-              clickHandlers.add(confirmButton.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                  if (!titleBox.getText().isEmpty() && !linkText.getValue().isEmpty()) {
-                    dialogBox.hide();
-                    callback.onSuccess(new RepresentationInformationRelation(select.getSelectedValue(),
+            for (HandlerRegistration handler : clickHandlers) {
+              handler.removeHandler();
+            }
+
+            clickHandlers.add(confirmButton.addClickHandler(new ClickHandler() {
+              @Override
+              public void onClick(ClickEvent event) {
+                if (!titleBox.getText().isEmpty() && !linkText.getValue().isEmpty()) {
+                  dialogBox.hide();
+                  callback.onSuccess(new RepresentationInformationRelation(select.getSelectedValue(),
                       RelationObjectType.REPRESENTATION_INFORMATION, linkText.getValue(), titleBox.getValue()));
-                  } else {
-                    Toast.showError(messages.representationInformationMissingFieldsTitle(),
+                } else {
+                  Toast.showError(messages.representationInformationMissingFieldsTitle(),
                       messages.representationInformationMissingFields());
-                  }
                 }
-              }));
-            }
-          });
+              }
+            }));
+          }
+        });
 
-          txtLabel.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-              txtLabel.addStyleName("dialog-left-item-selected");
-              aipLabel.removeStyleName("dialog-left-item-selected");
-              riLabel.removeStyleName("dialog-left-item-selected");
-              webLabel.removeStyleName("dialog-left-item-selected");
+        txtLabel.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            txtLabel.addStyleName("dialog-left-item-selected");
+            aipLabel.removeStyleName("dialog-left-item-selected");
+            riLabel.removeStyleName("dialog-left-item-selected");
+            webLabel.removeStyleName("dialog-left-item-selected");
 
-              rightSide.clear();
+            rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithText.html", null,
+            HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithText.html", null,
                 RodaConstants.ResourcesTypes.INTERNAL, centerDialogBox);
-              description.addStyleName("page-description");
-              rightSide.add(description);
+            description.addStyleName("page-description");
+            rightSide.add(description);
 
-              Label selectLabel = new Label(messages.representationInformationRelationType());
-              selectLabel.addStyleName("form-label");
-              rightSide.add(selectLabel);
+            Label selectLabel = new Label(messages.representationInformationRelationType());
+            selectLabel.addStyleName("form-label");
+            rightSide.add(selectLabel);
 
-              final ListBox select = new ListBox();
-              select.addStyleName("form-listbox");
-              for (Entry<String, String> type : relationTypes.getTranslations().get(RelationObjectType.TEXT)
+            final ListBox select = new ListBox();
+            select.addStyleName("form-listbox");
+            for (Entry<String, String> type : representationInformationRelationOptions.getRelationsTranslations()
+              .get(RelationObjectType.TEXT.toString())
                 .entrySet()) {
-                select.addItem(type.getValue(), type.getKey());
-              }
-              rightSide.add(select);
+              select.addItem(type.getValue(), type.getKey());
+            }
+            rightSide.add(select);
 
-              Label titleLabel = new Label(messages.representationInformationRelationTitle());
-              titleLabel.addStyleName("form-label");
-              rightSide.add(titleLabel);
+            Label titleLabel = new Label(messages.representationInformationRelationTitle());
+            titleLabel.addStyleName("form-label");
+            rightSide.add(titleLabel);
 
-              final TextBox titleBox = new TextBox();
-              titleBox.setStyleName("form-textbox");
-              rightSide.add(titleBox);
+            final TextBox titleBox = new TextBox();
+            titleBox.setStyleName("form-textbox");
+            rightSide.add(titleBox);
 
-              confirmButton.setEnabled(true);
+            confirmButton.setEnabled(true);
 
-              for (HandlerRegistration handler : clickHandlers) {
-                handler.removeHandler();
-              }
+            for (HandlerRegistration handler : clickHandlers) {
+              handler.removeHandler();
+            }
 
-              clickHandlers.add(confirmButton.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                  if (!titleBox.getText().isEmpty()) {
-                    dialogBox.hide();
-                    callback.onSuccess(new RepresentationInformationRelation(select.getSelectedValue(),
+            clickHandlers.add(confirmButton.addClickHandler(new ClickHandler() {
+              @Override
+              public void onClick(ClickEvent event) {
+                if (!titleBox.getText().isEmpty()) {
+                  dialogBox.hide();
+                  callback.onSuccess(new RepresentationInformationRelation(select.getSelectedValue(),
                       RelationObjectType.TEXT, titleBox.getValue(), titleBox.getValue()));
-                  } else {
-                    Toast.showError(messages.representationInformationMissingFieldsTitle(),
+                } else {
+                  Toast.showError(messages.representationInformationMissingFieldsTitle(),
                       messages.representationInformationMissingFields());
-                  }
                 }
-              }));
-            }
-          });
+              }
+            }));
+          }
+        });
 
-          webLabel.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-              webLabel.addStyleName("dialog-left-item-selected");
-              aipLabel.removeStyleName("dialog-left-item-selected");
-              riLabel.removeStyleName("dialog-left-item-selected");
-              txtLabel.removeStyleName("dialog-left-item-selected");
+        webLabel.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            webLabel.addStyleName("dialog-left-item-selected");
+            aipLabel.removeStyleName("dialog-left-item-selected");
+            riLabel.removeStyleName("dialog-left-item-selected");
+            txtLabel.removeStyleName("dialog-left-item-selected");
 
-              rightSide.clear();
+            rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithWeb.html", null,
+            HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithWeb.html", null,
                 RodaConstants.ResourcesTypes.INTERNAL, centerDialogBox);
-              description.addStyleName("page-description");
-              rightSide.add(description);
+            description.addStyleName("page-description");
+            rightSide.add(description);
 
-              Label selectLabel = new Label(messages.representationInformationRelationType());
-              selectLabel.addStyleName("form-label");
-              rightSide.add(selectLabel);
+            Label selectLabel = new Label(messages.representationInformationRelationType());
+            selectLabel.addStyleName("form-label");
+            rightSide.add(selectLabel);
 
-              final ListBox select = new ListBox();
-              select.addStyleName("form-listbox");
-              for (Entry<String, String> type : relationTypes.getTranslations().get(RelationObjectType.WEB)
+            final ListBox select = new ListBox();
+            select.addStyleName("form-listbox");
+            for (Entry<String, String> type : representationInformationRelationOptions.getRelationsTranslations()
+              .get(RelationObjectType.WEB.toString())
                 .entrySet()) {
-                select.addItem(type.getValue(), type.getKey());
-              }
-              rightSide.add(select);
-
-              Label linkLabel = new Label(messages.representationInformationRelationLink());
-              linkLabel.addStyleName("form-label");
-              rightSide.add(linkLabel);
-
-              final TextBox linkText = new TextBox();
-              linkText.setStyleName("form-textbox");
-              rightSide.add(linkText);
-
-              Label titleLabel = new Label(messages.representationInformationRelationTitle());
-              titleLabel.addStyleName("form-label");
-              rightSide.add(titleLabel);
-
-              final TextBox titleBox = new TextBox();
-              titleBox.addStyleName("form-textbox");
-              rightSide.add(titleBox);
-
-              confirmButton.setEnabled(true);
-
-              for (HandlerRegistration handler : clickHandlers) {
-                handler.removeHandler();
-              }
-
-              clickHandlers.add(confirmButton.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                  if (!titleBox.getText().isEmpty() && !linkText.getText().isEmpty()) {
-                    dialogBox.hide();
-                    callback.onSuccess(new RepresentationInformationRelation(select.getSelectedValue(),
-                      RelationObjectType.WEB, linkText.getValue(), titleBox.getValue()));
-                  } else {
-                    Toast.showError(messages.representationInformationMissingFieldsTitle(),
-                      messages.representationInformationMissingFields());
-                  }
-                }
-              }));
+              select.addItem(type.getValue(), type.getKey());
             }
-          });
-        }
-      });
+            rightSide.add(select);
+
+            Label linkLabel = new Label(messages.representationInformationRelationLink());
+            linkLabel.addStyleName("form-label");
+            rightSide.add(linkLabel);
+
+            final TextBox linkText = new TextBox();
+            linkText.setStyleName("form-textbox");
+            rightSide.add(linkText);
+
+            Label titleLabel = new Label(messages.representationInformationRelationTitle());
+            titleLabel.addStyleName("form-label");
+            rightSide.add(titleLabel);
+
+            final TextBox titleBox = new TextBox();
+            titleBox.addStyleName("form-textbox");
+            rightSide.add(titleBox);
+
+            confirmButton.setEnabled(true);
+
+            for (HandlerRegistration handler : clickHandlers) {
+              handler.removeHandler();
+            }
+
+            clickHandlers.add(confirmButton.addClickHandler(new ClickHandler() {
+              @Override
+              public void onClick(ClickEvent event) {
+                if (!titleBox.getText().isEmpty() && !linkText.getText().isEmpty()) {
+                  dialogBox.hide();
+                  callback.onSuccess(new RepresentationInformationRelation(select.getSelectedValue(),
+                      RelationObjectType.WEB, linkText.getValue(), titleBox.getValue()));
+                } else {
+                  Toast.showError(messages.representationInformationMissingFieldsTitle(),
+                      messages.representationInformationMissingFields());
+                }
+              }
+            }));
+          }
+        });
+      }
+    });
   }
 
   private static void showAIPDescription(Label aipLabel, Label riLabel, Label txtLabel, Label webLabel,
-    FlowPanel rightSide, RelationTypeTranslationsBundle relationTypes, RepresentationInformation ri,
+    FlowPanel rightSide, RepresentationInformationRelationOptions relationTypes, RepresentationInformation ri,
     Button confirmButton, List<HandlerRegistration> clickHandlers, DialogBox dialogBox,
     AsyncCallback<RepresentationInformationRelation> callback, AsyncCallback<Void> centerDialogBox) {
     aipLabel.addStyleName("dialog-left-item-selected");
@@ -743,7 +744,8 @@ public class RepresentationInformationDialogs {
     final ListBox select = new ListBox();
     select.addStyleName("form-listbox");
 
-    for (Entry<String, String> type : relationTypes.getTranslations().get(RelationObjectType.AIP).entrySet()) {
+    for (Entry<String, String> type : relationTypes.getRelationsTranslations().get(RelationObjectType.AIP.toString())
+      .entrySet()) {
       select.addItem(type.getValue(), type.getKey());
     }
     rightSide.add(select);

@@ -8,11 +8,13 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateRequest;
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.DisposalConfirmationService;
@@ -45,7 +47,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   IndexService indexService;
 
   @Override
-  public DisposalConfirmation findByUuid(String uuid) {
+  public DisposalConfirmation findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(requestContext, DisposalConfirmation.class, uuid, new ArrayList<>());
   }
@@ -57,9 +59,9 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   }
 
   @Override
-  public Long count(@RequestBody CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(DisposalConfirmation.class, countRequest, requestContext);
+    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
   }
 
   @Override

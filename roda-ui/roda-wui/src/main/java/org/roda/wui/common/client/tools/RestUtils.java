@@ -33,7 +33,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 
 public class RestUtils {
 
-  private static FindRequestMapper FIND_REQUEST_MAPPER = GWT.create(FindRequestMapper.class);
+  private static final FindRequestMapper FIND_REQUEST_MAPPER = GWT.create(FindRequestMapper.class);
 
   private RestUtils() {
     // do nothing
@@ -105,29 +105,15 @@ public class RestUtils {
   }
 
   public static SafeUri createRepresentationFileDownloadUri(String fileUuid) {
-    return createRepresentationFileDownloadUriV2(fileUuid, false);
-  }
-
-  public static SafeUri createRepresentationFileDownloadUriV2(String fileUuid, boolean contentDispositionInline) {
-
-    // api/v2/files/{file_uuid}
-    return UriUtils.fromSafeConstant("api/v2/files/binary/" + URL.encodeQueryString(fileUuid));
+    return createRepresentationFileDownloadUri(fileUuid, false);
   }
 
   public static SafeUri createRepresentationFileDownloadUri(String fileUuid, boolean contentDispositionInline) {
+    // api/v2/files/{file_uuid}/binary
+    String b = RodaConstants.API_REST_V2_FILES + URL.encodeQueryString(fileUuid)
+      + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER;
 
-    // api/v1/files/{file_uuid}?acceptFormat=bin&inline={inline}
-    StringBuilder b = new StringBuilder();
-    // base uri
-    b.append(RodaConstants.API_REST_V1_FILES).append(URL.encodeQueryString(fileUuid));
-    // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
-
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_INLINE)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(contentDispositionInline);
-
-    return UriUtils.fromSafeConstant(b.toString());
+    return UriUtils.fromSafeConstant(b);
   }
 
   public static SafeUri createDipDownloadUri(String dipUUID) {
@@ -362,14 +348,16 @@ public class RestUtils {
 
   public static SafeUri createPreservationEventDownloadUri(String eventId) {
     // api/v2/preservation/events/{id}/binary
-    String b = "api/v2/preservation/events/" + URL.encodeQueryString(eventId) + "/binary";
+    String b = RodaConstants.API_REST_V2_PRESERVATION_EVENTS + URL.encodeQueryString(eventId)
+      + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER;
 
     return UriUtils.fromSafeConstant(b);
   }
 
   public static SafeUri createPreservationEventDetailsUri(String eventId) {
     // api/v2/preservation/events/{id}/details/html?lang={lang}
-    String b = "api/v2/preservation/events/" + URL.encodeQueryString(eventId) + "/details/html"
+    String b = RodaConstants.API_REST_V2_PRESERVATION_EVENTS + URL.encodeQueryString(eventId)
+      + RodaConstants.API_REST_V2_PRESERVATION_EVENTS_DETAILS_HTML
       + RodaConstants.API_QUERY_START + RodaConstants.API_QUERY_KEY_LANG + RodaConstants.API_QUERY_ASSIGN_SYMBOL
       + LocaleInfo.getCurrentLocale().getLocaleName();
 
@@ -378,7 +366,8 @@ public class RestUtils {
 
   public static SafeUri createPreservationAgentDownloadUri(String agentId) {
     // api/v2/preservation/agents/{id}/binary
-    String b = "api/v2/preservation/agents/" + URL.encodeQueryString(agentId) + "/binary";
+    String b = RodaConstants.API_REST_V2_PRESERVATION_AGENTS + URL.encodeQueryString(agentId)
+      + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER;
 
     return UriUtils.fromSafeConstant(b);
   }
@@ -439,24 +428,18 @@ public class RestUtils {
   }
 
   public static SafeUri createTransferredResourceDownloadUri(String resourceId) {
-    // api/v2/transfers/binary/{transferred_resource_uuid}
-    StringBuilder b = new StringBuilder();
-    // base uri
-    // TODO add binary string to RodaConstants
-    b.append(RodaConstants.API_REST_V2_RESOURCES).append(RodaConstants.API_PARAM_BINARY).append(resourceId);
+    // api/v2/transfers/{transferred_resource_uuid}/binary
 
-    return UriUtils.fromSafeConstant(b.toString());
+    return UriUtils
+      .fromSafeConstant(RodaConstants.API_REST_V2_RESOURCES + resourceId + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
   }
 
   public static SafeUri createRepresentationInformationDownloadUri(String riId) {
-    // api/v1/representation_information/{representation_information_id}?acceptFormat=xml
-    StringBuilder b = new StringBuilder();
-    // base uri
-    b.append(RodaConstants.API_REST_V1_REPRESENTATION_INFORMATION).append(riId).append(RodaConstants.API_QUERY_START)
-      .append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+    // api/v2/representation-information/{id}/binary
 
-    return UriUtils.fromSafeConstant(b.toString());
+    String b = RodaConstants.API_REST_V2_REPRESENTATION_INFORMATION + riId + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER;
+
+    return UriUtils.fromSafeConstant(b);
   }
 
   /**
@@ -490,7 +473,8 @@ public class RestUtils {
     // api/v2/themes/?resource-id={resourceId}&default-resource-id={defaultResourceId}&resource-type={resourceType}
     StringBuilder b = new StringBuilder();
 
-    b.append("api/v2/themes").append(RodaConstants.API_QUERY_START).append(RodaConstants.API_V2_QUERY_PARAM_RESOURCE_ID)
+    b.append(RodaConstants.API_REST_V2_THEME).append(RodaConstants.API_QUERY_START)
+      .append(RodaConstants.API_V2_QUERY_PARAM_RESOURCE_ID)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encode(resourceId));
 
     if (defaultResourceId != null) {
@@ -512,10 +496,8 @@ public class RestUtils {
   }
 
   public static SafeUri createJobAttachmentDownloadUri(String jobId, String attachmentId) {
-    StringBuilder b = new StringBuilder();
     // api/v1/jobs/{jobId}/attachment/{attachmentId}
-    b.append(RodaConstants.API_REST_V2_JOBS).append(jobId).append("/attachment/").append(attachmentId);
-    return UriUtils.fromSafeConstant(b.toString());
+    return UriUtils.fromSafeConstant(RodaConstants.API_REST_V2_JOBS + jobId + "/attachment/" + attachmentId);
   }
 
   public static <T extends IsIndexed> void requestCSVExport(Class<T> classToReturnName, Filter filter, Sorter sorter,

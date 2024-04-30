@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import java.io.Serial;
 import java.util.Date;
 
 import org.roda.core.data.common.RodaConstants.DateGranularity;
@@ -16,6 +17,7 @@ import org.roda.core.data.common.RodaConstants.DateGranularity;
  */
 public class DateIntervalFilterParameter extends RangeFilterParameter<Date> {
 
+  @Serial
   private static final long serialVersionUID = -8039972534809175118L;
 
   private String toName;

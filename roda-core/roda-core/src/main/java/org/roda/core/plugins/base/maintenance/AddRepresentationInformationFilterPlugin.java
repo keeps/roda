@@ -31,9 +31,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +45,8 @@ public class AddRepresentationInformationFilterPlugin extends AbstractPlugin<Rep
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER, "New filter",
-        PluginParameterType.STRING, "", true, false, "Representation information new filter"));
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER, "New filter",
+        PluginParameterType.STRING).withDescription("Representation information new filter").build());
   }
 
   @Override
