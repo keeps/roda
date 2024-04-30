@@ -10,7 +10,6 @@ package org.roda.wui.api.controllers;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -23,6 +22,7 @@ import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.ldap.NamingException;
 
 /**
  * Helper class to perform users login.
@@ -69,7 +69,7 @@ public class UserLoginHelper {
     try {
       user = RodaCoreFactory.getModelService().retrieveUser(username);
     } catch (GenericException e) {
-      if (!(e.getCause() instanceof LdapException)) {
+      if (!(e.getCause() instanceof NamingException)) {
         throw e;
       }
     }
@@ -92,7 +92,7 @@ public class UserLoginHelper {
         try {
           retrievedUserByEmail = RodaCoreFactory.getModelService().retrieveUserByEmail(newUser.getEmail());
         } catch (GenericException e) {
-          if (!(e.getCause() instanceof LdapException)) {
+          if (!(e.getCause() instanceof NamingException)) {
             throw e;
           }
         }

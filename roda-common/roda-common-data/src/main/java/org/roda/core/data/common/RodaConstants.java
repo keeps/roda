@@ -814,9 +814,6 @@ public final class RodaConstants {
 
   public static final String CORE_LDAP_DEFAULT_URL = "ldap://localhost";
   public static final int CORE_LDAP_DEFAULT_PORT = 10389;
-  public static final String CORE_LDAP_BACKEND_JDBM = "JDBM";
-  public static final String CORE_LDAP_BACKEND_LDIF = "LDIF";
-  public static final String CORE_LDAP_BACKEND_MAVIBOT = "MAVIBOT";
 
   /*
    * Solr Retry

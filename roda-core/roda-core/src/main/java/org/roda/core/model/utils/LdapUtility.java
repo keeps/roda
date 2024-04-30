@@ -228,16 +228,6 @@ public class LdapUtility {
   }
 
   /**
-   * Stop the directory service and LDAP server if it is running.
-   *
-   * @throws GenericException
-   *           is some error occurred during shutdown.
-   */
-  public void stopService() throws GenericException {
-
-  }
-
-  /**
    * Initialize the server. It creates the partition, and injects the context
    * entries for the created partitions.
    *

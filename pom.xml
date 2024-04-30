@@ -104,7 +104,6 @@
         <spring.version>6.1.6</spring.version>
         <solr.version>9.6.0</solr.version>
         <akka.version>2.8.5</akka.version>
-        <apacheds.version>2.0.0.AM27</apacheds.version>
         <httpcomponents.version>4.5.14</httpcomponents.version>
         <commons_ip2.version>2.6.1</commons_ip2.version>
         <metrics.version>3.2.6</metrics.version>
@@ -713,133 +712,6 @@
                 <version>2.2.11-KEEPS</version>
             </dependency>
             <!-- CAS related dependencies - end -->
-            <!-- ApacheDS related dependencies - start -->
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-core</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-core-annotations</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-core-api</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-core-avl</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-core-constants</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-core-jndi</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-interceptor-kerberos</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-jdbm-partition</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-kerberos-codec</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-ldif-partition</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-protocol-dhcp</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-protocol-dns</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-protocol-kerberos</artifactId>
-                <version>2.0.0.AM26</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-protocol-ldap</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-protocol-ntp</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-protocol-shared</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-server-annotations</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-server-config</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-server-jndi</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-test-framework</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-xdbm-partition</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-            <!-- ApacheDS related dependencies - end -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
@@ -1103,7 +975,6 @@
             </dependency>
             <!-- lfaria: 2022-12-07 -->
             <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
-            <!-- Forcing apacheds 2.0.0.AM26 dependency upgrade -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
@@ -1111,7 +982,6 @@
             </dependency>
             <!-- mguimaraes: 2022-12-15 -->
             <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
-            <!-- Forcing apacheds 2.0.0.AM26 dependency upgrade -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>

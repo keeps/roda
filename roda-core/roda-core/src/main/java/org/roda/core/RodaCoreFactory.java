@@ -241,7 +241,6 @@ public class RodaCoreFactory {
   private static EventsManager eventsManager;
 
   private static LdapUtility ldapUtility;
-  private static Path rodaApacheDSDataDirectory = null;
 
   // TransferredResources related objects
   private static TransferredResourcesScanner transferredResourcesScanner;
@@ -1614,9 +1613,6 @@ public class RodaCoreFactory {
           LOGGER.error("Error shutting down SOLR", e);
         }
       }
-      if (INSTANTIATE_LDAP) {
-        stopApacheDS();
-      }
       if (INSTANTIATE_PLUGIN_MANAGER) {
         pluginManager.shutdown();
       }
@@ -1666,16 +1662,8 @@ public class RodaCoreFactory {
         indexUsersAndGroupsFromLDAP();
       }
     } catch (Exception e) {
-      LOGGER.error("Error starting up embedded ApacheDS", e);
+      LOGGER.error("Error starting ldap server", e);
       instantiatedWithoutErrors = false;
-    }
-  }
-
-  private static void stopApacheDS() {
-    try {
-      RodaCoreFactory.ldapUtility.stopService();
-    } catch (final Exception e) {
-      LOGGER.error("Error while shutting down ApacheDS embedded server", e);
     }
   }
 
