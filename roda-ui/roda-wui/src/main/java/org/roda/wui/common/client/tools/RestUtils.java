@@ -362,14 +362,14 @@ public class RestUtils {
   }
 
   public static SafeUri createPreservationEventDownloadUri(String eventId) {
-    // api/v2/preservation/events/{event_id}/binary
+    // api/v2/preservation/events/{id}/binary
     String b = "api/v2/preservation/events/" + URL.encodeQueryString(eventId) + "/binary";
 
     return UriUtils.fromSafeConstant(b);
   }
 
   public static SafeUri createPreservationEventDetailsUri(String eventId) {
-    // api/v2/preservation/events/{event_id}/details/html?lang={lang}
+    // api/v2/preservation/events/{id}/details/html?lang={lang}
     String b = "api/v2/preservation/events/" + URL.encodeQueryString(eventId) + "/details/html"
       + RodaConstants.API_QUERY_START + RodaConstants.API_QUERY_KEY_LANG + RodaConstants.API_QUERY_ASSIGN_SYMBOL
       + LocaleInfo.getCurrentLocale().getLocaleName();
@@ -377,18 +377,11 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b);
   }
 
-  public static SafeUri createPreservationAgentUri(String agentId, String acceptFormat) {
-    // api/v1/agents?id={agent_id}&acceptFormat={format}
-    StringBuilder b = new StringBuilder();
+  public static SafeUri createPreservationAgentDownloadUri(String agentId) {
+    // api/v2/preservation/agents/{id}/binary
+    String b = "api/v2/preservation/agents/" + URL.encodeQueryString(agentId) + "/binary";
 
-    b.append(RodaConstants.API_REST_V1_AGENTS).append(RodaConstants.API_QUERY_START)
-      .append(RodaConstants.API_QUERY_PARAM_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(URL.encodeQueryString(agentId));
-
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(acceptFormat));
-
-    return UriUtils.fromSafeConstant(b.toString());
+    return UriUtils.fromSafeConstant(b);
   }
 
   public static String createTransferredResourceUploadUri(String parentUUID, String locale) {

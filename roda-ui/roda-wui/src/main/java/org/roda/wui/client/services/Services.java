@@ -12,6 +12,7 @@ import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.notifications.Notification;
 
@@ -91,6 +92,8 @@ public class Services implements DirectRestService {
       service = GWT.create(DisposalScheduleRestService.class);
     } else if (IndexedPreservationEvent.class.getName().equals(objectClassString)) {
       service = GWT.create(PreservationEventRestService.class);
+    } else if (IndexedPreservationAgent.class.getName().equals(objectClassString)) {
+      service = GWT.create(PreservationAgentRestService.class);
     } else {
       throw new IllegalArgumentException(objectClassString + " not supported");
     }

@@ -10,19 +10,17 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.PreservationAgentActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -52,13 +50,7 @@ public class ShowPreservationAgent extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        final String agentId = historyTokens.get(0);
-        ShowPreservationAgent preservationAgents = new ShowPreservationAgent(agentId);
-        callback.onSuccess(preservationAgents);
-      } else if (historyTokens.size() == 2) {
-        final String eventId = historyTokens.get(0);
-        final String agentId = historyTokens.get(1);
-        ShowPreservationAgent preservationAgents = new ShowPreservationAgent(eventId, agentId);
+        ShowPreservationAgent preservationAgents = new ShowPreservationAgent(historyTokens.get(0));
         callback.onSuccess(preservationAgents);
       } else {
         HistoryUtils.newHistory(PreservationAgents.RESOLVER);
@@ -82,63 +74,50 @@ public class ShowPreservationAgent extends Composite {
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, ShowPreservationAgent> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.PRESERVATION_AGENT_ID, RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
-    RodaConstants.PRESERVATION_AGENT_VERSION, RodaConstants.PRESERVATION_AGENT_NOTE,
-    RodaConstants.PRESERVATION_AGENT_EXTENSION);
-
+  private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
-  Label agentId, agentName, agentType, agentVersion, agentNote, agentExtension;
-
+  Label agentId;
   @UiField
-  FlowPanel agentVersionPanel, agentNotePanel, agentExtensionPanel;
-
+  Label agentName;
+  @UiField
+  Label agentType;
+  @UiField
+  Label agentVersion;
+  @UiField
+  Label agentNote;
+  @UiField
+  Label agentExtension;
+  @UiField
+  FlowPanel agentVersionPanel;
+  @UiField
+  FlowPanel agentNotePanel;
+  @UiField
+  FlowPanel agentExtensionPanel;
   @UiField
   SimplePanel actionsSidebar;
   ActionableWidgetBuilder<IndexedPreservationAgent> actionableWidgetBuilder;
-
-  private IndexedPreservationAgent agent = null;
-  private String eventId = null;
-
-  public ShowPreservationAgent(final String eventId, final String agentId) {
-    this(agentId);
-    this.eventId = eventId;
-  }
 
   public ShowPreservationAgent(final String agentId) {
     initWidget(uiBinder.createAndBindUi(this));
 
     actionableWidgetBuilder = new ActionableWidgetBuilder<>(PreservationAgentActions.get());
 
-    BrowserService.Util.getInstance().retrieve(IndexedPreservationAgent.class.getName(), agentId, fieldsToReturn,
-      new AsyncCallback<IndexedPreservationAgent>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          if (caught instanceof NotFoundException) {
+    Services services = new Services("Retrieve preservation agent", "get");
+    services.rodaEntityRestService(s -> s.findByUuid(agentId), IndexedPreservationAgent.class)
+      .whenComplete((preservationAgent, throwable) -> {
+        if (throwable != null) {
+          if (throwable instanceof NotFoundException) {
             Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationAgent());
             HistoryUtils.newHistory(ListUtils.concat(PreservationAgents.RESOLVER.getHistoryPath()));
           } else {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
           }
-        }
-
-        @Override
-        public void onSuccess(IndexedPreservationAgent agent) {
-          ShowPreservationAgent.this.agent = agent;
-          viewAction();
+        } else {
+          viewAction(preservationAgent);
         }
       });
-  }
-
-  public static final List<String> getViewItemHistoryToken(String id) {
-    return ListUtils.concat(RESOLVER.getHistoryPath(), id);
   }
 
   @Override
@@ -147,7 +126,7 @@ public class ShowPreservationAgent extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
-  public void viewAction() {
+  public void viewAction(IndexedPreservationAgent agent) {
     agentId.setText(agent.getId());
     agentName.setText(agent.getName());
     agentType.setText(agent.getType());
@@ -163,5 +142,8 @@ public class ShowPreservationAgent extends Composite {
 
     actionsSidebar
       .setWidget(actionableWidgetBuilder.withBackButton().buildListWithObjects(new ActionableObject<>(agent)));
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowPreservationAgent> {
   }
 }
