@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.common.lists;
 
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +22,7 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -79,7 +79,7 @@ public class RepresentationInformationList extends AsyncTableCell<Representation
     TextColumn<RepresentationInformation> familyColumn = new TextColumn<RepresentationInformation>() {
       @Override
       public String getValue(RepresentationInformation ri) {
-        return ri != null ? ri.getFamily() : null;
+        return ri != null ? ri.getFamilyI18n() : null;
       }
     };
 

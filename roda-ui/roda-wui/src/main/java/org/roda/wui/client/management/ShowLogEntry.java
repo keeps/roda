@@ -32,6 +32,7 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -57,7 +58,7 @@ public class ShowLogEntry extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         Services services = new Services("Retrieve audit log", "get");
-        services.rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0)), LogEntry.class)
+        services.rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0), LocaleInfo.getCurrentLocale().getLocaleName()), LogEntry.class)
           .whenComplete((logEntry, throwable) -> {
             if (throwable == null) {
               ShowLogEntry logEntryPanel = new ShowLogEntry(logEntry);

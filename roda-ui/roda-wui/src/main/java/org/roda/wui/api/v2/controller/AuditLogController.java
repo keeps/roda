@@ -11,6 +11,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
@@ -57,7 +58,7 @@ public class AuditLogController implements AuditLogRestService {
   AuditLogService auditLogService;
 
   @Override
-  public LogEntry findByUuid(String uuid) {
+  public LogEntry findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.LOG_ID,
       RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD, RodaConstants.LOG_ADDRESS,
@@ -73,9 +74,9 @@ public class AuditLogController implements AuditLogRestService {
   }
 
   @Override
-  public Long count(@RequestBody CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(LogEntry.class, countRequest, requestContext);
+    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
   }
 
   @PostMapping(path = "/import", produces = MediaType.APPLICATION_JSON_VALUE)

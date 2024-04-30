@@ -5,11 +5,13 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.api.incidences.SelectedIncidences;
@@ -44,7 +46,7 @@ public class RiskIncidenceController implements RiskIncidenceRestService {
   private IndexService indexService;
 
   @Override
-  public RiskIncidence findByUuid(String uuid) {
+  public RiskIncidence findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_INCIDENCE_ID,
       RodaConstants.RISK_INCIDENCE_RISK_ID, RodaConstants.RISK_INCIDENCE_DESCRIPTION,
@@ -62,9 +64,9 @@ public class RiskIncidenceController implements RiskIncidenceRestService {
   }
 
   @Override
-  public Long count(CountRequest countRequest) {
+  public LongResponse count(CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(RiskIncidence.class, countRequest, requestContext);
+    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
   }
 
   @Override

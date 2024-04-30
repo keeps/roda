@@ -10,28 +10,26 @@ package org.roda.wui.client.planning;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.ri.RepresentationInformation;
+import org.roda.core.data.v2.ri.RepresentationInformationCustomForm;
+import org.roda.core.data.v2.ri.RepresentationInformationFamily;
+import org.roda.core.data.v2.ri.RepresentationInformationFamilyOptions;
 import org.roda.core.data.v2.ri.RepresentationInformationSupport;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
-import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.IncrementalFilterList;
 import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.client.common.IncrementalRelationList;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NoAsyncCallback;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
+import org.roda.wui.client.services.Services;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -40,7 +38,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
@@ -86,73 +83,74 @@ public class RepresentationInformationDataPanel extends Composite
   private boolean editmode;
   private boolean changed = false;
   private boolean checked = false;
-  private RepresentationInformationExtraBundle extraBundle = null;
+  private RepresentationInformationCustomForm customForm = null;
 
   /**
    * Create a new user data panel
    *
-   * @param editmode
+   * @param editMode
    *          if user name should be editable
    */
-  public RepresentationInformationDataPanel(boolean editmode, RepresentationInformation ri) {
-    this(true, editmode, ri);
+  public RepresentationInformationDataPanel(boolean editMode, RepresentationInformation ri) {
+    this(true, editMode, ri);
   }
 
   /**
    * Create a new user data panel
    *
    * @param visible
-   * @param editmode
+   * @param editMode
    */
-  public RepresentationInformationDataPanel(boolean visible, final boolean editmode,
+  public RepresentationInformationDataPanel(boolean visible, final boolean editMode,
     final RepresentationInformation ri) {
     relations = new IncrementalRelationList(ri);
     tags = new IncrementalList(true);
     initWidget(uiBinder.createAndBindUi(this));
 
-    this.editmode = editmode;
+    this.editmode = editMode;
     super.setVisible(visible);
     filters.setVisible(false);
 
-    ChangeHandler changeHandler = new ChangeHandler() {
-      @Override
-      public void onChange(ChangeEvent event) {
-        RepresentationInformationDataPanel.this.onChange();
-      }
-    };
+    ChangeHandler changeHandler = event -> RepresentationInformationDataPanel.this.onChange();
 
-    ValueChangeHandler valueChangeHandler = new ValueChangeHandler() {
-      @Override
-      public void onValueChange(ValueChangeEvent event) {
-        RepresentationInformationDataPanel.this.onChange();
-      }
-    };
+    ValueChangeHandler valueChangeHandler = event -> RepresentationInformationDataPanel.this.onChange();
 
-    KeyUpHandler keyUpHandler = new KeyUpHandler() {
-
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        onChange();
-      }
-    };
+    KeyUpHandler keyUpHandler = event -> onChange();
 
     name.addChangeHandler(changeHandler);
     name.addKeyUpHandler(keyUpHandler);
     description.addChangeHandler(changeHandler);
     description.addKeyUpHandler(keyUpHandler);
 
-    ChangeHandler familyChangeHandler = new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        RepresentationInformationDataPanel.this.onChange();
-        extras.clear();
-        FormUtilities.create(extras, extraBundle.getFamilyValues().get(family.getSelectedValue()), false,
-          new Callable<Void>() {
-            @Override
-            public Void call() {
+    ChangeHandler familyChangeHandler = event -> {
+      RepresentationInformationDataPanel.this.onChange();
+      extras.clear();
+      Services services = new Services("Retrieve representation information family metadata", "get");
+      if (editMode) {
+        services
+          .representationInformationResource(s -> s.retrieveRepresentationInformationFamily(ri.getId(),
+            family.getSelectedValue(), LocaleInfo.getCurrentLocale().getLocaleName()))
+          .whenComplete((representationInformationFamily, throwable) -> {
+            customForm = new RepresentationInformationCustomForm();
+            customForm.setValues(representationInformationFamily.getFamilyValues());
+            FormUtilities.create(extras,
+            representationInformationFamily.getFamilyValues(), false, () -> {
               RepresentationInformationDataPanel.this.onChange();
               return null;
+              });
+          });
+      } else {
+        services
+          .representationInformationResource(s -> s.retrieveRepresentationInformationFamilyConfigurations(
+            family.getSelectedValue(), LocaleInfo.getCurrentLocale().getLocaleName()))
+          .whenComplete((representationInformationFamily, throwable) -> {
+            customForm = new RepresentationInformationCustomForm();
+            customForm.setValues(representationInformationFamily.getFamilyValues());
+            if (throwable == null) {
+              FormUtilities.create(extras, representationInformationFamily.getFamilyValues(), false, () -> {
+                RepresentationInformationDataPanel.this.onChange();
+                return null;
+              });
             }
           });
       }
@@ -172,72 +170,73 @@ public class RepresentationInformationDataPanel extends Composite
       support.addItem(messages.representationInformationSupportValue(val.toString()), val.toString());
     }
 
-    BrowserService.Util.getInstance().retrieveRepresentationInformationFamilyOptions(
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Map<String, String>>() {
+    if (editMode) {
+      Services services = new Services("Retrieve representation information family metadata", "get");
+      CompletableFuture<RepresentationInformationFamily> riFamilyCompletableFuture = services
+        .representationInformationResource(s -> s.retrieveRepresentationInformationFamily(ri.getId(), ri.getFamily(),
+          LocaleInfo.getCurrentLocale().getLocaleName()))
+        .toCompletableFuture();
+      CompletableFuture<RepresentationInformationFamilyOptions> riFamilyOptionsCompletableFuture = services
+        .representationInformationResource(
+          s -> s.retrieveRepresentationInformationFamilyOptions(LocaleInfo.getCurrentLocale().getLocaleName()))
+        .toCompletableFuture();
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
+      CompletableFuture.allOf(riFamilyCompletableFuture, riFamilyOptionsCompletableFuture).thenApplyAsync(unused -> {
+        RepresentationInformationFamily representationInformationFamily = riFamilyCompletableFuture.join();
+        RepresentationInformationFamilyOptions options = riFamilyOptionsCompletableFuture.join();
+
+        extras.clear();
+        customForm = new RepresentationInformationCustomForm();
+        customForm.setValues(representationInformationFamily.getFamilyValues());
+        FormUtilities.create(extras, representationInformationFamily.getFamilyValues(), false, () -> {
+          RepresentationInformationDataPanel.this.onChange();
+          return null;
+        });
+
+        for (Entry<String, String> item : options.getOptions().entrySet()) {
+          family.addItem(item.getValue(), item.getKey());
         }
 
-        @Override
-        public void onSuccess(final Map<String, String> families) {
-          for (Entry<String, String> item : families.entrySet()) {
-            family.addItem(item.getValue(), item.getKey());
-          }
-        }
+        setRepresentationInformation(ri);
+
+        return null;
       });
+    } else {
+      Services services = new Services("Retrieve representation information family options", "get");
+      CompletableFuture<RepresentationInformationFamilyOptions> riFamilyOptionsCompletableFuture = services
+        .representationInformationResource(
+          s -> s.retrieveRepresentationInformationFamilyOptions(LocaleInfo.getCurrentLocale().getLocaleName()))
+        .toCompletableFuture();
 
-    BrowserService.Util.getInstance().retrieveObjectClassFields(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<RepresentationInformationFilterBundle>() {
+      CompletableFuture.allOf(riFamilyOptionsCompletableFuture).thenApplyAsync(unused -> {
+        RepresentationInformationFamilyOptions options = riFamilyOptionsCompletableFuture.join();
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        for (Entry<String, String> item : options.getOptions().entrySet()) {
+          family.addItem(item.getValue(), item.getKey());
         }
 
-        @Override
-        public void onSuccess(RepresentationInformationFilterBundle result) {
-          RepresentationInformationDataPanel.this.filters.setFields(result.getObjectClassFields());
+        DomEvent.fireNativeEvent(Document.get().createChangeEvent(), family);
 
-          if (editmode) {
-            setRepresentationInformation(ri);
-          } else {
-            LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-            List<String> lastHistory = selectedItems.getLastHistory();
+        LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+        List<String> lastHistory = selectedItems.getLastHistory();
 
-            if (lastHistory.size() > 4 && lastHistory.get(0).equals(Planning.RESOLVER.getHistoryToken())
-              && lastHistory.get(1).equals(RepresentationInformationNetwork.RESOLVER.getHistoryToken())
-              && lastHistory.get(2).equals(RepresentationInformationAssociations.RESOLVER.getHistoryToken())) {
+        if (lastHistory.size() > 4 && lastHistory.get(0).equals(Planning.RESOLVER.getHistoryToken())
+          && lastHistory.get(1).equals(RepresentationInformationNetwork.RESOLVER.getHistoryToken())
+          && lastHistory.get(2).equals(RepresentationInformationAssociations.RESOLVER.getHistoryToken())) {
 
-              RepresentationInformationDataPanel.this.filters
-                .setFilters(Collections.singletonList(lastHistory.get(lastHistory.size() - 1)));
+          RepresentationInformationDataPanel.this.filters
+            .setFilters(Collections.singletonList(lastHistory.get(lastHistory.size() - 1)));
 
-              String[] filterParts = RepresentationInformationUtils
-                .breakFilterIntoParts(lastHistory.get(lastHistory.size() - 1));
-              RepresentationInformationDataPanel.this.name.setText(
-                messages.representationInformationNameFromAssociation(filterParts[0], filterParts[1], filterParts[2]));
-            }
-          }
+          String[] filterParts = RepresentationInformationUtils
+            .breakFilterIntoParts(lastHistory.get(lastHistory.size() - 1));
+          RepresentationInformationDataPanel.this.name.setText(
+            messages.representationInformationNameFromAssociation(filterParts[0], filterParts[1], filterParts[2]));
         }
+
+        return null;
+
       });
-
-    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri.getId(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), new NoAsyncCallback<RepresentationInformationExtraBundle>() {
-        @Override
-        public void onSuccess(RepresentationInformationExtraBundle extra) {
-          RepresentationInformationDataPanel.this.extraBundle = extra;
-          extras.clear();
-          FormUtilities.create(extras, extra.getFamilyValues().get(family.getSelectedValue()), false,
-            new Callable<Void>() {
-              @Override
-              public Void call() {
-                RepresentationInformationDataPanel.this.onChange();
-                return null;
-              }
-            });
-        }
-      });
+    }
   }
 
   public boolean isValid() {
@@ -339,7 +338,7 @@ public class RepresentationInformationDataPanel extends Composite
     return getRepresentationInformation();
   }
 
-  public RepresentationInformationExtraBundle getExtras() {
-    return extraBundle;
+  public RepresentationInformationCustomForm getCustomForm() {
+    return customForm;
   }
 }

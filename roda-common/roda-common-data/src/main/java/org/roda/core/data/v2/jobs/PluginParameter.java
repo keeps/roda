@@ -424,6 +424,11 @@ public class PluginParameter implements Serializable {
     CONVERSION
   }
 
+  public static PluginParameterBuilder getBuilder(final String id, final String name,
+    final PluginParameter.PluginParameterType type) {
+    return new PluginParameterBuilder(id, name, type);
+  }
+
   public static class PluginParameterBuilder {
 
     // required parameters
@@ -438,7 +443,7 @@ public class PluginParameter implements Serializable {
     private boolean readOnly = false;
     private String description = null;
 
-    public PluginParameterBuilder(String id, String name, PluginParameter.PluginParameterType type) {
+    private PluginParameterBuilder(String id, String name, PluginParameter.PluginParameterType type) {
       this.id = id;
       this.name = name;
       this.type = type;

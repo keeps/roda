@@ -59,12 +59,12 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
         PluginParameter.PluginParameterType.STRING).isMandatory(true).isReadOnly(false)
         .withDescription("Disposal hold identifier").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE,
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE,
         "Override disposal holds", PluginParameter.PluginParameterType.BOOLEAN).withDefaultValue("false")
         .isMandatory(true).isReadOnly(false)
         .withDescription("Lift all disposal holds associated and apply the selected disposal hold").build());

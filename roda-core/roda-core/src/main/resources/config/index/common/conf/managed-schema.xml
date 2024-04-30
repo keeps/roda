@@ -116,6 +116,10 @@
     <!-- for nested documents (minimal; points to root document) -->
     <field name="_root_" type="string" indexed="true" stored="false" docValues="false" />
 
+    <fieldType name="_nest_path_" class="solr.NestPathField" />
+    <field name="_nest_path_" type="_nest_path_" />
+    <field name="_nest_parent_" type="string" indexed="true" stored="true" />
+
     <!-- Only remove the "id" field if you have a very good reason to. While not strictly
       required, it is highly recommended. A <uniqueKey> is present in almost all Solr
       installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".

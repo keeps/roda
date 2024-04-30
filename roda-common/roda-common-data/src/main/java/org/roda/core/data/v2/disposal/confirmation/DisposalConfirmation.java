@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.disposal.confirmation;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +32,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalConfirmation implements IsModelObject, IsIndexed, HasId {
+
+  @Serial
   private static final long serialVersionUID = 1429757961220532837L;
 
   private String id;

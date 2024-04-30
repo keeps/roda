@@ -6,11 +6,13 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.NotificationAcknowledgeRequest;
@@ -93,7 +95,7 @@ public class NotificationController implements NotificationRestService {
   }
 
   @Override
-  public Notification findByUuid(String uuid) {
+  public Notification findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(requestContext, Notification.class, uuid, new ArrayList<>());
   }
@@ -105,8 +107,8 @@ public class NotificationController implements NotificationRestService {
   }
 
   @Override
-  public Long count(@RequestBody CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(Notification.class, countRequest, requestContext);
+    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
   }
 }

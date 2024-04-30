@@ -59,7 +59,7 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
         PluginParameter.PluginParameterType.STRING).isMandatory(true).isReadOnly(false)
         .withDescription("Disposal hold identifier").build());
   }

@@ -8,17 +8,18 @@
 package org.roda.wui.client.browse;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.CountRequest;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
-import org.roda.wui.client.planning.ShowRepresentationInformation;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -50,37 +51,30 @@ public class RepresentationInformationHelper {
         icon.addStyleName("representationInformationPresent");
       }
 
-      BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(filter,
-        new AsyncCallback<Pair<String, Integer>>() {
+      Services services = new Services("Count representation information", "count");
+      CountRequest request = new CountRequest(RepresentationInformation.class.getName(),
+        new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter)), true);
+      services.representationInformationResource(s -> s.count(request)).whenComplete((longResponse, throwable) -> {
+        if (throwable == null) {
+          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+          selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+          icon.removeStyleName("representationInformationMissing");
 
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          if (StringUtils.isBlank(iconCssClass)) {
+            icon.addStyleName("representationInformationPresent");
           }
 
-          @Override
-          public void onSuccess(Pair<String, Integer> pair) {
-            LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-            selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-            icon.removeStyleName("representationInformationMissing");
-
-            if (StringUtils.isBlank(iconCssClass)) {
-              icon.addStyleName("representationInformationPresent");
-            }
-
-            if (pair.getSecond() == 1) {
-              icon.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
-            } else if (pair.getSecond() > 1) {
-              icon.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
+          if (longResponse.getResult() > 0) {
+            icon.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
                 RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
-            } else {
-              icon.addStyleName("representationInformationMissing");
-              icon.removeStyleName("representationInformationPresent");
-              icon.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
+          } else {
+            icon.addStyleName("representationInformationMissing");
+            icon.removeStyleName("representationInformationPresent");
+            icon.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
                 RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
-            }
           }
-        });
+        }
+      });
 
       fieldPanel.add(icon);
     }

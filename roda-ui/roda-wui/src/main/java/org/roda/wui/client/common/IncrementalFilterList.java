@@ -16,7 +16,6 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
@@ -83,23 +82,14 @@ public class IncrementalFilterList extends Composite implements HasHandlers {
     filterPanel.add(filter);
     filters.add(filter);
 
-    filter.addRemoveClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        filterPanel.remove(filter);
-        filters.remove(filter);
-        DomEvent.fireNativeEvent(Document.get().createChangeEvent(), filter);
-      }
+    filter.addRemoveClickHandler(event -> {
+      filterPanel.remove(filter);
+      filters.remove(filter);
+      DomEvent.fireNativeEvent(Document.get().createChangeEvent(), filter);
     });
 
-    filter.addChangeHandler(new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        DomEvent.fireNativeEvent(Document.get().createChangeEvent(), IncrementalFilterList.this);
-      }
-    });
+    filter.addChangeHandler(
+      event -> DomEvent.fireNativeEvent(Document.get().createChangeEvent(), IncrementalFilterList.this));
   }
 
   public HandlerRegistration addChangeHandler(ChangeHandler handler) {

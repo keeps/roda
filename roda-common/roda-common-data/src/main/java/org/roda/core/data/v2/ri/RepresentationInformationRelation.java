@@ -7,15 +7,21 @@
  */
 package org.roda.core.data.v2.ri;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class RepresentationInformationRelation implements Serializable {
+  @Serial
   private static final long serialVersionUID = -903456414232867144L;
 
   private String relationType;
   private RelationObjectType objectType;
   private String link;
   private String title;
+
+  // i18n
+  private String relationTypeI18n;
+  private String objectTypeI18n;
 
   public RepresentationInformationRelation() {
     this.setRelationType(null);
@@ -62,6 +68,22 @@ public class RepresentationInformationRelation implements Serializable {
 
   public void setTitle(String label) {
     this.title = label;
+  }
+
+  public String getRelationTypeI18n() {
+    return relationTypeI18n;
+  }
+
+  public void setRelationTypeI18n(String relationTypeI18n) {
+    this.relationTypeI18n = relationTypeI18n;
+  }
+
+  public String getObjectTypeI18n() {
+    return objectTypeI18n;
+  }
+
+  public void setObjectTypeI18n(String objectTypeI18n) {
+    this.objectTypeI18n = objectTypeI18n;
   }
 
   @Override

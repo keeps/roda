@@ -99,6 +99,7 @@ public class RepresentationInformationAssociations extends Composite {
       () -> new RepresentationInformationList(),
       new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationAssociations_RI")
         .bindOpener().withActionable(RepresentationInformationActions.getForAssociation(filter)).withFilter(filter)
+        .withRedirectOnSingleResult(true)
         .withSearchPlaceholder(messages.representationInformationRegisterSearchPlaceHolder()));
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(representationInformationAssociationsListBuilder);

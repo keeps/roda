@@ -327,29 +327,55 @@ public final class RodaConstants {
   /*
    * API related
    */
-  public static final String API_BASE_PATH = "/api";
   public static final String API_SEP = "/";
   public static final String API_REST_V1_AIPS = "api/v1/aips/";
   public static final String API_REST_V1_REPRESENTATIONS = "api/v1/representations/";
   public static final String API_REST_V1_FILES = "api/v1/files/";
-  public static final String API_REST_V1_RESOURCES = "api/v1/transfers/";
-  public static final String API_REST_V1_THEME = "api/v1/theme/";
   public static final String API_REST_V1_INDEX = "api/v1/index/";
   public static final String API_REST_V1_DIPS = "api/v1/dips/";
   public static final String API_REST_V1_DIPFILES = "api/v1/dipfiles/";
-  public static final String API_REST_V1_EVENTS = "api/v1/events/";
-  public static final String API_REST_V1_AGENTS = "api/v1/agents/";
-  public static final String API_REST_V1_REPRESENTATION_INFORMATION = "api/v1/representation_information/";
-  public static final String API_REST_V1_AUTH = "api/v1/auth/";
   public static final String API_REST_V1_DISTRIBUTED_INSTANCE = "api/v1/distributed_instances/";
-  public static final String API_REST_V1_JOBS = "api/v1/jobs/";
-  public static final String API_REST_V2_JOBS = "api/v2/jobs/";
-  public static final String API_REST_V2_MEMBERS = "api/v2/members/";
 
   public static final String API_REST_V1_REPRESENTATION_OTHER_METADATA = "otherMetadata";
 
+  /**
+   * API related (Version 2)
+   */
+
+  // common
+  public static final String API_REST_V2_DOWNLOAD_HANDLER = "/binary";
+
+  // transferred resource
   public static final String API_REST_V2_RESOURCES = "api/v2/transfers/";
   public static final String API_REST_V2_TRANSFERRED_RESOURCE_CREATE_RESOURCE = "create/resource";
+
+  // jobs
+  public static final String API_REST_V2_JOBS = "api/v2/jobs/";
+
+  // files
+  public static final String API_REST_V2_FILES = "api/v2/files/";
+
+  // representation-information
+  public static final String API_REST_V2_REPRESENTATION_INFORMATION = "api/v2/representation-information/";
+
+  // preservation events
+  public static final String API_REST_V2_PRESERVATION_EVENTS = "api/v2/preservation/events/";
+  public static final String API_REST_V2_PRESERVATION_EVENTS_DETAILS_HTML = "/details/html";
+
+  // preservation agents
+  public static final String API_REST_V2_PRESERVATION_AGENTS = "api/v2/preservation/agents/";
+
+  // members
+  public static final String API_REST_V2_MEMBERS = "api/v2/members/";
+
+  // themes
+  public static final String API_REST_V2_THEME = "api/v2/themes";
+  public static final String API_V2_QUERY_PARAM_RESOURCE_ID = "resource-id";
+  public static final String API_V2_QUERY_PARAM_DEFAULT_RESOURCE_ID = "default-resource-id";
+  public static final String API_V2_QUERY_PARAM_RESOURCE_TYPE = "resource-type";
+  /**
+   * END: API related (Version 2)
+   */
 
   // sub-resources strings
   public static final String API_DATA = "data";
@@ -363,7 +389,6 @@ public final class RodaConstants {
   public static final String API_REPORTS = "reports";
 
   // "http query string" related strings
-  public static final String API_PARAM_BINARY = "binary/";
   public static final String API_QUERY_START = "?";
   public static final String API_QUERY_ASSIGN_SYMBOL = "=";
   public static final String API_QUERY_SEP = "&";
@@ -477,13 +502,6 @@ public final class RodaConstants {
   public static final String API_DEFAULT_CSV_FILENAME = "export.csv";
   public static final String API_DEFAULT_JSON_FILENAME = "export.json";
   public static final String API_NOTIFICATION_DEFAULT_TEMPLATE = "test-email-template";
-
-  // REST API V2
-  public static final String API_V2_QUERY_PARAM_RESOURCE_ID = "resource-id";
-  public static final String API_V2_QUERY_PARAM_DEFAULT_RESOURCE_ID = "default-resource-id";
-  public static final String API_V2_QUERY_PARAM_RESOURCE_TYPE = "resource-type";
-
-
 
   // api method allowable values
   public enum ListMediaTypes {

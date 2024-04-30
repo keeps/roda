@@ -52,7 +52,7 @@ public interface TransferredResourceRestService extends RODAEntityRestService<Tr
 
   @RequestMapping(path = "/delete", method = RequestMethod.POST)
   @Operation(summary = "Delete multiple transferred resource via search query", description = "Deletes one or more transferred resources", responses = {
-    @ApiResponse(responseCode = "204", description = "No Content"),
+    @ApiResponse(responseCode = "201", description = "Created job", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job deleteMultipleResources(
     @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<TransferredResource> selected);

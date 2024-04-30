@@ -13,13 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
@@ -30,7 +26,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -76,23 +71,10 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
   }
 
   public void setRelationList(final List<RepresentationInformationRelation> list) {
-    BrowserService.Util.getInstance().retrieveRelationTypeTranslations(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<RelationTypeTranslationsBundle>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(final RelationTypeTranslationsBundle bundle) {
-          for (RepresentationInformationRelation element : list) {
-            addRelation(element, false, bundle.getTranslations());
-          }
-
-          listRelations();
-        }
-      });
+    for (RepresentationInformationRelation element : list) {
+      addRelation(element, false);
+    }
+    listRelations();
   }
 
   public void clear() {
@@ -100,11 +82,10 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
     relations = new HashMap<>();
   }
 
-  private void addRelation(final RepresentationInformationRelation element, final boolean redesign,
-    final Map<RelationObjectType, Map<String, String>> translations) {
+  private void addRelation(final RepresentationInformationRelation element, final boolean redesign) {
 
     final RemovableRelation relation = new RemovableRelation(element);
-    String relationType = translations.get(element.getObjectType()).get(element.getRelationType());
+    String relationType = element.getRelationTypeI18n();
 
     if (relations.containsKey(relationType)) {
       relations.get(relationType).add(relation);
@@ -118,7 +99,7 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
 
       @Override
       public void onClick(ClickEvent event) {
-        relations.get(translations.get(relation.getValue().getObjectType()).get(relation.getValue().getRelationType()))
+        relations.get(relationType)
           .remove(relation);
         listRelations();
         DomEvent.fireNativeEvent(Document.get().createChangeEvent(), IncrementalRelationList.this);
@@ -166,20 +147,7 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
         @Override
         public void onSuccess(final RepresentationInformationRelation newRelation) {
           DomEvent.fireNativeEvent(Document.get().createChangeEvent(), IncrementalRelationList.this);
-
-          BrowserService.Util.getInstance().retrieveRelationTypeTranslations(
-            LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RelationTypeTranslationsBundle>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-
-              @Override
-              public void onSuccess(final RelationTypeTranslationsBundle bundle) {
-                addRelation(newRelation, true, bundle.getTranslations());
-              }
-            });
+          addRelation(newRelation, true);
         }
       });
   }

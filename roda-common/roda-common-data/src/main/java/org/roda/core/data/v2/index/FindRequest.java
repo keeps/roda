@@ -53,6 +53,8 @@ public class FindRequest extends CountRequest {
   /** The filter querying options for collapsing results */
   @JsonProperty("collapse")
   private Collapse collapse;
+  @JsonProperty("children")
+  private boolean children;
 
   // Private constructor for Jackson deserialization
   private FindRequest(FindRequestBuilder builder) {
@@ -64,6 +66,7 @@ public class FindRequest extends CountRequest {
     this.filename = builder.filename;
     this.fieldsToReturn = builder.fieldsToReturn;
     this.collapse = builder.collapse;
+    this.children = builder.children;
   }
 
   public Sorter getSorter() {
@@ -94,6 +97,10 @@ public class FindRequest extends CountRequest {
     return collapse;
   }
 
+  public boolean getChildren() {
+    return children;
+  }
+
   public static FindRequestBuilder getBuilder(final String classToReturn, final Filter filter, boolean onlyActive) {
     return new FindRequestBuilder(classToReturn, filter, onlyActive);
   }
@@ -110,6 +117,7 @@ public class FindRequest extends CountRequest {
     private String filename = null;
     private List<String> fieldsToReturn;
     private Collapse collapse;
+    private boolean children;
 
     public FindRequestBuilder(@JsonProperty("classToReturn") final String classToReturn,
       @JsonProperty("filter") final Filter filter, @JsonProperty("onlyActive") boolean onlyActive) {
@@ -124,6 +132,7 @@ public class FindRequest extends CountRequest {
       this.exportFacets = false;
       this.fieldsToReturn = Collections.emptyList();
       this.collapse = null;
+      this.children = false;
     }
 
     public FindRequest build() {
@@ -162,6 +171,11 @@ public class FindRequest extends CountRequest {
 
     public FindRequestBuilder withCollapse(Collapse collapse) {
       this.collapse = collapse;
+      return this;
+    }
+
+    public FindRequestBuilder withChildren(boolean children) {
+      this.children = children;
       return this;
     }
   }

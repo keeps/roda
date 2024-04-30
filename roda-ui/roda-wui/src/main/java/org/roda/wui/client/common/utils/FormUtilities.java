@@ -77,9 +77,6 @@ public class FormUtilities {
         addTextField(panel, layout, mv, mandatory, onChange);
       } else {
         switch (controlType) {
-          case "text":
-            addTextField(panel, layout, mv, mandatory, onChange);
-            break;
           case "textarea":
           case "big-text":
           case "text-area":
@@ -98,6 +95,7 @@ public class FormUtilities {
             layout.addStyleName("form-separator");
             addSeparator(panel, layout, mv);
             break;
+          case "text":
           default:
             addTextField(panel, layout, mv, mandatory, onChange);
             break;

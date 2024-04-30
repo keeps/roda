@@ -10,6 +10,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
@@ -18,6 +19,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationEventsLinkingObjects;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.storage.Binary;
@@ -67,7 +69,7 @@ public class PreservationEventController implements PreservationEventRestService
   PreservationEventService preservationEventService;
 
   @Override
-  public IndexedPreservationEvent findByUuid(String uuid) {
+  public IndexedPreservationEvent findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(requestContext, IndexedPreservationEvent.class, uuid, new ArrayList<>());
   }
@@ -79,9 +81,9 @@ public class PreservationEventController implements PreservationEventRestService
   }
 
   @Override
-  public Long count(@RequestBody CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(IndexedPreservationEvent.class, countRequest, requestContext);
+    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
   }
 
   @Override
@@ -91,7 +93,7 @@ public class PreservationEventController implements PreservationEventRestService
     LogEntryState state = LogEntryState.SUCCESS;
 
     preservationEventService.setIndexService(indexService);
-    IndexedPreservationEvent preservationEvent = findByUuid(id);
+    IndexedPreservationEvent preservationEvent = findByUuid(id, "en");
 
     try {
       // check user permissions
@@ -120,7 +122,7 @@ public class PreservationEventController implements PreservationEventRestService
     LogEntryState state = LogEntryState.SUCCESS;
 
     preservationEventService.setIndexService(indexService);
-    IndexedPreservationEvent preservationEvent = findByUuid(id);
+    IndexedPreservationEvent preservationEvent = findByUuid(id, "en");
 
     try {
       // check user permissions

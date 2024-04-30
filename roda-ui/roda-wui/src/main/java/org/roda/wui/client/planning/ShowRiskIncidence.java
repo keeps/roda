@@ -32,6 +32,7 @@ import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -242,7 +243,7 @@ public class ShowRiskIncidence extends Composite {
 
       String riskIncidenceId = historyTokens.get(0);
 
-      services.rodaEntityRestService(s -> s.findByUuid(riskIncidenceId), RiskIncidence.class)
+      services.rodaEntityRestService(s -> s.findByUuid(riskIncidenceId, LocaleInfo.getCurrentLocale().getLocaleName()), RiskIncidence.class)
         .whenComplete((value, error) -> {
           if (error != null) {
             callback.onFailure(error);

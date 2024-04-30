@@ -10,11 +10,11 @@ package org.roda.wui.client.planning;
 import java.util.List;
 
 import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.core.data.v2.ri.RepresentationInformationCreateRequest;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -72,12 +72,6 @@ public class CreateRepresentationInformation extends Composite {
   @UiField(provided = true)
   RepresentationInformationDataPanel representationInformationDataPanel;
 
-  /**
-   * Create a new panel to create a user
-   *
-   * @param user
-   *          the user to create
-   */
   public CreateRepresentationInformation(RepresentationInformation ri) {
     this.ri = ri;
     this.representationInformationDataPanel = new RepresentationInformationDataPanel(true, false, ri);
@@ -94,19 +88,15 @@ public class CreateRepresentationInformation extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (representationInformationDataPanel.isValid()) {
       ri = representationInformationDataPanel.getRepresentationInformation();
-      BrowserService.Util.getInstance().createRepresentationInformation(ri,
-        this.representationInformationDataPanel.getExtras(), new AsyncCallback<RepresentationInformation>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
+      Services services = new Services("Create representation information", "create");
+      RepresentationInformationCreateRequest request = new RepresentationInformationCreateRequest();
+      request.setRepresentationInformation(ri);
+      request.setForm(representationInformationDataPanel.getCustomForm());
+      services.representationInformationResource(s -> s.createRepresentationInformation(request))
+        .whenComplete((representationInformation, throwable) -> {
+          if (throwable == null) {
+            HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, representationInformation.getId());
           }
-
-          @Override
-          public void onSuccess(RepresentationInformation result) {
-            HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, result.getId());
-          }
-
         });
     }
   }

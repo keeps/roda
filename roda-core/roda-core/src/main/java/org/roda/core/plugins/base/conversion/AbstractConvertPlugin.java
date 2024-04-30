@@ -95,7 +95,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         "Do not process files that have a different format from the indicated."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, "Outcome",
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, "Outcome",
         PluginParameterType.CONVERSION)
         .withDescription(
           "A conversion can create a representation or a dissemination. Please choose which option to output")

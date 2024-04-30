@@ -31,6 +31,7 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -52,7 +53,7 @@ public class EditRisk extends Composite {
         Services service = new Services("Retrieve indexed risk", "get");
         String riskId = historyTokens.get(0);
 
-        service.rodaEntityRestService(s -> s.findByUuid(riskId), IndexedRisk.class).whenComplete((value, error) -> {
+        service.rodaEntityRestService(s -> s.findByUuid(riskId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedRisk.class).whenComplete((value, error) -> {
           if (error != null) {
             callback.onFailure(error);
           } else if (value != null) {

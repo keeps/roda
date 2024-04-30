@@ -106,7 +106,7 @@ public class ChildOfPanel extends Composite implements HasValueChangeHandlers<Pa
 
   private void initPluginParameterPanel() {
     pluginParameterPanel = new PluginParameterPanel(
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_PARENT_ID, messages.selectParentTitle(),
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_PARENT_ID, messages.selectParentTitle(),
         PluginParameter.PluginParameterType.AIP_ID).withDescription("").isMandatory(false).isReadOnly(false)
         .withDescription("Use the provided parent node if the SIPs does not provide one.").build());
     pluginParameterPanel.getLayout().removeStyleName("plugin-options-parameter");

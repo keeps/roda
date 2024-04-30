@@ -174,14 +174,14 @@ public class IndexService {
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, User user, boolean justActive, final List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
-    return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive,
-      fieldsToReturn, null);
+    FindRequest findRequest = FindRequest.getBuilder(returnClass.getName(), filter, justActive).withSorter(sorter)
+      .withSublist(sublist).withFacets(facets).withFieldsToReturn(fieldsToReturn).build();
+    return SolrUtils.find(getSolrClient(), returnClass, findRequest, user);
   }
 
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, FindRequest findRequest, User user)
       throws GenericException, RequestNotValidException {
-    return SolrUtils.find(getSolrClient(), returnClass, findRequest.getFilter(),findRequest.getSorter(), findRequest.getSublist(), findRequest.getFacets(), user, findRequest.isOnlyActive(),
-        findRequest.getFieldsToReturn(), findRequest.getCollapse());
+    return SolrUtils.find(getSolrClient(), returnClass, findRequest, user);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
@@ -205,9 +205,14 @@ public class IndexService {
     return SolrUtils.count(getSolrClient(), returnClass, filter, user, justActive);
   }
 
+  public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn, boolean appendChildren)
+      throws NotFoundException, GenericException {
+    return SolrUtils.retrieve(getSolrClient(), returnClass, id, fieldsToReturn, appendChildren);
+  }
+
   public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn)
     throws NotFoundException, GenericException {
-    return SolrUtils.retrieve(getSolrClient(), returnClass, id, fieldsToReturn);
+    return retrieve(returnClass, id, fieldsToReturn, false);
   }
 
   public <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, List<String> ids, List<String> fieldsToReturn)
