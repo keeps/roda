@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.collapse.Collapse;
+import org.roda.core.data.v2.index.collapse.NullPolicyEnum;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
@@ -50,7 +52,8 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.LOG_ID,
     RodaConstants.LOG_DATETIME, RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD,
-    RodaConstants.LOG_USERNAME, RodaConstants.LOG_DURATION, RodaConstants.LOG_ADDRESS, RodaConstants.LOG_STATE);
+    RodaConstants.LOG_USERNAME, RodaConstants.LOG_DURATION, RodaConstants.LOG_ADDRESS, RodaConstants.LOG_STATE,
+    RodaConstants.LOG_REQUEST_HEADER_UUID, RodaConstants.LOG_REQUEST_HEADER_REASON, RodaConstants.LOG_REQUEST_HEADER_TYPE);
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<LogEntry> options) {
@@ -149,4 +152,12 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 
+  @Override
+  public Collapse getCollapse() {
+    Collapse collapse = new Collapse();
+    collapse.setField(RodaConstants.LOG_REQUEST_HEADER_UUID);
+    collapse.setNullPolicy(NullPolicyEnum.EXPAND);
+
+    return collapse;
+  }
 }

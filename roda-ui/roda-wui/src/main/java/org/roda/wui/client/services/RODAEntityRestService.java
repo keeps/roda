@@ -36,6 +36,6 @@ public interface RODAEntityRestService<T extends IsIndexed> extends DirectRestSe
   @RequestMapping(path = "/count", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
   @Operation(summary = "Count indexed resources", description = "Counts indexed resources", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class)))})
-  String count(
+  Long count(
     @RequestBody(description = "Count parameters", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CountRequest.class))) CountRequest countRequest);
 }

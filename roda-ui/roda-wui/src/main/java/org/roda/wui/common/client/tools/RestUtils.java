@@ -7,7 +7,6 @@
  */
 package org.roda.wui.common.client.tools;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -529,8 +528,8 @@ public class RestUtils {
     // api/v1/index/findFORM?type=csv
 
     String url = RodaConstants.API_REST_V1_INDEX + "findFORM";
-    FindRequest request = new FindRequest(classToReturnName, filter, sorter, sublist, facets, onlyActive, exportFacets,
-      filename, new ArrayList<>());
+    FindRequest request = FindRequest.getBuilder(classToReturnName, filter, onlyActive).withSorter(sorter)
+      .withSublist(sublist).withFacets(facets).withExportFacets(exportFacets).withFilename(filename).build();
 
     final FormPanel form = new FormPanel();
     form.setAction(URL.encode(url));

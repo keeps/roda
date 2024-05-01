@@ -84,7 +84,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         selected);
     }
   }
@@ -109,7 +109,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         items, RodaConstants.CONTROLLER_TRANSFERRED_RESOURCE_PARAM, transferredResource);
     }
   }
@@ -117,7 +117,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
   @Override
   public TransferredResource getResource(String resourceId) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext.getUser(), TransferredResource.class, resourceId, new ArrayList<>());
+    return indexService.retrieve(requestContext, TransferredResource.class, resourceId, new ArrayList<>());
   }
 
   @Override
@@ -136,7 +136,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         transferredResourceSelectedItems);
     }
   }
@@ -158,7 +158,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state,
+      controllerAssistant.registerAction(requestContext, state,
         RodaConstants.CONTROLLER_TRANSFERRED_RESOURCE_ID_PARAM, resourceId, RodaConstants.CONTROLLER_FILENAME_PARAM,
         newName);
     }
@@ -185,10 +185,10 @@ public class TransferredResourceController implements TransferredResourceRestSer
     } finally {
       // register action
       if (folderRelativePath.isPresent()) {
-        controllerAssistant.registerAction(requestContext.getUser(), state,
+        controllerAssistant.registerAction(requestContext, state,
           RodaConstants.CONTROLLER_FOLDER_RELATIVEPATH_PARAM, folderRelativePath.get());
       } else {
-        controllerAssistant.registerAction(requestContext.getUser(), state);
+        controllerAssistant.registerAction(requestContext, state);
       }
     }
     return null;
@@ -211,7 +211,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_PATH_PARAM, path);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_PATH_PARAM, path);
     }
   }
 
@@ -229,8 +229,8 @@ public class TransferredResourceController implements TransferredResourceRestSer
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      TransferredResource transferredResource = indexService.retrieve(requestContext.getUser(),
-        TransferredResource.class, uuid, new ArrayList<>());
+      TransferredResource transferredResource = indexService.retrieve(requestContext, TransferredResource.class, uuid,
+        new ArrayList<>());
 
       StreamResponse streamResponse = transferredResourceService.createStreamResponse(transferredResource);
 
@@ -240,7 +240,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), uuid, state,
+      controllerAssistant.registerAction(requestContext, uuid, state,
         RodaConstants.CONTROLLER_RESOURCE_ID_PARAM, uuid);
     }
   }
@@ -248,7 +248,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
   @PostMapping(path = "/create/resource", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @Operation(summary = "Create transferred resource", description = "Creates a new transferred resource", responses = {
-    @ApiResponse(responseCode = "201", description = "OK", content = @Content(schema = @Schema(implementation = TransferredResource.class))),
+    @ApiResponse(responseCode = "201", description = "Transferred resource created", content = @Content(schema = @Schema(implementation = TransferredResource.class))),
     @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   public TransferredResource createTransferredResource(
     @Parameter(description = "The id of the parent") @RequestParam(name = "parent-uuid", required = false) String parentUUID,
@@ -270,7 +270,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_PATH_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_PATH_PARAM,
         parentUUID, RodaConstants.CONTROLLER_FILENAME_PARAM, fileName, RodaConstants.CONTROLLER_SUCCESS_PARAM, true);
     }
   }
@@ -291,7 +291,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_PARENT_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_PARENT_PARAM,
         parentUUID, RodaConstants.CONTROLLER_FOLDERNAME_PARAM, folderName, RodaConstants.CONTROLLER_FORCE_COMMIT_PARAM,
         commit);
     }
@@ -305,18 +305,12 @@ public class TransferredResourceController implements TransferredResourceRestSer
   @Override
   public IndexResult<TransferredResource> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    if (findRequest.filter == null || findRequest.filter.getParameters().isEmpty()) {
-      return new IndexResult<>();
-    }
-    // delegate
-    return indexService.find(TransferredResource.class, findRequest, localeString, requestContext.getUser());
+    return indexService.find(TransferredResource.class, findRequest, localeString, requestContext);
   }
 
   @Override
-  public String count(@RequestBody CountRequest countRequest) {
+  public Long count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    return String.valueOf(indexService.count(TransferredResource.class, countRequest.filter, countRequest.onlyActive,
-      requestContext.getUser()));
+    return indexService.count(TransferredResource.class, countRequest, requestContext.getUser());
   }
 }

@@ -42,6 +42,9 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private String relatedObjectID;
   private long duration;
 
+  // REST API requests
+  private AuditLogRequestHeaders auditLogRequestHeaders = null;
+
   private String instanceId = "";
   private long lineNumber = -1;
 
@@ -396,6 +399,14 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
 
   public void setState(LogEntryState state) {
     this.state = state;
+  }
+
+  public AuditLogRequestHeaders getAuditLogRequestHeaders() {
+    return auditLogRequestHeaders;
+  }
+
+  public void setAuditLogRequestHeaders(AuditLogRequestHeaders auditLogRequestHeaders) {
+    this.auditLogRequestHeaders = auditLogRequestHeaders;
   }
 
   @Override

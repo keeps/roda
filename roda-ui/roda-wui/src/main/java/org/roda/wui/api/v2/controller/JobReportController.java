@@ -2,19 +2,12 @@ package org.roda.wui.api.v2.controller;
 
 import java.util.ArrayList;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.IndexedReport;
-import org.roda.core.data.v2.log.LogEntryState;
-import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.client.services.JobReportRestService;
-import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,40 +35,19 @@ public class JobReportController implements JobReportRestService {
 
   @Override
   public IndexedReport findByUuid(String uuid) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser(), TransferredResource.class);
-
-      // delegate
-      final IndexedReport ret = indexService.retrieve(requestContext.getUser(), IndexedReport.class, uuid,
-        new ArrayList<>());
-
-      // checking object permissions
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), ret, IndexedReport.class);
-
-      return ret;
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), uuid, state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        IndexedReport.class.getSimpleName(), RodaConstants.CONTROLLER_ID_PARAM, uuid);
-    }
+    return indexService.retrieve(requestContext, IndexedReport.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedReport> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedReport.class, findRequest, localeString, requestContext.getUser());
+    return indexService.find(IndexedReport.class, findRequest, localeString, requestContext);
   }
 
   @Override
-  public String count(CountRequest countRequest) {
-    return "0";
+  public Long count(@RequestBody CountRequest countRequest) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.count(IndexedReport.class, countRequest, requestContext.getUser());
   }
 }

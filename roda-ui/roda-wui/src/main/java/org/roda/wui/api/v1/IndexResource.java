@@ -7,10 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.csv.CSVFormat;
@@ -27,15 +24,6 @@ import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.facet.FacetParameter;
-import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.filter.AllFilterParameter;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.User;
@@ -166,77 +154,65 @@ public class IndexResource {
     @Parameter(description = "Choose format in which to get the response") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
-
-    final String mediaType = ApiUtils.getMediaType(acceptFormat, request);
-    final User user = UserUtility.getApiUser(request);
-
-    final FindRequest findRequest = new FindRequest();
-    findRequest.classToReturn = returnClass;
-    findRequest.exportFacets = exportFacets;
-    findRequest.filename = StringUtils.isBlank(filename) ? DEFAULT_CSV_FILENAME : filename;
-
-    findRequest.filter = new Filter();
-    if (filterParameters.isEmpty()){
-      return Response.status(Response.Status.BAD_REQUEST)
-        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Filter parameter is required. For an all-inclusive search, use filter=any.")).build();
-    } else {
-      for (String filterParameter : filterParameters) {
-        if (filterParameter.equals("any")) {
-          findRequest.filter.add(new AllFilterParameter());
-        } else {
-          final String[] parts = filterParameter.split("=");
-          if (parts.length == 2) {
-            if (parts[0].startsWith("!")) {
-              String key = parts[0].substring(1);
-              findRequest.filter.add(new NotSimpleFilterParameter(key, parts[1]));
-            } else {
-              findRequest.filter.add(new SimpleFilterParameter(parts[0], parts[1]));
-            }
-          } else {
-            LOGGER.warn("Unable to parse filter parameter '{}'. Ignored", filterParameter);
-          }
-        }
-      }
-    }
-
-
-    findRequest.sorter = new Sorter();
-    for (String sortParameter : sortParameters) {
-      final String[] parts = sortParameter.split(" ");
-      final boolean descending = parts.length == 2 && "desc".equalsIgnoreCase(parts[1]);
-      if (parts.length > 0) {
-        findRequest.sorter.add(new SortParameter(parts[0], descending));
-      } else {
-        LOGGER.warn("Unable to parse sorter parameter '{}'. Ignored", sortParameter);
-      }
-    }
-
-    findRequest.sublist = new Sublist(start == null ? DEFAULT_START : start, limit == null ? DEFAULT_LIMIT : limit);
-
-    final int paramFacetLimit = facetLimit == null ? DEFAULT_FACET_LIMIT : facetLimit;
-
-    final Set<FacetParameter> facetParameters = new HashSet<>();
-    for (String facetAttribute : facetAttributes) {
-      facetParameters.add(new SimpleFacetParameter(facetAttribute, paramFacetLimit, SORT.COUNT));
-    }
-    findRequest.facets = new Facets(facetParameters);
-
-    findRequest.onlyActive = onlyActive == null ? DEFAULT_ONLY_ACTIVE : onlyActive;
-
-    final Response response;
-    if (ExtraMediaType.TEXT_CSV.equals(mediaType)) {
-      response = csvResponse(findRequest, user, localeString);
-    } else {
-      final Class<T> classToReturn = getClass(findRequest.classToReturn);
-
-      IndexResult<T> indexResult = Browser.find(classToReturn, findRequest.filter, findRequest.sorter,
-        findRequest.sublist, findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
-      indexResult = I18nUtility.translate(indexResult, classToReturn, localeString);
-
-      response = Response.ok(indexResult, mediaType).build();
-    }
-
-    return response;
+    return null;
+    /*
+     * final String mediaType = ApiUtils.getMediaType(acceptFormat, request); final
+     * User user = UserUtility.getApiUser(request);
+     * 
+     * final FindRequest findRequest = new FindRequest(); findRequest.classToReturn
+     * = returnClass; findRequest.exportFacets = exportFacets; findRequest.filename
+     * = StringUtils.isBlank(filename) ? DEFAULT_CSV_FILENAME : filename;
+     * 
+     * findRequest.filter = new Filter(); if (filterParameters.isEmpty()){ return
+     * Response.status(Response.Status.BAD_REQUEST) .entity(new
+     * ApiResponseMessage(ApiResponseMessage.ERROR,
+     * "Filter parameter is required. For an all-inclusive search, use filter=any.")
+     * ).build(); } else { for (String filterParameter : filterParameters) { if
+     * (filterParameter.equals("any")) { findRequest.filter.add(new
+     * AllFilterParameter()); } else { final String[] parts =
+     * filterParameter.split("="); if (parts.length == 2) { if
+     * (parts[0].startsWith("!")) { String key = parts[0].substring(1);
+     * findRequest.filter.add(new NotSimpleFilterParameter(key, parts[1])); } else {
+     * findRequest.filter.add(new SimpleFilterParameter(parts[0], parts[1])); } }
+     * else { LOGGER.warn("Unable to parse filter parameter '{}'. Ignored",
+     * filterParameter); } } } }
+     * 
+     * 
+     * findRequest.sorter = new Sorter(); for (String sortParameter :
+     * sortParameters) { final String[] parts = sortParameter.split(" "); final
+     * boolean descending = parts.length == 2 && "desc".equalsIgnoreCase(parts[1]);
+     * if (parts.length > 0) { findRequest.sorter.add(new SortParameter(parts[0],
+     * descending)); } else {
+     * LOGGER.warn("Unable to parse sorter parameter '{}'. Ignored", sortParameter);
+     * } }
+     * 
+     * findRequest.sublist = new Sublist(start == null ? DEFAULT_START : start,
+     * limit == null ? DEFAULT_LIMIT : limit);
+     * 
+     * final int paramFacetLimit = facetLimit == null ? DEFAULT_FACET_LIMIT :
+     * facetLimit;
+     * 
+     * final Set<FacetParameter> facetParameters = new HashSet<>(); for (String
+     * facetAttribute : facetAttributes) { facetParameters.add(new
+     * SimpleFacetParameter(facetAttribute, paramFacetLimit, SORT.COUNT)); }
+     * findRequest.facets = new Facets(facetParameters);
+     * 
+     * findRequest.onlyActive = onlyActive == null ? DEFAULT_ONLY_ACTIVE :
+     * onlyActive;
+     * 
+     * final Response response; if (ExtraMediaType.TEXT_CSV.equals(mediaType)) {
+     * response = csvResponse(findRequest, user, localeString); } else { final
+     * Class<T> classToReturn = getClass(findRequest.classToReturn);
+     * 
+     * IndexResult<T> indexResult = Browser.find(classToReturn, findRequest.filter,
+     * findRequest.sorter, findRequest.sublist, findRequest.facets, user,
+     * findRequest.onlyActive, new ArrayList<>()); indexResult =
+     * I18nUtility.translate(indexResult, classToReturn, localeString);
+     * 
+     * response = Response.ok(indexResult, mediaType).build(); }
+     * 
+     * return response;
+     */
   }
 
   /**
@@ -260,7 +236,7 @@ public class IndexResource {
     throws RODAException {
 
 
-    if(findRequest.filter == null || findRequest.filter.getParameters().isEmpty()){
+    if(findRequest.getFilter() == null || findRequest.getFilter().getParameters().isEmpty()){
       return Response.status(Response.Status.BAD_REQUEST)
         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Filter parameter is required. For an all-inclusive search, use type AllFilterParameter.")).build();
     }
@@ -271,9 +247,9 @@ public class IndexResource {
     if (ExtraMediaType.TEXT_CSV.equals(mediaType)) {
       return csvResponse(findRequest, user, null);
     } else {
-      final IndexResult<T> result = Browser.find(getClass(findRequest.classToReturn), findRequest.filter,
-        findRequest.sorter, findRequest.sublist, findRequest.facets, user, findRequest.onlyActive,
-        findRequest.fieldsToReturn);
+      final IndexResult<T> result = Browser.find(getClass(findRequest.getClassToReturn()), findRequest.getFilter(),
+        findRequest.getSorter(), findRequest.getSublist(), findRequest.getFacets(), user, findRequest.isOnlyActive(),
+        findRequest.getFieldsToReturn());
       return Response.ok(result, mediaType).build();
     }
 
@@ -326,8 +302,8 @@ public class IndexResource {
     throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);
     final User user = UserUtility.getApiUser(request);
-    final long result = Browser.count(user, getClass(countRequest.classToReturn), countRequest.filter,
-      countRequest.onlyActive);
+    final long result = Browser.count(user, getClass(countRequest.getClassToReturn()), countRequest.getFilter(),
+      countRequest.isOnlyActive());
     return Response.ok(result, mediaType).build();
   }
 
@@ -351,7 +327,7 @@ public class IndexResource {
   private <T extends IsIndexed> Response csvResponse(final FindRequest findRequest, final User user,
     String localeString) throws RequestNotValidException, AuthorizationDeniedException, GenericException {
 
-    final Class<T> returnClass = getClass(findRequest.classToReturn);
+    final Class<T> returnClass = getClass(findRequest.getClassToReturn());
     final Configuration config = RodaCoreFactory.getRodaConfiguration();
     final char delimiter;
     if (StringUtils.isBlank(config.getString(CONFIG_KEY_CSV_DELIMITER))) {
@@ -360,25 +336,25 @@ public class IndexResource {
       delimiter = config.getString(CONFIG_KEY_CSV_DELIMITER).trim().charAt(0);
     }
 
-    if (findRequest.exportFacets) {
-      IndexResult<T> result = Browser.find(returnClass, findRequest.filter, Sorter.NONE, Sublist.NONE,
-        findRequest.facets, user, findRequest.onlyActive, findRequest.fieldsToReturn);
+    if (findRequest.isExportFacets()) {
+      IndexResult<T> result = Browser.find(returnClass, findRequest.getFilter(), Sorter.NONE, Sublist.NONE,
+        findRequest.getFacets(), user, findRequest.isOnlyActive(), findRequest.getFieldsToReturn());
       if (localeString != null) {
         result = I18nUtility.translate(result, returnClass, localeString);
       }
 
       return ApiUtils.okResponse(
-        new RodaStreamingOutput(new FacetsCSVOutputStream(result.getFacetResults(), findRequest.filename, delimiter))
+        new RodaStreamingOutput(new FacetsCSVOutputStream(result.getFacetResults(), findRequest.getFilename(), delimiter))
           .toStreamResponse());
     } else {
-      IndexResult<T> result = Browser.find(returnClass, findRequest.filter, findRequest.sorter, findRequest.sublist,
-        findRequest.facets, user, findRequest.onlyActive, findRequest.fieldsToReturn);
+      IndexResult<T> result = Browser.find(returnClass, findRequest.getFilter(), findRequest.getSorter(), findRequest.getSublist(),
+        findRequest.getFacets(), user, findRequest.isOnlyActive(), findRequest.getFieldsToReturn());
       if (localeString != null) {
         result = I18nUtility.translate(result, returnClass, localeString);
       }
 
       return ApiUtils
-        .okResponse(new RodaStreamingOutput(new ResultsCSVOutputStream<>(result, findRequest.filename, delimiter))
+        .okResponse(new RodaStreamingOutput(new ResultsCSVOutputStream<>(result, findRequest.getFilename(), delimiter))
           .toStreamResponse());
     }
   }

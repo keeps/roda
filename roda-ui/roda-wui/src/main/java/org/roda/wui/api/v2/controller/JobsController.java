@@ -82,7 +82,7 @@ public class JobsController implements JobsRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_JOB_PARAM, job);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_PARAM, job);
     }
   }
 
@@ -102,14 +102,14 @@ public class JobsController implements JobsRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
     }
   }
 
   @Override
   public Job getJob(String jobId) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext.getUser(), Job.class, jobId, new ArrayList<>());
+    return indexService.retrieve(requestContext, Job.class, jobId, new ArrayList<>());
   }
 
   @Override
@@ -128,7 +128,7 @@ public class JobsController implements JobsRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
     }
     return null;
   }
@@ -169,7 +169,7 @@ public class JobsController implements JobsRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_ITEMS_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_ITEMS_PARAM,
         selectedJobs);
     }
 
@@ -205,7 +205,7 @@ public class JobsController implements JobsRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_ITEMS_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_ITEMS_PARAM,
         selectedJobs);
     }
     return jobs;
@@ -228,7 +228,7 @@ public class JobsController implements JobsRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
     }
     return null;
   }
@@ -250,7 +250,7 @@ public class JobsController implements JobsRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId,
         RodaConstants.CONTROLLER_JOB_JUST_FAILED_PARAM, justFailed, RodaConstants.CONTROLLER_START_PARAM, start,
         RodaConstants.CONTROLLER_LIMIT_PARAM, limit);
     }
@@ -272,37 +272,15 @@ public class JobsController implements JobsRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId,
         RodaConstants.CONTROLLER_JOB_REPORT_ID_PARAM, jobReportId);
     }
   }
 
   @Override
   public IndexedReport getIndexedJobReport(String jobReportId) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser(), IndexedReport.class);
-
-      // delegate
-      final IndexedReport ret = indexService.retrieve(requestContext.getUser(), IndexedReport.class, jobReportId,
-        new ArrayList<>());
-
-      // checking object permissions
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), ret, IndexedReport.class);
-
-      return ret;
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), jobReportId, state,
-        RodaConstants.CONTROLLER_JOB_REPORT_ID_PARAM, jobReportId);
-    }
+    return indexService.retrieve(requestContext, IndexedReport.class, jobReportId, new ArrayList<>());
   }
 
   @GetMapping(path = "/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/attachment/{"
@@ -330,7 +308,7 @@ public class JobsController implements JobsRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId,
         RodaConstants.CONTROLLER_JOB_ATTACHMENT_ID_PARAM, attachmentId);
     }
   }

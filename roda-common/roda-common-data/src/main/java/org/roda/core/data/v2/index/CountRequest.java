@@ -21,11 +21,11 @@ public class CountRequest implements Serializable {
   private static final long serialVersionUID = -6793510712321710035L;
 
   /** Class name of resources to return. */
-  public String classToReturn;
+  private String classToReturn;
   /** Filter. */
-  public Filter filter;
+  private Filter filter;
   /** Return only active resources? */
-  public boolean onlyActive;
+  private boolean onlyActive;
 
   /**
    * Constructor.
@@ -48,4 +48,15 @@ public class CountRequest implements Serializable {
     this.onlyActive = onlyActive;
   }
 
+  public String getClassToReturn() {
+    return classToReturn;
+  }
+
+  public Filter getFilter() {
+    return filter;
+  }
+
+  public boolean isOnlyActive() {
+    return onlyActive;
+  }
 }

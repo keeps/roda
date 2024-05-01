@@ -10,7 +10,6 @@ package org.roda.wui.common;
 import java.lang.reflect.Method;
 import java.util.Date;
 
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -20,7 +19,9 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.model.RequestContext;
 
 public class ControllerAssistant {
   private final Date startDate;
@@ -85,6 +86,17 @@ public class ControllerAssistant {
       registerAction(user, LogEntryState.UNAUTHORIZED);
       throw e;
     }
+  }
+
+  public void registerAction(final RequestContext requestContext, final String relatedObjectId, final LogEntryState state,
+                             final Object... parameters) {
+    final long duration = new Date().getTime() - startDate.getTime();
+    ControllerAssistantUtils.registerAction(requestContext, this.enclosingMethod.getDeclaringClass().getName(),
+        this.enclosingMethod.getName(), relatedObjectId, duration, state, parameters);
+  }
+
+  public void registerAction(final RequestContext requestContext, final LogEntryState state, final Object... parameters) {
+    registerAction(requestContext, null, state, parameters);
   }
 
   public void registerAction(final User user, final String relatedObjectId, final LogEntryState state,

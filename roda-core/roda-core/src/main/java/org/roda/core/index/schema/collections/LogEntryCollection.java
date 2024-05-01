@@ -20,9 +20,10 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.data.v2.log.AuditLogRequestHeaders;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
@@ -76,6 +77,9 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     fields.add(new Field(RodaConstants.LOG_PARAMETERS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
     fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING).setIndexed(true));
     fields.add(new Field(RodaConstants.LOG_LINE_NUMBER, Field.TYPE_LONG).setIndexed(true));
+    fields.add(new Field(RodaConstants.LOG_REQUEST_HEADER_UUID, Field.TYPE_STRING).setIndexed(true));
+    fields.add(new Field(RodaConstants.LOG_REQUEST_HEADER_REASON, Field.TYPE_STRING).setIndexed(true));
+    fields.add(new Field(RodaConstants.LOG_REQUEST_HEADER_TYPE, Field.TYPE_STRING).setIndexed(true));
 
     return fields;
   }
@@ -99,8 +103,13 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
     doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
     doc.addField(RodaConstants.LOG_STATE, logEntry.getState().toString());
-    doc.addField(RodaConstants.INDEX_INSTANCE_ID, logEntry.getInstanceId().toString());
+    doc.addField(RodaConstants.INDEX_INSTANCE_ID, logEntry.getInstanceId());
     doc.addField(RodaConstants.LOG_LINE_NUMBER, logEntry.getLineNumber());
+    if (logEntry.getAuditLogRequestHeaders() != null) {
+      doc.addField(RodaConstants.LOG_REQUEST_HEADER_UUID, logEntry.getAuditLogRequestHeaders().getUuid());
+      doc.addField(RodaConstants.LOG_REQUEST_HEADER_REASON, logEntry.getAuditLogRequestHeaders().getReason());
+      doc.addField(RodaConstants.LOG_REQUEST_HEADER_TYPE, logEntry.getAuditLogRequestHeaders().getType());
+    }
 
     return doc;
   }
@@ -117,6 +126,10 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     final String parameters = SolrUtils.objectToString(doc.get(RodaConstants.LOG_PARAMETERS), null);
     final String relatedObjectId = SolrUtils.objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID), null);
     final String username = SolrUtils.objectToString(doc.get(RodaConstants.LOG_USERNAME), null);
+    final String requestHeaderUUID = SolrUtils.objectToString(doc.get(RodaConstants.LOG_REQUEST_HEADER_UUID), "");
+    final String requestHeaderReason = SolrUtils.objectToString(doc.get(RodaConstants.LOG_REQUEST_HEADER_REASON), "");
+    final String requestHeaderType = SolrUtils.objectToString(doc.get(RodaConstants.LOG_REQUEST_HEADER_TYPE), "");
+
     LogEntryState state = null;
 
     if (doc.containsKey(RodaConstants.LOG_STATE)) {
@@ -145,6 +158,9 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     entry.setUsername(username);
     entry.setInstanceId(instanceId);
     entry.setLineNumber(lineNumber);
+
+    // Request header context
+    entry.setAuditLogRequestHeaders(new AuditLogRequestHeaders(requestHeaderUUID, requestHeaderReason, requestHeaderType));
     return entry;
   }
 

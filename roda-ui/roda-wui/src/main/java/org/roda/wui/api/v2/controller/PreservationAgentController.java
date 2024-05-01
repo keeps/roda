@@ -62,21 +62,20 @@ public class PreservationAgentController implements PreservationAgentRestService
       RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
       RodaConstants.PRESERVATION_AGENT_VERSION, RodaConstants.PRESERVATION_AGENT_NOTE,
       RodaConstants.PRESERVATION_AGENT_EXTENSION);
-    return indexService.retrieve(requestContext.getUser(), IndexedPreservationAgent.class, uuid, fieldsToReturn);
+    return indexService.retrieve(requestContext, IndexedPreservationAgent.class, uuid, fieldsToReturn);
   }
 
   @Override
   public IndexResult<IndexedPreservationAgent> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedPreservationAgent.class, findRequest, localeString, requestContext.getUser());
+    return indexService.find(IndexedPreservationAgent.class, findRequest, localeString, requestContext);
   }
 
   @Override
-  public String count(CountRequest countRequest) {
+  public Long count(CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    Long count = indexService.count(IndexedPreservationAgent.class, countRequest.filter, countRequest.onlyActive,
+    return indexService.count(IndexedPreservationAgent.class, countRequest,
       requestContext.getUser());
-    return String.valueOf(count);
   }
 
   @RequestMapping(path = "/{id}/binary", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -103,7 +102,7 @@ public class PreservationAgentController implements PreservationAgentRestService
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.CONTROLLER_AGENT_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_AGENT_ID_PARAM,
         id);
     }
   }

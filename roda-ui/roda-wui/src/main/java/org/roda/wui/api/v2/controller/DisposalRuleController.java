@@ -58,7 +58,7 @@ public class DisposalRuleController implements DisposalRuleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
@@ -85,7 +85,7 @@ public class DisposalRuleController implements DisposalRuleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), disposalRule.getId(), state,
+      controllerAssistant.registerAction(requestContext, disposalRule.getId(), state,
         RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM, disposalRule);
     }
   }
@@ -114,7 +114,7 @@ public class DisposalRuleController implements DisposalRuleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM,
         disposalRule);
     }
   }
@@ -138,7 +138,7 @@ public class DisposalRuleController implements DisposalRuleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.DISPOSAL_RULE_ID, id);
+      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.DISPOSAL_RULE_ID, id);
     }
   }
 
@@ -163,7 +163,7 @@ public class DisposalRuleController implements DisposalRuleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state,
+      controllerAssistant.registerAction(requestContext, id, state,
         RodaConstants.CONTROLLER_DISPOSAL_RULE_ID_PARAM, id);
     }
   }
@@ -187,7 +187,7 @@ public class DisposalRuleController implements DisposalRuleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state,
+      controllerAssistant.registerAction(requestContext, state,
         RodaConstants.CONTROLLER_DISPOSAL_RULE_OVERRIDE_MANUAL_PARAM, includeManually);
     }
   }

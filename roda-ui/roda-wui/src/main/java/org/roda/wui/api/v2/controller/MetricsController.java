@@ -51,7 +51,7 @@ public class MetricsController {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state,
+      controllerAssistant.registerAction(requestContext, state,
         RodaConstants.CONTROLLER_REQUEST_METRICS_PARAM, metricsToObtain);
     }
   }

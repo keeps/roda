@@ -55,10 +55,10 @@ public class NotificationController implements NotificationRestService {
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
 
-    FindRequest findRequest = new FindRequest.FindRequestBuilder(Notification.class.getName(), Filter.ALL, justActive).withSubList(new Sublist(pagingParams.getFirst(), pagingParams.getSecond()))
-        .build();
+    FindRequest findRequest = FindRequest.getBuilder(Notification.class.getName(), Filter.ALL, justActive)
+      .withSublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())).build();
 
-    IndexResult<Notification> result = indexService.find(Notification.class, findRequest, requestContext.getUser());
+    IndexResult<Notification> result = indexService.find(Notification.class, findRequest, requestContext);
 
     return new Notifications(result.getResults());
   }
@@ -66,8 +66,7 @@ public class NotificationController implements NotificationRestService {
   @Override
   public Notification getNotification(String notificationId) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    return indexService.retrieve(requestContext.getUser(), Notification.class, notificationId, new ArrayList<>());
+    return indexService.retrieve(requestContext, Notification.class, notificationId, new ArrayList<>());
   }
 
   @Override
@@ -90,7 +89,7 @@ public class NotificationController implements NotificationRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), ackRequest.getNotificationUUID(), state,
+      controllerAssistant.registerAction(requestContext, ackRequest.getNotificationUUID(), state,
         RodaConstants.CONTROLLER_NOTIFICATION_ID_PARAM, ackRequest.getNotificationUUID(),
         RodaConstants.CONTROLLER_NOTIFICATION_TOKEN_PARAM, ackRequest.getToken());
     }
@@ -99,19 +98,18 @@ public class NotificationController implements NotificationRestService {
   @Override
   public Notification findByUuid(String uuid) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext.getUser(), Notification.class, uuid, new ArrayList<>());
+    return indexService.retrieve(requestContext, Notification.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<Notification> find(FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(Notification.class, findRequest, localeString, requestContext.getUser());
+    return indexService.find(Notification.class, findRequest, localeString, requestContext);
   }
 
   @Override
-  public String count(@RequestBody CountRequest countRequest) {
+  public Long count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return String.valueOf(indexService.count(Notification.class, countRequest.filter, countRequest.onlyActive,
-      requestContext.getUser()));
+    return indexService.count(Notification.class, countRequest, requestContext.getUser());
   }
 }

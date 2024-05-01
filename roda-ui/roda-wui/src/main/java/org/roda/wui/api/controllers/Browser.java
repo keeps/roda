@@ -99,7 +99,6 @@ import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
-import org.roda.wui.common.model.RequestContext;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 
@@ -329,33 +328,6 @@ public class Browser extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, dipUUID, state, RodaConstants.CONTROLLER_DIP_ID_PARAM, dipUUID,
         RodaConstants.CONTROLLER_DIP_FILE_ID_PARAM, dipFileUUID);
-    }
-  }
-
-  public static <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final Facets facets, final RequestContext requestContext,
-    final boolean justActive, final List<String> fieldsToReturn)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(requestContext.getUser(), classToReturn);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // delegate
-      return BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, requestContext.getUser(), justActive,
-        fieldsToReturn);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, filter,
-        RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
     }
   }
 

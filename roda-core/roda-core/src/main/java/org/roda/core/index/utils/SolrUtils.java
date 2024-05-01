@@ -7,7 +7,6 @@
  */
 package org.roda.core.index.utils;
 
-import dev.failsafe.Failsafe;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
@@ -44,10 +43,10 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
+import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
@@ -83,6 +82,9 @@ import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.collapse.Collapse;
+import org.roda.core.data.v2.index.collapse.HintEnum;
+import org.roda.core.data.v2.index.collapse.NullPolicyEnum;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
@@ -134,6 +136,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import dev.failsafe.Failsafe;
 import dev.failsafe.Fallback;
 
 /**
@@ -169,7 +172,8 @@ public class SolrUtils {
 
   public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter, User user,
     boolean justActive) throws GenericException, RequestNotValidException {
-    return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, justActive, new ArrayList<>())
+    return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, justActive, new ArrayList<>(),
+      null)
       .getTotalCount();
   }
 
@@ -323,7 +327,8 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    Sorter sorter, Sublist sublist, Facets facets, User user, boolean justActive, List<String> fieldsToReturn)
+    Sorter sorter, Sublist sublist, Facets facets, User user, boolean justActive, List<String> fieldsToReturn,
+    Collapse collapse)
     throws GenericException, RequestNotValidException {
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
@@ -336,6 +341,10 @@ public class SolrUtils {
     parseAndConfigureFacets(facets, query);
     if (hasPermissionFilters(classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
+    }
+
+    if (collapse != null) {
+      query.addFilterQuery(parseCollapse(collapse));
     }
 
     try {
@@ -352,6 +361,34 @@ public class SolrUtils {
    * "Internal" helper methods
    * ____________________________________________________________________________________________________________________
    */
+
+  private static String parseCollapse(Collapse collapse) {
+
+    return "{" + "!collapse field=" + collapse.getField() + " " + parseCollapseNullPolicy(collapse.getNullPolicy())
+      + " " + parseCollapseHint(collapse.getHint()) + " " + parseCollapseSorter(collapse.getSorter()) + "}";
+  }
+
+  private static String parseCollapseSorter(Sorter sorter) {
+    // sort='numeric_field asc, score desc'
+    StringBuilder sb = new StringBuilder();
+
+    if (sorter != null && sorter.getParameters().length != 0) {
+      sb.append("sort='");
+      for (SortParameter sortParameter : sorter.getParameters()) {
+        sb.append(sortParameter.getName()).append(" ").append(sortParameter.isDescending() ? ORDER.desc : ORDER.asc);
+      }
+      sb.append("'");
+    }
+    return sb.toString();
+  }
+
+  private static String parseCollapseHint(HintEnum hintEnum) {
+    return "hint=" + hintEnum.toString();
+  }
+
+  private static String parseCollapseNullPolicy(NullPolicyEnum nullPolicyEnum) {
+    return "nullPolicy=" + nullPolicyEnum.toString();
+  }
 
   private static <T> boolean hasPermissionFilters(Class<T> resultClass) {
     return HasPermissionFilters.class.isAssignableFrom(resultClass);
@@ -1399,7 +1436,7 @@ public class SolrUtils {
     Binary binary = model.retrieveOtherMetadataBinary(otherMetadataBinary);
     Map<String, List<String>> otherProperties = MetadataFileUtils.parseBinary(binary);
 
-    for (Map.Entry<String, List<String>> entry : otherProperties.entrySet()) {
+    for (Entry<String, List<String>> entry : otherProperties.entrySet()) {
       solrDocument.setField(prefix + entry.getKey(), entry.getValue());
     }
 
@@ -1684,8 +1721,7 @@ public class SolrUtils {
       return values;
     }
 
-    if (o instanceof Date) {
-      Date retentionPeriodStartDate = (Date) o;
+    if (o instanceof Date retentionPeriodStartDate) {
       cal.setTime(retentionPeriodStartDate);
     } else {
       values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS, "Retention period start must be of date type");
@@ -1707,6 +1743,8 @@ public class SolrUtils {
         case DAYS:
           cal.add(Calendar.DATE, retentionPeriodDuration);
           break;
+        default:
+          throw new IllegalStateException("Unexpected value: " + disposalSchedule.getRetentionPeriodIntervalCode());
       }
     }
     overDueDate = cal.getTime();

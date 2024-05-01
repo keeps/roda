@@ -21,6 +21,7 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.collapse.Collapse;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.FacetValue;
@@ -133,6 +134,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private Facets facets;
   private boolean selectable;
   private List<String> fieldsToReturn;
+  private Collapse collapse;
 
   private HandlerRegistration facetsValueChangedHandlerRegistration;
 
@@ -587,9 +589,9 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   private CompletableFuture<IndexResult<T>> getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn) {
     Services services = new Services("Get data", "get");
-    FindRequest findRequest = new FindRequest.FindRequestBuilder(getClassToReturn().getName(), getFilter(),
-      getJustActive()).withSubList(sublist).withFacets(getFacets()).shouldExportFacets(false).withSorter(sorter)
-      .withFieldsToReturn(fieldsToReturn).build();
+    FindRequest findRequest = FindRequest.getBuilder(getClassToReturn().getName(), getFilter(),
+      getJustActive()).withSublist(sublist).withFacets(getFacets()).withExportFacets(false).withSorter(sorter)
+      .withFieldsToReturn(fieldsToReturn).withCollapse(getCollapse()).build();
     return services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       getClassToReturn());
   }
@@ -681,6 +683,10 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   public void setFilter(Filter filter) {
     this.filter = filter;
     refresh();
+  }
+
+  public Collapse getCollapse() {
+    return collapse;
   }
 
   public boolean isSearchRestricted() {
