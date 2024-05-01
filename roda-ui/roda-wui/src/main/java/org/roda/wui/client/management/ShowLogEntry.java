@@ -10,16 +10,14 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -50,23 +48,14 @@ public class ShowLogEntry extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        String logEntryId = historyTokens.get(0);
-
-        BrowserService.Util.getInstance().retrieve(LogEntry.class.getName(), logEntryId, fieldsToReturn,
-          new AsyncCallback<LogEntry>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
-            }
-
-            @Override
-            public void onSuccess(LogEntry result) {
-              ShowLogEntry logEntryPanel = new ShowLogEntry(result);
+        Services services = new Services("Retrieve audit log", "get");
+        services.rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0)), LogEntry.class)
+          .whenComplete((logEntry, throwable) -> {
+            if (throwable == null) {
+              ShowLogEntry logEntryPanel = new ShowLogEntry(logEntry);
               callback.onSuccess(logEntryPanel);
             }
           });
-
       } else {
         HistoryUtils.newHistory(UserLog.RESOLVER);
         callback.onSuccess(null);
@@ -92,53 +81,50 @@ public class ShowLogEntry extends Composite {
   interface MyUiBinder extends UiBinder<Widget, ShowLogEntry> {
   }
 
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.LOG_ID,
-    RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD, RodaConstants.LOG_ADDRESS,
-    RodaConstants.LOG_DATETIME, RodaConstants.LOG_RELATED_OBJECT_ID, RodaConstants.LOG_USERNAME,
-    RodaConstants.LOG_PARAMETERS, RodaConstants.LOG_STATE);
+  @UiField
+  Label logIdLabel;
+  @UiField
+  Label logIdValue;
 
   @UiField
-  Label logIdLabel, logIdValue;
-
+  Label logComponentLabel;
   @UiField
-  Label logComponentLabel, logComponentValue;
-
+  Label logComponentValue;
   @UiField
-  Label logMethodLabel, logMethodValue;
-
+  Label logMethodLabel;
   @UiField
-  Label logAddressLabel, logAddressValue;
-
+  Label logMethodValue;
   @UiField
-  Label logDatetimeLabel, logDatetimeValue;
-
+  Label logAddressLabel;
   @UiField
-  Label logDurationLabel, logDurationValue;
-
+  Label logAddressValue;
   @UiField
-  Label logRelatedObjectLabel, logRelatedObjectValue;
-
+  Label logDatetimeLabel;
   @UiField
-  Label logUsernameLabel, logUsernameValue;
-
+  Label logDatetimeValue;
+  @UiField
+  Label logDurationValue;
+  @UiField
+  Label logRelatedObjectLabel;
+  @UiField
+  Label logRelatedObjectValue;
+  @UiField
+  Label logUsernameLabel;
+  @UiField
+  Label logUsernameValue;
   @UiField
   Label logParametersLabel;
-
   @UiField
   FlowPanel logParametersValue;
-
   @UiField
   Label logStateLabel;
-
   @UiField
   HTML logStateValue;
-
   @UiField
   Label logInstanceIdLabel;
-
   @UiField
   Label logInstanceIdValue;
 

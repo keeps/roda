@@ -8,11 +8,11 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.disposal.hold.DisposalHolds;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -64,7 +64,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
@@ -91,7 +91,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), hold.getId(), state,
+      controllerAssistant.registerAction(requestContext, hold.getId(), state,
         RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM, hold);
     }
   }
@@ -122,7 +122,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM,
         hold);
     }
   }
@@ -146,7 +146,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.DISPOSAL_HOLD_ID, id);
+      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.DISPOSAL_HOLD_ID, id);
     }
   }
 
@@ -168,7 +168,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), disposalHoldId, state,
+      controllerAssistant.registerAction(requestContext, disposalHoldId, state,
         RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId);
     }
   }
@@ -193,7 +193,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         items, RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
         RodaConstants.CONTROLLER_DISPOSAL_HOLD_OVERRIDE_PARAM, override);
     }
@@ -215,7 +215,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         items, RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId);
     }
   }
@@ -245,7 +245,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state,
+      controllerAssistant.registerAction(requestContext, id, state,
         RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, id);
     }
   }
@@ -267,7 +267,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         items, RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
         RodaConstants.CONTROLLER_DISPOSAL_HOLD_DISASSOCIATE_ALL, clear);
     }
@@ -291,7 +291,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
@@ -313,7 +313,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 }

@@ -56,7 +56,7 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
@@ -79,7 +79,7 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.DISPOSAL_SCHEDULE_ID, id);
+      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.DISPOSAL_SCHEDULE_ID, id);
     }
   }
 
@@ -109,7 +109,7 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state,
+      controllerAssistant.registerAction(requestContext, state,
         RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_PARAM, schedule);
     }
   }
@@ -140,7 +140,7 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), schedule.getId(), state,
+      controllerAssistant.registerAction(requestContext, schedule.getId(), state,
         RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_PARAM, schedule);
     }
   }
@@ -165,7 +165,7 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state,
+      controllerAssistant.registerAction(requestContext, id, state,
         RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM, id);
     }
     return null;
@@ -190,7 +190,7 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         selectedItems, RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM, disposalScheduleId);
     }
   }
@@ -212,7 +212,7 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         selectedItems);
     }
   }

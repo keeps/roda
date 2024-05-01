@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.index.sort;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ import java.util.List;
  * @author Luis Faria
  */
 public class Sorter implements Serializable {
+  @Serial
   private static final long serialVersionUID = 4255866410869992178L;
 
   public static final Sorter NONE = new Sorter();

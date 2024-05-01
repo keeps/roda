@@ -67,7 +67,7 @@ public class FilesController {
       controllerAssistant.checkRoles(requestContext.getUser());
       List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
       fileFields.add(RodaConstants.FILE_ISDIRECTORY);
-      IndexedFile file = indexService.retrieve(requestContext.getUser(), IndexedFile.class, fileUUID, fileFields);
+      IndexedFile file = indexService.retrieve(requestContext, IndexedFile.class, fileUUID, fileFields);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
       StreamResponse response = filesService.retrieveAIPRepresentationFile(file);
@@ -78,7 +78,7 @@ public class FilesController {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), fileUUID, state,
+      controllerAssistant.registerAction(requestContext, fileUUID, state,
         RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
     }
   }

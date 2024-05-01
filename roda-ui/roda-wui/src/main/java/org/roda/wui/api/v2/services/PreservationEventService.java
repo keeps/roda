@@ -26,13 +26,13 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationEventsLinkingObjects;
-import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.common.HTMLUtils;
+import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.server.ServerTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,7 +57,7 @@ public class PreservationEventService {
   }
 
   public PreservationEventsLinkingObjects getLinkingObjectsFromPreservationEventBinary(Binary preservationEventBinary,
-    User user) throws ValidationException, GenericException {
+    RequestContext context) throws ValidationException, GenericException {
     PreservationEventsLinkingObjects linkingObjects = new PreservationEventsLinkingObjects();
     List<LinkingIdentifier> sourceObjectIds = new ArrayList<>();
     Map<String, IndexedAIP> aips = new HashMap<>();
@@ -79,13 +79,13 @@ public class PreservationEventService {
       if (RodaConstants.RODA_TYPE.AIP.equals(linkingType)) {
         String uuid = LinkingObjectUtils.getAipIdFromLinkingId(idValue);
         List<String> aipFields = Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.INDEX_UUID);
-        IndexedAIP aip = indexService.retrieve(user, IndexedAIP.class, uuid, aipFields);
+        IndexedAIP aip = indexService.retrieve(context, IndexedAIP.class, uuid, aipFields);
         aips.put(idValue, aip);
       } else if (RodaConstants.RODA_TYPE.REPRESENTATION.equals(linkingType)) {
         String uuid = LinkingObjectUtils.getRepresentationIdFromLinkingId(idValue);
         List<String> representationFields = Arrays.asList(RodaConstants.REPRESENTATION_ID,
           RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ORIGINAL);
-        IndexedRepresentation rep = indexService.retrieve(user, IndexedRepresentation.class, uuid,
+        IndexedRepresentation rep = indexService.retrieve(context, IndexedRepresentation.class, uuid,
           representationFields);
         representations.put(idValue, rep);
       } else if (RodaConstants.RODA_TYPE.FILE.equals(linkingType)) {
@@ -93,7 +93,7 @@ public class PreservationEventService {
         fileFields.addAll(RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
         fileFields.addAll(Arrays.asList(RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_SIZE,
           RodaConstants.FILE_FILEFORMAT, RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FORMAT_DESIGNATION));
-        IndexedFile file = indexService.retrieve(user, IndexedFile.class,
+        IndexedFile file = indexService.retrieve(context, IndexedFile.class,
           LinkingObjectUtils.getFileIdFromLinkingId(idValue), fileFields);
         files.put(idValue, file);
       } else if (RodaConstants.RODA_TYPE.TRANSFERRED_RESOURCE.equals(linkingType)) {
@@ -101,7 +101,7 @@ public class PreservationEventService {
         if (id != null) {
           List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_NAME,
             RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
-          TransferredResource tr = indexService.retrieve(user, TransferredResource.class, IdUtils.createUUID(id),
+          TransferredResource tr = indexService.retrieve(context, TransferredResource.class, IdUtils.createUUID(id),
             resourceFields);
           transferredResources.put(idValue, tr);
         }
@@ -135,7 +135,8 @@ public class PreservationEventService {
     return identifier;
   }
 
-  public List<IndexedPreservationAgent> getAgentsFromPreservationEventBinary(Binary preservationEventBinary, User user)
+  public List<IndexedPreservationAgent> getAgentsFromPreservationEventBinary(Binary preservationEventBinary,
+    RequestContext context)
     throws ValidationException, GenericException {
     List<IndexedPreservationAgent> agents = new ArrayList<>();
     List<String> agentFields = Arrays.asList(RodaConstants.PRESERVATION_AGENT_ID, RodaConstants.PRESERVATION_AGENT_NAME,
@@ -147,7 +148,7 @@ public class PreservationEventService {
     for (LinkingAgentIdentifierComplexType linkingAgentIdentifierComplexType : eventComplexType
       .getLinkingAgentIdentifier()) {
 
-      IndexedPreservationAgent agent = indexService.retrieve(user, IndexedPreservationAgent.class,
+      IndexedPreservationAgent agent = indexService.retrieve(context, IndexedPreservationAgent.class,
         linkingAgentIdentifierComplexType.getLinkingAgentIdentifierValue(), agentFields);
       agents.add(agent);
 
@@ -156,7 +157,7 @@ public class PreservationEventService {
     return agents;
   }
 
-  public Binary getPreservationEventBinary(IndexedPreservationEvent preservationEvent, User user)
+  public Binary getPreservationEventBinary(IndexedPreservationEvent preservationEvent, RequestContext context)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
 
     ModelService model = RodaCoreFactory.getModelService();
@@ -170,13 +171,13 @@ public class PreservationEventService {
       List<String> directoryFilePath = null;
 
       if (preservationEvent.getRepresentationUUID() != null) {
-        IndexedRepresentation representation = indexService.retrieve(user, IndexedRepresentation.class,
+        IndexedRepresentation representation = indexService.retrieve(context, IndexedRepresentation.class,
           preservationEvent.getRepresentationUUID(), new ArrayList<>());
         representationId = representation.getId();
       }
 
       if (preservationEvent.getFileUUID() != null) {
-        IndexedFile file = indexService.retrieve(user, IndexedFile.class, preservationEvent.getFileUUID(),
+        IndexedFile file = indexService.retrieve(context, IndexedFile.class, preservationEvent.getFileUUID(),
           new ArrayList<>());
         fileId = file.getId();
         directoryFilePath = file.getPath();
@@ -188,19 +189,21 @@ public class PreservationEventService {
     return binary;
   }
 
-  public StreamResponse retrievePreservationEventFile(IndexedPreservationEvent preservationEvent, User user)
+  public StreamResponse retrievePreservationEventFile(IndexedPreservationEvent preservationEvent,
+    RequestContext context)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
-    Binary binary = getPreservationEventBinary(preservationEvent, user);
+    Binary binary = getPreservationEventBinary(preservationEvent, context);
     final ConsumesOutputStream stream = new BinaryConsumesOutputStream(binary,
       RodaConstants.MEDIA_TYPE_APPLICATION_XML);
     return new StreamResponse(stream);
   }
 
-  public StreamResponse retrievePreservationEventDetails(IndexedPreservationEvent preservationEvent, User user,
+  public StreamResponse retrievePreservationEventDetails(IndexedPreservationEvent preservationEvent,
+    RequestContext context,
     String language)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Binary binary = getPreservationEventBinary(preservationEvent, user);
+    Binary binary = getPreservationEventBinary(preservationEvent, context);
     final String filename = binary.getStoragePath().getName() + HTML_EXT;
     final String htmlEvent = HTMLUtils.preservationMetadataEventToHtml(binary, true, ServerTools.parseLocale(language));
 

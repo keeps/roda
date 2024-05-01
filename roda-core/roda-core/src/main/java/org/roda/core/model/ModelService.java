@@ -71,6 +71,22 @@ import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationAIPEntry;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
+import org.roda.core.data.v2.disposal.hold.DisposalHolds;
+import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.rule.DisposalRules;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
@@ -86,22 +102,6 @@ import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
-import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationAIPEntry;
-import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
-import org.roda.core.data.v2.disposal.hold.DisposalHold;
-import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
-import org.roda.core.data.v2.disposal.hold.DisposalHolds;
-import org.roda.core.data.v2.disposal.rule.DisposalRule;
-import org.roda.core.data.v2.disposal.rule.DisposalRules;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
-import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
-import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -2168,16 +2168,15 @@ public class ModelService extends ModelObservable {
       for (Path path : directoryStream) {
         if (!path.equals(currentLogFile)) {
           int httpExitCode = RESTClientUtility.sendPostRequestWithFile(url, resource, username, password, path);
-          if (httpExitCode == RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
+          if (httpExitCode == RodaConstants.HTTP_RESPONSE_CODE_CREATED) {
             LOGGER.info("The action log file ({}) was moved to Master successfully!", path);
             Files.delete(path);
           } else {
             LOGGER.error(
-              "The action log file (" + path + ") was not moved to Master due to http response error: " + httpExitCode);
+              "The action log file ({}) was not moved to Master due to http response error: {}", path, httpExitCode);
           }
         }
       }
-      password.close();
     } catch (IOException e) {
       LOGGER.error("Error listing directory for log files", e);
     } catch (RODAException e) {

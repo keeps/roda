@@ -8,133 +8,122 @@
 package org.roda.core.data.v2.index;
 
 import java.io.Serial;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.roda.core.data.v2.index.collapse.Collapse;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * A request to a find operation.
  *
  * @author Rui Castro <rui.castro@gmail.com>
  */
+@JsonDeserialize(builder = FindRequest.FindRequestBuilder.class)
 public class FindRequest extends CountRequest {
 
   @Serial
   private static final long serialVersionUID = 5997470558754294987L;
 
   /** Sorter. */
-  public Sorter sorter;
+  @JsonProperty("sorter")
+  private Sorter sorter;
   /** Sublist (paging). */
-  public Sublist sublist;
+  @JsonProperty("sublist")
+  private Sublist sublist;
   /** Facets to return. */
-  public Facets facets;
+  @JsonProperty("facets")
+  private Facets facets;
   /** For CSV results, export only facets? */
-  public boolean exportFacets;
+  @JsonProperty("exportFacets")
+  private boolean exportFacets;
   /** The filename for exported CSV. */
-  public String filename;
+  @JsonProperty("filename")
+  private String filename;
   /** The index fields to return and use to construct the indexed object. */
-  public List<String> fieldsToReturn;
+  @JsonProperty("fieldsToReturn")
+  private List<String> fieldsToReturn;
+  /** The filter querying options for collapsing results */
+  @JsonProperty("collapse")
+  private Collapse collapse;
 
-  /**
-   * Constructor.
-   */
-  public FindRequest() {
-    this(null, new Filter(), new Sorter(), new Sublist(), new Facets(), true);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param classToReturn
-   *          Class name of resources to return.
-   * @param filter
-   *          Filter.
-   * @param sorter
-   *          Sorter.
-   * @param sublist
-   *          Sublist (paging).
-   * @param facets
-   *          Facets to return.
-   * @param onlyActive
-   *          Return only active resources?
-   */
-  public FindRequest(final String classToReturn, final Filter filter, final Sorter sorter, final Sublist sublist,
-    final Facets facets, final boolean onlyActive) {
-    this(classToReturn, filter, sorter, sublist, facets, onlyActive, false, "export.csv", new ArrayList<>());
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param classToReturn
-   *          Class name of resources to return.
-   * @param filter
-   *          Filter.
-   * @param sorter
-   *          Sorter.
-   * @param sublist
-   *          Sublist (paging).
-   * @param facets
-   *          Facets to return.
-   * @param onlyActive
-   *          Return only active resources?
-   * @param exportFacets
-   *          for CSV results, export only facets?
-   * @param filename
-   *          the filename for exported CSV.
-   * @param fieldsToReturn
-   *          the index fields to return.
-   */
-  public FindRequest(final String classToReturn, final Filter filter, final Sorter sorter, final Sublist sublist,
-    final Facets facets, final boolean onlyActive, final boolean exportFacets, final String filename,
-    final List<String> fieldsToReturn) {
-    super(classToReturn, filter, onlyActive);
-    this.sorter = sorter;
-    this.sublist = sublist;
-    this.facets = facets;
-    this.exportFacets = exportFacets;
-    this.filename = filename;
-    this.fieldsToReturn = fieldsToReturn;
-  }
-
+  // Private constructor for Jackson deserialization
   private FindRequest(FindRequestBuilder builder) {
     super(builder.classToReturn, builder.filter, builder.onlyActive);
     this.sorter = builder.sorter;
-    this.sublist = builder.subList;
+    this.sublist = builder.sublist;
     this.facets = builder.facets;
     this.exportFacets = builder.exportFacets;
     this.filename = builder.filename;
     this.fieldsToReturn = builder.fieldsToReturn;
-
+    this.collapse = builder.collapse;
   }
 
+  public Sorter getSorter() {
+    return sorter;
+  }
+
+  public Sublist getSublist() {
+    return sublist;
+  }
+
+  public Facets getFacets() {
+    return facets;
+  }
+
+  public boolean isExportFacets() {
+    return exportFacets;
+  }
+
+  public String getFilename() {
+    return filename;
+  }
+
+  public List<String> getFieldsToReturn() {
+    return fieldsToReturn;
+  }
+
+  public Collapse getCollapse() {
+    return collapse;
+  }
+
+  public static FindRequestBuilder getBuilder(final String classToReturn, final Filter filter, boolean onlyActive) {
+    return new FindRequestBuilder(classToReturn, filter, onlyActive);
+  }
+
+  @JsonPOJOBuilder
   public static class FindRequestBuilder {
     private final String classToReturn;
     private final Filter filter;
     private final boolean onlyActive;
     private Sorter sorter;
-    private Sublist subList;
+    private Sublist sublist;
     private Facets facets;
     private boolean exportFacets;
     private String filename = null;
     private List<String> fieldsToReturn;
+    private Collapse collapse;
 
-    public FindRequestBuilder(final String classToReturn, final Filter filter, boolean onlyActive) {
+    public FindRequestBuilder(@JsonProperty("classToReturn") final String classToReturn,
+      @JsonProperty("filter") final Filter filter, @JsonProperty("onlyActive") boolean onlyActive) {
       // mandatory
       this.classToReturn = classToReturn;
       this.filter = filter;
       this.onlyActive = onlyActive;
       // optional with defaults if not set
       this.sorter = Sorter.NONE;
-      this.subList = new Sublist(0, 100);
+      this.sublist = new Sublist(0, 100);
       this.facets = Facets.NONE;
       this.exportFacets = false;
       this.fieldsToReturn = Collections.emptyList();
+      this.collapse = null;
     }
 
     public FindRequest build() {
@@ -146,8 +135,8 @@ public class FindRequest extends CountRequest {
       return this;
     }
 
-    public FindRequestBuilder withSubList(Sublist subList) {
-      this.subList = subList;
+    public FindRequestBuilder withSublist(Sublist sublist) {
+      this.sublist = sublist;
       return this;
     }
 
@@ -156,7 +145,7 @@ public class FindRequest extends CountRequest {
       return this;
     }
 
-    public FindRequestBuilder shouldExportFacets(boolean exportFacets) {
+    public FindRequestBuilder withExportFacets(boolean exportFacets) {
       this.exportFacets = exportFacets;
       return this;
     }
@@ -168,6 +157,11 @@ public class FindRequest extends CountRequest {
 
     public FindRequestBuilder withFieldsToReturn(List<String> fieldsToReturn) {
       this.fieldsToReturn = fieldsToReturn;
+      return this;
+    }
+
+    public FindRequestBuilder withCollapse(Collapse collapse) {
+      this.collapse = collapse;
       return this;
     }
   }

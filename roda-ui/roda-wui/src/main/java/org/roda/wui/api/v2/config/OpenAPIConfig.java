@@ -23,6 +23,7 @@ public class OpenAPIConfig {
   @Bean
   public OpenAPI generateOpenAPI() {
     OpenAPI oas = new OpenAPI();
+
     Info info = new Info().title("RODA REST API").description("REST AIP for RODA")
       .contact(new Contact().email("info@keep.pt").name("KEEP SOLUTIONS")
         .url("https://www.keep.pt/en/contacts-proposals-information-telephone-address"))

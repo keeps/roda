@@ -69,21 +69,20 @@ public class PreservationEventController implements PreservationEventRestService
   @Override
   public IndexedPreservationEvent findByUuid(String uuid) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext.getUser(), IndexedPreservationEvent.class, uuid, new ArrayList<>());
+    return indexService.retrieve(requestContext, IndexedPreservationEvent.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedPreservationEvent> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedPreservationEvent.class, findRequest, localeString, requestContext.getUser());
+    return indexService.find(IndexedPreservationEvent.class, findRequest, localeString, requestContext);
   }
 
   @Override
-  public String count(@RequestBody CountRequest countRequest) {
+  public Long count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    Long count = indexService.count(IndexedPreservationEvent.class, countRequest.filter, countRequest.onlyActive,
+    return indexService.count(IndexedPreservationEvent.class, countRequest,
       requestContext.getUser());
-    return String.valueOf(count);
   }
 
   @Override
@@ -100,9 +99,9 @@ public class PreservationEventController implements PreservationEventRestService
       controllerAssistant.checkRoles(requestContext.getUser());
 
       Binary preservationEventBinary = preservationEventService.getPreservationEventBinary(preservationEvent,
-        requestContext.getUser());
+        requestContext);
       return preservationEventService.getAgentsFromPreservationEventBinary(preservationEventBinary,
-        requestContext.getUser());
+        requestContext);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -111,7 +110,7 @@ public class PreservationEventController implements PreservationEventRestService
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state);
+      controllerAssistant.registerAction(requestContext, id, state);
     }
   }
 
@@ -129,9 +128,9 @@ public class PreservationEventController implements PreservationEventRestService
       controllerAssistant.checkRoles(requestContext.getUser());
 
       Binary preservationEventBinary = preservationEventService.getPreservationEventBinary(preservationEvent,
-        requestContext.getUser());
+        requestContext);
       return preservationEventService.getLinkingObjectsFromPreservationEventBinary(preservationEventBinary,
-        requestContext.getUser());
+        requestContext);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -140,7 +139,7 @@ public class PreservationEventController implements PreservationEventRestService
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state);
+      controllerAssistant.registerAction(requestContext, id, state);
     }
   }
 
@@ -159,7 +158,7 @@ public class PreservationEventController implements PreservationEventRestService
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      IndexedPreservationEvent preservationEvent = indexService.retrieve(requestContext.getUser(),
+      IndexedPreservationEvent preservationEvent = indexService.retrieve(requestContext,
         IndexedPreservationEvent.class, id, new ArrayList<>());
 
       if (preservationEvent.getAipID() != null) {
@@ -168,7 +167,7 @@ public class PreservationEventController implements PreservationEventRestService
       }
 
       StreamResponse response = preservationEventService.retrievePreservationEventFile(preservationEvent,
-        requestContext.getUser());
+        requestContext);
 
       return ApiUtils.rangeResponse(headers, response.getStream());
     } catch (RODAException e) {
@@ -176,7 +175,7 @@ public class PreservationEventController implements PreservationEventRestService
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state,
+      controllerAssistant.registerAction(requestContext, id, state,
         RodaConstants.CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM, id);
     }
   }
@@ -197,7 +196,7 @@ public class PreservationEventController implements PreservationEventRestService
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      IndexedPreservationEvent preservationEvent = indexService.retrieve(requestContext.getUser(),
+      IndexedPreservationEvent preservationEvent = indexService.retrieve(requestContext,
         IndexedPreservationEvent.class, id, new ArrayList<>());
 
       if (preservationEvent.getAipID() != null) {
@@ -206,7 +205,7 @@ public class PreservationEventController implements PreservationEventRestService
       }
 
       StreamResponse response = preservationEventService.retrievePreservationEventDetails(preservationEvent,
-        requestContext.getUser(), locale);
+        requestContext, locale);
 
       return ApiUtils.rangeResponse(headers, response.getStream());
     } catch (RODAException e) {
@@ -214,7 +213,7 @@ public class PreservationEventController implements PreservationEventRestService
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state,
+      controllerAssistant.registerAction(requestContext, id, state,
         RodaConstants.CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM, id);
     }
   }

@@ -1,6 +1,5 @@
 package org.roda.wui.api.v2.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
@@ -13,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -35,13 +36,12 @@ public class AIPController implements AIPRestService {
   @Override
   public IndexResult<IndexedAIP> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedAIP.class, findRequest, localeString, requestContext.getUser());
+    return indexService.find(IndexedAIP.class, findRequest, localeString, requestContext);
   }
 
   @Override
-  public String count(@RequestBody CountRequest countRequest) {
+  public Long count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return String.valueOf(
-      indexService.count(IndexedAIP.class, countRequest.filter, countRequest.onlyActive, requestContext.getUser()));
+    return indexService.count(IndexedAIP.class, countRequest, requestContext.getUser());
   }
 }

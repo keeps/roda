@@ -8,38 +8,37 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.I18nUtility;
+import org.roda.wui.common.model.RequestContext;
 import org.springframework.stereotype.Service;
 
 @Service
 public class IndexService {
 
   public <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final FindRequest findRequest,
-    User user) {
-    return find(classToReturn, findRequest, null, user);
+    RequestContext context) {
+    return find(classToReturn, findRequest, null, context);
   }
 
   public <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final FindRequest findRequest,
-    String locale, User user) {
+    String locale, RequestContext context) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // check user permissions
-      controllerAssistant.checkRoles(user, classToReturn);
+      controllerAssistant.checkRoles(context.getUser(), classToReturn);
 
       // delegate
-      IndexResult<T> result = RodaCoreFactory.getIndexService().find(classToReturn, findRequest.filter,
-        findRequest.sorter, findRequest.sublist, findRequest.facets, user, findRequest.onlyActive,
-        findRequest.fieldsToReturn);
+      IndexResult<T> result = RodaCoreFactory.getIndexService().find(classToReturn, findRequest, context.getUser());
 
       if (locale == null) {
         return result;
@@ -54,25 +53,26 @@ public class IndexService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, findRequest.filter,
-        RodaConstants.CONTROLLER_SORTER_PARAM, findRequest.sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM,
-        findRequest.sublist);
+      controllerAssistant.registerAction(context, state, RodaConstants.CONTROLLER_CLASS_PARAM,
+        classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, findRequest.getFilter(),
+        RodaConstants.CONTROLLER_SORTER_PARAM, findRequest.getSorter(), RodaConstants.CONTROLLER_SUBLIST_PARAM,
+        findRequest.getSublist());
     }
   }
 
-  public <T extends IsIndexed> T retrieve(User user, Class<T> returnClass, String id, List<String> fieldsToReturn) {
+  public <T extends IsIndexed> T retrieve(RequestContext context, Class<T> returnClass, String id,
+    List<String> fieldsToReturn) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // check user permissions
-      controllerAssistant.checkRoles(user, returnClass);
+      controllerAssistant.checkRoles(context.getUser(), returnClass);
       // delegate
       final T ret = RodaCoreFactory.getIndexService().retrieve(returnClass, id, fieldsToReturn);
 
       // checking object permissions
-      controllerAssistant.checkObjectPermissions(user, ret, returnClass);
+      controllerAssistant.checkObjectPermissions(context.getUser(), ret, returnClass);
 
       return ret;
     } catch (AuthorizationDeniedException e) {
@@ -83,18 +83,18 @@ public class IndexService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(user, id, state, RodaConstants.CONTROLLER_CLASS_PARAM,
+      controllerAssistant.registerAction(context, id, state, RodaConstants.CONTROLLER_CLASS_PARAM,
         returnClass.getSimpleName());
     }
   }
 
-  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, boolean justActive, User user) {
+  public <T extends IsIndexed> Long count(Class<T> returnClass, CountRequest request, User user) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       // check user permissions
       controllerAssistant.checkRoles(user, returnClass);
-      return RodaCoreFactory.getIndexService().count(returnClass, filter, user, justActive);
+      return RodaCoreFactory.getIndexService().count(returnClass, request.getFilter(), user, request.isOnlyActive());
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -104,7 +104,7 @@ public class IndexService {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_CLASS_PARAM, returnClass.getSimpleName(),
-        RodaConstants.CONTROLLER_FILTER_PARAM, filter.toString());
+        RodaConstants.CONTROLLER_FILTER_PARAM, request.getFilter().toString());
     }
   }
 }

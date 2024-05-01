@@ -1,17 +1,9 @@
 package org.roda.wui.api.v2.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.StreamResponse;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.ClassificationPlanService;
@@ -27,6 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "/api/v2/classification-plans")
@@ -62,7 +61,7 @@ public class ClassificationPlanController {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_FILENAME_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_FILENAME_PARAM,
         filename);
     }
   }

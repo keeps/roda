@@ -704,7 +704,7 @@
             <dependency>
                 <groupId>org.fusesource.restygwt</groupId>
                 <artifactId>restygwt</artifactId>
-                <version>2.2.8-SNAPSHOT</version>
+                <version>2.2.11-KEEPS</version>
             </dependency>
             <!-- CAS related dependencies - end -->
             <!-- ApacheDS related dependencies - start -->

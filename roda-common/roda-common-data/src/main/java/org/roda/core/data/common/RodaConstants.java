@@ -1128,6 +1128,9 @@ public final class RodaConstants {
   public static final String LOG_STATE = "state";
   public static final String LOG_FILE_ID = "fileID";
   public static final String LOG_LINE_NUMBER = "lineNumber";
+  public static final String LOG_REQUEST_HEADER_UUID = "requestHeaderUUID";
+  public static final String LOG_REQUEST_HEADER_REASON = "requestHeaderReason";
+  public static final String LOG_REQUEST_HEADER_TYPE = "requestHeaderType";
 
   // MEMBER: USER or GROUP
   public static final String MEMBERS_ID = "id";
@@ -2059,6 +2062,7 @@ public final class RodaConstants {
 
   /* HTTP Response codes */
   public static final int HTTP_RESPONSE_CODE_SUCCESS = 200;
+  public static final int HTTP_RESPONSE_CODE_CREATED = 201;
   public static final int HTTP_RESPONSE_CODE_BAD_REQUEST = 400;
   public static final int HTTP_RESPONSE_CODE_UNAUTHORIZED = 401;
   public static final int HTTP_RESPONSE_CODE_NOT_FOUND = 404;

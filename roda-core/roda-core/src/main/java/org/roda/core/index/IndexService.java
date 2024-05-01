@@ -42,6 +42,7 @@ import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -174,7 +175,13 @@ public class IndexService {
     Facets facets, User user, boolean justActive, final List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
     return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive,
-      fieldsToReturn);
+      fieldsToReturn, null);
+  }
+
+  public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, FindRequest findRequest, User user)
+      throws GenericException, RequestNotValidException {
+    return SolrUtils.find(getSolrClient(), returnClass, findRequest.getFilter(),findRequest.getSorter(), findRequest.getSublist(), findRequest.getFacets(), user, findRequest.isOnlyActive(),
+        findRequest.getFieldsToReturn(), findRequest.getCollapse());
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
