@@ -8,7 +8,9 @@
 package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -27,7 +29,7 @@ public class MarketInfo implements Serializable {
   private String id = null;
   @JsonProperty("name")
   private String name = null;
-  //plugin, service, component
+  // plugin, service, component
   @JsonProperty("type")
   private String type = null;
   @JsonProperty("version")
@@ -45,6 +47,8 @@ public class MarketInfo implements Serializable {
   private Vendor vendor = new Vendor();
   @JsonProperty("compatibility")
   private List<String> compatibility = null;
+  @JsonProperty("linkToQuote")
+  private Map<String, String> linkToQuote = new HashMap<>();
 
   public MarketInfo() {
   }
@@ -64,16 +68,20 @@ public class MarketInfo implements Serializable {
   public void setName(String name) {
     this.name = name;
   }
-  public String getType(){
+
+  public String getType() {
     return type;
   }
-  public void setType(String type){
+
+  public void setType(String type) {
     this.type = type;
   }
+
   @JsonIgnore
   public PluginType getPluginType() {
     return pluginProperties.getType();
   }
+
   @JsonIgnore
   public void setPluginType(PluginType type) {
     this.pluginProperties.setType(type);
@@ -94,18 +102,22 @@ public class MarketInfo implements Serializable {
   public void setDescription(String description) {
     this.description = description;
   }
+
   @JsonIgnore
   public List<String> getCategories() {
     return pluginProperties.getCategories();
   }
+
   @JsonIgnore
   public void setCategories(List<String> categories) {
     this.pluginProperties.setCategories(categories);
   }
+
   @JsonIgnore
   public Set<String> getObjectClasses() {
     return pluginProperties.getObjectClasses();
   }
+
   @JsonIgnore
   public void setObjectClasses(Set<String> objectClasses) {
     this.pluginProperties.setObjectClasses(objectClasses);
@@ -146,10 +158,12 @@ public class MarketInfo implements Serializable {
   public void setVendor(Vendor vendor) {
     this.vendor = vendor;
   }
+
   @JsonIgnore
   public String getVendorName() {
     return vendor.getName();
   }
+
   @JsonIgnore
   public void setVendorName(String vendor) {
     this.vendor.setName(vendor);
@@ -171,6 +185,14 @@ public class MarketInfo implements Serializable {
     this.compatibility = compatibility;
   }
 
+  public Map<String, String> getLinkToQuote() {
+    return linkToQuote;
+  }
+
+  public void setLinkToQuote(Map<String, String> linkToQuote) {
+    this.linkToQuote = linkToQuote;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -178,9 +200,11 @@ public class MarketInfo implements Serializable {
     if (o == null || getClass() != o.getClass())
       return false;
     MarketInfo that = (MarketInfo) o;
-    return Objects.equals(id, that.id) && Objects.equals(name, that.name) && pluginProperties.getType() == that.pluginProperties.getType()
-      && Objects.equals(version, that.version) && Objects.equals(description, that.description)
-      && Objects.equals(pluginProperties.getCategories(), that.pluginProperties.getCategories()) && Objects.equals(pluginProperties.getObjectClasses(), that.pluginProperties.getObjectClasses())
+    return Objects.equals(id, that.id) && Objects.equals(name, that.name)
+      && pluginProperties.getType() == that.pluginProperties.getType() && Objects.equals(version, that.version)
+      && Objects.equals(description, that.description)
+      && Objects.equals(pluginProperties.getCategories(), that.pluginProperties.getCategories())
+      && Objects.equals(pluginProperties.getObjectClasses(), that.pluginProperties.getObjectClasses())
       && Objects.equals(license, that.license) && Objects.equals(installation, that.installation)
       && Objects.equals(homepage, that.homepage) && Objects.equals(vendor, that.vendor)
       && Objects.equals(compatibility, that.compatibility);
@@ -188,7 +212,7 @@ public class MarketInfo implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, pluginProperties.getType(), version, description, pluginProperties.getCategories(), pluginProperties.getCategories(), license, installation,
-      homepage, vendor, compatibility);
+    return Objects.hash(id, name, pluginProperties.getType(), version, description, pluginProperties.getCategories(),
+      pluginProperties.getCategories(), license, installation, homepage, vendor, compatibility);
   }
 }

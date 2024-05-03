@@ -20,6 +20,12 @@ if [[ -z "$RELEASE_VERSION" ]]; then
   exit 1
 fi
 
+docker pull docker.labs.keep.pt/bu/digitalpreservation/dev/market-info-generator:1
+docker run -it -e GITLAB_PRIVATE_TOKEN=${GITLAB_PRIVATE_TOKEN} -v /tmp/market-info:/tmp/target docker.labs.keep.pt/bu/digitalpreservation/dev/market-info-generator:1 -o /tmp/target
+cp /tmp/market-info/marketInfo.jsonl roda-core/roda-core/src/main/resources/config/market/marketInfo.jsonl
+
+exit 0
+
 cat << EOF
 ################################
 # Release version
