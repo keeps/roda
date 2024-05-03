@@ -24,7 +24,7 @@ import org.roda.core.data.v2.ip.HasInstanceID;
 import org.roda.core.data.v2.ip.HasInstanceName;
 
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_INCIDENCE)
-@JsonInclude(JsonInclude.Include.ALWAYS)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RiskIncidence implements IsModelObject, IsIndexed, HasId, HasInstanceID, HasInstanceName {
   private static final long serialVersionUID = -1089167070045254627L;
 
