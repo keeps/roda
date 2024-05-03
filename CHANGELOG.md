@@ -1,5 +1,18 @@
 # Changelog
 
+## v5.6.1 (03/05/2024)
+#### Bug fixes
+
+- Custom E-ARK SIP representation type not being set when ingesting a E-ARK SIP #3139
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.6.0 (04/04/2024)
 #### New features 
 
@@ -489,16 +502,4 @@ docker pull keeps/roda:v4.3.0
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.7.0
-```
-
----
-
-## v3.6.4 (11/03/2022)
-#### Bug Fixes:
-
--  Fix job orchestration displayed badges
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.6.4
 ```
