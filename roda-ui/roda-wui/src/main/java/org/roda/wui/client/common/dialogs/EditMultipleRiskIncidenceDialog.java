@@ -53,11 +53,6 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed> extends Dialog
   @UiField
   ListBox status, severity;
 
-  @UiField
-  DateBox mitigatedOn;
-
-  @UiField
-  TextBox mitigatedBy;
 
   @UiField
   TextArea mitigatedDescription;
@@ -72,9 +67,6 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed> extends Dialog
     setWidget(binder.createAndBindUi(this));
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-    mitigatedOn.setFormat(dateFormat);
-    mitigatedOn.getDatePicker().setYearArrowsVisible(true);
-    mitigatedOn.setFireNullValues(true);
 
     for (IncidenceStatus istatus : IncidenceStatus.values()) {
       status.addItem(messages.riskIncidenceStatusValue(istatus), istatus.toString());
@@ -139,14 +131,6 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed> extends Dialog
 
   public String getSeverity() {
     return severity.getSelectedValue();
-  }
-
-  public Date getMitigatedOn() {
-    return mitigatedOn.getValue();
-  }
-
-  public String getMitigatedBy() {
-    return mitigatedBy.getValue();
   }
 
   public String getMitigatedDescription() {
