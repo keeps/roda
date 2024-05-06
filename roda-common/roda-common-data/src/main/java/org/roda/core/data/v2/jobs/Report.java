@@ -440,8 +440,7 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
   public void injectLineSeparator(String lineSeparator) {
     this.lineSeparator = lineSeparator;
   }
-
-  @JsonIgnore
+  
   public String getLineSeparator() {
     return lineSeparator;
   }
