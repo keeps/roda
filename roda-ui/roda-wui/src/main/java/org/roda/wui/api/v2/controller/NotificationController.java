@@ -29,14 +29,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "/api/v2/notifications")
-@Tag(name = NotificationController.SWAGGER_ENDPOINT)
 public class NotificationController implements NotificationRestService {
-  public static final String SWAGGER_ENDPOINT = "v2 notifications";
 
   @Autowired
   private NotificationsService notificationsService;
@@ -110,6 +107,6 @@ public class NotificationController implements NotificationRestService {
   @Override
   public Long count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(Notification.class, countRequest, requestContext.getUser());
+    return indexService.count(Notification.class, countRequest, requestContext);
   }
 }

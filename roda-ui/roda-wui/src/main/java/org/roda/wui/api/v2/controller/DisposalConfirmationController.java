@@ -59,7 +59,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   @Override
   public Long count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(DisposalConfirmation.class, countRequest, requestContext.getUser());
+    return indexService.count(DisposalConfirmation.class, countRequest, requestContext);
   }
 
   @Override

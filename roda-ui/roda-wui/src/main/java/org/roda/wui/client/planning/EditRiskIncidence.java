@@ -15,7 +15,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
-import org.roda.core.data.v2.risks.api.incidences.SelectedIncidences;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -207,7 +206,7 @@ public class EditRiskIncidence extends Composite {
 
     Services service = new Services("Edit risk incidence", "update");
 
-    service.incidenceRiskResource(s -> s.updateRiskIncidence(incidence)).whenComplete((value, error) -> {
+    service.riskIncidenceResource(s -> s.updateRiskIncidence(incidence)).whenComplete((value, error) -> {
       if (error != null) {
         errorMessage(error);
       } else {

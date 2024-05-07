@@ -21,7 +21,6 @@ import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.CreateRisk;
 import org.roda.wui.client.planning.EditRisk;
@@ -43,7 +42,7 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<IndexedRiskAction> POSSIBLE_ACTIONS_WITHOUT_RISK = new HashSet<>(
-    Arrays.asList(IndexedRiskAction.NEW, IndexedRiskAction.REFRESH));
+    Arrays.asList(IndexedRiskAction.NEW));
 
   private static final Set<IndexedRiskAction> POSSIBLE_ACTIONS_ON_SINGLE_RISK = new HashSet<>(
     Arrays.asList(IndexedRiskAction.REMOVE, IndexedRiskAction.START_PROCESS, IndexedRiskAction.EDIT));
@@ -61,7 +60,7 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   public enum IndexedRiskAction implements Action<IndexedRisk> {
     NEW(RodaConstants.PERMISSION_METHOD_CREATE_RISK), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_RISK),
     START_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_RISK),
-    REFRESH(), HISTORY(RodaConstants.PERMISSION_METHOD_RETRIEVE_RISK_VERSIONS);
+    HISTORY(RodaConstants.PERMISSION_METHOD_RETRIEVE_RISK_VERSIONS);
 
     private List<String> methods;
 
@@ -113,8 +112,6 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   public void act(Action<IndexedRisk> action, AsyncCallback<ActionImpact> callback) {
     if (IndexedRiskAction.NEW.equals(action)) {
       create(callback);
-    } else if (IndexedRiskAction.REFRESH.equals(action)) {
-      refresh(callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -145,21 +142,6 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
     } else {
       unsupportedAction(action, callback);
     }
-  }
-
-  private void refresh(AsyncCallback<ActionImpact> callback) {
-    Services services = new Services("Refresh risks", "refresh");
-
-    services.riskResource(s -> s.refreshRisk()).whenComplete((value, error) -> {
-      if (error != null) {
-        AsyncCallbackUtils.defaultFailureTreatment(error);
-        callback.onSuccess(Actionable.ActionImpact.UPDATED);
-      } else {
-        Toast.showInfo(messages.dialogRefresh(), messages.riskRefreshDone());
-        callback.onSuccess(Actionable.ActionImpact.UPDATED);
-      }
-
-    });
   }
 
   private void history(IndexedRisk object, AsyncCallback<ActionImpact> callback) {
@@ -232,7 +214,6 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
     ActionableGroup<IndexedRisk> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
     managementGroup.addButton(messages.riskHistoryButton(), IndexedRiskAction.HISTORY, ActionImpact.NONE,
       "btn-history");
-    managementGroup.addButton(messages.refreshButton(), IndexedRiskAction.REFRESH, ActionImpact.UPDATED, "btn-refresh");
     managementGroup.addButton(messages.newButton(), IndexedRiskAction.NEW, ActionImpact.UPDATED, "btn-plus-circle");
     managementGroup.addButton(messages.editButton(), IndexedRiskAction.EDIT, ActionImpact.UPDATED, "btn-edit");
     managementGroup.addButton(messages.removeButton(), IndexedRiskAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");

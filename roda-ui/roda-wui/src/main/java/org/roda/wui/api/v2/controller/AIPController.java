@@ -42,6 +42,6 @@ public class AIPController implements AIPRestService {
   @Override
   public Long count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(IndexedAIP.class, countRequest, requestContext.getUser());
+    return indexService.count(IndexedAIP.class, countRequest, requestContext);
   }
 }

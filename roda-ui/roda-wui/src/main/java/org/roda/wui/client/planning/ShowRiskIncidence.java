@@ -10,7 +10,6 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -83,13 +82,6 @@ public class ShowRiskIncidence extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.RISK_INCIDENCE_ID, RodaConstants.RISK_INCIDENCE_RISK_ID, RodaConstants.RISK_INCIDENCE_DESCRIPTION,
-    RodaConstants.RISK_INCIDENCE_STATUS, RodaConstants.RISK_INCIDENCE_SEVERITY,
-    RodaConstants.RISK_INCIDENCE_DETECTED_BY, RodaConstants.RISK_INCIDENCE_DETECTED_ON,
-    RodaConstants.RISK_INCIDENCE_MITIGATED_ON, RodaConstants.RISK_INCIDENCE_MITIGATED_BY,
-    RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION);
-
   private RiskIncidence incidence;
 
   @UiField
@@ -111,7 +103,10 @@ public class ShowRiskIncidence extends Composite {
   Anchor riskLink;
 
   @UiField
-  Label descriptionKey, descriptionValue;
+  Label descriptionKey;
+
+  @UiField
+  Label descriptionValue;
 
   @UiField
   Label status;
@@ -126,13 +121,22 @@ public class ShowRiskIncidence extends Composite {
   Label detectedBy;
 
   @UiField
-  Label mitigatedOnKey, mitigatedOnValue;
+  Label mitigatedOnKey;
 
   @UiField
-  Label mitigatedByKey, mitigatedByValue;
+  Label mitigatedOnValue;
 
   @UiField
-  Label mitigatedDescriptionKey, mitigatedDescriptionValue;
+  Label mitigatedByKey;
+
+  @UiField
+  Label mitigatedByValue;
+
+  @UiField
+  Label mitigatedDescriptionKey;
+
+  @UiField
+  Label mitigatedDescriptionValue;
 
   @UiField
   SimplePanel actionsSidebar;

@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface RiskIncidenceRestService extends RODAEntityRestService<RiskIncidence> {
 
   @RequestMapping(path = "/delete", method = RequestMethod.POST)
-  @Operation(summary = "Delete multiple incidences via search query", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), description = "Deletes one or more incidence", responses = {
+  @Operation(summary = "Deletes multiple incidences via search query", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), description = "Deletes one or more incidence", responses = {
     @ApiResponse(responseCode = "200", description = "Job created"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job deleteRiskIncidences(
@@ -36,7 +36,7 @@ public interface RiskIncidenceRestService extends RODAEntityRestService<RiskInci
     @RequestParam(name = RodaConstants.API_QUERY_JOB_DETAILS) String details);
 
   @RequestMapping(path = "/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Update risk incidences", description = "Update existing incidences", responses = {
+  @Operation(summary = "Updates multiple risk incidences via search query", description = "Updates multiple risk incidences", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
@@ -44,7 +44,7 @@ public interface RiskIncidenceRestService extends RODAEntityRestService<RiskInci
     @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedIncidences<RiskIncidence> selected);
 
   @RequestMapping(path = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Update risk incidence", description = "Update existing incidence", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RiskIncidence.class))), responses = {
+  @Operation(summary = "Updates a single risk incidence", description = "Updates an existing incidence", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RiskIncidence.class))), responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = RiskIncidence.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   RiskIncidence updateRiskIncidence(

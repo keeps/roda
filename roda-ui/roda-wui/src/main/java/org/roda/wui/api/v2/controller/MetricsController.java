@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @Tag(name = MetricsController.SWAGGER_ENDPOINT)
 public class MetricsController {
   public static final String SWAGGER_ENDPOINT = "v2 metrics";
+
   @Autowired
   MetricsService metricsService;
   @Autowired

@@ -13,7 +13,6 @@ import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.log.LogEntryState;
-import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.I18nUtility;
@@ -36,6 +35,10 @@ public class IndexService {
     try {
       // check user permissions
       controllerAssistant.checkRoles(context.getUser(), classToReturn);
+
+      if (findRequest.getFilter() == null || findRequest.getFilter().getParameters().isEmpty()) {
+        return new IndexResult<>();
+      }
 
       // delegate
       IndexResult<T> result = RodaCoreFactory.getIndexService().find(classToReturn, findRequest, context.getUser());
@@ -88,13 +91,13 @@ public class IndexService {
     }
   }
 
-  public <T extends IsIndexed> Long count(Class<T> returnClass, CountRequest request, User user) {
+  public <T extends IsIndexed> Long count(Class<T> returnClass, CountRequest request, RequestContext context) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       // check user permissions
-      controllerAssistant.checkRoles(user, returnClass);
-      return RodaCoreFactory.getIndexService().count(returnClass, request.getFilter(), user, request.isOnlyActive());
+      controllerAssistant.checkRoles(context.getUser(), returnClass);
+      return RodaCoreFactory.getIndexService().count(returnClass, request.getFilter(), context.getUser(), request.isOnlyActive());
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -103,7 +106,7 @@ public class IndexService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_CLASS_PARAM, returnClass.getSimpleName(),
+      controllerAssistant.registerAction(context, state, RodaConstants.CONTROLLER_CLASS_PARAM, returnClass.getSimpleName(),
         RodaConstants.CONTROLLER_FILTER_PARAM, request.getFilter().toString());
     }
   }

@@ -46,8 +46,8 @@ import org.springframework.stereotype.Service;
  * @author Carlos Afonso <cafonso@keep.pt>
  */
 @Service
-public class IndexedRiskService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(IndexedRiskService.class);
+public class RiskService {
+  private static final Logger LOGGER = LoggerFactory.getLogger(RiskService.class);
 
   public Job deleteRisk(User user, SelectedItems<IndexedRisk> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
