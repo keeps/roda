@@ -14,12 +14,10 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.core.data.v2.risks.api.incidences.SelectedIncidences;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
-import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -29,6 +27,7 @@ import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.EditRiskIncidence;
 import org.roda.wui.client.process.CreateSelectedJob;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -149,6 +148,8 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
           messages.riskIncidenceRemoveConfirmDialogCancel(), messages.riskIncidenceRemoveConfirmDialogOk(),
           new ActionAsyncCallback<Boolean>(callback) {
 
+            Services service = new Services("Remove risk incidence", "remove");
+
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
@@ -158,11 +159,10 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
 
                     @Override
                     public void onSuccess(final String details) {
-                      BrowserService.Util.getInstance().deleteRiskIncidences(objects, details,
-                        new ActionAsyncCallback<Job>(callback) {
 
-                          @Override
-                          public void onSuccess(Job result) {
+                      service.incidenceRiskResource(s -> s.deleteRiskIncidences(objects, details))
+                        .whenComplete((value, error) -> {
+                          if (error == null) {
                             Toast.showInfo(messages.runningInBackgroundTitle(),
                               messages.runningInBackgroundDescription());
 
@@ -177,7 +177,7 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
                                 @Override
                                 public void onSuccess(final Void nothing) {
                                   doActionCallbackNone();
-                                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                                  HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
                                 }
                               });
                           }
@@ -200,33 +200,36 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
   }
 
   private void edit(SelectedItems<RiskIncidence> objects, AsyncCallback<ActionImpact> callback) {
+    Services service = new Services("Edit risk incidences", "update");
     EditMultipleRiskIncidenceDialog dialog = new EditMultipleRiskIncidenceDialog();
     dialog.showAndCenter();
     dialog.addValueChangeHandler((ValueChangeHandler<RiskIncidence>) event -> {
       EditMultipleRiskIncidenceDialog editDialog = (EditMultipleRiskIncidenceDialog) event.getSource();
 
-      BrowserService.Util.getInstance().updateMultipleIncidences(objects, editDialog.getStatus(),
-        editDialog.getSeverity(), editDialog.getMitigatedOn(), editDialog.getMitigatedBy(),
-        editDialog.getMitigatedDescription(), new ActionLoadingAsyncCallback<Job>(callback) {
+      SelectedIncidences<RiskIncidence> selectedIncidences = new SelectedIncidences<>(objects,
+        editDialog.getMitigatedDescription(), editDialog.getSeverity(), editDialog.getStatus());
 
-          @Override
-          public void onSuccessImpl(Job result) {
+      service.incidenceRiskResource(s -> s.updateMultipleIncidences(selectedIncidences))
+        .whenComplete((value, error) -> {
+
+          if (error == null) {
             Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
             Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
               @Override
               public void onFailure(Throwable caught) {
-                doActionCallbackUpdated();
+                callback.onSuccess(Actionable.ActionImpact.UPDATED);
               }
 
               @Override
               public void onSuccess(final Void nothing) {
-                doActionCallbackNone();
-                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                callback.onSuccess(Actionable.ActionImpact.NONE);
+                HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
               }
             });
           }
+
         });
     });
   }

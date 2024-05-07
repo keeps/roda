@@ -35,9 +35,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 
 public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
@@ -50,25 +50,29 @@ public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS, "Risk incidence status",
-        PluginParameterType.STRING, "UNMITIGATED", false, false, "Risk incidence status."));
+      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS,
+        "Risk incidence status", PluginParameterType.STRING).withDefaultValue("UNMITIGATED").isMandatory(false)
+        .isReadOnly(false).withDescription("Risk incidence status.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY, "Risk incidence severity",
-        PluginParameterType.STRING, "MODERATE", false, false, "Risk incidence severity."));
+      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY,
+        "Risk incidence severity", PluginParameterType.STRING).withDefaultValue("MODERATE").isMandatory(false)
+        .isReadOnly(false).withDescription("Risk incidence severity.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_ON,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_ON, "Risk incidence mitigated on",
-        PluginParameterType.STRING, "", false, false, "Risk incidence mitigated on."));
+      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_ON,
+        "Risk incidence mitigated on", PluginParameterType.STRING).withDefaultValue("").isMandatory(false)
+        .isReadOnly(false).withDescription("Risk incidence mitigated on.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_BY,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_BY, "Risk incidence mitigated by",
-        PluginParameterType.STRING, "MODERATE", false, false, "Risk incidence mitigated by."));
+      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_BY,
+        "Risk incidence mitigated by", PluginParameterType.STRING).withDefaultValue("MODERATE").isMandatory(false)
+        .isReadOnly(false).withDescription("Risk incidence mitigated by.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_DESCRIPTION,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_DESCRIPTION,
-        "Risk incidence mitigated description", PluginParameterType.STRING, "MODERATE", false, false,
-        "Risk incidence mitigated description."));
+      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_DESCRIPTION,
+        "Risk incidence mitigated description", PluginParameterType.STRING).withDefaultValue("MODERATE")
+        .isMandatory(false).isReadOnly(false).withDescription("Risk incidence mitigated description.").build());
   }
 
   @Override

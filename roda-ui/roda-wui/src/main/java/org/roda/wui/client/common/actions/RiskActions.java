@@ -14,11 +14,8 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -30,7 +27,7 @@ import org.roda.wui.client.planning.CreateRisk;
 import org.roda.wui.client.planning.EditRisk;
 import org.roda.wui.client.planning.RiskHistory;
 import org.roda.wui.client.process.CreateSelectedJob;
-import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -151,21 +148,17 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   }
 
   private void refresh(AsyncCallback<ActionImpact> callback) {
-    BrowserService.Util.getInstance().updateRiskCounters(new ActionAsyncCallback<Void>(callback) {
+    Services services = new Services("Refresh risks", "refresh");
 
-      @Override
-      public void onFailure(Throwable caught) {
-        if (caught != null) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-        doActionCallbackUpdated();
-      }
-
-      @Override
-      public void onSuccess(Void result) {
+    services.riskResource(s -> s.refreshRisk()).whenComplete((value, error) -> {
+      if (error != null) {
+        AsyncCallbackUtils.defaultFailureTreatment(error);
+        callback.onSuccess(Actionable.ActionImpact.UPDATED);
+      } else {
         Toast.showInfo(messages.dialogRefresh(), messages.riskRefreshDone());
-        doActionCallbackUpdated();
+        callback.onSuccess(Actionable.ActionImpact.UPDATED);
       }
+
     });
   }
 
@@ -184,47 +177,32 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
 
   private void remove(SelectedItems<IndexedRisk> objects, AsyncCallback<ActionImpact> callback) {
     ClientSelectedItemsUtils.size(IndexedRisk.class, objects, new ActionNoAsyncCallback<Long>(callback) {
+      Services service = new Services("Remove risks", "remove");
 
       @Override
       public void onSuccess(final Long size) {
-        Dialogs.showConfirmDialog(messages.riskRemoveConfirmDialogTitle(),
-          messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveConfirmDialogCancel(),
-          messages.riskRemoveConfirmDialogOk(), new ActionNoAsyncCallback<Boolean>(callback) {
+        Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
+          messages.ingestTransferRemoveSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
+          new ActionNoAsyncCallback<Boolean>(callback) {
 
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().deleteRisk(objects, new ActionAsyncCallback<Job>(callback) {
+                service.riskResource(s -> s.deleteRisk(objects)).whenComplete((value, error) -> {
+                  if (value != null) {
+                    doActionCallbackNone();
+                    HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
+                  } else if (error != null) {
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    callback.onFailure(caught);
-                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                  }
-
-                  @Override
-                  public void onSuccess(Job result) {
-                    Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
-
+                    Timer timer = new Timer() {
                       @Override
-                      public void onFailure(Throwable caught) {
-                        Timer timer = new Timer() {
-                          @Override
-                          public void run() {
-                            Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                            doActionCallbackDestroyed();
-                          }
-                        };
-
-                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                      public void run() {
+                        Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
+                        doActionCallbackDestroyed();
                       }
+                    };
 
-                      @Override
-                      public void onSuccess(final Void nothing) {
-                        doActionCallbackNone();
-                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                      }
-                    });
+                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
                   }
                 });
               } else {
