@@ -75,8 +75,7 @@ public class AuditLogController implements AuditLogRestService {
   @Override
   public Long count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(LogEntry.class, countRequest,
-      requestContext.getUser());
+    return indexService.count(LogEntry.class, countRequest, requestContext);
   }
 
   @PostMapping(path = "/import", produces = MediaType.APPLICATION_JSON_VALUE)

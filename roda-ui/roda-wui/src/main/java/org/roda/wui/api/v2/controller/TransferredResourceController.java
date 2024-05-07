@@ -311,6 +311,6 @@ public class TransferredResourceController implements TransferredResourceRestSer
   @Override
   public Long count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(TransferredResource.class, countRequest, requestContext.getUser());
+    return indexService.count(TransferredResource.class, countRequest, requestContext);
   }
 }

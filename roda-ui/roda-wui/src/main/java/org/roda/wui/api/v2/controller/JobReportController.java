@@ -48,6 +48,6 @@ public class JobReportController implements JobReportRestService {
   @Override
   public Long count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.count(IndexedReport.class, countRequest, requestContext.getUser());
+    return indexService.count(IndexedReport.class, countRequest, requestContext);
   }
 }

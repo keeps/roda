@@ -31,6 +31,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping(path = "/api/v2/disposal/schedules")
 public class DisposalScheduleController implements DisposalScheduleRestService {
+
   @Autowired
   HttpServletRequest request;
 

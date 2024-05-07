@@ -1,5 +1,17 @@
 package org.roda.wui.api.v2.services;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
@@ -33,18 +45,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 @Service
 public class TransferredResourceService {
 
@@ -52,18 +52,22 @@ public class TransferredResourceService {
 
   public List<TransferredResource> retrieveSelectedTransferredResource(SelectedItems<TransferredResource> selected)
     throws GenericException, RequestNotValidException {
-    if (selected instanceof SelectedItemsList<TransferredResource> selectedList) {
-      Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
-      IndexResult<TransferredResource> results = RodaCoreFactory.getIndexService().find(TransferredResource.class,
-        filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()), new ArrayList<>());
-      return results.getResults();
-    } else if (selected instanceof SelectedItemsFilter<TransferredResource> selectedFilter) {
-      Long counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, selectedFilter.getFilter());
-      IndexResult<TransferredResource> results = RodaCoreFactory.getIndexService().find(TransferredResource.class,
-        selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter.intValue()), new ArrayList<>());
-      return results.getResults();
-    } else {
-      return new ArrayList<>();
+    switch (selected) {
+      case SelectedItemsList<TransferredResource> selectedList -> {
+        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
+        IndexResult<TransferredResource> results = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+          filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()), new ArrayList<>());
+        return results.getResults();
+      }
+      case SelectedItemsFilter<TransferredResource> selectedFilter -> {
+        Long counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, selectedFilter.getFilter());
+        IndexResult<TransferredResource> results = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+          selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter.intValue()), new ArrayList<>());
+        return results.getResults();
+      }
+      case null, default -> {
+        return new ArrayList<>();
+      }
     }
   }
 

@@ -10,10 +10,8 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -77,17 +75,6 @@ public class ShowRisk extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_ID,
-    RodaConstants.RISK_NAME, RodaConstants.RISK_DESCRIPTION, RodaConstants.RISK_IDENTIFIED_ON,
-    RodaConstants.RISK_IDENTIFIED_BY, RodaConstants.RISK_CATEGORIES, RodaConstants.RISK_NOTES,
-    RodaConstants.RISK_PRE_MITIGATION_PROBABILITY, RodaConstants.RISK_PRE_MITIGATION_IMPACT,
-    RodaConstants.RISK_PRE_MITIGATION_SEVERITY, RodaConstants.RISK_POST_MITIGATION_PROBABILITY,
-    RodaConstants.RISK_POST_MITIGATION_IMPACT, RodaConstants.RISK_POST_MITIGATION_SEVERITY,
-    RodaConstants.RISK_PRE_MITIGATION_NOTES, RodaConstants.RISK_POST_MITIGATION_NOTES,
-    RodaConstants.RISK_MITIGATION_STRATEGY, RodaConstants.RISK_MITIGATION_OWNER,
-    RodaConstants.RISK_MITIGATION_OWNER_TYPE, RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE,
-    RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE);
-
   private static final AsyncCallback<Actionable.ActionImpact> actionCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
     @Override
     public void onSuccess(Actionable.ActionImpact result) {
@@ -142,37 +129,25 @@ public class ShowRisk extends Composite {
       Services services = new Services("Retrieve indexed risk", "get");
       SidebarUtils.showSidebar(contentFlowPanel, sidebarFlowPanel);
 
-      final RiskActions riskActions = RiskActions.get();
-      final RiskActions actionsWithHistory = RiskActions.getWithHistory();
-
-      String riskId = historyTokens.get(0);
-
-      services.rodaEntityRestService(s -> s.findByUuid(riskId), IndexedRisk.class).thenCompose(indexedRisk -> services
-        .riskResource(s -> s.hasRiskVersions(indexedRisk.getId())).whenComplete((value, error) -> {
-          instance = new ShowRisk(indexedRisk);
-          if (error != null) {
+      services.rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0)), IndexedRisk.class)
+        .whenComplete((indexedRisk, throwable) -> {
+          if (throwable == null) {
+            instance = new ShowRisk(indexedRisk);
+            RiskActions riskActions = RiskActions.get();
+            if (indexedRisk.hasVersions()) {
+              riskActions = RiskActions.getWithHistory();
+            }
             SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
             instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskActions).withBackButton()
               .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(indexedRisk)));
             callback.onSuccess(instance);
           } else {
-            if (value) {
-              SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, actionsWithHistory.hasAnyRoles());
-              instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(actionsWithHistory).withBackButton()
-                .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(indexedRisk)));
-            } else {
-              SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
-              instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskActions).withBackButton()
-                .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(indexedRisk)));
-            }
-            callback.onSuccess(instance);
+            callback.onFailure(throwable);
           }
-
-        }));
+        });
     } else {
       HistoryUtils.newHistory(RiskRegister.RESOLVER);
       callback.onSuccess(null);
     }
   }
-
 }

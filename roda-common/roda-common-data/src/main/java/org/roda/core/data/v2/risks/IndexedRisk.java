@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.risks;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -15,14 +16,18 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_RISK)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class IndexedRisk extends Risk implements IsIndexed {
+
+  @Serial
   private static final long serialVersionUID = 2864416437668370485L;
   private int incidencesCount = 0;
   private int unmitigatedIncidencesCount = 0;
 
+  private boolean hasVersions = false;
   private Map<String, Object> fields;
 
   public IndexedRisk() {
@@ -32,6 +37,8 @@ public class IndexedRisk extends Risk implements IsIndexed {
   public IndexedRisk(IndexedRisk risk) {
     super(risk);
     this.incidencesCount = risk.getIncidencesCount();
+    this.unmitigatedIncidencesCount = risk.getUnmitigatedIncidencesCount();
+    this.hasVersions = risk.hasVersions();
   }
 
   public int getIncidencesCount() {
@@ -48,6 +55,15 @@ public class IndexedRisk extends Risk implements IsIndexed {
 
   public void setUnmitigatedIncidencesCount(int unmitigatedIncidencesCount) {
     this.unmitigatedIncidencesCount = unmitigatedIncidencesCount;
+  }
+
+  @JsonProperty("hasVersions")
+  public boolean hasVersions() {
+    return hasVersions;
+  }
+
+  public void setHasVersions(boolean hasVersions) {
+    this.hasVersions = hasVersions;
   }
 
   @Override
@@ -73,13 +89,13 @@ public class IndexedRisk extends Risk implements IsIndexed {
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(new Object[] {getId(), getName(), getDescription(), getIdentifiedOn(), getIdentifiedBy(),
-      getCategories(), getNotes(), getPreMitigationProbability(), getPreMitigationImpact(), getPreMitigationSeverity(),
+    return Arrays.asList(getId(), getName(), getDescription(), getIdentifiedOn(), getIdentifiedBy(), getCategories(),
+      getNotes(), getPreMitigationProbability(), getPreMitigationImpact(), getPreMitigationSeverity(),
       getPreMitigationNotes(), getPostMitigationProbability(), getPostMitigationImpact(), getPostMitigationSeverity(),
       getPreMitigationNotes(), getMitigationStrategy(), getMitigationOwnerType(), getMitigationOwner(),
       getMitigationRelatedEventIdentifierType(), getMitigationRelatedEventIdentifierValue(), getCreatedOn(),
       getCreatedBy(), getUpdatedOn(), getUpdatedBy(), getIncidencesCount(), getUnmitigatedIncidencesCount(),
-      getInstanceId()});
+      getInstanceId());
   }
 
   @Override
@@ -122,9 +138,6 @@ public class IndexedRisk extends Risk implements IsIndexed {
     IndexedRisk other = (IndexedRisk) obj;
     if (incidencesCount != other.incidencesCount)
       return false;
-    if (unmitigatedIncidencesCount != other.unmitigatedIncidencesCount)
-      return false;
-    return true;
+    return unmitigatedIncidencesCount == other.unmitigatedIncidencesCount;
   }
-
 }

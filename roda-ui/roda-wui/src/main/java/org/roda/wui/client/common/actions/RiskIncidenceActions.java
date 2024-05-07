@@ -160,7 +160,7 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
                     @Override
                     public void onSuccess(final String details) {
 
-                      service.incidenceRiskResource(s -> s.deleteRiskIncidences(objects, details))
+                      service.riskIncidenceResource(s -> s.deleteRiskIncidences(objects, details))
                         .whenComplete((value, error) -> {
                           if (error == null) {
                             Toast.showInfo(messages.runningInBackgroundTitle(),
@@ -209,7 +209,7 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
       SelectedIncidences<RiskIncidence> selectedIncidences = new SelectedIncidences<>(objects,
         editDialog.getMitigatedDescription(), editDialog.getSeverity(), editDialog.getStatus());
 
-      service.incidenceRiskResource(s -> s.updateMultipleIncidences(selectedIncidences))
+      service.riskIncidenceResource(s -> s.updateMultipleIncidences(selectedIncidences))
         .whenComplete((value, error) -> {
 
           if (error == null) {

@@ -1,12 +1,14 @@
 package org.roda.wui.api.v2.controller;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.CountRequest;
@@ -17,12 +19,10 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.user.User;
-import org.roda.wui.api.controllers.BrowserHelper;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.IndexService;
-import org.roda.wui.api.v2.services.IndexedRiskService;
-import org.roda.wui.client.services.IndexedRiskRestService;
+import org.roda.wui.api.v2.services.RiskService;
+import org.roda.wui.client.services.RiskRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -39,70 +38,54 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping(path = "/api/v2/risks")
-@Tag(name = IndexedRiskController.SWAGGER_ENDPOINT)
-public class IndexedRiskController implements IndexedRiskRestService {
-
-  public static final String SWAGGER_ENDPOINT = "v2 risks";
+public class RiskController implements RiskRestService {
 
   @Autowired
   private HttpServletRequest request;
 
   @Autowired
-  private IndexedRiskService indexedRiskService;
+  private RiskService indexedRiskService;
 
   @Autowired
   private IndexService indexService;
 
   @Override
   public IndexedRisk findByUuid(String uuid) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
+    final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_ID,
+      RodaConstants.RISK_NAME, RodaConstants.RISK_DESCRIPTION, RodaConstants.RISK_IDENTIFIED_ON,
+      RodaConstants.RISK_IDENTIFIED_BY, RodaConstants.RISK_CATEGORIES, RodaConstants.RISK_NOTES,
+      RodaConstants.RISK_PRE_MITIGATION_PROBABILITY, RodaConstants.RISK_PRE_MITIGATION_IMPACT,
+      RodaConstants.RISK_PRE_MITIGATION_SEVERITY, RodaConstants.RISK_POST_MITIGATION_PROBABILITY,
+      RodaConstants.RISK_POST_MITIGATION_IMPACT, RodaConstants.RISK_POST_MITIGATION_SEVERITY,
+      RodaConstants.RISK_PRE_MITIGATION_NOTES, RodaConstants.RISK_POST_MITIGATION_NOTES,
+      RodaConstants.RISK_MITIGATION_STRATEGY, RodaConstants.RISK_MITIGATION_OWNER,
+      RodaConstants.RISK_MITIGATION_OWNER_TYPE, RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE,
+      RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE);
+    IndexedRisk retrieve = indexService.retrieve(requestContext, IndexedRisk.class, uuid, fieldsToReturn);
     try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser(), User.class);
-
-      // delegate
-      final IndexedRisk ret = indexService.retrieve(requestContext.getUser(), IndexedRisk.class, uuid,
-        new ArrayList<>());
-
-      // checking object permissions
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), ret, User.class);
-
-      return ret;
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
+      retrieve.setHasVersions(indexedRiskService.hasRiskVersions(uuid));
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
       throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), uuid, state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        User.class.getSimpleName(), RodaConstants.CONTROLLER_ID_PARAM, uuid);
     }
+    return retrieve;
   }
 
   @Override
   public IndexResult<IndexedRisk> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    if (findRequest.filter == null || findRequest.filter.getParameters().isEmpty()) {
-      return new IndexResult<>();
-    }
-    // delegate
-    return indexService.find(IndexedRisk.class, findRequest, localeString, requestContext.getUser());
+    return indexService.find(IndexedRisk.class, findRequest, localeString, requestContext);
   }
 
   @Override
-  public String count(CountRequest countRequest) {
+  public Long count(CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    return String.valueOf(
-      indexService.count(IndexedRisk.class, countRequest.filter, countRequest.onlyActive, requestContext.getUser()));
+    return indexService.count(IndexedRisk.class, countRequest, requestContext);
   }
 
   public Job deleteRisk(@RequestBody SelectedItems<IndexedRisk> selected) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
@@ -114,48 +97,7 @@ public class IndexedRiskController implements IndexedRiskRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        selected);
-    }
-  }
-
-  @Override
-  public Void refreshRisk() {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // delegate
-      indexedRiskService.updateRiskCounters();
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state);
-    }
-    return null;
-  }
-
-  @Override
-  public Boolean hasRiskVersions(String riskId) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      controllerAssistant.checkRoles(requestContext.getUser());
-      // delegate
-      return indexedRiskService.hasRiskVersions(riskId);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), riskId, state,
-        RodaConstants.CONTROLLER_RISK_ID_PARAM, riskId);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected);
     }
   }
 
@@ -170,7 +112,8 @@ public class IndexedRiskController implements IndexedRiskRestService {
       Map<String, String> properties = new HashMap<>();
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
-      return indexedRiskService.updateRisk(risk, requestContext.getUser(), properties, true, Integer.parseInt(incidences));
+      return indexedRiskService.updateRisk(risk, requestContext.getUser(), properties, true,
+        Integer.parseInt(incidences));
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
