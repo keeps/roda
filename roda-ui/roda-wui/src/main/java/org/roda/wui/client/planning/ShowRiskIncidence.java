@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
@@ -26,6 +25,7 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -233,21 +233,21 @@ public class ShowRiskIncidence extends Composite {
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
+
+      Services services = new Services("Retrieve risk incidences", "get");
+
       String riskIncidenceId = historyTokens.get(0);
-      BrowserService.Util.getInstance().retrieve(RiskIncidence.class.getName(), riskIncidenceId, fieldsToReturn,
-        new AsyncCallback<RiskIncidence>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
-          @Override
-          public void onSuccess(RiskIncidence result) {
-            ShowRiskIncidence incidencePanel = new ShowRiskIncidence(result);
+      services.rodaEntityRestService(s -> s.findByUuid(riskIncidenceId), RiskIncidence.class)
+        .whenComplete((value, error) -> {
+          if (error != null) {
+            callback.onFailure(error);
+          } else if (value != null) {
+            ShowRiskIncidence incidencePanel = new ShowRiskIncidence(value);
             callback.onSuccess(incidencePanel);
           }
         });
+
     } else {
       HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER);
       callback.onSuccess(null);

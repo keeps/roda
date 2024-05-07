@@ -16,6 +16,8 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 
 import com.google.gwt.core.client.GWT;
 
@@ -51,6 +53,10 @@ public class Services implements DirectRestService {
       return GWT.create(DisposalRuleRestService.class);
     } else if (DisposalConfirmationRestService.class.equals(serviceClass)) {
       return GWT.create(DisposalConfirmationRestService.class);
+    } else if (RiskIncidenceRestService.class.equals(serviceClass)) {
+      return GWT.create(RiskIncidenceRestService.class);
+    } else if (IndexedRiskRestService.class.equals(serviceClass)) {
+      return GWT.create(IndexedRiskRestService.class);
     } else if (PreservationEventRestService.class.equals(serviceClass)) {
       return GWT.create(PreservationEventRestService.class);
     } else {
@@ -92,6 +98,10 @@ public class Services implements DirectRestService {
       service = GWT.create(AIPRestService.class);
     } else if (DisposalConfirmation.class.getName().equals(objectClassString)) {
       service = GWT.create(DisposalConfirmationRestService.class);
+    } else if (RiskIncidence.class.getName().equals(objectClassString)) {
+      service = GWT.create(RiskIncidenceRestService.class);
+    } else if (IndexedRisk.class.getName().equals(objectClassString)) {
+      service = GWT.create(IndexedRiskRestService.class);
     } else if (IndexedPreservationEvent.class.getName().equals(objectClassString)) {
       service = GWT.create(PreservationEventRestService.class);
     } else if (IndexedPreservationAgent.class.getName().equals(objectClassString)) {
@@ -159,6 +169,14 @@ public class Services implements DirectRestService {
   public <T> CompletableFuture<T> disposalConfirmationResource(
     CheckedFunction<DisposalConfirmationRestService, T> method) {
     return future(DisposalConfirmationRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> riskResource(CheckedFunction<IndexedRiskRestService, T> method) {
+    return future(IndexedRiskRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> incidenceRiskResource(CheckedFunction<RiskIncidenceRestService, T> method) {
+    return future(RiskIncidenceRestService.class, method);
   }
 
   public <T> CompletableFuture<T> preservationEventsResource(CheckedFunction<PreservationEventRestService, T> method) {

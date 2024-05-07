@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
@@ -25,6 +24,7 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -111,8 +111,6 @@ public class ShowRisk extends Composite {
 
   /**
    * Create a new panel to view a risk
-   *
-   *
    */
   public ShowRisk() {
     this.riskShowPanel = new RiskShowPanel("RiskShowPanel_riskIncidences");
@@ -141,54 +139,40 @@ public class ShowRisk extends Composite {
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
 
     if (historyTokens.size() == 1) {
+      Services services = new Services("Retrieve indexed risk", "get");
       SidebarUtils.showSidebar(contentFlowPanel, sidebarFlowPanel);
 
       final RiskActions riskActions = RiskActions.get();
       final RiskActions actionsWithHistory = RiskActions.getWithHistory();
 
       String riskId = historyTokens.get(0);
-      BrowserService.Util.getInstance().retrieve(IndexedRisk.class.getName(), riskId, fieldsToReturn,
-        new AsyncCallback<IndexedRisk>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
+      services.rodaEntityRestService(s -> s.findByUuid(riskId), IndexedRisk.class).thenCompose(indexedRisk -> services
+        .riskResource(s -> s.hasRiskVersions(indexedRisk.getId())).whenComplete((value, error) -> {
+          instance = new ShowRisk(indexedRisk);
+          if (error != null) {
+            SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
+            instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskActions).withBackButton()
+              .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(indexedRisk)));
+            callback.onSuccess(instance);
+          } else {
+            if (value) {
+              SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, actionsWithHistory.hasAnyRoles());
+              instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(actionsWithHistory).withBackButton()
+                .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(indexedRisk)));
+            } else {
+              SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
+              instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskActions).withBackButton()
+                .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(indexedRisk)));
+            }
+            callback.onSuccess(instance);
           }
 
-          @Override
-          public void onSuccess(IndexedRisk result) {
-            instance = new ShowRisk(result);
-
-            BrowserService.Util.getInstance().hasRiskVersions(result.getId(), new AsyncCallback<Boolean>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
-                instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskActions).withBackButton()
-                  .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
-                callback.onSuccess(instance);
-              }
-
-              @Override
-              public void onSuccess(Boolean hasHistory) {
-                if (hasHistory) {
-                  SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, actionsWithHistory.hasAnyRoles());
-                  instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(actionsWithHistory).withBackButton()
-                    .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
-                } else {
-                  SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
-                  instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskActions).withBackButton()
-                    .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
-                }
-
-                callback.onSuccess(instance);
-              }
-            });
-          }
-        });
+        }));
     } else {
       HistoryUtils.newHistory(RiskRegister.RESOLVER);
       callback.onSuccess(null);
     }
   }
+
 }
