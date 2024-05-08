@@ -12,9 +12,17 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.LogEntryList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.services.Services;
@@ -33,6 +41,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -127,6 +136,10 @@ public class ShowLogEntry extends Composite {
   Label logInstanceIdLabel;
   @UiField
   Label logInstanceIdValue;
+  @UiField
+  SimplePanel expandedAuditLogs;
+  @UiField
+  SimplePanel expandedAuditLogsList;
 
   /**
    * Create a new panel to view a log entry
@@ -188,7 +201,22 @@ public class ShowLogEntry extends Composite {
     logStateLabel.setVisible(logEntry.getState() != null);
     logStateValue.setVisible(logEntry.getState() != null);
 
+    Label aipTitle = new Label();
+    aipTitle.addStyleName("h5");
+    aipTitle.setText(messages.disposalScheduleListAips());
+    expandedAuditLogs.add(aipTitle);
+
+    ListBuilder<LogEntry> auditLogListBuilder = new ListBuilder<>(LogEntryList::new,
+      new AsyncTableCellOptions<>(LogEntry.class, "AuditLogs_triggeredLogs")
+        .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.LOG_REQUEST_HEADER_UUID,
+          logEntry.getAuditLogRequestHeaders().getUuid()), new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, logEntry.getUUID())))
+        .withSummary(messages.listOfAIPs()).bindOpener());
+
+    SearchWrapper aipsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(auditLogListBuilder);
+    expandedAuditLogsList.setWidget(aipsSearchWrapper);
+    expandedAuditLogsList.setVisible(true);
   }
+
 
   @Override
   protected void onLoad() {
