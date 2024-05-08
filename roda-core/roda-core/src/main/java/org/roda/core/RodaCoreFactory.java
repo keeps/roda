@@ -1781,7 +1781,7 @@ public class RodaCoreFactory {
       if (INSTANTIATE_SOLR) {
         try {
           PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), getModelService(), getIndexService(),
-            false);
+            true);
         } catch (ValidationException | NotFoundException | RequestNotValidException | AuthorizationDeniedException
           | AlreadyExistsException e) {
           LOGGER.error("Could not create PREMIS agent for default users");

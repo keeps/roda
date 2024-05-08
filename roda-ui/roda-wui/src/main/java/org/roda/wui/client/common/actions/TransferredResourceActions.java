@@ -255,7 +255,6 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
         dialog.addValueChangeHandler(event -> {
           TransferredResource transferredResource = event.getValue();
           String resourceId = transferredResource == null ? null : transferredResource.getUUID();
-          GWT.log(resourceId);
           service.transferredResource(s -> s.moveTransferredResources(objects, resourceId)).whenComplete((result, err) -> {
             if (result != null) {
               Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
@@ -286,7 +285,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
                 }
               });
             } else if (err != null) {
-              Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
+              Toast.showError(messages.dialogFailure(), messages.moveSIPFailed());
               HistoryUtils.newHistory(InternalProcess.RESOLVER);
               callback.onSuccess(Actionable.ActionImpact.UPDATED);
             }

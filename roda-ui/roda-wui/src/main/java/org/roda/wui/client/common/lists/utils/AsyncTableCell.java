@@ -34,6 +34,10 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
@@ -588,12 +592,28 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   }
 
   private CompletableFuture<IndexResult<T>> getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn) {
-    Services services = new Services("Get data", "get");
+    String reason = "Get " + beautifyClassToReturn(getClassToReturn()) + " data";
+    Services services = new Services(reason, "get");
     FindRequest findRequest = FindRequest.getBuilder(getClassToReturn().getName(), getFilter(),
       getJustActive()).withSublist(sublist).withFacets(getFacets()).withExportFacets(false).withSorter(sorter)
       .withFieldsToReturn(fieldsToReturn).withCollapse(getCollapse()).build();
     return services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       getClassToReturn());
+  }
+
+  private String beautifyClassToReturn(Class<T> classToReturn) {
+    // GWT does not support isAssignableFrom
+    if (LogEntry.class.getName().equals(classToReturn.getName())) {
+      return "audit log";
+    } else if (Notification.class.getName().equals(classToReturn.getName())) {
+      return "notification";
+    } else if (TransferredResource.class.getName().equals(classToReturn.getName())) {
+      return "transferred resource";
+    } else if (IndexedAIP.class.getName().equals(classToReturn.getName())) {
+      return "AIP";
+    } else {
+      return classToReturn.getSimpleName().toLowerCase();
+    }
   }
 
   protected abstract Sorter getSorter(ColumnSortList columnSortList);
@@ -639,11 +659,11 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       public void run() {
         setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_WORKING);
 
-        dataProvider.update(fieldsToReturn).whenComplete((result, error) -> {
-          if (error != null) {
+        dataProvider.update(fieldsToReturn).whenComplete((unused, throwable) -> {
+          if (throwable != null) {
             autoUpdateTimer.cancel();
             setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_ERROR);
-            LOGGER.error("Could not auto-update table " + listId, error);
+            LOGGER.error("Could not auto-update table " + listId, throwable);
           } else {
             setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_ON);
           }

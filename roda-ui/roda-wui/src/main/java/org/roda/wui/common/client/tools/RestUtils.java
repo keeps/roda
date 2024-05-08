@@ -384,7 +384,7 @@ public class RestUtils {
   }
 
   public static String createTransferredResourceUploadUri(String parentUUID, String locale) {
-    // api/v2/transfers/create/resource?parentUUID={parentUUID}&locale={locale}&commit=true
+    // api/v2/transfers/create/resource?parent-uuid={parentUUID}&locale={locale}&commit=true
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V2_RESOURCES);
@@ -396,7 +396,7 @@ public class RestUtils {
     }
 
     if (parentUUID != null) {
-      b.append(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      b.append("parent-uuid").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
         .append(parentUUID);
     }
 

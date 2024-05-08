@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
@@ -201,15 +200,17 @@ public class ShowLogEntry extends Composite {
     logStateLabel.setVisible(logEntry.getState() != null);
     logStateValue.setVisible(logEntry.getState() != null);
 
-    Label aipTitle = new Label();
-    aipTitle.addStyleName("h5");
-    aipTitle.setText(messages.disposalScheduleListAips());
-    expandedAuditLogs.add(aipTitle);
+    Label relatedAuditLogs = new Label();
+    relatedAuditLogs.addStyleName("h5");
+    relatedAuditLogs.setText(messages.relatedAuditLogs());
+    expandedAuditLogs.add(relatedAuditLogs);
 
-    ListBuilder<LogEntry> auditLogListBuilder = new ListBuilder<>(LogEntryList::new,
+    Filter filter = new Filter(
+      new SimpleFilterParameter(RodaConstants.LOG_REQUEST_HEADER_UUID, logEntry.getAuditLogRequestHeaders().getUuid()));
+
+    ListBuilder<LogEntry> auditLogListBuilder = new ListBuilder<>(() -> new LogEntryList(false),
       new AsyncTableCellOptions<>(LogEntry.class, "AuditLogs_triggeredLogs")
-        .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.LOG_REQUEST_HEADER_UUID,
-          logEntry.getAuditLogRequestHeaders().getUuid()), new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, logEntry.getUUID())))
+        .withFilter(filter)
         .withSummary(messages.listOfAIPs()).bindOpener());
 
     SearchWrapper aipsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(auditLogListBuilder);
