@@ -41,7 +41,7 @@ public interface TransferredResourceRestService extends RODAEntityRestService<Tr
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job moveTransferredResources(
     @Parameter(name = "moveTransferResource", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<TransferredResource> items,
-    @Parameter(description = "The transferred resource uuid") @RequestParam(name = "uuid") String uuid);
+    @Parameter(description = "The transferred resource uuid") @RequestParam(name = "uuid", required = false) String uuid);
 
   @RequestMapping(path = "/{uuid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get transferred resource", description = "Gets a particular transferred resource", responses = {
@@ -71,7 +71,7 @@ public interface TransferredResourceRestService extends RODAEntityRestService<Tr
   @Operation(summary = "Refreshes transferred resource", description = "Refreshes transferred resources", responses = {
     @ApiResponse(responseCode = "204", description = "No Content")})
   Void refreshTransferResource(
-    @Parameter(description = "Transfer resource relative path") @RequestParam(name = "path") String transferredResourceRelativePath);
+    @Parameter(description = "Transfer resource relative path") @RequestParam(name = "path", required = false) String transferredResourceRelativePath);
 
   @RequestMapping(path = "/reindex", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Reindex transferred resource", description = "Reindex a particular transferred resource", responses = {
@@ -87,7 +87,7 @@ public interface TransferredResourceRestService extends RODAEntityRestService<Tr
     @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = TransferredResource.class))),
     @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   TransferredResource createTransferredResourcesFolder(
-    @Parameter(description = "The id of the parent") @RequestParam(name = "parent-uuid") String parentUUID,
+    @Parameter(description = "The id of the parent") @RequestParam(name = "parent-uuid", required = false) String parentUUID,
     @Parameter(description = "The name of the directory to create") @RequestParam(name = "name") String folderName,
     @Parameter(description = "Commit after creation", content = @Content(schema = @Schema(defaultValue = "false", implementation = Boolean.class))) @RequestParam(name = "commit") boolean commit);
 }

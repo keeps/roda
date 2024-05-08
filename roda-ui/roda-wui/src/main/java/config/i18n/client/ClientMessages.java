@@ -2452,4 +2452,6 @@ public interface ClientMessages extends Messages {
 
   String conversionProfileDescription();
 
+  /* Audit logs */
+  String relatedAuditLogs();
 }

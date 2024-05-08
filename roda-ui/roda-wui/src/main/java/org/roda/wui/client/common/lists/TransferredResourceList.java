@@ -101,7 +101,7 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
           b.append(SafeHtmlUtils.fromSafeConstant("<div title='"));
           b.append(SafeHtmlUtils.fromString(relativePath));
           b.append(SafeHtmlUtils.fromSafeConstant("'>"));
-          if (relativePath != null && addParentPath) {
+          if (relativePath != null && addParentPath && relativePath.contains("/")) {
             String pathWithoutName = relativePath.substring(0, relativePath.lastIndexOf('/'));
             b.append(SafeHtmlUtils.fromSafeConstant("<span class='table-file-path'>"));
             b.append(SafeHtmlUtils.fromString(pathWithoutName));
@@ -110,6 +110,7 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
             }
             b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
           }
+
           b.append(SafeHtmlUtils.fromString(r.getName()));
           b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
         }
@@ -156,5 +157,4 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     columnSortingKeyMap.put(creationDateColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_DATE));
     return createSorter(columnSortList, columnSortingKeyMap);
   }
-
 }
