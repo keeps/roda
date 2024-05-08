@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Timer;
@@ -92,6 +93,7 @@ public class PluginManager {
   private static Path RODA_PLUGINS_SHARED_PATH = null;
   private static String RODA_PLUGIN_MANIFEST_KEY = "RODA-Plugin";
   private static String RODA_PLUGIN_MANIFEST_KEY_DEPENDS = "RODA-Plugin-Depends";
+  private static String RODA_AUTH_PLUGIN_MANIFEST_KEY = "RODA-Auth-Plugin";
   /**
    * The default Plugin Manager instance.
    */
@@ -99,6 +101,7 @@ public class PluginManager {
   private Timer loadPluginsTimer = null;
   private Map<Path, JarPlugins> jarPluginCache = new HashMap<>();
   private Map<String, ClassLoader> jarPluginClassloaderCache = new HashMap<>();
+  private Map<String, ClassLoader> jarStartupPluginsClassloaderCache = new HashMap<>();
   private Map<String, Plugin<? extends IsRODAObject>> internalPluginChache = new HashMap<>();
   private Map<String, Plugin<? extends IsRODAObject>> externalPluginChache = new HashMap<>();
   private Map<PluginType, List<PluginInfo>> pluginInfoPerType = new EnumMap<>(PluginType.class);
@@ -506,11 +509,6 @@ public class PluginManager {
     loadPlugins();
 
     // schedule
-    LOGGER.debug("Starting plugin scanner timer...");
-    int timeInSeconds = RodaCoreFactory.getRodaConfiguration().getInt("core.plugins.external.scheduler.interval", 30);
-    this.loadPluginsTimer = new Timer("Plugin scanner timer", true);
-    this.loadPluginsTimer.schedule(new SearchPluginsTask(), timeInSeconds * 1000, timeInSeconds * 1000);
-
     LOGGER.info("{} init OK", getClass().getSimpleName());
   }
 
@@ -738,12 +736,29 @@ public class PluginManager {
           pluginDepends.addAll(Arrays.asList(pluginClassNamesDependsString.split("\\s+")));
         }
 
+        addStartupPluginJars(jarPath, mainAttributes, jarClasspath);
+
         pluginLoadInfos.add(new PluginLoadInfo(jarPath, jar, jarClasspath, pluginClassNames, pluginDepends,
           pluginProperties, pluginClassNamesString));
 
       }
     } catch (IOException e) {
       LOGGER.error("Error loading plugin from {}", jarPath.getFileName(), e);
+    }
+  }
+
+  private void addStartupPluginJars(Path jarPath, Attributes mainAttributes, List<URL> jarClasspath) throws IOException {
+    // Add jars from authenticate plugins to a compound class loader
+    String authPluginClassNamesString = mainAttributes.getValue(RODA_AUTH_PLUGIN_MANIFEST_KEY);
+    if (authPluginClassNamesString != null) {
+      // for development purpose
+      boolean optIn = RodaCoreFactory.getProperty(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
+      CertificateInfo certificateInfo = PluginCertificateUtils.loadAndCheckCertificates(jarPath);
+      if (!certificateInfo.isNotVerified() || optIn) {
+        LOGGER.info("Adding startup jars from auth plugin " + authPluginClassNamesString);
+        jarStartupPluginsClassloaderCache.put(authPluginClassNamesString,
+          new URLClassLoader(jarClasspath.toArray(new URL[] {}), getClass().getClassLoader()));
+      }
     }
   }
 
@@ -1053,5 +1068,18 @@ public class PluginManager {
       plugins.add(plugin);
       this.lastModified = lastModified;
     }
+  }
+
+  public Optional<CompoundClassLoader> getEssentialPluginsClassLoader(ClassLoader mainClassLoad) {
+    Optional<CompoundClassLoader> oCompoundClassLoader = Optional.empty();
+    if (!jarStartupPluginsClassloaderCache.isEmpty()) {
+      CompoundClassLoader compoundClassLoader = new CompoundClassLoader();
+      compoundClassLoader.addLoader(mainClassLoad);
+      for (ClassLoader pluginClassloader : jarStartupPluginsClassloaderCache.values()) {
+        compoundClassLoader.addLoader(pluginClassloader);
+      }
+      oCompoundClassLoader = Optional.of(compoundClassLoader);
+    }
+    return oCompoundClassLoader;
   }
 }

@@ -14,13 +14,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -33,6 +41,10 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.tuple.Triple;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -319,5 +331,81 @@ public class RodaUtils {
     } catch (IOException e) {
       throw new GenericException(e);
     }
+  }
+
+  public static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory) throws IOException {
+    copyFilesFromClasspath(classpathPrefix, destinationDirectory, false);
+  }
+
+  public static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory,
+    boolean removeClasspathPrefixFromFinalPath) throws IOException {
+    copyFilesFromClasspath(classpathPrefix, destinationDirectory, removeClasspathPrefixFromFinalPath,
+      Collections.emptyList());
+  }
+
+  public static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory,
+    boolean removeClasspathPrefixFromFinalPath, List<String> excludePaths) throws IOException {
+
+    List<ClassLoader> classLoadersList = new LinkedList<>();
+    classLoadersList.add(ClasspathHelper.contextClassLoader());
+
+    Reflections reflections = new Reflections(new ConfigurationBuilder()
+      .forPackage(classpathPrefix, ClasspathHelper.contextClassLoader(), ClasspathHelper.staticClassLoader())
+      .setScanners(Scanners.Resources));
+
+    Set<String> resources = reflections.getResources(Pattern.compile(".*"));
+    resources = resources.stream().filter(r -> !shouldExclude(r, classpathPrefix, excludePaths))
+      .collect(Collectors.toSet());
+
+    LOGGER.info("Copying files from classpath prefix={}, destination={}, removePrefix={}, excludePaths={}",
+      classpathPrefix, destinationDirectory, removeClasspathPrefixFromFinalPath, excludePaths);
+
+    for (String resource : resources) {
+
+      InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
+      Path destinyPath;
+
+      String resourceFileName = resource;
+
+      // Removing ":" escape
+      resourceFileName = resourceFileName.replace("::", ":");
+
+      if (removeClasspathPrefixFromFinalPath) {
+        destinyPath = destinationDirectory.resolve(resourceFileName.replaceFirst(classpathPrefix, ""));
+      } else {
+        destinyPath = destinationDirectory.resolve(resourceFileName);
+      }
+
+      try {
+        // create all parent directories
+        Files.createDirectories(destinyPath.getParent());
+        // copy file
+        Files.copy(originStream, destinyPath, StandardCopyOption.REPLACE_EXISTING);
+      } catch (IOException e) {
+        LOGGER.error("Error copying file from classpath: {} to {} (reason: {})", originStream, destinyPath,
+          e.getMessage());
+        throw e;
+      } finally {
+        RodaUtils.closeQuietly(originStream);
+      }
+
+    }
+  }
+
+  private static boolean shouldExclude(String resource, String classpathPrefix, List<String> excludePaths) {
+    boolean exclude = false;
+
+    if (resource.startsWith(classpathPrefix)) {
+
+      for (String excludePath : excludePaths) {
+        if (resource.startsWith(excludePath)) {
+          exclude = true;
+          break;
+        }
+      }
+    } else {
+      exclude = true;
+    }
+    return exclude;
   }
 }
