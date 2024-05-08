@@ -338,7 +338,7 @@ public class LdapUtility {
       if (ldapUser != null) {
         return getUser(ldapUser);
       }
-      return new User();
+      return null;
     } catch (NamingException e) {
       throw new GenericException("Error getting user " + name, e);
     }

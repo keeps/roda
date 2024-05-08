@@ -8,6 +8,7 @@
 package org.roda.wui;
 
 import org.apereo.cas.client.session.SingleSignOutHttpSessionListener;
+import org.roda.core.RodaCoreFactory;
 import org.roda.wui.filter.OnOffFilter;
 import org.roda.wui.filter.SecurityHeadersFilter;
 import org.roda.wui.servlets.ContextListener;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
@@ -34,12 +36,13 @@ import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @ComponentScan(basePackages = {"org.roda.*"})
 @ServletComponentScan
 public class RODA {
   public static void main(String[] args) {
-    SpringApplication.run(RODA.class, args);
+    RodaCoreFactory.bootstrap();
+    SpringApplication.run(RODA.class);
   }
 
   @Bean
