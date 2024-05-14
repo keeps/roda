@@ -15,6 +15,8 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -108,6 +110,10 @@ public class Services implements DirectRestService {
       service = GWT.create(PreservationAgentRestService.class);
     } else if (LogEntry.class.getName().equals(objectClassString)) {
       service = GWT.create(AuditLogRestService.class);
+    } else if (Job.class.getName().equals(objectClassString)) {
+      service = GWT.create(JobsRestService.class);
+    } else if (IndexedReport.class.getName().equals(objectClassString)) {
+      service = GWT.create(JobReportRestService.class);
     } else {
       throw new IllegalArgumentException(objectClassString + " not supported");
     }
