@@ -1360,12 +1360,13 @@ public class LdapUtility {
   private void modifyUserPassword(final String username, SecureString password)
     throws NamingException, NoSuchAlgorithmException, InvalidKeySpecException {
 
-    LdapUser ldapUser = ldapUserRepository.findByUid(username);
-    Pbkdf2PasswordEncoderImpl encoder = new Pbkdf2PasswordEncoderImpl();
-    ldapUser.setUserPassword(encoder.encode(password));
+    if (password != null) {
+      LdapUser ldapUser = ldapUserRepository.findByUid(username);
+      Pbkdf2PasswordEncoderImpl encoder = new Pbkdf2PasswordEncoderImpl();
+      ldapUser.setUserPassword(encoder.encode(password));
 
-    ldapUserRepository.save(ldapUser);
-
+      ldapUserRepository.save(ldapUser);
+    }
   }
 
   private void removeMember(final String memberDN) {

@@ -10,7 +10,6 @@ import java.util.function.BiConsumer;
 
 import javax.crypto.SecretKey;
 
-import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
@@ -53,6 +52,7 @@ import org.roda.wui.common.utils.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ldap.NamingException;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -731,7 +731,7 @@ public class MembersController implements MembersRestService {
     try {
       user = RodaCoreFactory.getModelService().retrieveUser(username);
     } catch (GenericException e) {
-      if (!(e.getCause() instanceof LdapException)) {
+      if (!(e.getCause() instanceof NamingException)) {
         throw e;
       }
     }
@@ -754,7 +754,7 @@ public class MembersController implements MembersRestService {
         try {
           retrievedUserByEmail = RodaCoreFactory.getModelService().retrieveUserByEmail(newUser.getEmail());
         } catch (GenericException e) {
-          if (!(e.getCause() instanceof LdapException)) {
+          if (!(e.getCause() instanceof NamingException)) {
             throw e;
           }
         }
