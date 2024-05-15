@@ -25,7 +25,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.generics.MetadataValue;
-import org.roda.core.data.v2.generics.UserOperations;
+import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -165,8 +165,8 @@ public class Register extends Composite {
       final String recaptcha = recaptchaResponse;
 
       Services services = new Services("Register RODA user", "register");
-      UserOperations userOperations = new UserOperations(user, null, userDataPanel.getUserExtra());
-      services.membersResource(s -> s.registerUser(userOperations,  LocaleInfo.getCurrentLocale().getLocaleName(), recaptcha)).whenComplete((registedUser, error) -> {
+      CreateUserRequest userRequest = new CreateUserRequest(user, null, userDataPanel.getUserExtra());
+      services.membersResource(s -> s.registerUser(userRequest,  LocaleInfo.getCurrentLocale().getLocaleName(), recaptcha)).whenComplete((registedUser, error) -> {
         if (registedUser != null) {
           if (registedUser.isActive()) {
               Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),

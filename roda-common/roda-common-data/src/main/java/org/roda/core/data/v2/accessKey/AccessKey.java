@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.accessKey;
 
+import java.io.Serial;
 import java.util.Date;
 import java.util.Map;
 
@@ -23,6 +24,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccessKey implements IsModelObject {
   private static final int VERSION = 1;
+
+  @Serial
   private static final long serialVersionUID = 2279579053027903305L;
 
   private String id;

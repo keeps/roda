@@ -8,6 +8,7 @@
 package org.roda.core.data.common;
 
 import java.io.Closeable;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
@@ -19,7 +20,10 @@ import java.util.Objects;
  **/
 
 public class SecureString implements CharSequence, Closeable, Serializable {
+
+  @Serial
   private static final long serialVersionUID = -2870985634520825237L;
+
   private char[] chars;
 
   public SecureString() {
@@ -40,8 +44,9 @@ public class SecureString implements CharSequence, Closeable, Serializable {
     ensureNotClosed();
     if (this == o)
       return true;
-    if (o == null || o instanceof CharSequence == false)
+    if (o == null || o instanceof CharSequence == false) {
       return false;
+    }
     CharSequence that = (CharSequence) o;
     if (chars.length != that.length()) {
       return false;

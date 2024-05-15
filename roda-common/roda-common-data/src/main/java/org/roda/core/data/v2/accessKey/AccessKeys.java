@@ -8,7 +8,6 @@
 package org.roda.core.data.v2.accessKey;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,43 +23,43 @@ import jakarta.xml.bind.annotation.XmlElement;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_ACCESS_KEYS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AccessKeys implements Serializable, RODAObjectList<AccessKey> {
+public class AccessKeys implements RODAObjectList<AccessKey> {
+
   @Serial
   private static final long serialVersionUID = -7954551447492822643L;
-  private List<AccessKey> accessKeys;
+  private List<AccessKey> accessKeyList;
 
   public AccessKeys() {
     super();
-    accessKeys = new ArrayList<>();
+    accessKeyList = new ArrayList<>();
   }
 
   public AccessKeys(List<AccessKey> accessKeys) {
     super();
-    this.accessKeys = accessKeys;
+    this.accessKeyList = accessKeys;
   }
 
   @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_ACCESS_KEYS)
   @XmlElement(name = RodaConstants.RODA_OBJECT_ACCESS_KEY)
   public List<AccessKey> getObjects() {
-    return accessKeys;
+    return accessKeyList;
   }
 
   @Override
   public void setObjects(List<AccessKey> accessKeys) {
-    this.accessKeys = accessKeys;
+    this.accessKeyList = accessKeys;
   }
 
   @Override
   public void addObject(AccessKey accessKey) {
-    this.accessKeys.add(accessKey);
+    this.accessKeyList.add(accessKey);
   }
 
   @JsonIgnore
   public AccessKey getAccessKeyByKey(String key) {
-    for (AccessKey accessKey : accessKeys) {
+    for (AccessKey accessKey : accessKeyList) {
       if (accessKey.getKey().equals(key)) {
         return accessKey;
       }

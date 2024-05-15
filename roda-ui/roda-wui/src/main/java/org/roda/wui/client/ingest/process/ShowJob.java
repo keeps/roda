@@ -116,15 +116,15 @@ public class ShowJob extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() > 1 && historyTokens.get(1).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
         ShowJobReport.RESOLVER.resolve(historyTokens, callback);
-      } else if (historyTokens.size() >= 1) {
+      } else if (!historyTokens.isEmpty()) {
         String jobId = historyTokens.get(0);
         Services services = new Services("Get job plugin info", "get");
         services.jobsResource(s -> s.getJob(jobId)).thenCompose(retrievedJob -> services
           .jobsResource(s -> s.getJobPluginInfo(retrievedJob)).whenComplete((pluginInfoList, error) -> {
             if (pluginInfoList != null) {
-              Map<String, PluginInfo> pluginsInfo = new HashMap<>();
+              Map<String, PluginInfo> pluginsInfoMap = new HashMap<>();
               for (PluginInfo pluginInfo : pluginInfoList) {
-                pluginsInfo.put(pluginInfo.getId(), pluginInfo);
+                pluginsInfoMap.put(pluginInfo.getId(), pluginInfo);
               }
               List<FilterParameter> reportFilterParameters = new ArrayList<>();
               for (int i = 1; i < historyTokens.size() - 1; i += 2) {
@@ -132,7 +132,7 @@ public class ShowJob extends Composite {
                 String value = historyTokens.get(i + 1);
                 reportFilterParameters.add(new SimpleFilterParameter(key, value));
               }
-              ShowJob showJob = new ShowJob(retrievedJob, pluginsInfo, reportFilterParameters);
+              ShowJob showJob = new ShowJob(retrievedJob, pluginsInfoMap, reportFilterParameters);
               callback.onSuccess(showJob);
             } else if (error != null) {
               if (error instanceof NotFoundException) {

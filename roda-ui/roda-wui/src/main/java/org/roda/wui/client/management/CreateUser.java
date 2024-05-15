@@ -23,7 +23,7 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.generics.UserOperations;
+import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -108,7 +108,7 @@ public class CreateUser extends Composite {
     if (userDataPanel.isValid()) {
       user = userDataPanel.getUser();
       Services services = new Services("Create RODA user", "create");
-      UserOperations userOperations = new UserOperations(user, null, userDataPanel.getUserExtra());
+      CreateUserRequest userOperations = new CreateUserRequest(user, null, userDataPanel.getUserExtra());
       services.membersResource(s -> s.createUser(userOperations,  LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((createdUser, error) -> {
         if (createdUser != null) {
           HistoryUtils.newHistory(MemberManagement.RESOLVER);

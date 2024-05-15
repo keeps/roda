@@ -1,11 +1,15 @@
 package org.roda.wui.api.v2.controller;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiConsumer;
+
+import javax.crypto.SecretKey;
+
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
@@ -23,8 +27,9 @@ import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.generics.CreateUserRequest;
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
-import org.roda.core.data.v2.generics.UserOperations;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
@@ -52,24 +57,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiConsumer;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author António Lindo <alindo@keep.pt>
  */
 @RestController
 @RequestMapping(path = "/api/v2/members")
-@Tag(name = JobsController.SWAGGER_ENDPOINT)
 public class MembersController implements MembersRestService {
-  public static final String SWAGGER_ENDPOINT = "v2 members";
-  private static final String RECAPTCHA_CODE_SECRET_PROPERTY = "ui.google.recaptcha.code.secret";
+
   @Autowired
   private HttpServletRequest request;
 
@@ -79,6 +79,7 @@ public class MembersController implements MembersRestService {
   @Autowired
   private IndexService indexService;
   private static final Logger LOGGER = LoggerFactory.getLogger(MembersController.class);
+
   @Override
   public User getUser(String name) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
@@ -96,7 +97,8 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USERNAME_PARAM, name);
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USERNAME_PARAM,
+        name);
     }
   }
 
@@ -124,7 +126,8 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USERNAME_PARAM, name);
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USERNAME_PARAM,
+        name);
     }
   }
 
@@ -253,7 +256,8 @@ public class MembersController implements MembersRestService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM, accessKey);
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM,
+        accessKey);
     }
   }
 
@@ -296,7 +300,8 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public AccessToken authenticate(@RequestBody AccessKey accessKey) throws GenericException, AuthorizationDeniedException {
+  public AccessToken authenticate(@RequestBody AccessKey accessKey)
+    throws GenericException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -462,11 +467,9 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public Void updateUser(@RequestBody UserOperations userOperations) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {
-    };
+  public Void updateUser(@RequestBody CreateUserRequest userRequest) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -474,21 +477,21 @@ public class MembersController implements MembersRestService {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
       // delegate
-      membersService.updateUser(userOperations.getUser(), userOperations.getPassword(), userOperations.getValues());
+      membersService.updateUser(userRequest);
       return null;
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USER_PARAM, userOperations.getUser());
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USER_PARAM,
+        requestContext.getUser());
     }
   }
 
   @Override
-  public User updateMyUser(@RequestBody UserOperations userOperations) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {
-    };
+  public User updateMyUser(@RequestBody CreateUserRequest userOperations) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -496,20 +499,21 @@ public class MembersController implements MembersRestService {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
       // delegate
-      return membersService.updateMyUser(requestContext.getUser(), userOperations.getUser(), userOperations.getPassword(), userOperations.getValues());
+      return membersService.updateMyUser(requestContext.getUser(), userOperations.getUser(),
+        userOperations.getPassword(), userOperations.getValues());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USER_PARAM, userOperations.getUser());
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USER_PARAM,
+        userOperations.getUser());
     }
   }
 
   @Override
   public Void resetUserPassword(String username, String resetPasswordToken, @RequestBody SecureString password) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {
-    };
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
     User user = null;
@@ -521,7 +525,8 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
+      controllerAssistant.registerAction(requestContext.getUser(), LogEntryState.SUCCESS,
+        RodaConstants.CONTROLLER_USER_PARAM, user);
     }
     return null;
   }
@@ -531,7 +536,8 @@ public class MembersController implements MembersRestService {
 
     try {
       membersService.recoverLoginCheckCaptcha(captcha);
-      membersService.requestPasswordReset(request.getRequestURL().toString().split("/api")[0], usernameOrEmail, localeString, request.getRemoteAddr(), true);
+      membersService.requestPasswordReset(request.getRequestURL().toString().split("/api")[0], usernameOrEmail,
+        localeString, request.getRemoteAddr(), true);
     } catch (RODAException e) {
       throw new RESTException(e);
     }
@@ -552,7 +558,8 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
+      controllerAssistant.registerAction(requestContext.getUser(), LogEntryState.SUCCESS,
+        RodaConstants.CONTROLLER_USER_PARAM, user);
     }
   }
 
@@ -568,8 +575,7 @@ public class MembersController implements MembersRestService {
 
   @Override
   public Set<MetadataValue> getDefaultUserExtra() {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {
-    };
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     Set<MetadataValue> userExtra = membersService.retrieveDefaultExtraBundle();
@@ -583,8 +589,8 @@ public class MembersController implements MembersRestService {
   @Override
   public Notification sendEmailVerification(String username, boolean generateNewToken, String localeString) {
     try {
-      return membersService.sendEmailVerification(request.getRequestURL().toString().split("/api")[0], username, generateNewToken, request.getRemoteAddr(),
-        localeString);
+      return membersService.sendEmailVerification(request.getRequestURL().toString().split("/api")[0], username,
+        generateNewToken, request.getRemoteAddr(), localeString);
     } catch (RODAException e) {
       throw new RESTException(e);
     }
@@ -637,7 +643,7 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public User createUser(@RequestBody UserOperations userOperations, String localeString) {
+  public User createUser(@RequestBody CreateUserRequest userOperations, String localeString) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -647,7 +653,8 @@ public class MembersController implements MembersRestService {
       controllerAssistant.checkRoles(requestContext.getUser());
 
       User createdUser = membersService.createUser(user, userOperations.getPassword(), userOperations.getValues());
-      membersService.requestPasswordReset(request.getRequestURL().toString().split("/api")[0], user.getEmail(), localeString, request.getRemoteAddr(), false);
+      membersService.requestPasswordReset(request.getRequestURL().toString().split("/api")[0], user.getEmail(),
+        localeString, request.getRemoteAddr(), false);
       return createdUser;
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
@@ -659,69 +666,41 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public User registerUser(@RequestBody UserOperations userOperations, String localeString, String captcha) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {
-    };
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // delegate
-      return membersService.registerUser(request, userOperations.getUser(), userOperations.getPassword(), captcha, userOperations.getValues(), localeString, request.getRequestURL().toString().split("/api")[0]);
-    } catch (RODAException | RecaptchaException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USER_PARAM, userOperations.getUser());
-    }
-  }
-
-  @Override
-  public RodaPrincipal findByUuid(String uuid) {
+  public User registerUser(@RequestBody CreateUserRequest createUserRequest, String localeString, String captcha) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser(), RodaPrincipal.class);
-
       // delegate
-      final RodaPrincipal ret = indexService.retrieve(requestContext, RodaPrincipal.class, uuid,
-        new ArrayList<>());
-
-      // checking object permissions
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), ret, RodaPrincipal.class);
-
-      return ret;
-    } catch (RODAException e) {
+      return membersService.registerUser(request, createUserRequest.getUser(), createUserRequest.getPassword(), captcha,
+        createUserRequest.getValues(), localeString, request.getRequestURL().toString().split("/api")[0]);
+    } catch (RODAException | RecaptchaException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), uuid, state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        User.class.getSimpleName(), RodaConstants.CONTROLLER_ID_PARAM, uuid);
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USER_PARAM,
+        createUserRequest.getUser());
     }
+  }
+
+  @Override
+  public RodaPrincipal findByUuid(String uuid, String localeString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.retrieve(requestContext, RodaPrincipal.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<RODAMember> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    if (findRequest.getFilter() == null || findRequest.getFilter().getParameters().isEmpty()) {
-      return new IndexResult<>();
-    }
-
-    // delegate
     return indexService.find(RODAMember.class, findRequest, localeString, requestContext);
   }
 
   @Override
-  public Long count(@RequestBody CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    return indexService.count(RODAMember.class, countRequest, requestContext);
+    return new LongResponse(indexService.count(RODAMember.class, countRequest, requestContext));
   }
 
   public static void casLogin(String username, HttpServletRequest request) throws RODAException {
@@ -798,7 +777,7 @@ public class MembersController implements MembersRestService {
   }
 
   private static void mapCasAttribute(User user, Map<String, Object> attributes, String attributeKey,
-                                      BiConsumer<User, String> mapping) {
+    BiConsumer<User, String> mapping) {
     Object attributeValue = attributes.get(attributeKey);
     if (attributeValue instanceof String value) {
       mapping.accept(user, value);

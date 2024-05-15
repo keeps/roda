@@ -61,9 +61,10 @@ services:
       - VALIDATOR_URL=none
   mailhog:
     image: mailhog/mailhog
+    restart: unless-stopped
     ports:
-      - 1025:1025 # smtp server
-      - 8025:8025 # web ui
+      - "1025:1025" # smtp server
+      - "8025:8025" # web ui
 volumes:
   zookeeper_data:
   zookeeper_datalog:

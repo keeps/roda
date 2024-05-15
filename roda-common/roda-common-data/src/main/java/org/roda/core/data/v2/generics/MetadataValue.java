@@ -12,7 +12,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Andre Pereira apereira@keep.pt
@@ -47,9 +46,7 @@ public class MetadataValue implements Comparable<MetadataValue>, Serializable {
       this.options = options;
     }
 
-    if (!this.options.containsKey(LABEL)) {
-      this.options.put(LABEL, id);
-    }
+    this.options.computeIfAbsent(LABEL, k -> id);
   }
 
   /**
@@ -83,10 +80,7 @@ public class MetadataValue implements Comparable<MetadataValue>, Serializable {
   }
 
   public MetadataValue copy() {
-    HashMap<String, String> newOptions = new HashMap<>();
-    for (Map.Entry<String, String> entry : options.entrySet()) {
-      newOptions.put(entry.getKey(), entry.getValue());
-    }
+    HashMap<String, String> newOptions = new HashMap<>(options);
     return new MetadataValue(this.id, newOptions);
   }
 
