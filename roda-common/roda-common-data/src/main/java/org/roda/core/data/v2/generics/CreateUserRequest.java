@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.v2.user.User;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,19 +13,22 @@ import java.util.Set;
  * @author António Lindo <alindo@keep.pt>
  */
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class UserOperations implements Serializable {
+public class CreateUserRequest implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = -2706255856347304025L;
 
   private User user;
   private SecureString password;
   private Set<MetadataValue> values;
 
-  public UserOperations(User user, SecureString password, Set<MetadataValue> values) {
+  public CreateUserRequest(User user, SecureString password, Set<MetadataValue> values) {
     this.user = user;
     this.password = password;
     this.values = values;
   }
 
-  public UserOperations() {
+  public CreateUserRequest() {
     this.user = new User();
     this.password = new SecureString();
     this.values = new HashSet<>();

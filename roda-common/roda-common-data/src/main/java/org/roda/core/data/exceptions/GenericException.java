@@ -7,11 +7,14 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
 public class GenericException extends RODAException {
+  @Serial
   private static final long serialVersionUID = -2093798996190248576L;
 
   public GenericException() {

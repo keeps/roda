@@ -1,11 +1,18 @@
 package org.roda.wui.api.v2.services;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.joda.time.DateTime;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -26,6 +33,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -43,9 +51,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.util.IdUtils;
-import org.roda.wui.api.controllers.UserManagementHelper;
 import org.roda.wui.api.v2.exceptions.RESTException;
-import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -55,18 +61,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiConsumer;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -279,14 +277,14 @@ public class MembersService {
     return RodaCoreFactory.getModelService().confirmUserEmail(username, email, emailConfirmationToken, true, true);
   }
 
-  public User updateUser(User user, SecureString password, Set<MetadataValue> extra)
+  public User updateUser(CreateUserRequest request)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException,
     ValidationException, RequestNotValidException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
-    user.setExtra(getUserExtra(extra));
-    User modifiedUser = RodaCoreFactory.getModelService().updateUser(user, password, true);
-    PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), model, index, false);
+    request.getUser().setExtra(getUserExtra(request.getValues()));
+    User modifiedUser = RodaCoreFactory.getModelService().updateUser(request.getUser(), request.getPassword(), true);
+    PremisV3Utils.createOrUpdatePremisUserAgentBinary(request.getUser().getName(), model, index, false);
     RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
     return modifiedUser;
   }
@@ -393,7 +391,7 @@ public class MembersService {
         user.setResetPasswordTokenExpirationDate(DateTime.now().plusDays(1).toDateTimeISO().toInstant().toString());
 
         try {
-          user = updateUser(user, null, null);
+          user = updateUser(new CreateUserRequest(user, null, null));
           // 20170523 hsilva: need to set ip address for registering the action
           // as the above method returns a new instante of the modified user
           user.setIpAddress(ipAddress);

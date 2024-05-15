@@ -20,6 +20,7 @@ import org.roda.core.data.v2.ip.SIPInformation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Report implements IsModelObject, HasId, HasInstanceID {
@@ -437,6 +438,7 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
     return this;
   }
 
+  @JsonProperty("lineSeparator")
   public void injectLineSeparator(String lineSeparator) {
     this.lineSeparator = lineSeparator;
   }

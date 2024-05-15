@@ -1,6 +1,5 @@
 package org.roda.wui.client.services;
 
-import org.fusesource.restygwt.client.DirectRestService;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.IndexedReport;

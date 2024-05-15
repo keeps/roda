@@ -24,7 +24,7 @@ import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.generics.UserOperations;
+import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -156,7 +156,7 @@ public class EditUser extends Composite {
         final User updatedUser = userDataPanel.getUser();
         try (SecureString password = getPassword()) {
           Services services = new Services("Update User", "update");
-          UserOperations userOperations = new UserOperations(updatedUser, password, userDataPanel.getUserExtra());
+          CreateUserRequest userOperations = new CreateUserRequest(updatedUser, password, userDataPanel.getUserExtra());
           services.membersResource(s -> s.updateUser(userOperations)).whenComplete((res, error) -> {
             if (error == null) {
               HistoryUtils.newHistory(MemberManagement.RESOLVER);
@@ -175,7 +175,7 @@ public class EditUser extends Composite {
   void buttonDeActivateHandler(ClickEvent e) {
     user.setActive(!user.isActive());
     Services services = new Services("Update User", "update");
-    UserOperations userOperations = new UserOperations(user, null, userDataPanel.getUserExtra());
+    CreateUserRequest userOperations = new CreateUserRequest(user, null, userDataPanel.getUserExtra());
     services.membersResource(s -> s.updateUser(userOperations)).thenCompose(res -> services.membersResource(s -> s.deactivateUserAccessKeys(user.getId())))
       .whenComplete((res, error) -> {
         if (error == null) {

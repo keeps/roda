@@ -47,7 +47,6 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class JobService {
@@ -302,7 +301,7 @@ public class JobService {
             if (refPlugin != null) {
               pluginsInfo.add(refPlugin);
             } else {
-              LOGGER.warn("Could not find plugin: " + pluginId);
+              LOGGER.warn("Could not find plugin: {}", pluginId);
             }
           }
         }

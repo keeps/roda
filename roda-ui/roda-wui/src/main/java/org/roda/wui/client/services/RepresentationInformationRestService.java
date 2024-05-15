@@ -37,7 +37,7 @@ public interface RepresentationInformationRestService extends RODAEntityRestServ
   RepresentationInformation createRepresentationInformation(RepresentationInformationCreateRequest request);
 
   @RequestMapping(path = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Creates a representation information", description = "Creates a representation information", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RepresentationInformationCreateRequest.class))), responses = {
+  @Operation(summary = "Updates an existing representation information", description = "Updates an existing representation information", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RepresentationInformationCreateRequest.class))), responses = {
       @ApiResponse(responseCode = "201", description = "Representation information created", content = @Content(schema = @Schema(implementation = RepresentationInformation.class))),
       @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
       @ApiResponse(responseCode = "404", description = "Representation information not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
@@ -77,13 +77,16 @@ public interface RepresentationInformationRestService extends RODAEntityRestServ
   RepresentationInformationRelationOptions retrieveRepresentationInformationRelationOptions(
     @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
-  @RequestMapping(path = "/delete", method = RequestMethod.POST)
+  @RequestMapping(path = "/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Delete multiple representation information via search query", description = "Deletes one or more representation information", responses = {
     @ApiResponse(responseCode = "201", description = "Created job", content = @Content(schema = @Schema(implementation = Job.class)))})
   Job deleteMultipleRepresentationInformation(
     @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<RepresentationInformation> selected);
 
-  @RequestMapping(path = "/filter", method = RequestMethod.POST)
+  @RequestMapping(path = "/filter", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Add a Filter to a set of selected representation information", requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = RepresentationInformationFilterRequest.class))), responses = {
+      @ApiResponse(responseCode = "201", description = "Created job", content = @Content(schema = @Schema(implementation = Job.class)))
+  })
   Job addFilterToRepresentationInformation(
     @Parameter(name = "request", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RepresentationInformationFilterRequest.class))) RepresentationInformationFilterRequest request);
 }

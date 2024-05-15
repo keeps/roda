@@ -32,8 +32,6 @@ import org.roda.wui.client.services.JobsRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +48,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -59,10 +56,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "/api/v2/jobs")
-@Tag(name = JobsController.SWAGGER_ENDPOINT)
 public class JobsController implements JobsRestService {
-  public static final String SWAGGER_ENDPOINT = "v2 jobs";
-
   @Autowired
   private HttpServletRequest request;
 
@@ -71,8 +65,6 @@ public class JobsController implements JobsRestService {
 
   @Autowired
   private IndexService indexService;
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(JobsController.class);
 
   @Override
   public Job createJob(@RequestBody Job job) {
