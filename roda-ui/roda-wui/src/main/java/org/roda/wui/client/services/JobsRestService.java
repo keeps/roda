@@ -49,12 +49,6 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
     @ApiResponse(responseCode = "409", description = "Already started", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job startJob(@PathVariable(name = "jobId") String jobId);
 
-  @RequestMapping(path = "/{jobId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Get job", description = "Gets a job information", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Job getJob(@PathVariable(name = "jobId") String jobId);
-
   @RequestMapping(method = RequestMethod.GET, path = "/{jobId}/stop", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Stop job", description = "Stops a job", responses = {
