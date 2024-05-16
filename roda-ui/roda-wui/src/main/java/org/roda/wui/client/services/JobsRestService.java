@@ -73,13 +73,13 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
     @Parameter(description = "Index of the first element to return", schema = @Schema(defaultValue = "0")) @RequestParam(value = RodaConstants.API_QUERY_KEY_START, defaultValue = "0", required = false) String start,
     @Parameter(description = "Maximum number of elements to return", schema = @Schema(defaultValue = "100")) @RequestParam(value = RodaConstants.API_QUERY_KEY_LIMIT, defaultValue = "0", required = false) String limit);
 
-  @RequestMapping(method = RequestMethod.GET, path = "/{jobId}/report/{" + RodaConstants.API_PATH_PARAM_JOB_REPORT_ID
+  @RequestMapping(method = RequestMethod.GET, path = "/{id}/report/{" + RodaConstants.API_PATH_PARAM_JOB_REPORT_ID
     + "}", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get job reports items", description = "Gets job report items", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Report.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Report getJobReport(@PathVariable(name = "jobId") String jobId,
-                      @PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_REPORT_ID) String jobReportId);
+  Report getJobReport(@PathVariable(name = "id") String id,
+                      @PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_REPORT_ID) String reportId);
 
   @RequestMapping(method = RequestMethod.GET, path = "/report/{jobReportId}/indexed", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get job reports items", description = "Gets job report items", responses = {
