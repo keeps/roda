@@ -42,12 +42,25 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
   Job createJob(
     @Parameter(name = "job", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Job job);
 
-  @RequestMapping(method = RequestMethod.GET, path = "/{jobId}/stop", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @Operation(summary = "Stop job", description = "Stops a job", responses = {
-    @ApiResponse(responseCode = "204", description = "Not content", content = @Content(schema = @Schema(implementation = Job.class))),
+  @RequestMapping(path = "/{jobId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Start job", description = "Starts an already created job", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "409", description = "Already started", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Job startJob(@PathVariable(name = "jobId") String jobId);
+
+  @RequestMapping(path = "/{jobId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get job", description = "Gets a job information", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Void stopJob(@PathVariable(name = "jobId") String jobId);
+  Job getJob(@PathVariable(name = "jobId") String jobId);
+
+  @RequestMapping(method = RequestMethod.GET, path = "/{id}/stop", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  @Operation(summary = "Stop job", description = "Stops a job", responses = {
+    @ApiResponse(responseCode = "202", description = "Accepted"),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Void stopJob(@PathVariable(name = "id") String id);
 
   @RequestMapping(method = RequestMethod.POST, path = "/approve", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Approve job", description = "Approves a job.", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), responses = {
