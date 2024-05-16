@@ -119,7 +119,7 @@ public class ShowJob extends Composite {
       } else if (!historyTokens.isEmpty()) {
         String jobId = historyTokens.get(0);
         Services services = new Services("Get job plugin info", "get");
-        services.jobsResource(s -> s.getJob(jobId)).thenCompose(retrievedJob -> services
+        services.jobsResource(s -> s.findByUuid(jobId, LocaleInfo.getCurrentLocale().getLocaleName())).thenCompose(retrievedJob -> services
           .jobsResource(s -> s.getJobPluginInfo(retrievedJob)).whenComplete((pluginInfoList, error) -> {
             if (pluginInfoList != null) {
               Map<String, PluginInfo> pluginsInfoMap = new HashMap<>();
@@ -364,7 +364,7 @@ public class ShowJob extends Composite {
         @Override
         public void onSuccess(Actionable.ActionImpact result) {
           Services services = new Services("refresh sidebar", "refresh");
-          services.jobsResource(s -> s.getJob(job.getId())).whenComplete((updatedJob, error) -> {
+          services.jobsResource(s -> s.findByUuid(job.getId(), LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((updatedJob, error) -> {
             if (updatedJob != null) {
                 ShowJob.this.job = updatedJob;
                 update();
@@ -683,7 +683,7 @@ public class ShowJob extends Composite {
 
   private void refreshJobPluginInfo() {
     Services services = new Services("Refresh job plugin info", "update");
-    services.jobsResource(s -> s.getJob(job.getId()))
+    services.jobsResource(s -> s.findByUuid(job.getId(), LocaleInfo.getCurrentLocale().getLocaleName()))
       .thenCompose(updateJob -> services.jobsResource(s -> s.getJobPluginInfo(updateJob)))
       .whenComplete((pluginsInfoList, error) -> {
         if (pluginsInfoList != null) {
@@ -710,7 +710,7 @@ public class ShowJob extends Composite {
           @Override
           public void run() {
             Services services = new Services("Update job status", "update");
-            services.jobsResource(s -> s.getJob(job.getId())).whenComplete((updatedJob, error) -> {
+            services.jobsResource(s -> s.findByUuid(job.getId(), LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((updatedJob, error) -> {
               if (updatedJob != null) {
                   ShowJob.this.job = updatedJob;
                   update();
