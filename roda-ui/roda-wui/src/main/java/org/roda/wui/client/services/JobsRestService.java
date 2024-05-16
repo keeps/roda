@@ -71,11 +71,11 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
     @Parameter(name = "jobId", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<Job> selectedJobs,
     @RequestParam(name = RodaConstants.API_QUERY_JOB_DETAILS) String details);
 
-  @RequestMapping(method = RequestMethod.GET, path = "/{jobId}/reports", produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(method = RequestMethod.GET, path = "/{id}/reports", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "List job reports", description = "Gets a list of job reports", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Reports.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Reports listJobReports(@PathVariable(name = "jobId") String jobId,
+  Reports listJobReports(@PathVariable(name = "id") String id,
     @Parameter(description = "If just the failed reports should be included in the response or all the job reports", schema = @Schema(defaultValue = "false")) @RequestParam(name = RodaConstants.API_PATH_PARAM_JOB_JUST_FAILED, defaultValue = "false", required = false) boolean justFailed,
     @Parameter(description = "Index of the first element to return", schema = @Schema(defaultValue = "0")) @RequestParam(value = RodaConstants.API_QUERY_KEY_START, defaultValue = "0", required = false) String start,
     @Parameter(description = "Maximum number of elements to return", schema = @Schema(defaultValue = "100")) @RequestParam(value = RodaConstants.API_QUERY_KEY_LIMIT, defaultValue = "0", required = false) String limit);

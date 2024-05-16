@@ -496,7 +496,7 @@ public final class RodaConstants {
   // job related params
   public static final String API_PATH_PARAM_JOB_ID = "jobId";
   public static final String API_PATH_PARAM_JOB_REPORT_ID = "jobReportId";
-  public static final String API_PATH_PARAM_JOB_JUST_FAILED = "jobJustFailed";
+  public static final String API_PATH_PARAM_JOB_JUST_FAILED = "job-just-failed";
   public static final String API_PATH_PARAM_JOB_ATTACHMENT_ID = "attachmentId";
 
   public static final String API_DEFAULT_CSV_FILENAME = "export.csv";
