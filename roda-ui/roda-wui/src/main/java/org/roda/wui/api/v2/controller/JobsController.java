@@ -109,12 +109,6 @@ public class JobsController implements JobsRestService {
   }
 
   @Override
-  public Job getJob(String jobId) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, Job.class, jobId, new ArrayList<>());
-  }
-
-  @Override
   public Void stopJob(String jobId) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
