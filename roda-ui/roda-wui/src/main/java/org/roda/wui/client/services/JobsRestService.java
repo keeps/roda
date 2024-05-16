@@ -77,13 +77,6 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
     @Parameter(name = "jobId", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<Job> selectedJobs,
     @RequestParam(name = RodaConstants.API_QUERY_JOB_DETAILS) String details);
 
-  @RequestMapping(method = RequestMethod.DELETE, path = "/{jobId}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @Operation(summary = "Delete job", description = "Deletes a job, stopping it if still running", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Void deleteJob(@PathVariable(name = "jobId") String jobId);
-
   @RequestMapping(method = RequestMethod.GET, path = "/{jobId}/reports", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "List job reports", description = "Gets a list of job reports", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Reports.class))),
