@@ -7,13 +7,15 @@
  */
 package org.roda.wui.client.common.actions;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.generics.ChangeRepresentationStatesRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -32,18 +34,15 @@ import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.regexp.shared.RegExp;
-import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
-import config.i18n.client.ClientMessages;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class RepresentationActions extends AbstractActionable<IndexedRepresentation> {
   private static final RepresentationActions GENERAL_INSTANCE = new RepresentationActions(null, null);
@@ -147,11 +146,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       new ActionNoAsyncCallback<String>(callback) {
         @Override
         public void onSuccess(String details) {
-          BrowserService.Util.getInstance().createRepresentation(parentAipId, details,
-            new ActionLoadingAsyncCallback<String>(callback) {
-              @Override
-              public void onSuccessImpl(String representationId) {
-                HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, parentAipId, representationId);
+          Services services = new Services("Create representation", "create");
+          services.representationResource(s -> s.createRepresentation(parentAipId, "MIXED", details))
+            .whenComplete((representation, error) -> {
+              if (representation != null) {
+                HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, parentAipId, representation.getId());
                 callback.onSuccess(ActionImpact.UPDATED);
               }
             });
@@ -242,11 +241,10 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
                 @Override
                 public void onSuccess(String details) {
-                  BrowserService.Util.getInstance().deleteRepresentation(selectedList, details,
-                    new AsyncCallback<Job>() {
-
-                      @Override
-                      public void onSuccess(Job result) {
+                  Services services = new Services("Delete representation", "delete");
+                  services.representationResource(s -> s.deleteRepresentation(selectedList, details))
+                    .whenComplete((result, error) -> {
+                      if (result != null) {
                         Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
                           new ActionAsyncCallback<Void>(callback) {
 
@@ -261,10 +259,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                               HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                             }
                           });
-                      }
-
-                      @Override
-                      public void onFailure(Throwable caught) {
+                      } else if (error != null) {
                         doActionCallbackNone();
                         HistoryUtils.newHistory(InternalProcess.RESOLVER);
                       }
@@ -282,14 +277,12 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   private void changeType(final SelectedItems<IndexedRepresentation> representations,
     final AsyncCallback<ActionImpact> callback) {
-
-    BrowserService.Util.getInstance().retrieveRepresentationTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new ActionNoAsyncCallback<Pair<Boolean, List<String>>>(callback) {
-
-        @Override
-        public void onSuccess(Pair<Boolean, List<String>> result) {
+    Services services = new Services("Get representation type options", "get");
+    services.representationResource(s -> s.getRepresentationTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName()))
+      .whenComplete((representationTypeOptions, error) -> {
+        if (representationTypeOptions != null) {
           RepresentationDialogs.showPromptDialogRepresentationTypes(messages.changeTypeTitle(), null,
-            messages.cancelButton(), messages.confirmButton(), result.getSecond(), result.getFirst(),
+            messages.cancelButton(), messages.confirmButton(), representationTypeOptions.getRepresentationTypeOptions().getSecond(), representationTypeOptions.getRepresentationTypeOptions().getFirst(),
             new ActionNoAsyncCallback<String>(callback) {
 
               @Override
@@ -300,11 +293,10 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
                     @Override
                     public void onSuccess(String details) {
-                      BrowserService.Util.getInstance().changeRepresentationType(representations, newType, details,
-                        new ActionLoadingAsyncCallback<Job>(callback) {
-
-                          @Override
-                          public void onSuccessImpl(Job result) {
+                      Services services = new Services("Change representation type", "update");
+                      services.representationResource(s -> s.changeRepresentationType(representations, newType, details))
+                        .whenComplete((result, error) -> {
+                          if (result != null) {
                             Toast.showInfo(messages.runningInBackgroundTitle(),
                               messages.runningInBackgroundDescription());
 
@@ -349,25 +341,26 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   private void identifyFormats(SelectedItems<IndexedRepresentation> selected,
     final AsyncCallback<ActionImpact> callback) {
-    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new ActionAsyncCallback<Job>(callback) {
-      @Override
-      public void onSuccess(Job result) {
-        Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
+    Services services = new Services("Create format identification job", "create");
+    services.representationResource(s -> s.createFormatIdentificationJob(selected))
+      .whenComplete((result, error) -> {
+        if (result != null) {
+          Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
 
-        Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(), new AsyncCallback<Void>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            doActionCallbackUpdated();
-          }
+          Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(), new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onSuccess(Actionable.ActionImpact.UPDATED);
+            }
 
-          @Override
-          public void onSuccess(final Void nothing) {
-            doActionCallbackNone();
-            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-          }
-        });
-      }
-    });
+            @Override
+            public void onSuccess(final Void nothing) {
+              callback.onSuccess(Actionable.ActionImpact.NONE);
+              HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+            }
+          });
+        }
+      });
   }
 
   private void changeState(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
@@ -383,11 +376,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
               @Override
               public void onSuccess(String details) {
-                BrowserService.Util.getInstance().changeRepresentationStates(representation, newStates, details,
-                  new ActionLoadingAsyncCallback<Void>(callback) {
-
-                    @Override
-                    public void onSuccessImpl(Void nothing) {
+                Services services = new Services("Change representation states", "update");
+                ChangeRepresentationStatesRequest changeRepresentationStatesRequest = new ChangeRepresentationStatesRequest(representation, newStates);
+                services.representationResource(s -> s.changeRepresentationStatus(changeRepresentationStatesRequest, details))
+                  .whenComplete((result, error) -> {
+                    if (error == null) {
                       Toast.showInfo(messages.dialogSuccess(), messages.changeStatusSuccessful());
                       doActionCallbackUpdated();
                     }

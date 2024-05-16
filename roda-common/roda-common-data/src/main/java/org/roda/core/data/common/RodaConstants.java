@@ -344,6 +344,7 @@ public final class RodaConstants {
 
   // common
   public static final String API_REST_V2_DOWNLOAD_HANDLER = "/binary";
+  public static final String API_REST_V2_REPRESENTATION_OTHER_METADATA = "/other-metadata";
 
   // transferred resource
   public static final String API_REST_V2_RESOURCES = "api/v2/transfers/";
@@ -377,6 +378,7 @@ public final class RodaConstants {
    * END: API related (Version 2)
    */
 
+  public static final String API_REST_V2_REPRESENTATIONS = "api/v2/representations";
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";
