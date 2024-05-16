@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -30,12 +31,15 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobMixIn;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -334,5 +338,67 @@ public class JobService {
       pluginsInfo.addAll(aipToAipPlugins);
     }
     return pluginsInfo;
+  }
+
+  public <T extends IsRODAObject> Job createAndExecuteInternalJob(String name, SelectedItems<T> sourceObjects,
+                                                                         Class<?> plugin, User user, Map<String, String> pluginParameters, String exceptionMessage)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    return createAndExecuteJob(name, sourceObjects, plugin, PluginType.INTERNAL, user, pluginParameters,
+      exceptionMessage);
+  }
+
+  public <T extends IsRODAObject> Job createAndExecuteJob(String name, SelectedItems<T> sourceObjects,
+                                                                  Class<?> plugin, PluginType pluginType, User user, Map<String, String> pluginParameters, String exceptionMessage)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    Job job = new Job();
+    job.setId(IdUtils.createUUID());
+    job.setName(name);
+    job.setSourceObjects(sourceObjects);
+    job.setPlugin(plugin.getCanonicalName());
+    job.setPluginType(pluginType);
+    job.setUsername(user.getName());
+    job.setPluginParameters(pluginParameters);
+    job.setPriority(getJobPriorityFromConfiguration());
+    job.setParallelism(getJobParallelismFromConfiguration());
+
+    try {
+      RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(job, true);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error(exceptionMessage, e);
+    }
+
+    return job;
+  }
+
+  private JobParallelism getJobParallelismFromConfiguration() {
+    // Fetch priority
+    String parallelism = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_ORCHESTRATOR_PREFIX,
+      RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PARALLELISM);
+
+    if (parallelism == null) {
+      return JobParallelism.NORMAL;
+    }
+
+    try {
+      return JobParallelism.valueOf(parallelism);
+    } catch (IllegalArgumentException e) {
+      return JobParallelism.NORMAL;
+    }
+  }
+
+  private JobPriority getJobPriorityFromConfiguration() {
+    // Fetch priority
+    String priority = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_ORCHESTRATOR_PREFIX,
+      RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PRIORITY);
+
+    if (priority == null) {
+      return JobPriority.MEDIUM;
+    }
+
+    try {
+      return JobPriority.valueOf(priority);
+    } catch (IllegalArgumentException e) {
+      return JobPriority.MEDIUM;
+    }
   }
 }

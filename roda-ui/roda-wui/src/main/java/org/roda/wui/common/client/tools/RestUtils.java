@@ -65,29 +65,23 @@ public class RestUtils {
 
   public static SafeUri createRepresentationDownloadUri(String aipId, String representationId) {
 
-    // api/v1/representations/{aip_id}/{representation_id}/?acceptFormat=zip
+    // api/v2/representations/{aip_id}/{representation_id}/binary
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_SEP);
-    // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP);
+    b.append(RodaConstants.API_REST_V2_REPRESENTATIONS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
 
   public static SafeUri createRepresentationOtherMetadataDownloadUri(String aipId, String representationId) {
 
-    // api/v1/representations/{aip_id}/{representation_id}/otherMetadata/?acceptFormat=zip
+    // api/v2/representations/{aip_id}/{representation_id}/other-metadata/binary
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_REST_V1_REPRESENTATION_OTHER_METADATA).append(RodaConstants.API_SEP);
-    // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP);
+    b.append(RodaConstants.API_REST_V2_REPRESENTATIONS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_REST_V2_REPRESENTATION_OTHER_METADATA)
+      .append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
 
     return UriUtils.fromSafeConstant(b.toString());
   }

@@ -24,7 +24,6 @@ public class Representation implements IsModelObject, HasId, HasInstanceID {
 
   private static final long serialVersionUID = 3658011895150894795L;
 
-  @JsonIgnore
   private String aipId;
 
   private String id;
