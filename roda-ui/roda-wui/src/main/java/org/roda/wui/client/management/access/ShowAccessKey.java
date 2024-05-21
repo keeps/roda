@@ -90,7 +90,7 @@ public class ShowAccessKey extends Composite {
   @UiField
   HTML statusValue;
   @UiField
-  Button buttonEdit, buttonRegenerate, buttonRevoke, buttonDelete, buttonCancel;
+  Button buttonRegenerate, buttonRevoke, buttonDelete, buttonCancel;
   private AccessKey accessKey;
 
   public ShowAccessKey(AccessKey accessKey) {
@@ -154,23 +154,23 @@ public class ShowAccessKey extends Composite {
     switch (accessKey.getStatus()) {
       case CREATED:
       case ACTIVE:
-        enableButtons(buttonEdit, buttonRegenerate, buttonRevoke);
+        enableButtons(buttonRegenerate, buttonRevoke);
         disableButtons(buttonDelete);
         break;
       case EXPIRED:
-        enableButtons(buttonRevoke, buttonEdit);
+        enableButtons(buttonRevoke);
         disableButtons(buttonRegenerate, buttonDelete);
         break;
       case REVOKED:
         enableButtons(buttonDelete);
-        disableButtons(buttonEdit, buttonRegenerate, buttonRevoke);
+        disableButtons(buttonRegenerate, buttonRevoke);
         break;
       case INACTIVE:
         enableButtons(buttonRevoke, buttonDelete);
-        disableButtons(buttonDelete, buttonRegenerate, buttonEdit);
+        disableButtons(buttonDelete, buttonRegenerate);
         break;
       default:
-        enableButtons(buttonEdit, buttonRegenerate, buttonRevoke, buttonDelete);
+        enableButtons(buttonRegenerate, buttonRevoke, buttonDelete);
         break;
     }
   }
@@ -185,11 +185,6 @@ public class ShowAccessKey extends Composite {
     for (Button button : buttons) {
       button.setEnabled(true);
     }
-  }
-
-  @UiHandler("buttonEdit")
-  void buttonApplyHandler(ClickEvent e) {
-    HistoryUtils.newHistory(EditAccessKey.RESOLVER, accessKey.getId());
   }
 
   @UiHandler("buttonDelete")
