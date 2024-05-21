@@ -237,13 +237,13 @@ public class JobsController implements JobsRestService {
     return indexService.retrieve(requestContext, IndexedReport.class, jobReportId, new ArrayList<>());
   }
 
-  @GetMapping(path = "/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/attachment/{"
+  @GetMapping(path = "/{id}/attachment/{"
     + RodaConstants.API_PATH_PARAM_JOB_ATTACHMENT_ID + "}", produces = ExtraMediaType.APPLICATION_ZIP)
   @Operation(summary = "Get attachment", description = "Gets the attachments of a job", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseMessage.class)))})
   public ResponseEntity<StreamingResponseBody> retrieveJobAttachment(
-    @Parameter(description = "The ID of the existing job", required = true) @PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
+    @Parameter(description = "The ID of the existing job", required = true) @PathVariable(name = "id") String id,
     @Parameter(description = "The ID of the existing attachment", required = true) @PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_ATTACHMENT_ID) String attachmentId,
     WebRequest webRequest) {
 
@@ -255,14 +255,14 @@ public class JobsController implements JobsRestService {
       // check permissions
       controllerAssistant.checkRoles(requestContext.getUser());
 
-      StreamResponse streamResponse = jobService.retrieveJobAttachment(jobId, attachmentId);
+      StreamResponse streamResponse = jobService.retrieveJobAttachment(id, attachmentId);
       return ApiUtils.okResponse(streamResponse, webRequest);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, id,
         RodaConstants.CONTROLLER_JOB_ATTACHMENT_ID_PARAM, attachmentId);
     }
   }
