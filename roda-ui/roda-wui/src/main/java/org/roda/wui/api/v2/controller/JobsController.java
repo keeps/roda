@@ -231,12 +231,6 @@ public class JobsController implements JobsRestService {
     }
   }
 
-  @Override
-  public IndexedReport getIndexedJobReport(String jobReportId) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, IndexedReport.class, jobReportId, new ArrayList<>());
-  }
-
   @GetMapping(path = "/{id}/attachment/{"
     + RodaConstants.API_PATH_PARAM_JOB_ATTACHMENT_ID + "}", produces = ExtraMediaType.APPLICATION_ZIP)
   @Operation(summary = "Get attachment", description = "Gets the attachments of a job", responses = {
