@@ -467,7 +467,7 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public Void updateUser(@RequestBody CreateUserRequest userRequest) {
+  public User updateUser(@RequestBody CreateUserRequest userRequest) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
@@ -477,8 +477,7 @@ public class MembersController implements MembersRestService {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
       // delegate
-      membersService.updateUser(userRequest);
-      return null;
+      return membersService.updateUser(userRequest);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
