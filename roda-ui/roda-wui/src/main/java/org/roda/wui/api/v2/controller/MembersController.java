@@ -17,11 +17,13 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
@@ -656,6 +658,9 @@ public class MembersController implements MembersRestService {
       // delegate
       return membersService.registerUser(request, createUserRequest.getUser(), createUserRequest.getPassword(), captcha,
         createUserRequest.getValues(), localeString, request.getRequestURL().toString().split("/api")[0]);
+    } catch (EmailAlreadyExistsException | UserAlreadyExistsException e) {
+      state = LogEntryState.FAILURE;
+      return new User(createUserRequest.getUser());
     } catch (RODAException | RecaptchaException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);

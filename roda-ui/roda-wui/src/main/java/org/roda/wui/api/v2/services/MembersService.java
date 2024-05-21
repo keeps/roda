@@ -369,6 +369,10 @@ public class MembersService {
         throw new GenericException(e);
       }
     }
+    registeredUser.setResetPasswordToken(null);
+    registeredUser.setResetPasswordTokenExpirationDate(null);
+    registeredUser.setEmailConfirmationToken(null);
+    registeredUser.setEmailConfirmationTokenExpirationDate(null);
 
     return registeredUser;
   }
@@ -387,8 +391,6 @@ public class MembersService {
       if (generateNewToken) {
         user.setEmailConfirmationToken(IdUtils.createUUID());
         user.setEmailConfirmationTokenExpirationDate(DateTime.now().plusDays(1).toDateTimeISO().toInstant().toString());
-        user.setResetPasswordToken(IdUtils.createUUID());
-        user.setResetPasswordTokenExpirationDate(DateTime.now().plusDays(1).toDateTimeISO().toInstant().toString());
 
         try {
           user = updateUser(new CreateUserRequest(user, null, null));
@@ -444,23 +446,16 @@ public class MembersService {
       notification.setRecipientUsers(Arrays.asList(user.getEmail()));
 
       String tokenVerifyEmail = user.getEmailConfirmationToken();
-      String tokenSetPassword = user.getResetPasswordToken();
       String username = user.getName();
       String verificationEmailURL = servletPath + "/#verifyemail";
       String verificationCompleteURL = verificationEmailURL + "/"
         + URLEncoder.encode(username, RodaConstants.DEFAULT_ENCODING) + "/" + tokenVerifyEmail;
-      String setPasswordURL = servletPath + "/#setpassword";
-      String setPasswordCompleteURL = setPasswordURL + "/"
-        + URLEncoder.encode(username, RodaConstants.DEFAULT_ENCODING) + "/" + tokenSetPassword;
 
       Map<String, Object> scopes = new HashMap<>();
       scopes.put("username", username);
-      scopes.put("tokenVerifyEmail", tokenVerifyEmail);
-      scopes.put("tokenSetPassword", tokenSetPassword);
-      scopes.put("verificationEmailURL", verificationEmailURL);
+      scopes.put("token", tokenVerifyEmail);
+      scopes.put("verificationURL", verificationEmailURL);
       scopes.put("verificationCompleteURL", verificationCompleteURL);
-      scopes.put("setPasswordURL", setPasswordURL);
-      scopes.put("setPasswordCompleteURL", setPasswordCompleteURL);
 
       Notification res = RodaCoreFactory.getModelService().createNotification(notification,
         new EmailNotificationProcessor(RodaConstants.VERIFICATION_EMAIL_TEMPLATE, scopes, localeString));

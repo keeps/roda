@@ -1,24 +1,15 @@
 <html>
 <body>
-<p>In the sequence of the registration process for the username <em>{{username}}</em>, an email address verification is required.</p>
-
-<p>To continue the verification process, please access the following link: <a href="{{verificationCompleteURL}}">{{verificationCompleteURL}}</a>. Alternatively, you can insert the password for verification at the following link: <a href="{{verificationEmailURL}}">{{verificationEmailURL}}</a>:</p>
-
+<p>In the sequence of the registration process of the username <em>{{username}}</em>, an e-mail address verification is needed.</p>
+<p>To continue the verification process, access the following address <a href="{{verificationCompleteURL}}">{{verificationCompleteURL}}</a>, or, alternatively, insert the password for verification in the following address <a href="{{verificationURL}}">{{verificationURL}}</a>:
 <ul>
-  <li><strong>Username:</strong> {{username}}</li>
-  <li><strong>Password for verification:</strong> {{tokenVerifyEmail}}</li>
+<li><strong>Username:</strong> {{username}}</li>
+<li><strong>Password for verification:</strong> {{token}}</li>
 </ul>
-
-<p>To set your account's password, please insert the necessary data at the following link: <a href="{{setPasswordURL}}">{{setPasswordURL}}</a>.</p>
-
-<ul>
-  <li><strong>Username:</strong> {{username}}</li>
-  <li><strong>New Password:</strong> {{tokenSetPassword}}</li>
-</ul>
-
-<p>If you did not initiate this registration, please disregard this email.</p>
+</p>
+<p>If you didn't made the registration before mentioned, please ignore this e-mail.</p>
 
 <p>RODA - Repository of Authentic Digital Objects</p>
 
 </body>
-</html>
+<html>
