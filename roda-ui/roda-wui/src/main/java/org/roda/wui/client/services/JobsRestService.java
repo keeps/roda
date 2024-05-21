@@ -56,13 +56,13 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
   Jobs approveJob(
     @Parameter(name = "jobId", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<Job> selectedJobs);
 
-  @RequestMapping(method = RequestMethod.POST, path = "/reject")
+  @RequestMapping(method = RequestMethod.POST, path = "/reject", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Reject job", description = "Rejects a job.", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Jobs rejectJob(
     @Parameter(name = "jobId", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<Job> selectedJobs,
-    @RequestParam(name = RodaConstants.API_QUERY_JOB_DETAILS) String details);
+    @Parameter(description = "Justification for why the job was rejected") @RequestParam(name = RodaConstants.API_QUERY_JOB_DETAILS) String details);
 
   @RequestMapping(method = RequestMethod.GET, path = "/{id}/reports", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "List job reports", description = "Gets a list of job reports", responses = {
