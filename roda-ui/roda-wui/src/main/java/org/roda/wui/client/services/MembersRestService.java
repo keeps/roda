@@ -140,7 +140,8 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
 
   @RequestMapping(path = "/users/reset-password", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Reset user password", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SecureString.class))), description = "Resets a user password", responses = {
-    @ApiResponse(responseCode = "204", description = "No Content"),
+    @ApiResponse(responseCode = "200", description = "OK"),
+    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Void resetUserPassword(
     @Parameter(description = "username") @RequestParam(name = "username") String username,
