@@ -190,8 +190,6 @@ public class AccessKeyManagement extends Composite {
       CreateAccessKey.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(ShowAccessKey.RESOLVER.getHistoryToken())) {
       ShowAccessKey.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.get(0).equals(EditAccessKey.RESOLVER.getHistoryToken())) {
-      EditAccessKey.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
       HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
