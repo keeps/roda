@@ -8,6 +8,7 @@ import org.roda.core.data.exceptions.DisposalHoldNotValidException;
 import org.roda.core.data.exceptions.DisposalScheduleNotValidException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -57,7 +58,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     } else if (ex.getCause() instanceof GenericException || ex.getCause() instanceof RequestNotValidException
       || ex.getCause() instanceof JobStateNotPendingException
       || ex.getCause() instanceof DisposalScheduleNotValidException
-      || ex.getCause() instanceof DisposalHoldNotValidException) {
+      || ex.getCause() instanceof DisposalHoldNotValidException
+      || ex.getCause() instanceof InvalidTokenException) {
       message = "Request was not valid";
       details = ex.getCause().getMessage();
       httpStatus = HttpStatus.BAD_REQUEST;
