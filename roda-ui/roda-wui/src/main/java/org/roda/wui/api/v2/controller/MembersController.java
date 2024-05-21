@@ -282,24 +282,6 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public AccessKey updateAccessKey(@RequestBody AccessKey accessKey) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      controllerAssistant.checkRoles(requestContext.getUser());
-      return RodaCoreFactory.getModelService().updateAccessKey(accessKey, requestContext.getUser().getName());
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
-    }
-  }
-
-  @Override
   public AccessToken authenticate(@RequestBody AccessKey accessKey)
     throws GenericException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};

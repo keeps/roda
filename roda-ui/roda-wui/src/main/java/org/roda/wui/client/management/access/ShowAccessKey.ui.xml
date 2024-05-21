@@ -60,9 +60,6 @@
 						<g:Label addStyleNames="h4">
 							<ui:text from="{messages.actions}" />
 						</g:Label>
-						<g:Button addStyleNames="btn btn-block btn-edit" ui:field="buttonEdit">
-							<ui:text from='{messages.accessKeyEditButton}' />
-						</g:Button>
 						<g:Button addStyleNames="btn btn-block btn-success btn-refresh" ui:field="buttonRegenerate">
 							<ui:text from='{messages.accessKeyRegenerateButton}' />
 						</g:Button>
