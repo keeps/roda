@@ -462,8 +462,11 @@ public class MembersService {
       scopes.put("setPasswordURL", setPasswordURL);
       scopes.put("setPasswordCompleteURL", setPasswordCompleteURL);
 
-      return RodaCoreFactory.getModelService().createNotification(notification,
+      Notification res = RodaCoreFactory.getModelService().createNotification(notification,
         new EmailNotificationProcessor(RodaConstants.VERIFICATION_EMAIL_TEMPLATE, scopes, localeString));
+      LOGGER.info("The email verification was sent to user {}", user.getName());
+
+      return res;
     } catch (UnsupportedEncodingException | AuthorizationDeniedException e) {
       throw new GenericException("Error sending email verification", e);
     }
