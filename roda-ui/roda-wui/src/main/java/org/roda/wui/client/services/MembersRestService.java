@@ -180,12 +180,11 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
 
   @RequestMapping(path = "/users/send-verification", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Send verification email", description = "Sends verification email", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Notification.class))),
-    @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Notification.class)))})
   Notification sendEmailVerification(
-    @Parameter(description = "username") @RequestParam(name = "username") String username,
-    @Parameter(description = "generateNewToken") @RequestParam(required = false, name = "token") boolean generateNewToken,
-    @Parameter(description = "localeString") @RequestParam(name = "locale") String localeString);
+    @Parameter(description = "Username") @RequestParam(name = "username") String username,
+    @Parameter(description = "Generate new token") @RequestParam(required = false, name = "generate-new-token", defaultValue = "false") boolean generateNewToken,
+    @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
   @RequestMapping(path = "/users/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Login", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SecureString.class))), description = "Logs in a user", responses = {
