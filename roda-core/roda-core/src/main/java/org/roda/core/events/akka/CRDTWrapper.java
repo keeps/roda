@@ -7,18 +7,20 @@
  */
 package org.roda.core.events.akka;
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.pekko.cluster.ddata.AbstractReplicatedData;
+import org.apache.pekko.cluster.ddata.ReplicatedData;
+import org.apache.pekko.cluster.ddata.ReplicatedDataSerialization;
 import org.roda.core.data.v2.IsRODAObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import akka.cluster.ddata.AbstractReplicatedData;
-import akka.cluster.ddata.ReplicatedDataSerialization;
-
 public class CRDTWrapper extends AbstractReplicatedData<CRDTWrapper>
-  implements IsRODAObject, ReplicatedDataSerialization {
+  implements IsRODAObject, ReplicatedDataSerialization, ReplicatedData {
+  @Serial
   private static final long serialVersionUID = -9133998132086063749L;
   private static final Logger LOGGER = LoggerFactory.getLogger(CRDTWrapper.class);
 

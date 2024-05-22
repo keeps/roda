@@ -10,6 +10,10 @@ package org.roda.core.plugins.orchestrate.akka;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.Props;
+import org.apache.pekko.actor.Terminated;
+import org.apache.pekko.routing.RoundRobinPool;
 import org.roda.core.common.akka.AkkaBaseActor;
 import org.roda.core.common.akka.Messages;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -38,11 +42,6 @@ import org.slf4j.LoggerFactory;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Iterables;
-
-import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.actor.Terminated;
-import akka.routing.RoundRobinPool;
 
 public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobStateInfoActor.class);

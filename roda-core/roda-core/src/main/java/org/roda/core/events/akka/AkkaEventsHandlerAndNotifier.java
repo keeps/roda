@@ -8,12 +8,20 @@
 package org.roda.core.events.akka;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.actor.Address;
+import org.apache.pekko.actor.Props;
+import org.apache.pekko.actor.Terminated;
+import org.apache.pekko.cluster.Cluster;
+import org.apache.pekko.dispatch.OnComplete;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs;
@@ -34,18 +42,12 @@ import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Address;
-import akka.actor.Props;
-import akka.actor.Terminated;
-import akka.cluster.Cluster;
-import akka.dispatch.OnComplete;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 
 public class AkkaEventsHandlerAndNotifier extends AbstractEventsHandler implements EventsNotifier {
+  @Serial
   private static final long serialVersionUID = 919188071375009042L;
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaEventsHandlerAndNotifier.class);
 

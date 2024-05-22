@@ -10,8 +10,8 @@ package org.roda.core.common.akka;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import akka.actor.DeadLetter;
-import akka.actor.UntypedAbstractActor;
+import org.apache.pekko.actor.DeadLetter;
+import org.apache.pekko.actor.UntypedAbstractActor;
 
 public class DeadLetterActor extends UntypedAbstractActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(DeadLetterActor.class);

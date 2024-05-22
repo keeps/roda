@@ -7,6 +7,7 @@
  */
 package org.roda.core.events.akka;
 
+import java.io.Serial;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,6 +16,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.pekko.actor.AbstractActor;
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.cluster.Cluster;
+import org.apache.pekko.cluster.ddata.DistributedData;
+import org.apache.pekko.cluster.ddata.GSet;
+import org.apache.pekko.cluster.ddata.GSetKey;
+import org.apache.pekko.cluster.ddata.Key;
+import org.apache.pekko.cluster.ddata.ORMap;
+import org.apache.pekko.cluster.ddata.Replicator;
+import org.apache.pekko.cluster.ddata.Replicator.Changed;
+import org.apache.pekko.cluster.ddata.Replicator.Update;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.akka.Messages.EventGroupCreated;
 import org.roda.core.common.akka.Messages.EventGroupDeleted;
@@ -22,29 +34,13 @@ import org.roda.core.common.akka.Messages.EventGroupUpdated;
 import org.roda.core.common.akka.Messages.EventUserCreated;
 import org.roda.core.common.akka.Messages.EventUserDeleted;
 import org.roda.core.common.akka.Messages.EventUserUpdated;
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.events.EventsHandler;
-import org.roda.core.data.common.SecureString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
-import akka.cluster.Cluster;
-import akka.cluster.ddata.DistributedData;
-import akka.cluster.ddata.GSet;
-import akka.cluster.ddata.GSetKey;
-import akka.cluster.ddata.Key;
-import akka.cluster.ddata.ORMap;
-import akka.cluster.ddata.Replicator.Changed;
-import akka.cluster.ddata.Replicator.Subscribe;
-import akka.cluster.ddata.Replicator.Update;
-import akka.cluster.ddata.Replicator.UpdateFailure;
-import akka.cluster.ddata.Replicator.UpdateSuccess;
-import akka.cluster.ddata.Replicator.WriteAll;
-import akka.cluster.ddata.Replicator.WriteConsistency;
-import akka.cluster.ddata.Replicator.WriteMajority;
 import scala.Option;
 import scala.concurrent.duration.Duration;
 
@@ -65,7 +61,7 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
   private final Key<GSet<ObjectKey>> objectKeysKey = GSetKey.create("objectKeys");
   private Set<ObjectKey> objectKeys = new HashSet<>();
 
-  private final WriteConsistency writeConsistency;
+  private final Replicator.WriteConsistency writeConsistency;
 
   public AkkaEventsHandlerAndNotifierActor(final EventsHandler eventsHandler, final String writeConsistency,
     final int writeConsistencyTimeoutInSeconds) {
@@ -74,19 +70,19 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
     this.writeConsistency = instantiateWriteConsistency(writeConsistency, writeConsistencyTimeoutInSeconds);
   }
 
-  private WriteConsistency instantiateWriteConsistency(String writeConsistency,
+  private Replicator.WriteConsistency instantiateWriteConsistency(String writeConsistency,
     final int writeConsistencyTimeoutInSeconds) {
     if ("WriteAll".equalsIgnoreCase(writeConsistency)) {
-      return new WriteAll(Duration.create(writeConsistencyTimeoutInSeconds, TimeUnit.SECONDS));
+      return new Replicator.WriteAll(Duration.create(writeConsistencyTimeoutInSeconds, TimeUnit.SECONDS));
     } else {
-      return new WriteMajority(Duration.create(writeConsistencyTimeoutInSeconds, TimeUnit.SECONDS));
+      return new Replicator.WriteMajority(Duration.create(writeConsistencyTimeoutInSeconds, TimeUnit.SECONDS));
     }
 
   }
 
   @Override
   public void preStart() {
-    Subscribe<GSet<ObjectKey>> subscribe = new Subscribe<>(objectKeysKey, getSelf());
+    Replicator.Subscribe<GSet<ObjectKey>> subscribe = new Replicator.Subscribe<>(objectKeysKey, getSelf());
     replicator.tell(subscribe, ActorRef.noSender());
   }
 
@@ -96,39 +92,40 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
       .match(EventUserUpdated.class, e -> handleUserUpdated(e)).match(EventUserDeleted.class, e -> handleUserDeleted(e))
       .match(EventGroupCreated.class, e -> handleGroupCreated(e))
       .match(EventGroupUpdated.class, e -> handleGroupUpdated(e))
-      .match(EventGroupDeleted.class, e -> handleGroupDeleted(e)).match(Changed.class, c -> handleChanged(c))
-      .match(UpdateSuccess.class, e -> handleUpdateSuccess(e)).match(UpdateFailure.class, e -> handleUpdateFailure(e))
+      .match(EventGroupDeleted.class, e -> handleGroupDeleted(e)).match(Replicator.Changed.class, c -> handleChanged(c))
+      .match(Replicator.UpdateSuccess.class, e -> handleUpdateSuccess(e))
+      .match(Replicator.UpdateFailure.class, e -> handleUpdateFailure(e))
       .matchAny(msg -> {
         LOGGER.warn("Received unknown message '{}'", msg);
       }).build();
   }
 
-  private void handleUpdateSuccess(UpdateSuccess e) {
+  private void handleUpdateSuccess(Replicator.UpdateSuccess e) {
     // LOGGER.info("handleUpdateSuccess '{}'", e);
     // FIXME 20180925 hsilva: do nothing???
   }
 
-  private void handleUpdateFailure(UpdateFailure e) {
+  private void handleUpdateFailure(Replicator.UpdateFailure e) {
     // LOGGER.info("handleUpdateFailure '{}'", e);
     // FIXME 20180925 hsilva: what to do???
   }
 
-  private void handleChanged(Changed<?> e) {
+  private void handleChanged(Replicator.Changed<?> e) {
     if (e.key().equals(objectKeysKey)) {
-      handleObjectKeysChanged((Changed<GSet<ObjectKey>>) e);
+      handleObjectKeysChanged((Replicator.Changed<GSet<ObjectKey>>) e);
     } else if (e.key() instanceof ObjectKey) {
       handleObjectChanged((Changed<ORMap<String, CRDTWrapper>>) e);
     }
   }
 
-  private void handleObjectKeysChanged(Changed<GSet<ObjectKey>> e) {
+  private void handleObjectKeysChanged(Replicator.Changed<GSet<ObjectKey>> e) {
     Set<ObjectKey> newKeys = e.dataValue().getElements();
     Set<ObjectKey> keysToSubscribe = new HashSet<>(newKeys);
     keysToSubscribe.removeAll(objectKeys);
     keysToSubscribe.forEach(keyToSubscribe -> {
       // subscribe to get notifications of when objects with this name are
       // added or removed
-      replicator.tell(new Subscribe<>(keyToSubscribe, self()), self());
+      replicator.tell(new Replicator.Subscribe<>(keyToSubscribe, self()), self());
     });
     objectKeys = newKeys;
 
@@ -136,7 +133,7 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
     keysToSubscribe = null;
   }
 
-  private void handleObjectChanged(Changed<ORMap<String, CRDTWrapper>> e) {
+  private void handleObjectChanged(Replicator.Changed<ORMap<String, CRDTWrapper>> e) {
     String objectId = e.key().id().replaceFirst(CACHE_PREFIX, "");
     Option<CRDTWrapper> option = e.dataValue().get(objectId);
     if (option.isDefined()) {
@@ -248,6 +245,7 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
   }
 
   public static class ObjectKey extends Key<ORMap<String, CRDTWrapper>> {
+    @Serial
     private static final long serialVersionUID = 4859356839497209682L;
 
     public ObjectKey(String eventKey) {
