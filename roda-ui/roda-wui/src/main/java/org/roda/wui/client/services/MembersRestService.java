@@ -18,6 +18,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
+import org.roda.wui.api.v2.model.GenericOkResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -151,12 +152,12 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @Parameter(name = "password", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SecureString password);
 
   @RequestMapping(path = "/users/recover", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Recover login", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class))), description = "Registers a new user", responses = {
-    @ApiResponse(responseCode = "204", description = "No Content"),
-    @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Void recoverLogin(
-    @Parameter(description = "usernameOrEmail") @RequestParam(name = "usernameOrEmail") String usernameOrEmail,
-    @Parameter(description = "localeString") @RequestParam(name = "locale") String localeString,
+  @Operation(summary = "Recover login", description = "Sends an email to recover login", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GenericOkResponse.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  String recoverLogin(
+    @Parameter(description = "email") @RequestParam(name = "email") String email,
+    @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
     @Parameter(description = "captcha") @RequestParam(required = false, name = "captcha") String captcha);
 
   @RequestMapping(path = "/users/confirm", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
