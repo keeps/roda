@@ -30,6 +30,7 @@ import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.generics.CreateUserRequest;
+import org.roda.core.data.v2.generics.LoginRequest;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.CountRequest;
@@ -582,7 +583,10 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public User login(String username, @RequestBody SecureString password) throws AuthenticationDeniedException {
+  public User login(@RequestBody LoginRequest loginRequest) throws AuthenticationDeniedException {
+    String username = loginRequest.getUsername();
+    SecureString password = loginRequest.getPassword();
+
     if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_WEB_BASIC_AUTH_DISABLE, false)) {
       List<String> allowedUsers = RodaCoreFactory
         .getRodaConfigurationAsList(RodaConstants.CORE_WEB_BASIC_AUTH_WHITELIST);
