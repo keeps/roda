@@ -81,11 +81,31 @@ public class PermissionUtils {
           .collect(Collectors.toSet()));
     }
 
-    // default creator Permissions
-    Set<Permissions.PermissionType> defaultCreatorPermissions = RodaCoreFactory
-      .getRodaConfigurationAsList("core.aip.default_permissions.creator.permission[]").stream()
+    // creator Permissions
+    Set<Permissions.PermissionType> userCreatorPermissions = RodaCoreFactory
+      .getRodaConfigurationAsList("core.aip.default_permissions.creator.user.permission[]").stream()
       .map(Permissions.PermissionType::valueOf) // Convert string to PermissionType enum
       .collect(Collectors.toSet());
+
+    // add default creator permissions
+    Set<Permissions.PermissionType> tempUserPermissions = finalPermissions.getUserPermissions(creatorUsername);
+    tempUserPermissions.addAll(userCreatorPermissions);
+    finalPermissions.setUserPermissions(creatorUsername, tempUserPermissions);
+
+    // default legacy behaviour
+    boolean getLegacyPermissions = RodaCoreFactory.getProperty("core.aip.default_permissions.legacy_permissions", true);
+
+    if (getLegacyPermissions) {
+      Set<Permissions.PermissionType> defaultCreatorPermissions = RodaCoreFactory
+        .getRodaConfigurationAsList("core.aip.default_permissions.creator.permission[]").stream()
+        .map(Permissions.PermissionType::valueOf) // Convert string to PermissionType enum
+        .collect(Collectors.toSet());
+
+      // add default creator permissions
+      Set<Permissions.PermissionType> temp = finalPermissions.getUserPermissions(creatorUsername);
+      temp.addAll(defaultCreatorPermissions);
+      finalPermissions.setUserPermissions(creatorUsername, temp);
+    }
 
     // defaultPermissions
     Permissions defaultPermissions = new Permissions();
@@ -117,10 +137,6 @@ public class PermissionUtils {
       finalPermissions.setUserPermissions(name, temp);
     }
 
-    // add default creator permissions
-    Set<Permissions.PermissionType> temp = finalPermissions.getUserPermissions(creatorUsername);
-    temp.addAll(defaultCreatorPermissions);
-    finalPermissions.setUserPermissions(creatorUsername, temp);
 
     // intersection
     boolean intersection = RodaCoreFactory.getProperty("core.aip.default_permissions.intersect_groups", false);
