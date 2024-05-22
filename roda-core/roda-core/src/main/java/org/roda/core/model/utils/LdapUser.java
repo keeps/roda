@@ -15,7 +15,7 @@ import org.springframework.ldap.odm.annotations.Transient;
  */
 @Entry(objectClasses = {"extensibleObject", "top", "person", "organizationalPerson", "inetOrgPerson",
   "shadowAccount"}, base = "")
-public class LdapUser implements Persistable<Name> {
+public final class LdapUser implements Persistable<Name> {
 
   @Id
   private Name dn;

@@ -79,6 +79,7 @@ import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
+import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -98,6 +99,7 @@ public class IndexServiceTest {
   private static Path logPath;
   private static ModelService model;
   private static IndexService index;
+  private static LdapUtilityTestHelper ldapUtilityTestHelper;
 
   private static StorageService corporaService;
 
@@ -106,6 +108,7 @@ public class IndexServiceTest {
   @BeforeClass
   public static void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(IndexServiceTest.class, true);
+    ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -114,7 +117,7 @@ public class IndexServiceTest {
     boolean deployPluginManager = false;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false);
+      deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
 
     logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
@@ -129,6 +132,7 @@ public class IndexServiceTest {
   @AfterClass
   public static void tearDown() throws Exception {
     IndexTestUtils.resetIndex();
+    ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
@@ -552,7 +556,7 @@ public class IndexServiceTest {
         user.setAllRoles(roles);
         user.setDirectRoles(roles);
         user.setGuest(false);
-        user.setId("USER" + i);
+        user.setId("NAMEUSER" + i);
         user.setName("NAMEUSER" + i);
         user.setFullName("NAMEUSER" + i);
 
@@ -564,7 +568,7 @@ public class IndexServiceTest {
         group.setActive(true);
         group.setAllRoles(roles);
         group.setDirectRoles(roles);
-        group.setId("GROUP" + i);
+        group.setId("NAMEGROUP" + i);
         group.setName("NAMEGROUP" + i);
         group.setFullName("NAMEGROUP" + i);
 

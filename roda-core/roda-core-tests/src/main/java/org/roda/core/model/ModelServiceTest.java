@@ -66,6 +66,7 @@ import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
@@ -108,6 +109,7 @@ public class ModelServiceTest {
   private static ModelService model;
   private static StorageService corporaService;
   private static int fileCounter = 0;
+  private static LdapUtilityTestHelper ldapUtilityTestHelper;
 
   @BeforeClass
   public static void setUp() throws IOException, URISyntaxException, GenericException {
@@ -122,6 +124,7 @@ public class ModelServiceTest {
   @BeforeClass
   public void init() throws IOException, GenericException {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
+    ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     boolean deploySolr = false;
     boolean deployLdap = true;
@@ -130,7 +133,7 @@ public class ModelServiceTest {
     boolean deployPluginManager = false;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false);
+      deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
 
     logPath = RodaCoreFactory.getLogPath();
     storage = RodaCoreFactory.getStorageService();
@@ -140,6 +143,7 @@ public class ModelServiceTest {
   // @AfterMethod
   @AfterClass
   public void cleanup() throws NotFoundException, GenericException, IOException {
+    ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
     // FSUtils.deletePath(basePath);
   }

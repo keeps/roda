@@ -53,6 +53,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.base.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.plugins.base.ingest.v2.MinimalIngestPlugin;
+import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -70,6 +71,7 @@ public class PluginReportContentTest {
   private static Path basePath;
   private static ModelService model;
   private static IndexService index;
+  private static LdapUtilityTestHelper ldapUtilityTestHelper;
   private static Path corporaPath;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginReportContentTest.class);
@@ -86,6 +88,7 @@ public class PluginReportContentTest {
       PosixFilePermissions
         .asFileAttribute(new HashSet<>(Arrays.asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE,
           PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OTHERS_READ, PosixFilePermission.OTHERS_EXECUTE))));
+    ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -94,7 +97,7 @@ public class PluginReportContentTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false);
+      deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
 
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
@@ -108,6 +111,7 @@ public class PluginReportContentTest {
   @AfterClass
   public void tearDown() throws Exception {
     IndexTestUtils.resetIndex();
+    ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }

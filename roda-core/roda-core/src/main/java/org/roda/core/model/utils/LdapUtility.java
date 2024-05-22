@@ -184,7 +184,7 @@ public class LdapUtility {
     return ldapTemplate;
   }
 
-  public void initialize() throws Exception {
+  public void initialize(RodaConstants.NodeType nodeType) throws Exception {
     Configuration configuration = RodaCoreFactory.getRodaConfiguration();
     this.ldapRootDN = configuration.getString("core.ldap.baseDN", "dc=roda,dc=org");
 
@@ -214,14 +214,16 @@ public class LdapUtility {
     final int ldapPort = configuration.getInt("core.ldap.port", RodaConstants.CORE_LDAP_DEFAULT_PORT);
     final String ldapAdminPassword = configuration.getString("core.ldap.adminPassword", "roda");
 
-    LdapContextSource contextSource = new LdapContextSource();
-    contextSource.setUrl(ldapUrl + ":" + ldapPort);
-    contextSource.setBase(ldapRootDN);
-    contextSource.setUserDn(ldapAdminDN);
-    contextSource.setPassword(ldapAdminPassword);
-    contextSource.afterPropertiesSet();
+    if (nodeType != RodaConstants.NodeType.TEST) {
+      LdapContextSource contextSource = new LdapContextSource();
+      contextSource.setUrl(ldapUrl + ":" + ldapPort);
+      contextSource.setBase(ldapRootDN);
+      contextSource.setUserDn(ldapAdminDN);
+      contextSource.setPassword(ldapAdminPassword);
+      contextSource.afterPropertiesSet();
 
-    ldapTemplate.setContextSource(contextSource);
+      ldapTemplate.setContextSource(contextSource);
+    }
 
     bootstrap();
     createRoles(configuration);
@@ -405,20 +407,20 @@ public class LdapUtility {
       if (user.isActive()) {
         try (SecureString randomPassword = new SecureString(
           RandomStringUtils.random(RANDOM_PASSWORD_LENGTH).toCharArray())) {
-          setUserPasswordUnchecked(user.getName(), randomPassword);
+          setUserPasswordUnchecked(user.getId(), randomPassword);
         } catch (final NotFoundException e) {
           LOGGER.error("Created user doesn't exist! Notify developers!!!", e);
         }
       }
     } catch (final NameAlreadyBoundException e) {
       LOGGER.debug(e.getMessage(), e);
-      throw new UserAlreadyExistsException(userMessage(user.getName(), " already exists."), e);
+      throw new UserAlreadyExistsException(userMessage(user.getId(), " already exists."), e);
     } catch (final NamingException e) {
       LOGGER.debug(e.getMessage(), e);
-      throw new GenericException("Error adding user " + user.getName(), e);
+      throw new GenericException("Error adding user " + user.getId(), e);
     }
 
-    final User newUser = getUser(user.getName());
+    final User newUser = getUser(user.getId());
     if (newUser == null) {
       throw new GenericException("The user was not created!");
     } else {
@@ -588,7 +590,7 @@ public class LdapUtility {
         }
         return group;
       } else {
-        return null;
+        throw new NotFoundException();
       }
     } catch (NamingException e) {
       throw new GenericException("Error searching for group " + name, e);
@@ -745,7 +747,7 @@ public class LdapUtility {
     final User newUser = addUser(user);
     try {
 
-      setUserPassword(newUser.getName(), password);
+      setUserPassword(newUser.getId(), password);
 
     } catch (final IllegalOperationException | NotFoundException e) {
       throw new GenericException("Error setting user password - " + e.getMessage(), e);
@@ -1327,7 +1329,7 @@ public class LdapUtility {
       ldapUserRepository.save(modifiedLdapUser);
 
       if (newPassword != null) {
-        modifyUserPassword(modifiedUser.getName(), newPassword);
+        modifyUserPassword(modifiedUser.getId(), newPassword);
       }
 
       if (modifyRolesAndGroups) {

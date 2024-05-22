@@ -59,7 +59,6 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -76,9 +75,8 @@ import org.roda.core.plugins.base.ingest.AutoAcceptSIPPlugin;
 import org.roda.core.plugins.base.ingest.EARKSIP2ToAIPPlugin;
 import org.roda.core.plugins.base.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.plugins.base.ingest.v2.MinimalIngestPlugin;
+import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.DirectResourceAccess;
-import org.roda.core.storage.Resource;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -117,6 +115,7 @@ public class InternalPluginsTest {
 
   private static ModelService model;
   private static IndexService index;
+  private static LdapUtilityTestHelper ldapUtilityTestHelper;
 
   @BeforeClass
   public void setUp() throws Exception {
@@ -124,6 +123,7 @@ public class InternalPluginsTest {
       PosixFilePermissions
         .asFileAttribute(new HashSet<>(Arrays.asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE,
           PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OTHERS_READ, PosixFilePermission.OTHERS_EXECUTE))));
+    ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -132,7 +132,7 @@ public class InternalPluginsTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false);
+      deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
@@ -142,6 +142,7 @@ public class InternalPluginsTest {
   @AfterClass
   public void tearDown() throws Exception {
     IndexTestUtils.resetIndex();
+    ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
