@@ -11,9 +11,9 @@ import org.roda.core.common.akka.Messages;
 
 import com.typesafe.config.Config;
 
-import akka.actor.ActorSystem;
-import akka.dispatch.PriorityGenerator;
-import akka.dispatch.UnboundedStablePriorityMailbox;
+import org.apache.pekko.actor.ActorSystem;
+import org.apache.pekko.dispatch.PriorityGenerator;
+import org.apache.pekko.dispatch.UnboundedStablePriorityMailbox;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>

@@ -16,7 +16,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
-import akka.serialization.SerializerWithStringManifest;
+import org.apache.pekko.serialization.SerializerWithStringManifest;
 
 public class CRDTSerializer extends SerializerWithStringManifest {
 

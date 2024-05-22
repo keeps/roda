@@ -9,6 +9,7 @@ package org.roda.core.common.akka;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -31,7 +32,7 @@ public final class AkkaUtils {
 
     try (InputStream originStream = RodaCoreFactory
       .getConfigurationFileAsStream(RodaConstants.CORE_ORCHESTRATOR_FOLDER + "/" + configFilename)) {
-      String configAsString = IOUtils.toString(originStream, RodaConstants.DEFAULT_ENCODING);
+      String configAsString = IOUtils.toString(originStream, StandardCharsets.UTF_8);
       akkaConfig = ConfigFactory.parseString(configAsString);
     } catch (IOException e) {
       LOGGER.error("Could not load Akka configuration '{}'", configFilename, e);

@@ -198,28 +198,28 @@
 
 		<!-- Akka related dependencies - start -->
 		<dependency>
-			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-actor_2.12</artifactId>
+			<groupId>org.apache.pekko</groupId>
+			<artifactId>pekko-actor_2.13</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-cluster_2.12</artifactId>
+			<groupId>org.apache.pekko</groupId>
+			<artifactId>pekko-cluster_2.13</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-cluster-tools_2.12</artifactId>
+			<groupId>org.apache.pekko</groupId>
+			<artifactId>pekko-cluster-tools_2.13</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-persistence_2.12</artifactId>
+			<groupId>org.apache.pekko</groupId>
+			<artifactId>pekko-persistence_2.13</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-slf4j_2.12</artifactId>
+			<groupId>org.apache.pekko</groupId>
+			<artifactId>pekko-slf4j_2.13</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-distributed-data_2.12</artifactId>
+			<groupId>org.apache.pekko</groupId>
+			<artifactId>pekko-distributed-data_2.13</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jknack</groupId>
