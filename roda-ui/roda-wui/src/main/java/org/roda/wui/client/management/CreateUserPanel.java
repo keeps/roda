@@ -239,7 +239,7 @@ public class CreateUserPanel extends Composite implements HasValueChangeHandlers
 
 
     Services services = new Services("Get User extra", "get");
-    services.membersResource(s -> s.getUserExtra(user.getName())).whenComplete((extra, error) -> {
+    services.membersResource(s -> s.getDefaultUserExtra()).whenComplete((extra, error) -> {
       if (extra != null) {
         CreateUserPanel.this.userExtra = extra;
         createForm(userExtra);
