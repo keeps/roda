@@ -98,6 +98,16 @@ public class MembersService {
     RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
   }
 
+  public void deactivateUserAccessKeys(SelectedItems<RODAMember> members, String userId) throws GenericException,
+    RequestNotValidException, AuthorizationDeniedException, NotFoundException, AlreadyExistsException {
+    List<String> uuids = getMemberUuidFromSelectedItems(members);
+    for (String uuid : uuids) {
+      if (RodaPrincipal.isUser(uuid)) {
+        RodaCoreFactory.getModelService().deactivateUserAccessKeys(RodaPrincipal.getId(uuid), userId);
+      }
+    }
+  }
+
   private static List<String> getMemberUuidFromSelectedItems(SelectedItems<RODAMember> members)
     throws GenericException, RequestNotValidException {
     List<String> uuids = new ArrayList<>();

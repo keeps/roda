@@ -156,24 +156,6 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public Void deactivateUserAccessKeys(String name) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      controllerAssistant.checkRoles(requestContext.getUser());
-      return null;
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
-    }
-  }
-
-  @Override
   public Void deleteAccessKey(String accessKeyId) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
@@ -378,6 +360,11 @@ public class MembersController implements MembersRestService {
       controllerAssistant.checkRoles(requestContext.getUser());
 
       membersService.changeActiveMembers(members, activate);
+
+      if (!activate) {
+        membersService.deactivateUserAccessKeys(members, requestContext.getUser().getId());
+      }
+
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
