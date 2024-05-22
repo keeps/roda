@@ -25,6 +25,8 @@ import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.generics.CreateUserRequest;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -37,6 +39,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -175,8 +178,7 @@ public class EditUser extends Composite {
   void buttonDeActivateHandler(ClickEvent e) {
     user.setActive(!user.isActive());
     Services services = new Services("Update User", "update");
-    CreateUserRequest userOperations = new CreateUserRequest(user, null, userDataPanel.getUserExtra());
-    services.membersResource(s -> s.updateUser(userOperations)).thenCompose(res -> services.membersResource(s -> s.deactivateUserAccessKeys(user.getId())))
+    services.membersResource(s -> s.changeActive(SelectedItemsList.create(RODAMember.class, user.getUUID()), user.isActive()))
       .whenComplete((res, error) -> {
         if (error == null) {
           HistoryUtils.newHistory(MemberManagement.RESOLVER);
