@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.jobs;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class PluginParameter implements Serializable {
+  @Serial
   private static final long serialVersionUID = -431821437136556726L;
   private String id = null;
   private String name = null;
@@ -26,7 +28,7 @@ public class PluginParameter implements Serializable {
   private boolean mandatory = true;
   private boolean readonly = false;
   private String description = null;
-  private RenderingHints renderingHings = null;
+  private RenderingHints renderingHints = null;
 
   /**
    * Constructs an empty {@link PluginParameter}.
@@ -40,6 +42,7 @@ public class PluginParameter implements Serializable {
    *
    * @param builder
    *          {@link PluginParameterBuilder}
+   *
    */
   public PluginParameter(PluginParameterBuilder builder) {
     this.id = builder.id;
@@ -62,9 +65,7 @@ public class PluginParameter implements Serializable {
    * @param mandatory
    * @param readonly
    * @param description
-   */
-
-  /**
+   *
    * @deprecated It will be removed in the next major version. Due to
    *             maintainability, a constructor shouldn't have to many arguments.
    *             Use instead the builder
@@ -93,8 +94,7 @@ public class PluginParameter implements Serializable {
    * @param mandatory
    * @param readonly
    * @param description
-   */
-  /**
+   *
    * @deprecated It will be removed in the next major version. Due to
    *             maintainability, a constructor shouldn't have to many arguments.
    *             Use instead the builder
@@ -118,12 +118,16 @@ public class PluginParameter implements Serializable {
    *
    * @param parameter
    *          the {@link PluginParameter} to clone.
+   * @deprecated It will be removed in the next major version. Due to
+   *             maintainability, a constructor shouldn't have to many arguments.
+   *             Use instead the builder
+   *             {@link #PluginParameter(PluginParameterBuilder)}
    */
   public PluginParameter(PluginParameter parameter) {
     this(new PluginParameterBuilder(parameter.getId(), parameter.getName(), parameter.getType())
-            .withDescription(parameter.getDescription()).withDefaultValue(parameter.getDefaultValue())
-            .withPossibleValues(parameter.getPossibleValues()).isReadOnly(parameter.isReadonly())
-            .isMandatory(parameter.isMandatory()));
+      .withDescription(parameter.getDescription()).withDefaultValue(parameter.getDefaultValue())
+      .withPossibleValues(parameter.getPossibleValues()).isReadOnly(parameter.isReadonly())
+      .isMandatory(parameter.isMandatory()));
   }
 
   /**
@@ -325,18 +329,18 @@ public class PluginParameter implements Serializable {
   }
 
   /**
-   * @return the renderingHings
+   * @return the renderingHints
    */
-  public RenderingHints getRenderingHings() {
-    return renderingHings;
+  public RenderingHints getRenderingHints() {
+    return renderingHints;
   }
 
   /**
-   * @param renderingHings
-   *          the renderingHings to set
+   * @param renderingHints
+   *          the renderingHints to set
    */
-  public void setRenderingHings(RenderingHints renderingHings) {
-    this.renderingHings = renderingHings;
+  public void setRenderingHints(RenderingHints renderingHints) {
+    this.renderingHints = renderingHints;
   }
 
   public enum PluginParameterType {
@@ -424,6 +428,11 @@ public class PluginParameter implements Serializable {
     CONVERSION
   }
 
+  public static PluginParameterBuilder getBuilder(final String id, final String name,
+    final PluginParameter.PluginParameterType type) {
+    return new PluginParameterBuilder(id, name, type);
+  }
+
   public static class PluginParameterBuilder {
 
     // required parameters
@@ -432,13 +441,13 @@ public class PluginParameter implements Serializable {
     private final PluginParameter.PluginParameterType type;
 
     // optional parameters
-    private String defaultValue;
+    private String defaultValue = "";
     private List<String> possibleValues = new ArrayList<>();
     private boolean mandatory = true;
     private boolean readOnly = false;
     private String description = null;
 
-    public PluginParameterBuilder(String id, String name, PluginParameter.PluginParameterType type) {
+    private PluginParameterBuilder(String id, String name, PluginParameter.PluginParameterType type) {
       this.id = id;
       this.name = name;
       this.type = type;
@@ -473,5 +482,4 @@ public class PluginParameter implements Serializable {
       return this;
     }
   }
-
 }

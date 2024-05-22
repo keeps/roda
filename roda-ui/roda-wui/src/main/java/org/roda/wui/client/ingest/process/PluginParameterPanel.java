@@ -341,8 +341,8 @@ public class PluginParameterPanel extends Composite {
 
   private void createSelectAipLayout() {
     AipIdPluginParameterRenderingHints renderingHints = null;
-    if (parameter.getRenderingHings() instanceof AipIdPluginParameterRenderingHints) {
-      renderingHints = (AipIdPluginParameterRenderingHints) parameter.getRenderingHings();
+    if (parameter.getRenderingHints() instanceof AipIdPluginParameterRenderingHints) {
+      renderingHints = (AipIdPluginParameterRenderingHints) parameter.getRenderingHints();
     }
     Label parameterName = new Label(parameter.getName());
     final HorizontalPanel editPanel = new HorizontalPanel();
