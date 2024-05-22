@@ -193,26 +193,16 @@ public class MembersService {
     RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
   }
 
-  public void requestPasswordReset(String servletPath, String usernameOrEmail, String localeString,
+  public void requestPasswordReset(String servletPath, String email, String localeString,
                                    String ipAddress, boolean isRecover)
     throws GenericException, NotFoundException, IllegalOperationException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    String username = null;
-    String email = null;
-
-    if (usernameOrEmail.matches(
-      "^[\\w-]+(\\.[\\w-]+)*@([a-z0-9-]+(\\.[a-z0-9-]+)*?\\.[a-z]{2,6}|(\\d{1,3}\\.){3}\\d{1,3})(:\\d{4})?$")) {
-      email = usernameOrEmail;
-    } else {
-      username = usernameOrEmail;
-    }
-
-    User user = requestPasswordReset(username, email);
+    User user = requestPasswordReset(email);
     if (user != null) {
       sendSetPasswordEmail(servletPath, user, localeString, isRecover);
     } else {
-      user = new User(usernameOrEmail);
+      user = new User(email);
     }
 
     // 20180112 hsilva: need to set ip address for registering the action
@@ -267,9 +257,9 @@ public class MembersService {
     }
   }
 
-  public User requestPasswordReset(String username, String email)
+  public User requestPasswordReset(String email)
     throws IllegalOperationException, NotFoundException, GenericException, AuthorizationDeniedException {
-    return RodaCoreFactory.getModelService().requestPasswordReset(username, email, true, true);
+    return RodaCoreFactory.getModelService().requestPasswordReset(null, email, true, true);
   }
 
   public User confirmUserEmail(String username, String email, String emailConfirmationToken)

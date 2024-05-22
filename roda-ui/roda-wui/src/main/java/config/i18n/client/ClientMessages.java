@@ -1685,7 +1685,7 @@ public interface ClientMessages extends Messages {
   // Recover Login
   String recoverLoginTitle();
 
-  String recoverLoginUsernameOrEmail();
+  String recoverLoginEmail();
 
   String recoverLoginSubmit();
 
