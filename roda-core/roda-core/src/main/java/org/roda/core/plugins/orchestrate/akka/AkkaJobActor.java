@@ -9,6 +9,11 @@ package org.roda.core.plugins.orchestrate.akka;
 
 import java.util.Optional;
 
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.OneForOneStrategy;
+import org.apache.pekko.actor.Props;
+import org.apache.pekko.actor.SupervisorStrategy;
+import org.apache.pekko.japi.pf.DeciderBuilder;
 import org.roda.core.common.akka.AkkaBaseActor;
 import org.roda.core.common.akka.Messages;
 import org.roda.core.data.exceptions.GenericException;
@@ -28,12 +33,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import akka.actor.ActorRef;
-import akka.actor.OneForOneStrategy;
-import akka.actor.Props;
-import akka.actor.SupervisorStrategy;
-import akka.japi.pf.DeciderBuilder;
 
 public class AkkaJobActor extends AkkaBaseActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobActor.class);

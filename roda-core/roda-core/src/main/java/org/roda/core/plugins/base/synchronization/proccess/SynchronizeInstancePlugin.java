@@ -45,7 +45,6 @@ import org.roda.core.plugins.base.synchronization.packages.RiskIncidencePackageP
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.java8.FuturesConvertersImpl;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>

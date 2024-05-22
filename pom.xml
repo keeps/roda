@@ -118,8 +118,9 @@
         <swagger.version>2.2.21</swagger.version>
         <jackson.version>2.17.0</jackson.version>
         <spring.version>6.1.6</spring.version>
+        <solr.version>9.6.0</solr.version>
+        <pekko.version>1.0.2</pekko.version>
         <solr.version>9.5.0</solr.version>
-        <akka.version>2.8.5</akka.version>
         <apacheds.version>2.0.0.AM27</apacheds.version>
         <httpcomponents.version>4.5.14</httpcomponents.version>
         <commons_ip2.version>2.6.2</commons_ip2.version>
@@ -925,7 +926,7 @@
             <dependency>
                 <groupId>org.glassfish.jersey.ext</groupId>
                 <artifactId>jersey-spring6</artifactId>
-                <version>3.1.5</version>
+                <version>3.1.6</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.springframework</groupId>
@@ -993,41 +994,41 @@
             </dependency>
             <!-- REST API related dependencies - end -->
 
-            <!-- Akka related dependencies - start -->
+            <!-- Pekko related dependencies - start -->
             <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-actor_2.12</artifactId>
-                <version>${akka.version}</version>
+                <groupId>org.apache.pekko</groupId>
+                <artifactId>pekko-actor_2.13</artifactId>
+                <version>${pekko.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-cluster_2.12</artifactId>
-                <version>${akka.version}</version>
+                <groupId>org.apache.pekko</groupId>
+                <artifactId>pekko-cluster_2.13</artifactId>
+                <version>${pekko.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-cluster-tools_2.12</artifactId>
-                <version>${akka.version}</version>
+                <groupId>org.apache.pekko</groupId>
+                <artifactId>pekko-cluster-tools_2.13</artifactId>
+                <version>${pekko.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-testkit_2.12</artifactId>
-                <version>${akka.version}</version>
+                <groupId>org.apache.pekko</groupId>
+                <artifactId>pekko-testkit_2.13</artifactId>
+                <version>${pekko.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-persistence_2.12</artifactId>
-                <version>${akka.version}</version>
+                <groupId>org.apache.pekko</groupId>
+                <artifactId>pekko-persistence_2.13</artifactId>
+                <version>${pekko.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-slf4j_2.12</artifactId>
-                <version>${akka.version}</version>
+                <groupId>org.apache.pekko</groupId>
+                <artifactId>pekko-slf4j_2.13</artifactId>
+                <version>${pekko.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-distributed-data_2.12</artifactId>
-                <version>${akka.version}</version>
+                <groupId>org.apache.pekko</groupId>
+                <artifactId>pekko-distributed-data_2.13</artifactId>
+                <version>${pekko.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.reflections</groupId>
@@ -1084,7 +1085,7 @@
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-java</artifactId>
-                <version>4.19.0</version>
+                <version>4.19.1</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>

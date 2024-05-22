@@ -18,6 +18,9 @@ import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.pekko.actor.ActorRef;
+import org.apache.pekko.actor.Props;
+import org.apache.pekko.routing.RoundRobinPool;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.akka.AkkaBaseActor;
 import org.roda.core.common.akka.Messages;
@@ -25,9 +28,9 @@ import org.roda.core.common.akka.Messages.JobsManagerAcquireLock;
 import org.roda.core.common.akka.Messages.JobsManagerReleaseAllLocks;
 import org.roda.core.common.akka.Messages.JobsManagerReleaseLock;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.JobParallelism;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +38,6 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 
-import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.routing.RoundRobinPool;
 import scala.concurrent.duration.Duration;
 
 public class AkkaJobsManager extends AkkaBaseActor {
