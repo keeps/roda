@@ -46,6 +46,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.base.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
+import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
@@ -69,6 +70,7 @@ public class FilterTest {
   private static StorageService corporaService;
   private static ModelService model;
   private static IndexService index;
+  private static LdapUtilityTestHelper ldapUtilityTestHelper;
 
   @BeforeClass
   public static void setUp() throws URISyntaxException, GenericException {
@@ -81,6 +83,7 @@ public class FilterTest {
   @BeforeClass
   public void init() throws IOException {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
+    ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -89,7 +92,7 @@ public class FilterTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false);
+      deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
 
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
@@ -100,6 +103,7 @@ public class FilterTest {
   @AfterClass
   public void cleanup() throws NotFoundException, GenericException, IOException {
     IndexTestUtils.resetIndex();
+    ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }

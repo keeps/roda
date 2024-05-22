@@ -62,6 +62,7 @@ import org.roda.core.plugins.base.PluginThatStopsItself;
 import org.roda.core.plugins.base.PluginThatTestsLocking;
 import org.roda.core.plugins.base.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexAIPPlugin;
+import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
@@ -79,11 +80,13 @@ public class JobsTest {
 
   private static ModelService model;
   private static IndexService index;
+  private static LdapUtilityTestHelper ldapUtilityTestHelper;
   private static Path basePath;
 
   @BeforeClass
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
+    ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -92,7 +95,7 @@ public class JobsTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false);
+      deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
 
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
@@ -103,6 +106,7 @@ public class JobsTest {
   @AfterClass
   public void tearDown() throws Exception {
     IndexTestUtils.resetIndex();
+    ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
@@ -366,8 +370,8 @@ public class JobsTest {
   }
 
   @Test
-  public void testRunPluginWithFilter() throws AuthorizationDeniedException, RequestNotValidException, NotFoundException,
-    GenericException, AlreadyExistsException {
+  public void testRunPluginWithFilter() throws AuthorizationDeniedException, RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException {
     for (int i = 0; i < 20; i++) {
       createSampleAIP(false);
     }

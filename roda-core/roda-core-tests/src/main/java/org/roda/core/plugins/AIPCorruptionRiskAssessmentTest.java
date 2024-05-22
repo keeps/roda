@@ -10,7 +10,6 @@ package org.roda.core.plugins;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,6 +31,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.preservation.AIPCorruptionRiskAssessmentPlugin;
+import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -52,11 +52,13 @@ public class AIPCorruptionRiskAssessmentTest {
 
   private static ModelService model;
   private static IndexService index;
+  private static LdapUtilityTestHelper ldapUtilityTestHelper;
   private static StorageService corporaService;
 
   @BeforeMethod
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
+    ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -65,7 +67,7 @@ public class AIPCorruptionRiskAssessmentTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false);
+      deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
@@ -79,6 +81,7 @@ public class AIPCorruptionRiskAssessmentTest {
   @AfterMethod
   public void tearDown() throws Exception {
     IndexTestUtils.resetIndex();
+    ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }

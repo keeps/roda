@@ -15,7 +15,7 @@ import org.springframework.ldap.odm.annotations.Transient;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 @Entry(objectClasses = {"extensibleObject", "top", "groupOfUniqueNames"}, base = "")
-public class LdapGroup implements Persistable<Name> {
+public final class LdapGroup implements Persistable<Name> {
 
   @Id
   private Name dn;

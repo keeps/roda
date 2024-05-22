@@ -37,6 +37,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.AbstractConvertPluginDummy;
+import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -62,6 +63,7 @@ public class AbstractConvertPluginTest {
 
   private ModelService model;
   private IndexService index;
+  private static LdapUtilityTestHelper ldapUtilityTestHelper;
 
   private static StorageService corporaService;
 
@@ -72,6 +74,7 @@ public class AbstractConvertPluginTest {
   @BeforeClass
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
+    ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     boolean deploySolr = true;
     boolean deployLdap = true;
@@ -80,7 +83,7 @@ public class AbstractConvertPluginTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, true);
+      deployPluginManager, deployDefaultResources, true, ldapUtilityTestHelper.getLdapUtility());
     IndexTestUtils.resetIndex();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
@@ -98,6 +101,7 @@ public class AbstractConvertPluginTest {
   @AfterClass
   public void tearDown() throws Exception {
     IndexTestUtils.resetIndex();
+    ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }

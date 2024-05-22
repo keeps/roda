@@ -16,7 +16,7 @@ import org.springframework.ldap.odm.annotations.Transient;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 @Entry(objectClasses = {"top", "organizationalRole"}, base = "")
-public class LdapRole implements Persistable<Name> {
+public final class LdapRole implements Persistable<Name> {
 
   @Id
   private Name dn;
@@ -60,7 +60,7 @@ public class LdapRole implements Persistable<Name> {
   }
 
   public void addRoleOccupant(Name roleOccupant) {
-    if(roleOccupants == null){
+    if (roleOccupants == null) {
       this.roleOccupants = new ArrayList<>();
     }
     this.roleOccupants.add(roleOccupant);

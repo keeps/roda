@@ -422,6 +422,20 @@ public class RodaCoreFactory {
   }
 
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
+    boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources,
+    boolean deployProtocolManager, LdapUtility ldapUtility) {
+    INSTANTIATE_SOLR = deploySolr;
+    INSTANTIATE_LDAP = deployLdap;
+    INSTANTIATE_SCANNER = deployTransferredResourcesScanner;
+    INSTANTIATE_PLUGIN_ORCHESTRATOR = deployOrchestrator;
+    INSTANTIATE_PLUGIN_MANAGER = deployPluginManager;
+    INSTANTIATE_DEFAULT_RESOURCES = deployDefaultResources;
+    INSTANTIATE_PROTOCOL_MANAGER = deployProtocolManager;
+    RodaCoreFactory.ldapUtility = ldapUtility;
+    instantiateTest();
+  }
+
+  public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
     boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources, SolrType solrType) {
     INSTANTIATE_SOLR_TYPE = solrType;
     instantiateTest(deploySolr, deployLdap, deployTransferredResourcesScanner, deployOrchestrator, deployPluginManager,
@@ -1498,7 +1512,7 @@ public class RodaCoreFactory {
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
     if (INSTANTIATE_LDAP) {
       LOGGER.debug("Instantiate LDAP Server");
-      initializeLdapServer();
+      initializeLdapServer(nodeType);
       LOGGER.debug("Finishing instantiate LDAP Server");
     }
 
@@ -1653,9 +1667,9 @@ public class RodaCoreFactory {
   /**
    * Instantiate Ldap server.
    */
-  private static void initializeLdapServer() {
+  private static void initializeLdapServer(NodeType nodeType) {
     try {
-      RodaCoreFactory.ldapUtility.initialize();
+      RodaCoreFactory.ldapUtility.initialize(nodeType);
       UserUtility.setLdapUtility(ldapUtility);
 
       if (checkIfWriteIsAllowed(getNodeType())) {
@@ -1672,8 +1686,7 @@ public class RodaCoreFactory {
       getModelService().notifyUserUpdated(user).failOnError();
       if (INSTANTIATE_SOLR) {
         try {
-          PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), getModelService(), getIndexService(),
-            true);
+          PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), getModelService(), getIndexService(), true);
         } catch (ValidationException | NotFoundException | RequestNotValidException | AuthorizationDeniedException
           | AlreadyExistsException e) {
           LOGGER.error("Could not create PREMIS agent for default users");
