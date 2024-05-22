@@ -8,7 +8,6 @@
 package org.roda.wui.client.common.utils;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Element;
 
 public class JavascriptUtils {
