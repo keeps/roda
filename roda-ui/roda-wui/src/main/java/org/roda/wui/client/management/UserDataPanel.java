@@ -258,7 +258,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.setPermissions(user.getDirectRoles(), user.getAllRoles());
 
     Services services = new Services("Get User extra", "get");
-    services.membersResource(s -> s.getUserExtra(user.getName())).whenComplete((extra, error) -> {
+    services.membersResource(s -> s.getDefaultUserExtra()).whenComplete((extra, error) -> {
       if (extra != null) {
         UserDataPanel.this.userExtra = extra;
         createForm(userExtra);

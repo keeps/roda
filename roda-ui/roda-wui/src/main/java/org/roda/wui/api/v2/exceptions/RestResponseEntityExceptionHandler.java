@@ -36,7 +36,11 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     String details = "";
     HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     UUID errorID = UUID.randomUUID();
-    if (ex.getCause() instanceof AuthorizationDeniedException || ex.getCause() instanceof AuthenticationDeniedException) {
+    if (ex.getCause() instanceof AuthorizationDeniedException) {
+      message = "Forbidden";
+      details = ex.getCause().getMessage();
+      httpStatus = HttpStatus.FORBIDDEN;
+    } else if (ex.getCause() instanceof AuthenticationDeniedException) {
       message = "Unauthorized access";
       details = ex.getCause().getMessage();
       httpStatus = HttpStatus.UNAUTHORIZED;
