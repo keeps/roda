@@ -18,6 +18,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -102,12 +104,12 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @Parameter(description = "localeString") @RequestParam(name = "locale") String localeString);
 
   @RequestMapping(path = "/users/register", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
   @Operation(summary = "Register user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class))), description = "Registers a new user", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
-    @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+    @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = User.class)))})
   User registerUser(
     @Parameter(name = "user", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) CreateUserRequest userOperations,
-    @Parameter(description = "localeString") @RequestParam(name = "locale") String localeString,
+    @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
     @Parameter(description = "captcha") @RequestParam(required = false, name = "captcha") String captcha);
 
   @RequestMapping(path = "/groups/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
