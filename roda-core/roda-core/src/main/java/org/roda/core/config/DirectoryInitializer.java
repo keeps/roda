@@ -12,10 +12,13 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
+
+@Component
 public class DirectoryInitializer {
   private final Logger LOGGER = LoggerFactory.getLogger(DirectoryInitializer.class);
   private static DirectoryInitializer instance;

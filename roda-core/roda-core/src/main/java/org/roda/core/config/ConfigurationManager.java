@@ -42,10 +42,12 @@ import com.google.common.cache.LoadingCache;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
+@Component
 public class ConfigurationManager {
   private final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManager.class);
   private static ConfigurationManager instance;

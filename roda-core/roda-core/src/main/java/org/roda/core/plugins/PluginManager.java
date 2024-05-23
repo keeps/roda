@@ -68,7 +68,9 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.plugins.base.security.AbstractSecurityConfiguration;
 import org.roda.core.plugins.certificate.PluginCertificateUtils;
+import org.roda.core.security.SecurityObserver;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.ClassLoaderUtility;
 import org.roda.core.util.CompoundClassLoader;
@@ -110,6 +112,8 @@ public class PluginManager {
   private boolean internalPluginStarted = false;
   private boolean marketInformationLoaded = false;
   private List<String> blacklistedPlugins;
+  private List<String> allowedSecurityPlugins;
+  private SecurityManager securityManager;
 
   /**
    * Constructs a new {@link PluginManager}.
@@ -505,10 +509,11 @@ public class PluginManager {
   }
 
   private void init() {
+    // retrieve allowed security
+    allowedSecurityPlugins = RodaCoreFactory.getRodaConfigurationAsList("core", "plugins", "security", "list");
+    securityManager = SecurityManager.getInstance(allowedSecurityPlugins);
     // load, for the first time, all the plugins (internal & external)
     loadPlugins();
-
-    // schedule
     LOGGER.info("{} init OK", getClass().getSimpleName());
   }
 
@@ -747,17 +752,22 @@ public class PluginManager {
     }
   }
 
-  private void addStartupPluginJars(Path jarPath, Attributes mainAttributes, List<URL> jarClasspath) throws IOException {
-    // Add jars from authenticate plugins to a compound class loader
-    String authPluginClassNamesString = mainAttributes.getValue(RODA_AUTH_PLUGIN_MANIFEST_KEY);
-    if (authPluginClassNamesString != null) {
-      // for development purpose
-      boolean optIn = RodaCoreFactory.getProperty(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
-      CertificateInfo certificateInfo = PluginCertificateUtils.loadAndCheckCertificates(jarPath);
-      if (!certificateInfo.isNotVerified() || optIn) {
-        LOGGER.info("Adding startup jars from auth plugin " + authPluginClassNamesString);
-        jarStartupPluginsClassloaderCache.put(authPluginClassNamesString,
-          new URLClassLoader(jarClasspath.toArray(new URL[] {}), getClass().getClassLoader()));
+  private void addStartupPluginJars(Path jarPath, Attributes mainAttributes, List<URL> jarClasspath)
+    throws IOException {
+    boolean addSecurityPlugins = RodaCoreFactory.getProperty("core.plugins.security.enable", false);
+    if (addSecurityPlugins) {
+      // Add jars from authenticate plugins to a compound class loader
+      String authPluginClassNamesString = mainAttributes.getValue(RODA_AUTH_PLUGIN_MANIFEST_KEY);
+      if (authPluginClassNamesString != null && allowedSecurityPlugins.contains(authPluginClassNamesString)) {
+        // for development purpose
+        boolean optIn = RodaCoreFactory.getProperty(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
+        CertificateInfo certificateInfo = PluginCertificateUtils.loadAndCheckCertificates(jarPath);
+        if (!certificateInfo.isNotVerified() || optIn) {
+          LOGGER.info("Adding startup jars from auth plugin " + authPluginClassNamesString);
+          URLClassLoader classLoader = new URLClassLoader(jarClasspath.toArray(new URL[] {}),
+            getClass().getClassLoader());
+          jarStartupPluginsClassloaderCache.put(authPluginClassNamesString, classLoader);
+        }
       }
     }
   }
@@ -1070,16 +1080,23 @@ public class PluginManager {
     }
   }
 
-  public Optional<CompoundClassLoader> getEssentialPluginsClassLoader(ClassLoader mainClassLoad) {
+  public Optional<CompoundClassLoader> getEssentialPluginsClassLoader() {
     Optional<CompoundClassLoader> oCompoundClassLoader = Optional.empty();
     if (!jarStartupPluginsClassloaderCache.isEmpty()) {
       CompoundClassLoader compoundClassLoader = new CompoundClassLoader();
-      compoundClassLoader.addLoader(mainClassLoad);
       for (ClassLoader pluginClassloader : jarStartupPluginsClassloaderCache.values()) {
         compoundClassLoader.addLoader(pluginClassloader);
       }
       oCompoundClassLoader = Optional.of(compoundClassLoader);
     }
     return oCompoundClassLoader;
+  }
+
+  public void registerSecurityObserver(SecurityObserver observer) {
+    securityManager.registerObserver(observer);
+  }
+
+  public void registerAuthPlugin(AbstractSecurityConfiguration securityConfiguration) {
+    securityManager.registerAuthPlugin(securityConfiguration);
   }
 }

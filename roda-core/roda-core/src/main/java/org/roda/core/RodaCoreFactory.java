@@ -404,7 +404,7 @@ public class RodaCoreFactory {
       directoryInitializer = DirectoryInitializer.getInstance(configurationManager);
       pluginManager = PluginManager.instantiatePluginManager(getConfigPath(), getPluginsPath());
       directoryInitializer.instantiateExampleResources();
-      pluginManager.getEssentialPluginsClassLoader(Thread.currentThread().getContextClassLoader())
+      pluginManager.getEssentialPluginsClassLoader()
         .ifPresent(compoundClassLoader -> Thread.currentThread().setContextClassLoader(compoundClassLoader));
     } catch (ConfigurationException | PluginManagerException e) {
       LOGGER.error("Error instantiating " + RodaCoreFactory.class.getSimpleName(), e);
@@ -418,6 +418,7 @@ public class RodaCoreFactory {
     if (!instantiated) {
       try {
         // load core configurations
+        configurationManager = ConfigurationManager.getInstance();
         configurationManager.setNodeType(nodeType);
         configurationManager.loadConfiguration();
         if (INSTANTIATE_CONFIGURE_LOGBACK) {
