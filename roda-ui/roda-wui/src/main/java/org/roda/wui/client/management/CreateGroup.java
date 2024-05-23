@@ -13,6 +13,7 @@ package org.roda.wui.client.management;
 import java.util.List;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.v2.generics.CreateGroupRequest;
 import org.roda.core.data.v2.user.Group;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -108,7 +109,8 @@ public class CreateGroup extends Composite {
     if (groupDataPanel.isValid()) {
       group = groupDataPanel.getGroup();
       Services services = new Services("Create group", "create");
-      services.membersResource(s -> s.createGroup(group)).whenComplete((newGroup, error) -> {
+      CreateGroupRequest createGroupRequest = new CreateGroupRequest(group.getName(), group.getFullName(), group.getDirectRoles());
+      services.membersResource(s -> s.createGroup(createGroupRequest)).whenComplete((newGroup, error) -> {
         if (newGroup != null) {
           HistoryUtils.newHistory(MemberManagement.RESOLVER);
         } else if (error != null) {

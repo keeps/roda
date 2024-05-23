@@ -1,15 +1,18 @@
 package org.roda.wui.client.services;
 
-import java.util.Set;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
-import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.generics.CreateGroupRequest;
 import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.generics.LoginRequest;
 import org.roda.core.data.v2.generics.MetadataValue;
@@ -26,15 +29,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.Set;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -116,12 +113,13 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
     @Parameter(description = "captcha") @RequestParam(required = false, name = "captcha") String captcha);
 
-  @RequestMapping(path = "/groups/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Create group", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Group.class))), description = "Creates a new group", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Group.class))),
-    @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  @RequestMapping(path = "/groups", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(summary = "Create group", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CreateGroupRequest.class))), description = "Creates a new group", responses = {
+    @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = Group.class))),
+    @ApiResponse(responseCode = "409", description = "Conflict", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Group createGroup(
-    @Parameter(name = "group", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Group group);
+    @Parameter(name = "group", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) CreateGroupRequest group);
 
   @RequestMapping(path = "/groups", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Update group", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Group.class))), description = "Updates a group", responses = {
