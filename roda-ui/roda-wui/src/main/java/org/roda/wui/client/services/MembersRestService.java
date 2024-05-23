@@ -88,9 +88,9 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @Parameter(description = "Is Active") @RequestParam(name = "active") Boolean active);
 
   @RequestMapping(path = "/delete", method = RequestMethod.POST)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete multiple RODA members via search query", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), description = "Deletes one or more RODA members", responses = {
-    @ApiResponse(responseCode = "204", description = "No Content"),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+    @ApiResponse(responseCode = "204", description = "No Content")})
   Void deleteMultipleMembers(
     @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<RODAMember> members);
 
