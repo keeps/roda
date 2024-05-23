@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
@@ -43,6 +44,7 @@ import org.roda.core.data.v2.user.RodaPrincipal;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.v2.exceptions.RESTException;
+import org.roda.wui.api.v2.model.GenericOkResponse;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.MembersService;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
@@ -515,16 +517,16 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public Void recoverLogin(String usernameOrEmail, String localeString, String captcha) {
+  public String recoverLogin(String email, String localeString, String captcha) {
 
     try {
       membersService.recoverLoginCheckCaptcha(captcha);
-      membersService.requestPasswordReset(request.getRequestURL().toString().split("/api")[0], usernameOrEmail,
+      membersService.requestPasswordReset(request.getRequestURL().toString().split("/api")[0], email,
         localeString, request.getRemoteAddr(), true);
+      return JsonUtils.getJsonFromObject(new GenericOkResponse("Recover email sent to " + email), GenericOkResponse.class);
     } catch (RODAException e) {
       throw new RESTException(e);
     }
-    return null;
   }
 
   @Override
