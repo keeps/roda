@@ -7,6 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Date;
+import java.util.Set;
+
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import jakarta.websocket.OnError;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -16,6 +21,7 @@ import org.roda.core.data.v2.generics.CreateGroupRequest;
 import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.generics.LoginRequest;
 import org.roda.core.data.v2.generics.MetadataValue;
+import org.roda.core.data.v2.generics.RegenerateAccessKeyRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
@@ -231,12 +237,13 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   AccessKey getAccessKey(
     @Parameter(description = "The access key id ") @PathVariable(name = RodaConstants.API_PATH_PARAM_NAME) String accessKeyId);
 
-  @RequestMapping(path = "/accesskey/regenerate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Regenerate access key", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AccessKey.class))), description = "Regenerate a access key", responses = {
+  @RequestMapping(path = "/users/access-keys/regenerate/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Regenerate access key", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RegenerateAccessKeyRequest.class))), description = "Regenerate a access key", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccessKey.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   AccessKey regenerateAccessKey(
-    @Parameter(name = "accesskey", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) AccessKey accessKey);
+    @Parameter(description = "The access key id") @PathVariable(name = "id") String id,
+    @Parameter(name = "expirationDate", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) RegenerateAccessKeyRequest regenerateAccessKeyRequest);
 
   @RequestMapping(path = "/accesskey/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Regenerate access key", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AccessKey.class))), description = "Regenerate a access key", responses = {

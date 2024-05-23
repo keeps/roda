@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.generics.RegenerateAccessKeyRequest;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -31,12 +32,12 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -210,17 +211,28 @@ public class ShowAccessKey extends Composite {
         @Override
         public void onSuccess(Boolean confirm) {
           if (confirm) {
-            Services services = new Services("Regenerate access key", "regenerate");
-            services.membersResource(s -> s.regenerateAccessKey(accessKey)).whenComplete((accessKey, error) -> {
-              if (accessKey != null) {
-                AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), accessKey,
-                  new NoAsyncCallback<Boolean>() {
-                    @Override
-                    public void onSuccess(Boolean result) {
-                      refresh();
-                      Toast.showInfo(messages.accessKeyLabel(), messages.accessKeySuccessfullyRegenerated());
-                    }
-                  });
+            AccessKeyDialogs.showRegenerateAccessKeyDialog("Regenerate access key", new AsyncCallback<Date>() {
+              @Override
+              public void onFailure(Throwable caught) {
+                //do nothing
+              }
+
+              @Override
+              public void onSuccess(Date date) {
+                Services services = new Services("Regenerate access key", "regenerate");
+                RegenerateAccessKeyRequest regenerateAccessKeyRequest = new RegenerateAccessKeyRequest(date);
+                services.membersResource(s -> s.regenerateAccessKey(accessKey.getId(), regenerateAccessKeyRequest)).whenComplete((accessKey, error) -> {
+                  if (accessKey != null) {
+                    AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), accessKey,
+                      new NoAsyncCallback<Boolean>() {
+                        @Override
+                        public void onSuccess(Boolean result) {
+                          refresh();
+                          Toast.showInfo(messages.accessKeyLabel(), messages.accessKeySuccessfullyRegenerated());
+                        }
+                      });
+                  }
+                });
               }
             });
           }
