@@ -388,12 +388,17 @@ public class LdapUtility {
   public User addUser(final User user)
     throws UserAlreadyExistsException, EmailAlreadyExistsException, GenericException {
     if (!user.isNameValid()) {
-      LOGGER.debug("'{}' is not a valid user name.", user.getName());
+      LOGGER.warn("'{}' is not a valid user name.", user.getName());
       throw new GenericException("'" + user.getName() + "' is not a valid user name.");
     }
 
+    if (!getUser(user.getId()).equals(new User())) {
+      LOGGER.warn("The username {} is already used.", user.getName());
+      throw new UserAlreadyExistsException("The username " + user.getName() + " is already used.");
+    }
+
     if (getUserWithEmail(user.getEmail()) != null) {
-      LOGGER.debug("The email address {} is already used.", user.getEmail());
+      LOGGER.warn("The email address {} is already used.", user.getEmail());
       throw new EmailAlreadyExistsException("The email address " + user.getEmail() + " is already used.");
     }
 

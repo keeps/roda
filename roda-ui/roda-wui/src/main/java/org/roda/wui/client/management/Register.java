@@ -22,10 +22,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.generics.CreateUserRequest;
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -112,7 +113,7 @@ public class Register extends Composite {
   FlowPanel registerPanel;
 
   @UiField(provided = true)
-  CreateUserPanel userDataPanel;
+  UserDataPanel userDataPanel;
 
   /**
    * Create a new panel to edit a user
@@ -121,7 +122,7 @@ public class Register extends Composite {
    *          the user to edit
    */
   public Register() {
-    this.userDataPanel = new CreateUserPanel(true, false, false, false);
+    this.userDataPanel = new UserDataPanel(true, false, false, false);
     Services services = new Services("Get User extra", "get");
     services.membersResource(s -> s.getDefaultUserExtra()).whenComplete((userExtra, error) -> {
       if (userExtra != null) {
@@ -162,13 +163,14 @@ public class Register extends Composite {
 
       User user = userDataPanel.getUser();
       user.setActive(false);
-      final String recaptcha = recaptchaResponse;
+      try (SecureString password = new SecureString(userDataPanel.getPassword().toCharArray())) {
+        final String recaptcha = recaptchaResponse;
 
-      Services services = new Services("Register RODA user", "register");
-      CreateUserRequest userRequest = new CreateUserRequest(user, null, userDataPanel.getUserExtra());
-      services.membersResource(s -> s.registerUser(userRequest,  LocaleInfo.getCurrentLocale().getLocaleName(), recaptcha)).whenComplete((registedUser, error) -> {
-        if (registedUser != null) {
-          if (registedUser.isActive()) {
+        Services services = new Services("Register RODA user", "register");
+        CreateUserRequest userRequest = new CreateUserRequest(user, password, userDataPanel.getUserExtra());
+        services.membersResource(s -> s.registerUser(userRequest, LocaleInfo.getCurrentLocale().getLocaleName(), recaptcha)).whenComplete((registedUser, error) -> {
+          if (registedUser != null) {
+            if (registedUser.isActive()) {
               Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
                 messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(), false,
                 new AsyncCallback<Void>() {
@@ -199,10 +201,11 @@ public class Register extends Composite {
                   }
                 });
             }
-        } else if (error != null) {
-          errorMessage(error);
-        }
-      });
+          } else if (error != null) {
+            errorMessage(error);
+          }
+        });
+      }
     }
   }
 
