@@ -236,7 +236,7 @@ public class ShowAccessKey extends Composite {
         public void onSuccess(Boolean confirm) {
           if (confirm) {
             Services services = new Services("Revoke access key", "revoke");
-            services.membersResource(s -> s.revokeAccessKey(accessKey)).whenComplete((accessKey, error) -> {
+            services.membersResource(s -> s.revokeAccessKey(accessKey.getId())).whenComplete((accessKey, error) -> {
               if (accessKey != null) {
                 refresh();
                 Toast.showInfo(messages.accessKeyLabel(), messages.accessKeySuccessfullyRevoked());
