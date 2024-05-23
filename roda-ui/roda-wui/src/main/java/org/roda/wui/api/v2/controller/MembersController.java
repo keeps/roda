@@ -30,6 +30,7 @@ import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.generics.CreateGroupRequest;
+import org.roda.core.data.v2.generics.CreateAccessKeyRequest;
 import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.generics.LoginRequest;
 import org.roda.core.data.v2.generics.LongResponse;
@@ -238,13 +239,20 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public AccessKey createAccessKey(@RequestBody AccessKey accessKey) {
+  public AccessKey createAccessKey(@RequestBody CreateAccessKeyRequest accessKeyRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
     LogEntryState state = LogEntryState.SUCCESS;
+    AccessKey accessKey = new AccessKey();
 
     try {
+      accessKey.setName(accessKeyRequest.getName());
+      if (accessKeyRequest.getExpirationDate() == null || accessKeyRequest.getExpirationDate().before(new Date())) {
+        throw new RequestNotValidException("Invalid date");
+      }
+      accessKey.setExpirationDate(accessKeyRequest.getExpirationDate());
+      accessKey.setUserName(accessKeyRequest.getUserName());
       controllerAssistant.checkRoles(requestContext.getUser());
       return RodaCoreFactory.getModelService().createAccessKey(accessKey, requestContext.getUser().getName());
     } catch (RODAException e) {
