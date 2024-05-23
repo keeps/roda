@@ -79,13 +79,14 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   Void deleteGroup(
     @Parameter(description = "The group name") @PathVariable(name = RodaConstants.API_PATH_PARAM_NAME) String name);
 
-  @RequestMapping(path = "/change-active", method = RequestMethod.POST)
-  @Operation(summary = "Activate a RODA member", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), description = "Activates RODA members", responses = {
+  @RequestMapping(path = "/users/status", method = RequestMethod.POST)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(summary = "Activate or deactivate a RODA user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), description = "Activates or deactivates RODA users", responses = {
     @ApiResponse(responseCode = "204", description = "No Content"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Void changeActive(
     @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<RODAMember> members,
-    @Parameter(description = "Is Active") @RequestParam(name = "active") Boolean active);
+    @Parameter(description = "True to change their status to active and False to change their status to deactivate") @RequestParam(name = "activate") Boolean activate);
 
   @RequestMapping(path = "/delete", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.NO_CONTENT)
