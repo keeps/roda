@@ -269,45 +269,6 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public AccessToken authenticate(@RequestBody AccessKey accessKey)
-    throws GenericException, AuthorizationDeniedException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    Claims claims;
-    try {
-      SecretKey secretKey = Keys.hmacShaKeyFor(RodaCoreFactory.getApiSecretKey().getBytes(StandardCharsets.UTF_8));
-      claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(accessKey.getKey()).getPayload();
-    } catch (JwtException e) {
-      throw new AuthorizationDeniedException("Expired token");
-    }
-
-    User user = RodaCoreFactory.getModelService().retrieveUser(claims.getSubject());
-
-    try {
-      AccessKeys accessKeys = RodaCoreFactory.getModelService().listAccessKeys();
-      AccessKey retAccessKey = accessKeys.getAccessKeyByKey(accessKey.getKey());
-      if (retAccessKey != null) {
-        AccessToken accessToken = new AccessToken();
-        Date expirationDate = new Date(new Date().getTime() + RodaCoreFactory.getAccessTokenValidity());
-        accessToken.setToken(JwtUtils.generateToken(user.getId(), expirationDate, retAccessKey.getClaims()));
-        accessToken.setExpiresIn(RodaCoreFactory.getAccessTokenValidity());
-        retAccessKey.setLastUsageDate(new Date());
-        RodaCoreFactory.getModelService().updateAccessKeyLastUsageDate(retAccessKey);
-        return accessToken;
-      } else {
-        state = LogEntryState.FAILURE;
-        throw new AuthorizationDeniedException("Access token not found");
-      }
-    } catch (RequestNotValidException | AuthorizationDeniedException | GenericException | NotFoundException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
-    }
-  }
-
-  @Override
   public Group getGroup(String name) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
