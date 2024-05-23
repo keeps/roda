@@ -11,6 +11,7 @@ import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.generics.CreateUserRequest;
+import org.roda.core.data.v2.generics.LoginRequest;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.notifications.Notification;
@@ -190,12 +191,12 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
   @RequestMapping(path = "/users/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Login", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SecureString.class))), description = "Logs in a user", responses = {
+  @Operation(summary = "Login", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = LoginRequest.class))), description = "Logs in a user", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   User login(
-    @Parameter(description = "username") @RequestParam(name = "username") String username,
-    @Parameter(name = "password", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SecureString password) throws AuthenticationDeniedException;
+    @Parameter(name = "login-request", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) LoginRequest loginRequest) throws AuthenticationDeniedException;
 
   @RequestMapping(path = "/users/accesskey/{" + RodaConstants.API_PATH_PARAM_NAME
     + "}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
