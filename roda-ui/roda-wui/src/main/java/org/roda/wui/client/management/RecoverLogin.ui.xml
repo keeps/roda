@@ -9,10 +9,12 @@
 		<common:TitlePanel text="{messages.recoverLoginTitle}" />
 		<g:FlowPanel ui:field="recoverPanel">
 			<g:Label addStyleNames="form-label">
-				<ui:text from='{messages.recoverLoginUsernameOrEmail}' />
+				<ui:text from='{messages.recoverLoginEmail}' />
 			</g:Label>
-			<g:TextBox ui:field="usernameOrEmail" addStyleNames="fieldTextBox">
+			<g:TextBox ui:field="email" addStyleNames="fieldTextBox">
 			</g:TextBox>
+			<g:Label ui:field="emailError" addStyleNames="form-label-error">
+			</g:Label>
 		</g:FlowPanel>
 		<g:FlowPanel addStyleNames="recover-buttons">
 			<g:Button ui:field="cancel" addStyleNames="btn btn-link btn-default recover-link">

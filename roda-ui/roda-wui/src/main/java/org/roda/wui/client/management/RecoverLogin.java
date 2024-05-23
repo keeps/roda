@@ -22,6 +22,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
@@ -108,7 +109,10 @@ public class RecoverLogin extends Composite {
   FlowPanel recoverPanel;
 
   @UiField
-  TextBox usernameOrEmail;
+  Label emailError;
+
+  @UiField
+  TextBox email;
 
   @UiField
   Button cancel;
@@ -117,11 +121,11 @@ public class RecoverLogin extends Composite {
 
   private RecoverLogin() {
     initWidget(uiBinder.createAndBindUi(this));
-    usernameOrEmail.getElement().setTitle(messages.recoverLoginUsernameOrEmail());
+    email.getElement().setTitle(messages.recoverLoginEmail());
 
     addAttachHandler(event -> {
       if (event.isAttached()) {
-        usernameOrEmail.setFocus(true);
+        email.setFocus(true);
       }
     });
 
@@ -135,11 +139,23 @@ public class RecoverLogin extends Composite {
       recaptchaActive = false;
     }
 
-    usernameOrEmail.addKeyUpHandler(event -> {
+    email.addKeyUpHandler(event -> {
       if (checked) {
-        isValid();
+        validateEmailField();
       }
     });
+  }
+
+  private void validateEmailField() {
+    if (!email.getText().isEmpty() && email.getText().matches("^[_A-Za-z0-9-%+]+(\\.[_A-Za-z0-9-%+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z0-9-]+)$")) {
+      email.removeStyleName("isWrong");
+      emailError.setVisible(false);
+    } else {
+      if (!email.getText().isEmpty()) {
+        email.removeStyleName("isWrong");
+        emailError.setVisible(false);
+      }
+    }
   }
 
   /**
@@ -150,11 +166,15 @@ public class RecoverLogin extends Composite {
   public boolean isValid() {
     boolean valid = true;
 
-    if (usernameOrEmail.getText().length() == 0) {
+    // Check if the email field is empty
+    if (email.getText().isEmpty() || !email.getText().matches("^[_A-Za-z0-9-%+]+(\\.[_A-Za-z0-9-%+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z0-9-]+)$")) {
       valid = false;
-      usernameOrEmail.addStyleName("isWrong");
+      email.addStyleName("isWrong");
+      emailError.setText(messages.emailNotValid());
+      emailError.setVisible(true);
     } else {
-      usernameOrEmail.removeStyleName("isWrong");
+      email.removeStyleName("isWrong");
+      emailError.setVisible(false);
     }
 
     checked = true;
@@ -167,7 +187,7 @@ public class RecoverLogin extends Composite {
     doRecover();
   }
 
-  @UiHandler("usernameOrEmail")
+  @UiHandler("email")
   void handleUsernameKeyPress(KeyPressEvent event) {
     tryToRecoverWhenEnterIsPressed(event);
   }
@@ -187,7 +207,7 @@ public class RecoverLogin extends Composite {
         recaptchaResponse = null;
       }
       Services services = new Services("Recover login", "recover");
-      services.membersResource(s -> s.recoverLogin(usernameOrEmail.getValue(), LocaleInfo.getCurrentLocale().getLocaleName(), recaptchaResponse)).whenComplete((res, error) -> {
+      services.membersResource(s -> s.recoverLogin(email.getValue(), LocaleInfo.getCurrentLocale().getLocaleName(), recaptchaResponse)).whenComplete((res, error) -> {
         if (error == null) {
           showRecoverLoginMessage();
         } else {
