@@ -35,9 +35,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,11 +51,13 @@ public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> 
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NEW_TYPE, new PluginParameter(RodaConstants.PLUGIN_PARAMS_NEW_TYPE,
-      "New type", PluginParameterType.STRING, "", false, false, "New type"));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NEW_TYPE,
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_NEW_TYPE, "New type", PluginParameterType.STRING)
+        .isMandatory(false).withDescription("New type").build());
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, new PluginParameter(RodaConstants.PLUGIN_PARAMS_DETAILS,
-      "Event details", PluginParameterType.STRING, "", false, false, "Details that will be used when creating event"));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details", PluginParameterType.STRING)
+        .isMandatory(false).withDescription("Details that will be used when creating event").build());
   }
 
   @Override

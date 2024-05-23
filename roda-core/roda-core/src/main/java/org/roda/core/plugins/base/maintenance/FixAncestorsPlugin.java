@@ -56,7 +56,6 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID,
       PluginParameter
         .getBuilder(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "Ingest job identifier", PluginParameterType.STRING)
-        .isMandatory(false).isReadOnly(false)
         .withDescription("The identifier of the job responsible to ingest the information package to fix.").build());
   }
 

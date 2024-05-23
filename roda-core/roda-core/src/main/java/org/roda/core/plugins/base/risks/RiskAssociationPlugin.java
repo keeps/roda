@@ -67,16 +67,20 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_ID,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risks", PluginParameterType.RISK_ID, "", false, false,
-        "Add the risks that will be associated with the objects above."));
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risks", PluginParameterType.RISK_ID)
+        .isMandatory(false).withDescription("Add the risks that will be associated with the objects above.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION, "Incidence description",
-        PluginParameterType.STRING, "", false, false, "Associate a description to the incidence(s) created"));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION, "Incidence description",
+          PluginParameterType.STRING)
+        .isMandatory(false).withDescription("Associate a description to the incidence(s) created").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY, "Incidence severity",
-        PluginParameterType.SEVERITY, "", false, false, "Associate a severity to the incidence"));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY, "Incidence severity",
+          PluginParameterType.SEVERITY)
+        .isMandatory(false).withDescription("Associate a severity to the incidence").build());
   }
 
   @Override

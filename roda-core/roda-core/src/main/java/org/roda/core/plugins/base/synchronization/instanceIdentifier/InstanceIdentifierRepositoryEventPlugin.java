@@ -61,9 +61,11 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
-        PluginParameter.PluginParameterType.STRING, RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin(), true,
-        true, "Identifier from the RODA local instance"));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
+          PluginParameter.PluginParameterType.STRING)
+        .withDefaultValue(RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin()).isReadOnly(true)
+        .withDescription("Identifier from the RODA local instance").build());
   }
 
   private String instanceId;

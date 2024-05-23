@@ -60,12 +60,14 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ACCEPT,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_ACCEPT, "Appraisal accept or reject", PluginParameterType.BOOLEAN,
-        "true", false, false, "Allows to accept or reject intellectual entities."));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_ACCEPT, "Appraisal accept or reject", PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isMandatory(false)
+        .withDescription("Allows to accept or reject intellectual entities.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REJECT_REASON,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_REJECT_REASON, "Reject reason", PluginParameterType.STRING, "",
-        false, false, "Appraisal reject reason"));
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_REJECT_REASON, "Reject reason", PluginParameterType.STRING)
+        .isMandatory(false).withDescription("Appraisal reject reason").build());
   }
 
   @Override

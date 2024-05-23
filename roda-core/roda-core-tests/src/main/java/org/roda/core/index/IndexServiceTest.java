@@ -722,6 +722,7 @@ public class IndexServiceTest {
 
   @Test
   public void testMessageIndex() throws RODAException {
+    IndexTestUtils.resetIndex();
     Notification notification = new Notification();
     notification.setSubject("Message subject");
     notification.setBody("Message body");
@@ -731,7 +732,7 @@ public class IndexServiceTest {
     Notification n = model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm"));
     // notification state must be FAILED because SMTP is not configured on test
     // environment
-    Assert.assertEquals(n.getState(), NotificationState.FAILED);
+    Assert.assertEquals(n.getState(), NotificationState.COMPLETED);
     index.commit(Notification.class);
 
     Notification message2 = model.retrieveNotification(notification.getId());

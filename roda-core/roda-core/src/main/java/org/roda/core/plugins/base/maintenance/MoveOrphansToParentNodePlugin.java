@@ -31,9 +31,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +46,8 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_AIP_PARENT_ID,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_AIP_PARENT_ID, "Parent AIP", PluginParameterType.AIP_ID, "",
-        false, false, "Add the parent AIP."));
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_AIP_PARENT_ID, "Parent AIP", PluginParameterType.AIP_ID)
+        .isMandatory(false).withDescription("Add the parent AIP.").build());
   }
 
   @Override

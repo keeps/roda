@@ -103,28 +103,40 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   private List<String> otherMetadataTypes;
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
-  // TODO -> add plugin parameter type "LIST"...
   static {
-    pluginParameters.put(CSV_FILE_FIELDS, new PluginParameter(CSV_FILE_FIELDS, "Attributes to include in the report",
-      PluginParameterType.STRING, CSV_DEFAULT_FIELDS, true, false,
-      "List of file attributes to include in the inventory export. The example includes all the possible options. Remove attributes as necessary."));
+    pluginParameters.put(CSV_FILE_FIELDS, PluginParameter
+      .getBuilder(CSV_FILE_FIELDS, "Attributes to include in the report", PluginParameterType.STRING)
+      .withDefaultValue(CSV_DEFAULT_FIELDS)
+      .withDescription(
+        "List of file attributes to include in the inventory export. The example includes all the possible options. Remove attributes as necessary.")
+      .build());
     pluginParameters.put(CSV_FILE_OUTPUT,
-      new PluginParameter(CSV_FILE_OUTPUT, "Report file path", PluginParameterType.STRING, CSV_DEFAULT_OUTPUT, true,
-        false, "The full path and file name on the server where the inventory report file should be created."));
+      PluginParameter.getBuilder(CSV_FILE_OUTPUT, "Report file path", PluginParameterType.STRING)
+        .withDefaultValue(CSV_DEFAULT_OUTPUT)
+        .withDescription("The full path and file name on the server where the inventory report file should be created.")
+        .build());
     pluginParameters.put(CSV_FILE_HEADERS,
-      new PluginParameter(CSV_FILE_HEADERS, "Include header line", PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS,
-        true, false, "Include a header line in the CSV inventory report."));
+      PluginParameter.getBuilder(CSV_FILE_HEADERS, "Include header line", PluginParameterType.BOOLEAN)
+        .withDefaultValue(CSV_DEFAULT_HEADERS).withDescription("Include a header line in the CSV inventory report.")
+        .build());
     pluginParameters.put(CSV_FILE_OUTPUT_DATA,
-      new PluginParameter(CSV_FILE_OUTPUT_DATA, "Include data files", PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS,
-        true, false, "Include in the inventory report information about data files that exist inside AIPs."));
+      PluginParameter.getBuilder(CSV_FILE_OUTPUT_DATA, "Include data files", PluginParameterType.BOOLEAN)
+        .withDefaultValue(CSV_DEFAULT_HEADERS)
+        .withDescription("Include in the inventory report information about data files that exist inside AIPs.")
+        .build());
     pluginParameters.put(CSV_FILE_OUTPUT_DESCRIPTIVE,
-      new PluginParameter(CSV_FILE_OUTPUT_DESCRIPTIVE, "Include descriptive metadata files",
-        PluginParameterType.BOOLEAN, CSV_DEFAULT_HEADERS, true, false,
-        "Include in the inventory report information about descriptive metadata files that exist inside AIPs."));
+      PluginParameter
+        .getBuilder(CSV_FILE_OUTPUT_DESCRIPTIVE, "Include descriptive metadata files", PluginParameterType.BOOLEAN)
+        .withDefaultValue(CSV_DEFAULT_HEADERS)
+        .withDescription(
+          "Include in the inventory report information about descriptive metadata files that exist inside AIPs.")
+        .build());
     pluginParameters.put(CSV_FILE_OTHER_METADATA_TYPES,
-      new PluginParameter(CSV_FILE_OTHER_METADATA_TYPES, "Include other metadata files", PluginParameterType.STRING,
-        CSV_DEFAULT_OTHER_METADATA, true, false,
-        "Include in the inventory report information about other metadata files that exist inside AIPs."));
+      PluginParameter
+        .getBuilder(CSV_FILE_OTHER_METADATA_TYPES, "Include other metadata files", PluginParameterType.STRING)
+        .withDefaultValue(CSV_DEFAULT_OTHER_METADATA).withDescription(
+          "Include in the inventory report information about other metadata files that exist inside AIPs.")
+        .build());
   }
 
   @Override

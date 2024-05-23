@@ -21,23 +21,24 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.base.antivirus.AntivirusPlugin;
+import org.roda.core.plugins.base.characterization.PremisSkeletonPlugin;
+import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
+import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.base.ingest.AutoAcceptSIPPlugin;
 import org.roda.core.plugins.base.ingest.EARKSIP2ToAIPPlugin;
 import org.roda.core.plugins.base.ingest.VerifyUserAuthorizationPlugin;
 import org.roda.core.plugins.base.ingest.v2.steps.AutoAcceptIngestStep;
 import org.roda.core.plugins.base.ingest.v2.steps.IngestStep;
-import org.roda.core.plugins.base.preservation.DescriptiveMetadataValidationPlugin;
-import org.roda.core.plugins.base.characterization.PremisSkeletonPlugin;
-import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
-import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.base.notifications.EmailIngestNotification;
 import org.roda.core.plugins.base.notifications.HttpGenericNotification;
 import org.roda.core.plugins.base.notifications.JobNotification;
+import org.roda.core.plugins.base.preservation.DescriptiveMetadataValidationPlugin;
 
 public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
+  public static final String FALSE = "false";
   private static List<IngestStep> steps = new ArrayList<>();
 
   static {
@@ -100,33 +101,33 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
   public List<PluginParameter> getParameters() {
     loadMap();
 
-    ArrayList<PluginParameter> pluginParameters = new ArrayList<>();
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION));
+    ArrayList<PluginParameter> pluginParametersList = new ArrayList<>();
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION));
 
     if (!deactivatedPlugins.contains(DefaultIngestPlugin.PLUGIN_CLASS_VERAPDF)) {
-      pluginParameters.add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK));
+      pluginParametersList.add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK));
     }
 
     if (!deactivatedPlugins.contains(DefaultIngestPlugin.PLUGIN_CLASS_TIKA_FULLTEXT)) {
-      pluginParameters.add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_AND_FULL_TEXT_EXTRACTION));
+      pluginParametersList.add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_AND_FULL_TEXT_EXTRACTION));
     }
 
     if (!deactivatedPlugins.contains(DefaultIngestPlugin.PLUGIN_CLASS_DIGITAL_SIGNATURE)) {
-      pluginParameters.add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION));
+      pluginParametersList.add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION));
     }
 
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED));
-    return pluginParameters;
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
+    pluginParametersList.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED));
+    return pluginParametersList;
   }
 
   private void loadMap() {
@@ -134,58 +135,77 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
       deactivatedPlugins = new ArrayList<>();
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
-          "Format of the Submission Information Packages", PluginParameterType.PLUGIN_SIP_TO_AIP,
-          EARKSIP2ToAIPPlugin.class.getName(), true, false,
-          "Select the format of the Submission Information Packages to be ingested in this ingest process."));
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS, "Format of the Submission Information Packages",
+            PluginParameterType.PLUGIN_SIP_TO_AIP)
+          .withDefaultValue(EARKSIP2ToAIPPlugin.class.getName()).withDescription(
+            "Select the format of the Submission Information Packages to be ingested in this ingest process.")
+          .build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent node", PluginParameterType.AIP_ID, "", false,
-          false, "Use the provided parent node if the SIPs does not provide one."));
+        PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent node", PluginParameterType.AIP_ID)
+          .isMandatory(false).withDescription("Use the provided parent node if the SIPs does not provide one.")
+          .build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent node",
-          PluginParameterType.BOOLEAN, "false", false, false,
-          "Force the use of the selected parent node even if the SIPs provide information about the desired parent."));
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent node", PluginParameterType.BOOLEAN)
+          .withDefaultValue(FALSE).isMandatory(false)
+          .withDescription(
+            "Force the use of the selected parent node even if the SIPs provide information about the desired parent.")
+          .build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK, AntivirusPlugin.getStaticName(),
-          PluginParameterType.BOOLEAN, "true", true, false, AntivirusPlugin.getStaticDescription()));
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK, AntivirusPlugin.getStaticName(),
+            PluginParameterType.BOOLEAN)
+          .withDefaultValue("true").withDescription(AntivirusPlugin.getStaticDescription()).build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
-          DescriptiveMetadataValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, true,
-          DescriptiveMetadataValidationPlugin.getStaticDescription()));
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION,
+            DescriptiveMetadataValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN)
+          .withDefaultValue("true").isReadOnly(true)
+          .withDescription(DescriptiveMetadataValidationPlugin.getStaticDescription()).build());
 
       PluginManager pluginManager = RodaCoreFactory.getPluginManager();
       Plugin<?> plugin = pluginManager.getPlugin(DefaultIngestPlugin.PLUGIN_CLASS_VERAPDF);
       if (plugin != null) {
         pluginParameters.put(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK,
-          new PluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK, plugin.getName(),
-            PluginParameterType.BOOLEAN, "false", true, false, plugin.getDescription()));
+          PluginParameter.getBuilder(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK, plugin.getName(),
+            PluginParameterType.BOOLEAN).withDefaultValue(FALSE).withDescription(plugin.getDescription()).build());
       } else {
         deactivatedPlugins.add(DefaultIngestPlugin.PLUGIN_CLASS_VERAPDF);
       }
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON, PremisSkeletonPlugin.getStaticName(),
-          PluginParameterType.BOOLEAN, "true", true, true, PremisSkeletonPlugin.getStaticDescription()));
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON, PremisSkeletonPlugin.getStaticName(),
+            PluginParameterType.BOOLEAN)
+          .withDefaultValue("true").isReadOnly(true).withDescription(PremisSkeletonPlugin.getStaticDescription())
+          .build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK,
-          VerifyUserAuthorizationPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, true,
-          VerifyUserAuthorizationPlugin.getStaticDescription()));
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK,
+            VerifyUserAuthorizationPlugin.getStaticName(), PluginParameterType.BOOLEAN)
+          .withDefaultValue("true").isReadOnly(true)
+          .withDescription(VerifyUserAuthorizationPlugin.getStaticDescription()).build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION, SiegfriedPlugin.getStaticName(),
-          PluginParameterType.BOOLEAN, "true", true, false, SiegfriedPlugin.getStaticDescription()));
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION, SiegfriedPlugin.getStaticName(),
+            PluginParameterType.BOOLEAN)
+          .withDefaultValue("true").withDescription(SiegfriedPlugin.getStaticDescription()).build());
 
       plugin = pluginManager.getPlugin(DefaultIngestPlugin.PLUGIN_CLASS_TIKA_FULLTEXT);
       if (plugin != null) {
         pluginParameters.put(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_AND_FULL_TEXT_EXTRACTION,
-          new PluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_AND_FULL_TEXT_EXTRACTION,
-            "Feature & full-text extraction", PluginParameterType.BOOLEAN, "false", true, false,
-            "Extraction of technical metadata and full-text using Apache Tika"));
+          PluginParameter
+            .getBuilder(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_AND_FULL_TEXT_EXTRACTION,
+              "Feature & full-text extraction", PluginParameterType.BOOLEAN)
+            .withDefaultValue(FALSE)
+            .withDescription("Extraction of technical metadata and full-text using Apache Tika").build());
       } else {
         deactivatedPlugins.add(DefaultIngestPlugin.PLUGIN_CLASS_TIKA_FULLTEXT);
       }
@@ -193,36 +213,52 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
       plugin = pluginManager.getPlugin(DefaultIngestPlugin.PLUGIN_CLASS_DIGITAL_SIGNATURE);
       if (plugin != null) {
         pluginParameters.put(DefaultIngestPlugin.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION,
-          new PluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION, plugin.getName(),
-            PluginParameterType.BOOLEAN, "false", true, false, plugin.getDescription()));
+          PluginParameter.getBuilder(DefaultIngestPlugin.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION,
+            plugin.getName(), PluginParameterType.BOOLEAN).withDefaultValue(FALSE)
+            .withDescription(plugin.getDescription()).build());
       } else {
         deactivatedPlugins.add(DefaultIngestPlugin.PLUGIN_CLASS_DIGITAL_SIGNATURE);
       }
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES,
-          ApplyDisposalRulesPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, false,
-          ApplyDisposalRulesPlugin.getStaticDescription()));
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES, ApplyDisposalRulesPlugin.getStaticName(),
+            PluginParameterType.BOOLEAN)
+          .withDefaultValue("true").withDescription(ApplyDisposalRulesPlugin.getStaticDescription()).build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, AutoAcceptSIPPlugin.getStaticName(),
-          PluginParameterType.BOOLEAN, "true", true, false, AutoAcceptSIPPlugin.getStaticDescription()));
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, AutoAcceptSIPPlugin.getStaticName(),
+            PluginParameterType.BOOLEAN)
+          .withDefaultValue("true").withDescription(AutoAcceptSIPPlugin.getStaticDescription()).build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED,
-          "Ingest finished notification only when failed", PluginParameterType.BOOLEAN,
-          RodaCoreFactory.getRodaConfigurationAsString("ingest.notification.when_failed"), false, false,
-          "If checked, the ingest finished notification will only be sent if a fail occurs during ingestion"));
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED,
+            "Ingest finished notification only when failed", PluginParameterType.BOOLEAN)
+          .withDefaultValue(RodaCoreFactory.getRodaConfigurationAsString("ingest.notification.when_failed"))
+          .isMandatory(false)
+          .withDescription(
+            "If checked, the ingest finished notification will only be sent if a fail occurs during ingestion")
+          .build());
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Ingest finished email notification",
-          PluginParameterType.STRING, "", false, false,
-          "Send a notification after finishing the ingest process to one or more e-mail addresses (comma separated)"));
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Ingest finished email notification",
+            PluginParameterType.STRING)
+          .isMandatory(false)
+          .withDescription(
+            "Send a notification after finishing the ingest process to one or more e-mail addresses (comma separated)")
+          .build());
 
       pluginParameters.put(RodaConstants.NOTIFICATION_HTTP_ENDPOINT,
-        new PluginParameter(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "Ingest finished HTTP notification",
-          PluginParameterType.STRING, RodaCoreFactory.getRodaConfigurationAsString("ingest.configurable.http_endpoint"),
-          false, false, "Send a notification after finishing the ingest process to a specific HTTP endpoint"));
+        PluginParameter
+          .getBuilder(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "Ingest finished HTTP notification",
+            PluginParameterType.STRING)
+          .withDefaultValue(RodaCoreFactory.getRodaConfigurationAsString("ingest.configurable.http_endpoint"))
+          .isMandatory(false)
+          .withDescription("Send a notification after finishing the ingest process to a specific HTTP endpoint")
+          .build());
     }
   }
 

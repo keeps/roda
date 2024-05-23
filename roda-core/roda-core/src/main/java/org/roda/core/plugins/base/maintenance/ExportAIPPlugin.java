@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.common.DownloadUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.ExportType;
@@ -32,6 +31,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -75,17 +75,21 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER,
-      new PluginParameter(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "Destination folder", PluginParameterType.STRING,
-        "/tmp/export", true, false, "Folder where the exported AIPs will be stored."));
+      PluginParameter.getBuilder(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "Destination folder", PluginParameterType.STRING)
+        .withDefaultValue("/tmp/export").withDescription("Folder where the exported AIPs will be stored.").build());
 
     pluginParameters.put(PLUGIN_PARAM_EXPORT_TYPE,
-      new PluginParameter(PLUGIN_PARAM_EXPORT_TYPE, "Type of export", PluginParameterType.STRING, "FOLDER", true, false,
-        "Type of export: ZIP – exports each AIP as a ZIP file; FOLDER – exports each AIP as a folder."));
+      PluginParameter.getBuilder(PLUGIN_PARAM_EXPORT_TYPE, "Type of export", PluginParameterType.STRING)
+        .withDefaultValue("FOLDER")
+        .withDescription("Type of export: ZIP – exports each AIP as a ZIP file; FOLDER – exports each AIP as a folder.")
+        .build());
 
     pluginParameters.put(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS,
-      new PluginParameter(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS, "Overwrite files/folders",
-        PluginParameterType.BOOLEAN, "true", true, false,
-        "Overwrites files and folders if they already exist on the destination folder."));
+      PluginParameter
+        .getBuilder(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS, "Overwrite files/folders",
+          PluginParameterType.BOOLEAN)
+        .withDefaultValue("true")
+        .withDescription("Overwrites files and folders if they already exist on the destination folder.").build());
   }
 
   @Override
@@ -165,7 +169,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
             error = "No permissions to write to " + outputPath.toString();
           }
         } catch (IOException e) {
-          LOGGER.error("Error creating base folder: " + e.getMessage());
+          LOGGER.error("Error creating base folder: {}", e.getMessage(), e);
           error = e.getMessage();
         }
 
@@ -255,7 +259,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
           cos.consumeOutputStream(os);
         }
       } catch (Exception e) {
-        LOGGER.error("Error exporting AIP " + aip.getId() + ": " + e.getMessage());
+        LOGGER.error("Error exporting AIP {}: {}", aip.getId(), e.getMessage(), e);
         error = e.getMessage();
       } finally {
         if (os != null) {
