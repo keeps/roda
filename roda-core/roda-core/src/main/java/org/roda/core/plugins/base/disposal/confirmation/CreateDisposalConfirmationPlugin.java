@@ -54,9 +54,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
@@ -73,11 +73,11 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE,
-      new PluginParameter(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE, "Disposal confirmation title",
-        PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal confirmation report title"));
+      PluginParameter.getBuilder(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE, "Disposal confirmation title",
+        PluginParameter.PluginParameterType.STRING).withDescription("Disposal confirmation report title").build());
     pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO,
-      new PluginParameter(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO, "Disposal confirmation information",
-        PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal confirmation information"));
+      PluginParameter.getBuilder(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO, "Disposal confirmation information",
+        PluginParameter.PluginParameterType.STRING).withDefaultValue("Disposal confirmation information").build());
   }
 
   private final Set<String> disposalSchedules = new HashSet<>();

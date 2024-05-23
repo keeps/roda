@@ -45,7 +45,6 @@ import org.roda.core.plugins.base.synchronization.packages.RiskIncidencePackageP
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.java8.FuturesConvertersImpl;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -58,37 +57,64 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
   static {
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN, AipPackagePlugin.getStaticName(),
-        PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, AipPackagePlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN, AipPackagePlugin.getStaticName(),
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(AipPackagePlugin.getStaticDescription()).build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN, JobPackagePlugin.getStaticName(),
-        PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, JobPackagePlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN, JobPackagePlugin.getStaticName(),
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(JobPackagePlugin.getStaticDescription()).build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN, DipPackagePlugin.getStaticName(),
-        PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, DipPackagePlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN, DipPackagePlugin.getStaticName(),
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(DipPackagePlugin.getStaticDescription()).build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_RISK_INCIDENCE_PACKAGE_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_RISK_INCIDENCE_PACKAGE_PLUGIN,
-        RiskIncidencePackagePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
-        RiskIncidencePackagePlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_RISK_INCIDENCE_PACKAGE_PLUGIN,
+          RiskIncidencePackagePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(RiskIncidencePackagePlugin.getStaticDescription())
+        .build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REPOSITORY_EVENT_PACKAGE_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPOSITORY_EVENT_PACKAGE_PLUGIN,
-        RepositoryEventPackagePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
-        RepositoryEventPackagePlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_REPOSITORY_EVENT_PACKAGE_PLUGIN,
+          RepositoryEventPackagePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(RepositoryEventPackagePlugin.getStaticDescription())
+        .build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_PRESERVATION_AGENT_PACKAGE_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRESERVATION_AGENT_PACKAGE_PLUGIN,
-        PreservationAgentPackagePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
-        PreservationAgentPackagePlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_PRESERVATION_AGENT_PACKAGE_PLUGIN,
+          PreservationAgentPackagePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true)
+        .withDescription(PreservationAgentPackagePlugin.getStaticDescription()).build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN,
-        BuildSyncManifestPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
-        BuildSyncManifestPlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN, BuildSyncManifestPlugin.getStaticName(),
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(BuildSyncManifestPlugin.getStaticDescription())
+        .build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN, SendSyncBundlePlugin.getStaticName(),
-        PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, SendSyncBundlePlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN, SendSyncBundlePlugin.getStaticName(),
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(SendSyncBundlePlugin.getStaticDescription())
+        .build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN,
-        RequestSyncBundlePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
-        RequestSyncBundlePlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN, RequestSyncBundlePlugin.getStaticName(),
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(RequestSyncBundlePlugin.getStaticDescription())
+        .build());
 
     steps
       .add(new Step(AipPackagePlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN, true, true));
@@ -233,15 +259,10 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
       localInstance.setStatus(SynchronizingStatus.ACTIVE);
       RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
     } catch (GenericException | IOException e) {
-      LOGGER.warn("Failed to delete working dir: " + e.getMessage());
+      LOGGER.warn("Failed to delete working dir: {}", e.getMessage(), e);
     }
 
     return new Report();
-  }
-
-  @Override
-  public void shutdown() {
-    // do nothing
   }
 
   @Override

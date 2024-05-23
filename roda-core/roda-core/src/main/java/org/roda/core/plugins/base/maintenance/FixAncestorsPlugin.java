@@ -38,9 +38,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +54,9 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "Ingest job identifier", PluginParameterType.STRING,
-        "", true, false, "The identifier of the job responsible to ingest the information package to fix."));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "Ingest job identifier", PluginParameterType.STRING)
+        .withDescription("The identifier of the job responsible to ingest the information package to fix.").build());
   }
 
   @Override

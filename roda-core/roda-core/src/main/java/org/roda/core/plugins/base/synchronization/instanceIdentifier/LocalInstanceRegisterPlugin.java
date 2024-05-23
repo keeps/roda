@@ -9,17 +9,13 @@ package org.roda.core.plugins.base.synchronization.instanceIdentifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -30,65 +26,97 @@ import org.roda.core.plugins.base.multiple.DefaultMultipleStepPlugin;
 import org.roda.core.plugins.base.multiple.Step;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
  */
 public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<Void> {
-  Logger LOGGER = LoggerFactory.getLogger(LocalInstanceRegisterPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   private static List<Step> steps = new ArrayList<>();
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN,
-        InstanceIdentifierAIPPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
-        InstanceIdentifierAIPPlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN,
+          InstanceIdentifierAIPPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(InstanceIdentifierAIPPlugin.getStaticDescription())
+        .build());
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_EVENT_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_EVENT_PLUGIN,
-        InstanceIdentifierAIPEventPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true,
-        true, InstanceIdentifierAIPEventPlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_EVENT_PLUGIN,
+          InstanceIdentifierAIPEventPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true)
+        .withDescription(InstanceIdentifierAIPEventPlugin.getStaticDescription()).build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_DIP_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_DIP_PLUGIN,
-        InstanceIdentifierDIPPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
-        InstanceIdentifierDIPPlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_DIP_PLUGIN,
+          InstanceIdentifierDIPPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(InstanceIdentifierDIPPlugin.getStaticDescription())
+        .build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPRESENTATION_INFORMATION_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPRESENTATION_INFORMATION_PLUGIN,
-        InstanceIdentifierRepresentationInformationPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN,
-        "true", true, true, InstanceIdentifierRepresentationInformationPlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPRESENTATION_INFORMATION_PLUGIN,
+          InstanceIdentifierRepresentationInformationPlugin.getStaticName(),
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true)
+        .withDescription(InstanceIdentifierRepresentationInformationPlugin.getStaticDescription()).build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_NOTIFICATION_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_NOTIFICATION_PLUGIN,
-        InstanceIdentifierNotificationPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true,
-        true, InstanceIdentifierNotificationPlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_NOTIFICATION_PLUGIN,
+          InstanceIdentifierNotificationPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true)
+        .withDescription(InstanceIdentifierNotificationPlugin.getStaticDescription()).build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_PLUGIN,
-        InstanceIdentifierRiskPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
-        InstanceIdentifierRiskPlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_PLUGIN,
+          InstanceIdentifierRiskPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(InstanceIdentifierRiskPlugin.getStaticDescription())
+        .build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_INCIDENCE_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_INCIDENCE_PLUGIN,
-        InstanceIdentifierRiskIncidencePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true",
-        true, true, InstanceIdentifierRiskIncidencePlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_INCIDENCE_PLUGIN,
+          InstanceIdentifierRiskIncidencePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true)
+        .withDescription(InstanceIdentifierRiskIncidencePlugin.getStaticDescription()).build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_JOB_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_JOB_PLUGIN,
-        InstanceIdentifierJobPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
-        InstanceIdentifierJobPlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_JOB_PLUGIN,
+          InstanceIdentifierJobPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true).withDescription(InstanceIdentifierJobPlugin.getStaticDescription())
+        .build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPOSITORY_EVENT_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPOSITORY_EVENT_PLUGIN,
-        InstanceIdentifierRepositoryEventPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true",
-        true, true, InstanceIdentifierRepositoryEventPlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPOSITORY_EVENT_PLUGIN,
+          InstanceIdentifierRepositoryEventPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true)
+        .withDescription(InstanceIdentifierRepositoryEventPlugin.getStaticDescription()).build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_PRESERVATION_AGENT_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_PRESERVATION_AGENT_PLUGIN,
-        InstanceIdentifierPreservationAgentPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true",
-        true, true, InstanceIdentifierPreservationAgentPlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_PRESERVATION_AGENT_PLUGIN,
+          InstanceIdentifierPreservationAgentPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isReadOnly(true)
+        .withDescription(InstanceIdentifierPreservationAgentPlugin.getStaticDescription()).build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, RegisterPlugin.getStaticName(),
-        PluginParameter.PluginParameterType.BOOLEAN, "false", true, false, RegisterPlugin.getStaticDescription()));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, RegisterPlugin.getStaticName(),
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").withDescription(RegisterPlugin.getStaticDescription()).build());
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
-        PluginParameter.PluginParameterType.STRING, RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin(), true,
-        true, "Identifier from the RODA local instance"));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
+          PluginParameter.PluginParameterType.STRING)
+        .withDefaultValue(RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin()).isReadOnly(true)
+        .withDescription("Identifier from the RODA local instance").build());
 
     steps.add(new Step(InstanceIdentifierAIPPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN, true, true));

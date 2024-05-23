@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.jobs;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class PluginParameter implements Serializable {
+  @Serial
   private static final long serialVersionUID = -431821437136556726L;
   private String id = null;
   private String name = null;
@@ -26,7 +28,7 @@ public class PluginParameter implements Serializable {
   private boolean mandatory = true;
   private boolean readonly = false;
   private String description = null;
-  private RenderingHints renderingHings = null;
+  private RenderingHints renderingHints = null;
 
   /**
    * Constructs an empty {@link PluginParameter}.
@@ -50,80 +52,6 @@ public class PluginParameter implements Serializable {
     this.mandatory = builder.mandatory;
     this.readonly = builder.readOnly;
     this.description = builder.description;
-  }
-
-  /**
-   * Constructs a new {@link PluginParameter} with the given parameters.
-   *
-   * @param id
-   * @param name
-   * @param type
-   * @param defaultValue
-   * @param mandatory
-   * @param readonly
-   * @param description
-   */
-
-  /**
-   * @deprecated It will be removed in the next major version. Due to
-   *             maintainability, a constructor shouldn't have to many arguments.
-   *             Use instead the builder
-   *             {@link #PluginParameter(PluginParameterBuilder)}
-   */
-  public PluginParameter(String id, String name, PluginParameterType type, String defaultValue, boolean mandatory,
-    boolean readonly, String description) {
-    setId(id);
-    setName(name);
-    setType(type);
-    setDefaultValue(defaultValue);
-    // setPossibleValues(); no possible values, value is free text
-    setMandatory(mandatory);
-    setReadonly(readonly);
-    setDescription(description);
-  }
-
-  /**
-   * Constructs a new {@link PluginParameter} with the given parameters.
-   *
-   * @param id
-   * @param name
-   * @param type
-   * @param value
-   * @param possibleValues
-   * @param mandatory
-   * @param readonly
-   * @param description
-   */
-  /**
-   * @deprecated It will be removed in the next major version. Due to
-   *             maintainability, a constructor shouldn't have to many arguments.
-   *             Use instead the builder
-   *             {@link #PluginParameter(PluginParameterBuilder)}
-   */
-  public PluginParameter(String id, String name, PluginParameterType type, String value, List<String> possibleValues,
-    boolean mandatory, boolean readonly, String description) {
-    setId(id);
-    setName(name);
-    setType(type);
-    setDefaultValue(value);
-    setPossibleValues(possibleValues);
-    setMandatory(mandatory);
-    setReadonly(readonly);
-    setDescription(description);
-  }
-
-  /**
-   * Constructs a new {@link PluginParameter} cloning an existing
-   * {@link PluginParameter}.
-   *
-   * @param parameter
-   *          the {@link PluginParameter} to clone.
-   */
-  public PluginParameter(PluginParameter parameter) {
-    this(new PluginParameterBuilder(parameter.getId(), parameter.getName(), parameter.getType())
-            .withDescription(parameter.getDescription()).withDefaultValue(parameter.getDefaultValue())
-            .withPossibleValues(parameter.getPossibleValues()).isReadOnly(parameter.isReadonly())
-            .isMandatory(parameter.isMandatory()));
   }
 
   /**
@@ -325,18 +253,18 @@ public class PluginParameter implements Serializable {
   }
 
   /**
-   * @return the renderingHings
+   * @return the renderingHints
    */
-  public RenderingHints getRenderingHings() {
-    return renderingHings;
+  public RenderingHints getRenderingHints() {
+    return renderingHints;
   }
 
   /**
-   * @param renderingHings
-   *          the renderingHings to set
+   * @param renderingHints
+   *          the renderingHints to set
    */
-  public void setRenderingHings(RenderingHints renderingHings) {
-    this.renderingHings = renderingHings;
+  public void setRenderingHints(RenderingHints renderingHints) {
+    this.renderingHints = renderingHints;
   }
 
   public enum PluginParameterType {

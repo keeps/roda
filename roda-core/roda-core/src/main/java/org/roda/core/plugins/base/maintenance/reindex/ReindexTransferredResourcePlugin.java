@@ -36,9 +36,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,12 +54,16 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
-        "false", false, false, "Clear all indexes before reindexing them."));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").isMandatory(false).withDescription("Clear all indexes before reindexing them.")
+        .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN,
-        "true", false, false, "Optimize indexes after reindexing them."));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isMandatory(false).withDescription("Optimize indexes after reindexing them.")
+        .build());
   }
 
   @Override

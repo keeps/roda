@@ -1305,6 +1305,11 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DONT_CHECK_RELATIVES = "parameter.dont_check_relatives";
   public static final String PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER = "parameter.representation_information_filter";
 
+  public static final String PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA = "parameter.validate_descriptive_metadata";
+  public static final String PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE = "parameter.metadata_type";
+  public static final String PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION = "parameter.metadata_version";
+  public static final String PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE = "parameter.force_type";
+
   public static final String PLUGIN_PARAMS_INCLUDE_SELECTED_DESCRIPTIVE_METADATA = "parameter.include_selected_descriptive_metadata";
   public static final String PLUGIN_PARAMS_SELECTED_DESCRIPTIVE_METADATA = "parameter.selected_descriptive_metadata";
   public static final String PLUGIN_PARAMS_INCLUDE_ALL_PRESERVATION_METADATA = "parameter.include_all_preservation_metadata";

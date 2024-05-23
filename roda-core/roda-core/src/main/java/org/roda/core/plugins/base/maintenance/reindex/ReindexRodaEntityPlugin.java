@@ -60,12 +60,16 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
-        "false", false, false, "Clear all indexes before reindexing them."));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").isMandatory(false).withDescription("Clear all indexes before reindexing them.")
+        .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN,
-        "true", false, false, "Optimize indexes after reindexing them."));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isMandatory(false).withDescription("Optimize indexes after reindexing them.")
+        .build());
   }
 
   @Override
