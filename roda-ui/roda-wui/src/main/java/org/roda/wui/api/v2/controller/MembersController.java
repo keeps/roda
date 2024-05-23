@@ -531,7 +531,7 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public Void confirmUserEmail(String username, String token) {
+  public String confirmUserEmail(String username, String token) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     User user = null;
@@ -539,7 +539,7 @@ public class MembersController implements MembersRestService {
       user = membersService.confirmUserEmail(username, null, token);
       // 20180112 hsilva: need to set ip address for registering the action
       user.setIpAddress(request.getRemoteAddr());
-      return null;
+      return JsonUtils.getJsonFromObject(new GenericOkResponse("User " + username + " email confirmed"), GenericOkResponse.class);
     } catch (RODAException e) {
       throw new RESTException(e);
     } finally {
