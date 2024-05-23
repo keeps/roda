@@ -10,6 +10,7 @@ package org.roda.wui.client.management.access;
 import java.util.List;
 
 import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.generics.CreateAccessKeyRequest;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
@@ -119,7 +120,8 @@ public class CreateAccessKey extends Composite {
       accessKey.setName(accessKeyUpdated.getName());
       accessKey.setExpirationDate(accessKeyUpdated.getExpirationDate());
       Services services = new Services("Create access key", "create");
-      services.membersResource(s -> s.createAccessKey(this.accessKey)).whenComplete((accessKey, error) -> {
+      CreateAccessKeyRequest createAccessKeyRequest = new CreateAccessKeyRequest(this.accessKey.getName(), this.accessKey.getExpirationDate(), this.accessKey.getUserName());
+      services.membersResource(s -> s.createAccessKey(createAccessKeyRequest)).whenComplete((accessKey, error) -> {
         if (accessKey != null) {
           AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), accessKey, new NoAsyncCallback<Boolean>() {
             @Override
