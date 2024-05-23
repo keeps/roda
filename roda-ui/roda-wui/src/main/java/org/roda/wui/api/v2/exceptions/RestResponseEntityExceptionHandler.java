@@ -2,7 +2,9 @@ package org.roda.wui.api.v2.exceptions;
 
 import java.util.UUID;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.DisposalHoldNotValidException;
 import org.roda.core.data.exceptions.DisposalScheduleNotValidException;
@@ -34,8 +36,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     String details = "";
     HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     UUID errorID = UUID.randomUUID();
-
-    if (ex.getCause() instanceof AuthorizationDeniedException) {
+    if (ex.getCause() instanceof AuthorizationDeniedException || ex.getCause() instanceof AuthenticationDeniedException) {
       message = "Unauthorized access";
       details = ex.getCause().getMessage();
       httpStatus = HttpStatus.UNAUTHORIZED;

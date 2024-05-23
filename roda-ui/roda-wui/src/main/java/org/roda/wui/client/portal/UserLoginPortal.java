@@ -17,6 +17,7 @@ import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.SecureString;
+import org.roda.core.data.v2.generics.LoginRequest;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -131,7 +132,8 @@ public class UserLoginPortal {
   public void login(String username, String password, final AsyncCallback<User> callback) {
     Services services = new Services("Login", "login");
     try (SecureString securePassword = new SecureString(password.toCharArray())) {
-      services.membersResource(s -> s.login(username, securePassword)).whenComplete((loggedUser, error) -> {
+      LoginRequest loginRequest = new LoginRequest(username, securePassword);
+      services.membersResource(s -> s.login(loginRequest)).whenComplete((loggedUser, error) -> {
         if (loggedUser != null) {
           getUserRequest.setCached(loggedUser);
           onLoginStatusChanged(loggedUser);

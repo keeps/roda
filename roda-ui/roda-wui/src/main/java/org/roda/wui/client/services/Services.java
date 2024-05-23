@@ -80,8 +80,8 @@ public class Services implements DirectRestService {
       method.apply(REST.withCallback(new MethodCallback<T>() {
         @Override
         public void onFailure(Method method, Throwable throwable) {
-          MethodCallThrowableTreatment.treatCommonFailures(method, throwable);
-          result.completeExceptionally(throwable);
+          Throwable handledThrowable = MethodCallThrowableTreatment.treatCommonFailures(method, throwable);
+          result.completeExceptionally(handledThrowable);
         }
 
         @Override
@@ -133,8 +133,8 @@ public class Services implements DirectRestService {
       method.apply(REST.withCallback(new MethodCallback<T>() {
         @Override
         public void onFailure(Method method, Throwable throwable) {
-          MethodCallThrowableTreatment.treatCommonFailures(method, throwable);
-          result.completeExceptionally(throwable);
+          Throwable handledThrowable = MethodCallThrowableTreatment.treatCommonFailures(method, throwable);
+          result.completeExceptionally(handledThrowable);
         }
 
         @Override
