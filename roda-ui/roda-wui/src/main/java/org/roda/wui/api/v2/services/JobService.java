@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -19,6 +20,8 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.StreamResponse;
@@ -32,6 +35,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobMixIn;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -44,6 +48,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.servlets.ContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -52,6 +57,20 @@ import org.springframework.stereotype.Service;
 public class JobService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JobService.class);
+
+  public String buildCurlCommand(String path, Job job) {
+    String command = RodaCoreFactory.getRodaConfiguration().getString("ui.createJob.curl");
+    if (command != null) {
+      command = command.replace("{{jsonObject}}",
+          StringEscapeUtils.escapeJava(JsonUtils.getJsonFromObject(job, JobMixIn.class)));
+
+      command = command.replace("{{RODA_CONTEXT_PATH}}",
+          StringEscapeUtils.escapeJava(path));
+      return command;
+    } else {
+      return "";
+    }
+  }
 
   public Job createJob(Job job, boolean async) throws NotFoundException, GenericException, JobAlreadyStartedException,
     RequestNotValidException, AuthorizationDeniedException {

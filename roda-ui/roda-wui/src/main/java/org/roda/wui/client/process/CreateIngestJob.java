@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
@@ -32,6 +34,8 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.JobUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -102,21 +106,17 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
     List<PluginParameter> missingMandatoryParameters = getWorkflowOptions().getMissingMandatoryParameters();
     if (missingMandatoryParameters.isEmpty()) {
 
-      BrowserService.Util.getInstance().createProcess(jobName, getJobPriority(), getJobParallelism(), getSelected(),
-        getSelectedPlugin().getId(), getWorkflowOptions().getValue(), null, new AsyncCallback<Job>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            getButtonCreate().setEnabled(true);
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Job result) {
-            Toast.showInfo(messages.dialogDone(), messages.processCreated());
-            HistoryUtils.newHistory(IngestProcess.RESOLVER);
-          }
-        });
+      Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(), getSelectedPlugin().getId(), getWorkflowOptions().getValue());
+      Services services = new Services("Create job", "create");
+      services.jobsResource(s -> s.createJob(job)).whenComplete((job1, throwable) -> {
+        if (throwable != null) {
+          getButtonCreate().setEnabled(true);
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
+        } else {
+          Toast.showInfo(messages.dialogDone(), messages.processCreated());
+          HistoryUtils.newHistory(IngestProcess.RESOLVER);
+        }
+      });
     } else {
 
       List<String> missingPluginNames = new ArrayList<>();
@@ -149,19 +149,12 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
     List<PluginParameter> missingMandatoryParameters = getWorkflowOptions().getMissingMandatoryParameters();
     if (missingMandatoryParameters.isEmpty()) {
 
-      BrowserService.Util.getInstance().createProcessJson(jobName, getJobPriority(), getJobParallelism(), getSelected(),
-        getSelectedPlugin().getId(), getWorkflowOptions().getValue(), null, new AsyncCallback<String>() {
+      Services services = new Services("Obtain cURL command", "get");
+      Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(), getSelectedPlugin().getId(), getWorkflowOptions().getValue());
 
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(String result) {
-            Dialogs.showInformationDialog(messages.createJobCurlCommand(), result, messages.closeButton(), true);
-          }
-        });
+      services.jobsResource(s -> s.obtainJobCommand(job)).whenComplete((result, throwable) -> {
+        Dialogs.showInformationDialog(messages.createJobCurlCommand(), result.getValue(), messages.closeButton(), true);
+      });
     } else {
 
       List<String> missingPluginNames = new ArrayList<>();

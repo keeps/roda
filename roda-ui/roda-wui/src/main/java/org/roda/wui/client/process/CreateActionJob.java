@@ -29,8 +29,10 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.lists.utils.ListFactory;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.JobUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.search.Search;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -95,22 +97,17 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
     getButtonCreate().setEnabled(false);
     String jobName = getName().getText();
 
-    BrowserService.Util.getInstance().createProcess(jobName, getJobPriority(), getJobParallelism(), getSelected(),
-      getSelectedPlugin().getId(), getWorkflowOptions().getValue(), getSelectedClass(), new AsyncCallback<Job>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-          getButtonCreate().setEnabled(true);
-        }
-
-        @Override
-        public void onSuccess(Job job) {
-          Toast.showInfo(messages.dialogDone(), messages.processCreated());
-          HistoryUtils.newHistory(ActionProcess.RESOLVER);
-        }
-
-      });
+    Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(), getSelectedPlugin().getId(), getWorkflowOptions().getValue());
+    Services services = new Services("Create job", "create");
+    services.jobsResource(s -> s.createJob(job)).whenComplete((job1, throwable) -> {
+      if (throwable != null) {
+        getButtonCreate().setEnabled(true);
+        AsyncCallbackUtils.defaultFailureTreatment(throwable);
+      } else {
+        Toast.showInfo(messages.dialogDone(), messages.processCreated());
+        HistoryUtils.newHistory(IngestProcess.RESOLVER);
+      }
+    });
   }
 
   @Override
