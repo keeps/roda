@@ -11,9 +11,12 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 
+import java.io.Serial;
+
 @JsonTypeName("SelectedItemsFilter")
 public class SelectedItemsFilter<T extends IsIndexed> implements SelectedItems<T> {
 
+  @Serial
   private static final long serialVersionUID = 975693329806484985L;
 
   private Filter filter;

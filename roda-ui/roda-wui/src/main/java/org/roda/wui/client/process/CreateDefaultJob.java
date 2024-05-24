@@ -53,9 +53,11 @@ import org.roda.wui.client.common.lists.utils.ListFactory;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.JobUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.client.main.Theme;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -706,30 +708,24 @@ public class CreateDefaultJob extends Composite {
   public void buttonCreateHandler(ClickEvent e) {
     buttonCreate.setEnabled(false);
     String jobName = getName().getText();
-    SelectedItems selected = search.getSelectedItemsInCurrentList();
-
+    SelectedItems<? extends IsIndexed> selected = search.getSelectedItemsInCurrentList();
     if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
       selected = new SelectedItemsNone();
     } else if (isListEmpty) {
       selected = SelectedItemsAll.create(targetList.getSelectedValue());
     }
 
-    BrowserService.Util.getInstance().createProcess(jobName, priority, parallelism, selected,
-      getSelectedPlugin().getId(), getWorkflowOptions().getValue(), selected.getSelectedClass(),
-      new AsyncCallback<Job>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          Toast.showError(messages.dialogFailure(), caught.getMessage());
-          buttonCreate.setEnabled(true);
-        }
-
-        @Override
-        public void onSuccess(Job result) {
-          Toast.showInfo(messages.dialogDone(), messages.processCreated());
-          HistoryUtils.newHistory(ActionProcess.RESOLVER);
-        }
-      });
+    Job job = JobUtils.createJob(jobName, priority, parallelism, selected, getSelectedPlugin().getId(), getWorkflowOptions().getValue(), selected.getSelectedClass());
+    Services services = new Services("Create job", "create");
+    services.jobsResource(s -> s.createJob(job)).whenComplete((job1, throwable) -> {
+      if (throwable != null) {
+        //Toast.showError(messages.dialogFailure(), caught.getMessage());
+        buttonCreate.setEnabled(true);
+      } else {
+        Toast.showInfo(messages.dialogDone(), messages.processCreated());
+        HistoryUtils.newHistory(ActionProcess.RESOLVER);
+      }
+    });
   }
 
   @SuppressWarnings("rawtypes")

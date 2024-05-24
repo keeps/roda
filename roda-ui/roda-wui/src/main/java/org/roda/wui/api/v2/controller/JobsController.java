@@ -7,13 +7,13 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.v2.generics.ValueResponse;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.Jobs;
@@ -65,6 +65,12 @@ public class JobsController implements JobsRestService {
 
   @Autowired
   private IndexService indexService;
+
+  @Override
+  public ValueResponse obtainJobCommand(@RequestBody Job job) {
+    String path = request.getRequestURL().toString().split("/api")[0];
+    return new ValueResponse(jobService.buildCurlCommand(path, job));
+  }
 
   @Override
   public Job createJob(@RequestBody Job job) {
@@ -231,8 +237,8 @@ public class JobsController implements JobsRestService {
     }
   }
 
-  @GetMapping(path = "/{id}/attachment/{"
-    + RodaConstants.API_PATH_PARAM_JOB_ATTACHMENT_ID + "}", produces = ExtraMediaType.APPLICATION_ZIP)
+  @GetMapping(path = "/{id}/attachment/{" + RodaConstants.API_PATH_PARAM_JOB_ATTACHMENT_ID
+    + "}", produces = ExtraMediaType.APPLICATION_ZIP)
   @Operation(summary = "Get attachment", description = "Gets the attachments of a job", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseMessage.class)))})
@@ -260,6 +266,7 @@ public class JobsController implements JobsRestService {
         RodaConstants.CONTROLLER_JOB_ATTACHMENT_ID_PARAM, attachmentId);
     }
   }
+
   @Override
   public List<PluginInfo> getJobPluginInfo(@RequestBody Job job) {
     List<PluginInfo> pluginsInfo = new ArrayList<>();

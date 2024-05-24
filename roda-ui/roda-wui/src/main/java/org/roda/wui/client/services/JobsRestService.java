@@ -1,8 +1,10 @@
 package org.roda.wui.client.services;
 
+import java.util.List;
+
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.generics.ValueResponse;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Jobs;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -25,8 +27,6 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.util.List;
-
 /**
  * @author António Lindo <alindo@keep.pt>
  */
@@ -35,6 +35,11 @@ import java.util.List;
 @RequestMapping(path = "../api/v2/jobs")
 public interface JobsRestService extends RODAEntityRestService<Job> {
 
+  @RequestMapping(method = RequestMethod.POST, path = "/obtain-command", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Obtains the cURL command for a job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {
+      @ApiResponse(responseCode = "200", description = "cURL command successfully built", content = @Content(schema = @Schema(implementation = String.class)))})
+  ValueResponse obtainJobCommand(@Parameter(name = "job", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Job job);
+  
   @RequestMapping(method = RequestMethod.POST, path = "", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Create job", description = "Creates a new job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {
     @ApiResponse(responseCode = "201", description = "Job created successfully", content = @Content(schema = @Schema(implementation = Job.class))),
