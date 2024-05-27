@@ -31,6 +31,7 @@ import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.generics.CreateGroupRequest;
 import org.roda.core.data.v2.generics.CreateAccessKeyRequest;
+import org.roda.core.data.v2.generics.CreateUserExtraFormFields;
 import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.generics.LoginRequest;
 import org.roda.core.data.v2.generics.LongResponse;
@@ -517,26 +518,16 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public Set<MetadataValue> getUserExtra(String username) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    if (requestContext.getUser().getName().equals(username)) {
-      return membersService.retrieveOwnUserExtra(requestContext.getUser());
-    } else {
-      return membersService.retrieveUserExtra(requestContext.getUser(), username);
-    }
-  }
-
-  @Override
-  public Set<MetadataValue> getDefaultUserExtra() {
+  public CreateUserExtraFormFields getDefaultUserExtra() {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    Set<MetadataValue> userExtra = membersService.retrieveDefaultExtraBundle();
-
+    Set<MetadataValue> userExtra = membersService.retrieveDefaultExtraFormFields();
+    CreateUserExtraFormFields createUserExtraFormFields = new CreateUserExtraFormFields(userExtra);
     // register action
     controllerAssistant.registerAction(requestContext.getUser(), LogEntryState.SUCCESS);
 
-    return userExtra;
+    return createUserExtraFormFields;
   }
 
   @Override
@@ -611,6 +602,7 @@ public class MembersController implements MembersRestService {
       User createdUser = membersService.createUser(user, userOperations.getPassword(), userOperations.getValues());
       membersService.requestPasswordReset(request.getRequestURL().toString().split("/api")[0], user.getEmail(),
         localeString, request.getRemoteAddr(), false);
+      createdUser.setExtra(userOperations.getValues());
       return createdUser;
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;

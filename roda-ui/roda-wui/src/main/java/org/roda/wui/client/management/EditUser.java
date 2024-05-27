@@ -40,6 +40,7 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -123,9 +124,14 @@ public class EditUser extends Composite {
    */
   public EditUser(User user) {
     this.user = user;
-
     this.userDataPanel = new UserDataPanel(true, true, true);
     this.userDataPanel.setUser(user);
+    if (user.getExtra() != null) {
+      this.userDataPanel.setUserExtra(user.getExtra());
+    } else {
+      this.userDataPanel.setUserExtra(new HashSet<>());
+    }
+
 
     initWidget(uiBinder.createAndBindUi(this));
 

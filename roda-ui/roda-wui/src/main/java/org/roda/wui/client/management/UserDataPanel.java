@@ -253,25 +253,9 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.username.setText(user.getName());
     this.fullname.setText(user.getFullName());
     this.email.setText(user.getEmail());
-
+    this.userExtra = user.getExtra();
     this.setMemberGroups(user.getGroups());
     this.setPermissions(user.getDirectRoles(), user.getAllRoles());
-
-    Services services = new Services("Get User extra", "get");
-    services.membersResource(s -> s.getDefaultUserExtra()).whenComplete((extra, error) -> {
-      if (extra != null) {
-        UserDataPanel.this.userExtra = extra;
-        createForm(userExtra);
-      } else if (error != null) {
-        if (error instanceof AuthorizationDeniedException) {
-          // TODO inform user he does not have permissions to see to which
-          // groups he belongs to.
-          GWT.log("No permissions: " + error.getMessage());
-        } else {
-          AsyncCallbackUtils.defaultFailureTreatment(error);
-        }
-      }
-    });
   }
 
   public void setUserExtra(Set<MetadataValue> extra) {
