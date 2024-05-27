@@ -1,9 +1,11 @@
 package org.roda.core.model.utils;
 
 import java.util.Objects;
+import java.util.Set;
 
 import javax.naming.Name;
 
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.springframework.data.domain.Persistable;
 import org.springframework.ldap.odm.annotations.Attribute;
 import org.springframework.ldap.odm.annotations.Entry;

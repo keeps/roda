@@ -19,7 +19,7 @@ import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
+import org.roda.core.data.v2.generics.MetadataValue;
 
 
 /**
@@ -54,9 +54,10 @@ public class User extends RodaPrincipal {
   private String emailConfirmationToken = null;
   /** LDAP info. */
   private String emailConfirmationTokenExpirationDate = null;
-
   /** LDAP description. */
-  private String extra = null;
+  String extraLDAP = null;
+
+  private Set<MetadataValue> extra = null;
 
   /**
    * Constructor.
@@ -77,7 +78,7 @@ public class User extends RodaPrincipal {
 
   public User(final User user) {
     this(user.getId(), user.getName(), user.getFullName(), user.isActive(), user.getAllRoles(), user.getDirectRoles(),
-      user.getGroups(), user.getEmail(), user.isGuest(), user.getIpAddress(), user.getExtra(),
+      user.getGroups(), user.getEmail(), user.isGuest(), user.getIpAddress(), user.getExtra(), user.getExtraLDAP(),
       user.getResetPasswordToken(), user.getResetPasswordTokenExpirationDate(), user.getEmailConfirmationToken(),
       user.getEmailConfirmationTokenExpirationDate());
   }
@@ -107,13 +108,13 @@ public class User extends RodaPrincipal {
               final Set<String> allRoles, final Set<String> directRoles, final Set<String> groups,
               final String resetPasswordToken, final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
               final String emailConfirmationTokenExpirationDate) {
-    this(id, name, name, true, allRoles, directRoles, groups, email, guest, ipAddress, null, resetPasswordToken,
+    this(id, name, name, true, allRoles, directRoles, groups, email, guest, ipAddress, null, null, resetPasswordToken,
       resetPasswordTokenExpirationDate, emailConfirmationToken, emailConfirmationTokenExpirationDate);
   }
 
   public User(final String id, final String name, final String fullName, final boolean active,
     final Set<String> allRoles, final Set<String> directRoles, final Set<String> groups, final String email,
-    final boolean guest, final String ipAddress, final String extra, final String resetPasswordToken,
+    final boolean guest, final String ipAddress, final Set<MetadataValue> extra, final String extraLDAP, final String resetPasswordToken,
     final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
     final String emailConfirmationTokenExpirationDate) {
     super(id, name, fullName, active, allRoles, directRoles);
@@ -123,6 +124,7 @@ public class User extends RodaPrincipal {
     this.guest = guest;
     this.ipAddress = ipAddress;
     this.extra = extra;
+    this.extraLDAP = extraLDAP;
     this.resetPasswordToken = resetPasswordToken;
     this.resetPasswordTokenExpirationDate = resetPasswordTokenExpirationDate;
     this.emailConfirmationToken = emailConfirmationToken;
@@ -154,12 +156,20 @@ public class User extends RodaPrincipal {
     return this;
   }
 
+  public String getExtraLDAP() {
+    return extraLDAP;
+  }
+
+  public void setExtraLDAP(String extraLDAP) {
+    this.extraLDAP = extraLDAP;
+  }
+
   /**
    * Get {@link User}'s extra information.
    *
-   * @return a {@link String} with user's extra information.
+   * @return a {@link Set<MetadataValue>} with user's extra information.
    */
-  public String getExtra() {
+  public Set<MetadataValue> getExtra() {
     return extra;
   }
 
@@ -169,7 +179,7 @@ public class User extends RodaPrincipal {
    * @param extra
    *          a {@link String} with user's extra information.
    */
-  public void setExtra(final String extra) {
+  public void setExtra(final Set<MetadataValue> extra) {
     this.extra = extra;
   }
 
@@ -337,7 +347,7 @@ public class User extends RodaPrincipal {
       + ", ipAddress='" + ipAddress + '\'' + ", resetPasswordToken='" + resetPasswordToken + '\''
       + ", resetPasswordTokenExpirationDate='" + resetPasswordTokenExpirationDate + '\'' + ", emailConfirmationToken='"
       + emailConfirmationToken + '\'' + ", emailConfirmationTokenExpirationDate='"
-      + emailConfirmationTokenExpirationDate + '\'' + ", extra='" + extra + "\'}";
+      + emailConfirmationTokenExpirationDate + '\''  + ", extra='" + extra + "\'}";
   }
 
   @Override
