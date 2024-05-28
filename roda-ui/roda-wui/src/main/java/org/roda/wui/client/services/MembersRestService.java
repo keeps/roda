@@ -245,10 +245,10 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   AccessKey createAccessKey(
     @Parameter(name = "accesskey", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) AccessKey accessKey);
 
-  @RequestMapping(path = "/accesskey/revoke", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Revoke access key", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AccessKey.class))), description = "Revokes a access key", responses = {
+  @RequestMapping(path = "/users/access-keys/revoke/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Revoke access key", description = "Revokes a access key", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccessKey.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   AccessKey revokeAccessKey(
-    @Parameter(name = "accesskey", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) AccessKey accessKey);
+    @Parameter(description = "The access key id") @PathVariable(name = "id") String id);
 }
