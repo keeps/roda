@@ -1051,7 +1051,7 @@ public class LdapUtility {
     user.setEmail(ldapUser.getEmail());
     user.setGuest(false);
 
-    user.setExtra(ldapUser.getDescription());
+    user.setExtraLDAP(ldapUser.getDescription());
 
     if (Strings.isNotBlank(ldapUser.getInfo())) {
       final String infoStr = ldapUser.getInfo();
@@ -1102,8 +1102,8 @@ public class LdapUtility {
       ldapUser.setEmail(user.getEmail());
     }
 
-    if (StringUtils.isNotBlank(user.getExtra())) {
-      ldapUser.setDescription(user.getExtra());
+    if (user.getExtraLDAP() != null) {
+      ldapUser.setDescription(user.getExtraLDAP());
     }
 
     final String[] infoParts = new String[] {user.getEmailConfirmationToken(),

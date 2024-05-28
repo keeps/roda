@@ -20,6 +20,7 @@ import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.generics.CreateGroupRequest;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.generics.CreateAccessKeyRequest;
+import org.roda.core.data.v2.generics.CreateUserExtraFormFields;
 import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.generics.LoginRequest;
 import org.roda.core.data.v2.generics.MetadataValue;
@@ -178,18 +179,11 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @Parameter(description = "username") @RequestParam(name = "username") String username,
     @Parameter(description = "token") @RequestParam(required = false, name = "token") String token);
 
-  @RequestMapping(path = "/users/extra", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Get user extra", description = "Gets user extra", responses = {
+  @RequestMapping(path = "/configuration/custom-form", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get default user extra", description = "Gets the default extra form fields to create an user", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Set.class))),
     @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Set<MetadataValue> getUserExtra(
-    @Parameter(description = "username") @RequestParam(name = "username") String username);
-
-  @RequestMapping(path = "/users/extra/default", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Get default user extra", description = "Gets default user extra", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Set.class))),
-    @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Set<MetadataValue> getDefaultUserExtra();
+  CreateUserExtraFormFields getDefaultUserExtra();
 
   @RequestMapping(path = "/users/send-verification", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Send verification email", description = "Sends verification email", responses = {

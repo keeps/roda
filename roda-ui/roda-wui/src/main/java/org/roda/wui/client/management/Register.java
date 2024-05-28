@@ -126,7 +126,7 @@ public class Register extends Composite {
     Services services = new Services("Get User extra", "get");
     services.membersResource(s -> s.getDefaultUserExtra()).whenComplete((userExtra, error) -> {
       if (userExtra != null) {
-        setExtra(userExtra);
+        setExtra(userExtra.getExtraFormFields());
       } else if (error != null) {
         errorMessage(error);
       }
