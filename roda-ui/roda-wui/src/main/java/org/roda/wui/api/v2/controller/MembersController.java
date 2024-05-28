@@ -250,16 +250,16 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public AccessKey revokeAccessKey(@RequestBody AccessKey accessKey) {
+  public AccessKey revokeAccessKey(String id) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
-    accessKey.setStatus(AccessKeyStatus.REVOKED);
-
     try {
       controllerAssistant.checkRoles(requestContext.getUser());
+      AccessKey accessKey = RodaCoreFactory.getModelService().retrieveAccessKey(id);
+      accessKey.setStatus(AccessKeyStatus.REVOKED);
       return RodaCoreFactory.getModelService().updateAccessKey(accessKey, requestContext.getUser().getName());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
