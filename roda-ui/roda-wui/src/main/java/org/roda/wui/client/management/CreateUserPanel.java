@@ -93,7 +93,6 @@ public class CreateUserPanel extends Composite implements HasValueChangeHandlers
   // has to be true to detected new field changes
   private boolean changed = true;
   private boolean checked = false;
-  private UserExtraBundle userExtraBundle = null;
   private Set<MetadataValue> userExtra;
 
   @UiField
@@ -237,11 +236,10 @@ public class CreateUserPanel extends Composite implements HasValueChangeHandlers
     this.setMemberGroups(user.getGroups());
     this.setPermissions(user.getDirectRoles(), user.getAllRoles());
 
-
     Services services = new Services("Get User extra", "get");
     services.membersResource(s -> s.getDefaultUserExtra()).whenComplete((extra, error) -> {
       if (extra != null) {
-        CreateUserPanel.this.userExtra = extra;
+        CreateUserPanel.this.userExtra = extra.getExtraFormFields();
         createForm(userExtra);
       } else if (error != null) {
         if (error instanceof AuthorizationDeniedException) {
@@ -499,6 +497,7 @@ public class CreateUserPanel extends Composite implements HasValueChangeHandlers
 
   public void setUserExtra(Set<MetadataValue> userExtra) {
     this.userExtra = userExtra;
+    createForm(userExtra);
   }
 }
 

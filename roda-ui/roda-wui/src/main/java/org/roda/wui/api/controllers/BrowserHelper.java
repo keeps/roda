@@ -3644,7 +3644,7 @@ public class BrowserHelper {
 
     try {
       User user = RodaCoreFactory.getModelService().retrieveUser("name");
-      String userExtra = user.getExtra();
+      String userExtra = user.getExtraLDAP();
 
       if (userExtra != null && !values.isEmpty()) {
         for (MetadataValue mv : values) {
