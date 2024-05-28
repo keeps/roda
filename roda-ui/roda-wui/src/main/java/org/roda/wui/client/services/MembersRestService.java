@@ -81,6 +81,7 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
 
   @RequestMapping(path = "/groups/{" + RodaConstants.API_PATH_PARAM_NAME
     + "}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete group", description = "Deletes an existing group", responses = {
     @ApiResponse(responseCode = "204", description = "No Content"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
