@@ -127,9 +127,9 @@ public class MembersController implements MembersRestService {
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-
+      RodaCoreFactory.getModelService().deleteUserAccessKeys(name, requestContext.getUser().getId());
       membersService.deleteUser(name);
-      return deleteUserAccessKeys(name);
+      return null;
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
@@ -137,25 +137,6 @@ public class MembersController implements MembersRestService {
       // register action
       controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USERNAME_PARAM,
         name);
-    }
-  }
-
-  @Override
-  public Void deleteUserAccessKeys(String name) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      controllerAssistant.checkRoles(requestContext.getUser());
-      RodaCoreFactory.getModelService().deleteUserAccessKeys(name, requestContext.getUser().getId());
-      return null;
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
     }
   }
 

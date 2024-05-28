@@ -201,21 +201,14 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   User login(
     @Parameter(name = "login-request", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) LoginRequest loginRequest) throws AuthenticationDeniedException;
 
-  @RequestMapping(path = "/users/accesskey/{" + RodaConstants.API_PATH_PARAM_NAME
+  @RequestMapping(path = "/users/access-keys/{" + RodaConstants.API_PATH_PARAM_NAME
     + "}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Delete user access key", description = "Deletes user access keys", responses = {
-    @ApiResponse(responseCode = "204", description = "No Content"),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Void deleteUserAccessKeys(
-    @Parameter(description = "The user name") @PathVariable(name = RodaConstants.API_PATH_PARAM_NAME) String name);
-
-  @RequestMapping(path = "/accesskey/{" + RodaConstants.API_PATH_PARAM_NAME
-    + "}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete access key", description = "Deletes an access key", responses = {
     @ApiResponse(responseCode = "204", description = "No Content"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Void deleteAccessKey(
-    @Parameter(description = "The access key id ") @PathVariable(name = RodaConstants.API_PATH_PARAM_NAME) String accessKeyId);
+    @Parameter(description = "The access key id") @PathVariable(name = RodaConstants.API_PATH_PARAM_NAME) String accessKeyId);
 
   @RequestMapping(path = "/users/{" + RodaConstants.API_PATH_PARAM_NAME
     + "}/access-keys", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
