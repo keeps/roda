@@ -29,6 +29,7 @@ import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.generics.CreateGroupRequest;
 import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.generics.LoginRequest;
 import org.roda.core.data.v2.generics.LongResponse;
@@ -360,14 +361,17 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public Group createGroup(@RequestBody Group group) {
+  public Group createGroup(@RequestBody CreateGroupRequest groupRequest) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
-
+    Group group = new Group();
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
+      group.setName(groupRequest.getName());
+      group.setFullName(groupRequest.getFullName());
+      group.setDirectRoles(groupRequest.getDirectRoles());
       // delegate
       return membersService.createGroup(group);
     } catch (RODAException e) {
