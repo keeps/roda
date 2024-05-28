@@ -34,6 +34,7 @@ import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.generics.LoginRequest;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
+import org.roda.core.data.v2.generics.RegenerateAccessKeyRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
@@ -212,7 +213,7 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public AccessKey regenerateAccessKey(@RequestBody AccessKey accessKey) {
+  public AccessKey regenerateAccessKey(String id, @RequestBody RegenerateAccessKeyRequest regenerateAccessKeyRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
@@ -220,8 +221,14 @@ public class MembersController implements MembersRestService {
 
     try {
       controllerAssistant.checkRoles(requestContext.getUser());
-      accessKey.setKey(JwtUtils.regenerateToken(accessKey.getKey()));
-      return RodaCoreFactory.getModelService().updateAccessKey(accessKey, requestContext.getUser().getName());
+      AccessKey accessKey = RodaCoreFactory.getModelService().retrieveAccessKey(id);
+      if (regenerateAccessKeyRequest.getExpirationDate().after(new Date())) {
+        accessKey.setKey(JwtUtils.generateToken(accessKey.getName(), regenerateAccessKeyRequest.getExpirationDate()));
+        RodaCoreFactory.getModelService().updateAccessKey(accessKey, requestContext.getUser().getName());
+        return accessKey;
+      } else {
+        throw new RequestNotValidException("Date not valid.");
+      }
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
