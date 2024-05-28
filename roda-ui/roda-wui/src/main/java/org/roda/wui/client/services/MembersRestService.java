@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -57,11 +58,9 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   User getUser(
     @Parameter(description = "The user name") @PathVariable(name = RodaConstants.API_PATH_PARAM_NAME) String name);
 
-  @RequestMapping(path = "/users/authenticated/{" + RodaConstants.API_PATH_PARAM_NAME
-    + "}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/users/authenticated", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get authenticated user", description = "Gets the authenticated user", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class)))})
   User getAuthenticatedUser();
 
   @RequestMapping(path = "/users/{" + RodaConstants.API_PATH_PARAM_NAME
