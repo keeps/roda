@@ -252,11 +252,4 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   AccessKey revokeAccessKey(
     @Parameter(name = "accesskey", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) AccessKey accessKey);
-
-  @RequestMapping(path = "/token", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Authenticate using access key", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AccessKey.class))), description = "Authenticates using access key", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccessToken.class))),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  AccessToken authenticate(
-    @Parameter(name = "accesskey", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) AccessKey accessKey) throws GenericException, AuthorizationDeniedException;
 }
