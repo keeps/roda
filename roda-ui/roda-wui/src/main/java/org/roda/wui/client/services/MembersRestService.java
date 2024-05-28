@@ -18,6 +18,8 @@ import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.generics.CreateGroupRequest;
+import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.generics.CreateAccessKeyRequest;
 import org.roda.core.data.v2.generics.CreateUserRequest;
 import org.roda.core.data.v2.generics.LoginRequest;
 import org.roda.core.data.v2.generics.MetadataValue;
@@ -245,12 +247,13 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @Parameter(description = "The access key id") @PathVariable(name = "id") String id,
     @Parameter(name = "expirationDate", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) RegenerateAccessKeyRequest regenerateAccessKeyRequest);
 
-  @RequestMapping(path = "/accesskey/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Regenerate access key", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AccessKey.class))), description = "Regenerate a access key", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccessKey.class))),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  @RequestMapping(path = "/users/access-keys", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(summary = "Create access key", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CreateAccessKeyRequest.class))), description = "Creates an access key", responses = {
+    @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = AccessKey.class))),
+    @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   AccessKey createAccessKey(
-    @Parameter(name = "accesskey", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) AccessKey accessKey);
+    @Parameter(name = "accessKeyRequest", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) CreateAccessKeyRequest accessKey);
 
   @RequestMapping(path = "/users/access-keys/revoke/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Revoke access key", description = "Revokes a access key", responses = {
