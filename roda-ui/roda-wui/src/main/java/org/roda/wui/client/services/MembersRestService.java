@@ -224,13 +224,12 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   AccessKeys getAccessKeysByUser(
     @Parameter(description = "username") @PathVariable(name = RodaConstants.API_PATH_PARAM_NAME) String username);
 
-  @RequestMapping(path = "/users/accesskey/{" + RodaConstants.API_PATH_PARAM_NAME
-    + "}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Get access key", description = "Gets a particular access key", responses = {
+  @RequestMapping(path = "/users/access-keys/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get access key", description = "Gets an access key by its id", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccessKey.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   AccessKey getAccessKey(
-    @Parameter(description = "The access key id ") @PathVariable(name = RodaConstants.API_PATH_PARAM_NAME) String accessKeyId);
+    @Parameter(description = "The access key id ") @PathVariable(name = "id") String accessKeyId);
 
   @RequestMapping(path = "/users/access-keys/regenerate/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Regenerate access key", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RegenerateAccessKeyRequest.class))), description = "Regenerate a access key", responses = {
