@@ -216,8 +216,8 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   Void deleteAccessKey(
     @Parameter(description = "The access key id ") @PathVariable(name = RodaConstants.API_PATH_PARAM_NAME) String accessKeyId);
 
-  @RequestMapping(path = "/users/accesskey/list/{" + RodaConstants.API_PATH_PARAM_NAME
-    + "}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/users/{" + RodaConstants.API_PATH_PARAM_NAME
+    + "}/access-keys", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get user access keys list", description = "Gets a particular user access keys", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccessKeys.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
