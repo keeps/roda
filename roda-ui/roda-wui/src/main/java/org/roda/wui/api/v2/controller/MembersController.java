@@ -187,7 +187,14 @@ public class MembersController implements MembersRestService {
 
     try {
       controllerAssistant.checkRoles(requestContext.getUser());
-      return RodaCoreFactory.getModelService().listAccessKeysByUser(username);
+      if (membersService.retrieveUser(username).getId() == null) {
+        throw new NotFoundException("User not found");
+      }
+      AccessKeys accessKeys = RodaCoreFactory.getModelService().listAccessKeysByUser(username);
+      for (AccessKey accessKey : accessKeys.getObjects()){
+        accessKey.setKey(null);
+      }
+      return accessKeys;
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
