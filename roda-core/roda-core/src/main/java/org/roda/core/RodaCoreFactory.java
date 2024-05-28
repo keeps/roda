@@ -773,7 +773,7 @@ public class RodaCoreFactory {
 
           getIndexService().reindexRisks(fileStorageService);
           getIndexService().reindexRepresentationInformation(fileStorageService);
-          getIndexService().reindexAIPs();
+          // getIndexService().reindexAIPs(); // TODO: CHECK WITH @LFARIA IF THIS CAN BE COMMENTED OUT
           // reindex other default objects HERE
         }
       } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
