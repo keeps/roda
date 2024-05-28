@@ -10,39 +10,25 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.common.ConversionProfile;
-import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
-import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
-import org.roda.core.data.v2.disposal.hold.DisposalHold;
-import org.roda.core.data.v2.disposal.hold.DisposalHolds;
-import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
-import org.roda.core.data.v2.disposal.rule.DisposalRule;
-import org.roda.core.data.v2.disposal.rule.DisposalRules;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
@@ -50,9 +36,6 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
@@ -64,15 +47,10 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
-import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
-import org.roda.wui.client.planning.MitigationPropertiesBundle;
-import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
-import org.roda.wui.client.planning.RiskMitigationBundle;
-import org.roda.wui.client.planning.RiskVersionsBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -103,8 +81,6 @@ public interface BrowserServiceAsync {
   void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details,
     AsyncCallback<Job> callback);
 
-  void deleteFile(SelectedItems<IndexedFile> representations, String details, AsyncCallback<Job> callback);
-
   void updateDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle bundle,
     AsyncCallback<Void> callback);
 
@@ -116,21 +92,6 @@ public interface BrowserServiceAsync {
 
   void retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle, AsyncCallback<String> async);
 
-  void createTransferredResourcesFolder(String parent, String folderName, boolean commit,
-    AsyncCallback<String> callback);
-
-  void deleteTransferredResources(SelectedItems<TransferredResource> selected, AsyncCallback<Void> callback);
-
-  void transferScanRequestUpdate(String transferredResourceUUID, AsyncCallback<Void> callback);
-
-  void createJob(Job job, AsyncCallback<Job> callback);
-
-  void stopJob(String jobId, AsyncCallback<Void> callback);
-
-  void approveJob(SelectedItems<Job> jobs, AsyncCallback<Void> callback);
-
-  void rejectJob(SelectedItems<Job> jobs, String details, AsyncCallback<Void> callback);
-
   void retrievePluginsInfo(List<PluginType> type, AsyncCallback<List<PluginInfo>> callback);
 
   void retrieveReindexPluginObjectClasses(AsyncCallback<Set<Pair<String, String>>> asyncCallback);
@@ -139,7 +100,7 @@ public interface BrowserServiceAsync {
     AsyncCallback<Set<Pair<String, String>>> asyncCallback);
 
   void retrieveConversionProfilePluginItems(String pluginId, String repOrDip, String localeString,
-                                            AsyncCallback<Set<ConversionProfile>> asyncCallback);
+    AsyncCallback<Set<ConversionProfile>> asyncCallback);
 
   void retrieveCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
 
@@ -165,10 +126,6 @@ public interface BrowserServiceAsync {
     Facets facets, String localeString, boolean justActive, List<String> fieldsToReturn,
     AsyncCallback<IndexResult<T>> callback);
 
-  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, AsyncCallback<Void> callback);
-
-  void count(String classNameToReturn, Filter filter, boolean justActive, AsyncCallback<Long> callback);
-
   <T extends IsIndexed> void retrieve(String classNameToReturn, String id, List<String> fieldsToReturn,
     AsyncCallback<T> callback);
 
@@ -184,29 +141,6 @@ public interface BrowserServiceAsync {
   void updateDIPPermissions(SelectedItems<IndexedDIP> dips, Permissions permissions, String details,
     AsyncCallback<Job> callback);
 
-  void createRisk(Risk risk, AsyncCallback<Risk> asyncCallback);
-
-  void updateRisk(Risk risk, int incidences, AsyncCallback<Void> asyncCallback);
-
-  void revertRiskVersion(String riskId, String versionId, AsyncCallback<Void> callback);
-
-  void deleteRiskVersion(String riskId, String versionId, AsyncCallback<Void> callback);
-
-  void retrieveRiskVersions(String riskId, AsyncCallback<RiskVersionsBundle> callback);
-
-  void hasRiskVersions(String id, AsyncCallback<Boolean> asyncCallback);
-
-  void retrieveRiskVersion(String riskId, String selectedVersion, AsyncCallback<Risk> asyncCallback);
-
-  void retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact, int posMitigationProbability,
-    int posMitigationImpact, AsyncCallback<RiskMitigationBundle> asyncCallback);
-
-  void retrieveMitigationSeverityLimits(AsyncCallback<List<String>> asyncCallback);
-
-  void retrieveAllMitigationProperties(AsyncCallback<MitigationPropertiesBundle> asyncCallback);
-
-  void deleteRisk(SelectedItems<IndexedRisk> selected, AsyncCallback<Job> asyncCallback);
-
   void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details, AsyncCallback<Job> asyncCallback);
 
   void createProcess(String jobName, JobPriority priority, JobParallelism parallelism, SelectedItems<?> selected,
@@ -221,32 +155,7 @@ public interface BrowserServiceAsync {
   void createProcessJson(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
     String selectedClass, AsyncCallback<String> asyncCallback);
 
-  void updateRiskCounters(AsyncCallback<Void> asyncCallback);
-
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, AsyncCallback<Job> callback);
-
-  void renameTransferredResource(String transferredResourceId, String newName, AsyncCallback<String> asyncCallback);
-
-  void moveTransferredResource(SelectedItems<TransferredResource> selected, TransferredResource transferredResource,
-    AsyncCallback<Job> asyncCallback);
-
-  void retrieveSelectedTransferredResource(SelectedItems<TransferredResource> selected,
-    AsyncCallback<List<TransferredResource>> asyncCallback);
-
-  void deleteFile(String fileUUID, String details, AsyncCallback<Void> callback);
-
-  void updateRiskIncidence(RiskIncidence incidence, AsyncCallback<Void> asyncCallback);
-
-  void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity, Date mitigatedOn,
-    String mitigatedBy, String mitigatedDescription, AsyncCallback<Job> loadingAsyncCallback);
-
-  void renameFolder(String folderUUID, String newName, String details, AsyncCallback<IndexedFile> asyncCallback);
-
-  void moveFiles(String aipId, String representationId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder,
-    String details, AsyncCallback<Job> asyncCallback);
-
-  void createFolder(String aipId, String representationId, String folderUUID, String newName, String details,
-    AsyncCallback<IndexedFile> asyncCallback);
 
   void createFormatIdentificationJob(SelectedItems<?> selected, AsyncCallback<Job> loadingAsyncCallback);
 
@@ -270,8 +179,6 @@ public interface BrowserServiceAsync {
   void retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId, List<String> historyFilePath,
     String historyFileId, List<String> fileFieldsToReturn, AsyncCallback<BrowseFileBundle> asyncCallback);
 
-  <T extends IsIndexed> void retrieveFromModel(String objectClass, String objectUUID, AsyncCallback<T> asyncCallback);
-
   void hasDocumentation(String aipId, AsyncCallback<Boolean> asyncCallback);
 
   void hasSubmissions(String aipId, AsyncCallback<Boolean> asyncCallback);
@@ -286,111 +193,7 @@ public interface BrowserServiceAsync {
 
   void retrieveRepresentationTypeOptions(String locale, AsyncCallback<Pair<Boolean, List<String>>> asyncCallback);
 
-  void createRepresentationInformation(RepresentationInformation ri, RepresentationInformationExtraBundle bundle,
-    AsyncCallback<RepresentationInformation> asyncCallback);
-
-  void updateRepresentationInformation(RepresentationInformation ri, RepresentationInformationExtraBundle bundle,
-    AsyncCallback<Void> asyncCallback);
-
-  void updateRepresentationInformationListWithFilter(
-    SelectedItems<RepresentationInformation> representationInformationIds, String filterToAdd,
-    AsyncCallback<Job> asyncCallback);
-
-  void deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected,
-    AsyncCallback<Job> asyncCallback);
-
-  void retrieveRepresentationInformationWithFilter(String riFilter, AsyncCallback<Pair<String, Integer>> asyncCallback);
-
   void retrieveObjectClassFields(String locale, AsyncCallback<RepresentationInformationFilterBundle> asyncCallback);
-
-  void retrieveRepresentationInformationFamilyOptions(String localeString,
-    AsyncCallback<Map<String, String>> asyncCallback);
-
-  void retrieveRepresentationInformationFamilyOptions(String family, String localeString,
-    AsyncCallback<String> asyncCallback);
-
-  void retrieveRelationTypeTranslations(String localeString,
-    AsyncCallback<RelationTypeTranslationsBundle> asyncCallback);
-
-  void retrieveRepresentationInformationExtraBundle(String representationInformationId, String localeString,
-    AsyncCallback<RepresentationInformationExtraBundle> asyncCallback);
-
-  void retrieveSharedProperties(String localeName, AsyncCallback<Map<String, List<String>>> asyncCallback);
-
-  void createDisposalRule(DisposalRule rule, AsyncCallback<DisposalRule> async);
-
-  void retrieveDisposalRule(String disposalRuleId, AsyncCallback<DisposalRule> async);
-
-  void listDisposalRules(AsyncCallback<DisposalRules> async);
-
-  void updateDisposalRule(DisposalRule rule, AsyncCallback<DisposalRule> async);
-
-  void updateDisposalRules(DisposalRules rules, AsyncCallback<Void> async);
-
-  void deleteDisposalRule(String disposalRuleId, AsyncCallback<Void> async);
-
-  void applyDisposalRules(boolean applyToManuallyInclusive, AsyncCallback<Job> async);
-
-  void createDisposalSchedule(DisposalSchedule schedule, AsyncCallback<DisposalSchedule> async);
-
-  void retrieveDisposalSchedule(String disposalScheduleId, AsyncCallback<DisposalSchedule> async);
-
-  void listDisposalSchedules(AsyncCallback<DisposalSchedules> async);
-
-  void updateDisposalSchedule(DisposalSchedule schedule, AsyncCallback<DisposalSchedule> async);
-
-  void deleteDisposalSchedule(String disposalScheduleId, AsyncCallback<Void> async);
-
-  void createDisposalHold(DisposalHold hold, AsyncCallback<DisposalHold> async);
-
-  void retrieveDisposalHold(String disposalHoldId, AsyncCallback<DisposalHold> async);
-
-  void listDisposalHolds(AsyncCallback<DisposalHolds> async);
-
-  void updateDisposalHold(DisposalHold hold, AsyncCallback<DisposalHold> async);
-
-  void deleteDisposalHold(String disposalHoldId, AsyncCallback<Void> async);
-
-  void associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId,
-    AsyncCallback<Job> async);
-
-  void disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
-
-  void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
-    DisposalConfirmationForm metadata, AsyncCallback<Job> async);
-
-  void listDisposalHoldsAssociation(String aipId, AsyncCallback<List<DisposalHoldAIPMetadata>> async);
-
-  void deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmation> selectedItems, String details,
-                                        AsyncCallback<Job> async);
-
-  void destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
-                                                  AsyncCallback<Job> async);
-
-  void permanentlyDeleteRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
-    AsyncCallback<Job> async);
-
-  void retrieveDisposalConfirmationExtraBundle(AsyncCallback<DisposalConfirmationForm> async);
-
-  void applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean override,
-    AsyncCallback<Job> async);
-
-  void recoverRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
-    AsyncCallback<Job> async);
-
-  void restoreRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
-    AsyncCallback<Job> async);
-
-  void liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, AsyncCallback<Job> async);
-
-  void liftDisposalHold(DisposalHold disposalHold, AsyncCallback<DisposalHold> async);
-
-  void disassociateDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll,
-    AsyncCallback<Job> async);
-
-  void retrieveDisposalConfirmationReport(String confirmationId, boolean isToPrint, AsyncCallback<String> async);
-
-  void listTransitiveDisposalHolds(String aipId, AsyncCallback<List<DisposalTransitiveHoldAIPMetadata>> async);
 
   void createDistributedInstance(DistributedInstance distributedInstance, AsyncCallback<DistributedInstance> async);
 

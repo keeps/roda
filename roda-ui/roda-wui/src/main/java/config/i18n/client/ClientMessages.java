@@ -138,6 +138,10 @@ public interface ClientMessages extends Messages {
 
   String createFolderAlreadyExistsMessage();
 
+  String renameFolderAlreadyExistsTitle();
+
+  String renameFolderAlreadyExistsMessage();
+
   String outcomeDetailTitle();
 
   String outcomeDetailPlaceholder();
@@ -945,6 +949,10 @@ public interface ClientMessages extends Messages {
   String riskIncidenceRemoveConfirmDialogCancel();
 
   String riskIncidenceRemoveConfirmDialogOk();
+
+  String riskCreatedTitle();
+
+  String riskCreatedMessage();
 
   /************* RepresentationInformation register ****************/
 

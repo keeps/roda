@@ -24,7 +24,7 @@ import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.generics.CreateUserRequest;
+import org.roda.core.data.v2.user.CreateUserRequest;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -39,7 +39,6 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 

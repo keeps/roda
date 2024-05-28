@@ -14,10 +14,12 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.core.data.v2.risks.RiskMitigationProperties;
 import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.services.RiskRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
@@ -32,7 +34,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
@@ -51,97 +52,65 @@ import config.i18n.client.ClientMessages;
  */
 public class RiskDataPanel extends Composite implements HasValueChangeHandlers<Risk> {
 
-  interface MyUiBinder extends UiBinder<Widget, RiskDataPanel> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
   Label id;
-
   @UiField
   TextBox idBox;
-
   @UiField
   TextBox name;
-
   @UiField
   TextArea description;
-
   @UiField
   DateBox identifiedOn;
-
   @UiField(provided = true)
   SearchSuggestBox<IndexedRisk> identifiedBy;
-
   @UiField(provided = true)
   IncrementalList categories;
-
   @UiField
   TextArea notes;
-
   @UiField
   ListBox preMitigationProbability;
-
   @UiField
   ListBox preMitigationImpact;
-
   @UiField
   Label preMitigationSeverityKey;
-
   @UiField
   HTML preMitigationSeverityValue;
-
   @UiField
   TextArea preMitigationNotes;
-
   @UiField
   ListBox posMitigationProbability;
-
   @UiField
   ListBox posMitigationImpact;
-
   @UiField
   Label posMitigationSeverityKey;
-
   @UiField
   HTML posMitigationSeverityValue;
-
   @UiField
   TextArea posMitigationNotes;
-
   @UiField
   TextArea mitigationStrategy;
-
   @UiField
   Label mitigationOwnerTypeKey;
-
   @UiField
   TextBox mitigationOwnerType;
-
   @UiField(provided = true)
   SearchSuggestBox<IndexedRisk> mitigationOwner;
-
   @UiField
   TextBox mitigationRelatedEventIdentifierType;
-
   @UiField
   TextBox mitigationRelatedEventIdentifierValue;
-
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private boolean editmode;
-
   private boolean changed = false;
   private boolean checked = false;
-
   private int severityLowLimit;
   private int severityHighLimit;
   private int probabilitiesSize;
   private int impactsSize;
-
   private Date createdOn;
   private String createdBy;
 
@@ -161,21 +130,16 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    BrowserService.Util.getInstance().retrieveAllMitigationProperties(new AsyncCallback<MitigationPropertiesBundle>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        // do nothing
-      }
-
-      @Override
-      public void onSuccess(MitigationPropertiesBundle terms) {
-        init(editmode, terms, risk);
-      }
-    });
+    Services services = new Services("Retrieve risk mitigation properties", "get");
+    services.riskResource(RiskRestService::retrieveRiskMitigationProperties)
+      .whenComplete((riskMitigationProperties, throwable) -> {
+        if (throwable == null) {
+          init(editmode, riskMitigationProperties, risk);
+        }
+      });
   }
 
-  public void init(boolean editmode, MitigationPropertiesBundle mitigationProperties, IndexedRisk risk) {
+  public void init(boolean editmode, RiskMitigationProperties mitigationProperties, IndexedRisk risk) {
     severityLowLimit = mitigationProperties.getSeverityLowLimit();
     severityHighLimit = mitigationProperties.getSeverityHighLimit();
 
@@ -364,56 +328,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     return valid;
   }
 
-  public void setRisk(IndexedRisk risk) {
-    this.id.setText(risk.getId());
-    this.name.setText(risk.getName());
-    this.description.setText(risk.getDescription());
-    this.identifiedOn.setValue(risk.getIdentifiedOn());
-    this.identifiedBy.setValue(risk.getIdentifiedBy());
-    this.categories.setTextBoxList(risk.getCategories());
-    this.notes.setText(risk.getNotes());
-
-    int preProbability = getIndex(risk.getPreMitigationProbability(), probabilitiesSize);
-    int preImpact = getIndex(risk.getPreMitigationImpact(), impactsSize);
-
-    this.preMitigationProbability.setSelectedIndex(preProbability);
-    this.preMitigationImpact.setSelectedIndex(preImpact);
-    this.preMitigationNotes.setText(risk.getPreMitigationNotes());
-
-    this.preMitigationSeverityKey.setVisible(true);
-    this.preMitigationSeverityValue.setVisible(true);
-    int preSeverity = risk.getPreMitigationSeverity();
-    this.preMitigationSeverityValue
-      .setHTML(HtmlSnippetUtils.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
-
-    int probability = getIndex(risk.getPostMitigationProbability(), probabilitiesSize);
-    int impact = getIndex(risk.getPostMitigationImpact(), impactsSize);
-
-    this.posMitigationProbability.setSelectedIndex(probability);
-    this.posMitigationImpact.setSelectedIndex(impact);
-    this.posMitigationNotes.setText(risk.getPostMitigationNotes());
-
-    if (probability != 0 || impact != 0) {
-      this.posMitigationSeverityKey.setVisible(true);
-      this.posMitigationSeverityValue.setVisible(true);
-      int posSeverity = risk.getPostMitigationSeverity();
-      this.posMitigationSeverityValue
-        .setHTML(HtmlSnippetUtils.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
-    } else {
-      this.posMitigationSeverityKey.setVisible(false);
-      this.posMitigationSeverityValue.setVisible(false);
-    }
-
-    this.mitigationStrategy.setText(risk.getMitigationStrategy());
-    this.mitigationOwnerType.setText(risk.getMitigationOwnerType());
-    this.mitigationOwner.setValue(risk.getMitigationOwner());
-    this.mitigationRelatedEventIdentifierType.setText(risk.getMitigationRelatedEventIdentifierType());
-    this.mitigationRelatedEventIdentifierValue.setText(risk.getMitigationRelatedEventIdentifierValue());
-
-    this.createdOn = risk.getCreatedOn();
-    this.createdBy = risk.getCreatedBy();
-  }
-
   public Risk getRisk() {
     Risk risk = new Risk();
     if (idBox.isVisible() && idBox.getText() != null && !"".equals(idBox.getText())) {
@@ -466,6 +380,56 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     }
 
     return risk;
+  }
+
+  public void setRisk(IndexedRisk risk) {
+    this.id.setText(risk.getId());
+    this.name.setText(risk.getName());
+    this.description.setText(risk.getDescription());
+    this.identifiedOn.setValue(risk.getIdentifiedOn());
+    this.identifiedBy.setValue(risk.getIdentifiedBy());
+    this.categories.setTextBoxList(risk.getCategories());
+    this.notes.setText(risk.getNotes());
+
+    int preProbability = getIndex(risk.getPreMitigationProbability(), probabilitiesSize);
+    int preImpact = getIndex(risk.getPreMitigationImpact(), impactsSize);
+
+    this.preMitigationProbability.setSelectedIndex(preProbability);
+    this.preMitigationImpact.setSelectedIndex(preImpact);
+    this.preMitigationNotes.setText(risk.getPreMitigationNotes());
+
+    this.preMitigationSeverityKey.setVisible(true);
+    this.preMitigationSeverityValue.setVisible(true);
+    int preSeverity = risk.getPreMitigationSeverity();
+    this.preMitigationSeverityValue
+      .setHTML(HtmlSnippetUtils.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
+
+    int probability = getIndex(risk.getPostMitigationProbability(), probabilitiesSize);
+    int impact = getIndex(risk.getPostMitigationImpact(), impactsSize);
+
+    this.posMitigationProbability.setSelectedIndex(probability);
+    this.posMitigationImpact.setSelectedIndex(impact);
+    this.posMitigationNotes.setText(risk.getPostMitigationNotes());
+
+    if (probability != 0 || impact != 0) {
+      this.posMitigationSeverityKey.setVisible(true);
+      this.posMitigationSeverityValue.setVisible(true);
+      int posSeverity = risk.getPostMitigationSeverity();
+      this.posMitigationSeverityValue
+        .setHTML(HtmlSnippetUtils.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
+    } else {
+      this.posMitigationSeverityKey.setVisible(false);
+      this.posMitigationSeverityValue.setVisible(false);
+    }
+
+    this.mitigationStrategy.setText(risk.getMitigationStrategy());
+    this.mitigationOwnerType.setText(risk.getMitigationOwnerType());
+    this.mitigationOwner.setValue(risk.getMitigationOwner());
+    this.mitigationRelatedEventIdentifierType.setText(risk.getMitigationRelatedEventIdentifierType());
+    this.mitigationRelatedEventIdentifierValue.setText(risk.getMitigationRelatedEventIdentifierValue());
+
+    this.createdOn = risk.getCreatedOn();
+    this.createdBy = risk.getCreatedBy();
   }
 
   public void clear() {
@@ -527,5 +491,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
 
   public Risk getValue() {
     return getRisk();
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, RiskDataPanel> {
   }
 }

@@ -7,10 +7,12 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
 public class FileLink extends RepresentationLink implements Serializable {
+  @Serial
   private static final long serialVersionUID = 7553550787359540332L;
 
   private List<String> path;

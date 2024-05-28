@@ -5,12 +5,14 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.planning;
+package org.roda.core.data.v2.risks;
 
+import java.io.Serial;
 import java.io.Serializable;
 
-public class RiskMitigationBundle implements Serializable {
+public class RiskMitigationTerms implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = -5597089097774406159L;
 
   private String preMitigationProbability;
@@ -21,7 +23,7 @@ public class RiskMitigationBundle implements Serializable {
   private int severityLowLimit;
   private int severityHighLimit;
 
-  public RiskMitigationBundle() {
+  public RiskMitigationTerms() {
     preMitigationProbability = "";
     preMitigationImpact = "";
     posMitigationProbability = "";
@@ -31,7 +33,7 @@ public class RiskMitigationBundle implements Serializable {
     severityHighLimit = 15;
   }
 
-  public RiskMitigationBundle(int lowLimit, int highLimit, String preProbability, String preImpact,
+  public RiskMitigationTerms(int lowLimit, int highLimit, String preProbability, String preImpact,
     String posProbability, String posImpact) {
 
     preMitigationProbability = preProbability;
@@ -90,5 +92,4 @@ public class RiskMitigationBundle implements Serializable {
   public void setPosMitigationImpact(String posMitigationImpact) {
     this.posMitigationImpact = posMitigationImpact;
   }
-
 }

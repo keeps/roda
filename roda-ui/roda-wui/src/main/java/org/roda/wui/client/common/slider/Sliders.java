@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.slider;
 
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
@@ -15,6 +16,8 @@ import org.roda.wui.client.browse.bundle.Bundle;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
+import org.roda.wui.client.common.model.BrowseFileResponse;
+import org.roda.wui.client.services.Services;
 
 public class Sliders {
 
@@ -30,7 +33,14 @@ public class Sliders {
     return slider;
   }
 
-  public static <T extends IsIndexed> SliderPanel createDisseminationsSlider(FlowPanel container,
+  public static <T extends IsIndexed> SliderPanel createDisseminationSlider(FlowPanel container,
+                                                                            FocusPanel toggleButton, T object, Services services) {
+    SliderPanel slider = createSlider(container, toggleButton);
+    DisseminationsSliderHelper.updateDisseminationsObjectSliderPanel(object, slider, services);
+    return slider;
+  }
+
+  public static <T extends IsIndexed> SliderPanel createDisseminationSlider(FlowPanel container,
     FocusPanel toggleButton, T object) {
     SliderPanel slider = createSlider(container, toggleButton);
     DisseminationsSliderHelper.updateDisseminationsObjectSliderPanel(object, slider);
@@ -53,6 +63,12 @@ public class Sliders {
       return createAipInfoSlider(container, toggleButton, (BrowseAIPBundle) bundle);
     }
     return null;
+  }
+
+  public static SliderPanel createFileInfoSlider(FlowPanel container, FocusPanel toggleButton, IndexedFile file, BrowseFileResponse response) {
+    SliderPanel slider = createSlider(container, toggleButton);
+    InfoSliderHelper.createFileInfoSliderPanel(file, response, slider);
+    return slider;
   }
 
   public static SliderPanel createFileInfoSlider(FlowPanel container, FocusPanel toggleButton,

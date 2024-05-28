@@ -5,14 +5,16 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.planning;
+package org.roda.core.data.v2.risks;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MitigationPropertiesBundle implements Serializable {
+public class RiskMitigationProperties implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = -7437948328796925775L;
 
   private List<String> probabilities;
@@ -21,15 +23,14 @@ public class MitigationPropertiesBundle implements Serializable {
   private int severityLowLimit;
   private int severityHighLimit;
 
-  public MitigationPropertiesBundle() {
+  public RiskMitigationProperties() {
     probabilities = new ArrayList<>();
     impacts = new ArrayList<>();
     severityLowLimit = 5;
     severityHighLimit = 15;
   }
 
-  public MitigationPropertiesBundle(int lowLimit, int highLimit, List<String> probabilityList,
-    List<String> impactList) {
+  public RiskMitigationProperties(int lowLimit, int highLimit, List<String> probabilityList, List<String> impactList) {
     probabilities = probabilityList;
     impacts = impactList;
     severityLowLimit = lowLimit;
@@ -67,5 +68,4 @@ public class MitigationPropertiesBundle implements Serializable {
   public void setSeverityHighLimit(int severityHighLimit) {
     this.severityHighLimit = severityHighLimit;
   }
-
 }

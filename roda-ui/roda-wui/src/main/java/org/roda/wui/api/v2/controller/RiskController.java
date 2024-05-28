@@ -1,10 +1,12 @@
 package org.roda.wui.api.v2.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -17,10 +19,12 @@ import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskMitigationProperties;
+import org.roda.core.data.v2.risks.RiskMitigationTerms;
+import org.roda.core.data.v2.risks.RiskVersions;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.RiskService;
@@ -46,7 +50,7 @@ public class RiskController implements RiskRestService {
   private HttpServletRequest request;
 
   @Autowired
-  private RiskService indexedRiskService;
+  private RiskService riskService;
 
   @Autowired
   private IndexService indexService;
@@ -66,7 +70,7 @@ public class RiskController implements RiskRestService {
       RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE);
     IndexedRisk retrieve = indexService.retrieve(requestContext, IndexedRisk.class, uuid, fieldsToReturn);
     try {
-      retrieve.setHasVersions(indexedRiskService.hasRiskVersions(uuid));
+      retrieve.setHasVersions(riskService.hasRiskVersions(uuid));
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
       throw new RESTException(e);
     }
@@ -82,7 +86,7 @@ public class RiskController implements RiskRestService {
   @Override
   public LongResponse count(CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
+    return new LongResponse(indexService.count(IndexedRisk.class, countRequest, requestContext));
   }
 
   public Job deleteRisk(@RequestBody SelectedItems<IndexedRisk> selected) {
@@ -93,7 +97,7 @@ public class RiskController implements RiskRestService {
     try {
       controllerAssistant.checkRoles(requestContext.getUser());
       // delegate
-      return indexedRiskService.deleteRisk(requestContext.getUser(), selected);
+      return riskService.deleteRisk(requestContext.getUser(), selected);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
@@ -114,8 +118,7 @@ public class RiskController implements RiskRestService {
       Map<String, String> properties = new HashMap<>();
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
-      return indexedRiskService.updateRisk(risk, requestContext.getUser(), properties, true,
-        Integer.parseInt(incidences));
+      return riskService.updateRisk(risk, requestContext.getUser(), properties, true, Integer.parseInt(incidences));
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
@@ -127,4 +130,182 @@ public class RiskController implements RiskRestService {
     }
   }
 
+  @Override
+  public Risk createRisk(@RequestBody Risk risk) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // delegate
+      return riskService.createRisk(risk, requestContext.getUser(), true);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_RISK_PARAM, risk);
+    }
+  }
+
+  @Override
+  public RiskVersions retrieveRiskVersions(String id) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try { // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      return riskService.retrieveRiskVersions(id);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (RequestNotValidException | GenericException | NotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
+        id);
+    }
+  }
+
+  @Override
+  public Risk retrieveRiskVersion(String id, String versionId) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // delegate
+      return riskService.retrieveRiskVersion(id, versionId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
+        id, RodaConstants.CONTROLLER_SELECTED_VERSION_PARAM, versionId);
+    }
+  }
+
+  @Override
+  public Risk revertRiskVersion(String id, String versionId) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // delegate
+      Map<String, String> properties = new HashMap<>();
+      properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.REVERTED.toString());
+
+      int incidences = 0;
+
+      IndexedRisk indexedRisk = RodaCoreFactory.getIndexService().retrieve(IndexedRisk.class, id,
+        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_INCIDENCES_COUNT));
+      incidences = indexedRisk.getIncidencesCount();
+
+      return riskService.revertRiskVersion(id, versionId, properties, incidences);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (RequestNotValidException | NotFoundException | GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
+        id, RodaConstants.CONTROLLER_VERSION_ID_PARAM, versionId, RodaConstants.CONTROLLER_MESSAGE_PARAM,
+        RodaConstants.VersionAction.REVERTED.toString());
+    }
+  }
+
+  @Override
+  public Void deleteRiskVersion(String id, String versionId) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // delegate
+      riskService.deleteRiskVersion(id, versionId);
+
+      return null;
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (RequestNotValidException | NotFoundException | GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
+        id, RodaConstants.CONTROLLER_VERSION_ID_PARAM, versionId);
+    }
+  }
+
+  @Override
+  public RiskMitigationTerms retrieveRiskMitigationTerms(String id) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      IndexedRisk indexedRisk = RodaCoreFactory.getIndexService().retrieve(IndexedRisk.class, id, new ArrayList<>());
+
+      // delegate
+      return riskService.retrieveFromConfigurationMitigationTerms(indexedRisk);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (NotFoundException | GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, id);
+    }
+  }
+
+  @Override
+  public RiskMitigationProperties retrieveRiskMitigationProperties() {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // delegate
+      return riskService.retrieveMitigationProperties();
+
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext.getUser(), state);
+    }
+  }
 }

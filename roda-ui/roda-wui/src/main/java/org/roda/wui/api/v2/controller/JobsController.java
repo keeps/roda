@@ -7,7 +7,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
-import org.roda.core.data.v2.generics.ValueResponse;
+import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
@@ -67,9 +67,9 @@ public class JobsController implements JobsRestService {
   private IndexService indexService;
 
   @Override
-  public ValueResponse obtainJobCommand(@RequestBody Job job) {
+  public StringResponse obtainJobCommand(@RequestBody Job job) {
     String path = request.getRequestURL().toString().split("/api")[0];
-    return new ValueResponse(jobService.buildCurlCommand(path, job));
+    return new StringResponse(jobService.buildCurlCommand(path, job));
   }
 
   @Override

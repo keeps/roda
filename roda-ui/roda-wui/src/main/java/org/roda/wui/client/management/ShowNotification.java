@@ -55,7 +55,6 @@ public class ShowNotification extends Composite {
         Services services = new Services("Get notification", "get");
         services.notificationResource(s -> s.getNotification(notificationId)).whenComplete((notification, throwable) -> {
           if (throwable != null) {
-            GWT.log("" + throwable);
             callback.onFailure(throwable);
           } else {
             ShowNotification notificationPanel = new ShowNotification(notification);

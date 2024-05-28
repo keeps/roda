@@ -65,8 +65,7 @@ public interface RepresentationInformationRestService extends RODAEntityRestServ
   @RequestMapping(path = "/configuration/families/options", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Retrieves from the configuration the options for the representation information family", description = "Retrieve the representation information family possible values and internationalize the results", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = RepresentationInformationFamilyOptions.class))),
-    @ApiResponse(responseCode = "401", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
-    @ApiResponse(responseCode = "404", description = "Family type not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+    @ApiResponse(responseCode = "401", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   RepresentationInformationFamilyOptions retrieveRepresentationInformationFamilyOptions(
     @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 

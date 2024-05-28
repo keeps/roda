@@ -19,6 +19,7 @@ import org.roda.wui.client.common.resources.MyResources;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.GAnalyticsTracker;
 import org.roda.wui.client.main.Theme;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -49,20 +50,16 @@ public class MainPortal extends Composite implements EntryPoint {
     ClientLogger.setUncaughtExceptionHandler();
 
     // load shared properties before init
-    BrowserService.Util.getInstance().retrieveSharedProperties(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<Map<String, List<String>>>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          logger.error("Failed loading initial data", caught);
-        }
-
-        @Override
-        public void onSuccess(Map<String, List<String>> sharedProperties) {
-          ConfigurationManager.initialize(sharedProperties);
+    Services services = new Services("Retrieve shared properties", "get");
+    services.configurationsResource(s -> s.retrieveSharedProperties(LocaleInfo.getCurrentLocale().getLocaleName()))
+      .whenComplete((sharedProperties, throwable) -> {
+        if (throwable != null) {
+          logger.error("Failed loading initial data", throwable);
+        } else {
+          ConfigurationManager.initialize(sharedProperties.getProperties());
           init();
         }
       });
-
   }
 
   interface Binder extends UiBinder<Widget, MainPortal> {

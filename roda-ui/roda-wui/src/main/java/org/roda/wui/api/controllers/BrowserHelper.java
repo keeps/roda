@@ -179,7 +179,6 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ObjectResponse;
-import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
@@ -192,9 +191,7 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
-import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
@@ -2620,54 +2617,6 @@ public class BrowserHelper {
     } else {
       throw new GenericException("Unsupported part: " + part);
     }
-  }
-
-  public static RiskMitigationBundle retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
-    int posMitigationProbability, int posMitigationImpact) {
-    int lowLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationSeverity", "lowLimit");
-    int highLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationSeverity", "highLimit");
-
-    String preProbability = RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability",
-      Integer.toString(preMitigationProbability));
-    String preImpact = RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact",
-      Integer.toString(preMitigationImpact));
-    String posProbability = RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability",
-      Integer.toString(posMitigationProbability));
-    String posImpact = RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact",
-      Integer.toString(posMitigationImpact));
-
-    return new RiskMitigationBundle(lowLimit, highLimit, preProbability, preImpact, posProbability, posImpact);
-  }
-
-  public static List<String> retrieveShowMitigationTerms() {
-    List<String> terms = new ArrayList<>();
-    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "lowLimit"));
-    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "highLimit"));
-    return terms;
-  }
-
-  public static MitigationPropertiesBundle retrieveAllMitigationProperties() {
-    int lowLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationSeverity", "lowLimit");
-    int highLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationSeverity", "highLimit");
-
-    int probabilityLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationProbability", "limit");
-    int impactLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationImpact", "limit");
-
-    // second list contains probability content
-    List<String> probabilities = new ArrayList<>();
-    for (int i = 0; i <= probabilityLimit; i++) {
-      String value = Integer.toString(i);
-      probabilities.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability", value));
-    }
-
-    // third list contains impact content
-    List<String> impacts = new ArrayList<>();
-    for (int i = 0; i <= impactLimit; i++) {
-      String value = Integer.toString(i);
-      impacts.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact", value));
-    }
-
-    return new MitigationPropertiesBundle(lowLimit, highLimit, probabilities, impacts);
   }
 
   public static Job deleteRisk(User user, SelectedItems<IndexedRisk> selected)

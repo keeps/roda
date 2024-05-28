@@ -13,8 +13,6 @@ package org.roda.wui.client.browse;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -51,7 +49,6 @@ import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -63,6 +60,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -278,7 +277,7 @@ public class BrowseDIP extends Composite {
       topNavigationToolbar.withPermissions(bundle.getReferrerPermissions());
       topNavigationToolbar.updateBreadcrumb(bundle.getReferrerBundle());
       topNavigationToolbar.build();
-      Sliders.createDisseminationsSlider(center, topNavigationToolbar.getDisseminationsButton(), bundle.getReferrer());
+      Sliders.createDisseminationSlider(center, topNavigationToolbar.getDisseminationsButton(), bundle.getReferrer());
       Sliders.createInfoSlider(center, topNavigationToolbar.getInfoSidebarButton(), bundle.getReferrerBundle());
 
       container.insert(topNavigationToolbar, 0);

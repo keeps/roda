@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.ArrayList;
+
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
@@ -31,7 +33,8 @@ public class AIPController implements AIPRestService {
 
   @Override
   public IndexedAIP findByUuid(String uuid, String localeString) {
-    return null;
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.retrieve(requestContext, IndexedAIP.class, uuid, new ArrayList<>());
   }
 
   @Override

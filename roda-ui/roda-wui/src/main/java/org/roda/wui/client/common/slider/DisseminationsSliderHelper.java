@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -33,6 +34,7 @@ import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.popup.CalloutPopup.CalloutPosition;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -76,6 +78,36 @@ public class DisseminationsSliderHelper {
   private static void updateDisseminationsSliderPanel(IndexedFile file, final SliderPanel disseminationsSliderPanel) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, file.getUUID()));
     updateDisseminations(filter, disseminationsSliderPanel);
+  }
+
+  private static void updateDisseminationsSliderPanel(IndexedFile file, final SliderPanel disseminationsSliderPanel,
+    Services services) {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, file.getUUID()));
+    updateDisseminations(filter, disseminationsSliderPanel, services);
+  }
+
+  private static void updateDisseminations(Filter filter, final SliderPanel disseminationsSliderPanel,
+    Services services) {
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
+    Sublist sublist = new Sublist(0, 100);
+    Facets facets = Facets.NONE;
+    String localeString = LocaleInfo.getCurrentLocale().getLocaleName();
+
+    List<String> dipFields = new ArrayList<>(RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN);
+    dipFields.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
+      RodaConstants.DIP_DESCRIPTION, RodaConstants.DIP_DELETE_EXTERNAL_URL, RodaConstants.DIP_OPEN_EXTERNAL_URL));
+
+    FindRequest findRequest = FindRequest.getBuilder(IndexedDIP.class.getName(), filter, true).withSorter(sorter)
+      .withSublist(sublist).withFacets(facets).build();
+
+    services.rodaEntityRestService(s -> s.find(findRequest, localeString), IndexedDIP.class)
+      .whenComplete((indexedDIPIndexResult, throwable) -> {
+        if (throwable != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
+        } else {
+          updateDisseminationsSliderPanel(indexedDIPIndexResult.getResults(), disseminationsSliderPanel);
+        }
+      });
   }
 
   private static void updateDisseminations(Filter filter, final SliderPanel disseminationsSliderPanel) {
@@ -177,6 +209,19 @@ public class DisseminationsSliderHelper {
       updateDisseminationsSliderPanel((IndexedRepresentation) object, disseminationsSliderPanel);
     } else if (object instanceof IndexedFile) {
       updateDisseminationsSliderPanel((IndexedFile) object, disseminationsSliderPanel);
+    } else {
+      // do nothing
+    }
+  }
+
+  protected static <T extends IsIndexed> void updateDisseminationsObjectSliderPanel(final T object,
+    final SliderPanel disseminationsSliderPanel, Services services) {
+    if (object instanceof IndexedAIP) {
+      updateDisseminationsSliderPanel((IndexedAIP) object, disseminationsSliderPanel);
+    } else if (object instanceof IndexedRepresentation) {
+      updateDisseminationsSliderPanel((IndexedRepresentation) object, disseminationsSliderPanel);
+    } else if (object instanceof IndexedFile) {
+      updateDisseminationsSliderPanel((IndexedFile) object, disseminationsSliderPanel, services);
     } else {
       // do nothing
     }

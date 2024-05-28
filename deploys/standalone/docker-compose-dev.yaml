@@ -68,6 +68,7 @@ services:
 
   openldap:
     image: docker.io/bitnami/openldap:2.6
+    restart: unless-stopped
     user: 1001:root
     ports:
       - "1389:1389"

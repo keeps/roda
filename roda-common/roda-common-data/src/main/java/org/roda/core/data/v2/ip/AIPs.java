@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_AIPS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AIPs implements RODAObjectList<AIP> {
+  @Serial
   private static final long serialVersionUID = -2348317938368225021L;
   private List<AIP> aipList;
 

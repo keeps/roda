@@ -11,6 +11,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
@@ -30,6 +31,7 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.model.BrowseFileResponse;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
@@ -365,6 +367,156 @@ public class InfoSliderHelper {
     return table;
   }
 
+  public static void createFileInfoSliderPanel(IndexedFile file, BrowseFileResponse response,
+    SliderPanel infoSliderPanel) {
+    HashMap<String, Widget> values = new HashMap<>();
+    infoSliderPanel.clear();
+    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedFile.class.getName())));
+
+    Long risksCounter = response.getRiskCounterResponse().getResult();
+    Long preservationEventsCounter = response.getPreservationCounterResponse().getResult();
+
+    if (file != null) {
+      String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
+      values.put(messages.viewRepresentationInfoFilename(),
+        createIdHTML(response.getRepresentationInformationFields(), fileName, file.getUUID()));
+
+      if (file.getSize() > 0) {
+        values.put(messages.viewRepresentationInfoSize(),
+          new InlineHTML(SafeHtmlUtils.fromString(Humanize.readableFileSize(file.getSize()))));
+      }
+
+      if (file.getFileFormat() != null) {
+        FileFormat fileFormat = file.getFileFormat();
+
+        if (StringUtils.isNotBlank(fileFormat.getExtension())) {
+          values.put(messages.viewRepresentationInfoExtension(),
+            createExtensionHTML(response.getRepresentationInformationFields(), fileFormat.getExtension()));
+        }
+
+        if (StringUtils.isNotBlank(fileFormat.getMimeType())) {
+          values.put(messages.viewRepresentationInfoMimetype(),
+            createMimetypeHTML(response.getRepresentationInformationFields(), fileFormat.getMimeType()));
+        }
+
+        if (StringUtils.isNotBlank(fileFormat.getFormatDesignationName())) {
+          values.put(messages.viewRepresentationInfoFormat(), createFormatDesignationHTML(
+            response.getRepresentationInformationFields(), fileFormat.getFormatDesignation()));
+        }
+
+        if (StringUtils.isNotBlank(fileFormat.getPronom())) {
+          values.put(messages.viewRepresentationInfoPronom(),
+            createPronomHTML(response.getRepresentationInformationFields(), fileFormat.getPronom()));
+        }
+      }
+
+      if (StringUtils.isNotBlank(file.getCreatingApplicationName())) {
+        values.put(messages.viewRepresentationInfoCreatingApplicationName(), createCreatingApplicationNameHTML(
+          response.getRepresentationInformationFields(), file.getCreatingApplicationName()));
+      }
+
+      if (StringUtils.isNotBlank(file.getCreatingApplicationVersion())) {
+        values.put(messages.viewRepresentationInfoCreatingApplicationVersion(), createCreatingApplicationVersionHTML(
+          response.getRepresentationInformationFields(), file.getCreatingApplicationVersion()));
+      }
+
+      if (StringUtils.isNotBlank(file.getDateCreatedByApplication())) {
+        values.put(messages.viewRepresentationInfoDateCreatedByApplication(),
+          new InlineHTML(SafeHtmlUtils.fromString(file.getDateCreatedByApplication())));
+      }
+
+      if (file.getHash() != null && !file.getHash().isEmpty()) {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+        boolean first = true;
+        for (String hash : file.getHash()) {
+          if (first) {
+            first = false;
+          } else {
+            b.append(SafeHtmlUtils.fromSafeConstant("<br/>"));
+          }
+          b.append(SafeHtmlUtils.fromSafeConstant("<small>"));
+          b.append(SafeHtmlUtils.fromString(hash));
+          b.append(SafeHtmlUtils.fromSafeConstant("</small>"));
+        }
+        values.put(messages.viewRepresentationInfoHash(), new InlineHTML(b.toSafeHtml()));
+      }
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      if (file.isReference()) {
+        b.append(SafeHtmlUtils.fromSafeConstant("<small>"));
+        b.append(SafeHtmlUtils.fromString(file.getReferenceURL()));
+        b.append(SafeHtmlUtils.fromSafeConstant("</small>"));
+
+        values.put(messages.viewRepresentationInfoStoragePath(), new InlineHTML(b.toSafeHtml()));
+      } else {
+        if (file.getStoragePath() != null) {
+          b.append(SafeHtmlUtils.fromSafeConstant("<small>"));
+          b.append(SafeHtmlUtils.fromString(file.getStoragePath()));
+          b.append(SafeHtmlUtils.fromSafeConstant("</small>"));
+
+          values.put(messages.viewRepresentationInfoStoragePath(), new InlineHTML(b.toSafeHtml()));
+        }
+      }
+
+      addLinkIfCentralInstance(values, file.getInstanceName(), file.isLocalInstance(), file.getInstanceId());
+
+      List<String> history = new ArrayList<>();
+      history.add(file.getAipId());
+      history.add(file.getRepresentationId());
+      history.addAll(file.getPath());
+      history.add(file.getId());
+
+      if (risksCounter >= 0) {
+        Anchor risksLink = new Anchor(messages.aipRiskIncidences(risksCounter),
+          HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, history));
+        values.put(messages.preservationRisks(), risksLink);
+      }
+
+      if (preservationEventsCounter >= 0) {
+        Anchor eventsLink = new Anchor(messages.aipEvents(preservationEventsCounter),
+          HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, file.getAipId(),
+            file.getRepresentationUUID(), file.getUUID()));
+        values.put(messages.preservationEvents(), eventsLink);
+      }
+
+      SafeUri uri = RestUtils.createTechnicalMetadataHTMLUri(file.getAipId(), file.getUUID(), "html", null);
+      RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
+
+      Anchor technicalInformationAnchor = new Anchor();
+      technicalInformationAnchor.setStyleName("clickable");
+      technicalInformationAnchor.setText(messages.showTechnicalMetadata());
+
+      // technicalInformation
+      try {
+        requestBuilder.sendRequest(null, new RequestCallback() {
+          @Override
+          public void onResponseReceived(Request request, Response response) {
+            if (response.getStatusCode() == 200) {
+              if (!response.getText().isEmpty()) {
+                values.put(messages.viewTechnicalInformation(), technicalInformationAnchor);
+                technicalInformationAnchor
+                  .addClickHandler(e -> Dialogs.showTechnicalMetadataInformation(messages.viewTechnicalMetadata(),
+                    messages.downloadButton(), messages.closeButton(), file, response.getText()));
+              }
+            } else {
+              values.put(messages.viewTechnicalInformation(), technicalInformationAnchor);
+              technicalInformationAnchor
+                .addClickHandler(e -> Dialogs.showTechnicalMetadataInformation(messages.viewTechnicalMetadata(),
+                  messages.downloadButton(), messages.closeButton(), file, null));
+            }
+            populate(infoSliderPanel, values);
+          }
+
+          @Override
+          public void onError(Request request, Throwable throwable) {
+            populate(infoSliderPanel, values);
+          }
+        });
+      } catch (RequestException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
   public static void updateInfoSliderPanel(BrowseFileBundle bundle, SliderPanel infoSliderPanel) {
     HashMap<String, Widget> values = new HashMap<>();
     infoSliderPanel.clear();
@@ -494,8 +646,7 @@ public class InfoSliderHelper {
                   messages.downloadButton(), messages.closeButton(), file, response.getText()));
             }
 
-          }
-          else {
+          } else {
             values.put(messages.viewTechnicalInformation(), technicalInformationAnchor);
             technicalInformationAnchor
               .addClickHandler(e -> Dialogs.showTechnicalMetadataInformation(messages.viewTechnicalMetadata(),
@@ -512,7 +663,6 @@ public class InfoSliderHelper {
     } catch (RequestException e) {
       throw new RuntimeException(e);
     }
-
   }
 
   private static void populate(SliderPanel infoSliderPanel, HashMap<String, Widget> values) {
@@ -530,6 +680,80 @@ public class InfoSliderHelper {
       valueLabel.addStyleName("slider-info-entry-value");
       entryPanel.addStyleName("slider-info-entry");
     }
+  }
+
+  private static FlowPanel createExtensionHTML(List<String> representationInformationFields, String extension) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_FILE, RodaConstants.FILE_EXTENSION, extension);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(extension),
+      riFilter, panel, representationInformationFields.contains(RodaConstants.FILE_EXTENSION),
+      "browseFileInformationIcon");
+    return panel;
+  }
+
+  private static FlowPanel createMimetypeHTML(List<String> representationInformationFields, String mimetype) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_FILE, RodaConstants.FILE_FORMAT_MIMETYPE, mimetype);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(mimetype),
+      riFilter, panel, representationInformationFields.contains(RodaConstants.FILE_FORMAT_MIMETYPE),
+      "browseFileInformationIcon");
+    return panel;
+  }
+
+  private static FlowPanel createPronomHTML(List<String> representationInformationFields, String pronom) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_FILE, RodaConstants.FILE_PRONOM, pronom);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(pronom),
+      riFilter, panel, representationInformationFields.contains(RodaConstants.FILE_PRONOM),
+      "browseFileInformationIcon");
+    return panel;
+  }
+
+  private static FlowPanel createFormatDesignationHTML(List<String> representationInformationFields,
+    String designation) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_FILE, RodaConstants.FILE_FORMAT_DESIGNATION, designation);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(designation),
+      riFilter, panel, representationInformationFields.contains(RodaConstants.FILE_FORMAT_DESIGNATION),
+      "browseFileInformationIcon");
+    return panel;
+  }
+
+  private static FlowPanel createCreatingApplicationNameHTML(List<String> representationInformationFields,
+    String createApplicationName) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_FILE, RodaConstants.FILE_CREATING_APPLICATION_NAME, createApplicationName);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(createApplicationName), riFilter, panel,
+      representationInformationFields.contains(RodaConstants.FILE_CREATING_APPLICATION_NAME),
+      "browseFileInformationIcon");
+    return panel;
+  }
+
+  private static FlowPanel createCreatingApplicationVersionHTML(List<String> representationInformationFields,
+    String createApplicationVersion) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_FILE, RodaConstants.FILE_CREATING_APPLICATION_VERSION, createApplicationVersion);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(createApplicationVersion), riFilter, panel,
+      representationInformationFields.contains(RodaConstants.FILE_CREATING_APPLICATION_VERSION),
+      "browseFileInformationIcon");
+    return panel;
+  }
+
+  private static FlowPanel createIdHTML(List<String> representationInformationFields, String filename, String uuid) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_FILE, RodaConstants.INDEX_UUID, uuid);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(filename),
+      riFilter, panel, representationInformationFields.contains(RodaConstants.INDEX_UUID), "browseFileInformationIcon");
+    return panel;
   }
 
   private static FlowPanel createExtensionHTML(BrowseFileBundle bundle, String extension) {
@@ -666,8 +890,8 @@ public class InfoSliderHelper {
     return panel;
   }
 
-  public static void addLinkIfCentralInstance(HashMap<String, Widget> values, String instanceName,
-    boolean localToInstance, String instanceId) {
+  public static void addLinkIfCentralInstance(Map<String, Widget> values, String instanceName, boolean localToInstance,
+    String instanceId) {
     if (StringUtils.isNotBlank(instanceId)) {
       String distributedMode = ConfigurationManager.getStringWithDefault(
         RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);

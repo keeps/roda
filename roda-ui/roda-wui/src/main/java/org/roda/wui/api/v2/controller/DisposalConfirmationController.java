@@ -8,6 +8,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateRequest;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
@@ -16,6 +17,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.data.v2.ri.RepresentationInformationFamily;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.DisposalConfirmationService;
 import org.roda.wui.api.v2.services.IndexService;
@@ -61,7 +63,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
+    return new LongResponse(indexService.count(DisposalConfirmation.class, countRequest, requestContext));
   }
 
   @Override
@@ -84,8 +86,8 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state,
-        RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM, disposalConfirmationId, "printLayout", toPrint);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM,
+        disposalConfirmationId, "printLayout", toPrint);
     }
   }
 
@@ -109,8 +111,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        selectedItems);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
     }
   }
 
@@ -136,8 +137,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        selectedItems);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
     }
   }
 
@@ -161,8 +161,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        selectedItems);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
     }
   }
 
@@ -187,8 +186,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        selectedItems);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
     }
   }
 
@@ -213,8 +211,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        selectedItems);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
     }
   }
 
@@ -241,6 +238,23 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
         RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM, createRequest.getForm(),
         RodaConstants.CONTROLLER_SELECTED_ITEMS_PARAM, createRequest.getSelectedItems(), "title",
         createRequest.getTitle());
+    }
+  }
+
+  @Override
+  public DisposalConfirmationForm retrieveDisposalConfirmationForm() {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      return disposalConfirmationService.retrieveDisposalConfirmationExtraBundle();
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
     }
   }
 }

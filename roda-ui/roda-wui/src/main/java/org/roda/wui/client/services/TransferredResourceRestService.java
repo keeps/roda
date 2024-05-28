@@ -50,9 +50,9 @@ public interface TransferredResourceRestService extends RODAEntityRestService<Tr
   TransferredResource getResource(
     @Parameter(description = "The transferred resource uuid") @PathVariable(name = "uuid") String uuid);
 
-  @RequestMapping(path = "/delete", method = RequestMethod.POST)
+  @RequestMapping(path = "/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Delete multiple transferred resource via search query", description = "Deletes one or more transferred resources", responses = {
-    @ApiResponse(responseCode = "201", description = "Created job", content = @Content(schema = @Schema(implementation = Job.class))),
+    @ApiResponse(responseCode = "200", description = "Created job with the internal action to delete transferred resources", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job deleteMultipleResources(
     @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<TransferredResource> selected);

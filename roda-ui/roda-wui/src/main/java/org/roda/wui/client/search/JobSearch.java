@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.search;
 
-import com.google.gwt.core.client.GWT;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;

@@ -8,12 +8,14 @@
 package org.roda.wui.client.common.lists.utils;
 
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.services.Services;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -38,16 +40,13 @@ public class ClientSelectedItemsUtils {
       Filter filter = selectedItemsFilter.getFilter();
       boolean justActive = selectedItemsFilter.justActive();
 
-      BrowserService.Util.getInstance().count(classToReturn.getName(), filter, justActive, new AsyncCallback<Long>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
-        @Override
-        public void onSuccess(Long result) {
-          callback.onSuccess(result);
+      CountRequest request = new CountRequest(classToReturn.getName(), filter, justActive);
+      Services services = new Services("Count indexed objects", "count");
+      services.rodaEntityRestService(s -> s.count(request), classToReturn).whenComplete((longResponse, throwable) -> {
+        if (throwable != null) {
+          callback.onFailure(throwable);
+        } else {
+          callback.onSuccess(longResponse.getResult());
         }
       });
     } else {
