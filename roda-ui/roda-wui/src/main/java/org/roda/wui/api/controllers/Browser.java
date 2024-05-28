@@ -93,9 +93,7 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
-import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
@@ -2304,26 +2302,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Risk createRisk(User user, Risk risk) throws AuthorizationDeniedException, GenericException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // delegate
-      return BrowserHelper.createRisk(risk, user, true);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_RISK_PARAM, risk);
-    }
-  }
-
   public static void updateRisk(User user, Risk risk, int incidences)
     throws AuthorizationDeniedException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2468,59 +2446,6 @@ public class Browser extends RodaWuiController {
       controllerAssistant.registerAction(user, riskId, state, RodaConstants.CONTROLLER_RISK_ID_PARAM, riskId,
         RodaConstants.CONTROLLER_SELECTED_VERSION_PARAM, selectedVersion);
     }
-  }
-
-  public static RiskMitigationBundle retrieveShowMitigationTerms(User user, int preMitigationProbability,
-    int preMitigationImpact, int posMitigationProbability, int posMitigationImpact)
-    throws AuthorizationDeniedException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    RiskMitigationBundle ret = BrowserHelper.retrieveShowMitigationTerms(preMitigationProbability, preMitigationImpact,
-      posMitigationProbability, posMitigationImpact);
-
-    // register action
-    controllerAssistant.registerAction(user, LogEntryState.SUCCESS,
-      RodaConstants.CONTROLLER_PRE_MITIGATION_PROBABILITY_PARAM, preMitigationProbability,
-      RodaConstants.CONTROLLER_PRE_MITIGATION_IMPACT_PARAM, preMitigationImpact,
-      RodaConstants.CONTROLLER_POS_MITIGATION_PROBABILITY_PARAM, posMitigationProbability,
-      RodaConstants.CONTROLLER_POS_MITIGATION_IMPACT_PARAM, posMitigationImpact);
-
-    return ret;
-  }
-
-  public static List<String> retrieveMitigationSeverityLimits(User user) throws AuthorizationDeniedException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    List<String> ret = BrowserHelper.retrieveShowMitigationTerms();
-
-    // register action
-    controllerAssistant.registerAction(user, LogEntryState.SUCCESS);
-
-    return ret;
-  }
-
-  public static MitigationPropertiesBundle retrieveAllMitigationProperties(User user)
-    throws AuthorizationDeniedException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    MitigationPropertiesBundle ret = BrowserHelper.retrieveAllMitigationProperties();
-
-    // register action
-    controllerAssistant.registerAction(user, LogEntryState.SUCCESS);
-
-    return ret;
   }
 
   public static Job deleteRisk(User user, SelectedItems<IndexedRisk> selected)

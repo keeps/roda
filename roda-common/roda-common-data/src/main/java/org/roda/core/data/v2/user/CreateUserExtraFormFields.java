@@ -1,4 +1,6 @@
-package org.roda.core.data.v2.generics;
+package org.roda.core.data.v2.user;
+
+import org.roda.core.data.v2.generics.MetadataValue;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -12,10 +14,14 @@ public class CreateUserExtraFormFields implements Serializable {
   @Serial
   private static final long serialVersionUID = -2706255856347304025L;
 
-  Set<MetadataValue> extraFormFields;
+  private Set<MetadataValue> extraFormFields;
 
   public CreateUserExtraFormFields() {
     this.extraFormFields = new HashSet<>();
+  }
+
+  public CreateUserExtraFormFields(Set<MetadataValue> extraFormFields) {
+    this.extraFormFields = extraFormFields;
   }
 
   public Set<MetadataValue> getExtraFormFields() {
@@ -23,10 +29,6 @@ public class CreateUserExtraFormFields implements Serializable {
   }
 
   public void setExtraFormFields(Set<MetadataValue> extraFormFields) {
-    this.extraFormFields = extraFormFields;
-  }
-
-  public CreateUserExtraFormFields(Set<MetadataValue> extraFormFields) {
     this.extraFormFields = extraFormFields;
   }
 }

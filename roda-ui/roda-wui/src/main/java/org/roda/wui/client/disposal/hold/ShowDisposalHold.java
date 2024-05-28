@@ -13,11 +13,12 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
+import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -238,62 +239,59 @@ public class ShowDisposalHold extends Composite {
           SelectedItemsFilter<IndexedAIP> selectedItemsFilter = new SelectedItemsFilter<>(filter,
             IndexedAIP.class.getName(), true);
 
-          BrowserService.Util.getInstance().count(IndexedAIP.class.getName(), filter, true,
-            new NoAsyncCallback<Long>() {
-              @Override
-              public void onSuccess(Long size) {
-                if (size != 0) {
-                  Services services = new Services("Lift disposal hold", "job");
-                  services
-                    .disposalHoldResource(
-                      s -> s.liftDisposalHoldBySelectedItems(selectedItemsFilter, disposalHold.getId()))
-                    .whenComplete((job, throwable) -> {
-                      if (throwable != null) {
-                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                      } else {
-                        Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+          Services services = new Services("Lift disposal hold", "job");
+          CountRequest countRequest = new CountRequest(IndexedAIP.class.getName(), filter, true);
+          services.rodaEntityRestService(s -> s.count(countRequest), IndexedFile.class)
+            .whenComplete((longResponse, throwable) -> {
+              if (longResponse.getResult() != 0) {
+                services
+                  .disposalHoldResource(
+                    s -> s.liftDisposalHoldBySelectedItems(selectedItemsFilter, disposalHold.getId()))
+                  .whenComplete((job, cause) -> {
+                    if (cause != null) {
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    } else {
+                      Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
-                          @Override
-                          public void onFailure(Throwable caught) {
-                            Toast.showInfo(messages.runningInBackgroundTitle(),
-                              messages.runningInBackgroundDescription());
+                        @Override
+                        public void onFailure(Throwable caught) {
+                          Toast.showInfo(messages.runningInBackgroundTitle(),
+                            messages.runningInBackgroundDescription());
 
-                            Timer timer = new Timer() {
-                              @Override
-                              public void run() {
-                                refresh();
-                              }
-                            };
+                          Timer timer = new Timer() {
+                            @Override
+                            public void run() {
+                              refresh();
+                            }
+                          };
 
-                            timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                          }
+                          timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                        }
 
-                          @Override
-                          public void onSuccess(final Void nothing) {
-                            HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                          }
-                        });
-                      }
-                    });
-                } else {
-                  Services services = new Services("Lift disposal hold", "lift");
-                  services.disposalHoldResource(s -> s.liftDisposalHold(disposalHold.getId()))
-                    .whenComplete((result, throwable) -> {
-                      if (throwable != null) {
-                        AsyncCallbackUtils.defaultFailureTreatment(throwable);
-                      } else {
-                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.updateDisposalHoldMessage());
-                        Timer timer = new Timer() {
-                          @Override
-                          public void run() {
-                            refresh();
-                          }
-                        };
+                        @Override
+                        public void onSuccess(final Void nothing) {
+                          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                        }
+                      });
+                    }
+                  });
+              } else {
+                services.disposalHoldResource(s -> s.liftDisposalHold(disposalHold.getId()))
+                  .whenComplete((result, cause) -> {
+                    if (cause != null) {
+                      AsyncCallbackUtils.defaultFailureTreatment(cause);
+                    } else {
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.updateDisposalHoldMessage());
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          refresh();
+                        }
+                      };
 
-                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                      }
-                    });
-                }
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                    }
+                  });
               }
             });
         }

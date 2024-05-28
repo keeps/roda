@@ -7,15 +7,18 @@
  */
 package org.roda.wui.client.common.actions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.file.CreateFolderRequest;
+import org.roda.core.data.v2.file.DeleteFilesRequest;
+import org.roda.core.data.v2.file.MoveFilesRequest;
+import org.roda.core.data.v2.file.RenameFolderRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -23,19 +26,18 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.jobs.Job;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
-import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -61,12 +63,11 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     Arrays.asList(FileAction.UPLOAD_FILES, FileAction.CREATE_FOLDER));
 
   private static final Set<FileAction> POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY = new HashSet<>(
-    Arrays.asList(FileAction.DOWNLOAD, FileAction.MOVE, FileAction.REMOVE, FileAction.REMOVE, FileAction.NEW_PROCESS,
-      FileAction.IDENTIFY_FORMATS, FileAction.SHOW_EVENTS, FileAction.SHOW_RISKS));
+    Arrays.asList(FileAction.DOWNLOAD, FileAction.MOVE, FileAction.RENAME, FileAction.REMOVE, FileAction.NEW_PROCESS,
+      FileAction.IDENTIFY_FORMATS));
 
-  private static final Set<FileAction> POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM = new HashSet<>(
-    Arrays.asList(FileAction.DOWNLOAD, FileAction.MOVE, FileAction.REMOVE, FileAction.NEW_PROCESS,
-      FileAction.IDENTIFY_FORMATS, FileAction.SHOW_EVENTS, FileAction.SHOW_RISKS));
+  private static final Set<FileAction> POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM = new HashSet<>(Arrays.asList(
+    FileAction.DOWNLOAD, FileAction.MOVE, FileAction.REMOVE, FileAction.NEW_PROCESS, FileAction.IDENTIFY_FORMATS));
 
   private static final Set<FileAction> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION = new HashSet<>(
     Arrays.asList(FileAction.MOVE, FileAction.REMOVE, FileAction.NEW_PROCESS, FileAction.IDENTIFY_FORMATS));
@@ -84,38 +85,6 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     this.representationId = representationId;
     this.permissions = permissions;
     this.parentFolder = parentFolder != null && parentFolder.isDirectory() ? parentFolder : null;
-  }
-
-  // MANAGEMENT
-  public enum FileAction implements Action<IndexedFile> {
-    DOWNLOAD(), RENAME(RodaConstants.PERMISSION_METHOD_RENAME_FOLDER), MOVE(RodaConstants.PERMISSION_METHOD_MOVE_FILES),
-    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_FILE), UPLOAD_FILES(RodaConstants.PERMISSION_METHOD_CREATE_FILE),
-    CREATE_FOLDER(RodaConstants.PERMISSION_METHOD_CREATE_FOLDER),
-    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    SHOW_EVENTS(RodaConstants.PERMISSION_METHOD_FIND_PRESERVATION_EVENT),
-    SHOW_RISKS(RodaConstants.PERMISSION_METHOD_FIND_RISK);
-
-    private List<String> methods;
-
-    FileAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
-  }
-
-  @Override
-  public FileAction[] getActions() {
-    return FileAction.values();
-  }
-
-  @Override
-  public FileAction actionForName(String name) {
-    return FileAction.valueOf(name);
   }
 
   public static FileActions get() {
@@ -139,6 +108,16 @@ public class FileActions extends AbstractActionable<IndexedFile> {
         return false;
       }
     };
+  }
+
+  @Override
+  public FileAction[] getActions() {
+    return FileAction.values();
+  }
+
+  @Override
+  public FileAction actionForName(String name) {
+    return FileAction.valueOf(name);
   }
 
   @Override
@@ -234,13 +213,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     }
   }
 
-  // ACTIONS
-
   private void download(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = RestUtils.createRepresentationFileDownloadUri(file.getUUID());
     callback.onSuccess(ActionImpact.NONE);
     Window.Location.assign(downloadUri.asString());
   }
+
+  // ACTIONS
 
   private void rename(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.renameItemTitle(), null, file.getId(), null, RegExp.compile("^[^/]+$"),
@@ -254,16 +233,20 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
               @Override
               public void onSuccess(String details) {
-                BrowserService.Util.getInstance().renameFolder(file.getUUID(), newName, details,
-                  new ActionLoadingAsyncCallback<IndexedFile>(callback) {
-
-                    @Override
-                    public void onSuccessImpl(IndexedFile newFolder) {
-                      Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
-                      doActionCallbackNone();
-                      HistoryUtils.openBrowse(newFolder);
+                Services services = new Services("Rename folder", "update");
+                RenameFolderRequest renameFolderRequest = new RenameFolderRequest(file.getUUID(), newName, details);
+                services.fileResource(s -> s.renameFolder(renameFolderRequest)).whenComplete((result, throwable) -> {
+                  if (throwable == null) {
+                    Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
+                    doActionCallbackUpdated();
+                    HistoryUtils.openBrowse(result);
+                  } else {
+                    if (throwable instanceof AlreadyExistsException) {
+                      Toast.showError(messages.renameFolderAlreadyExistsTitle(),
+                        messages.renameFolderAlreadyExistsMessage());
                     }
-                  });
+                  }
+                });
               }
             });
         }
@@ -272,7 +255,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   private void move(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     move(file.getAipId(), file.getRepresentationId(),
-      new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
+      new SelectedItemsList<>(Collections.singletonList(file.getUUID()), IndexedFile.class.getName()), callback);
   }
 
   private void move(final String aipId, final String representationId, final SelectedItems<IndexedFile> selectedItems,
@@ -303,46 +286,47 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
             @Override
             public void onSuccess(String details) {
-              BrowserService.Util.getInstance().moveFiles(aipId, representationId, selectedItems, toFolder, details,
-                new ActionLoadingAsyncCallback<Job>(callback) {
+              Services services = new Services("Move a file", "move");
+              MoveFilesRequest moveFilesRequest = new MoveFilesRequest();
+              moveFilesRequest.setAipId(aipId);
+              moveFilesRequest.setRepresentationId(representationId);
+              moveFilesRequest.setItemsToMove(selectedItems);
+              moveFilesRequest.setDetails(details);
+              moveFilesRequest.setFileUUIDtoMove(toFolder != null ? toFolder.getUUID() : null);
+              services.fileResource(s -> s.moveFileToFolder(moveFilesRequest)).whenComplete((job, throwable) -> {
+                if (throwable != null) {
+                  AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                } else {
+                  Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onSuccessImpl(Job result) {
-                    Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-
-                        Timer timer = new Timer() {
-                          @Override
-                          public void run() {
-                            doActionCallbackNone();
-                            if (toFolder != null) {
-                              HistoryUtils.openBrowse(toFolder);
-                            } else {
-                              HistoryUtils.openBrowse(aipId, representationId);
-                            }
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          doActionCallbackNone();
+                          if (toFolder != null) {
+                            HistoryUtils.openBrowse(toFolder);
+                          } else {
+                            HistoryUtils.openBrowse(aipId, representationId);
                           }
-                        };
+                        }
+                      };
 
-                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                      }
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                    }
 
-                      @Override
-                      public void onSuccess(final Void nothing) {
-                        doActionCallbackNone();
-                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                      }
-                    });
-                  }
-
-                  @Override
-                  public void onFailureImpl(Throwable caught) {
-                    super.onFailureImpl(caught);
-                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                  }
-                });
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      doActionCallbackNone();
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                    }
+                  });
+                }
+              });
             }
           });
       }
@@ -394,24 +378,25 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
               @Override
               public void onSuccess(final String details) {
-                BrowserService.Util.getInstance().createFolder(aipId, representationId, null, newName, details,
-                  new ActionLoadingAsyncCallback<IndexedFile>(callback) {
-
-                    @Override
-                    public void onSuccessImpl(IndexedFile newFolder) {
-                      doActionCallbackNone();
-                      HistoryUtils.openBrowse(newFolder);
-                    }
-
-                    @Override
-                    public void onFailureImpl(Throwable caught) {
-                      if (caught instanceof NotFoundException) {
-                        Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                Services services = new Services("Create folder under representation", "create");
+                CreateFolderRequest request = new CreateFolderRequest();
+                request.setAipId(aipId);
+                request.setRepresentationId(representationId);
+                request.setName(newName);
+                request.setDetails(details);
+                services.fileResource(s -> s.createFolderUnderRepresentation(request))
+                  .whenComplete((file, throwable) -> {
+                    if (throwable != null) {
+                      if (throwable instanceof AlreadyExistsException) {
+                        Dialogs.showInformationDialog(messages.createFolderAlreadyExistsTitle(),
+                          messages.createFolderAlreadyExistsMessage(), messages.dialogOk(), false);
                       } else {
-                        super.onFailureImpl(caught);
+                        AsyncCallbackUtils.defaultFailureTreatment(throwable);
                       }
+                    } else {
+                      callback.onSuccess(Actionable.ActionImpact.NONE);
+                      HistoryUtils.openBrowse(file);
                     }
-
                   });
               }
             });
@@ -433,28 +418,30 @@ public class FileActions extends AbstractActionable<IndexedFile> {
               @Override
               public void onSuccess(String details) {
                 IndexedFile folder = file;
-                String aipId = folder.getAipId();
-                String repId = folder.getRepresentationId();
-                String folderUUID = folder.getUUID();
-                BrowserService.Util.getInstance().createFolder(aipId, repId, folderUUID, newName, details,
-                  new ActionLoadingAsyncCallback<IndexedFile>(callback) {
-
-                    @Override
-                    public void onSuccessImpl(IndexedFile newFolder) {
-                      doActionCallbackNone();
-                      HistoryUtils.openBrowse(newFolder);
+                Services services = new Services("Create folder under representation", "create");
+                CreateFolderRequest request = new CreateFolderRequest();
+                request.setAipId(folder.getAipId());
+                request.setRepresentationId(folder.getRepresentationId());
+                request.setFolderUUID(folder.getUUID());
+                request.setName(newName);
+                request.setDetails(details);
+                services.fileResource(s -> s.createFolderUnderRepresentation(request)).exceptionally(throwable -> {
+                  Dialogs.showInformationDialog(messages.createFolderAlreadyExistsTitle(),
+                    messages.createFolderAlreadyExistsMessage(), messages.dialogOk(), false);
+                  return null;
+                }).whenComplete((result, throwable) -> {
+                  if (throwable != null) {
+                    if (throwable instanceof AlreadyExistsException) {
+                      Dialogs.showInformationDialog(messages.createFolderAlreadyExistsTitle(),
+                        messages.createFolderAlreadyExistsMessage(), messages.dialogOk(), false);
+                    } else {
+                      AsyncCallbackUtils.defaultFailureTreatment(throwable);
                     }
-
-                    @Override
-                    public void onFailureImpl(Throwable caught) {
-                      if (caught instanceof AlreadyExistsException) {
-                        Dialogs.showInformationDialog(messages.createFolderAlreadyExistsTitle(),
-                          messages.createFolderAlreadyExistsMessage(), messages.dialogOk(), false);
-                      } else {
-                        super.onFailureImpl(caught);
-                      }
-                    }
-                  });
+                  } else {
+                    callback.onSuccess(Actionable.ActionImpact.NONE);
+                    HistoryUtils.openBrowse(result);
+                  }
+                });
               }
             });
         }
@@ -462,7 +449,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   private void newProcess(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    newProcess(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
+    newProcess(SelectedItemsList.create(IndexedFile.class.getName(), file.getUUID()), callback);
   }
 
   private void newProcess(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
@@ -474,79 +461,34 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   private void identifyFormats(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    identifyFormats(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
+    identifyFormats(SelectedItemsList.create(IndexedFile.class.getName(), file.getUUID()), callback);
   }
 
   private void identifyFormats(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
-    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new ActionAsyncCallback<Job>(callback) {
-      @Override
-      public void onSuccess(Job result) {
+    Services services = new Services("Create format identification job", "action");
+    services.fileResource(s -> s.identifyFileFormat(selected)).whenComplete((job, throwable) -> {
+      if (throwable == null) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
 
-        Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(), new AsyncCallback<Void>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            doActionCallbackUpdated();
-          }
+        Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(),
+          new ActionAsyncCallback<Void>(callback) {
+            @Override
+            public void onFailure(Throwable caught) {
+              doActionCallbackUpdated();
+            }
 
-          @Override
-          public void onSuccess(final Void nothing) {
-            doActionCallbackNone();
-            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-          }
-        });
+            @Override
+            public void onSuccess(final Void nothing) {
+              doActionCallbackNone();
+              HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+            }
+          });
       }
     });
   }
 
   private void remove(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
-      messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
-      new ActionNoAsyncCallback<Boolean>(callback) {
-
-        @Override
-        public void onSuccess(Boolean confirmed) {
-          if (confirmed) {
-            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-              new ActionNoAsyncCallback<String>(callback) {
-
-                @Override
-                public void onSuccess(String details) {
-                  BrowserService.Util.getInstance().deleteFile(file.getUUID(), details,
-                    new ActionAsyncCallback<Void>(callback) {
-
-                      @Override
-                      public void onSuccess(Void result) {
-                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-
-                        Timer timer = new Timer() {
-                          @Override
-                          public void run() {
-                            List<String> path = file.getPath();
-                            doActionCallbackNone();
-                            if (path.isEmpty()) {
-                              HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId());
-                            } else {
-                              int lastIndex = path.size() - 1;
-                              List<String> parentPath = new ArrayList<>(path.subList(0, lastIndex));
-                              String parentId = path.get(lastIndex);
-                              HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId(), parentPath,
-                                parentId);
-                            }
-                          }
-                        };
-
-                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                      }
-                    });
-                }
-              });
-          } else {
-            doActionCallbackNone();
-          }
-        }
-      });
+    remove(SelectedItemsList.create(IndexedFile.class, file.getUUID()), callback);
   }
 
   private void remove(final SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
@@ -562,10 +504,15 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
                 @Override
                 public void onSuccess(final String details) {
-                  BrowserService.Util.getInstance().deleteFile(selected, details, new AsyncCallback<Job>() {
-
-                    @Override
-                    public void onSuccess(Job result) {
+                  Services services = new Services("Remove files from representation", "delete");
+                  DeleteFilesRequest deleteFilesRequest = new DeleteFilesRequest();
+                  deleteFilesRequest.setDetails(details);
+                  deleteFilesRequest.setItemsToDelete(selected);
+                  services.fileResource(s -> s.deleteFiles(deleteFilesRequest)).whenComplete((job, throwable) -> {
+                    if (throwable != null) {
+                      callback.onFailure(throwable);
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    } else {
                       Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
                         new ActionAsyncCallback<Void>(callback) {
 
@@ -577,7 +524,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                             Timer timer = new Timer() {
                               @Override
                               public void run() {
-                                doActionCallbackNone();
+                                doActionCallbackDestroyed();
                                 HistoryUtils.newHistory(HistoryUtils.getCurrentHistoryPath());
                               }
                             };
@@ -588,15 +535,9 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                           @Override
                           public void onSuccess(final Void nothing) {
                             doActionCallbackNone();
-                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
                           }
                         });
-                    }
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      callback.onFailure(caught);
-                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
                     }
                   });
                 }
@@ -636,5 +577,25 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
     fileActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
     return fileActionableBundle;
+  }
+
+  // MANAGEMENT
+  public enum FileAction implements Action<IndexedFile> {
+    DOWNLOAD(), RENAME(RodaConstants.PERMISSION_METHOD_RENAME_FOLDER), MOVE(RodaConstants.PERMISSION_METHOD_MOVE_FILES),
+    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_FILE), UPLOAD_FILES(RodaConstants.PERMISSION_METHOD_CREATE_FILE),
+    CREATE_FOLDER(RodaConstants.PERMISSION_METHOD_CREATE_FOLDER),
+    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB);
+
+    private final List<String> methods;
+
+    FileAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 }

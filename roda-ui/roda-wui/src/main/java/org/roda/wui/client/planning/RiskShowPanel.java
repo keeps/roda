@@ -13,13 +13,13 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.actions.RiskIncidenceActions;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 
@@ -30,7 +30,6 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -45,90 +44,60 @@ import config.i18n.client.ClientMessages;
  */
 public class RiskShowPanel extends Composite implements HasValueChangeHandlers<Risk> {
 
-  interface MyUiBinder extends UiBinder<Widget, RiskShowPanel> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
   Label riskId;
-
   @UiField
   Label riskName;
-
   @UiField
   Label riskDescriptionKey, riskDescriptionValue;
-
   @UiField
   Label riskIdentifiedOn;
-
   @UiField
   Label riskIdentifiedBy;
-
   @UiField
   FlowPanel riskCategories;
-
   @UiField
   Label riskNotesKey, riskNotesValue;
-
   @UiField
   Label riskPreMitigationKey;
-
   @UiField
   Label riskPreMitigationProbability;
-
   @UiField
   Label riskPreMitigationImpact;
-
   @UiField
   HTML riskPreMitigationSeverity;
-
   @UiField
   Label riskPreMitigationNotesKey, riskPreMitigationNotesValue;
-
   @UiField
   Label riskPosMitigationKey;
-
   @UiField
   Label riskPosMitigationProbabilityKey;
-
   @UiField
   Label riskPosMitigationProbability;
-
   @UiField
   Label riskPosMitigationImpactKey;
-
   @UiField
   Label riskPosMitigationImpact;
-
   @UiField
   Label riskPosMitigationSeverityKey;
-
   @UiField
   HTML riskPosMitigationSeverity;
-
   @UiField
   Label riskPosMitigationNotesKey, riskPosMitigationNotesValue;
-
   @UiField
   Label riskMitigationKey;
-
   @UiField
   Label riskMitigationStrategyKey, riskMitigationStrategyValue;
-
   @UiField
   Label riskMitigationOwnerTypeKey, riskMitigationOwnerTypeValue;
-
   @UiField
   Label riskMitigationOwnerKey, riskMitigationOwnerValue;
-
   @UiField
   Label riskMitigationRelatedEventIdentifierTypeKey, riskMitigationRelatedEventIdentifierTypeValue;
-
   @UiField
   Label riskMitigationRelatedEventIdentifierValueKey, riskMitigationRelatedEventIdentifierValueValue;
-
   @UiField(provided = true)
   SearchWrapper searchWrapper;
 
@@ -176,38 +145,28 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
       riskCategories.add(categoryLabel);
     }
 
-    final int preProbability = risk.getPreMitigationProbability();
-    final int preImpact = risk.getPreMitigationImpact();
     final int preSeverity = risk.getPreMitigationSeverity();
-    final int posProbability = risk.getPostMitigationProbability();
-    final int posImpact = risk.getPostMitigationImpact();
     final int posSeverity = risk.getPostMitigationSeverity();
 
-    BrowserService.Util.getInstance().retrieveShowMitigationTerms(preProbability, preImpact, posProbability, posImpact,
-      new AsyncCallback<RiskMitigationBundle>() {
+    Services services = new Services("Retrieve risk mitigation terms", "get");
+    services.riskResource(s -> s.retrieveRiskMitigationTerms(risk.getUUID()))
+      .whenComplete((riskMitigationTerms, throwable) -> {
+        if (throwable == null) {
+          int severityLowLimit = riskMitigationTerms.getSeverityLowLimit();
+          int severityHighLimit = riskMitigationTerms.getSeverityHighLimit();
 
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
-
-        @Override
-        public void onSuccess(RiskMitigationBundle terms) {
-          int severityLowLimit = terms.getSeverityLowLimit();
-          int severityHighLimit = terms.getSeverityHighLimit();
-
-          riskPreMitigationProbability
-            .setText(messages.riskMitigationProbability(terms.getPreMitigationProbability().replace(' ', '_')));
+          riskPreMitigationProbability.setText(
+            messages.riskMitigationProbability(riskMitigationTerms.getPreMitigationProbability().replace(' ', '_')));
           riskPreMitigationImpact
-            .setText(messages.riskMitigationImpact(terms.getPreMitigationImpact().replace(' ', '_')));
+            .setText(messages.riskMitigationImpact(riskMitigationTerms.getPreMitigationImpact().replace(' ', '_')));
 
           riskPreMitigationSeverity
             .setHTML(HtmlSnippetUtils.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
 
-          riskPosMitigationProbability
-            .setText(messages.riskMitigationProbability(terms.getPosMitigationProbability().replace(' ', '_')));
+          riskPosMitigationProbability.setText(
+            messages.riskMitigationProbability(riskMitigationTerms.getPosMitigationProbability().replace(' ', '_')));
           riskPosMitigationImpact
-            .setText(messages.riskMitigationImpact(terms.getPosMitigationImpact().replace(' ', '_')));
+            .setText(messages.riskMitigationImpact(riskMitigationTerms.getPosMitigationImpact().replace(' ', '_')));
 
           riskPosMitigationKey.setVisible(true);
           riskPosMitigationProbabilityKey.setVisible(true);
@@ -269,11 +228,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
       riskMitigationRelatedEventIdentifierValueKey.setVisible(false);
     }
 
-    if (mitigationCounter == 0) {
-      riskMitigationKey.setVisible(false);
-    } else {
-      riskMitigationKey.setVisible(true);
-    }
+    riskMitigationKey.setVisible(mitigationCounter != 0);
 
     // FIXME it must be visible later
     riskMitigationOwnerTypeKey.setVisible(false);
@@ -327,5 +282,8 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Risk> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, RiskShowPanel> {
   }
 }

@@ -8,7 +8,6 @@
 package org.roda.wui.client.browse;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,9 +19,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
-import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -30,30 +27,17 @@ import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.ConversionProfile;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
-import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
-import org.roda.core.data.v2.disposal.hold.DisposalHold;
-import org.roda.core.data.v2.disposal.hold.DisposalHolds;
-import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
-import org.roda.core.data.v2.disposal.rule.DisposalRule;
-import org.roda.core.data.v2.disposal.rule.DisposalRules;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
@@ -61,9 +45,6 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
@@ -76,15 +57,10 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
-import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
-import org.roda.wui.client.planning.MitigationPropertiesBundle;
-import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
-import org.roda.wui.client.planning.RiskMitigationBundle;
-import org.roda.wui.client.planning.RiskVersionsBundle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -132,9 +108,6 @@ public interface BrowserService extends RemoteService {
   Job deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  Job deleteFile(SelectedItems<IndexedFile> files, String details)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
   void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
@@ -148,28 +121,6 @@ public interface BrowserService extends RemoteService {
 
   String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws AuthorizationDeniedException,
     GenericException, ValidationException, NotFoundException, RequestNotValidException;
-
-  String createTransferredResourcesFolder(String parent, String folderName, boolean commit)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
-    AlreadyExistsException;
-
-  void deleteTransferredResources(SelectedItems<TransferredResource> selected)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
-  void transferScanRequestUpdate(String transferredResourceUUID)
-    throws IsStillUpdatingException, AuthorizationDeniedException;
-
-  Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException,
-    GenericException, JobAlreadyStartedException;
-
-  void stopJob(String jobId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
-
-  void approveJob(SelectedItems<Job> jobs) throws RequestNotValidException, GenericException, NotFoundException,
-    JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
-
-  void rejectJob(SelectedItems<Job> jobs, String details) throws RequestNotValidException, GenericException,
-    NotFoundException, JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
 
   List<PluginInfo> retrievePluginsInfo(List<PluginType> type);
 
@@ -206,18 +157,12 @@ public interface BrowserService extends RemoteService {
     Facets facets, String localeString, boolean justActive, List<String> fieldsToReturn)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException;
 
-  <T extends IsIndexed> Long count(String classNameToReturn, Filter filter, boolean justActive)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
   <T extends IsIndexed> T retrieve(String classNameToReturn, String id, List<String> fieldsToReturn)
     throws RODAException;
 
   <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
     List<String> fieldsToReturn)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException;
-
-  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query, boolean allowPartial)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
@@ -228,37 +173,6 @@ public interface BrowserService extends RemoteService {
 
   Job updateDIPPermissions(SelectedItems<IndexedDIP> dips, Permissions permissions, String details)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
-
-  Risk createRisk(Risk risk)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  void updateRisk(Risk risk, int incidences)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  void revertRiskVersion(String riskId, String versionId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
-
-  boolean hasRiskVersions(String id)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
-
-  void deleteRiskVersion(String riskId, String versionId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
-
-  RiskVersionsBundle retrieveRiskVersions(String riskId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
-
-  Risk retrieveRiskVersion(String riskId, String selectedVersion)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException, IOException;
-
-  RiskMitigationBundle retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
-    int posMitigationProbability, int posMitigationImpact) throws AuthorizationDeniedException;
-
-  List<String> retrieveMitigationSeverityLimits() throws AuthorizationDeniedException;
-
-  MitigationPropertiesBundle retrieveAllMitigationProperties() throws AuthorizationDeniedException;
-
-  Job deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException;
 
   <T extends IsIndexed> Job createProcess(String jobName, JobPriority priority, JobParallelism parallelism,
     SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
@@ -278,49 +192,15 @@ public interface BrowserService extends RemoteService {
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, JobAlreadyStartedException;
 
-  void updateRiskCounters()
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
   Job appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
-
-  String renameTransferredResource(String transferredResourceId, String newName)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
-    IsStillUpdatingException, NotFoundException;
-
-  Job moveTransferredResource(SelectedItems<TransferredResource> selected, TransferredResource transferredResource)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
-    IsStillUpdatingException, NotFoundException;
-
-  List<TransferredResource> retrieveSelectedTransferredResource(SelectedItems<TransferredResource> selected)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException;
-
-  void deleteFile(String fileUUID, String details)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  void updateRiskIncidence(RiskIncidence incidence) throws AuthorizationDeniedException, GenericException;
 
   Job deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details)
     throws JobAlreadyStartedException, AuthorizationDeniedException, GenericException, RequestNotValidException,
     NotFoundException, InvalidParameterException;
 
-  Job updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity, Date mitigatedOn,
-    String mitigatedBy, String mitigatedDescription)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
-
   String createRepresentation(String aipId, String details) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException;
-
-  IndexedFile renameFolder(String folderUUID, String newName, String details) throws AuthorizationDeniedException,
-    GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException;
-
-  Job moveFiles(String aipId, String representationId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder,
-    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
-    AlreadyExistsException, NotFoundException;
-
-  IndexedFile createFolder(String aipId, String representationId, String folderUUID, String newName, String details)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
-    NotFoundException;
 
   Job createFormatIdentificationJob(SelectedItems<?> selected) throws GenericException, AuthorizationDeniedException,
     JobAlreadyStartedException, RequestNotValidException, NotFoundException;
@@ -340,8 +220,6 @@ public interface BrowserService extends RemoteService {
   Job deleteDIPs(SelectedItems<IndexedDIP> dips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id) throws RODAException;
-
   boolean hasDocumentation(String aipId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException;
 
@@ -358,134 +236,7 @@ public interface BrowserService extends RemoteService {
 
   Pair<Boolean, List<String>> retrieveRepresentationTypeOptions(String locale);
 
-  RepresentationInformation createRepresentationInformation(RepresentationInformation ri,
-    RepresentationInformationExtraBundle extra)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  void updateRepresentationInformation(RepresentationInformation ri, RepresentationInformationExtraBundle extra)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  Job updateRepresentationInformationListWithFilter(
-    SelectedItems<RepresentationInformation> representationInformationIds, String filterToAdd)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  Job deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  Pair<String, Integer> retrieveRepresentationInformationWithFilter(String riFilter) throws RODAException;
-
   RepresentationInformationFilterBundle retrieveObjectClassFields(String locale) throws AuthorizationDeniedException;
-
-  Map<String, String> retrieveRepresentationInformationFamilyOptions(String localeString);
-
-  String retrieveRepresentationInformationFamilyOptions(String family, String localeString);
-
-  RelationTypeTranslationsBundle retrieveRelationTypeTranslations(String localeString)
-    throws AuthorizationDeniedException;
-
-  RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(String representationInformationId,
-    String localeString)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
-  Map<String, List<String>> retrieveSharedProperties(String localeName);
-
-  DisposalRule createDisposalRule(DisposalRule rule) throws AuthorizationDeniedException, AlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException, IOException;
-
-  DisposalRule retrieveDisposalRule(String disposalRuleId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  DisposalRules listDisposalRules()
-    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
-
-  DisposalRule updateDisposalRule(DisposalRule rule)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  void updateDisposalRules(DisposalRules rules)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  void deleteDisposalRule(String disposalRuleId)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException, IOException;
-
-  Job applyDisposalRules(boolean applyToManuallyInclusive)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  DisposalSchedule createDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
-    AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException;
-
-  DisposalSchedule retrieveDisposalSchedule(String disposalScheduleId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  DisposalSchedules listDisposalSchedules()
-    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
-
-  DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
-    NotFoundException, GenericException, RequestNotValidException, IllegalOperationException;
-
-  void deleteDisposalSchedule(String disposalScheduleId) throws NotFoundException, AuthorizationDeniedException,
-    IllegalOperationException, GenericException, RequestNotValidException;
-
-  DisposalHold createDisposalHold(DisposalHold hold) throws AuthorizationDeniedException, AlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException;
-
-  DisposalHold retrieveDisposalHold(String disposalHoldId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  DisposalHolds listDisposalHolds()
-    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
-
-  DisposalHold updateDisposalHold(DisposalHold hold) throws AuthorizationDeniedException, NotFoundException,
-    GenericException, RequestNotValidException, IllegalOperationException;
-
-  void deleteDisposalHold(String disposalHoldId) throws NotFoundException, AuthorizationDeniedException,
-    IllegalOperationException, GenericException, RequestNotValidException;
-
-  Job associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  Job disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean override)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  DisposalHold liftDisposalHold(DisposalHold disposalHold) throws AuthorizationDeniedException,
-    IllegalOperationException, GenericException, NotFoundException, RequestNotValidException;
-
-  Job disassociateDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
-    DisposalConfirmationForm metadata)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
-
-  DisposalConfirmationForm retrieveDisposalConfirmationExtraBundle() throws RODAException;
-
-  Job deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmation> selectedItems, String details)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  Job destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
-  Job permanentlyDeleteRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
-  Job recoverRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  Job restoreRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
-  List<DisposalHoldAIPMetadata> listDisposalHoldsAssociation(String aipId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  String retrieveDisposalConfirmationReport(String confirmationId, boolean isToPrint) throws IOException, RODAException;
-
-  List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(String aipId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   DistributedInstance createDistributedInstance(DistributedInstance distributedInstance)
     throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,

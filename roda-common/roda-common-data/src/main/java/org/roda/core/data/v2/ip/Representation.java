@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Representation implements IsModelObject, HasId, HasInstanceID {
 
+  @Serial
   private static final long serialVersionUID = 3658011895150894795L;
 
   private String aipId;

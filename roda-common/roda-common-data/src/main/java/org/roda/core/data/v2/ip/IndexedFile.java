@@ -13,11 +13,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FILE)
@@ -57,10 +57,12 @@ public class IndexedFile
   private Map<String, Object> fields;
 
   private String instanceId;
-
   private String instanceName = null;
+  private boolean isLocalInstance = false;
 
   private Date createdOn = null;
+
+  private boolean isAvailable;
 
   public IndexedFile() {
     super();
@@ -312,12 +314,28 @@ public class IndexedFile
     this.instanceName = instanceName;
   }
 
+  public boolean isLocalInstance() {
+    return isLocalInstance;
+  }
+
+  public void setLocalInstance(boolean localInstance) {
+    isLocalInstance = localInstance;
+  }
+
   public Date getCreatedOn() {
     return createdOn;
   }
 
   public void setCreatedOn(Date createdOn) {
     this.createdOn = createdOn;
+  }
+
+  public boolean isAvailable() {
+    return isAvailable;
+  }
+
+  public void setAvailable(boolean available) {
+    isAvailable = available;
   }
 
   @Override

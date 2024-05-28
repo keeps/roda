@@ -398,16 +398,17 @@ public class RestUtils {
 
   public static String createFileUploadUri(String aipId, String representationId, List<String> directory,
     String details) {
-    // api/v1/files?aipId={aipId}&representationId={representationdId}&folder={folder[0]}&folder={folder[1]}&details={details}
+
+    // api/v2/files?aip-id={aipId}&representation-id={representationdId}&folder={folder[0]}&folder={folder[1]}&details={details}
 
     StringBuilder b = new StringBuilder();
 
     // base uri
-    b.append(RodaConstants.API_REST_V1_FILES).append(RodaConstants.API_QUERY_START);
-    b.append(RodaConstants.API_PATH_PARAM_AIP_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+    b.append(RodaConstants.API_REST_V2_FILES).append("upload").append(RodaConstants.API_QUERY_START);
+    b.append("aip-id").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
       .append(URL.encodeQueryString(aipId));
     b.append(RodaConstants.API_QUERY_SEP);
-    b.append(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+    b.append("representation-id").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
       .append(URL.encodeQueryString(representationId));
     b.append(RodaConstants.API_QUERY_SEP);
 

@@ -83,7 +83,7 @@ public class PreservationEventController implements PreservationEventRestService
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
+    return new LongResponse(indexService.count(IndexedPreservationEvent.class, countRequest, requestContext));
   }
 
   @Override

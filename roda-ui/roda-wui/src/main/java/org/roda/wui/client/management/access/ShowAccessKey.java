@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.accessKey.AccessKey;
-import org.roda.core.data.v2.generics.RegenerateAccessKeyRequest;
+import org.roda.core.data.v2.accessKey.CreateAccessKeyRequest;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -214,25 +214,27 @@ public class ShowAccessKey extends Composite {
             AccessKeyDialogs.showRegenerateAccessKeyDialog("Regenerate access key", new AsyncCallback<Date>() {
               @Override
               public void onFailure(Throwable caught) {
-                //do nothing
+                // do nothing
               }
 
               @Override
               public void onSuccess(Date date) {
                 Services services = new Services("Regenerate access key", "regenerate");
-                RegenerateAccessKeyRequest regenerateAccessKeyRequest = new RegenerateAccessKeyRequest(date);
-                services.membersResource(s -> s.regenerateAccessKey(accessKey.getId(), regenerateAccessKeyRequest)).whenComplete((accessKey, error) -> {
-                  if (accessKey != null) {
-                    AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), accessKey,
-                      new NoAsyncCallback<Boolean>() {
-                        @Override
-                        public void onSuccess(Boolean result) {
-                          refresh();
-                          Toast.showInfo(messages.accessKeyLabel(), messages.accessKeySuccessfullyRegenerated());
-                        }
-                      });
-                  }
-                });
+                CreateAccessKeyRequest regenerateAccessKeyRequest = new CreateAccessKeyRequest();
+                regenerateAccessKeyRequest.setExpirationDate(date);
+                services.membersResource(s -> s.regenerateAccessKey(accessKey.getId(), regenerateAccessKeyRequest))
+                  .whenComplete((response, error) -> {
+                    if (response != null) {
+                      AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), response,
+                        new NoAsyncCallback<Boolean>() {
+                          @Override
+                          public void onSuccess(Boolean result) {
+                            refresh();
+                            Toast.showInfo(messages.accessKeyLabel(), messages.accessKeySuccessfullyRegenerated());
+                          }
+                        });
+                    }
+                  });
               }
             });
           }
@@ -248,8 +250,8 @@ public class ShowAccessKey extends Composite {
         public void onSuccess(Boolean confirm) {
           if (confirm) {
             Services services = new Services("Revoke access key", "revoke");
-            services.membersResource(s -> s.revokeAccessKey(accessKey.getId())).whenComplete((accessKey, error) -> {
-              if (accessKey != null) {
+            services.membersResource(s -> s.revokeAccessKey(accessKey.getId())).whenComplete((response, error) -> {
+              if (response != null) {
                 refresh();
                 Toast.showInfo(messages.accessKeyLabel(), messages.accessKeySuccessfullyRevoked());
               }

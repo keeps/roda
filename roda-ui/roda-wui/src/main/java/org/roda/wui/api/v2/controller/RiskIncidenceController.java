@@ -66,7 +66,7 @@ public class RiskIncidenceController implements RiskIncidenceRestService {
   @Override
   public LongResponse count(CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
+    return new LongResponse(indexService.count(RiskIncidence.class, countRequest, requestContext));
   }
 
   @Override

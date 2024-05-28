@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
  */
 public class AuthorizationDeniedException extends RODAException {
 
+  @Serial
   private static final long serialVersionUID = -6744205569453461540L;
 
   private List<String> missingRoles = new ArrayList<>();

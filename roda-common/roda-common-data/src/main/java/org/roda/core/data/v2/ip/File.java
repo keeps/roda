@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FILE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class File implements IsModelObject, HasId, HasInstanceID {
+  @Serial
   private static final long serialVersionUID = 3303019735787641534L;
 
   private String id;

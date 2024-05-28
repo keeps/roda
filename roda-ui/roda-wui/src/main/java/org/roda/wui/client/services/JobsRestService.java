@@ -3,7 +3,7 @@ package org.roda.wui.client.services;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.generics.ValueResponse;
+import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Jobs;
@@ -38,7 +38,7 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
   @RequestMapping(method = RequestMethod.POST, path = "/obtain-command", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Obtains the cURL command for a job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {
       @ApiResponse(responseCode = "200", description = "cURL command successfully built", content = @Content(schema = @Schema(implementation = String.class)))})
-  ValueResponse obtainJobCommand(@Parameter(name = "job", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Job job);
+  StringResponse obtainJobCommand(@Parameter(name = "job", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Job job);
   
   @RequestMapping(method = RequestMethod.POST, path = "", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Create job", description = "Creates a new job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {

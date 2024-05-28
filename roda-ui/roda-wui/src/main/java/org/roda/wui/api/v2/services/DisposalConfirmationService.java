@@ -44,6 +44,9 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
+import org.roda.wui.common.server.ServerTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -58,6 +61,8 @@ import com.github.jknack.handlebars.Template;
  */
 @Service
 public class DisposalConfirmationService {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DisposalConfirmationService.class);
+
   private static final String DISPOSAL_CONFIRMATION_COMMAND_PROPERTY = "core.confirmation.generate.report.command";
   private static final String METADATA_FILE_PLACEHOLDER = "metadataFile";
   private static final String AIPS_FILE_PLACEHOLDER = "aipsFile";
@@ -231,5 +236,19 @@ public class DisposalConfirmationService {
     Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
 
     return entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
+  }
+
+  public DisposalConfirmationForm retrieveDisposalConfirmationExtraBundle() {
+    String template = null;
+
+    try (InputStream templateStream = RodaCoreFactory
+      .getConfigurationFileAsStream(RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/"
+        + RodaConstants.DISPOSAL_CONFIRMATION_EXTRA_METADATA_FILE)) {
+      template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      LOGGER.error("Error getting template from stream", e);
+    }
+
+    return new DisposalConfirmationForm(ServerTools.transform(template));
   }
 }

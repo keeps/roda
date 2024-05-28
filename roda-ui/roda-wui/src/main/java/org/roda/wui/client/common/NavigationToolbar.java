@@ -363,6 +363,13 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle));
   }
 
+  public void updateBreadcrumb(IndexedAIP indexedAIP, IndexedRepresentation indexedRepresentation,
+    IndexedFile indexedFile) {
+    breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(indexedAIP, indexedRepresentation, indexedFile));
+    aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(indexedAIP.getState()));
+    aipState.setVisible(AIPState.ACTIVE != indexedAIP.getState());
+  }
+
   public void updateBreadcrumb(BrowseFileBundle bundle) {
     breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(bundle));
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(bundle.getAip().getState()));

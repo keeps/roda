@@ -1,6 +1,5 @@
 package org.roda.wui.api.v2.controller;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,15 +7,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-import javax.crypto.SecretKey;
-
 import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InactiveUserException;
@@ -28,15 +24,13 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
-import org.roda.core.data.v2.accessToken.AccessToken;
-import org.roda.core.data.v2.generics.CreateGroupRequest;
-import org.roda.core.data.v2.generics.CreateAccessKeyRequest;
-import org.roda.core.data.v2.generics.CreateUserExtraFormFields;
-import org.roda.core.data.v2.generics.CreateUserRequest;
-import org.roda.core.data.v2.generics.LoginRequest;
+import org.roda.core.data.v2.user.CreateGroupRequest;
+import org.roda.core.data.v2.accessKey.CreateAccessKeyRequest;
+import org.roda.core.data.v2.user.CreateUserExtraFormFields;
+import org.roda.core.data.v2.user.CreateUserRequest;
+import org.roda.core.data.v2.user.LoginRequest;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
-import org.roda.core.data.v2.generics.RegenerateAccessKeyRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
@@ -66,10 +60,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -172,7 +162,7 @@ public class MembersController implements MembersRestService {
         throw new NotFoundException("User not found");
       }
       AccessKeys accessKeys = RodaCoreFactory.getModelService().listAccessKeysByUser(username);
-      for (AccessKey accessKey : accessKeys.getObjects()){
+      for (AccessKey accessKey : accessKeys.getObjects()) {
         accessKey.setKey(null);
       }
       return accessKeys;
@@ -205,27 +195,26 @@ public class MembersController implements MembersRestService {
   }
 
   @Override
-  public AccessKey regenerateAccessKey(String id, @RequestBody RegenerateAccessKeyRequest regenerateAccessKeyRequest) {
+  public AccessKey regenerateAccessKey(String id, @RequestBody CreateAccessKeyRequest regenerateAccessKeyRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       controllerAssistant.checkRoles(requestContext.getUser());
-      AccessKey accessKey = RodaCoreFactory.getModelService().retrieveAccessKey(id);
-      if (regenerateAccessKeyRequest.getExpirationDate().after(new Date())) {
-        accessKey.setKey(JwtUtils.generateToken(accessKey.getName(), regenerateAccessKeyRequest.getExpirationDate()));
-        RodaCoreFactory.getModelService().updateAccessKey(accessKey, requestContext.getUser().getName());
-        return accessKey;
-      } else {
-        throw new RequestNotValidException("Date not valid.");
+      if (regenerateAccessKeyRequest.getExpirationDate().before(new Date())) {
+        throw new RequestNotValidException("Expiration date must be after current date");
       }
+
+      AccessKey accessKey = RodaCoreFactory.getModelService().retrieveAccessKey(id);
+      accessKey.setKey(JwtUtils.generateToken(accessKey.getName(), regenerateAccessKeyRequest.getExpirationDate()));
+      return RodaCoreFactory.getModelService().updateAccessKey(accessKey, requestContext.getUser().getName());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM,
+        regenerateAccessKeyRequest);
     }
   }
 
@@ -233,25 +222,27 @@ public class MembersController implements MembersRestService {
   public AccessKey createAccessKey(@RequestBody CreateAccessKeyRequest accessKeyRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
     LogEntryState state = LogEntryState.SUCCESS;
-    AccessKey accessKey = new AccessKey();
 
     try {
-      accessKey.setName(accessKeyRequest.getName());
-      if (accessKeyRequest.getExpirationDate() == null || accessKeyRequest.getExpirationDate().before(new Date())) {
-        throw new RequestNotValidException("Invalid date");
-      }
-      accessKey.setExpirationDate(accessKeyRequest.getExpirationDate());
-      accessKey.setUserName(accessKeyRequest.getUserName());
       controllerAssistant.checkRoles(requestContext.getUser());
+
+      if (accessKeyRequest.getExpirationDate() == null || accessKeyRequest.getExpirationDate().before(new Date())) {
+        throw new RequestNotValidException("Expiration date must be after current date");
+      }
+
+      AccessKey accessKey = new AccessKey();
+      accessKey.setName(accessKeyRequest.getName());
+      accessKey.setExpirationDate(accessKeyRequest.getExpirationDate());
+      accessKey.setUserName(requestContext.getUser().getName());
+
       return RodaCoreFactory.getModelService().createAccessKey(accessKey, requestContext.getUser().getName());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM,
-        accessKey);
+        accessKeyRequest);
     }
   }
 
@@ -480,9 +471,10 @@ public class MembersController implements MembersRestService {
 
     try {
       membersService.recoverLoginCheckCaptcha(captcha);
-      membersService.requestPasswordReset(request.getRequestURL().toString().split("/api")[0], email,
-        localeString, request.getRemoteAddr(), true);
-      return JsonUtils.getJsonFromObject(new GenericOkResponse("Recover email sent to " + email), GenericOkResponse.class);
+      membersService.requestPasswordReset(request.getRequestURL().toString().split("/api")[0], email, localeString,
+        request.getRemoteAddr(), true);
+      return JsonUtils.getJsonFromObject(new GenericOkResponse("Recover email sent to " + email),
+        GenericOkResponse.class);
     } catch (RODAException e) {
       throw new RESTException(e);
     }
@@ -497,7 +489,8 @@ public class MembersController implements MembersRestService {
       user = membersService.confirmUserEmail(username, null, token);
       // 20180112 hsilva: need to set ip address for registering the action
       user.setIpAddress(request.getRemoteAddr());
-      return JsonUtils.getJsonFromObject(new GenericOkResponse("User " + username + " email confirmed"), GenericOkResponse.class);
+      return JsonUtils.getJsonFromObject(new GenericOkResponse("User " + username + " email confirmed"),
+        GenericOkResponse.class);
     } catch (RODAException e) {
       throw new RESTException(e);
     } finally {

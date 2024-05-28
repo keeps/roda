@@ -53,6 +53,6 @@ public class JobReportController implements JobReportRestService {
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
+    return new LongResponse(indexService.count(IndexedReport.class, countRequest, requestContext));
   }
 }

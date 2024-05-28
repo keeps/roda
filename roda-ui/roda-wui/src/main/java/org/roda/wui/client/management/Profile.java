@@ -16,7 +16,7 @@ import java.util.List;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.generics.CreateUserRequest;
+import org.roda.core.data.v2.user.CreateUserRequest;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;

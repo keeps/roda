@@ -38,7 +38,6 @@ import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ShowPreservationEvent;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
@@ -56,10 +55,12 @@ import org.roda.wui.client.planning.ShowRisk;
 import org.roda.wui.client.planning.ShowRiskIncidence;
 import org.roda.wui.client.portal.BrowseAIPPortal;
 import org.roda.wui.client.search.Search;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.http.client.URL;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -349,18 +350,16 @@ public class HistoryUtils {
 
   public static <T extends IsIndexed> void resolve(final String objectClass, final String objectUUID,
     final boolean replace) {
-    BrowserService.Util.getInstance().retrieveFromModel(objectClass, objectUUID, new AsyncCallback<T>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(T object) {
-        resolve(object, replace);
-      }
-    });
+    Services services = new Services("Get indexed object", "get");
+    services
+      .rodaEntityRestService(s -> s.findByUuid(objectUUID, LocaleInfo.getCurrentLocale().getLocaleName()), objectClass)
+      .whenComplete((isIndexed, throwable) -> {
+        if (throwable != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
+        } else {
+          resolve(isIndexed, replace);
+        }
+      });
   }
 
   public static <T extends IsIndexed> void resolve(T object) {

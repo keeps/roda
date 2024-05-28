@@ -328,4 +328,10 @@ public class SearchWrapper extends Composite {
       return null;
     }
   }
+
+  @Override
+  protected void onDetach() {
+    components.forEachList(AsyncTableCell::pauseAutoUpdate);
+    super.onDetach();
+  }
 }

@@ -23,7 +23,7 @@ public abstract class ActionLoadingAsyncCallback<T> extends LoadingAsyncCallback
   }
 
   public void doActionCallbackNone() {
-    actionCallback.onSuccess(Actionable.ActionImpact.NONE);
+      actionCallback.onSuccess(Actionable.ActionImpact.NONE);
   }
 
   public void doActionCallbackUpdated() {

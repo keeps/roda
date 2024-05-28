@@ -24,6 +24,7 @@ import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.DisposalConfirmationRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -105,21 +106,16 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
 
     errors.setVisible(false);
 
-    BrowserService.Util.getInstance()
-      .retrieveDisposalConfirmationExtraBundle(new AsyncCallback<DisposalConfirmationForm>() {
-
-        @Override
-        public void onFailure(Throwable throwable) {
+    Services services = new Services("Get disposal confirmation configurable form", "get");
+    services.disposalConfirmationResource(DisposalConfirmationRestService::retrieveDisposalConfirmationForm)
+      .whenComplete((result, throwable) -> {
+        if (throwable != null) {
           AsyncCallbackUtils.defaultFailureTreatment(throwable);
-        }
-
-        @Override
-        public void onSuccess(DisposalConfirmationForm result) {
+        } else {
           disposalConfirmationForm = result;
           FormUtilities.create(extra, disposalConfirmationForm.getValues(), true);
         }
       });
-
   }
 
   private void initActions() {
@@ -154,8 +150,8 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
       Toast.showInfo("Error", "Error");
       HistoryUtils.newHistory(ShowDisposalConfirmation.RESOLVER);
     } else {
-      DisposalConfirmationCreateRequest request = new DisposalConfirmationCreateRequest(title.getText(), selectedItemsList,
-        disposalConfirmationForm);
+      DisposalConfirmationCreateRequest request = new DisposalConfirmationCreateRequest(title.getText(),
+        selectedItemsList, disposalConfirmationForm);
       Services services = new Services("Create disposal confirmation", "create");
       services.disposalConfirmationResource(s -> s.createDisposalConfirmation(request))
         .whenComplete((job, throwable) -> {

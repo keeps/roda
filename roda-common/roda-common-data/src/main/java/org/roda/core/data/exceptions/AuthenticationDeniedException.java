@@ -7,11 +7,14 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  *
  * @author Luis Faria <lfaria@keep.pt>
  */
 public class AuthenticationDeniedException extends RODAException {
+  @Serial
   private static final long serialVersionUID = -8405660853143660038L;
 
   /**

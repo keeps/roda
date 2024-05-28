@@ -2,8 +2,10 @@ package org.roda.wui.client.services;
 
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateRequest;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.ri.RepresentationInformationFamily;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,4 +71,9 @@ public interface DisposalConfirmationRestService extends RODAEntityRestService<D
   @RequestMapping(method = RequestMethod.POST, path = "", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Creates a disposal confirmation", requestBody = @RequestBody(required = true, content = @Content(schema = @Schema(implementation = DisposalConfirmationCreateRequest.class))))
   Job createDisposalConfirmation(DisposalConfirmationCreateRequest createRequest);
+
+  @RequestMapping(path = "/configurations/form", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Retrieves from the configuration the custom disposal confirmation form", description = "Retrieves the metadata values from the configuration files according to configured form", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DisposalConfirmationForm.class)))})
+  DisposalConfirmationForm retrieveDisposalConfirmationForm();
 }

@@ -7,24 +7,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Date;
+
 import java.util.Set;
 
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import jakarta.websocket.OnError;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
-import org.roda.core.data.v2.generics.CreateGroupRequest;
-import org.roda.core.data.v2.accessToken.AccessToken;
-import org.roda.core.data.v2.generics.CreateAccessKeyRequest;
-import org.roda.core.data.v2.generics.CreateUserExtraFormFields;
-import org.roda.core.data.v2.generics.CreateUserRequest;
-import org.roda.core.data.v2.generics.LoginRequest;
-import org.roda.core.data.v2.generics.MetadataValue;
-import org.roda.core.data.v2.generics.RegenerateAccessKeyRequest;
+import org.roda.core.data.v2.user.CreateGroupRequest;
+import org.roda.core.data.v2.accessKey.CreateAccessKeyRequest;
+import org.roda.core.data.v2.user.CreateUserExtraFormFields;
+import org.roda.core.data.v2.user.CreateUserRequest;
+import org.roda.core.data.v2.user.LoginRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
@@ -39,9 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.Date;
-import java.util.Set;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -226,12 +218,12 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @Parameter(description = "The access key id ") @PathVariable(name = "id") String accessKeyId);
 
   @RequestMapping(path = "/users/access-keys/regenerate/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Regenerate access key", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RegenerateAccessKeyRequest.class))), description = "Regenerate a access key", responses = {
+  @Operation(summary = "Regenerate access key", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CreateAccessKeyRequest.class))), description = "Regenerate a access key", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccessKey.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   AccessKey regenerateAccessKey(
     @Parameter(description = "The access key id") @PathVariable(name = "id") String id,
-    @Parameter(name = "expirationDate", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) RegenerateAccessKeyRequest regenerateAccessKeyRequest);
+    @Parameter(name = "expirationDate", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) CreateAccessKeyRequest regenerateAccessKeyRequest);
 
   @RequestMapping(path = "/users/access-keys", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)

@@ -31,7 +31,7 @@ public class CommonServicesUtils {
       exceptionMessage);
   }
 
-  private static <T extends IsRODAObject> Job createAndExecuteJob(String name, SelectedItems<T> sourceObjects,
+  public static <T extends IsRODAObject> Job createAndExecuteJob(String name, SelectedItems<T> sourceObjects,
     Class<?> plugin, PluginType pluginType, User user, Map<String, String> pluginParameters, String exceptionMessage)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Job job = new Job();

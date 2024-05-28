@@ -7,15 +7,18 @@
  */
 package org.roda.wui.client.browse;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Viewers implements Serializable {
+  @Serial
   private static final long serialVersionUID = -2809811191632936028L;
 
-  private HashMap<String, String> pronoms;
-  private HashMap<String, String> mimetypes;
-  private HashMap<String, String> extensions;
+  private Map<String, String> pronoms;
+  private Map<String, String> mimetypes;
+  private Map<String, String> extensions;
   private String textLimit;
   private String options;
 
@@ -27,27 +30,27 @@ public class Viewers implements Serializable {
     this.options = "";
   }
 
-  public HashMap<String, String> getPronoms() {
+  public Map<String, String> getPronoms() {
     return pronoms;
   }
 
-  public void setPronoms(HashMap<String, String> pronoms) {
+  public void setPronoms(Map<String, String> pronoms) {
     this.pronoms = pronoms;
   }
 
-  public HashMap<String, String> getMimetypes() {
+  public Map<String, String> getMimetypes() {
     return mimetypes;
   }
 
-  public void setMimetypes(HashMap<String, String> mimetypes) {
+  public void setMimetypes(Map<String, String> mimetypes) {
     this.mimetypes = mimetypes;
   }
 
-  public HashMap<String, String> getExtensions() {
+  public Map<String, String> getExtensions() {
     return extensions;
   }
 
-  public void setExtensions(HashMap<String, String> extensions) {
+  public void setExtensions(Map<String, String> extensions) {
     this.extensions = extensions;
   }
 
