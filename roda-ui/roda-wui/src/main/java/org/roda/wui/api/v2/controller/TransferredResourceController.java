@@ -2,21 +2,24 @@ package org.roda.wui.api.v2.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.TransferredResources;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.IndexService;
@@ -314,6 +317,17 @@ public class TransferredResourceController implements TransferredResourceRestSer
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return new LongResponse(indexService.count(TransferredResource.class, countRequest, requestContext));
+    if (UserUtility.hasPermissions(requestContext.getUser(),
+      RodaConstants.PERMISSION_METHOD_FIND_TRANSFERRED_RESOURCE)) {
+      return new LongResponse(indexService.count(TransferredResource.class, countRequest, requestContext));
+    } else {
+      return new LongResponse(-1L);
+    }
+  }
+
+  @Override
+  @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+  public List<String> suggest(SuggestRequest suggestRequest) {
+    throw new RESTException(new NotImplementedException());
   }
 }

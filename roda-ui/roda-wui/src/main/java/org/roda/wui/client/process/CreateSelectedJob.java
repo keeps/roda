@@ -27,7 +27,6 @@ import org.roda.core.data.v2.jobs.LicenseInfo;
 import org.roda.core.data.v2.jobs.MarketInfo;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.BadgePanel;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
@@ -37,6 +36,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.client.main.Theme;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -73,7 +73,7 @@ import config.i18n.client.ClientMessages;
  */
 public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
 
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
@@ -109,89 +109,59 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
       return "create";
     }
   };
-
-  @SuppressWarnings("rawtypes")
-  public interface MyUiBinder extends UiBinder<Widget, CreateSelectedJob> {
-  }
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  @UiField
+  TextBox name;
+  @UiField
+  FlowPanel targetPanel;
+  @UiField
+  Label selectedObject;
+  @UiField
+  Label workflowCategoryLabel;
+  @UiField
+  FlowPanel workflowCategoryList;
+  @UiField
+  TabPanel workflowTabPanel;
+  @UiField
+  FlowPanel workflowList, workflowStoreList;
+  @UiField
+  FlowPanel workflowListPluginStatus;
+  @UiField
+  FlowPanel workflowListDescription;
+  @UiField
+  FlowPanel workflowListDescriptionCategories;
+  @UiField
+  FlowPanel workflowListTitle;
+  @UiField
+  FlowPanel workflowPanel;
+  @UiField
+  PluginOptionsPanel workflowOptions;
+  @UiField
+  Button buttonCreate;
+  @UiField
+  Button buttonObtainCommand;
+  @UiField
+  Button buttonCancel;
+  @UiField
+  FlowPanel jobPriorityRadioButtons;
+  @UiField
+  FlowPanel jobParallelismRadioButtons;
+  @UiField(provided = true)
+  RadioButton highPriorityRadioButton;
+  @UiField(provided = true)
+  RadioButton mediumPriorityRadioButton;
+  @UiField(provided = true)
+  RadioButton lowPriorityRadioButton;
+  @UiField(provided = true)
+  RadioButton normalParallelismRadioButton;
+  @UiField(provided = true)
+  RadioButton limitedParallelismRadioButton;
   private SelectedItems<?> selected = new SelectedItemsNone<>();
   private List<PluginInfo> plugins = null;
   private PluginInfo selectedPlugin = null;
   private String listSelectedClass = TransferredResource.class.getName();
   private JobPriority priority = JobPriority.MEDIUM;
   private JobParallelism parallelism = JobParallelism.NORMAL;
-
-  @UiField
-  TextBox name;
-
-  @UiField
-  FlowPanel targetPanel;
-
-  @UiField
-  Label selectedObject;
-
-  @UiField
-  Label workflowCategoryLabel;
-
-  @UiField
-  FlowPanel workflowCategoryList;
-
-  @UiField
-  TabPanel workflowTabPanel;
-
-  @UiField
-  FlowPanel workflowList, workflowStoreList;
-
-  @UiField
-  FlowPanel workflowListPluginStatus;
-
-  @UiField
-  FlowPanel workflowListDescription;
-
-  @UiField
-  FlowPanel workflowListDescriptionCategories;
-
-  @UiField
-  FlowPanel workflowListTitle;
-
-  @UiField
-  FlowPanel workflowPanel;
-
-  @UiField
-  PluginOptionsPanel workflowOptions;
-
-  @UiField
-  Button buttonCreate;
-
-  @UiField
-  Button buttonObtainCommand;
-
-  @UiField
-  Button buttonCancel;
-
-  @UiField
-  FlowPanel jobPriorityRadioButtons;
-
-  @UiField
-  FlowPanel jobParallelismRadioButtons;
-
-  @UiField(provided = true)
-  RadioButton highPriorityRadioButton;
-
-  @UiField(provided = true)
-  RadioButton mediumPriorityRadioButton;
-
-  @UiField(provided = true)
-  RadioButton lowPriorityRadioButton;
-
-  @UiField(provided = true)
-  RadioButton normalParallelismRadioButton;
-
-  @UiField(provided = true)
-  RadioButton limitedParallelismRadioButton;
 
   public CreateSelectedJob(final List<PluginType> pluginType) {
     this.selected = LastSelectedItemsSingleton.getInstance().getSelectedItems();
@@ -210,18 +180,13 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
       HistoryUtils.newHistory(lastHistory);
     }
 
-    BrowserService.Util.getInstance().retrievePluginsInfo(pluginType, new AsyncCallback<List<PluginInfo>>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        // do nothing
-      }
-
-      @Override
-      public void onSuccess(List<PluginInfo> pluginsInfo) {
-        init(pluginsInfo);
-      }
-    });
+    Services services = new Services("Retrieve plugin information", "get");
+    services.configurationsResource(s -> s.retrievePluginsInfo(pluginType))
+      .whenComplete((pluginInfoList, throwable) -> {
+        if (throwable == null) {
+          init(pluginInfoList.getPluginInfoList());
+        }
+      });
   }
 
   @Override
@@ -716,5 +681,11 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   public JobParallelism getJobParallelism() {
     return this.parallelism;
   }
+
+  @SuppressWarnings("rawtypes")
+  public interface MyUiBinder extends UiBinder<Widget, CreateSelectedJob> {
+  }
+
+
 
 }

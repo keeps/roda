@@ -85,7 +85,6 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
-import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
@@ -129,76 +128,6 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
-    }
-  }
-
-  public static BrowseRepresentationBundle retrieveBrowseRepresentationBundle(User user, String aipId,
-    String representationId, Locale locale, List<String> representationFieldsToReturn)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      List<String> aipFieldsWithPermissions = new ArrayList<>(Arrays.asList(RodaConstants.AIP_STATE,
-        RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
-      aipFieldsWithPermissions.addAll(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-
-      IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
-        IdUtils.getRepresentationId(aipId, representationId), representationFieldsToReturn);
-
-      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId(), aipFieldsWithPermissions);
-      controllerAssistant.checkObjectPermissions(user, aip);
-
-      // delegate
-      return BrowserHelper.retrieveBrowseRepresentationBundle(user, aip, representation, locale);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
-        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
-    }
-  }
-
-  public static BrowseFileBundle retrieveBrowseFileBundle(User user, String aipId, String representationId,
-    List<String> filePath, String fileId, List<String> fileFieldsToReturn)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      List<String> aipFieldsWithPermissions = new ArrayList<>(Arrays.asList(RodaConstants.AIP_STATE,
-        RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
-      aipFieldsWithPermissions.addAll(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-
-      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, aipFieldsWithPermissions);
-      controllerAssistant.checkObjectPermissions(user, aip);
-
-      List<String> representationFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_AIP_ID,
-        RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE, RodaConstants.REPRESENTATION_ORIGINAL);
-      IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
-        IdUtils.getRepresentationId(aip.getId(), representationId), representationFields);
-
-      String fileUUID = IdUtils.getFileId(aip.getId(), representationId, filePath, fileId);
-      IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID, fileFieldsToReturn);
-
-      // delegate
-      return BrowserHelper.retrieveBrowseFileBundle(aip, representation, file, user);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
-        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
-        RodaConstants.CONTROLLER_DIRECTORY_PATH_PARAM, filePath, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId);
     }
   }
 
@@ -469,30 +398,6 @@ public class Browser extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_CLASS_PARAM,
         classToReturn.getSimpleName());
-    }
-  }
-
-  public static <T extends IsIndexed> List<String> suggest(final User user, final Class<T> classToReturn,
-    final String field, final String query, boolean allowPartial)
-    throws AuthorizationDeniedException, GenericException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user, classToReturn);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // delegate
-      return BrowserHelper.suggest(classToReturn, field, query, user, allowPartial);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FIELD_PARAM, field,
-        RodaConstants.CONTROLLER_QUERY_PARAM, query);
     }
   }
 
@@ -1507,28 +1412,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Job deleteRepresentation(User user, SelectedItems<IndexedRepresentation> representations,
-    String details) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-    controllerAssistant.checkObjectPermissions(user, representations);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      return BrowserHelper.deleteRepresentation(user, representations, details);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, representations,
-        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
-    }
-  }
-
   public static Job deleteFile(User user, SelectedItems<IndexedFile> files, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2174,30 +2057,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static PreservationEventViewBundle retrievePreservationEventViewBundle(User user, String eventId)
-    throws RODAException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // delegate
-      PreservationEventViewBundle resource = BrowserHelper.retrievePreservationEventViewBundle(eventId);
-      controllerAssistant.checkObjectPermissions(user, resource.getEvent());
-      return resource;
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM,
-        eventId);
-    }
-  }
-
   public static void revertDescriptiveMetadataVersion(User user, String aipId, String representationId,
     String descriptiveMetadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
@@ -2823,27 +2682,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Job deleteRiskIncidences(User user, SelectedItems<RiskIncidence> selected, String details)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      return BrowserHelper.deleteRiskIncidences(user, selected, details);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
-        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
-    }
-  }
-
   public static Job deleteDIPs(User user, SelectedItems<IndexedDIP> dips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -3076,27 +2914,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Job createFormatIdentificationJob(User user, SelectedItems<?> selected)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // delegate
-      return BrowserHelper.createFormatIdentificationJob(user, selected);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected);
-    }
-  }
-
   public static Job changeAIPType(User user, SelectedItems<IndexedAIP> selected, String newType, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -3116,50 +2933,6 @@ public class Browser extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
         RodaConstants.CONTROLLER_TYPE_PARAM, newType, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
-    }
-  }
-
-  public static Job changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
-    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-    controllerAssistant.checkObjectPermissions(user, selected);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      return BrowserHelper.changeRepresentationType(user, selected, newType, details);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
-        RodaConstants.CONTROLLER_TYPE_PARAM, newType, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
-    }
-  }
-
-  public static void changeRepresentationStates(User user, IndexedRepresentation representation, List<String> newStates,
-    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-    controllerAssistant.checkObjectPermissions(user, representation);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      BrowserHelper.changeRepresentationStates(user, representation, newStates, details);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_PARAM, representation,
-        RodaConstants.CONTROLLER_STATES_PARAM, newStates, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -3421,17 +3194,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static RepresentationInformationFilterBundle retrieveObjectClassFields(User user, Messages messages)
-    throws AuthorizationDeniedException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    controllerAssistant.registerAction(user, LogEntryState.SUCCESS);
-    return BrowserHelper.retrieveObjectClassFields(messages);
-  }
-
   public static RelationTypeTranslationsBundle retrieveRelationTypeTranslations(User user, Messages messages)
     throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -3463,30 +3225,6 @@ public class Browser extends RodaWuiController {
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM,
         representationInformationItems);
     }
-  }
-
-  public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(User user,
-    String representationInformationId, Locale locale)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    RepresentationInformationExtraBundle extra = null;
-    try {
-      extra = BrowserHelper.retrieveRepresentationInformationExtraBundle(representationInformationId, locale);
-    } catch (NotFoundException | GenericException | RequestNotValidException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM,
-        representationInformationId);
-    }
-
-    return extra;
   }
 
   public static void importLogEntries(User user, InputStream inputStream, String filename) throws GenericException,

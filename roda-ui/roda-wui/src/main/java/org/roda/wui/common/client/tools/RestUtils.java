@@ -312,29 +312,18 @@ public class RestUtils {
 
   public static SafeUri createRepresentationDescriptiveMetadataHTMLUri(String aipId, String representationId,
     String descId) {
-    return createRepresentationDescriptiveMetadataHTMLUri(aipId, representationId, descId, null);
-  }
 
-  public static SafeUri createRepresentationDescriptiveMetadataHTMLUri(String aipId, String representationId,
-    String descId, String versionId) {
-    // api/v1/representations/{aip_id}/{representation_id}/descriptive_metadata/{descId}?acceptFormat=html&version_id={versionId}
+    // api/v2/aips/{id}/representations/{representation-id}/metadata/descriptive/{descriptive-metadata-id}/html
+
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_DESCRIPTIVE_METADATA).append(RodaConstants.API_SEP).append(descId);
-
-    // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML);
-
-    if (versionId != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION_ID)
-        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
-    }
+    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_SEP).append("representations").append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_SEP)
+        .append("metadata").append(RodaConstants.API_SEP).append("descriptive").append(RodaConstants.API_SEP)
+      .append(URL.encodeQueryString(descId)).append(RodaConstants.API_SEP).append("html");
 
     // locale
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
 
     return UriUtils.fromSafeConstant(b.toString());

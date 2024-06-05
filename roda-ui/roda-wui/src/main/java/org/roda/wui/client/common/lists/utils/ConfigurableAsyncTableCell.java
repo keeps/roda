@@ -10,7 +10,6 @@ package org.roda.wui.client.common.lists.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +50,15 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
 
   private static final Map<String, Column<?, ?>> DEFAULT_COLUMNS = new HashMap<>();
   private static final Map<String, List<String>> DEFAULT_COLUMNS_FIELDS = new HashMap<>();
+  private static final List<Class<? extends HasPermissions>> HAS_PERMISSIONS = Arrays.asList(AIP.class,
+    IndexedAIP.class, DIP.class, IndexedDIP.class);
+
+  // XXX Due to the lack of reflection capabilities in GWT
+  // A manual list must be maintained to keep the classes that follow
+  // The HasPermissions and HasState interfaces
+  private static final List<Class<? extends HasState>> HAS_STATE = Arrays.asList(AIP.class, IndexedAIP.class);
+  private static final List<Class<? extends HasDisposal>> HAS_DISPOSAL = Arrays.asList(AIP.class, IndexedAIP.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   static {
     /********************************************
@@ -245,19 +253,6 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
       RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FORMAT_MIMETYPE, RodaConstants.FILE_PRONOM));
   }
 
-  // XXX Due to the lack of reflection capabilities in GWT
-  // A manual list must be maintained to keep the classes that follow
-  // The HasPermissions and HasState interfaces
-
-  private static final List<Class<? extends HasPermissions>> HAS_PERMISSIONS = Arrays.asList(AIP.class,
-    IndexedAIP.class, DIP.class, IndexedDIP.class);
-
-  private static final List<Class<? extends HasState>> HAS_STATE = Arrays.asList(AIP.class, IndexedAIP.class);
-
-  private static final List<Class<? extends HasDisposal>> HAS_DISPOSAL = Arrays.asList(AIP.class, IndexedAIP.class);
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   private final Map<Column<T, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
 
   private static <T extends IsIndexed> List<String> calculateFieldsToReturn(AsyncTableCellOptions<T> options) {
@@ -350,32 +345,31 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
           }
 
           private String renderValue(Object value, RenderingHint hint) {
-            String ret;
-            if (value instanceof Date) {
-              switch (hint) {
-                case DATE_FORMAT_TITLE:
-                  ret = Humanize.formatDate((Date) value, true);
-                  break;
-                case DATE_FORMAT_SIMPLE:
-                  ret = Humanize.formatDate((Date) value, false);
-                  break;
-                case DATETIME_FORMAT_SIMPLE:
-                  ret = Humanize.formatDateTime((Date) value);
-                  break;
-                default:
-                  ret = Humanize.formatDate((Date) value);
-                  break;
-              }
-            } else if (value instanceof List) {
-              List<String> renderedList = ((List<?>) value).stream().map(v -> renderValue(v, hint))
-                .collect(Collectors.toList());
-              ret = StringUtils.prettyPrint(renderedList);
-            } else if (value instanceof Long && RenderingHint.FILE_SIZE.equals(hint)) {
-              ret = ((Long) value > 0) ? Humanize.readableFileSize((Long) value) : "";
-            } else {
-              ret = value.toString();
+            if (hint == null) {
+              return value.toString();
             }
-            return ret;
+
+            switch (hint) {
+              case FILE_SIZE:
+                Long size;
+                if (value instanceof Integer) {
+                  size = ((Integer) value).longValue();
+                } else {
+                  size = (Long) value;
+                }
+                return (size > 0) ? Humanize.readableFileSize(size) : "";
+              case DATETIME_FORMAT_SIMPLE:
+                return Humanize.formatDateTime((String) value);
+              case DATE_FORMAT_TITLE:
+                return Humanize.formatDate((String) value, true);
+              case DATE_FORMAT_SIMPLE:
+                return Humanize.formatDate((String) value, false);
+              case LIST:
+                List<String> renderedList = ((List<?>) value).stream().map(v -> renderValue(v, hint)).collect(Collectors.toList());
+                return StringUtils.prettyPrint(renderedList);
+              default:
+                return value.toString();
+            }
           }
         };
 

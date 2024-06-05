@@ -7,6 +7,7 @@ import org.roda.core.data.v2.file.DeleteFilesRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
 import org.roda.core.data.v2.file.RenameFolderRequest;
 import org.roda.core.data.v2.index.IndexedFileRequest;
+import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.jobs.Job;

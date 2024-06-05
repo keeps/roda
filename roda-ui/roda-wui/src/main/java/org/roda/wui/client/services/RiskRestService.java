@@ -1,6 +1,7 @@
 package org.roda.wui.client.services;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -24,6 +25,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.List;
 
 /**
  * @author Carlos Afonso <cafonso@keep.pt>
@@ -98,5 +101,4 @@ public interface RiskRestService extends RODAEntityRestService<IndexedRisk> {
     @ApiResponse(responseCode = "200", description = "Risk mitigation properties", content = @Content(schema = @Schema(implementation = RiskMitigationProperties.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   RiskMitigationProperties retrieveRiskMitigationProperties();
-
 }

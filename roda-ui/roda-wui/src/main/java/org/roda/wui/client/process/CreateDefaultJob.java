@@ -98,7 +98,8 @@ import config.i18n.client.ClientMessages;
  */
 public class CreateDefaultJob extends Composite {
 
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
@@ -126,13 +127,55 @@ public class CreateDefaultJob extends Composite {
       return "create_job";
     }
   };
-
-  public interface MyUiBinder extends UiBinder<Widget, CreateDefaultJob> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static List<PluginType> pluginTypes = PluginUtils.getPluginTypesWithoutIngest();
+  @UiField
+  TextBox name;
+  @UiField
+  FlowPanel workflowListTitle;
+  @UiField
+  Label workflowCategoryLabel;
+  @UiField
+  FlowPanel workflowCategoryList;
+  @UiField
+  TabPanel workflowTabPanel;
+  @UiField
+  FlowPanel workflowList, workflowStoreList;
+  @UiField
+  FlowPanel workflowListPluginStatus;
+  @UiField
+  FlowPanel workflowListDescription;
+  @UiField
+  FlowPanel workflowListDescriptionCategories;
+  @UiField
+  FlowPanel workflowPanel;
+  @UiField
+  PluginOptionsPanel workflowOptions;
+  @UiField
+  Label selectedObject;
+  @UiField
+  ListBox targetList;
+  @UiField
+  FlowPanel targetListPanel;
+  @UiField
+  Button buttonCreate;
+  @UiField
+  Button buttonObtainCommand;
+  @UiField
+  Button buttonCancel;
+  @UiField
+  FlowPanel jobPriorityRadioButtons;
+  @UiField
+  FlowPanel jobParallelismRadioButtons;
+  @UiField(provided = true)
+  RadioButton highPriorityRadioButton;
+  @UiField(provided = true)
+  RadioButton mediumPriorityRadioButton;
+  @UiField(provided = true)
+  RadioButton lowPriorityRadioButton;
+  @UiField(provided = true)
+  RadioButton normalParallelismRadioButton;
+  @UiField(provided = true)
+  RadioButton limitedParallelismRadioButton;
   @SuppressWarnings("rawtypes")
   private SearchWrapper search = null;
   private List<PluginInfo> plugins = null;
@@ -140,80 +183,6 @@ public class CreateDefaultJob extends Composite {
   private boolean isListEmpty = true;
   private JobPriority priority = JobPriority.MEDIUM;
   private JobParallelism parallelism = JobParallelism.NORMAL;
-  private static List<PluginType> pluginTypes = PluginUtils.getPluginTypesWithoutIngest();
-
-  @UiField
-  TextBox name;
-
-  @UiField
-  FlowPanel workflowListTitle;
-
-  @UiField
-  Label workflowCategoryLabel;
-
-  @UiField
-  FlowPanel workflowCategoryList;
-
-  @UiField
-  TabPanel workflowTabPanel;
-
-  @UiField
-  FlowPanel workflowList, workflowStoreList;
-
-  @UiField
-  FlowPanel workflowListPluginStatus;
-
-  @UiField
-  FlowPanel workflowListDescription;
-
-  @UiField
-  FlowPanel workflowListDescriptionCategories;
-
-  @UiField
-  FlowPanel workflowPanel;
-
-  @UiField
-  PluginOptionsPanel workflowOptions;
-
-  @UiField
-  Label selectedObject;
-
-  @UiField
-  ListBox targetList;
-
-  @UiField
-  FlowPanel targetListPanel;
-
-  @UiField
-  Button buttonCreate;
-
-  @UiField
-  Button buttonObtainCommand;
-
-  @UiField
-  Button buttonCancel;
-
-  @UiField
-  FlowPanel jobPriorityRadioButtons;
-
-  @UiField
-  FlowPanel jobParallelismRadioButtons;
-
-  @UiField(provided = true)
-  RadioButton highPriorityRadioButton;
-
-  @UiField(provided = true)
-  RadioButton mediumPriorityRadioButton;
-
-  @UiField(provided = true)
-  RadioButton lowPriorityRadioButton;
-
-  @UiField(provided = true)
-  RadioButton normalParallelismRadioButton;
-
-  @UiField(provided = true)
-  RadioButton limitedParallelismRadioButton;
-
   public CreateDefaultJob() {
     highPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.HIGH, false));
     mediumPriorityRadioButton = new RadioButton("priority",
@@ -226,17 +195,11 @@ public class CreateDefaultJob extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    BrowserService.Util.getInstance().retrievePluginsInfo(pluginTypes, new AsyncCallback<List<PluginInfo>>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        // do nothing
-      }
-
-      @Override
-      public void onSuccess(List<PluginInfo> pluginsInfo) {
-        init(pluginsInfo);
-      }
+    Services services = new Services("Retrieve plugin information", "get");
+    services.configurationsResource(s -> s.retrievePluginsInfo(pluginTypes)).whenComplete((pluginInfoList, throwable) -> {
+        if (throwable == null) {
+          init(pluginInfoList.getPluginInfoList());
+        }
     });
   }
 
@@ -715,11 +678,12 @@ public class CreateDefaultJob extends Composite {
       selected = SelectedItemsAll.create(targetList.getSelectedValue());
     }
 
-    Job job = JobUtils.createJob(jobName, priority, parallelism, selected, getSelectedPlugin().getId(), getWorkflowOptions().getValue(), selected.getSelectedClass());
+    Job job = JobUtils.createJob(jobName, priority, parallelism, selected, getSelectedPlugin().getId(),
+      getWorkflowOptions().getValue(), selected.getSelectedClass());
     Services services = new Services("Create job", "create");
     services.jobsResource(s -> s.createJob(job)).whenComplete((job1, throwable) -> {
       if (throwable != null) {
-        //Toast.showError(messages.dialogFailure(), caught.getMessage());
+        // Toast.showError(messages.dialogFailure(), caught.getMessage());
         buttonCreate.setEnabled(true);
       } else {
         Toast.showInfo(messages.dialogDone(), messages.processCreated());
@@ -740,20 +704,17 @@ public class CreateDefaultJob extends Composite {
       selected = SelectedItemsAll.create(targetList.getSelectedValue());
     }
 
-    BrowserService.Util.getInstance().createProcessJson(jobName, priority, parallelism, selected,
-      getSelectedPlugin().getId(), getWorkflowOptions().getValue(), selected.getSelectedClass(),
-      new AsyncCallback<String>() {
+    Services services = new Services("Obtain cURL command", "get");
+    Job job = JobUtils.createJob(jobName, priority, parallelism, selected, getSelectedPlugin().getId(),
+      getWorkflowOptions().getValue());
 
-        @Override
-        public void onFailure(Throwable caught) {
-          Toast.showError(messages.dialogFailure(), caught.getMessage());
-        }
-
-        @Override
-        public void onSuccess(String result) {
-          Dialogs.showInformationDialog(messages.createJobCurlCommand(), result, messages.closeButton(), true);
-        }
-      });
+    services.jobsResource(s -> s.obtainJobCommand(job)).whenComplete((result, throwable) -> {
+      if (throwable != null) {
+        Toast.showError(messages.dialogFailure(), throwable.getCause().getMessage());
+      } else {
+        Dialogs.showInformationDialog(messages.createJobCurlCommand(), result.getValue(), messages.closeButton(), true);
+      }
+    });
   }
 
   @UiHandler("buttonCancel")
@@ -785,5 +746,10 @@ public class CreateDefaultJob extends Composite {
   public FlowPanel getCategoryList() {
     return workflowCategoryList;
   }
+
+  public interface MyUiBinder extends UiBinder<Widget, CreateDefaultJob> {
+  }
+
+
 
 }

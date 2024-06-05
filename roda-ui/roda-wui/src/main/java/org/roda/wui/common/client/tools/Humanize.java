@@ -7,9 +7,7 @@
  */
 package org.roda.wui.common.client.tools;
 
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import org.roda.core.data.common.RodaConstants;
 
@@ -21,41 +19,34 @@ import com.google.gwt.i18n.client.TimeZone;
 import config.i18n.client.ClientMessages;
 
 public class Humanize {
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   public static final long ONE_SECOND = 1000;
   public static final long SECONDS = 60;
   public static final long ONE_MINUTE = ONE_SECOND * 60;
-  public static final long MINUTES = 60;
   public static final long ONE_HOUR = ONE_MINUTE * 60;
-  public static final long HOURS = 24;
   public static final long ONE_DAY = ONE_HOUR * 24;
-
+  public static final long MINUTES = 60;
+  public static final long HOURS = 24;
   public static final String BYTES = "B";
   public static final String KILOBYTES = "KB";
   public static final String MEGABYTES = "MB";
   public static final String GIGABYTES = "GB";
   public static final String TERABYTES = "TB";
   public static final String PETABYTES = "PB";
-
   public static final String[] UNITS = new String[] {BYTES, KILOBYTES, MEGABYTES, GIGABYTES, TERABYTES, PETABYTES};
-
   public static final double BYTES_IN_KILOBYTES = 1024L;
   public static final double BYTES_IN_MEGABYTES = 1048576L;
   public static final double BYTES_IN_GIGABYTES = 1073741824L;
   public static final double BYTES_IN_TERABYTES = 1099511627776L;
   public static final double BYTES_IN_PETABYTES = 1125899906842624L;
-
   public static final double[] BYTES_IN_UNITS = {1, BYTES_IN_KILOBYTES, BYTES_IN_MEGABYTES, BYTES_IN_GIGABYTES,
     BYTES_IN_TERABYTES, BYTES_IN_PETABYTES};
-
-  protected static final NumberFormat SMALL_NUMBER_FORMAT = NumberFormat.getFormat("0.#");
-  protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getFormat("#");
-
   public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd");
   public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss z");
-
+  public static final DateTimeFormat DATE_TIME_FORMAT_JSON = DateTimeFormat.getFormat("yyyy-MM-ddTHH:mm:ss.SSSZZZ");
   public static final boolean FORMAT_UTC = false;
+  protected static final NumberFormat SMALL_NUMBER_FORMAT = NumberFormat.getFormat("0.#");
+  protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getFormat("#");
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Humanize() {
     // do nothing
@@ -110,10 +101,6 @@ public class Humanize {
       return extendedDate ? messages.titleDates(dateInitialString, dateFinalString)
         : messages.simpleDates(dateInitialString, dateFinalString);
     }
-  }
-
-  public enum DHMSFormat {
-    LONG, SHORT;
   }
 
   public static String durationInDHMS(Date start, Date end, DHMSFormat format) {
@@ -237,5 +224,23 @@ public class Humanize {
     }
 
     return format.format(date);
+  }
+
+  public static String formatDate(String date, boolean extended) {
+    Date parsed = DATE_TIME_FORMAT_JSON.parse(date);
+
+    String formatPropertyName = extended ? RodaConstants.UI_DATE_FORMAT_TITLE : RodaConstants.UI_DATE_FORMAT_SIMPLE;
+    return applyDateTimeFormat(parsed, ConfigurationManager.getString(formatPropertyName), DATE_FORMAT);
+  }
+
+  public static String formatDateTime(String date) {
+    Date parsed = DATE_TIME_FORMAT_JSON.parse(date);
+
+    return applyDateTimeFormat(parsed, ConfigurationManager.getString(RodaConstants.UI_DATE_TIME_FORMAT_SIMPLE),
+        DATE_TIME_FORMAT);
+  }
+
+  public enum DHMSFormat {
+    LONG, SHORT;
   }
 }

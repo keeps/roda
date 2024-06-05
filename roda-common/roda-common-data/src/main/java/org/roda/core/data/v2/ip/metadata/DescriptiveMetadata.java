@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 
@@ -16,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DESCRIPTIVE_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DescriptiveMetadata implements IsModelObject {
+  @Serial
   private static final long serialVersionUID = 5460845130599998867L;
 
   private String id;

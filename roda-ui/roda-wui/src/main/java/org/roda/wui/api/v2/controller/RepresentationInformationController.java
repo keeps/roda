@@ -10,6 +10,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.StreamResponse;
@@ -17,9 +18,9 @@ import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationCreateRequest;
@@ -28,6 +29,7 @@ import org.roda.core.data.v2.ri.RepresentationInformationFamily;
 import org.roda.core.data.v2.ri.RepresentationInformationFamilyOptions;
 import org.roda.core.data.v2.ri.RepresentationInformationFilterRequest;
 import org.roda.core.data.v2.ri.RepresentationInformationRelationOptions;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.IndexService;
@@ -39,12 +41,14 @@ import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -107,7 +111,17 @@ public class RepresentationInformationController implements RepresentationInform
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return new LongResponse(indexService.count(RepresentationInformation.class, countRequest, requestContext));
+    if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION)) {
+      return new LongResponse(indexService.count(RepresentationInformation.class, countRequest, requestContext));
+    } else {
+      return new LongResponse(-1L);
+    }
+  }
+
+  @Override
+  @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+  public List<String> suggest(SuggestRequest suggestRequest) {
+    throw new RESTException(new NotImplementedException());
   }
 
   @Override

@@ -9,7 +9,6 @@ package org.roda.wui.client.browse;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -18,7 +17,6 @@ import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
@@ -36,31 +34,19 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobParallelism;
-import org.roda.core.data.v2.jobs.JobPriority;
-import org.roda.core.data.v2.jobs.PluginInfo;
-import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
-import org.roda.wui.client.browse.bundle.BrowseFileBundle;
-import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
-import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
-import org.roda.wui.client.ingest.process.JobBundle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -77,14 +63,6 @@ public interface BrowserService extends RemoteService {
   static final String SERVICE_URI = "browserservice";
 
   BrowseAIPBundle retrieveBrowseAIPBundle(String aipId, String localeString, List<String> aipFieldsToReturn)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
-  BrowseRepresentationBundle retrieveBrowseRepresentationBundle(String aipId, String representationId,
-    String localeString, List<String> representationFieldsToReturn)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
-  BrowseFileBundle retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId,
-    List<String> historyFilePath, String historyFileId, List<String> fileFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
@@ -105,9 +83,6 @@ public interface BrowserService extends RemoteService {
   Job deleteAIP(SelectedItems<IndexedAIP> aips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  Job deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
   void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
@@ -122,24 +97,12 @@ public interface BrowserService extends RemoteService {
   String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws AuthorizationDeniedException,
     GenericException, ValidationException, NotFoundException, RequestNotValidException;
 
-  List<PluginInfo> retrievePluginsInfo(List<PluginType> type);
-
-  Set<Pair<String, String>> retrieveReindexPluginObjectClasses();
-
   Set<Pair<String, String>> retrieveDropdownPluginItems(String parameterId, String localeString);
 
   Set<ConversionProfile> retrieveConversionProfilePluginItems(String pluginId, String repOrDip, String localeString);
 
-  CreateIngestJobBundle retrieveCreateIngestProcessBundle();
-
-  JobBundle retrieveJobBundle(String jobId, List<String> fieldsToReturn) throws RODAException;
-
-  Viewers retrieveViewersProperties() throws GenericException;
-
   List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String representationUUID, String locale)
     throws RODAException;
-
-  PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId) throws RODAException;
 
   DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId, String representationId,
     String descriptiveMetadataId, String localeString)
@@ -164,9 +127,6 @@ public interface BrowserService extends RemoteService {
     List<String> fieldsToReturn)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException;
 
-  <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query, boolean allowPartial)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
-
   Job updateAIPPermissions(SelectedItems<IndexedAIP> aips, Permissions permissions, String details, boolean recursive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     JobAlreadyStartedException;
@@ -174,44 +134,10 @@ public interface BrowserService extends RemoteService {
   Job updateDIPPermissions(SelectedItems<IndexedDIP> dips, Permissions permissions, String details)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
-  <T extends IsIndexed> Job createProcess(String jobName, JobPriority priority, JobParallelism parallelism,
-    SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
-    JobAlreadyStartedException;
-
-  <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
-    Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, GenericException, JobAlreadyStartedException;
-
-  <T extends IsIndexed> String createProcessJson(String jobName, JobPriority priority, JobParallelism parallelism,
-    SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
-    JobAlreadyStartedException;
-
-  <T extends IsIndexed> String createProcessJson(String jobName, SelectedItems<T> selected, String id,
-    Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, GenericException, JobAlreadyStartedException;
-
   Job appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
-  Job deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details)
-    throws JobAlreadyStartedException, AuthorizationDeniedException, GenericException, RequestNotValidException,
-    NotFoundException, InvalidParameterException;
-
-  String createRepresentation(String aipId, String details) throws AuthorizationDeniedException, GenericException,
-    NotFoundException, RequestNotValidException, AlreadyExistsException;
-
-  Job createFormatIdentificationJob(SelectedItems<?> selected) throws GenericException, AuthorizationDeniedException,
-    JobAlreadyStartedException, RequestNotValidException, NotFoundException;
-
-  Job changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,
-    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
   Job changeAIPType(SelectedItems<IndexedAIP> selectedAIP, String newType, String details)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  void changeRepresentationStates(IndexedRepresentation selectedRepresentation, List<String> newStates, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   BrowseDipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, String localeString)
@@ -233,10 +159,6 @@ public interface BrowserService extends RemoteService {
   int getExportLimit();
 
   Pair<Boolean, List<String>> retrieveAIPTypeOptions(String locale);
-
-  Pair<Boolean, List<String>> retrieveRepresentationTypeOptions(String locale);
-
-  RepresentationInformationFilterBundle retrieveObjectClassFields(String locale) throws AuthorizationDeniedException;
 
   DistributedInstance createDistributedInstance(DistributedInstance distributedInstance)
     throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,
@@ -310,9 +232,6 @@ public interface BrowserService extends RemoteService {
   boolean requestAIPLock(String aipId);
 
   void releaseAIPLock(String aipId);
-
-  List<Report> retrieveJobReportItems(String jobId, String jobReportId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   /**
    * Utilities

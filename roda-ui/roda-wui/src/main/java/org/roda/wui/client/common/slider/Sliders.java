@@ -17,6 +17,7 @@ import org.roda.wui.client.browse.bundle.Bundle;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import org.roda.wui.client.common.model.BrowseFileResponse;
+import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.services.Services;
 
 public class Sliders {
@@ -68,6 +69,13 @@ public class Sliders {
   public static SliderPanel createFileInfoSlider(FlowPanel container, FocusPanel toggleButton, IndexedFile file, BrowseFileResponse response) {
     SliderPanel slider = createSlider(container, toggleButton);
     InfoSliderHelper.createFileInfoSliderPanel(file, response, slider);
+    return slider;
+  }
+
+  public static SliderPanel createRepresentationInfoSlider(FlowPanel container, FocusPanel toggleButton,
+                                                           BrowseRepresentationResponse response) {
+    SliderPanel slider = createSlider(container, toggleButton);
+    InfoSliderHelper.updateInfoSliderPanel(response, slider);
     return slider;
   }
 

@@ -7,10 +7,12 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
 public class LinkingIdentifier implements Serializable {
+  @Serial
   private static final long serialVersionUID = -7150474519365697758L;
 
   private String type;

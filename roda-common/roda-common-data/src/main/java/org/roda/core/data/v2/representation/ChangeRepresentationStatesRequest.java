@@ -1,6 +1,4 @@
-package org.roda.core.data.v2.generics;
-
-import org.roda.core.data.v2.ip.IndexedRepresentation;
+package org.roda.core.data.v2.representation;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -15,25 +13,34 @@ public class ChangeRepresentationStatesRequest implements Serializable {
   @Serial
   private static final long serialVersionUID = -2706255856347304025L;
 
-  private IndexedRepresentation indexedRepresentation;
+  private String representationId;
   private List<String> newStates;
+  private String details;
 
   public ChangeRepresentationStatesRequest() {
-    this.indexedRepresentation = new IndexedRepresentation();
     this.newStates = new ArrayList<>();
   }
 
-  public ChangeRepresentationStatesRequest(IndexedRepresentation indexedRepresentation, List<String> newStates) {
-    this.indexedRepresentation = indexedRepresentation;
+  public ChangeRepresentationStatesRequest(String representationId, List<String> newStates, String details) {
+    this.representationId = representationId;
     this.newStates = newStates;
+    this.details = details;
   }
 
-  public IndexedRepresentation getIndexedRepresentation() {
-    return indexedRepresentation;
+  public String getRepresentationId() {
+    return representationId;
   }
 
-  public void setIndexedRepresentation(IndexedRepresentation indexedRepresentation) {
-    this.indexedRepresentation = indexedRepresentation;
+  public void setRepresentationId(String representationId) {
+    this.representationId = representationId;
+  }
+
+  public String getDetails() {
+    return details;
+  }
+
+  public void setDetails(String details) {
+    this.details = details;
   }
 
   public List<String> getNewStates() {

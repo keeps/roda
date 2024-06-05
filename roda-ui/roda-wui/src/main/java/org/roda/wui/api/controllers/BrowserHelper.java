@@ -50,7 +50,6 @@ import org.roda.core.common.tools.ZipEntryInfo;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -66,7 +65,6 @@ import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.DefaultConsumesOutputStream;
 import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.common.ObjectPermission;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
@@ -111,7 +109,6 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataList;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
@@ -145,7 +142,6 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginHelper;
-import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.base.disposal.confirmation.CreateDisposalConfirmationPlugin;
 import org.roda.core.plugins.base.disposal.confirmation.DeleteDisposalConfirmationPlugin;
 import org.roda.core.plugins.base.disposal.confirmation.DestroyRecordsPlugin;
@@ -187,7 +183,6 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
-import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
@@ -205,10 +200,6 @@ import org.xmlunit.diff.ElementSelectors;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 
-import gov.loc.premis.v3.EventComplexType;
-import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
-import gov.loc.premis.v3.LinkingObjectIdentifierComplexType;
-import gov.loc.premis.v3.StringPlusAuthority;
 import jakarta.ws.rs.core.MultivaluedMap;
 
 /**
@@ -874,12 +865,6 @@ public class BrowserHelper {
     }
 
     return ret;
-  }
-
-  protected static <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query,
-    User user, boolean allowPartial) throws GenericException {
-    boolean justActive = true;
-    return RodaCoreFactory.getIndexService().suggest(returnClass, field, query, user, allowPartial, justActive);
   }
 
   public static void validateGetFileParams(String acceptFormat) throws RequestNotValidException {
@@ -1860,14 +1845,6 @@ public class BrowserHelper {
       "Could not execute AIP delete action");
   }
 
-  public static Job deleteRepresentation(User user, SelectedItems<IndexedRepresentation> selected, String details)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    return createAndExecuteInternalJob("Delete representations", selected, DeleteRODAObjectPlugin.class, user,
-      pluginParameters, "Could not execute representations delete action");
-  }
-
   public static Job deleteFile(User user, SelectedItems<IndexedFile> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Map<String, String> pluginParameters = new HashMap<>();
@@ -2286,133 +2263,6 @@ public class BrowserHelper {
     };
 
     return new StreamResponse(stream);
-  }
-
-  public static PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
-    throws NotFoundException, GenericException {
-    PreservationEventViewBundle eventBundle = new PreservationEventViewBundle();
-    Map<String, IndexedAIP> aips = new HashMap<>();
-    Map<String, IndexedRepresentation> representations = new HashMap<>();
-    Map<String, IndexedFile> files = new HashMap<>();
-    Map<String, TransferredResource> transferredResources = new HashMap<>();
-    List<String> uris = new ArrayList<>();
-
-    List<String> eventFields = new ArrayList<>();
-    IndexedPreservationEvent ipe = retrieve(IndexedPreservationEvent.class, eventId, eventFields);
-
-    ModelService model = RodaCoreFactory.getModelService();
-    Binary binaryEvent = null;
-    try {
-      if (ipe.getObjectClass().equals(IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY)) {
-        binaryEvent = model.retrieveRepositoryPreservationEvent(ipe.getId());
-      } else {
-        String representationId = null;
-        String fileId = null;
-        List<String> directoryFilePath = null;
-
-        if (ipe.getRepresentationUUID() != null) {
-          IndexedRepresentation representation = retrieve(IndexedRepresentation.class, ipe.getRepresentationUUID(),
-            new ArrayList<>());
-          representationId = representation.getId();
-        }
-
-        if (ipe.getFileUUID() != null) {
-          IndexedFile file = retrieve(IndexedFile.class, ipe.getFileUUID(), new ArrayList<>());
-          fileId = file.getId();
-          directoryFilePath = file.getPath();
-        }
-        binaryEvent = model.retrievePreservationEvent(ipe.getAipID(), representationId, directoryFilePath, fileId,
-          eventId);
-      }
-    } catch (AuthorizationDeniedException | RequestNotValidException e) {
-      LOGGER.error("Error listing AIP preservation metadata {}: {}", ipe.getAipID(), e);
-    }
-
-    Map<String, IndexedPreservationAgent> agents = new HashMap<>();
-    try {
-      EventComplexType eventComplexType = PremisV3Utils.binaryToEvent(binaryEvent.getContent(), false);
-      for (LinkingAgentIdentifierComplexType linkingAgentIdentifierComplexType : eventComplexType
-        .getLinkingAgentIdentifier()) {
-        try {
-          List<String> agentFields = Arrays.asList(RodaConstants.PRESERVATION_AGENT_ID,
-            RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
-            RodaConstants.PRESERVATION_AGENT_ROLES, RodaConstants.PRESERVATION_AGENT_VERSION,
-            RodaConstants.PRESERVATION_AGENT_NOTE, RodaConstants.PRESERVATION_AGENT_EXTENSION);
-          IndexedPreservationAgent agent = retrieve(IndexedPreservationAgent.class,
-            linkingAgentIdentifierComplexType.getLinkingAgentIdentifierValue(), agentFields);
-          agents.put(linkingAgentIdentifierComplexType.getLinkingAgentIdentifierValue(), agent);
-        } catch (NotFoundException | GenericException e) {
-          LOGGER.error("Error getting agent {}: {}", linkingAgentIdentifierComplexType.getLinkingAgentIdentifierValue(),
-            e.getMessage());
-        }
-      }
-      eventBundle.setAgents(agents);
-
-      for (LinkingObjectIdentifierComplexType linkingObjectIdentifierComplexType : eventComplexType
-        .getLinkingObjectIdentifier()) {
-        LinkingIdentifier identifier = new LinkingIdentifier();
-        identifier.setValue(linkingObjectIdentifierComplexType.getLinkingObjectIdentifierValue());
-        identifier.setType(linkingObjectIdentifierComplexType.getLinkingObjectIdentifierType().getValue());
-        List<String> roles = new ArrayList<>();
-        for (StringPlusAuthority stringPlusAuthority : linkingObjectIdentifierComplexType.getLinkingObjectRole()) {
-          roles.add(stringPlusAuthority.getValue());
-        }
-        identifier.setRoles(roles);
-
-        eventBundle.addOutcomeObjectIds(identifier);
-        eventBundle.addSourcesObjectIds(identifier);
-
-        String idValue = identifier.getValue();
-        RODA_TYPE linkingType = LinkingObjectUtils.getLinkingIdentifierType(idValue);
-
-        try {
-          if (RODA_TYPE.AIP.equals(linkingType)) {
-            String uuid = LinkingObjectUtils.getAipIdFromLinkingId(idValue);
-            List<String> aipFields = Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.INDEX_UUID);
-            IndexedAIP aip = retrieve(IndexedAIP.class, uuid, aipFields);
-            aips.put(idValue, aip);
-          } else if (RODA_TYPE.REPRESENTATION.equals(linkingType)) {
-            String uuid = LinkingObjectUtils.getRepresentationIdFromLinkingId(idValue);
-            List<String> representationFields = Arrays.asList(RodaConstants.REPRESENTATION_ID,
-              RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ORIGINAL);
-            IndexedRepresentation rep = retrieve(IndexedRepresentation.class, uuid, representationFields);
-            representations.put(idValue, rep);
-          } else if (RODA_TYPE.FILE.equals(linkingType)) {
-            List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
-            fileFields.addAll(RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
-            fileFields.addAll(Arrays.asList(RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_SIZE,
-              RodaConstants.FILE_FILEFORMAT, RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FORMAT_DESIGNATION));
-            IndexedFile file = retrieve(IndexedFile.class, LinkingObjectUtils.getFileIdFromLinkingId(idValue),
-              fileFields);
-            files.put(idValue, file);
-          } else if (RODA_TYPE.TRANSFERRED_RESOURCE.equals(linkingType)) {
-            String id = LinkingObjectUtils.getTransferredResourceIdFromLinkingId(idValue);
-            if (id != null) {
-              List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID,
-                RodaConstants.TRANSFERRED_RESOURCE_NAME, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
-              TransferredResource tr = retrieve(TransferredResource.class, IdUtils.createUUID(id), resourceFields);
-              transferredResources.put(idValue, tr);
-            }
-          } else if (RodaConstants.URI_TYPE.equals(identifier.getType())) {
-            uris.add(idValue);
-          } else {
-            LOGGER.warn("No support for linking object type: {}", idValue);
-          }
-        } catch (NotFoundException e) {
-          // nothing to do
-        }
-      }
-    } catch (ValidationException e) {
-      LOGGER.error("error converting binary into event {}: {}", eventId, e);
-    }
-
-    eventBundle.setEvent(ipe);
-    eventBundle.setAips(aips);
-    eventBundle.setRepresentations(representations);
-    eventBundle.setFiles(files);
-    eventBundle.setTransferredResources(transferredResources);
-    eventBundle.setUris(uris);
-    return eventBundle;
   }
 
   public static CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(String aipId, String representationId,
@@ -2935,14 +2785,6 @@ public class BrowserHelper {
     return new Reports(results);
   }
 
-  public static Job deleteRiskIncidences(User user, SelectedItems<RiskIncidence> selected, String details)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    return createAndExecuteInternalJob("Delete risk incidences", selected, DeleteRODAObjectPlugin.class, user,
-      pluginParameters, "Could not execute risk incidence delete action");
-  }
-
   public static Job updateMultipleIncidences(User user, SelectedItems<RiskIncidence> selected, String status,
     String severity, Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
@@ -3080,12 +2922,6 @@ public class BrowserHelper {
     }
   }
 
-  public static Job createFormatIdentificationJob(User user, SelectedItems<?> selected)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return createAndExecuteJob("Format identification using Siegfried", selected, SiegfriedPlugin.class,
-      PluginType.MISC, user, Collections.emptyMap(), "Could not execute format identification using Siegfrid action");
-  }
-
   public static Job changeAIPType(User user, SelectedItems<IndexedAIP> selected, String newType, String details)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
@@ -3093,44 +2929,6 @@ public class BrowserHelper {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
     return createAndExecuteInternalJob("Change AIP type", selected, ChangeTypePlugin.class, user, pluginParameters,
       "Could not change AIP type");
-  }
-
-  public static Job changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
-    String details) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NEW_TYPE, newType);
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    return createAndExecuteInternalJob("Change representation type", selected, ChangeTypePlugin.class, user,
-      pluginParameters, "Could not change representation type");
-  }
-
-  public static void changeRepresentationStates(User user, IndexedRepresentation representation, List<String> newStates,
-    String details) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    String eventDescription = "The process of updating an object of the repository.";
-
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
-
-    List<LinkingIdentifier> sources = new ArrayList<>();
-    sources.add(PluginHelper.getLinkingIdentifier(representation.getAipId(), representation.getId(),
-      RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-
-    try {
-      model.changeRepresentationStates(representation.getAipId(), representation.getId(), newStates, user.getName());
-      index.commit(IndexedRepresentation.class);
-      StringBuilder outcomeText = new StringBuilder().append("The states of the representation '")
-        .append(representation.getId()).append("' were updated.");
-
-      model.createEvent(representation.getAipId(), representation.getId(), null, null, PreservationEventType.UPDATE,
-        eventDescription, sources, null, PluginState.SUCCESS, outcomeText.toString(), details, user.getName(), true);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      StringBuilder outcomeText = new StringBuilder().append("The states of the representation '")
-        .append(representation.getId()).append("' were not updated.");
-
-      model.createEvent(representation.getAipId(), representation.getId(), null, null, PreservationEventType.UPDATE,
-        eventDescription, sources, null, PluginState.FAILURE, outcomeText.toString(), details, user.getName(), true);
-      throw e;
-    }
   }
 
   public static ObjectPermissionResult verifyPermissions(String username, String permissionType,
@@ -3241,37 +3039,6 @@ public class BrowserHelper {
     }
   }
 
-  public static RepresentationInformationFilterBundle retrieveObjectClassFields(Messages messages) {
-    RepresentationInformationFilterBundle newBundle = new RepresentationInformationFilterBundle();
-    Iterator<String> keys = RodaCoreFactory.getRodaConfiguration().getKeys("ui.ri.rule");
-    Map<String, List<String>> fieldsResult = new HashMap<>();
-    Map<String, String> translationsResult = new HashMap<>();
-
-    while (keys.hasNext()) {
-      String key = keys.next();
-      String[] splittedKey = key.split("\\.");
-      List<String> fields = RodaCoreFactory.getRodaConfigurationAsList(key);
-      List<String> fieldsAndTranslations = new ArrayList<>();
-
-      for (String field : fields) {
-        String fieldName = RodaCoreFactory.getRodaConfigurationAsString(field, RodaConstants.SEARCH_FIELD_FIELDS);
-        fieldsAndTranslations.add(fieldName);
-
-        String fieldI18nKey = RodaCoreFactory.getRodaConfigurationAsString(field, RodaConstants.SEARCH_FIELD_I18N);
-        if (StringUtils.isNotBlank(fieldI18nKey)) {
-          String translation = messages.getTranslation(fieldI18nKey);
-          translationsResult.put(splittedKey[3] + ":" + fieldName, translation);
-        }
-      }
-
-      fieldsResult.put(splittedKey[3], fieldsAndTranslations);
-    }
-
-    newBundle.setObjectClassFields(fieldsResult);
-    newBundle.setTranslations(translationsResult);
-    return newBundle;
-  }
-
   public static RelationTypeTranslationsBundle retrieveRelationTypeTranslations(Messages messages) {
     RelationTypeTranslationsBundle bundle = new RelationTypeTranslationsBundle();
     Map<RelationObjectType, Map<String, String>> allTranslations = new HashMap<>();
@@ -3317,63 +3084,6 @@ public class BrowserHelper {
     return createAndExecuteInternalJob("Update representation information with filter", representationInformationItems,
       AddRepresentationInformationFilterPlugin.class, user, pluginParameters,
       "Could not update representation information with filter " + filterToAdd);
-  }
-
-  public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(
-    String representationInformationId, Locale locale)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
-      .retrieveExtraSupportedMetadata(RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family"), locale);
-    Map<String, Set<MetadataValue>> familyValues = new HashMap<>();
-
-    RepresentationInformation ri = null;
-    if (representationInformationId != null) {
-      ri = RodaCoreFactory.getModelService().retrieveRepresentationInformation(representationInformationId);
-    }
-
-    for (SupportedMetadataTypeBundle metadataTypeBundle : supportedMetadataTypeBundles) {
-      String xml = "";
-      if (ri != null && metadataTypeBundle.getType().equals(ri.getFamily())) {
-        xml = ri.getExtras();
-      }
-
-      // Get the values using XPath
-      Set<MetadataValue> values = new HashSet<>();
-
-      if (metadataTypeBundle != null) {
-        values = metadataTypeBundle.getValues();
-        if (values != null) {
-          for (MetadataValue mv : values) {
-            String xpathRaw = mv.get("xpath");
-            if (xpathRaw != null && xpathRaw.length() > 0) {
-              String[] xpaths = xpathRaw.split("##%##");
-              String value = "";
-
-              if (StringUtils.isNotBlank(xml)) {
-                List<String> allValues = new ArrayList<>();
-                for (String xpath : xpaths) {
-                  allValues.addAll(ServerTools.applyXpath(xml, xpath));
-                }
-                // if any of the values is different, concatenate all values in
-                // a string, otherwise return the value
-                boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
-                if (allEqual && !allValues.isEmpty()) {
-                  value = allValues.get(0);
-                } else {
-                  value = String.join(" / ", allValues);
-                }
-              }
-
-              mv.set("value", value.trim());
-            }
-          }
-        }
-      }
-
-      familyValues.put(metadataTypeBundle.getType(), values);
-    }
-
-    return new RepresentationInformationExtraBundle(ri, familyValues);
   }
 
   public static List<SupportedMetadataTypeBundle> retrieveExtraSupportedMetadata(List<String> types, Locale locale) {

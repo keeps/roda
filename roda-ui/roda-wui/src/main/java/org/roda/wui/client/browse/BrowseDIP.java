@@ -49,6 +49,8 @@ import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.services.ConfigurationRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -76,22 +78,22 @@ import config.i18n.client.ClientMessages;
  */
 public class BrowseDIP extends Composite {
 
+  public static final Sorter DEFAULT_DIPFILE_SORTER = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
 
-        @Override
-        public void onSuccess(Viewers viewers) {
-          load(viewers, historyTokens, callback);
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          errorRedirect(callback);
-        }
-      });
+      Services services = new Services("Retrieve viewers configuration", "get");
+      services.configurationsResource(ConfigurationRestService::retrieveViewersProperties)
+        .whenComplete((viewers, throwable) -> {
+          if (throwable != null) {
+            errorRedirect(callback);
+          } else {
+            load(viewers, historyTokens, callback);
+          }
+        });
     }
 
     @Override
@@ -157,22 +159,13 @@ public class BrowseDIP extends Composite {
     }
 
   };
-
-  interface MyUiBinder extends UiBinder<Widget, BrowseDIP> {
-  }
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  public static final Sorter DEFAULT_DIPFILE_SORTER = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
-
-  // interface
-
   @UiField
   AccessibleFocusPanel keyboardFocus;
 
+  // interface
   @UiField
   FlowPanel center;
-
   @UiField
   FlowPanel container;
 
@@ -313,5 +306,8 @@ public class BrowseDIP extends Composite {
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.smoothScroll(keyboardFocus.getElement());
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, BrowseDIP> {
   }
 }

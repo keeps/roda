@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
@@ -24,20 +25,21 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
-import org.roda.core.data.v2.user.CreateGroupRequest;
 import org.roda.core.data.v2.accessKey.CreateAccessKeyRequest;
-import org.roda.core.data.v2.user.CreateUserExtraFormFields;
-import org.roda.core.data.v2.user.CreateUserRequest;
-import org.roda.core.data.v2.user.LoginRequest;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.user.CreateGroupRequest;
+import org.roda.core.data.v2.user.CreateUserExtraFormFields;
+import org.roda.core.data.v2.user.CreateUserRequest;
 import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.LoginRequest;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaPrincipal;
 import org.roda.core.data.v2.user.User;
@@ -55,9 +57,11 @@ import org.roda.wui.common.utils.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.ldap.NamingException;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -634,7 +638,17 @@ public class MembersController implements MembersRestService {
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return new LongResponse(indexService.count(RODAMember.class, countRequest, requestContext));
+    if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_RODA_MEMBER)) {
+      return new LongResponse(indexService.count(RODAMember.class, countRequest, requestContext));
+    } else {
+      return new LongResponse(-1L);
+    }
+  }
+
+  @Override
+  @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+  public List<String> suggest(SuggestRequest suggestRequest) {
+    throw new RESTException(new NotImplementedException());
   }
 
   public static void casLogin(String username, HttpServletRequest request) throws RODAException {

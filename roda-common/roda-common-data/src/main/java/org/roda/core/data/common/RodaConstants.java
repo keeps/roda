@@ -346,6 +346,9 @@ public final class RodaConstants {
   public static final String API_REST_V2_DOWNLOAD_HANDLER = "/binary";
   public static final String API_REST_V2_REPRESENTATION_OTHER_METADATA = "/other-metadata";
 
+  // aips
+  public static final String API_REST_V2_AIPS = "api/v2/aips";
+
   // transferred resource
   public static final String API_REST_V2_RESOURCES = "api/v2/transfers/";
   public static final String API_REST_V2_TRANSFERRED_RESOURCE_CREATE_RESOURCE = "create/resource";
@@ -1976,8 +1979,15 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_FIND_REPRESENTATION = "org.roda.wui.api.controllers.Browser.find(IndexedRepresentation)";
   public static final String PERMISSION_METHOD_FIND_FILE = "org.roda.wui.api.controllers.Browser.find(IndexedFile)";
   public static final String PERMISSION_METHOD_FIND_DIP = "org.roda.wui.api.controllers.Browser.find(IndexedDIP)";
+  public static final String PERMISSION_METHOD_FIND_TRANSFERRED_RESOURCE = "org.roda.wui.api.controllers.Browser.find(TransferredResource)";
+  public static final String PERMISSION_METHOD_FIND_RODA_MEMBER = "org.roda.wui.api.controllers.Browser.find(RodaMember)";
+  public static final String PERMISSION_METHOD_FIND_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Browser.find(DisposalConfirmation)";
+  public static final String PERMISSION_METHOD_FIND_JOB_REPORT = "org.roda.wui.api.controllers.Browser.find(IndexedReport)";
+  public static final String PERMISSION_METHOD_FIND_JOB = "org.roda.wui.api.controllers.Browser.find(Job)";
+  public static final String PERMISSION_METHOD_FIND_NOTIFICATION = "org.roda.wui.api.controllers.Browser.find(Notification)";
   public static final String PERMISSION_METHOD_FIND_RISK_INCIDENCE = "org.roda.wui.api.controllers.Browser.find(RiskIncidence)";
   public static final String PERMISSION_METHOD_FIND_PRESERVATION_EVENT = "org.roda.wui.api.controllers.Browser.find(IndexedPreservationEvent)";
+  public static final String PERMISSION_METHOD_FIND_PRESERVATION_AGENT = "org.roda.wui.api.controllers.Browser.find(IndexedPreservationAgent)";
   public static final String PERMISSION_METHOD_FIND_LOG_ENTRY = "org.roda.wui.api.controllers.Browser.find(LogEntry)";
   public static final String PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION = "org.roda.wui.api.controllers.Browser.find(RepresentationInformation)";
   public static final String PERMISSION_METHOD_FIND_RISK = "org.roda.wui.api.controllers.Browser.find(IndexedRisk)";

@@ -10,12 +10,12 @@ package org.roda.core.data.v2.jobs;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.xml.bind.annotation.XmlElement;
-
 import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.xml.bind.annotation.XmlElement;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
@@ -48,5 +48,4 @@ public class Jobs {
   public void addJob(Job job) {
     this.jobList.add(job);
   }
-
 }

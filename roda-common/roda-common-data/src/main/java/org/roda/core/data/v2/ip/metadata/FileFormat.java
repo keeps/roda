@@ -7,10 +7,12 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
 public class FileFormat implements Serializable {
+  @Serial
   private static final long serialVersionUID = -6855712550409310949L;
 
   private String formatDesignationName;

@@ -12,6 +12,7 @@ import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.common.ControllerAssistant;
@@ -22,11 +23,36 @@ import org.springframework.stereotype.Service;
 @Service
 public class IndexService {
 
+  public <T extends IsIndexed> List<String> suggest(SuggestRequest suggestRequest, Class<T> classToReturn,
+    RequestContext requestContext) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser(), classToReturn);
+
+      boolean justActive = true;
+      return RodaCoreFactory.getIndexService().suggest(classToReturn, suggestRequest.getField(),
+        suggestRequest.getQuery(), requestContext.getUser(), suggestRequest.isAllowPartial(), justActive);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_CLASS_PARAM,
+        classToReturn, RodaConstants.CONTROLLER_FIELD_PARAM, suggestRequest.getField(),
+        RodaConstants.CONTROLLER_QUERY_PARAM, suggestRequest.getQuery());
+    }
+  }
+
   public <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final FindRequest findRequest,
     RequestContext context) {
     return find(classToReturn, findRequest, null, context);
   }
-
 
   public <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final FindRequest findRequest,
     String locale, RequestContext context) {
@@ -104,7 +130,8 @@ public class IndexService {
     try {
       // check user permissions
       controllerAssistant.checkRoles(context.getUser(), returnClass);
-      return RodaCoreFactory.getIndexService().count(returnClass, request.getFilter(), context.getUser(), request.isOnlyActive());
+      return RodaCoreFactory.getIndexService().count(returnClass, request.getFilter(), context.getUser(),
+        request.isOnlyActive());
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -113,8 +140,8 @@ public class IndexService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(context, state, RodaConstants.CONTROLLER_CLASS_PARAM, returnClass.getSimpleName(),
-        RodaConstants.CONTROLLER_FILTER_PARAM, request.getFilter().toString());
+      controllerAssistant.registerAction(context, state, RodaConstants.CONTROLLER_CLASS_PARAM,
+        returnClass.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, request.getFilter().toString());
     }
   }
 }

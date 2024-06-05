@@ -114,19 +114,16 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
   public void buttonObtainCommandHandler(ClickEvent e) {
     String jobName = getName().getText();
 
-    BrowserService.Util.getInstance().createProcessJson(jobName, getJobPriority(), getJobParallelism(), getSelected(),
-      getSelectedPlugin().getId(), getWorkflowOptions().getValue(), getSelectedClass(), new AsyncCallback<String>() {
+    Services services = new Services("Obtain cURL command", "get");
+    Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(), getSelectedPlugin().getId(), getWorkflowOptions().getValue());
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(String result) {
-          Dialogs.showInformationDialog(messages.createJobCurlCommand(), result, messages.closeButton(), true);
-        }
-      });
+    services.jobsResource(s -> s.obtainJobCommand(job)).whenComplete((result, throwable) -> {
+      if (throwable != null) {
+        AsyncCallbackUtils.defaultFailureTreatment(throwable.getCause());
+      } else {
+        Dialogs.showInformationDialog(messages.createJobCurlCommand(), result.getValue(), messages.closeButton(), true);
+      }
+    });
   }
 
   @Override

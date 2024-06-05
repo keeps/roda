@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.index;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.roda.core.data.v2.index.filter.Filter;
@@ -18,6 +19,7 @@ import org.roda.core.data.v2.index.filter.Filter;
  */
 public class CountRequest implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = -6793510712321710035L;
 
   /** Class name of resources to return. */

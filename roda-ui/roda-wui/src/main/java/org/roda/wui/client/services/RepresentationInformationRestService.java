@@ -84,8 +84,7 @@ public interface RepresentationInformationRestService extends RODAEntityRestServ
 
   @RequestMapping(path = "/filter", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Add a Filter to a set of selected representation information", requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = RepresentationInformationFilterRequest.class))), responses = {
-      @ApiResponse(responseCode = "201", description = "Created job", content = @Content(schema = @Schema(implementation = Job.class)))
-  })
+    @ApiResponse(responseCode = "201", description = "Created job", content = @Content(schema = @Schema(implementation = Job.class)))})
   Job addFilterToRepresentationInformation(
     @Parameter(name = "request", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RepresentationInformationFilterRequest.class))) RepresentationInformationFilterRequest request);
 }

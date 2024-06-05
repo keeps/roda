@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedRepresentation extends Representation
   implements IsIndexed, SetsUUID, HasPermissionFilters, HasStateFilter, HasInstanceID, HasInstanceName {
+  @Serial
   private static final long serialVersionUID = -950545608880793468L;
 
   private String uuid;
@@ -33,10 +35,12 @@ public class IndexedRepresentation extends Representation
   private long numberOfSchemaFiles;
 
   private String instanceName;
+  private boolean isLocalInstance = false;
 
   private List<String> ancestors;
 
   private Map<String, Object> fields;
+
 
   public IndexedRepresentation() {
     super();
@@ -139,6 +143,14 @@ public class IndexedRepresentation extends Representation
     this.fields = fields;
   }
 
+  public boolean isLocalInstance() {
+    return isLocalInstance;
+  }
+
+  public void setLocalInstance(boolean localInstance) {
+    isLocalInstance = localInstance;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -209,5 +221,4 @@ public class IndexedRepresentation extends Representation
     return Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_AIP_ID,
       RodaConstants.REPRESENTATION_ID);
   }
-
 }

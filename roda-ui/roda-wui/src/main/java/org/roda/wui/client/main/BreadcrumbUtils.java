@@ -20,7 +20,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.PreservationEvents;
-import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -164,13 +163,6 @@ public class BreadcrumbUtils {
   public static List<BreadcrumbItem> getRepresentationBreadcrumbs(IndexedAIP aip,
     IndexedRepresentation representation) {
     return Arrays.asList(getBreadcrumbItem(aip), getBreadcrumbItem(representation));
-  }
-
-  public static List<BreadcrumbItem> getFileBreadcrumbs(BrowseFileBundle bundle) {
-    IndexedAIP aip = bundle.getAip();
-    IndexedRepresentation representation = bundle.getRepresentation();
-    IndexedFile file = bundle.getFile();
-    return getFileBreadcrumbs(aip, representation, file);
   }
 
   public static List<BreadcrumbItem> getFileBreadcrumbs(IndexedAIP aip, IndexedRepresentation representation,
