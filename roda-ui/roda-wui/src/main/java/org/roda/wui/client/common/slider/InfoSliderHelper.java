@@ -32,6 +32,7 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.model.BrowseFileResponse;
+import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
@@ -134,6 +135,35 @@ public class InfoSliderHelper {
       values.put(messages.representationOriginal(), new InlineHTML(SafeHtmlUtils.fromString(
         representation.isOriginal() ? messages.originalRepresentation() : messages.alternativeRepresentation())));
     }
+
+    populate(infoSliderPanel, values);
+  }
+
+  public static void updateInfoSliderPanel(BrowseRepresentationResponse response, SliderPanel infoSliderPanel) {
+    IndexedRepresentation representation = response.getIndexedRepresentation();
+
+    HashMap<String, Widget> values = new HashMap<>();
+    infoSliderPanel.clear();
+    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedRepresentation.class.getName())));
+
+    values.put(messages.representationId(), createIdHTML(response));
+
+    if (representation.getCreatedOn() != null && StringUtils.isNotBlank(representation.getCreatedBy())) {
+      values.put(messages.aipCreated(), new InlineHTML(messages
+        .dateCreatedOrUpdated(Humanize.formatDateTime(representation.getCreatedOn()), representation.getCreatedBy())));
+    }
+
+    if (representation.getUpdatedOn() != null && StringUtils.isNotBlank(representation.getUpdatedBy())) {
+      values.put(messages.aipUpdated(), new InlineHTML(messages
+        .dateCreatedOrUpdated(Humanize.formatDateTime(representation.getUpdatedOn()), representation.getUpdatedBy())));
+    }
+
+    if (StringUtils.isNotBlank(representation.getType())) {
+      values.put(messages.representationType(), createRepresentationTypeHTML(response));
+    }
+
+    addLinkIfCentralInstance(values, representation.getInstanceName(), representation.isLocalInstance(),
+      representation.getInstanceId());
 
     populate(infoSliderPanel, values);
   }
@@ -841,6 +871,19 @@ public class InfoSliderHelper {
     return panel;
   }
 
+  private static FlowPanel createIdHTML(BrowseRepresentationResponse response) {
+    IndexedRepresentation representation = response.getIndexedRepresentation();
+    FlowPanel panel = new FlowPanel();
+
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_UUID, representation.getUUID());
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(representation.getId()), riFilter, panel,
+      response.getRiRules().contains(RodaConstants.INDEX_UUID));
+
+    return panel;
+  }
+
   private static FlowPanel createIdHTML(BrowseRepresentationBundle bundle) {
     IndexedRepresentation representation = bundle.getRepresentation();
     FlowPanel panel = new FlowPanel();
@@ -886,6 +929,19 @@ public class InfoSliderHelper {
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
       SafeHtmlUtils.fromString(representation.getType()), riFilter, panel,
       bundle.getRepresentationInformationFields().contains(RodaConstants.REPRESENTATION_TYPE));
+
+    return panel;
+  }
+
+  private static FlowPanel createRepresentationTypeHTML(BrowseRepresentationResponse response) {
+    IndexedRepresentation representation = response.getIndexedRepresentation();
+    FlowPanel panel = new FlowPanel();
+
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_TYPE, representation.getType());
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(representation.getType()), riFilter, panel,
+      response.getRiRules().contains(RodaConstants.REPRESENTATION_TYPE));
 
     return panel;
   }

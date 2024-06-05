@@ -269,31 +269,6 @@ public class RepresentationsResource {
     return Response.ok(rep, mediaType).build();
   }
 
-  @DELETE
-  @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID + "}")
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
-  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @Operation(summary = "Delete representation", description = "Deletes a representation", responses = {
-    @ApiResponse(responseCode = "200", description = "OK"),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
-  public Response deleteRepresentation(
-    @Parameter(description = "The ID of the existing AIP that contains the representation to delete", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @Parameter(description = "The ID of the existing representation to delete", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @Parameter(description = "Reason to remove representation") @QueryParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
-    @Parameter(description = "Choose format in which to get the response", schema = @Schema(implementation = RodaConstants.APIMediaTypes.class)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
-    throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
-    // get user
-    User user = UserUtility.getApiUser(request);
-    String eventDetails = details == null ? "" : details;
-
-    // delegate action to controller
-    Browser.deleteRepresentation(user, SelectedItemsList.create(IndexedRepresentation.class, representationId),
-      eventDetails);
-    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Representation deleted"), mediaType).build();
-  }
-
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID + "}/"
     + RodaConstants.API_DESCRIPTIVE_METADATA + "/")

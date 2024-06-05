@@ -14,6 +14,7 @@ import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.slf4j.LoggerFactory;
@@ -68,6 +69,9 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
       message = "Request was not valid";
       details = ex.getCause().getMessage();
       httpStatus = HttpStatus.BAD_REQUEST;
+    } else if (ex.getCause() instanceof NotImplementedException) {
+      message = "Method not support for this resource";
+      httpStatus = HttpStatus.METHOD_NOT_ALLOWED;
     }
 
     String warn = "ERROR_ID: " + errorID + " - " + ex.getClass().getSimpleName() + ": " + ex.getMessage();

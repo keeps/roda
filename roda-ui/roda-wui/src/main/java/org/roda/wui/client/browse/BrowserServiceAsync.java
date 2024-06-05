@@ -11,7 +11,6 @@
 package org.roda.wui.client.browse;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.v2.accessKey.AccessKey;
@@ -27,30 +26,17 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobParallelism;
-import org.roda.core.data.v2.jobs.JobPriority;
-import org.roda.core.data.v2.jobs.PluginInfo;
-import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
-import org.roda.wui.client.browse.bundle.BrowseFileBundle;
-import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
-import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
-import org.roda.wui.client.ingest.process.JobBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -74,12 +60,7 @@ public interface BrowserServiceAsync {
 
   void createAIP(String parentId, String type, AsyncCallback<String> callback);
 
-  void createRepresentation(String aipId, String details, AsyncCallback<String> callback);
-
   void deleteAIP(SelectedItems<IndexedAIP> aips, String details, AsyncCallback<Job> callback);
-
-  void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details,
-    AsyncCallback<Job> callback);
 
   void updateDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle bundle,
     AsyncCallback<Void> callback);
@@ -92,26 +73,14 @@ public interface BrowserServiceAsync {
 
   void retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle, AsyncCallback<String> async);
 
-  void retrievePluginsInfo(List<PluginType> type, AsyncCallback<List<PluginInfo>> callback);
-
-  void retrieveReindexPluginObjectClasses(AsyncCallback<Set<Pair<String, String>>> asyncCallback);
-
   void retrieveDropdownPluginItems(String parameterId, String localeString,
     AsyncCallback<Set<Pair<String, String>>> asyncCallback);
 
   void retrieveConversionProfilePluginItems(String pluginId, String repOrDip, String localeString,
     AsyncCallback<Set<ConversionProfile>> asyncCallback);
 
-  void retrieveCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
-
-  void retrieveJobBundle(String jobId, List<String> fieldsToReturn, AsyncCallback<JobBundle> callback);
-
-  void retrieveViewersProperties(AsyncCallback<Viewers> callback);
-
   void retrieveSupportedMetadata(String aipId, String representationUUID, String locale,
     AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
-
-  void retrievePreservationEventViewBundle(String eventId, AsyncCallback<PreservationEventViewBundle> asyncCallback);
 
   void retrieveDescriptiveMetadataVersionsBundle(String aipId, String representationId, String descriptiveMetadataId,
     String localeString, AsyncCallback<DescriptiveMetadataVersionsBundle> callback);
@@ -132,52 +101,21 @@ public interface BrowserServiceAsync {
   <T extends IsIndexed> void retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
     List<String> fieldsToReturn, AsyncCallback<List<T>> asyncCallback);
 
-  void suggest(String classNameToReturn, String field, String query, boolean allowPartial,
-    AsyncCallback<List<String>> callback);
-
   void updateAIPPermissions(SelectedItems<IndexedAIP> aips, Permissions permissions, String details, boolean recursive,
     AsyncCallback<Job> callback);
 
   void updateDIPPermissions(SelectedItems<IndexedDIP> dips, Permissions permissions, String details,
     AsyncCallback<Job> callback);
 
-  void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details, AsyncCallback<Job> asyncCallback);
-
-  void createProcess(String jobName, JobPriority priority, JobParallelism parallelism, SelectedItems<?> selected,
-    String id, Map<String, String> value, String selectedClass, AsyncCallback<Job> asyncCallback);
-
-  void createProcess(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
-    String selectedClass, AsyncCallback<Job> asyncCallback);
-
-  void createProcessJson(String jobName, JobPriority priority, JobParallelism parallelism, SelectedItems<?> selected,
-    String id, Map<String, String> value, String selectedClass, AsyncCallback<String> asyncCallback);
-
-  void createProcessJson(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
-    String selectedClass, AsyncCallback<String> asyncCallback);
-
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, AsyncCallback<Job> callback);
-
-  void createFormatIdentificationJob(SelectedItems<?> selected, AsyncCallback<Job> loadingAsyncCallback);
-
-  void changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,
-    String details, AsyncCallback<Job> loadingAsyncCallback);
 
   void changeAIPType(SelectedItems<IndexedAIP> selectedAIP, String newType, String details,
     AsyncCallback<Job> loadingAsyncCallback);
-
-  void changeRepresentationStates(IndexedRepresentation selectedRepresentation, List<String> newStates, String details,
-    AsyncCallback<Void> loadingAsyncCallback);
 
   void retrieveDipBundle(String dipUUID, String dipFileUUID, String localeString,
     AsyncCallback<BrowseDipBundle> callback);
 
   void deleteDIPs(SelectedItems<IndexedDIP> dips, String details, AsyncCallback<Job> async);
-
-  void retrieveBrowseRepresentationBundle(String aipId, String representationId, String localeString,
-    List<String> representationFieldsToReturn, AsyncCallback<BrowseRepresentationBundle> callback);
-
-  void retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId, List<String> historyFilePath,
-    String historyFileId, List<String> fileFieldsToReturn, AsyncCallback<BrowseFileBundle> asyncCallback);
 
   void hasDocumentation(String aipId, AsyncCallback<Boolean> asyncCallback);
 
@@ -190,10 +128,6 @@ public interface BrowserServiceAsync {
   void getExportLimit(AsyncCallback<Integer> asyncCallback);
 
   void retrieveAIPTypeOptions(String locale, AsyncCallback<Pair<Boolean, List<String>>> asyncCallback);
-
-  void retrieveRepresentationTypeOptions(String locale, AsyncCallback<Pair<Boolean, List<String>>> asyncCallback);
-
-  void retrieveObjectClassFields(String locale, AsyncCallback<RepresentationInformationFilterBundle> asyncCallback);
 
   void createDistributedInstance(DistributedInstance distributedInstance, AsyncCallback<DistributedInstance> async);
 
@@ -246,6 +180,4 @@ public interface BrowserServiceAsync {
   void requestAIPLock(String aipId, AsyncCallback<Boolean> async);
 
   void releaseAIPLock(String aipId, AsyncCallback<Void> async);
-
-  void retrieveJobReportItems(String jobId, String jobReportId, AsyncCallback<List<Report>> async);
 }

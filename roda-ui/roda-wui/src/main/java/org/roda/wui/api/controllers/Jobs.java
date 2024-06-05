@@ -231,26 +231,6 @@ public class Jobs extends RodaWuiController {
     }
   }
 
-  public static List<Report> retrieveJobReportItems(User user, String jobId, String jobReportId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    // check permissions
-    controllerAssistant.checkRoles(user);
-    LogEntryState state = LogEntryState.SUCCESS;
-    ModelService model = RodaCoreFactory.getModelService();
-
-    try {
-      Report report = model.retrieveJobReport(jobId, jobReportId);
-      return report.getReports();
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
-    }
-  }
-
   /*
    * ---------------------------------------------------------------------------
    * ---------------- REST related methods - end -------------------------------

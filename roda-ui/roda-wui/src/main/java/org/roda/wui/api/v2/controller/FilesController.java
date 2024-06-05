@@ -25,6 +25,7 @@ import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexedFileRequest;
+import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -32,6 +33,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.utils.RODAInstanceUtils;
@@ -131,7 +133,17 @@ public class FilesController implements FileRestService {
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return new LongResponse(indexService.count(IndexedFile.class, countRequest, requestContext));
+    if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
+      return new LongResponse(indexService.count(IndexedFile.class, countRequest, requestContext));
+    } else {
+      return new LongResponse(-1L);
+    }
+  }
+
+  @Override
+  public List<String> suggest(@RequestBody SuggestRequest suggestRequest) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.suggest(suggestRequest, IndexedFile.class, requestContext);
   }
 
   @Override

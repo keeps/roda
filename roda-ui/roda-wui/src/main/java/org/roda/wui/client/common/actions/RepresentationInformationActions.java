@@ -151,13 +151,13 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
         @Override
         public void onSuccess(final SelectedItems<RepresentationInformation> selectedItems) {
           if (selectedItems != null) {
-            String filtertoAdd = HistoryUtils.getCurrentHistoryPath()
+            String filterToAdd = HistoryUtils.getCurrentHistoryPath()
               .get(HistoryUtils.getCurrentHistoryPath().size() - 1);
 
             Services services = new Services("Update representation information with filter", "update");
             RepresentationInformationFilterRequest request = new RepresentationInformationFilterRequest();
             request.setSelectedItems(selectedItems);
-            request.setFilterToAdd(filtertoAdd);
+            request.setFilterToAdd(filterToAdd);
             services.representationInformationResource(s -> s.addFilterToRepresentationInformation(request))
               .whenComplete((job, throwable) -> {
                 if (throwable == null) {

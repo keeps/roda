@@ -284,7 +284,7 @@ public class DescriptiveMetadataHistory extends Composite {
     SafeUri uri;
     if (inHTML) {
       if (representationId != null) {
-        uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(aipId, representationId, descId, versionKey);
+        uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(aipId, representationId, descId);
       } else {
         uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId, versionKey);
       }

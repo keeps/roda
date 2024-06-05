@@ -28,7 +28,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.DipFilePreview;
-import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
@@ -42,6 +41,8 @@ import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
+import org.roda.wui.client.services.ConfigurationRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -81,9 +82,8 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 
 public class BrowseAIPPortal extends Composite {
-  private static SimplePanel container;
-
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  private static final List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -110,100 +110,51 @@ public class BrowseAIPPortal extends Composite {
       return Arrays.asList(getHistoryToken());
     }
   };
+  private static SimplePanel container;
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
-    container = new SimplePanel();
-    refresh(id, new AsyncCallback<BrowseAIPBundle>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      @Override
-      public void onSuccess(BrowseAIPBundle result) {
-        callback.onSuccess(container);
-      }
-    });
-  }
-
-  private static void refresh(String id, AsyncCallback<BrowseAIPBundle> callback) {
-    BrowserService.Util.getInstance().retrieveBrowseAIPBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
-      fieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
-        @Override
-        public void onSuccess(BrowseAIPBundle bundle) {
-          container.setWidget(new BrowseAIPPortal(bundle));
-          callback.onSuccess(bundle);
-        }
-      });
-  }
-
-  private static final List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
   static {
     fieldsToReturn.addAll(
       Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_STATE, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL,
         RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID, RodaConstants.INGEST_UPDATE_JOB_IDS));
   }
 
-  interface MyUiBinder extends UiBinder<Widget, BrowseAIPPortal> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private String aipId;
-  private IndexedAIP aip;
-
   // Focus
   @UiField
   FocusPanel keyboardFocus;
-
-  // HEADER
-
   @UiField
   NavigationToolbar<IndexedAIP> navigationToolbar;
-
-  // STATUS
-
   @UiField
   HTML aipState;
-
   // IDENTIFICATION
   @UiField
   TitlePanel title;
-
-  // DESCRIPTIVE METADATA
-
   @UiField
   HTML descriptiveMetadata;
-
   @UiField
   FlowPanel preMetadata;
-
   // DISSEMINATIONS
   @UiField
   SimplePanel disseminationsCard;
 
+  // HEADER
   @UiField
   FlowPanel preDisseminations;
 
+  // STATUS
   // AIP CHILDREN
   @UiField
   SimplePanel aipChildrenCard;
-
   @UiField
   FlowPanel preChildren;
 
+  // DESCRIPTIVE METADATA
   @UiField
   FlowPanel center;
-
   @UiField
   Label dateCreatedAndModified;
+  private String aipId;
+  private IndexedAIP aip;
 
   private BrowseAIPPortal(BrowseAIPBundle bundle) {
     aip = bundle.getAip();
@@ -233,58 +184,55 @@ public class BrowseAIPPortal extends Composite {
     preDisseminations.setVisible(false);
 
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_DIP)) {
-      BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
+      Services services = new Services("Retrieve viewers configuration", "get");
+      services.configurationsResource(ConfigurationRestService::retrieveViewersProperties)
+        .whenComplete((viewers, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.treatCommonFailures(throwable.getCause());
+          } else {
+            Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId()));
+            Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
 
-        @Override
-        public void onSuccess(Viewers viewers) {
-          Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId()));
-          Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
+            BrowserService.Util.getInstance().find(IndexedDIP.class.getName(), filter, sorter, new Sublist(0, 1),
+              Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), true,
+              Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID),
+              new AsyncCallback<IndexResult<IndexedDIP>>() {
 
-          BrowserService.Util.getInstance().find(IndexedDIP.class.getName(), filter, sorter, new Sublist(0, 1),
-            Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), true,
-            Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID),
-            new AsyncCallback<IndexResult<IndexedDIP>>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-
-              @Override
-              public void onSuccess(IndexResult<IndexedDIP> result) {
-                if (result.getTotalCount() > 0) {
-                  String dipId = result.getResults().get(0).getId();
-                  Filter fileFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dipId));
-                  BrowserService.Util.getInstance().find(
-                    DIPFile.class.getName(), fileFilter, Sorter.NONE, new Sublist(0, 1), Facets.NONE,
-                    LocaleInfo.getCurrentLocale().getLocaleName(), true, Arrays.asList(RodaConstants.INDEX_UUID,
-                      RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_SIZE, RodaConstants.DIPFILE_IS_DIRECTORY),
-                    new AsyncCallback<IndexResult<DIPFile>>() {
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      }
-
-                      @Override
-                      public void onSuccess(IndexResult<DIPFile> result) {
-                        if (result.getTotalCount() > 0) {
-                          disseminationsCard.setVisible(true);
-                          preDisseminations.setVisible(true);
-                          disseminationsCard.add(new DipFilePreview(viewers, result.getResults().get(0)));
-                        }
-                      }
-                    });
+                @Override
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
                 }
-              }
-            });
-        }
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.treatCommonFailures(caught);
-        }
-      });
+                @Override
+                public void onSuccess(IndexResult<IndexedDIP> result) {
+                  if (result.getTotalCount() > 0) {
+                    String dipId = result.getResults().get(0).getId();
+                    Filter fileFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dipId));
+                    BrowserService.Util.getInstance().find(
+                      DIPFile.class.getName(), fileFilter, Sorter.NONE, new Sublist(0, 1), Facets.NONE,
+                      LocaleInfo.getCurrentLocale().getLocaleName(), true, Arrays.asList(RodaConstants.INDEX_UUID,
+                        RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_SIZE, RodaConstants.DIPFILE_IS_DIRECTORY),
+                      new AsyncCallback<IndexResult<DIPFile>>() {
+
+                        @Override
+                        public void onFailure(Throwable caught) {
+                          AsyncCallbackUtils.defaultFailureTreatment(caught);
+                        }
+
+                        @Override
+                        public void onSuccess(IndexResult<DIPFile> result) {
+                          if (result.getTotalCount() > 0) {
+                            disseminationsCard.setVisible(true);
+                            preDisseminations.setVisible(true);
+                            disseminationsCard.add(new DipFilePreview(viewers, result.getResults().get(0)));
+                          }
+                        }
+                      });
+                  }
+                }
+              });
+          }
+        });
     }
 
     // AIP CHILDREN
@@ -367,6 +315,38 @@ public class BrowseAIPPortal extends Composite {
     keyboardFocus.setFocus(true);
   }
 
+  public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
+    container = new SimplePanel();
+    refresh(id, new AsyncCallback<BrowseAIPBundle>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
+      }
+
+      @Override
+      public void onSuccess(BrowseAIPBundle result) {
+        callback.onSuccess(container);
+      }
+    });
+  }
+
+  private static void refresh(String id, AsyncCallback<BrowseAIPBundle> callback) {
+    BrowserService.Util.getInstance().retrieveBrowseAIPBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
+      fieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+
+        @Override
+        public void onSuccess(BrowseAIPBundle bundle) {
+          container.setWidget(new BrowseAIPPortal(bundle));
+          callback.onSuccess(bundle);
+        }
+      });
+  }
+
   private void updateSectionDescriptiveMetadata() {
     getDescriptiveMetadataHTML(aipId, new AsyncCallback<SafeHtml>() {
 
@@ -437,4 +417,9 @@ public class BrowseAIPPortal extends Composite {
       callback.onFailure(e);
     }
   }
+
+  interface MyUiBinder extends UiBinder<Widget, BrowseAIPPortal> {
+  }
+
+
 }

@@ -11,6 +11,9 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -73,6 +76,8 @@ public class Services implements DirectRestService {
       return GWT.create(FileRestService.class);
     } else if (RepresentationRestService.class.equals(serviceClass)) {
       return GWT.create(RepresentationRestService.class);
+    } else if (AIPRestService.class.equals(serviceClass)) {
+      return GWT.create(AIPRestService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
@@ -235,5 +240,9 @@ public class Services implements DirectRestService {
 
   public <T> CompletableFuture<T> configurationsResource(CheckedFunction<ConfigurationRestService, T> method) {
     return future(ConfigurationRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> aipResource(CheckedFunction<AIPRestService, T> method) {
+    return future(AIPRestService.class, method);
   }
 }

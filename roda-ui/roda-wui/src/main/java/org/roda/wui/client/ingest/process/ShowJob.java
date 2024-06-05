@@ -119,30 +119,31 @@ public class ShowJob extends Composite {
       } else if (!historyTokens.isEmpty()) {
         String jobId = historyTokens.get(0);
         Services services = new Services("Get job plugin info", "get");
-        services.jobsResource(s -> s.findByUuid(jobId, LocaleInfo.getCurrentLocale().getLocaleName())).thenCompose(retrievedJob -> services
-          .jobsResource(s -> s.getJobPluginInfo(retrievedJob)).whenComplete((pluginInfoList, error) -> {
-            if (pluginInfoList != null) {
-              Map<String, PluginInfo> pluginsInfoMap = new HashMap<>();
-              for (PluginInfo pluginInfo : pluginInfoList) {
-                pluginsInfoMap.put(pluginInfo.getId(), pluginInfo);
-              }
-              List<FilterParameter> reportFilterParameters = new ArrayList<>();
-              for (int i = 1; i < historyTokens.size() - 1; i += 2) {
-                String key = historyTokens.get(i);
-                String value = historyTokens.get(i + 1);
-                reportFilterParameters.add(new SimpleFilterParameter(key, value));
-              }
-              ShowJob showJob = new ShowJob(retrievedJob, pluginsInfoMap, reportFilterParameters);
-              callback.onSuccess(showJob);
-            } else if (error != null) {
-              if (error instanceof NotFoundException) {
-                Toast.showError(messages.notFoundError(), messages.jobNotFound());
-                HistoryUtils.newHistory(Process.RESOLVER);
+        services.jobsResource(s -> s.findByUuid(jobId, LocaleInfo.getCurrentLocale().getLocaleName()))
+          .thenCompose(retrievedJob -> services.jobsResource(s -> s.getJobPluginInfo(retrievedJob))
+            .whenComplete((pluginInfoList, error) -> {
+              if (error != null) {
+                if (error.getCause() instanceof NotFoundException) {
+                  Toast.showError(messages.notFoundError(), messages.jobNotFound());
+                  HistoryUtils.newHistory(Process.RESOLVER);
+                } else {
+                  AsyncCallbackUtils.defaultFailureTreatment(error.getCause());
+                }
               } else {
-                AsyncCallbackUtils.defaultFailureTreatment(error);
+                Map<String, PluginInfo> pluginsInfoMap = new HashMap<>();
+                for (PluginInfo pluginInfo : pluginInfoList) {
+                  pluginsInfoMap.put(pluginInfo.getId(), pluginInfo);
+                }
+                List<FilterParameter> reportFilterParameters = new ArrayList<>();
+                for (int i = 1; i < historyTokens.size() - 1; i += 2) {
+                  String key = historyTokens.get(i);
+                  String value = historyTokens.get(i + 1);
+                  reportFilterParameters.add(new SimpleFilterParameter(key, value));
+                }
+                ShowJob showJob = new ShowJob(retrievedJob, pluginsInfoMap, reportFilterParameters);
+                callback.onSuccess(showJob);
               }
-            }
-          }));
+            }));
       } else {
         HistoryUtils.newHistory(Process.RESOLVER);
         callback.onSuccess(null);
@@ -364,12 +365,13 @@ public class ShowJob extends Composite {
         @Override
         public void onSuccess(Actionable.ActionImpact result) {
           Services services = new Services("refresh sidebar", "refresh");
-          services.jobsResource(s -> s.findByUuid(job.getId(), LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((updatedJob, error) -> {
-            if (updatedJob != null) {
+          services.jobsResource(s -> s.findByUuid(job.getId(), LocaleInfo.getCurrentLocale().getLocaleName()))
+            .whenComplete((updatedJob, error) -> {
+              if (updatedJob != null) {
                 ShowJob.this.job = updatedJob;
                 update();
-            } else if (error != null) {
-              AsyncCallbackUtils.defaultFailureTreatment(error);
+              } else if (error != null) {
+                AsyncCallbackUtils.defaultFailureTreatment(error);
               }
             });
         }
@@ -710,13 +712,14 @@ public class ShowJob extends Composite {
           @Override
           public void run() {
             Services services = new Services("Update job status", "update");
-            services.jobsResource(s -> s.findByUuid(job.getId(), LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((updatedJob, error) -> {
-              if (updatedJob != null) {
+            services.jobsResource(s -> s.findByUuid(job.getId(), LocaleInfo.getCurrentLocale().getLocaleName()))
+              .whenComplete((updatedJob, error) -> {
+                if (updatedJob != null) {
                   ShowJob.this.job = updatedJob;
                   update();
                   scheduleUpdateStatus();
-              } else if (error != null) {
-                AsyncCallbackUtils.defaultFailureTreatment(error);
+                } else if (error != null) {
+                  AsyncCallbackUtils.defaultFailureTreatment(error);
                 }
               });
           }
@@ -734,34 +737,29 @@ public class ShowJob extends Composite {
       : parameter.getDefaultValue();
 
     if (value != null && !value.isEmpty()) {
-      BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), value, aipFieldsToReturn,
-        new AsyncCallback<IndexedAIP>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            if (caught instanceof NotFoundException) {
-              Label itemTitle = new Label(value);
-              itemTitle.addStyleName("itemText");
-              aipPanel.clear();
-              aipPanel.add(itemTitle);
-            } else {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-          }
-
-          @Override
-          public void onSuccess(IndexedAIP aip) {
-            Label itemTitle = new Label();
-            HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
-            itemIconHtmlPanel.addStyleName("itemIcon");
-            itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
+      Services services = new Services("Retrieve AIP", "get");
+      services.aipResource(s -> s.findByUuid(value, LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((indexedAIP, throwable) -> {
+        if (throwable != null) {
+          if (throwable.getCause() instanceof NotFoundException) {
+            Label itemTitle = new Label(value);
             itemTitle.addStyleName("itemText");
-
             aipPanel.clear();
-            aipPanel.add(itemIconHtmlPanel);
             aipPanel.add(itemTitle);
+          } else {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable.getCause());
           }
-        });
+        } else {
+          Label itemTitle = new Label();
+          HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(indexedAIP.getLevel());
+          itemIconHtmlPanel.addStyleName("itemIcon");
+          itemTitle.setText(indexedAIP.getTitle() != null ? indexedAIP.getTitle() : indexedAIP.getId());
+          itemTitle.addStyleName("itemText");
+
+          aipPanel.clear();
+          aipPanel.add(itemIconHtmlPanel);
+          aipPanel.add(itemTitle);
+        }
+      });
     } else {
       HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getTopIconHTMLPanel();
       aipPanel.clear();

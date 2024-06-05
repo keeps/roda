@@ -17,7 +17,9 @@ import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -25,6 +27,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskMitigationProperties;
 import org.roda.core.data.v2.risks.RiskMitigationTerms;
 import org.roda.core.data.v2.risks.RiskVersions;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.RiskService;
@@ -86,7 +89,17 @@ public class RiskController implements RiskRestService {
   @Override
   public LongResponse count(CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return new LongResponse(indexService.count(IndexedRisk.class, countRequest, requestContext));
+    if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_RISK)) {
+      return new LongResponse(indexService.count(IndexedRisk.class, countRequest, requestContext));
+    } else {
+      return new LongResponse(-1L);
+    }
+  }
+
+  @Override
+  public List<String> suggest(@RequestBody SuggestRequest suggestRequest) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.suggest(suggestRequest, IndexedRisk.class, requestContext);
   }
 
   public Job deleteRisk(@RequestBody SelectedItems<IndexedRisk> selected) {

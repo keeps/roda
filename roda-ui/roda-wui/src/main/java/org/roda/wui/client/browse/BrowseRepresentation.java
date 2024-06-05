@@ -15,9 +15,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.index.CountRequest;
+import org.roda.core.data.v2.index.IndexedRepresentationRequest;
+import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -26,8 +32,10 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
-import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -39,12 +47,15 @@ import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
+import org.roda.wui.client.services.RepresentationRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -61,8 +72,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -130,40 +139,6 @@ public class BrowseRepresentation extends Composite {
 
   private static SimplePanel container;
 
-  private static void getAndRefresh(String aipId, String id, AsyncCallback<Widget> callback) {
-    container = new SimplePanel();
-    refresh(aipId, id, new AsyncCallback<BrowseRepresentationBundle>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      @Override
-      public void onSuccess(BrowseRepresentationBundle result) {
-        callback.onSuccess(container);
-      }
-    });
-  }
-
-  private static void refresh(String aipId, String id, AsyncCallback<BrowseRepresentationBundle> callback) {
-    BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(aipId, id,
-      LocaleInfo.getCurrentLocale().getLocaleName(), fieldsToReturn, new AsyncCallback<BrowseRepresentationBundle>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-          HistoryUtils.newHistory(BrowseTop.RESOLVER);
-          callback.onSuccess(null);
-        }
-
-        @Override
-        public void onSuccess(BrowseRepresentationBundle bundle) {
-          container.setWidget(new BrowseRepresentation(bundle));
-          callback.onSuccess(bundle);
-        }
-      });
-  }
-
   private static final List<String> fieldsToReturn = new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
 
@@ -225,11 +200,10 @@ public class BrowseRepresentation extends Composite {
   @UiField
   Label dateCreatedAndModified;
 
-  public BrowseRepresentation(BrowseRepresentationBundle bundle) {
-    this.representation = bundle.getRepresentation();
-    this.aip = bundle.getAip();
-
-    this.aipId = representation.getAipId();
+  public BrowseRepresentation(BrowseRepresentationResponse response) {
+    this.representation = response.getIndexedRepresentation();
+    this.aip = response.getIndexedAIP();
+    this.aipId = aip.getId();
     this.repId = representation.getId();
     this.repUUID = representation.getUUID();
 
@@ -242,7 +216,6 @@ public class BrowseRepresentation extends Composite {
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
 
     // FILES
-
     Filter filesFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repUUID),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
 
@@ -254,7 +227,6 @@ public class BrowseRepresentation extends Composite {
     filesSearch = new SearchWrapper(false).createListAndSearchPanel(fileListBuilder);
 
     // DISSEMINATIONS
-
     Filter disseminationsFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, repUUID));
 
@@ -277,153 +249,253 @@ public class BrowseRepresentation extends Composite {
       () -> refresh(aipId, repId, new NoAsyncCallback<>()));
     navigationToolbar.build();
 
-    updateLayout(bundle, state, justActive);
+    Services services = response.getServices();
+    Filter dipsFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, representation.getUUID()));
+    CountRequest dipCountRequest = new CountRequest(RiskIncidence.class.getName(), new Filter(dipsFilter), true);
+    CompletableFuture<LongResponse> dipCounterCompletableFuture = services
+      .rodaEntityRestService(s -> s.count(dipCountRequest), IndexedDIP.class).handle((longResponse, throwable1) -> {
+        if (throwable1 != null) {
+          return new LongResponse(-1L);
+        }
+        return longResponse;
+      });
 
-    // DESCRIPTIVE METADATA
+    AndFiltersParameters riskIncidenceFilter = new AndFiltersParameters(
+      Arrays.asList(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()),
+        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, representation.getAipId())));
+    CountRequest riskIncidenceCountRequest = new CountRequest(RiskIncidence.class.getName(),
+      new Filter(riskIncidenceFilter), true);
+    CompletableFuture<LongResponse> riskIncidenceCounterCompletableFuture = services
+      .rodaEntityRestService(s -> s.count(riskIncidenceCountRequest), RiskIncidence.class)
+      .handle((longResponse, throwable1) -> {
+        if (throwable1 != null) {
+          return new LongResponse(-1L);
+        }
+        return longResponse;
+      });
 
-    final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<>();
-    final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
-    for (DescriptiveMetadataViewBundle descMetadataBundle : bundle.getRepresentationDescriptiveMetadata()) {
-      String title = descMetadataBundle.getLabel() != null ? descMetadataBundle.getLabel() : descMetadataBundle.getId();
-      HTML container = new HTML();
-      container.addStyleName("metadataContent");
-      itemMetadata.add(container, title);
-      descriptiveMetadataContainers.add(Pair.of(descMetadataBundle.getId(), container));
-      bundles.put(descMetadataBundle.getId(), descMetadataBundle);
-    }
+    Filter preservationEventFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representation.getUUID()));
+    CountRequest preservationEventsCountRequest = new CountRequest(IndexedPreservationEvent.class.getName(),
+      preservationEventFilter, true);
 
-    HandlerRegistration tabHandler = itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
+    CompletableFuture<LongResponse> preservationCounterCompletableFuture = services
+      .rodaEntityRestService(s -> s.count(preservationEventsCountRequest), IndexedPreservationEvent.class)
+      .handle((longResponse, throwable2) -> {
+        if (throwable2 != null) {
+          return new LongResponse(-1L);
+        }
+        return longResponse;
+      });
 
-      @Override
-      public void onSelection(SelectionEvent<Integer> event) {
-        if (event.getSelectedItem() < descriptiveMetadataContainers.size()) {
-          Pair<String, HTML> pair = descriptiveMetadataContainers.get(event.getSelectedItem());
-          String descId = pair.getFirst();
-          final HTML html = pair.getSecond();
-          final DescriptiveMetadataViewBundle bundle = bundles.get(descId);
-          if (html.getText().length() == 0) {
-            getDescriptiveMetadataHTML(descId, bundle, event.getSelectedItem(), new AsyncCallback<SafeHtml>() {
+    CompletableFuture
+      .allOf(dipCounterCompletableFuture, riskIncidenceCounterCompletableFuture, preservationCounterCompletableFuture)
+      .thenRun(() -> {
+        LongResponse riskIncidenceCounterResponse = riskIncidenceCounterCompletableFuture.join();
+        LongResponse preservationCounterResponse = preservationCounterCompletableFuture.join();
+        LongResponse dipCounterResponse = dipCounterCompletableFuture.join();
 
-              @Override
-              public void onFailure(Throwable caught) {
-                if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
-                  Toast.showError(messages.errorLoadingDescriptiveMetadata(caught.getMessage()));
+        updateLayout(response, riskIncidenceCounterResponse.getResult(), preservationCounterResponse.getResult(), state,
+          justActive);
+
+        // DESCRIPTIVE METADATA
+        final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<>();
+        final Map<String, DescriptiveMetadataInfo> bundles = new HashMap<>();
+        for (DescriptiveMetadataInfo descriptiveMetadata : response.getDescriptiveMetadataInfos()
+          .getDescriptiveMetadataInfoList()) {
+          String title = descriptiveMetadata.getLabel() != null ? descriptiveMetadata.getLabel()
+            : descriptiveMetadata.getId();
+          HTML container = new HTML();
+          container.addStyleName("metadataContent");
+          itemMetadata.add(container, title);
+          descriptiveMetadataContainers.add(Pair.of(descriptiveMetadata.getId(), container));
+          bundles.put(descriptiveMetadata.getId(), descriptiveMetadata);
+        }
+
+        HandlerRegistration tabHandler = itemMetadata.addSelectionHandler(event -> {
+          if (event.getSelectedItem() < descriptiveMetadataContainers.size()) {
+            Pair<String, HTML> pair = descriptiveMetadataContainers.get(event.getSelectedItem());
+            String descId = pair.getFirst();
+            final HTML html = pair.getSecond();
+            final DescriptiveMetadataInfo bundle = bundles.get(descId);
+            if (html.getText().isEmpty()) {
+              getDescriptiveMetadataHTML(descId, bundle, event.getSelectedItem(), new AsyncCallback<SafeHtml>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
+                    Toast.showError(messages.errorLoadingDescriptiveMetadata(caught.getMessage()));
+                  }
                 }
-              }
 
-              @Override
-              public void onSuccess(SafeHtml result) {
-                html.setHTML(result);
-              }
-            });
+                @Override
+                public void onSuccess(SafeHtml result) {
+                  html.setHTML(result);
+                }
+              });
+            }
           }
-        }
-      }
-    });
+        });
 
-    final int addTabIndex = itemMetadata.getWidgetCount();
-    FlowPanel addTab = new FlowPanel();
-    addTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>")));
-    itemMetadata.add(new Label(), addTab);
-    HandlerRegistration addTabHandler = itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
-      @Override
-      public void onSelection(SelectionEvent<Integer> event) {
-        if (event.getSelectedItem() == addTabIndex) {
-          newRepresentationDescriptiveMetadata();
-        }
-      }
-    });
-    addTab.addStyleName("addTab");
-    addTab.getElement().setId("representationNewDescriptiveMetadata");
-    addTab.getParent().addStyleName("addTabWrapper");
+        final int addTabIndex = itemMetadata.getWidgetCount();
+        FlowPanel addTab = new FlowPanel();
+        addTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>")));
+        itemMetadata.add(new Label(), addTab);
+        HandlerRegistration addTabHandler = itemMetadata.addSelectionHandler(event -> {
+          if (event.getSelectedItem() == addTabIndex) {
+            newRepresentationDescriptiveMetadata();
+          }
+        });
+        addTab.addStyleName("addTab");
+        addTab.getElement().setId("representationNewDescriptiveMetadata");
+        addTab.getParent().addStyleName("addTabWrapper");
 
-    PermissionClientUtils.bindPermission(newDescriptiveMetadata, aip.getPermissions(),
-      RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE);
+        PermissionClientUtils.bindPermission(newDescriptiveMetadata, aip.getPermissions(),
+          RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE);
 
-    handlers.add(tabHandler);
-    handlers.add(addTabHandler);
+        handlers.add(tabHandler);
+        handlers.add(addTabHandler);
 
-    descriptiveMetadataSavedButtons = new HashMap<>();
-    descriptiveMetadataButtons = new SimplePanel();
-    descriptiveMetadataButtons.addStyleName("descriptiveMetadataTabButtons");
-    itemMetadata.getTabBar().getElement().getStyle().clearProperty("width");
-    itemMetadata.getTabBar().getElement().getParentElement().insertFirst(descriptiveMetadataButtons.getElement());
-    itemMetadata.addSelectionHandler(event -> {
-      if (descriptiveMetadataSavedButtons.containsKey(event.getSelectedItem())) {
-        descriptiveMetadataButtons.setWidget(descriptiveMetadataSavedButtons.get(event.getSelectedItem()));
-      } else {
-        descriptiveMetadataButtons.clear();
-      }
-    });
+        descriptiveMetadataSavedButtons = new HashMap<>();
+        descriptiveMetadataButtons = new SimplePanel();
+        descriptiveMetadataButtons.addStyleName("descriptiveMetadataTabButtons");
+        itemMetadata.getTabBar().getElement().getStyle().clearProperty("width");
+        itemMetadata.getTabBar().getElement().getParentElement().insertFirst(descriptiveMetadataButtons.getElement());
+        itemMetadata.addSelectionHandler(event -> {
+          if (descriptiveMetadataSavedButtons.containsKey(event.getSelectedItem())) {
+            descriptiveMetadataButtons.setWidget(descriptiveMetadataSavedButtons.get(event.getSelectedItem()));
+          } else {
+            descriptiveMetadataButtons.clear();
+          }
+        });
 
-    if (!bundle.getRepresentationDescriptiveMetadata().isEmpty()) {
-      newDescriptiveMetadata.setVisible(false);
-      itemMetadata.getParent().setVisible(true);
+        if (!response.getDescriptiveMetadataInfos().getDescriptiveMetadataInfoList().isEmpty()) {
+          newDescriptiveMetadata.setVisible(false);
+          itemMetadata.getParent().setVisible(true);
 
-      int index = ConfigurationManager.getInt(0, "ui.browser.metadata.index.representation");
-      if (index > 0) {
-        if (bundle.getRepresentationDescriptiveMetadata().size() > index) {
-          itemMetadata.selectTab(index);
+          int index = ConfigurationManager.getInt(0, "ui.browser.metadata.index.representation");
+          if (index > 0) {
+            if (response.getDescriptiveMetadataInfos().getDescriptiveMetadataInfoList().size() > index) {
+              itemMetadata.selectTab(index);
+            } else {
+              itemMetadata.selectTab(0);
+            }
+          } else {
+            int count = response.getDescriptiveMetadataInfos().getDescriptiveMetadataInfoList().size()
+              - Math.abs(index);
+            if (response.getDescriptiveMetadataInfos().getDescriptiveMetadataInfoList().size() > count) {
+              itemMetadata.selectTab(count);
+            } else {
+              itemMetadata.selectTab(0);
+            }
+          }
         } else {
-          itemMetadata.selectTab(0);
+          newDescriptiveMetadata.setVisible(true);
+          itemMetadata.getParent().setVisible(false);
         }
-      } else {
-        int count = bundle.getRepresentationDescriptiveMetadata().size() - Math.abs(index);
-        if (bundle.getRepresentationDescriptiveMetadata().size() > count) {
-          itemMetadata.selectTab(count);
-        } else {
-          itemMetadata.selectTab(0);
+
+        // DISSEMINATIONS (POST-INIT)
+        disseminationsSearch.getParent().setVisible(dipCounterResponse.getResult() > 0
+          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_DIP));
+
+        // CSS
+        this.addStyleName("browse");
+        this.addStyleName("browse-representation");
+        this.addStyleName(state.toString().toLowerCase());
+        newDescriptiveMetadata.getElement().setId("representationNewDescriptiveMetadata");
+
+        Element firstElement = this.getElement().getFirstChildElement();
+        if ("input".equalsIgnoreCase(firstElement.getTagName())) {
+          firstElement.setAttribute("title", "browse input");
         }
-      }
-    } else {
-      newDescriptiveMetadata.setVisible(true);
-      itemMetadata.getParent().setVisible(false);
-    }
 
-    // DISSEMINATIONS (POST-INIT)
-    disseminationsSearch.getParent().setVisible(
-      bundle.getDipCount() > 0 && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_DIP));
+        WCAGUtilities.getInstance().makeAccessible(itemMetadata.getElement());
 
-    // CSS
-    this.addStyleName("browse");
-    this.addStyleName("browse-representation");
-    this.addStyleName(state.toString().toLowerCase());
-    newDescriptiveMetadata.getElement().setId("representationNewDescriptiveMetadata");
-
-    Element firstElement = this.getElement().getFirstChildElement();
-    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
-      firstElement.setAttribute("title", "browse input");
-    }
-
-    WCAGUtilities.getInstance().makeAccessible(itemMetadata.getElement());
+      });
   }
 
-  private void updateLayout(final BrowseRepresentationBundle bundle, final AIPState state, final boolean justActive) {
+  private static void getAndRefresh(String aipId, String id, AsyncCallback<Widget> callback) {
+    container = new SimplePanel();
+    refresh(aipId, id, new AsyncCallback<BrowseRepresentationResponse>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
+      }
+
+      @Override
+      public void onSuccess(BrowseRepresentationResponse result) {
+        callback.onSuccess(container);
+      }
+    });
+  }
+
+  private static void refresh(String aipId, String representationId,
+    AsyncCallback<BrowseRepresentationResponse> callback) {
+    Services services = new Services("Retrieve Representation", "get");
+    CompletableFuture<List<IndexedAIP>> ancestorsCompletableFuture = services.aipResource(s -> s.getAncestors(aipId));
+    CompletableFuture<IndexedAIP> indexedAIPCompletableFuture = services
+      .aipResource(s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()));
+    CompletableFuture<IndexedRepresentation> indexedRepresentationCompletableFuture = services.representationResource(
+      s -> s.retrieveIndexedRepresentation(new IndexedRepresentationRequest(aipId, representationId)));
+    CompletableFuture<DescriptiveMetadataInfos> descriptiveMetadataInfosCompletableFuture = services
+      .aipResource(s -> s.retrieveRepresentationDescriptiveMetadata(aipId, representationId,
+        LocaleInfo.getCurrentLocale().getLocaleName()));
+    CompletableFuture<List<String>> riRulesCompletableFuture = services
+      .representationResource(RepresentationRestService::retrieveRepresentationRuleProperties);
+
+    CompletableFuture<Void> allFutures = CompletableFuture
+      .allOf(ancestorsCompletableFuture, indexedAIPCompletableFuture, indexedRepresentationCompletableFuture,
+        descriptiveMetadataInfosCompletableFuture, riRulesCompletableFuture)
+      .exceptionally(throwable -> {
+        if (throwable.getCause() instanceof AuthorizationDeniedException) {
+          Toast.showError(messages.authorizationDeniedAlert(), "");
+          HistoryUtils.newHistory(BrowseTop.RESOLVER);
+        } else {
+          Toast.showError(throwable.getClass().getSimpleName(), throwable.getMessage());
+          HistoryUtils.newHistory(BrowseTop.RESOLVER);
+        }
+        return null;
+      });
+
+    allFutures.thenRun(() -> {
+      BrowseRepresentationResponse response = new BrowseRepresentationResponse();
+      response.setAncestors(ancestorsCompletableFuture.join());
+      response.setIndexedAIP(indexedAIPCompletableFuture.join());
+      response.setIndexedRepresentation(indexedRepresentationCompletableFuture.join());
+      response.setDescriptiveMetadataInfos(descriptiveMetadataInfosCompletableFuture.join());
+      response.setRiRules(riRulesCompletableFuture.join());
+      response.setServices(services);
+
+      container.setWidget(new BrowseRepresentation(response));
+      callback.onSuccess(response);
+    });
+
+  }
+
+  private void updateLayout(final BrowseRepresentationResponse response, long riskIncidenceCounter,
+    long preservationCounter, final AIPState state, final boolean justActive) {
     // STATUS
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(state));
     aipState.setVisible(!justActive);
 
     // IDENTIFICATION
     representationIcon.setHTML(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
-    Sliders.createRepresentationInfoSlider(center, navigationToolbar.getInfoSidebarButton(), bundle);
-
-    long incidenceCount = bundle.getRiskIncidenceCount();
-    long eventCount = bundle.getPreservationEventCount();
+    Sliders.createRepresentationInfoSlider(center, navigationToolbar.getInfoSidebarButton(), response);
 
     risksEventsLogs.clear();
 
-    if (incidenceCount >= 0) {
-      Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()), HistoryUtils
+    if (riskIncidenceCounter >= 0) {
+      Anchor risksLink = new Anchor(messages.aipRiskIncidences(riskIncidenceCounter), HistoryUtils
         .createHistoryHashLink(RiskIncidenceRegister.RESOLVER, representation.getAipId(), representation.getId()));
       risksEventsLogs.add(risksLink);
     }
 
-    if (eventCount >= 0) {
-      Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()),
-        HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, representation.getAipId(),
-          representation.getUUID()));
+    if (preservationCounter >= 0) {
+      Anchor eventsLink = new Anchor(messages.aipEvents(preservationCounter), HistoryUtils.createHistoryHashLink(
+        PreservationEvents.BROWSE_RESOLVER, representation.getAipId(), representation.getUUID()));
 
-      if (incidenceCount >= 0) {
+      if (riskIncidenceCounter >= 0) {
         risksEventsLogs.add(new Label(" " + messages.and() + " "));
       }
 
@@ -450,10 +522,11 @@ public class BrowseRepresentation extends Composite {
     representationTitle.clear();
     HtmlSnippetUtils.getRepresentationTypeHTML(representationTitle, title, representation.getRepresentationStates());
 
-    navigationToolbar.updateBreadcrumb(bundle);
+    navigationToolbar.updateBreadcrumb(response.getAncestors(), response.getIndexedAIP(),
+      response.getIndexedRepresentation());
   }
 
-  private void getDescriptiveMetadataHTML(final String descId, final DescriptiveMetadataViewBundle bundle,
+  private void getDescriptiveMetadataHTML(final String descId, final DescriptiveMetadataInfo bundle,
     final Integer selectedIndex, final AsyncCallback<SafeHtml> callback) {
     SafeUri uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(aipId, repId, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());

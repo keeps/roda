@@ -7,12 +7,14 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * @author Rui Castro
  */
 public class Fixity implements Serializable {
+  @Serial
   private static final long serialVersionUID = 5643738632324867731L;
 
   private String messageDigestAlgorithm = null;

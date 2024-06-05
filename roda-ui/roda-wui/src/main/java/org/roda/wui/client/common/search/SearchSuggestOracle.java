@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.services.Services;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 
 public class SearchSuggestOracle<T extends IsIndexed> extends SuggestOracle {
@@ -31,18 +31,15 @@ public class SearchSuggestOracle<T extends IsIndexed> extends SuggestOracle {
 
   @Override
   public void requestSuggestions(final Request request, final Callback callback) {
-    BrowserService.Util.getInstance().suggest(classToRequest.getName(), field, request.getQuery(), allowPartial,
-      new AsyncCallback<List<String>>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(List<String> suggestionList) {
+    Services services = new Services("Retrieve suggestions", "get");
+    SuggestRequest suggestRequest = new SuggestRequest(field, request.getQuery(), allowPartial);
+    services.rodaEntityRestService(s -> s.suggest(suggestRequest), classToRequest)
+      .whenComplete((strings, throwable) -> {
+        if (throwable != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable.getCause());
+        } else {
           List<SearchSuggest> suggestions = new ArrayList<>();
-          for (String suggestion : suggestionList) {
+          for (String suggestion : strings) {
             suggestions.add(new SearchSuggest(suggestion, suggestion, suggestions.size()));
           }
 

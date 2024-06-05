@@ -7,25 +7,21 @@
  */
 package org.roda.wui.client.common.actions;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.regexp.shared.RegExp;
-import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import config.i18n.client.ClientMessages;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.generics.ChangeRepresentationStatesRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.representation.ChangeRepresentationStatesRequest;
+import org.roda.core.data.v2.representation.ChangeRepresentationTypeRequest;
 import org.roda.wui.client.browse.BrowseRepresentation;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
-import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -39,10 +35,14 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import config.i18n.client.ClientMessages;
 
 public class RepresentationActions extends AbstractActionable<IndexedRepresentation> {
   private static final RepresentationActions GENERAL_INSTANCE = new RepresentationActions(null, null);
@@ -68,36 +68,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     this.permissions = permissions;
   }
 
-  public enum RepresentationAction implements Action<IndexedRepresentation> {
-    NEW(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION), DOWNLOAD(),
-    CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_REPRESENTATION_TYPE),
-    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_REPRESENTATION),
-    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    CHANGE_STATE(RodaConstants.PERMISSION_METHOD_CHANGE_REPRESENTATION_STATES), DOWNLOAD_METADATA();
-
-    private List<String> methods;
-
-    RepresentationAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
-  }
-
-  @Override
-  public RepresentationAction[] getActions() {
-    return RepresentationAction.values();
-  }
-
-  @Override
-  public RepresentationAction actionForName(String name) {
-    return RepresentationAction.valueOf(name);
-  }
-
   public static RepresentationActions get() {
     return GENERAL_INSTANCE;
   }
@@ -113,6 +83,16 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
         return false;
       }
     };
+  }
+
+  @Override
+  public RepresentationAction[] getActions() {
+    return RepresentationAction.values();
+  }
+
+  @Override
+  public RepresentationAction actionForName(String name) {
+    return RepresentationAction.valueOf(name);
   }
 
   @Override
@@ -214,7 +194,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   private void downloadOtherMetadata(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = null;
     if (representation != null) {
-      downloadUri = RestUtils.createRepresentationOtherMetadataDownloadUri(representation.getAipId(), representation.getId());
+      downloadUri = RestUtils.createRepresentationOtherMetadataDownloadUri(representation.getAipId(),
+        representation.getId());
     }
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());
@@ -282,8 +263,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       .whenComplete((representationTypeOptions, error) -> {
         if (representationTypeOptions != null) {
           RepresentationDialogs.showPromptDialogRepresentationTypes(messages.changeTypeTitle(), null,
-            messages.cancelButton(), messages.confirmButton(), representationTypeOptions.getRepresentationTypeOptions().getSecond(), representationTypeOptions.getRepresentationTypeOptions().getFirst(),
-            new ActionNoAsyncCallback<String>(callback) {
+            messages.cancelButton(), messages.confirmButton(), representationTypeOptions.getTypes(),
+            representationTypeOptions.isControlledVocabulary(), new ActionNoAsyncCallback<String>(callback) {
 
               @Override
               public void onSuccess(final String newType) {
@@ -294,7 +275,9 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                     @Override
                     public void onSuccess(String details) {
                       Services services = new Services("Change representation type", "update");
-                      services.representationResource(s -> s.changeRepresentationType(representations, newType, details))
+                      ChangeRepresentationTypeRequest request = new ChangeRepresentationTypeRequest(representations,
+                        newType, details);
+                      services.representationResource(s -> s.changeRepresentationType(request))
                         .whenComplete((result, error) -> {
                           if (result != null) {
                             Toast.showInfo(messages.runningInBackgroundTitle(),
@@ -342,25 +325,24 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   private void identifyFormats(SelectedItems<IndexedRepresentation> selected,
     final AsyncCallback<ActionImpact> callback) {
     Services services = new Services("Create format identification job", "create");
-    services.representationResource(s -> s.createFormatIdentificationJob(selected))
-      .whenComplete((result, error) -> {
-        if (result != null) {
-          Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
+    services.representationResource(s -> s.createFormatIdentificationJob(selected)).whenComplete((result, error) -> {
+      if (result != null) {
+        Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
 
-          Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(), new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              callback.onSuccess(Actionable.ActionImpact.UPDATED);
-            }
+        Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(), new AsyncCallback<Void>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onSuccess(Actionable.ActionImpact.UPDATED);
+          }
 
-            @Override
-            public void onSuccess(final Void nothing) {
-              callback.onSuccess(Actionable.ActionImpact.NONE);
-              HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-            }
-          });
-        }
-      });
+          @Override
+          public void onSuccess(final Void nothing) {
+            callback.onSuccess(Actionable.ActionImpact.NONE);
+            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+          }
+        });
+      }
+    });
   }
 
   private void changeState(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
@@ -376,9 +358,10 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
               @Override
               public void onSuccess(String details) {
-                Services services = new Services("Change representation states", "update");
-                ChangeRepresentationStatesRequest changeRepresentationStatesRequest = new ChangeRepresentationStatesRequest(representation, newStates);
-                services.representationResource(s -> s.changeRepresentationStatus(changeRepresentationStatesRequest, details))
+                Services services = new Services("Change representation status", "update");
+                ChangeRepresentationStatesRequest changeRepresentationStatesRequest = new ChangeRepresentationStatesRequest(
+                  representation.getUUID(), newStates, details);
+                services.representationResource(s -> s.changeRepresentationStatus(changeRepresentationStatesRequest))
                   .whenComplete((result, error) -> {
                     if (error == null) {
                       Toast.showInfo(messages.dialogSuccess(), messages.changeStatusSuccessful());
@@ -421,5 +404,25 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
     representationActionableBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(downloadGroup);
     return representationActionableBundle;
+  }
+
+  public enum RepresentationAction implements Action<IndexedRepresentation> {
+    NEW(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION), DOWNLOAD(),
+    CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_REPRESENTATION_TYPE),
+    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_REPRESENTATION),
+    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    CHANGE_STATE(RodaConstants.PERMISSION_METHOD_CHANGE_REPRESENTATION_STATES), DOWNLOAD_METADATA();
+
+    private List<String> methods;
+
+    RepresentationAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 }

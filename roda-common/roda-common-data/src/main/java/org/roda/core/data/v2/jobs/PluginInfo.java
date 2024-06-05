@@ -7,13 +7,14 @@
  */
 package org.roda.core.data.v2.jobs;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * This class contains information about a plugin.
@@ -21,6 +22,7 @@ import java.util.Set;
  * @author Rui Castro
  */
 public class PluginInfo implements Serializable {
+  @Serial
   private static final long serialVersionUID = -7977449299190436877L;
 
   /**

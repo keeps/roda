@@ -6,6 +6,7 @@ import org.fusesource.restygwt.client.Method;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.wui.client.main.Login;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -31,10 +32,7 @@ public class MethodCallThrowableTreatment {
     final JSONValue parse = JSONParser.parseStrict(method.getResponse().getText());
 
     if (method.getResponse().getStatusCode() == Response.SC_NOT_FOUND) {
-      String message = parse.isObject().get("message").isString().stringValue();
-      Toast.showError(throwable.getClass().getSimpleName(), message);
-
-      HistoryUtils.newHistory(Welcome.RESOLVER);
+      throwable = new NotFoundException();
     } else if (method.getResponse().getStatusCode() == Response.SC_UNAUTHORIZED) {
       throwable = new AuthenticationDeniedException();
     } else if (method.getResponse().getStatusCode() ==  Response.SC_FORBIDDEN) {

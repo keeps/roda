@@ -45,6 +45,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.util.IdUtils;
 import org.testng.AssertJUnit;
 
+
 public final class TestsHelper {
   private TestsHelper() {
 

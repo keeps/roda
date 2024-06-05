@@ -26,8 +26,8 @@ public class ColumnOptions {
 
   public enum RenderingHint {
     FILE_SIZE,
-
-    DATE_FORMAT_TITLE, DATE_FORMAT_SIMPLE, DATETIME_FORMAT_SIMPLE;
+    DATE_FORMAT_TITLE, DATE_FORMAT_SIMPLE, DATETIME_FORMAT_SIMPLE,
+    LIST;
   }
 
   /**

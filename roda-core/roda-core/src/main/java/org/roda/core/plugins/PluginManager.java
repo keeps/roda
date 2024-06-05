@@ -39,7 +39,6 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
@@ -62,6 +61,7 @@ import org.roda.core.data.v2.jobs.CertificateInfo;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.MarketInfo;
 import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginInfoList;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -394,24 +394,15 @@ public class PluginManager {
     return plugins;
   }
 
-  /**
-   * Returns the {@link PluginInfo}s for all {@link Plugin}s.
-   *
-   * @return a {@link List} of {@link PluginInfo}s.
-   */
-  public List<PluginInfo> getPluginsInfo() {
-    return getPlugins().stream().map(e -> getPluginInfo(e)).collect(Collectors.toList());
-  }
-
   public List<PluginInfo> getPluginsInfo(PluginType pluginType) {
     return pluginInfoPerType.get(pluginType);
   }
 
-  public List<PluginInfo> getPluginsInfo(List<PluginType> pluginTypes) {
-    List<PluginInfo> pluginsInfo = new ArrayList<>();
+  public PluginInfoList getPluginsInfo(List<PluginType> pluginTypes) {
+    PluginInfoList pluginsInfo = new PluginInfoList();
 
     for (PluginType pluginType : pluginTypes) {
-      pluginsInfo.addAll(pluginInfoPerType.getOrDefault(pluginType, Collections.emptyList()));
+      pluginsInfo.addObjects(pluginInfoPerType.getOrDefault(pluginType, Collections.emptyList()));
     }
 
     return pluginsInfo;
@@ -993,8 +984,8 @@ public class PluginManager {
           } else {
             LOGGER.error("{} is not a valid Plugin", pluginClassNames);
           }
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | RuntimeException |
-                 NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | RuntimeException
+          | NoSuchMethodException | InvocationTargetException e) {
           LOGGER.error("Error loading plugin from {}", jarPath, e);
         }
       }

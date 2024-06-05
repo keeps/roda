@@ -13,18 +13,18 @@ package org.roda.wui.client.browse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.BrowseFileBundle;
-import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.search.PreservationEventsSearch;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -188,41 +188,46 @@ public class PreservationEvents extends Composite {
   }
 
   private void setupRepresentationToolbar() {
-    BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representationUUID,
-      RodaConstants.REPRESENTATION_FIELDS_TO_RETURN, new NoAsyncCallback<IndexedRepresentation>() {
-        @Override
-        public void onSuccess(IndexedRepresentation representation) {
-          navigationToolbar.withObject(representation);
-          BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(representation.getAipId(),
-            representation.getId(), LocaleInfo.getCurrentLocale().getLocaleName(), representationFieldsToReturn,
-            new NoAsyncCallback<BrowseRepresentationBundle>() {
-              @Override
-              public void onSuccess(BrowseRepresentationBundle repBundle) {
-                navigationToolbar.updateBreadcrumb(repBundle);
-                navigationToolbar.build();
-                navigationToolbar.setVisible(true);
-              }
-            });
-        }
+    Services services = new Services("Build navigation toolbar", "get");
+    services.representationResource(s -> s.findByUuid(representationUUID, LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((indexedRepresentation, throwable) -> {
+      navigationToolbar.withObject(indexedRepresentation);
+
+      CompletableFuture<List<IndexedAIP>> getAncestorsFuture = services.aipResource(s -> s.getAncestors(indexedRepresentation.getAipId()));
+      CompletableFuture<IndexedAIP> indexedAIPCompletableFuture = services.aipResource(s -> s.findByUuid(indexedRepresentation.getAipId(), LocaleInfo.getCurrentLocale().getLocaleName()));
+
+      CompletableFuture<Void> allFutures = CompletableFuture.allOf(getAncestorsFuture, indexedAIPCompletableFuture);
+
+      allFutures.thenRun(() -> {
+        // All futures completed
+        navigationToolbar.updateBreadcrumb(getAncestorsFuture.join(), indexedAIPCompletableFuture.join(),
+          indexedRepresentation);
+        navigationToolbar.build();
+        navigationToolbar.setVisible(true);
       });
+    });
   }
 
   private void setupFileToolbar() {
-    BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
-      RodaConstants.FILE_FIELDS_TO_RETURN, new NoAsyncCallback<IndexedFile>() {
-        @Override
-        public void onSuccess(IndexedFile file) {
-          navigationToolbar.withObject(file);
-          BrowserService.Util.getInstance().retrieveBrowseFileBundle(file.getAipId(), file.getRepresentationId(),
-            file.getPath(), file.getId(), fileFieldsToReturn, new NoAsyncCallback<BrowseFileBundle>() {
-              @Override
-              public void onSuccess(BrowseFileBundle fileBundle) {
-                navigationToolbar.updateBreadcrumb(fileBundle);
-                navigationToolbar.build();
-                navigationToolbar.setVisible(true);
-              }
-            });
-        }
+    Services services = new Services("Build navigation toolbar", "get");
+    services.fileResource(s -> s.findByUuid(fileUUID, LocaleInfo.getCurrentLocale().getLocaleName()))
+      .whenComplete((indexedFile, throwable) -> {
+        navigationToolbar.withObject(indexedFile);
+
+        CompletableFuture<IndexedAIP> indexedAIPCompletableFuture = services
+          .aipResource(s -> s.findByUuid(indexedFile.getAipId(), LocaleInfo.getCurrentLocale().getLocaleName()));
+        CompletableFuture<IndexedRepresentation> indexedRepresentationCompletableFuture = services
+          .representationResource(
+            s -> s.findByUuid(indexedFile.getRepresentationUUID(), LocaleInfo.getCurrentLocale().getLocaleName()));
+
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(indexedAIPCompletableFuture,
+          indexedRepresentationCompletableFuture);
+
+        allFutures.thenRun(() -> {
+          navigationToolbar.updateBreadcrumb(indexedAIPCompletableFuture.join(),
+            indexedRepresentationCompletableFuture.join(), indexedFile);
+          navigationToolbar.build();
+          navigationToolbar.setVisible(true);
+        });
       });
   }
 
