@@ -6,6 +6,10 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.index.CountRequest;
+import org.roda.core.data.v2.index.FindRequest;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
@@ -13,6 +17,7 @@ import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.FilesService;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.utils.ApiUtils;
+import org.roda.wui.client.services.FileRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
@@ -21,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,7 +44,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping(path = "/api/v2/files")
 @Tag(name = FilesController.SWAGGER_ENDPOINT)
-public class FilesController {
+public class FilesController implements FileRestService {
   public static final String SWAGGER_ENDPOINT = "v2 files";
 
   @Autowired
@@ -81,5 +87,23 @@ public class FilesController {
       controllerAssistant.registerAction(requestContext, fileUUID, state,
         RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
     }
+  }
+
+  @Override
+  public IndexedFile findByUuid(String uuid, String localeString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.retrieve(requestContext, IndexedFile.class, uuid, new ArrayList<>());
+  }
+
+  @Override
+  public IndexResult<IndexedFile> find(@RequestBody FindRequest findRequest, String localeString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.find(IndexedFile.class, findRequest, localeString, requestContext);
+  }
+
+  @Override
+  public LongResponse count(@RequestBody CountRequest countRequest) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return new LongResponse(indexService.count(IndexedFile.class, countRequest, requestContext));
   }
 }
