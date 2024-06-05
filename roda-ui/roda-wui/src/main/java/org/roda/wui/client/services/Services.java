@@ -11,6 +11,9 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -67,6 +70,10 @@ public class Services implements DirectRestService {
       return GWT.create(RepresentationInformationRestService.class);
     } else if (MembersRestService.class.equals(serviceClass)) {
       return GWT.create(MembersRestService.class);
+    } else if (RepresentationRestService.class.equals(serviceClass)) {
+      return GWT.create(RepresentationRestService.class);
+    } else if (FileRestService.class.equals(serviceClass)) {
+      return GWT.create(FileRestService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
@@ -124,6 +131,12 @@ public class Services implements DirectRestService {
       service = GWT.create(JobReportRestService.class);
     } else if (RODAMember.class.getName().equals(objectClassString)) {
       service = GWT.create(MembersRestService.class);
+    } else if (IndexedRepresentation.class.getName().equals(objectClassString)) {
+      service = GWT.create(RepresentationRestService.class);
+    } else if (IndexedFile.class.getName().equals(objectClassString)) {
+      service = GWT.create(FileRestService.class);
+    } else if (IndexedDIP.class.getName().equals(objectClassString)) {
+      service = GWT.create(DIPRestService.class);
     } else {
       throw new IllegalArgumentException(objectClassString + " not supported");
     }
@@ -206,5 +219,9 @@ public class Services implements DirectRestService {
   public <T> CompletableFuture<T> representationInformationResource(
     CheckedFunction<RepresentationInformationRestService, T> method) {
     return future(RepresentationInformationRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> representationResource(CheckedFunction<RepresentationRestService, T> method) {
+    return future(RepresentationRestService.class, method);
   }
 }
