@@ -289,9 +289,11 @@ public class IndexModelObserver implements ModelObserver {
         // suppose that all suffixes in othermetadata are like this
         // ".metadata.<real_suffix>
         String fileId = otherMetadata.get().getFileId();
-        suffix = fileId.substring(fileId.lastIndexOf(".")) + suffix;
-        fileId = fileId.substring(0, fileId.lastIndexOf("."));
 
+        if (fileId.lastIndexOf(".") != -1) {
+          suffix = fileId.substring(fileId.lastIndexOf(".")) + suffix;
+          fileId = fileId.substring(0, fileId.lastIndexOf("."));
+        }
         OtherMetadata om = model.retrieveOtherMetadata(aip.getId(), representation.getId(), path, fileId, suffix, type);
 
         otherMetadataCreated(om);
