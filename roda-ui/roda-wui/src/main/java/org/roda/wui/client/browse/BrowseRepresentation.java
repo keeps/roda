@@ -437,7 +437,7 @@ public class BrowseRepresentation extends Composite {
     CompletableFuture<IndexedAIP> indexedAIPCompletableFuture = services
       .aipResource(s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()));
     CompletableFuture<IndexedRepresentation> indexedRepresentationCompletableFuture = services.representationResource(
-      s -> s.retrieveIndexedRepresentation(new IndexedRepresentationRequest(aipId, representationId)));
+      s -> s.retrieveIndexedRepresentationViaRequest(new IndexedRepresentationRequest(aipId, representationId)));
     CompletableFuture<DescriptiveMetadataInfos> descriptiveMetadataInfosCompletableFuture = services
       .aipResource(s -> s.retrieveRepresentationDescriptiveMetadata(aipId, representationId,
         LocaleInfo.getCurrentLocale().getLocaleName()));

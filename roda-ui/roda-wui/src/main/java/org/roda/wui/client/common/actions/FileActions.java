@@ -16,9 +16,9 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.v2.file.CreateFolderRequest;
-import org.roda.core.data.v2.file.DeleteFilesRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
 import org.roda.core.data.v2.file.RenameFolderRequest;
+import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -505,10 +505,10 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                 @Override
                 public void onSuccess(final String details) {
                   Services services = new Services("Remove files from representation", "delete");
-                  DeleteFilesRequest deleteFilesRequest = new DeleteFilesRequest();
-                  deleteFilesRequest.setDetails(details);
-                  deleteFilesRequest.setItemsToDelete(selected);
-                  services.fileResource(s -> s.deleteFiles(deleteFilesRequest)).whenComplete((job, throwable) -> {
+                  DeleteRequest<IndexedFile> deleteRequest = new DeleteRequest<>();
+                  deleteRequest.setDetails(details);
+                  deleteRequest.setItemsToDelete(selected);
+                  services.fileResource(s -> s.deleteFiles(deleteRequest)).whenComplete((job, throwable) -> {
                     if (throwable != null) {
                       callback.onFailure(throwable);
                       HistoryUtils.newHistory(InternalProcess.RESOLVER);

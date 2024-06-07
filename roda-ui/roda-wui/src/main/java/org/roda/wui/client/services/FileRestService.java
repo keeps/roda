@@ -3,11 +3,10 @@ package org.roda.wui.client.services;
 import java.util.List;
 
 import org.roda.core.data.v2.file.CreateFolderRequest;
-import org.roda.core.data.v2.file.DeleteFilesRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
 import org.roda.core.data.v2.file.RenameFolderRequest;
+import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.index.IndexedFileRequest;
-import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.jobs.Job;
@@ -33,12 +32,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "../api/v2/files")
 public interface FileRestService extends RODAEntityRestService<IndexedFile> {
 
-  @RequestMapping(method = RequestMethod.POST, path = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Retrieves a file", requestBody = @RequestBody(required = true, content = @Content(schema = @Schema(implementation = IndexedFileRequest.class))), responses = {
+  @RequestMapping(method = RequestMethod.POST, path = "/find-via-request", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Retrieves a file using a dedicated request", requestBody = @RequestBody(required = true, content = @Content(schema = @Schema(implementation = IndexedFileRequest.class))), responses = {
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = IndexedFile.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "File not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  IndexedFile retrieveIndexedFile(IndexedFileRequest request);
+  IndexedFile retrieveIndexedFileViaRequest(IndexedFileRequest request);
 
   @RequestMapping(path = "/move", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Create an internal action to move file(s) to another folder within the representation", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = MoveFilesRequest.class))), responses = {
@@ -48,10 +47,10 @@ public interface FileRestService extends RODAEntityRestService<IndexedFile> {
   Job moveFileToFolder(MoveFilesRequest moveFilesRequest);
 
   @RequestMapping(path = "/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Creates an internal action to delete file(s) from the representation", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = DeleteFilesRequest.class))), responses = {
+  @Operation(summary = "Creates an internal action to delete file(s) from the representation", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = DeleteRequest.class))), responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Job deleteFiles(DeleteFilesRequest deleteFilesRequest);
+  Job deleteFiles(DeleteRequest<IndexedFile> deleteRequest);
 
   @RequestMapping(path = "/rename", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Rename folder", description = "Renames a folder", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RenameFolderRequest.class))), responses = {

@@ -137,7 +137,7 @@ public class RiskController implements RiskRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), risk.getId(), state,
+      controllerAssistant.registerAction(requestContext, risk.getId(), state,
         RodaConstants.CONTROLLER_RISK_PARAM, risk, RodaConstants.CONTROLLER_MESSAGE_PARAM,
         RodaConstants.VersionAction.UPDATED.toString());
     }
@@ -163,7 +163,7 @@ public class RiskController implements RiskRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_RISK_PARAM, risk);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_RISK_PARAM, risk);
     }
   }
 
@@ -185,7 +185,7 @@ public class RiskController implements RiskRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
         id);
     }
   }
@@ -207,7 +207,7 @@ public class RiskController implements RiskRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
         id, RodaConstants.CONTROLLER_SELECTED_VERSION_PARAM, versionId);
     }
   }
@@ -241,7 +241,7 @@ public class RiskController implements RiskRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
         id, RodaConstants.CONTROLLER_VERSION_ID_PARAM, versionId, RodaConstants.CONTROLLER_MESSAGE_PARAM,
         RodaConstants.VersionAction.REVERTED.toString());
     }
@@ -269,7 +269,7 @@ public class RiskController implements RiskRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_RISK_ID_PARAM,
         id, RodaConstants.CONTROLLER_VERSION_ID_PARAM, versionId);
     }
   }
@@ -318,7 +318,7 @@ public class RiskController implements RiskRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 }

@@ -29,6 +29,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.representation.ChangeRepresentationStatesRequest;
@@ -113,7 +114,7 @@ public class RepresentationController implements RepresentationRestService {
   }
 
   @Override
-  public IndexedRepresentation retrieveIndexedRepresentation(
+  public IndexedRepresentation retrieveIndexedRepresentationViaRequest(
     @RequestBody IndexedRepresentationRequest indexedRepresentationRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
@@ -138,10 +139,10 @@ public class RepresentationController implements RepresentationRestService {
       RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
 
       if (RODAInstanceUtils.isConfiguredAsDistributedMode()
-          && RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
+        && RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
         boolean isLocalInstance = representation.getInstanceId().equals(RODAInstanceUtils.getLocalInstanceIdentifier());
         representationsService.retrieveDistributedInstanceName(representation.getInstanceId(), isLocalInstance)
-            .ifPresent(representation::setInstanceName);
+          .ifPresent(representation::setInstanceName);
         representation.setLocalInstance(isLocalInstance);
       }
 
@@ -154,7 +155,7 @@ public class RepresentationController implements RepresentationRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
         indexedRepresentationRequest.getAipId(), RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM,
         indexedRepresentationRequest.getRepresentationId());
     }
@@ -183,7 +184,7 @@ public class RepresentationController implements RepresentationRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
         aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
     }
   }
@@ -217,7 +218,7 @@ public class RepresentationController implements RepresentationRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
         aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_TYPE_PARAM,
         type, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
@@ -267,7 +268,7 @@ public class RepresentationController implements RepresentationRestService {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
@@ -290,7 +291,7 @@ public class RepresentationController implements RepresentationRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         changeRepresentationTypeRequest.getItems(), RodaConstants.CONTROLLER_TYPE_PARAM,
         changeRepresentationTypeRequest.getType(), RodaConstants.CONTROLLER_DETAILS_PARAM,
         changeRepresentationTypeRequest.getDetails());
@@ -313,7 +314,7 @@ public class RepresentationController implements RepresentationRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         items, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
@@ -343,7 +344,7 @@ public class RepresentationController implements RepresentationRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state,
+      controllerAssistant.registerAction(requestContext, state,
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, changeRepresentationStatesRequest.getRepresentationId(),
         RodaConstants.CONTROLLER_STATES_PARAM, changeRepresentationStatesRequest.getNewStates(),
         RodaConstants.CONTROLLER_DETAILS_PARAM, changeRepresentationStatesRequest.getDetails());
@@ -366,7 +367,7 @@ public class RepresentationController implements RepresentationRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         items);
     }
   }
@@ -414,7 +415,7 @@ public class RepresentationController implements RepresentationRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
         aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
     }
   }
@@ -451,7 +452,7 @@ public class RepresentationController implements RepresentationRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
         aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
     }
   }

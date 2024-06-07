@@ -113,7 +113,7 @@ public class RiskHistory extends Composite {
     list.addChangeHandler(event -> {
       selectedVersion = list.getSelectedValue();
 
-      Services services = new Services("Retreive risk version", "get");
+      Services services = new Services("Retrieve risk version", "get");
       services.riskResource(s -> s.retrieveRiskVersion(riskId, selectedVersion)).whenComplete((result, throwable) -> {
         if (throwable != null) {
           AsyncCallbackUtils.defaultFailureTreatment(throwable);

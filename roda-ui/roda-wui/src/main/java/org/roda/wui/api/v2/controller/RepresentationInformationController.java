@@ -333,7 +333,7 @@ public class RepresentationInformationController implements RepresentationInform
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, "filter_request",
+      controllerAssistant.registerAction(requestContext, state, "filter_request",
         representationInformationFilterRequest);
     }
   }

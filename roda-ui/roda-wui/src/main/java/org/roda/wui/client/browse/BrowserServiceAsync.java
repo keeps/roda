@@ -15,25 +15,17 @@ import java.util.Set;
 
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
-import org.roda.core.data.v2.common.ConversionProfile;
+import org.roda.core.data.v2.properties.ConversionProfile;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
@@ -73,12 +65,6 @@ public interface BrowserServiceAsync {
 
   void retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle, AsyncCallback<String> async);
 
-  void retrieveDropdownPluginItems(String parameterId, String localeString,
-    AsyncCallback<Set<Pair<String, String>>> asyncCallback);
-
-  void retrieveConversionProfilePluginItems(String pluginId, String repOrDip, String localeString,
-    AsyncCallback<Set<ConversionProfile>> asyncCallback);
-
   void retrieveSupportedMetadata(String aipId, String representationUUID, String locale,
     AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
 
@@ -91,20 +77,10 @@ public interface BrowserServiceAsync {
   void deleteDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
     String versionId, AsyncCallback<Void> callback);
 
-  <T extends IsIndexed> void find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String localeString, boolean justActive, List<String> fieldsToReturn,
-    AsyncCallback<IndexResult<T>> callback);
-
-  <T extends IsIndexed> void retrieve(String classNameToReturn, String id, List<String> fieldsToReturn,
-    AsyncCallback<T> callback);
-
   <T extends IsIndexed> void retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
     List<String> fieldsToReturn, AsyncCallback<List<T>> asyncCallback);
 
   void updateAIPPermissions(SelectedItems<IndexedAIP> aips, Permissions permissions, String details, boolean recursive,
-    AsyncCallback<Job> callback);
-
-  void updateDIPPermissions(SelectedItems<IndexedDIP> dips, Permissions permissions, String details,
     AsyncCallback<Job> callback);
 
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, AsyncCallback<Job> callback);
@@ -112,18 +88,9 @@ public interface BrowserServiceAsync {
   void changeAIPType(SelectedItems<IndexedAIP> selectedAIP, String newType, String details,
     AsyncCallback<Job> loadingAsyncCallback);
 
-  void retrieveDipBundle(String dipUUID, String dipFileUUID, String localeString,
-    AsyncCallback<BrowseDipBundle> callback);
-
-  void deleteDIPs(SelectedItems<IndexedDIP> dips, String details, AsyncCallback<Job> async);
-
   void hasDocumentation(String aipId, AsyncCallback<Boolean> asyncCallback);
 
   void hasSubmissions(String aipId, AsyncCallback<Boolean> asyncCallback);
-
-  void showDIPEmbedded(AsyncCallback<Boolean> asyncCallback);
-
-  void acknowledgeNotification(String notificationId, String ackToken, AsyncCallback<Notification> asyncCallback);
 
   void getExportLimit(AsyncCallback<Integer> asyncCallback);
 

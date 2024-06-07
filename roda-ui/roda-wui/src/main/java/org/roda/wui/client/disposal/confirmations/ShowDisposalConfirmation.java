@@ -22,10 +22,17 @@ import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -87,24 +94,40 @@ public class ShowDisposalConfirmation extends Composite {
     if (historyTokens.size() == 1) {
       String confirmationId = historyTokens.get(0);
       Services services = new Services("Retrieve the disposal confirmation", "get");
-      services.rodaEntityRestService(s -> s.findByUuid(confirmationId, LocaleInfo.getCurrentLocale().getLocaleName()), DisposalConfirmation.class)
-        .thenCompose(disposalConfirmation -> services
-          .disposalConfirmationResource(s -> s.retrieveDisposalConfirmationReport(disposalConfirmation.getId(), false))
-          .whenComplete((report, throwable) -> {
-            if (throwable != null) {
-              AsyncCallbackUtils.defaultFailureTreatment(throwable);
-            } else {
-              final DisposalConfirmationReportActions confirmationActions = DisposalConfirmationReportActions.get();
-              instance = new ShowDisposalConfirmation();
-              SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
-              instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions).withBackButton()
-                .buildListWithObjects(new ActionableObject<>(disposalConfirmation)));
-              HTML reportHtml = new HTML(SafeHtmlUtils.fromSafeConstant(report));
-              instance.contentFlowPanel.add(reportHtml);
-              callback.onSuccess(instance);
-            }
+      services.rodaEntityRestService(s -> s.findByUuid(confirmationId, LocaleInfo.getCurrentLocale().getLocaleName()),
+        DisposalConfirmation.class).whenComplete((disposalConfirmation, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            SafeUri uri = RestUtils.createDisposalConfirmationHTMLUri(disposalConfirmation.getId(), false);
+            RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
+            try {
+              requestBuilder.sendRequest(null, new RequestCallback() {
 
-          }));
+                @Override
+                public void onResponseReceived(Request request, Response response) {
+                  if (200 == response.getStatusCode()) {
+                    final DisposalConfirmationReportActions confirmationActions = DisposalConfirmationReportActions.get();
+                    instance = new ShowDisposalConfirmation();
+                    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
+                    instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions).withBackButton()
+                        .buildListWithObjects(new ActionableObject<>(disposalConfirmation)));
+                    HTML reportHtml = new HTML(SafeHtmlUtils.fromSafeConstant(response.getText()));
+                    instance.contentFlowPanel.add(reportHtml);
+                    callback.onSuccess(instance);
+                  }
+                }
+
+                @Override
+                public void onError(Request request, Throwable throwable) {
+                  callback.onFailure(throwable);
+                }
+              });
+            } catch (RequestException e) {
+              callback.onFailure(e);
+            }
+          }
+        });
     } else {
       HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
       callback.onSuccess(null);

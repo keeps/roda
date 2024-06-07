@@ -23,27 +23,18 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
-import org.roda.core.data.v2.common.ConversionProfile;
+import org.roda.core.data.v2.properties.ConversionProfile;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
@@ -97,10 +88,6 @@ public interface BrowserService extends RemoteService {
   String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws AuthorizationDeniedException,
     GenericException, ValidationException, NotFoundException, RequestNotValidException;
 
-  Set<Pair<String, String>> retrieveDropdownPluginItems(String parameterId, String localeString);
-
-  Set<ConversionProfile> retrieveConversionProfilePluginItems(String pluginId, String repOrDip, String localeString);
-
   List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String representationUUID, String locale)
     throws RODAException;
 
@@ -116,13 +103,6 @@ public interface BrowserService extends RemoteService {
     String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
-  <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String localeString, boolean justActive, List<String> fieldsToReturn)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException;
-
-  <T extends IsIndexed> T retrieve(String classNameToReturn, String id, List<String> fieldsToReturn)
-    throws RODAException;
-
   <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
     List<String> fieldsToReturn)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException;
@@ -131,30 +111,16 @@ public interface BrowserService extends RemoteService {
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     JobAlreadyStartedException;
 
-  Job updateDIPPermissions(SelectedItems<IndexedDIP> dips, Permissions permissions, String details)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
-
   Job appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   Job changeAIPType(SelectedItems<IndexedAIP> selectedAIP, String newType, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  BrowseDipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, String localeString)
-    throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException;
-
-  Job deleteDIPs(SelectedItems<IndexedDIP> dips, String details)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
   boolean hasDocumentation(String aipId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException;
 
   boolean hasSubmissions(String aipId) throws AuthorizationDeniedException, RequestNotValidException, GenericException;
-
-  boolean showDIPEmbedded();
-
-  Notification acknowledgeNotification(String notificationId, String ackToken)
-    throws GenericException, NotFoundException, AuthorizationDeniedException;
 
   int getExportLimit();
 

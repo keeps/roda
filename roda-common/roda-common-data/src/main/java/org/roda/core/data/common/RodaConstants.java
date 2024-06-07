@@ -359,6 +359,9 @@ public final class RodaConstants {
   // files
   public static final String API_REST_V2_FILES = "api/v2/files/";
 
+  // dips
+  public static final String API_REST_V2_DIPS = "api/v2/dips/";
+
   // representation-information
   public static final String API_REST_V2_REPRESENTATION_INFORMATION = "api/v2/representation-information/";
 
@@ -371,6 +374,12 @@ public final class RodaConstants {
 
   // members
   public static final String API_REST_V2_MEMBERS = "api/v2/members/";
+
+  // disposal confirmation
+  public static final String API_REST_V2_DISPOSAL_CONFIRMATION = "api/v2/disposal/confirmations/";
+  public static final String API_REST_V2_DISPOSAL_CONFIRMATION_REPORT = "report";
+  public static final String API_REST_V2_DISPOSAL_CONFIRMATION_REPORT_HTML = "html";
+  public static final String API_REST_V2_DISPOSAL_CONFIRMATION_QUERY_PARAM_TO_PRINT = "to-print";
 
   // themes
   public static final String API_REST_V2_THEME = "api/v2/themes";
@@ -648,6 +657,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_DIP_PARAM = RODA_OBJECT_DIP;
   public static final String CONTROLLER_DIPS_PARAM = RODA_OBJECT_DIPS;
   public static final String CONTROLLER_DIP_ID_PARAM = "dipId";
+  public static final String CONTROLLER_DIP_UUID_PARAM = "dipUUID";
   public static final String CONTROLLER_DIP_FILE_ID_PARAM = "dipFileId";
   public static final String CONTROLLER_DIP_FILE_UUID_PARAM = "dipFileUUID";
   public static final String CONTROLLER_AGENT_ID_PARAM = "agentId";

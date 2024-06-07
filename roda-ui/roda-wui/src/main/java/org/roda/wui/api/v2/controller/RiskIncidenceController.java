@@ -97,7 +97,7 @@ public class RiskIncidenceController implements RiskIncidenceRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         selected, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
@@ -117,7 +117,7 @@ public class RiskIncidenceController implements RiskIncidenceRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         selected);
     }
   }
@@ -137,7 +137,7 @@ public class RiskIncidenceController implements RiskIncidenceRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), incidence.getId(), state,
+      controllerAssistant.registerAction(requestContext, incidence.getId(), state,
         RodaConstants.CONTROLLER_INCIDENCE_PARAM, incidence);
     }
   }

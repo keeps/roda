@@ -109,7 +109,7 @@ public class BrowseFile extends Composite {
         request.setRepresentationId(historyRepresentationId);
         request.setDirectoryPaths(historyFilePath);
         request.setFileId(historyFileId);
-        services.fileResource(s -> s.retrieveIndexedFile(request)).whenComplete((indexedFile, throwable) -> {
+        services.fileResource(s -> s.retrieveIndexedFileViaRequest(request)).whenComplete((indexedFile, throwable) -> {
           if (throwable != null) {
             AsyncCallbackUtils.defaultFailureTreatment(throwable);
           } else {

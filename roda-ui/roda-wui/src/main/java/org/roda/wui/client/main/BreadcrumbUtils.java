@@ -20,7 +20,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.PreservationEvents;
-import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -114,13 +113,6 @@ public class BreadcrumbUtils {
     breadcrumb.add(getBreadcrumbItem(aip));
 
     return breadcrumb;
-  }
-
-  public static List<BreadcrumbItem> getRepresentationBreadcrumbs(BrowseRepresentationBundle bundle) {
-    List<IndexedAIP> aipAncestors = bundle.getAipAncestors();
-    IndexedAIP aip = bundle.getAip();
-    IndexedRepresentation representation = bundle.getRepresentation();
-    return getRepresentationBreadcrumbs(aipAncestors, aip, representation);
   }
 
   public static List<BreadcrumbItem> getRepresentationBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip,

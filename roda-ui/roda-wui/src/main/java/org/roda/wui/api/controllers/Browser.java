@@ -70,7 +70,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntryState;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
@@ -84,13 +83,9 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.BrowseDipBundle;
-import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
-import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
@@ -229,32 +224,6 @@ public class Browser extends RodaWuiController {
       controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_METADATA_ID_PARAM,
         metadataId);
-    }
-  }
-
-  public static BrowseDipBundle retrieveDipBundle(User user, String dipUUID, String dipFileUUID, Locale locale)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // delegate
-      IndexedDIP dip = BrowserHelper.retrieve(IndexedDIP.class, dipUUID,
-        RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN);
-      controllerAssistant.checkObjectPermissions(user, dip);
-
-      return BrowserHelper.retrieveDipBundle(dipUUID, dipFileUUID, user, locale);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, dipUUID, state, RodaConstants.CONTROLLER_DIP_ID_PARAM, dipUUID,
-        RodaConstants.CONTROLLER_DIP_FILE_ID_PARAM, dipFileUUID);
     }
   }
 
@@ -2139,28 +2108,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Job updateDIPPermissions(User user, SelectedItems<IndexedDIP> dips, Permissions permissions,
-    String details) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-    controllerAssistant.checkObjectPermissions(user, dips);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      return BrowserHelper.updateDIPPermissions(user, dips, permissions, details);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DIPS_PARAM, dips,
-        RodaConstants.CONTROLLER_PERMISSIONS_PARAM, permissions, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
-    }
-  }
-
   public static void updateRisk(User user, Risk risk, int incidences)
     throws AuthorizationDeniedException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2682,29 +2629,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Job deleteDIPs(User user, SelectedItems<IndexedDIP> dips, String details)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-    controllerAssistant.checkObjectPermissions(user, dips);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // delegate
-      return BrowserHelper.deleteDIPs(user, dips, details);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, dips,
-        RodaConstants.CONTROLLER_DETAILS_PARAM, details, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
-    }
-  }
-
   public static EntityResponse retrieveDIP(User user, String dipId, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2996,29 +2920,6 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
-    }
-  }
-
-  public static Notification acknowledgeNotification(User user, String notificationId, String ackToken)
-    throws GenericException, NotFoundException, AuthorizationDeniedException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // 20170515 nvieira: decided to not check roles considering the ackToken
-    // should be enough and it is not necessary nor usable to create a new role
-    // only for this purpose
-    // controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      return BrowserHelper.acknowledgeNotification(notificationId, ackToken);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, notificationId, state, RodaConstants.CONTROLLER_NOTIFICATION_ID_PARAM,
-        notificationId, RodaConstants.CONTROLLER_NOTIFICATION_TOKEN_PARAM, ackToken);
     }
   }
 

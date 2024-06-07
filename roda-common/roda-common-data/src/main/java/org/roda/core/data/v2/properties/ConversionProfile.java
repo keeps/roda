@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.v2.common;
+package org.roda.core.data.v2.properties;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,8 +16,10 @@ import java.util.Map;
  * @author António Lindo <alindo@keep.pt>
  */
 public class ConversionProfile implements Serializable {
+
   @Serial
   private static final long serialVersionUID = -117396300862413045L;
+
   private String title;
   private String profile;
   private String description;

@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.common.lists.pagination;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,13 +14,12 @@ import java.util.Map.Entry;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.CountRequest;
-import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -110,19 +108,18 @@ public class ListSelectionUtils {
     final AsyncCallback<ListSelectionState<T>> callback, final ProcessRelativeItem<T> processor) {
     final int newIndex = state.getIndex() + relativeIndex;
     if (newIndex >= 0) {
-      BrowserService.Util.getInstance().find(state.getSelected().getClass().getName(), state.getFilter(),
-        state.getSorter(), new Sublist(newIndex, 1), state.getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(),
-        state.getJustActive(), new ArrayList<>(), new AsyncCallback<IndexResult<T>>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
-          @Override
-          public void onSuccess(IndexResult<T> result) {
-            if (!result.getResults().isEmpty()) {
-              T first = result.getResults().get(0);
+      Services services = new Services("Find relatives", "get");
+      FindRequest request = FindRequest
+        .getBuilder(state.getSelected().getClass().getName(), state.getFilter(), state.getJustActive())
+        .withSorter(state.getSorter()).withSublist(new Sublist(newIndex, 1)).withFacets(state.getFacets()).build();
+      services.rodaEntityRestService(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()),
+        state.getSelected().getClass()).whenComplete((indexResult, throwable) -> {
+          if (throwable != null) {
+            callback.onFailure(throwable);
+          } else {
+            if (!indexResult.getResults().isEmpty()) {
+              T first = (T) indexResult.getResults().get(0);
 
               // if we are jumping to the same file, try the next one
               if (first.getUUID().equals(state.getSelected().getUUID())) {
@@ -130,7 +127,7 @@ public class ListSelectionUtils {
               } else {
                 processor.process(first);
                 callback.onSuccess(ListSelectionUtils.create(first, state.getFilter(), state.getJustActive(),
-                  state.getFacets(), state.getSorter(), newIndex, result.getTotalCount()));
+                  state.getFacets(), state.getSorter(), newIndex, indexResult.getTotalCount()));
               }
             } else {
               callback.onFailure(new NotFoundException("No items were found"));

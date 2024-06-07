@@ -17,9 +17,9 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.file.CreateFolderRequest;
-import org.roda.core.data.v2.file.DeleteFilesRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
 import org.roda.core.data.v2.file.RenameFolderRequest;
+import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
@@ -147,7 +147,7 @@ public class FilesController implements FileRestService {
   }
 
   @Override
-  public IndexedFile retrieveIndexedFile(@RequestBody IndexedFileRequest indexedFileRequest) {
+  public IndexedFile retrieveIndexedFileViaRequest(@RequestBody IndexedFileRequest indexedFileRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     String uuid = IdUtils.getFileId(indexedFileRequest.getAipId(), indexedFileRequest.getRepresentationId(),
       indexedFileRequest.getDirectoryPaths(), indexedFileRequest.getFileId());
@@ -197,7 +197,7 @@ public class FilesController implements FileRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), moveFilesRequest.getAipId(), state,
+      controllerAssistant.registerAction(requestContext, moveFilesRequest.getAipId(), state,
         RodaConstants.CONTROLLER_AIP_ID_PARAM, moveFilesRequest.getAipId(),
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, moveFilesRequest.getRepresentationId(),
         RodaConstants.CONTROLLER_FILES_PARAM, moveFilesRequest.getItemsToMove(), RodaConstants.CONTROLLER_FILE_PARAM,
@@ -206,7 +206,7 @@ public class FilesController implements FileRestService {
   }
 
   @Override
-  public Job deleteFiles(@RequestBody DeleteFilesRequest deleteFilesRequest) {
+  public Job deleteFiles(@RequestBody DeleteRequest<IndexedFile> deleteRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -214,9 +214,9 @@ public class FilesController implements FileRestService {
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), deleteFilesRequest.getItemsToDelete());
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), deleteRequest.getItemsToDelete());
 
-      return filesService.deleteFiles(requestContext.getUser(), deleteFilesRequest);
+      return filesService.deleteFiles(requestContext.getUser(), deleteRequest);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -225,8 +225,8 @@ public class FilesController implements FileRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        deleteFilesRequest.getItemsToDelete(), RodaConstants.CONTROLLER_DETAILS_PARAM, deleteFilesRequest.getDetails());
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+        deleteRequest.getItemsToDelete(), RodaConstants.CONTROLLER_DETAILS_PARAM, deleteRequest.getDetails());
     }
   }
 
@@ -255,7 +255,7 @@ public class FilesController implements FileRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_FILE_UUID_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_FILE_UUID_PARAM,
         renameFolderRequest.getFolderUUID(), RodaConstants.CONTROLLER_FOLDERNAME_PARAM,
         renameFolderRequest.getRenameTo(), RodaConstants.CONTROLLER_DETAILS_PARAM, renameFolderRequest.getDetails());
     }
@@ -282,7 +282,7 @@ public class FilesController implements FileRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         selected);
     }
   }
@@ -329,7 +329,7 @@ public class FilesController implements FileRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
         aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
         RodaConstants.CONTROLLER_DIRECTORY_PATH_PARAM, directories, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileName,
         RodaConstants.CONTROLLER_DETAILS_PARAM, details);
@@ -363,7 +363,7 @@ public class FilesController implements FileRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
         createFolderRequest.getAipId(), RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM,
         createFolderRequest.getRepresentationId(), RodaConstants.CONTROLLER_FILE_UUID_PARAM,
         createFolderRequest.getFolderUUID(), RodaConstants.CONTROLLER_FOLDERNAME_PARAM, createFolderRequest.getName(),

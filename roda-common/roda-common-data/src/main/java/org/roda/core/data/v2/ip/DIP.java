@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DIP implements IsModelObject, HasId, HasPermissions, HasInstanceID {
 
+  @Serial
   private static final long serialVersionUID = -7335470043357396783L;
   private static final int VERSION = 1;
 

@@ -33,18 +33,14 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.popup.CalloutPopup.CalloutPosition;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.StringUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -120,19 +116,16 @@ public class DisseminationsSliderHelper {
     dipFields.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
       RodaConstants.DIP_DESCRIPTION, RodaConstants.DIP_DELETE_EXTERNAL_URL, RodaConstants.DIP_OPEN_EXTERNAL_URL));
 
-    BrowserService.Util.getInstance().find(IndexedDIP.class.getName(), filter, sorter, sublist, facets, localeString,
-      true, dipFields, new AsyncCallback<IndexResult<IndexedDIP>>() {
+    FindRequest request = FindRequest.getBuilder(IndexedDIP.class.getName(), filter, true).withFieldsToReturn(dipFields).withSublist(sublist).withSorter(sorter).withFacets(facets).build();
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(IndexResult<IndexedDIP> result) {
-          updateDisseminationsSliderPanel(result.getResults(), disseminationsSliderPanel);
-        }
-      });
+    Services services = new Services("Find Indexed DIP", "get");
+    services.dipResource(s -> s.find(request, localeString)).whenComplete((indexedDIPIndexResult, throwable) -> {
+      if (throwable != null) {
+        AsyncCallbackUtils.defaultFailureTreatment(throwable.getCause());
+      } else {
+        updateDisseminationsSliderPanel(indexedDIPIndexResult.getResults(), disseminationsSliderPanel);
+      }
+    });
   }
 
   private static void updateDisseminationsSliderPanel(List<IndexedDIP> dips, SliderPanel disseminationsSliderPanel) {

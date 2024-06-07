@@ -112,11 +112,10 @@ public class RepresentationService {
 
   public StreamResponse retrieveAIPRepresentationBinary(IndexedRepresentation representation)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    String aipId = representation.getAipId();
     String representationId = representation.getId();
     StoragePath storagePath = ModelUtils.getRepresentationStoragePath(representation.getAipId(),
       representation.getId());
-    // ModelUtils.getOtherMetadataStoragePath();
+
     Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
     return ApiUtils.download(directory, representationId);
   }

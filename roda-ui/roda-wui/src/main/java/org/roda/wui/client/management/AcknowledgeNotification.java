@@ -14,7 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.notifications.NotificationAcknowledgeRequest;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -73,19 +75,17 @@ public class AcknowledgeNotification extends Composite {
       final String notificationId = historyTokens.get(0);
       final String ackToken = historyTokens.get(1);
 
-      BrowserService.Util.getInstance().acknowledgeNotification(notificationId, ackToken,
-        new AsyncCallback<Notification>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
-          @Override
-          public void onSuccess(Notification notification) {
-            callback.onSuccess(acknowledgeBody);
-          }
-        });
+      Services services = new Services("Acknowledge a notification", "ack");
+      NotificationAcknowledgeRequest request = new NotificationAcknowledgeRequest();
+      request.setNotificationUUID(notificationId);
+      request.setToken(ackToken);
+      services.notificationResource(s -> s.acknowledgeNotification(request)).whenComplete((s, throwable) -> {
+        if (throwable != null) {
+          callback.onFailure(throwable);
+        } else {
+          callback.onSuccess(acknowledgeBody);
+        }
+      });
     } else {
       HistoryUtils.newHistory(NotificationRegister.RESOLVER);
       callback.onSuccess(null);

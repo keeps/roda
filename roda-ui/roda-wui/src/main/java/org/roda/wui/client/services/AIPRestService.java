@@ -40,4 +40,10 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
     @Parameter(description = "The representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
     @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
+
+  @RequestMapping(method = RequestMethod.GET, path = "/configuration/rules", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Retrieves from the configuration the rules for the Representation information", responses = {
+      @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = List.class))),
+      @ApiResponse(responseCode = "401", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  List<String> retrieveAIPRuleProperties();
 }

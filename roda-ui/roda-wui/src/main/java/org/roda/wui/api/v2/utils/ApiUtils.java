@@ -17,6 +17,10 @@ import java.util.concurrent.TimeUnit;
 
 public class ApiUtils {
 
+  public static ResponseEntity<StreamingResponseBody> okResponse(StreamResponse streamResponse) {
+    return okResponse(streamResponse, null);
+  }
+
   public static ResponseEntity<StreamingResponseBody> okResponse(StreamResponse streamResponse, WebRequest request) {
     if (request != null && request.checkNotModified(streamResponse.getLastModified().getTime())) {
       return ResponseEntity.status(304).build();

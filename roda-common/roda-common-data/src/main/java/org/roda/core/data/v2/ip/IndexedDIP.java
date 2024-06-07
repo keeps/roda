@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedDIP extends DIP implements IsIndexed, HasInstanceName {
+
+  @Serial
   private static final long serialVersionUID = 4188689893034771594L;
-  private String openExternalURL = "";
+  private String openExternalURL = null;
   private String instanceName = null;
 
   private Map<String, Object> fields;

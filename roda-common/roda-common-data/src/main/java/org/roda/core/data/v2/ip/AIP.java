@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasDisposal, HasInstanceID {
 
+  @Serial
   private static final long serialVersionUID = 430629679119752757L;
   private static final int VERSION = 1;
 

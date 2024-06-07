@@ -1,10 +1,10 @@
 package org.roda.wui.client.services;
 
 import org.fusesource.restygwt.client.DirectRestService;
-import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
-import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHolds;
+import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
+import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -64,7 +64,7 @@ public interface DisposalHoldRestService extends DirectRestService {
     @ApiResponse(responseCode = "204", description = "Resource deleted"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Void deleteDisposalHold(
-    @Parameter(description = "The ID of the disposal hold to delete.", required = true) @PathVariable("id") String disposalHoldId);
+    @Parameter(description = "The ID of the disposal hold to delete.", required = true) @PathVariable(name = "id") String disposalHoldId);
 
   @RequestMapping(method = RequestMethod.POST, path = "/apply", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Apply disposal hold to selected AIPs", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), responses = {

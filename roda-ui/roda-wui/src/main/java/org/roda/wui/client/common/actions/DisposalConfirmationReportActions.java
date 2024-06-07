@@ -30,10 +30,17 @@ import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
@@ -124,17 +131,31 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
   private void retrieveDisposalConfirmationReportForPrint(DisposalConfirmation confirmation,
     AsyncCallback<ActionImpact> callback) {
-    Services services = new Services("Retrieve disposal confirmation report", "get");
-    services.disposalConfirmationResource(s -> s.retrieveDisposalConfirmationReport(confirmation.getId(), true))
-      .whenComplete((report, throwable) -> {
-        if (throwable != null) {
+
+    SafeUri uri = RestUtils.createDisposalConfirmationHTMLUri(confirmation.getId(), true);
+    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
+    try {
+      requestBuilder.sendRequest(null, new RequestCallback() {
+
+        @Override
+        public void onResponseReceived(Request request, Response response) {
+          if (200 == response.getStatusCode()) {
+            JavascriptUtils.print(response.getText());
+            callback.onSuccess(Actionable.ActionImpact.NONE);
+          } else {
+            callback.onFailure(null);
+          }
+        }
+
+        @Override
+        public void onError(Request request, Throwable throwable) {
           AsyncCallbackUtils.defaultFailureTreatment(throwable);
           callback.onFailure(throwable);
-        } else {
-          JavascriptUtils.print(report);
-          callback.onSuccess(Actionable.ActionImpact.NONE);
         }
       });
+    } catch (RequestException e) {
+      callback.onFailure(e);
+    }
   }
 
   private void reExecuteDisposalConfirmation(DisposalConfirmation confirmation, AsyncCallback<ActionImpact> callback) {
