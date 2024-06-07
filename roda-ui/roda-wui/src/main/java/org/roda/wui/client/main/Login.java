@@ -227,7 +227,7 @@ public class Login extends Composite {
   @UiHandler("resendEmail")
   void handleResendEmail(final ClickEvent e) {
     Services services = new Services("Resend email", "resend");
-    services.membersResource(s -> s.sendEmailVerification(username.getText(), true,
+    services.membersResource(s -> s.sendEmailVerification(username.getText(),
       LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, error) -> {
         if (result != null) {
           if (result.getState() == NotificationState.COMPLETED) {

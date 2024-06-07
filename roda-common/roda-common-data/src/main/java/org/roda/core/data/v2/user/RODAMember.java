@@ -19,10 +19,13 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({@Type(value = User.class, name = "User"),
   @Type(value = Group.class, name = "Group")})
+@Schema(oneOf = {User.class, Group.class})
 public interface RODAMember extends IsIndexed, IsModelObject, HasId, Serializable {
 
   boolean isActive();

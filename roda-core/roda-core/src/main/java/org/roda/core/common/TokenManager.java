@@ -65,10 +65,11 @@ public class TokenManager {
     String url = localInstance.getCentralInstanceURL() + RodaConstants.API_SEP + RodaConstants.API_REST_V2_MEMBERS
       + RodaConstants.API_PATH_PARAM_AUTH_TOKEN;
     HttpPost httpPost = new HttpPost(url);
+    httpPost.addHeader("Authorization", "Bearer " + localInstance.getAccessKey());
     httpPost.addHeader("content-type", "application/json");
 
     try {
-      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(localInstance.getAccessKey())));
+      httpPost.setEntity(new StringEntity(localInstance.getAccessKey()));
       HttpResponse response = httpClient.execute(httpPost);
       HttpEntity responseEntity = response.getEntity();
       int responseStatusCode = response.getStatusLine().getStatusCode();

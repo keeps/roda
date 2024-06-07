@@ -7,11 +7,17 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import java.io.Serial;
+
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  *
  */
+@JsonTypeName("EmptyKeyFilterParameter")
 public class EmptyKeyFilterParameter extends FilterParameter {
+  @Serial
   private static final long serialVersionUID = 5888125949326684987L;
 
   /**

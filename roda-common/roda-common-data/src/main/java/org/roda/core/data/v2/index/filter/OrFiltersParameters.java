@@ -7,9 +7,12 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import java.io.Serial;
 import java.util.List;
 
+@JsonTypeName("OrFiltersParameters")
 public class OrFiltersParameters extends FiltersParameters {
   @Serial
   private static final long serialVersionUID = -7444113772637341849L;

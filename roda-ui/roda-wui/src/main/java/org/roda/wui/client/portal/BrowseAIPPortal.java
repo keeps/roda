@@ -22,9 +22,7 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.DipFilePreview;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
@@ -188,7 +186,7 @@ public class BrowseAIPPortal extends Composite {
             Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId()));
             Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
 
-            FindRequest request = FindRequest.getBuilder(IndexedDIP.class.getName(), filter, true)
+            FindRequest request = FindRequest.getBuilder(filter, true)
               .withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID)).withSorter(sorter)
               .withSublist(new Sublist(0, 1)).build();
 
@@ -201,7 +199,7 @@ public class BrowseAIPPortal extends Composite {
                   if (indexedDIPIndexResult.getTotalCount() > 0) {
                     String dipId = indexedDIPIndexResult.getResults().get(0).getId();
                     Filter fileFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dipId));
-                    FindRequest findRequest = FindRequest.getBuilder(DIPFile.class.getName(), fileFilter, true)
+                    FindRequest findRequest = FindRequest.getBuilder(fileFilter, true)
                       .withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIPFILE_ID,
                         RodaConstants.DIPFILE_SIZE, RodaConstants.DIPFILE_IS_DIRECTORY))
                       .withSublist(new Sublist(0, 1)).build();

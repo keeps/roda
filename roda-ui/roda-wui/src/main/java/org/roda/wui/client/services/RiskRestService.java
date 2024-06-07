@@ -1,8 +1,6 @@
 package org.roda.wui.client.services;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.SuggestRequest;
-import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
@@ -15,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,8 +23,6 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.util.List;
-
 /**
  * @author Carlos Afonso <cafonso@keep.pt>
  */
@@ -36,17 +31,18 @@ import java.util.List;
 @RequestMapping(path = "../api/v2/risks")
 public interface RiskRestService extends RODAEntityRestService<IndexedRisk> {
   @RequestMapping(path = "/delete", method = RequestMethod.POST)
-  @Operation(summary = "Delete multiple risks via search query", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), description = "Deletes one or more risks", responses = {
-    @ApiResponse(responseCode = "204", description = "Risks deleted"),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  @Operation(summary = "Delete multiple risks via search query", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItemsRequest.class))), description = "Deletes one or more risks via search query", responses = {
+    @ApiResponse(responseCode = "200", description = "Job created"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),})
   Job deleteRisk(
-    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<IndexedRisk> selected);
+    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selected);
 
   @RequestMapping(path = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Update risk", description = "Update existing risk", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Risk.class))), responses = {
     @ApiResponse(responseCode = "200", description = "Risk updated", content = @Content(schema = @Schema(implementation = Risk.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Risk updateRisk(Risk risk, @RequestParam(name = RodaConstants.RISK_INCIDENCES_COUNT) String incidencesCount);
+  Risk updateRisk(Risk risk);
 
   @RequestMapping(path = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)

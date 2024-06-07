@@ -7,7 +7,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.generics.DeleteRequest;
@@ -26,19 +25,18 @@ import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.DIPService;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.utils.ApiUtils;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.DIPRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -90,12 +88,12 @@ public class DIPController implements DIPRestService {
   }
 
   @Override
-  @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
   public List<String> suggest(SuggestRequest suggestRequest) {
-    throw new RESTException(new NotImplementedException());
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.suggest(suggestRequest, IndexedDIP.class, requestContext);
   }
 
-  @GetMapping(path = "{uuid}/binary", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @GetMapping(path = "{uuid}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   @Operation(summary = "Downloads file", description = "Downloads a DIP", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamingResponseBody.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
@@ -124,7 +122,7 @@ public class DIPController implements DIPRestService {
   }
 
   @Override
-  public Job deleteIndexedDIPs(@RequestBody DeleteRequest<IndexedDIP> deleteRequest) {
+  public Job deleteIndexedDIPs(@RequestBody DeleteRequest deleteRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -149,14 +147,15 @@ public class DIPController implements DIPRestService {
   }
 
   @Override
-  public Job updatePermissions(@RequestBody UpdatePermissionsRequest<IndexedDIP> updateRequest) {
+  public Job updatePermissions(@RequestBody UpdatePermissionsRequest updateRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), updateRequest.getItemsToUpdate());
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+        CommonServicesUtils.convertSelectedItems(updateRequest.getItemsToUpdate(), IndexedDIP.class));
 
       return dipService.updateDIPPermissions(requestContext.getUser(), updateRequest);
     } catch (AuthorizationDeniedException e) {

@@ -17,7 +17,7 @@ import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.SecureString;
-import org.roda.core.data.v2.user.LoginRequest;
+import org.roda.core.data.v2.user.requests.LoginRequest;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;

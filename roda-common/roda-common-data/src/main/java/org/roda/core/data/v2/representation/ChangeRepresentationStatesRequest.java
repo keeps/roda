@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
+
 /**
  * @author António Lindo <alindo@keep.pt>
  */
@@ -13,7 +15,7 @@ public class ChangeRepresentationStatesRequest implements Serializable {
   @Serial
   private static final long serialVersionUID = -2706255856347304025L;
 
-  private String representationId;
+  private SelectedItemsRequest items;
   private List<String> newStates;
   private String details;
 
@@ -21,18 +23,18 @@ public class ChangeRepresentationStatesRequest implements Serializable {
     this.newStates = new ArrayList<>();
   }
 
-  public ChangeRepresentationStatesRequest(String representationId, List<String> newStates, String details) {
-    this.representationId = representationId;
+  public ChangeRepresentationStatesRequest(SelectedItemsRequest items, List<String> newStates, String details) {
+    this.items = items;
     this.newStates = newStates;
     this.details = details;
   }
 
-  public String getRepresentationId() {
-    return representationId;
+  public SelectedItemsRequest getItems() {
+    return items;
   }
 
-  public void setRepresentationId(String representationId) {
-    this.representationId = representationId;
+  public void setItems(SelectedItemsRequest items) {
+    this.items = items;
   }
 
   public String getDetails() {

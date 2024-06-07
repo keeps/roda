@@ -142,8 +142,8 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
                 @Override
                 public void onSuccess(final String details) {
                   Services services = new Services("Delete DIPs", "delete");
-                  DeleteRequest<IndexedDIP> deleteRequest = new DeleteRequest<>();
-                  deleteRequest.setItemsToDelete(selectedItems);
+                  DeleteRequest deleteRequest = new DeleteRequest();
+                  deleteRequest.setSelectedItemsToDelete(selectedItems);
                   deleteRequest.setDetails(details);
 
                   services.dipResource(s -> s.deleteIndexedDIPs(deleteRequest)).whenComplete((job, throwable) -> {

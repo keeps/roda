@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.base.synchronization.instanceIdentifier;
+package org.roda.core.plugins.base.synchronization.instance;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,21 +15,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AlreadyHasInstanceIdentifier;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InstanceIdNotUpdated;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -48,8 +56,9 @@ import org.slf4j.LoggerFactory;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierAIPPlugin.class);
+public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierAIPEventPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
@@ -69,7 +78,7 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticName() {
-    return "AIP instance identifier";
+    return "Instance identifier AIP preservation events";
   }
 
   @Override
@@ -112,17 +121,17 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Updated the instance identifier";
+    return "Updated the AIP preservation events instance identifier";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The instance identifier was updated successfully";
+    return "The AIP preservation event instance identifier was updated successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Could not update the instance identifier";
+    return "Could not update the AIP preservation event instance identifier";
   }
 
   @Override
@@ -136,8 +145,13 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
+  public Plugin<Void> cloneMe() {
+    return new InstanceIdentifierAIPEventPlugin();
+  }
+
+  @Override
   public boolean areParameterValuesValid() {
-    return false;
+    return true;
   }
 
   @Override
@@ -148,11 +162,6 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
   @Override
   public void shutdown() {
     // do nothing
-  }
-
-  @Override
-  public Plugin<Void> cloneMe() {
-    return new InstanceIdentifierAIPPlugin();
   }
 
   @Override
@@ -168,15 +177,14 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> list) throws PluginException {
+    List<LiteOptionalWithCause> liteList) throws PluginException {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
         try {
           modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
-        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
-          | IOException e) {
+        } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
           LOGGER.error("Could not modify Instance ID's in objects");
         }
       }
@@ -184,40 +192,60 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
   }
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
-    JobPluginInfo jobPluginInfo)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
+    JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     int countFail = 0;
     int countSuccess = 0;
-    List<String> detailsList = new ArrayList<>();
+    int countSkipped = 0;
     PluginState pluginState = PluginState.SKIPPED;
+    List<String> detailsList = new ArrayList<>();
 
-    // Get AIP's from index
-    IterableIndexResult<IndexedAIP> indexedAIPS = retrieveList(index);
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
-    for (IndexedAIP indexedAIP : indexedAIPS) {
-      try {
-        model.updateAIPInstanceId(model.retrieveAIP(indexedAIP.getId()), cachedJob.getUsername());
-
-        countSuccess++;
-      } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-        detailsList.add(e.getMessage());
-
-        countFail++;
+    try (IterableIndexResult<IndexedAIP> indexedAIPS = retrieveList(index)) {
+      for (IndexedAIP indexedAIP : indexedAIPS) {
+        try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model
+          .listPreservationMetadata(indexedAIP.getId(), true)) {
+          for (OptionalWithCause<PreservationMetadata> opm : iterable) {
+            if (opm.isPresent()) {
+              try {
+                PremisV3Utils.updatePremisEventInstanceId(opm.get(), model, index, instanceId, cachedJob.getUsername());
+              } catch (InstanceIdNotUpdated e) {
+                countFail++;
+              }
+              countSuccess++;
+            } else {
+              countFail++;
+            }
+          }
+        } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
+          | ValidationException | AlreadyExistsException | IOException e) {
+          LOGGER.error("Error updating instance id on AIP preservation events", e);
+          countFail++;
+          detailsList.add(e.getMessage());
+        } catch (AlreadyHasInstanceIdentifier alreadyHasInstanceIdentifier) {
+          countSkipped++;
+          detailsList.add("" + alreadyHasInstanceIdentifier);
+        }
       }
+    } catch (IOException e) {
+      LOGGER.error("Error updating instance id on AIP preservation events", e);
+      countFail++;
+      detailsList.add(e.getMessage());
     }
 
     StringBuilder details = new StringBuilder();
 
     if (countFail > 0) {
       pluginState = PluginState.FAILURE;
-      details.append("Updated the instance identifier on ").append(countSuccess).append(" AIP's and failed to update ")
-        .append(countFail).append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
+
     } else if (countSuccess > 0) {
       pluginState = PluginState.SUCCESS;
-      details.append("Updated the instance identifier on ").append(countSuccess).append(" AIP's");
     }
+    details.append("Updated the instance identifier on ").append(countSuccess)
+      .append(" AIP preservation events and failed to update ").append(countFail).append(". Skipped ")
+      .append(countSkipped).append(" AIP preservation events.\n")
+      .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
 
     reportItem.setPluginDetails(details.toString());
     jobPluginInfo.incrementObjectsProcessed(pluginState);
@@ -234,9 +262,8 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
   private IterableIndexResult<IndexedAIP> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     final Filter filter = new Filter();
-
     RODAInstanceUtils.addLocalInstanceFilter(filter);
-
     return index.findAll(IndexedAIP.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
+
 }

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -163,14 +164,15 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
 
       @Override
       public void onSuccess(final Long size) {
-        Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
-          messages.ingestTransferRemoveSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
-          new ActionNoAsyncCallback<Boolean>(callback) {
+        Dialogs.showConfirmDialog(messages.riskRemoveConfirmDialogTitle(),
+          messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveConfirmDialogCancel(),
+          messages.riskRemoveConfirmDialogOk(), new ActionNoAsyncCallback<Boolean>(callback) {
 
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                service.riskResource(s -> s.deleteRisk(objects)).whenComplete((value, error) -> {
+                service.riskResource(s -> s.deleteRisk(SelectedItemsUtils.convertToRESTRequest(objects)))
+                  .whenComplete((value, error) -> {
                   if (value != null) {
                     doActionCallbackNone();
                     HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());

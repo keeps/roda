@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.base.synchronization.instanceIdentifier;
+package org.roda.core.plugins.base.synchronization.instance;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,12 +24,12 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -48,9 +48,8 @@ import org.slf4j.LoggerFactory;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRiskIncidencePlugin.class);
+public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierAIPPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
@@ -70,7 +69,7 @@ public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> 
   }
 
   public static String getStaticName() {
-    return "Risk Incidence instance identifier";
+    return "AIP instance identifier";
   }
 
   @Override
@@ -153,7 +152,7 @@ public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> 
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new InstanceIdentifierRiskIncidencePlugin();
+    return new InstanceIdentifierAIPPlugin();
   }
 
   @Override
@@ -187,39 +186,40 @@ public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
-    PluginState pluginState = PluginState.SKIPPED;
     int countFail = 0;
     int countSuccess = 0;
+    List<String> detailsList = new ArrayList<>();
+    PluginState pluginState = PluginState.SKIPPED;
 
-    // Get RiskIncidences from index
-    IterableIndexResult<RiskIncidence> indexedRiskIncidences = retrieveList(index);
-
+    // Get AIP's from index
+    IterableIndexResult<IndexedAIP> indexedAIPS = retrieveList(index);
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-    final List<String> detailsList = new ArrayList<>();
-    for (RiskIncidence indexedRiskIncidence : indexedRiskIncidences) {
+
+    for (IndexedAIP indexedAIP : indexedAIPS) {
       try {
-        model.updateRiskIncidenceInstanceId(model.retrieveRiskIncidence(indexedRiskIncidence.getId()), true);
+        model.updateAIPInstanceId(model.retrieveAIP(indexedAIP.getId()), cachedJob.getUsername());
+
         countSuccess++;
-      } catch (GenericException | AuthorizationDeniedException e) {
+      } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         detailsList.add(e.getMessage());
+
         countFail++;
       }
     }
 
     StringBuilder details = new StringBuilder();
+
     if (countFail > 0) {
       pluginState = PluginState.FAILURE;
-      details.append("Updated the instance identifier on ").append(countSuccess)
-        .append(" Risk incidences and failed to update ").append(countFail).append(".\n")
-        .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" AIP's and failed to update ")
+        .append(countFail).append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
       pluginState = PluginState.SUCCESS;
-      details.append("Updated the instance identifier on ").append(countSuccess).append(" risk incidences event");
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" AIP's");
     }
 
     reportItem.setPluginDetails(details.toString());
-
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);
     pluginReport.addReport(reportItem);
@@ -231,11 +231,12 @@ public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> 
     return new Report();
   }
 
-  private IterableIndexResult<RiskIncidence> retrieveList(final IndexService index)
+  private IterableIndexResult<IndexedAIP> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     final Filter filter = new Filter();
-    RODAInstanceUtils.addLocalInstanceFilter(filter);
-    return index.findAll(RiskIncidence.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
-  }
 
+    RODAInstanceUtils.addLocalInstanceFilter(filter);
+
+    return index.findAll(IndexedAIP.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
+  }
 }

@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.base.synchronization.instanceIdentifier;
+package org.roda.core.plugins.base.synchronization.instance;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.base.multiple.DefaultMultipleStepPlugin;
+import org.roda.core.plugins.base.multiple.NoObjectsMultipleStepPlugin;
 import org.roda.core.plugins.base.multiple.Step;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
@@ -30,7 +30,7 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
  */
-public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<Void> {
+public class LocalInstanceRegisterPlugin extends NoObjectsMultipleStepPlugin {
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   private static List<Step> steps = new ArrayList<>();
 

@@ -7,20 +7,6 @@
  */
 package org.roda.wui.client.management.distributed;
 
-import java.util.List;
-
-import com.google.gwt.user.client.ui.FlowPanel;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
-import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -28,9 +14,22 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
+import org.roda.core.data.v2.generics.CreateLocalInstanceRequest;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
-import config.i18n.client.ClientMessages;
+import java.util.List;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -86,10 +85,12 @@ public class CreateLocalInstanceConfiguration extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (localInstanceConfigurationDataPanel.isValid()) {
       LocalInstance localInstanceReturned = localInstanceConfigurationDataPanel.getLocalInstance();
-      BrowserService.Util.getInstance().createLocalInstance(localInstanceReturned,
-        new NoAsyncCallback<DistributedInstance>() {
-          @Override
-          public void onSuccess(DistributedInstance distributedInstance) {
+      CreateLocalInstanceRequest createLocalInstanceRequest = new CreateLocalInstanceRequest(localInstanceReturned.getId(),
+        localInstanceReturned.getAccessKey(), localInstanceReturned.getCentralInstanceURL());
+      Services services = new Services("Create local instance", "create");
+      services.distributedInstanceResource(s -> s.createLocalInstance(createLocalInstanceRequest))
+        .whenComplete((createdLocalInstance, error) -> {
+          if (createdLocalInstance != null) {
             HistoryUtils.newHistory(LocalInstanceManagement.RESOLVER);
           }
         });

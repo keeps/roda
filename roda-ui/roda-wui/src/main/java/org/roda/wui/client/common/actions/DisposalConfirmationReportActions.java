@@ -14,11 +14,13 @@ import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RESTORE_
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -172,8 +174,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
           if (result) {
             Services services = new Services("Recovers disposal confirmation", "recover");
             services
-              .disposalConfirmationResource(
-                s -> s.recoverDisposalConfirmation(objectToSelectedItems(confirmation, DisposalConfirmation.class)))
+              .disposalConfirmationResource(s -> s.recoverDisposalConfirmation(
+                new SelectedItemsListRequest(Collections.singletonList(confirmation.getUUID()))))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);
@@ -211,8 +213,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
           if (result) {
             Services services = new Services("Recover disposal confirmation", "recover");
             services
-              .disposalConfirmationResource(
-                s -> s.restoreDisposalConfirmation(objectToSelectedItems(confirmation, DisposalConfirmation.class)))
+              .disposalConfirmationResource(s -> s.restoreDisposalConfirmation(
+                new SelectedItemsListRequest(Collections.singletonList(confirmation.getUUID()))))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);
@@ -251,8 +253,10 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Permanently deletes records in disposal confirmation", "delete");
-            services.disposalConfirmationResource(s -> s.permanentlyDeleteRecordsInDisposalConfirmation(
-              objectToSelectedItems(confirmation, DisposalConfirmation.class))).whenComplete((job, throwable) -> {
+            services
+              .disposalConfirmationResource(s -> s.permanentlyDeleteRecordsInDisposalConfirmation(
+                new SelectedItemsListRequest(Collections.singletonList(confirmation.getUUID()))))
+              .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);
                 } else {
@@ -290,8 +294,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
           if (result) {
             Services services = new Services("Destroy records in disposal confirmation", "delete");
             services
-              .disposalConfirmationResource(
-                s -> s.destroyRecordsInDisposalConfirmation(objectToSelectedItems(report, DisposalConfirmation.class)))
+              .disposalConfirmationResource(s -> s.destroyRecordsInDisposalConfirmation(
+                new SelectedItemsListRequest(Collections.singletonList(report.getUUID()))))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);
@@ -337,8 +341,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
                 public void onSuccess(final String details) {
                   Services services = new Services("Delete disposal confirmation", "delete");
                   services
-                    .disposalConfirmationResource(s -> s
-                      .deleteDisposalConfirmation(objectToSelectedItems(report, DisposalConfirmation.class), details))
+                    .disposalConfirmationResource(s -> s.deleteDisposalConfirmation(
+                      new SelectedItemsListRequest(Collections.singletonList(report.getUUID())), details))
                     .whenComplete((job, throwable) -> {
                       if (throwable != null) {
                         callback.onFailure(throwable);

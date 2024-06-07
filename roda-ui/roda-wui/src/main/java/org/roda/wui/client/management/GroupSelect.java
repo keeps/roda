@@ -74,7 +74,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.MEMBERS_FULLNAME, false));
 
     Services services = new Services("Find RODA members", "get");
-    FindRequest request = FindRequest.getBuilder(RODAMember.class.getName(), filter, justActive).withSorter(sorter)
+    FindRequest request = FindRequest.getBuilder(filter, justActive).withSorter(sorter)
       .build();
     services.membersResource(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()))
       .whenComplete((indexedResult, throwable) -> {

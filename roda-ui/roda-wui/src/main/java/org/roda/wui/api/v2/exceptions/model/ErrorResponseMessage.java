@@ -1,16 +1,21 @@
 package org.roda.wui.api.v2.exceptions.model;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-public class ErrorResponseMessage {
+public class ErrorResponseMessage implements Serializable {
 
-  private int status;
-  private String errorId;
-  private String message;
-  private String details;
-  private Instant timestamp;
-  private String instance;
+  @Serial
+  private static final long serialVersionUID = -2206131216992713872L;
+
+  private final int status;
+  private final String errorId;
+  private final String message;
+  private final String details;
+  private final Instant timestamp;
+  private final String instance;
 
   public ErrorResponseMessage(int status, String errorId, String message, String details, String instance) {
     this.status = status;

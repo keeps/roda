@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.base.synchronization.instanceIdentifier;
+package org.roda.core.plugins.base.synchronization.instance;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.ri.RepresentationInformation;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -48,17 +48,29 @@ import org.slf4j.LoggerFactory;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class InstanceIdentifierRepresentationInformationPlugin extends AbstractPlugin<Void> {
+public class InstanceIdentifierRiskPlugin extends AbstractPlugin<Void> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRepresentationInformationPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRiskPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
+          PluginParameter.PluginParameterType.STRING)
+        .withDefaultValue(RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin()).isReadOnly(true)
+        .withDescription("Identifier from the RODA local instance").build());
+  }
+
+  private String instanceId;
+
   @Override
   public String getVersionImpl() {
     return "1.0";
   }
 
   public static String getStaticName() {
-    return "Representation Information instance identifier";
+    return "Risk instance identifier";
   }
 
   @Override
@@ -89,6 +101,9 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
+    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER)) {
+      instanceId = parameters.get(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER);
+    }
   }
 
   @Override
@@ -138,7 +153,7 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new InstanceIdentifierRepresentationInformationPlugin();
+    return new InstanceIdentifierRiskPlugin();
   }
 
   @Override
@@ -173,44 +188,38 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
     JobPluginInfo jobPluginInfo)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     PluginState pluginState = PluginState.SKIPPED;
+
     int countFail = 0;
     int countSuccess = 0;
     List<String> detailsList = new ArrayList<>();
-
-    // Get AIP's from index
-    IterableIndexResult<RepresentationInformation> indexedRepresentationInformations = retrieveList(index);
+    // Get Risks from index
+    IterableIndexResult<IndexedRisk> indexedRisks = retrieveList(index);
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-
-    for (RepresentationInformation indexedRepresentationInformation : indexedRepresentationInformations) {
+    for (IndexedRisk indexedRisk : indexedRisks) {
       try {
-        model.updateRepresentationInformationInstanceId(
-          model.retrieveRepresentationInformation(indexedRepresentationInformation.getId()), cachedJob.getUsername(),
-          true);
+        model.updateRiskInstanceId(model.retrieveRisk(indexedRisk.getId()), true);
         countSuccess++;
-      } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         detailsList.add(e.getMessage());
         countFail++;
       }
     }
-
     StringBuilder details = new StringBuilder();
-
     if (countFail > 0) {
-      pluginState = PluginState.FAILURE;
       details.append("Updated the instance identifier on ").append(countSuccess)
-        .append(" Representation informations and failed to update ").append(countFail).append(".\n")
+        .append("Risk incidences and failed to update ").append(countFail).append(".\n")
         .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
+      pluginState = PluginState.FAILURE;
     } else if (countSuccess > 0) {
       pluginState = PluginState.SUCCESS;
-      details.append("Updated the instance identifier on ").append(countSuccess)
-        .append(" Representation Informations.");
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" risk incidences event");
     }
-
     reportItem.setPluginDetails(details.toString());
 
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);
+
     pluginReport.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
@@ -220,10 +229,11 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
     return new Report();
   }
 
-  private IterableIndexResult<RepresentationInformation> retrieveList(final IndexService index)
+  private IterableIndexResult<IndexedRisk> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     final Filter filter = new Filter();
     RODAInstanceUtils.addLocalInstanceFilter(filter);
-    return index.findAll(RepresentationInformation.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
+
+    return index.findAll(IndexedRisk.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }

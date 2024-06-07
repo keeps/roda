@@ -6,6 +6,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
@@ -14,6 +15,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.DisposalScheduleService;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.DisposalScheduleRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
@@ -110,8 +112,8 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state,
-        RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_PARAM, schedule);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_PARAM,
+        schedule);
     }
   }
 
@@ -166,15 +168,14 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, id, state,
-        RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM, id);
+      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM,
+        id);
     }
     return null;
   }
 
   @Override
-  public Job associatedDisposalSchedule(@RequestBody SelectedItems<IndexedAIP> selectedItems,
-    String disposalScheduleId) {
+  public Job associatedDisposalSchedule(@RequestBody SelectedItemsRequest selectedItems, String disposalScheduleId) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -184,20 +185,20 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // delegate
-      return disposalScheduleService.associateDisposalSchedule(requestContext.getUser(), selectedItems,
-        disposalScheduleId);
+      return disposalScheduleService.associateDisposalSchedule(requestContext.getUser(),
+        CommonServicesUtils.convertSelectedItems(selectedItems, IndexedAIP.class), disposalScheduleId);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        selectedItems, RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM, disposalScheduleId);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems,
+        RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM, disposalScheduleId);
     }
   }
 
   @Override
-  public Job disassociatedDisposalSchedule(SelectedItems<IndexedAIP> selectedItems) {
+  public Job disassociatedDisposalSchedule(@RequestBody SelectedItemsRequest selectedItems) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -207,14 +208,14 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // delegate
-      return disposalScheduleService.disassociateDisposalSchedule(requestContext.getUser(), selectedItems);
+      return disposalScheduleService.disassociateDisposalSchedule(requestContext.getUser(),
+        CommonServicesUtils.convertSelectedItems(selectedItems, IndexedAIP.class));
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        selectedItems);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
     }
   }
 }

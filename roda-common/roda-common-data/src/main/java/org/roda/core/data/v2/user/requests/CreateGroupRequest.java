@@ -1,4 +1,4 @@
-package org.roda.core.data.v2.user;
+package org.roda.core.data.v2.user.requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

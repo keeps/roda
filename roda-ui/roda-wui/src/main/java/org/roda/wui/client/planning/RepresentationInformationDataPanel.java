@@ -128,8 +128,8 @@ public class RepresentationInformationDataPanel extends Composite
       Services services = new Services("Retrieve representation information family metadata", "get");
       if (editMode) {
         services
-          .representationInformationResource(s -> s.retrieveRepresentationInformationFamily(ri.getId(),
-            family.getSelectedValue(), LocaleInfo.getCurrentLocale().getLocaleName()))
+          .representationInformationResource(
+            s -> s.retrieveRepresentationInformationFamily(ri.getId(), LocaleInfo.getCurrentLocale().getLocaleName()))
           .whenComplete((representationInformationFamily, throwable) -> {
             customForm = new RepresentationInformationCustomForm();
             customForm.setValues(representationInformationFamily.getFamilyValues());
@@ -173,7 +173,7 @@ public class RepresentationInformationDataPanel extends Composite
     if (editMode) {
       Services services = new Services("Retrieve representation information family metadata", "get");
       CompletableFuture<RepresentationInformationFamily> riFamilyCompletableFuture = services
-        .representationInformationResource(s -> s.retrieveRepresentationInformationFamily(ri.getId(), ri.getFamily(),
+        .representationInformationResource(s -> s.retrieveRepresentationInformationFamily(ri.getId(),
           LocaleInfo.getCurrentLocale().getLocaleName()))
         .toCompletableFuture();
       CompletableFuture<RepresentationInformationFamilyOptions> riFamilyOptionsCompletableFuture = services

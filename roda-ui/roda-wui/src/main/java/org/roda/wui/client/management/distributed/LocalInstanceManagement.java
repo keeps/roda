@@ -9,11 +9,14 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.Management;
+import org.roda.wui.client.services.DistributedInstancesRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -31,16 +34,15 @@ public class LocalInstanceManagement extends Composite {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       if (historyTokens.isEmpty()) {
-        BrowserService.Util.getInstance().retrieveLocalInstance(new NoAsyncCallback<LocalInstance>() {
-          @Override
-          public void onSuccess(LocalInstance localInstance) {
-            if (localInstance != null) {
+        Services services = new Services("Get local instance", "get");
+        services.distributedInstanceResource(DistributedInstancesRestService::getLocalInstance)
+          .whenComplete((localInstance, error) -> {
+            if (!localInstance.equals(new LocalInstance())) {
               HistoryUtils.newHistory(ShowLocalInstanceConfiguration.RESOLVER);
             } else {
               HistoryUtils.newHistory(CreateLocalInstanceConfiguration.RESOLVER);
             }
-          }
-        });
+          });
       } else if (historyTokens.get(0).equals(EditLocalInstanceConfiguration.RESOLVER.getHistoryToken())) {
         EditLocalInstanceConfiguration.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(CreateLocalInstanceConfiguration.RESOLVER.getHistoryToken())) {

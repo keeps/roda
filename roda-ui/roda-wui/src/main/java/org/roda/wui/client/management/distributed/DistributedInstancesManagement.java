@@ -11,13 +11,13 @@ import java.util.List;
 
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.Management;
+import org.roda.wui.client.services.DistributedInstancesRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -107,13 +107,14 @@ public class DistributedInstancesManagement extends Composite {
   public DistributedInstancesManagement() {
     initWidget(uiBinder.createAndBindUi(this));
     distributedInstancesManagementDescription.add(new HTMLWidgetWrapper(("DistributedInstancesDescription.html")));
-    BrowserService.Util.getInstance().listDistributedInstances(new NoAsyncCallback<DistributedInstances>() {
-      @Override
-      public void onSuccess(DistributedInstances distributedInstances) {
+
+    Services services = new Services("List distributed instances", "get");
+    services.distributedInstanceResource(DistributedInstancesRestService::getDistributedInstances).whenComplete((distributedInstances, throwable) -> {
+      if (throwable == null) {
         init(distributedInstances);
+        initSidebar();
       }
     });
-    initSidebar();
   }
 
   private void initSidebar() {
@@ -204,9 +205,9 @@ public class DistributedInstancesManagement extends Composite {
   }
 
   private void refresh() {
-    BrowserService.Util.getInstance().listDistributedInstances(new NoAsyncCallback<DistributedInstances>() {
-      @Override
-      public void onSuccess(DistributedInstances distributedInstances) {
+    Services services = new Services("List distributed instances", "get");
+    services.distributedInstanceResource(DistributedInstancesRestService::getDistributedInstances).whenComplete((distributedInstances, throwable) -> {
+      if (throwable == null) {
         init(distributedInstances);
       }
     });

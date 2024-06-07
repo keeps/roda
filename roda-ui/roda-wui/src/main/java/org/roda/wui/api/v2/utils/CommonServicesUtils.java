@@ -1,5 +1,7 @@
 package org.roda.wui.api.v2.utils;
 
+import java.util.Map;
+
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -8,7 +10,13 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.generics.select.SelectedItemsFilterRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
@@ -18,11 +26,13 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 public class CommonServicesUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CommonServicesUtils.class);
+
+  private CommonServicesUtils() {
+    // empty constructor
+  }
 
   public static <T extends IsRODAObject> Job createAndExecuteInternalJob(String name, SelectedItems<T> sourceObjects,
     Class<?> plugin, User user, Map<String, String> pluginParameters, String exceptionMessage)
@@ -84,5 +94,16 @@ public class CommonServicesUtils {
     } catch (IllegalArgumentException e) {
       return JobParallelism.NORMAL;
     }
+  }
+
+  public static <T extends IsIndexed> SelectedItems<T> convertSelectedItems(SelectedItemsRequest request,
+    Class<T> tClass) throws RequestNotValidException {
+    if (request instanceof SelectedItemsListRequest itemsListRequest) {
+      return SelectedItemsList.create(tClass, itemsListRequest.getIds());
+    } else if (request instanceof SelectedItemsFilterRequest filterRequest) {
+      return new SelectedItemsFilter<>(filterRequest.getFilter(), tClass.getName(), filterRequest.getJustActive());
+    }
+
+    throw new RequestNotValidException("Selected items must be either a list or a filter");
   }
 }

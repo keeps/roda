@@ -460,7 +460,7 @@ public class BrowseDIP extends Composite {
 
   private static <T extends IsIndexed> void openReferred(final T object, Filter filter, Services services) {
 
-    FindRequest findRequest = FindRequest.getBuilder(IndexedDIP.class.getName(), filter, true)
+    FindRequest findRequest = FindRequest.getBuilder(filter, true)
       .withSorter(DEFAULT_DIPFILE_SORTER).withSublist(new Sublist(0, 1))
       .withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID)).build();
 
@@ -485,13 +485,13 @@ public class BrowseDIP extends Composite {
     if (historyDipFileUUID != null) {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, historyDipFileUUID));
       Sublist sublist = new Sublist(0, 1);
-      FindRequest findRequest = FindRequest.getBuilder(DIPFile.class.getName(), filter, false).withSublist(sublist)
+      FindRequest findRequest = FindRequest.getBuilder(filter, false).withSublist(sublist)
         .build();
       return services.dipFileResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()));
     } else {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, historyDipUUID));
       Sublist sublist = new Sublist(0, 1);
-      FindRequest findRequest = FindRequest.getBuilder(DIPFile.class.getName(), filter, false).withSublist(sublist)
+      FindRequest findRequest = FindRequest.getBuilder(filter, false).withSublist(sublist)
         .build();
       return services.dipFileResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()));
     }
@@ -523,7 +523,7 @@ public class BrowseDIP extends Composite {
 
       Filter riskIncidenceFilter = new Filter(
         new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, response.getIndexedFile().getId()));
-      CountRequest riskIncidenceCountRequest = new CountRequest(RiskIncidence.class.getName(), riskIncidenceFilter,
+      CountRequest riskIncidenceCountRequest = new CountRequest(riskIncidenceFilter,
         true);
       CompletableFuture<LongResponse> riskCounterCompletableFuture = services
         .rodaEntityRestService(s -> s.count(riskIncidenceCountRequest), RiskIncidence.class)
@@ -536,8 +536,7 @@ public class BrowseDIP extends Composite {
 
       Filter preservationEventFilter = new Filter(
         new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, response.getIndexedFile().getUUID()));
-      CountRequest preservationEventsCountRequest = new CountRequest(IndexedPreservationEvent.class.getName(),
-        preservationEventFilter, true);
+      CountRequest preservationEventsCountRequest = new CountRequest(preservationEventFilter, true);
 
       CompletableFuture<LongResponse> preservationCounterCompletableFuture = services
         .rodaEntityRestService(s -> s.count(preservationEventsCountRequest), IndexedPreservationEvent.class)

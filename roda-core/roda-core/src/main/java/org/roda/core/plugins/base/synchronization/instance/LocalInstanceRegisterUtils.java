@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.base.synchronization.instanceIdentifier;
+package org.roda.core.plugins.base.synchronization.instance;
 
 import java.util.List;
 

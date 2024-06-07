@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.common.UserLogin;
@@ -143,7 +143,7 @@ public class EditRisk extends Composite {
       risk = riskDataPanel.getRisk();
       risk.setId(riskId);
 
-      services.riskResource(s -> s.updateRisk(risk, String.valueOf(incidences))).whenComplete((value, error) -> {
+      services.riskResource(s -> s.updateRisk(risk)).whenComplete((value, error) -> {
         if (error != null) {
           errorMessage(error);
         } else {
@@ -157,11 +157,10 @@ public class EditRisk extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-
     Services service = new Services("Remove risk", "remove");
     service
       .riskResource(s -> s
-        .deleteRisk(new SelectedItemsList<>(Collections.singletonList(risk.getUUID()), IndexedRisk.class.getName())))
+        .deleteRisk(new SelectedItemsListRequest(Collections.singletonList(risk.getUUID()))))
       .whenComplete((value, error) -> {
         if (error != null) {
           HistoryUtils.newHistory(InternalProcess.RESOLVER);

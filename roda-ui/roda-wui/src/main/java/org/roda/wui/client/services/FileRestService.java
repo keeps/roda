@@ -6,8 +6,8 @@ import org.roda.core.data.v2.file.CreateFolderRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
 import org.roda.core.data.v2.file.RenameFolderRequest;
 import org.roda.core.data.v2.generics.DeleteRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.IndexedFileRequest;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
@@ -47,10 +47,10 @@ public interface FileRestService extends RODAEntityRestService<IndexedFile> {
   Job moveFileToFolder(MoveFilesRequest moveFilesRequest);
 
   @RequestMapping(path = "/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Creates an internal action to delete file(s) from the representation", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = DeleteRequest.class))), responses = {
+  @Operation(summary = "Creates an internal action to delete file(s) from the representation", responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Job deleteFiles(DeleteRequest<IndexedFile> deleteRequest);
+  Job deleteFiles(@Parameter(description = "Selected disposal confirmations", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) DeleteRequest deleteRequest);
 
   @RequestMapping(path = "/rename", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Rename folder", description = "Renames a folder", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RenameFolderRequest.class))), responses = {
@@ -58,11 +58,11 @@ public interface FileRestService extends RODAEntityRestService<IndexedFile> {
     @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   IndexedFile renameFolder(RenameFolderRequest renameFolderRequest);
 
-  @RequestMapping(path = "/identify", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/format-identification", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Creates a preservation action to identify the file formats via search query", description = "Identifies the file format for a set of Files", responses = {
     @ApiResponse(responseCode = "200", description = "Created job to identify the format associated to the files", content = @Content(schema = @Schema(implementation = Job.class))),})
   Job identifyFileFormat(
-    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<IndexedFile> selected);
+    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selected);
 
   @RequestMapping(method = RequestMethod.POST, path = "/create/folder", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)

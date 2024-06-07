@@ -25,7 +25,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.user.CreateUserRequest;
+import org.roda.core.data.v2.user.requests.CreateUserRequest;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;

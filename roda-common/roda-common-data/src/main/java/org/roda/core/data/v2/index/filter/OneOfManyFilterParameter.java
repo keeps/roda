@@ -7,6 +7,9 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+import java.io.Serial;
 import java.util.List;
 
 /**
@@ -14,7 +17,9 @@ import java.util.List;
  *
  * @author Rui Castro
  */
+@JsonTypeName("OneOfManyFilterParameter")
 public class OneOfManyFilterParameter extends FilterParameter {
+  @Serial
   private static final long serialVersionUID = -8705013718226758378L;
 
   private List<String> values = null;

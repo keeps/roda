@@ -174,7 +174,7 @@ public class SolrUtils {
 
   public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter, User user,
     boolean justActive) throws GenericException, RequestNotValidException {
-    FindRequest findRequest = FindRequest.getBuilder(classToRetrieve.getName(), filter, justActive).build();
+    FindRequest findRequest = FindRequest.getBuilder(filter, justActive).build();
     return find(index, classToRetrieve, findRequest, user)
       .getTotalCount();
   }

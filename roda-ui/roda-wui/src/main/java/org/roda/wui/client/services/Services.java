@@ -83,6 +83,8 @@ public class Services implements DirectRestService {
       return GWT.create(DIPRestService.class);
     } else if (DIPFileRestService.class.equals(serviceClass)) {
       return GWT.create(DIPFileRestService.class);
+    } else if (DistributedInstancesRestService.class.equals(serviceClass)) {
+      return GWT.create(DistributedInstancesRestService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
@@ -259,5 +261,10 @@ public class Services implements DirectRestService {
 
   public <T> CompletableFuture<T> dipFileResource(CheckedFunction<DIPFileRestService, T> method) {
     return future(DIPFileRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> distributedInstanceResource(
+    CheckedFunction<DistributedInstancesRestService, T> method) {
+    return future(DistributedInstancesRestService.class, method);
   }
 }

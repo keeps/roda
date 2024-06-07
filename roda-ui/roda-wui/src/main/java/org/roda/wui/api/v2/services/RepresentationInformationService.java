@@ -144,7 +144,7 @@ public class RepresentationInformationService {
     }
   }
 
-  public RepresentationInformationFamily retrieveRepresentationInformationFamily(String familyType, String localeString)
+  public RepresentationInformationFamily retrieveRepresentationInformationFamilyConfigurations(String familyType, String localeString)
     throws NotFoundException {
     Locale locale = ServerTools.parseLocale(localeString);
     List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
@@ -160,8 +160,7 @@ public class RepresentationInformationService {
     return representationInformationFamily;
   }
 
-  public RepresentationInformationFamily retrieveRepresentationInformationFamily(String representationInformationId,
-    String familyType, String localeString)
+  public RepresentationInformationFamily retrieveRepresentationInformationFamily(String representationInformationId, String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Locale locale = ServerTools.parseLocale(localeString);
     List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
@@ -171,7 +170,7 @@ public class RepresentationInformationService {
       .retrieveRepresentationInformation(representationInformationId);
 
     SupportedMetadataTypeBundle searchResult = supportedMetadataTypeBundles.stream()
-      .filter(p -> p.getType().equals(familyType)).findFirst().orElseThrow(() -> new NotFoundException(
+      .filter(p -> p.getType().equals(ri.getFamily())).findFirst().orElseThrow(() -> new NotFoundException(
         "The family type provided didn't had any match with the configurable representation families"));
 
     Set<MetadataValue> familyValues = new TreeSet<>(parseMetadataValues(searchResult.getValues(), ri.getExtras()));
@@ -255,7 +254,7 @@ public class RepresentationInformationService {
     List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
       RodaConstants.REPRESENTATION_INFORMATION_NAME);
 
-    FindRequest findRequest = FindRequest.getBuilder(RepresentationInformation.class.getName(), filter, true)
+    FindRequest findRequest = FindRequest.getBuilder(filter, true)
       .withFieldsToReturn(fieldsToReturn).withChildren(true).build();
     IndexResult<RepresentationInformation> indexResult = indexService.find(RepresentationInformation.class, findRequest,
       requestContext);

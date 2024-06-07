@@ -58,7 +58,7 @@ public class FindRequest extends CountRequest {
 
   // Private constructor for Jackson deserialization
   private FindRequest(FindRequestBuilder builder) {
-    super(builder.classToReturn, builder.filter, builder.onlyActive);
+    super(builder.filter, builder.onlyActive);
     this.sorter = builder.sorter;
     this.sublist = builder.sublist;
     this.facets = builder.facets;
@@ -101,13 +101,12 @@ public class FindRequest extends CountRequest {
     return children;
   }
 
-  public static FindRequestBuilder getBuilder(final String classToReturn, final Filter filter, boolean onlyActive) {
-    return new FindRequestBuilder(classToReturn, filter, onlyActive);
+  public static FindRequestBuilder getBuilder(final Filter filter, boolean onlyActive) {
+    return new FindRequestBuilder(filter, onlyActive);
   }
 
   @JsonPOJOBuilder
   public static class FindRequestBuilder {
-    private final String classToReturn;
     private final Filter filter;
     private final boolean onlyActive;
     private Sorter sorter;
@@ -119,10 +118,8 @@ public class FindRequest extends CountRequest {
     private Collapse collapse;
     private boolean children;
 
-    public FindRequestBuilder(@JsonProperty("classToReturn") final String classToReturn,
-      @JsonProperty("filter") final Filter filter, @JsonProperty("onlyActive") boolean onlyActive) {
+    public FindRequestBuilder(@JsonProperty("filter") final Filter filter, @JsonProperty("onlyActive") boolean onlyActive) {
       // mandatory
-      this.classToReturn = classToReturn;
       this.filter = filter;
       this.onlyActive = onlyActive;
       // optional with defaults if not set

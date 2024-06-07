@@ -7,22 +7,24 @@
  */
 package org.roda.core.data.v2.risks;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.ip.HasInstanceID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_RISK)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class Risk extends NamedIndexedModel implements IsModelObject, HasInstanceID {
 
+  @Serial
   private static final long serialVersionUID = -585753367605901060L;
 
   private String description = null;

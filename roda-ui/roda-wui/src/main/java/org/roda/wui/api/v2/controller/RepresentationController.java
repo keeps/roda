@@ -29,7 +29,6 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.representation.ChangeRepresentationStatesRequest;
@@ -44,6 +43,7 @@ import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.RepresentationService;
 import org.roda.wui.api.v2.utils.ApiUtils;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.RepresentationRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.I18nUtility;
@@ -242,7 +242,7 @@ public class RepresentationController implements RepresentationRestService {
         types = RodaCoreFactory.getRodaConfigurationAsList("core.representation_type.value");
       } else {
         Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_TYPE));
-        FindRequest findRequest = FindRequest.getBuilder(IndexedRepresentation.class.getName(), Filter.ALL, false)
+        FindRequest findRequest = FindRequest.getBuilder(Filter.ALL, false)
           .withSublist(Sublist.NONE).withFacets(facets).withExportFacets(false).withSorter(Sorter.NONE)
           .withFieldsToReturn(new ArrayList<>()).build();
 
@@ -281,12 +281,19 @@ public class RepresentationController implements RepresentationRestService {
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), changeRepresentationTypeRequest.getItems());
+
+      SelectedItems<IndexedRepresentation> indexedRepresentationSelectedItems = CommonServicesUtils
+        .convertSelectedItems(changeRepresentationTypeRequest.getItems(), IndexedRepresentation.class);
+
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentationSelectedItems);
 
       return representationsService.changeRepresentationType(requestContext.getUser(),
-        changeRepresentationTypeRequest.getItems(), changeRepresentationTypeRequest.getType(),
+        indexedRepresentationSelectedItems, changeRepresentationTypeRequest.getType(),
         changeRepresentationTypeRequest.getDetails());
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (NotFoundException | GenericException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -320,7 +327,7 @@ public class RepresentationController implements RepresentationRestService {
   }
 
   @Override
-  public IndexedRepresentation changeRepresentationStatus(
+  public Job changeRepresentationStatus(
     @RequestBody ChangeRepresentationStatesRequest changeRepresentationStatesRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
@@ -330,12 +337,15 @@ public class RepresentationController implements RepresentationRestService {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
 
-      IndexedRepresentation indexedRepresentation = RodaCoreFactory.getIndexService().retrieve(
-        IndexedRepresentation.class, changeRepresentationStatesRequest.getRepresentationId(), new ArrayList<>());
+      // check user object permissions
+      SelectedItems<IndexedRepresentation> indexedRepresentationSelectedItems = CommonServicesUtils
+        .convertSelectedItems(changeRepresentationStatesRequest.getItems(), IndexedRepresentation.class);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentationSelectedItems);
 
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentation);
-      return representationsService.changeRepresentationStates(requestContext.getUser(), indexedRepresentation,
-        changeRepresentationStatesRequest);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentationSelectedItems);
+      return representationsService.changeRepresentationStatus(requestContext.getUser(),
+        indexedRepresentationSelectedItems, changeRepresentationStatesRequest.getNewStates(),
+        changeRepresentationStatesRequest.getDetails());
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -345,7 +355,8 @@ public class RepresentationController implements RepresentationRestService {
     } finally {
       // register action
       controllerAssistant.registerAction(requestContext, state,
-        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, changeRepresentationStatesRequest.getRepresentationId(),
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, RodaConstants.CONTROLLER_SELECTED_PARAM,
+        changeRepresentationStatesRequest.getItems(),
         RodaConstants.CONTROLLER_STATES_PARAM, changeRepresentationStatesRequest.getNewStates(),
         RodaConstants.CONTROLLER_DETAILS_PARAM, changeRepresentationStatesRequest.getDetails());
     }

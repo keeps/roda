@@ -43,14 +43,13 @@ public interface RepresentationInformationRestService extends RODAEntityRestServ
       @ApiResponse(responseCode = "404", description = "Representation information not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   RepresentationInformation updateRepresentationInformation(RepresentationInformationCreateRequest request);
 
-  @RequestMapping(path = "/{id}/family/{family-type}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/{id}/family", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Retrieves representation information family values", description = "Retrieves metadata values about the representation information type of family that can be customizable", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = RepresentationInformationFamily.class))),
     @ApiResponse(responseCode = "401", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Representation information not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   RepresentationInformationFamily retrieveRepresentationInformationFamily(
     @Parameter(description = "The representation information identifier", required = true) @PathVariable(name = "id") String id,
-    @Parameter(description = "The type of family associated with the representation information") @PathVariable(name = "family-type") String familyType,
     @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
   @RequestMapping(path = "/configuration/families/{family-type}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

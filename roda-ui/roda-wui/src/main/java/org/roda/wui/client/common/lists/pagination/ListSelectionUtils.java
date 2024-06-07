@@ -111,7 +111,7 @@ public class ListSelectionUtils {
 
       Services services = new Services("Find relatives", "get");
       FindRequest request = FindRequest
-        .getBuilder(state.getSelected().getClass().getName(), state.getFilter(), state.getJustActive())
+        .getBuilder(state.getFilter(), state.getJustActive())
         .withSorter(state.getSorter()).withSublist(new Sublist(newIndex, 1)).withFacets(state.getFacets()).build();
       services.rodaEntityRestService(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()),
         state.getSelected().getClass()).whenComplete((indexResult, throwable) -> {
@@ -233,7 +233,7 @@ public class ListSelectionUtils {
       if (last != null) {
         if (last.getSelected().getUUID().equals(object.getUUID())) {
           Services services = new Services("Count indexed objects", "count");
-          CountRequest request = new CountRequest(objectClass.getName(), last.getFilter(), last.getJustActive());
+          CountRequest request = new CountRequest(last.getFilter(), last.getJustActive());
           services.rodaEntityRestService(s -> s.count(request), objectClass).whenComplete((longResponse, throwable) -> {
             if (throwable != null) {
               callback.onFailure(throwable);
