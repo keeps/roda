@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.base.synchronization.instanceIdentifier;
+package org.roda.core.plugins.base.synchronization.instance;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -48,29 +48,17 @@ import org.slf4j.LoggerFactory;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
+public class InstanceIdentifierRepresentationInformationPlugin extends AbstractPlugin<Void> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierNotificationPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRepresentationInformationPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
-
-  static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
-      PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
-          PluginParameter.PluginParameterType.STRING)
-        .withDefaultValue(RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin()).isReadOnly(true)
-        .withDescription("Identifier from the RODA local instance").build());
-  }
-
-  private String instanceId;
-
   @Override
   public String getVersionImpl() {
     return "1.0";
   }
 
   public static String getStaticName() {
-    return "Notification instance identifier";
+    return "Representation Information instance identifier";
   }
 
   @Override
@@ -101,9 +89,6 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER)) {
-      instanceId = parameters.get(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER);
-    }
   }
 
   @Override
@@ -153,7 +138,7 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new InstanceIdentifierNotificationPlugin();
+    return new InstanceIdentifierRepresentationInformationPlugin();
   }
 
   @Override
@@ -188,35 +173,42 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
     JobPluginInfo jobPluginInfo)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     PluginState pluginState = PluginState.SKIPPED;
-    List<String> detailsList = new ArrayList<>();
     int countFail = 0;
     int countSuccess = 0;
-    // Get Notifications from index
-    IterableIndexResult<Notification> indexedNotifications = retrieveList(index);
+    List<String> detailsList = new ArrayList<>();
+
+    // Get AIP's from index
+    IterableIndexResult<RepresentationInformation> indexedRepresentationInformations = retrieveList(index);
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
-    for (Notification indexedNotification : indexedNotifications) {
+    for (RepresentationInformation indexedRepresentationInformation : indexedRepresentationInformations) {
       try {
-        model.updateNotificationInstanceId(model.retrieveNotification(indexedNotification.getId()));
+        model.updateRepresentationInformationInstanceId(
+          model.retrieveRepresentationInformation(indexedRepresentationInformation.getId()), cachedJob.getUsername(),
+          true);
         countSuccess++;
-      } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
+      } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         detailsList.add(e.getMessage());
         countFail++;
       }
     }
+
     StringBuilder details = new StringBuilder();
+
     if (countFail > 0) {
       pluginState = PluginState.FAILURE;
       details.append("Updated the instance identifier on ").append(countSuccess)
-        .append(" Notifications and failed to update ").append(countFail).append(".\n")
+        .append(" Representation informations and failed to update ").append(countFail).append(".\n")
         .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
       pluginState = PluginState.SUCCESS;
-      details.append("Updated the instance identifier on ").append(countSuccess).append(" Notifications.");
+      details.append("Updated the instance identifier on ").append(countSuccess)
+        .append(" Representation Informations.");
     }
 
     reportItem.setPluginDetails(details.toString());
+
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);
     pluginReport.addReport(reportItem);
@@ -228,10 +220,10 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
     return new Report();
   }
 
-  private IterableIndexResult<Notification> retrieveList(final IndexService index)
+  private IterableIndexResult<RepresentationInformation> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     final Filter filter = new Filter();
     RODAInstanceUtils.addLocalInstanceFilter(filter);
-    return index.findAll(Notification.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
+    return index.findAll(RepresentationInformation.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }

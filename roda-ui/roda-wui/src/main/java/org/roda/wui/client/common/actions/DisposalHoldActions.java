@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -103,7 +104,7 @@ public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
             public void onSuccess(Boolean result) {
               if (result) {
                 Services services = new Services("Lift disposal hold", "job");
-                services.disposalHoldResource(s -> s.liftDisposalHoldBySelectedItems(aips, disposalHold.getId()))
+                services.disposalHoldResource(s -> s.liftDisposalHoldBySelectedItems(SelectedItemsUtils.convertToRESTRequest(aips), disposalHold.getId()))
                   .whenComplete((job, throwable) -> {
                     if (throwable != null) {
                       callback.onFailure(throwable);

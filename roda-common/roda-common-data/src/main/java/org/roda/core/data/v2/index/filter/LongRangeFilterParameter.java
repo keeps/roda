@@ -7,10 +7,16 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+import java.io.Serial;
+
 /**
  * @author Luis Faria <lfaria@keep.pt>
  */
+@JsonTypeName("LongRangeFilterParameter")
 public class LongRangeFilterParameter extends RangeFilterParameter<Long> {
+  @Serial
   private static final long serialVersionUID = -5658723022959992610L;
 
   public LongRangeFilterParameter() {

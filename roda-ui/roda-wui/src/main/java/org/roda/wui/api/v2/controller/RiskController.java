@@ -14,12 +14,11 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SuggestRequest;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -31,6 +30,7 @@ import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.RiskService;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.RiskRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
@@ -102,16 +102,21 @@ public class RiskController implements RiskRestService {
     return indexService.suggest(suggestRequest, IndexedRisk.class, requestContext);
   }
 
-  public Job deleteRisk(@RequestBody SelectedItems<IndexedRisk> selected) {
+  public Job deleteRisk(@RequestBody SelectedItemsRequest selected) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       controllerAssistant.checkRoles(requestContext.getUser());
+
       // delegate
-      return riskService.deleteRisk(requestContext.getUser(), selected);
-    } catch (RODAException e) {
+      return riskService.deleteRisk(requestContext.getUser(),
+        CommonServicesUtils.convertSelectedItems(selected, IndexedRisk.class));
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (RequestNotValidException | GenericException | NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -121,7 +126,7 @@ public class RiskController implements RiskRestService {
   }
 
   @Override
-  public Risk updateRisk(@RequestBody Risk risk, String incidences) {
+  public Risk updateRisk(@RequestBody Risk risk) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -131,7 +136,13 @@ public class RiskController implements RiskRestService {
       Map<String, String> properties = new HashMap<>();
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
-      return riskService.updateRisk(risk, requestContext.getUser(), properties, true, Integer.parseInt(incidences));
+      int incidences = 0;
+
+      IndexedRisk indexedRisk = RodaCoreFactory.getIndexService().retrieve(IndexedRisk.class, risk.getUUID(),
+        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_INCIDENCES_COUNT));
+      incidences = indexedRisk.getIncidencesCount();
+
+      return riskService.updateRisk(risk, requestContext.getUser(), properties, true, incidences);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);

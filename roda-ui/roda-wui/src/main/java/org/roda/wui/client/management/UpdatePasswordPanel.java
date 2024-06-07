@@ -1,5 +1,17 @@
 package org.roda.wui.client.management;
 
+import org.roda.core.data.common.SecureString;
+import org.roda.core.data.exceptions.InvalidTokenException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.user.requests.ResetPasswordRequest;
+import org.roda.wui.client.common.TitlePanel;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.main.Login;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -19,17 +31,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+
 import config.i18n.client.ClientMessages;
-import org.roda.core.data.common.SecureString;
-import org.roda.core.data.exceptions.InvalidTokenException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.wui.client.common.TitlePanel;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.main.Login;
-import org.roda.wui.client.services.Services;
-import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -222,7 +225,11 @@ public class UpdatePasswordPanel extends Composite {
     if (isValid() && isPasswordValid()) {
       try (SecureString securePassword = new SecureString(password.getValue().toCharArray())) {
         Services services = new Services("Reset user password", "reset");
-        services.membersResource(s -> s.resetUserPassword(username.getValue(), token.getValue(), securePassword)).whenComplete((res, error) -> {
+        ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest();
+        resetPasswordRequest.setNewPassword(securePassword);
+        resetPasswordRequest.setToken(token.getValue());
+        services.membersResource(s -> s.resetUserPassword(username.getValue(), resetPasswordRequest))
+          .whenComplete((res, error) -> {
           if (error == null) {
             Dialogs.showInformationDialog(messages.resetPasswordSuccessDialogTitle(),
               messages.resetPasswordSuccessDialogMessage(), messages.resetPasswordSuccessDialogButton(), false,

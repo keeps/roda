@@ -11,7 +11,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.client.services.Services;
@@ -52,7 +51,7 @@ public class RepresentationInformationHelper {
       }
 
       Services services = new Services("Count representation information", "count");
-      CountRequest request = new CountRequest(RepresentationInformation.class.getName(),
+      CountRequest request = new CountRequest(
         new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter)), true);
       services.representationInformationResource(s -> s.count(request)).whenComplete((longResponse, throwable) -> {
         if (throwable == null) {

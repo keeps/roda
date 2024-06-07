@@ -86,7 +86,7 @@ public interface RepresentationRestService extends RODAEntityRestService<Indexed
   @Operation(summary = "Changes the representation status", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ChangeRepresentationStatesRequest.class))), description = "Changes representation status", responses = {
     @ApiResponse(responseCode = "200", description = "Representation status changed"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  IndexedRepresentation changeRepresentationStatus(ChangeRepresentationStatesRequest changeRepresentationStatesRequest);
+  Job changeRepresentationStatus(ChangeRepresentationStatesRequest changeRepresentationStatesRequest);
 
   @RequestMapping(path = "/identify", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Creates a preservation action to identify the file formats via search query", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), description = "Identifies the file format for a set of files within the representation", responses = {

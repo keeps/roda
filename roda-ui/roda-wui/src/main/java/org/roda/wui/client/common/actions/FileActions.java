@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.file.CreateFolderRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
 import org.roda.core.data.v2.file.RenameFolderRequest;
@@ -466,7 +467,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   private void identifyFormats(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
     Services services = new Services("Create format identification job", "action");
-    services.fileResource(s -> s.identifyFileFormat(selected)).whenComplete((job, throwable) -> {
+    services.fileResource(s -> s.identifyFileFormat(SelectedItemsUtils.convertToRESTRequest(selected))).whenComplete((job, throwable) -> {
       if (throwable == null) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
 
@@ -505,9 +506,9 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                 @Override
                 public void onSuccess(final String details) {
                   Services services = new Services("Remove files from representation", "delete");
-                  DeleteRequest<IndexedFile> deleteRequest = new DeleteRequest<>();
+                  DeleteRequest deleteRequest = new DeleteRequest();
                   deleteRequest.setDetails(details);
-                  deleteRequest.setItemsToDelete(selected);
+                  deleteRequest.setSelectedItemsToDelete(selected);
                   services.fileResource(s -> s.deleteFiles(deleteRequest)).whenComplete((job, throwable) -> {
                     if (throwable != null) {
                       callback.onFailure(throwable);

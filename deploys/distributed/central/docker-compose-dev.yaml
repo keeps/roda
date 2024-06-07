@@ -1,7 +1,6 @@
-version: '3.3'
 services:
   zoo:
-    image: docker.io/zookeeper:3.8
+    image: docker.io/zookeeper:3.9.2
     restart: unless-stopped
     ports:
       - "2182:2181"
@@ -11,7 +10,7 @@ services:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
   solr:
-    image: docker.io/solr:9
+    image: docker.io/solr:9.6.1
     restart: unless-stopped
     ports:
       - "8984:8984"
@@ -26,7 +25,7 @@ services:
     volumes:
       - solr_data:/var/solr
   clamd:
-    image: docker.io/clamav/clamav:stable
+    image: docker.io/clamav/clamav:1.2.3
     restart: unless-stopped
     ports:
       - "3311:3310"
@@ -34,7 +33,7 @@ services:
       - clam_data:/var/lib/clamav
       - $HOME/.roda_central/data/storage:$HOME/.roda_central/data/storage
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.10.1
+    image: ghcr.io/keeps/siegfried:v1.11.0
     restart: unless-stopped
     ports:
       - "5139:5138"
@@ -44,6 +43,21 @@ services:
     volumes:
       - siegfried_data:/root/siegfried/
       - $HOME/.roda_central/data/storage:$HOME/.roda_central/data/storage
+  openldap:
+    image: docker.io/bitnami/openldap:2.6.8
+    user: 1001:root
+    ports:
+      - "1388:1389"
+      - "1637:1636"
+    environment:
+      - BITNAMI_DEBUG=true
+      - LDAP_ROOT=dc=roda,dc=org
+      - LDAP_SKIP_DEFAULT_TREE=yes
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=roda
+      - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
+    volumes:
+      - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 volumes:
   zookeeper_data:
   zookeeper_datalog:

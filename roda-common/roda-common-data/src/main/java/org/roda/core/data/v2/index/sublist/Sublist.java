@@ -7,23 +7,17 @@
  */
 package org.roda.core.data.v2.index.sublist;
 
+import java.io.Serial;
 import java.io.Serializable;
-
-import org.roda.core.data.common.RodaConstants;
 
 /**
  * @author Rui Castro
  */
 public class Sublist implements Serializable {
-  private static final long serialVersionUID = 5274598970369555552L;
   public static final Sublist NONE = new Sublist(0, 0);
-  /**
-   * 20170512 hsilva: this should not be used at all and, because it can be very
-   * harmful for Solr, I'll set the maximumElementCount to a default value (which
-   * is a very low number like 100)
-   */
-  @Deprecated
-  public static final Sublist ALL = new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE);
+
+  @Serial
+  private static final long serialVersionUID = 5274598970369555552L;
 
   private int firstElementIndex = 0;
   private int maximumElementCount = 10;

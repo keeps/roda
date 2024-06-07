@@ -13,7 +13,7 @@ package org.roda.wui.client.management;
 import java.util.List;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.v2.user.CreateGroupRequest;
+import org.roda.core.data.v2.user.requests.CreateGroupRequest;
 import org.roda.core.data.v2.user.Group;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;

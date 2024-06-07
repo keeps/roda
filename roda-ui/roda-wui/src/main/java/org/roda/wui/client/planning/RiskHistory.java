@@ -17,7 +17,9 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.RiskVersion;
 import org.roda.core.data.v2.risks.RiskVersions;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
@@ -158,35 +160,52 @@ public class RiskHistory extends Composite {
 
   @UiHandler("buttonRevert")
   void buttonRevertHandler(ClickEvent e) {
-    Services services = new Services("Revert risk", "revert");
-    services.riskResource(s -> s.revertRiskVersion(riskId, selectedVersion)).whenComplete((risk, throwable) -> {
-      if (throwable != null) {
-        AsyncCallbackUtils.defaultFailureTreatment(throwable);
-      } else {
-        Toast.showInfo(messages.dialogDone(), messages.versionReverted());
-        HistoryUtils.newHistory(ShowRisk.RESOLVER, riskId);
-      }
+    Dialogs.showConfirmDialog(messages.riskHistoryRevertConfirmDialogTitle(),
+      messages.riskHistoryRevertConfirmDialogMessage(), messages.dialogNo(), messages.dialogYes(),
+      new NoAsyncCallback<Boolean>() {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            Services services = new Services("Revert risk", "revert");
+            services.riskResource(s -> s.revertRiskVersion(riskId, selectedVersion)).whenComplete((risk, throwable) -> {
+              if (throwable != null) {
+                AsyncCallbackUtils.defaultFailureTreatment(throwable);
+              } else {
+                Toast.showInfo(messages.dialogDone(), messages.versionReverted());
+                HistoryUtils.newHistory(ShowRisk.RESOLVER, riskId);
+              }
 
-    });
+            });
+          }
+        }
+      });
   }
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    Services services = new Services("Delete risk version", "delete");
-
-    services.riskResource(s -> s.deleteRiskVersion(riskId, selectedVersion))
-      .thenCompose(unused -> services.riskResource(s -> s.retrieveRiskVersions(riskId)))
-      .whenComplete((versions, throwable) -> {
-        if (throwable != null) {
-          AsyncCallbackUtils.defaultFailureTreatment(throwable);
-        } else {
-          Toast.showInfo(messages.dialogDone(), messages.versionDeleted());
-          if (versions.getVersions().isEmpty()) {
-            HistoryUtils.newHistory(ShowRisk.RESOLVER, riskId);
-          } else {
-            this.riskVersions = versions;
-            clean();
-            init();
+    Dialogs.showConfirmDialog(messages.riskHistoryRemoveConfirmDialogTitle(),
+      messages.riskHistoryRemoveConfirmDialogMessage(), messages.dialogNo(), messages.removeButton(),
+      new NoAsyncCallback<Boolean>() {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            Services services = new Services("Delete risk version", "delete");
+            services.riskResource(s -> s.deleteRiskVersion(riskId, selectedVersion))
+              .thenCompose(unused -> services.riskResource(s -> s.retrieveRiskVersions(riskId)))
+              .whenComplete((versions, throwable) -> {
+                if (throwable != null) {
+                  AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                } else {
+                  Toast.showInfo(messages.dialogDone(), messages.versionDeleted());
+                  if (versions.getVersions().isEmpty()) {
+                    HistoryUtils.newHistory(ShowRisk.RESOLVER, riskId);
+                  } else {
+                    riskVersions = versions;
+                    clean();
+                    init();
+                  }
+                }
+              });
           }
         }
       });

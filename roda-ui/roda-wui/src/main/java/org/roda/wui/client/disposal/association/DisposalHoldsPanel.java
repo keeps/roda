@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.disposal.hold.DisposalHolds;
@@ -179,7 +180,7 @@ public class DisposalHoldsPanel extends Composite {
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Disassociate disposal holds", "job");
-            services.disposalHoldResource(s -> s.disassociateDisposalHold(aips, null, true))
+            services.disposalHoldResource(s -> s.disassociateDisposalHold(SelectedItemsUtils.convertToRESTRequest(aips), null, true))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
@@ -220,10 +221,8 @@ public class DisposalHoldsPanel extends Composite {
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Apply disposal hold", "job");
-            services
-              .disposalHoldResource(
-                s -> s.applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(), override))
-              .whenComplete((job, throwable) -> {
+            services.disposalHoldResource(s -> s.applyDisposalHold(SelectedItemsUtils.convertToRESTRequest(aips),
+              holdDialogResult.getDisposalHold().getId(), override)).whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
                 } else {

@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.risks;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -17,15 +18,16 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.HasId;
+import org.roda.core.data.v2.ip.HasInstanceID;
+import org.roda.core.data.v2.ip.HasInstanceName;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.roda.core.data.v2.ip.HasInstanceID;
-import org.roda.core.data.v2.ip.HasInstanceName;
 
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_INCIDENCE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RiskIncidence implements IsModelObject, IsIndexed, HasId, HasInstanceID, HasInstanceName {
+  @Serial
   private static final long serialVersionUID = -1089167070045254627L;
 
   private String id = null;
@@ -49,7 +51,6 @@ public class RiskIncidence implements IsModelObject, IsIndexed, HasId, HasInstan
   private Map<String, Object> fields;
 
   private String instanceId = null;
-
   private String instanceName = null;
   private Date updatedOn = null;
 

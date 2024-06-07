@@ -6,7 +6,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
@@ -43,9 +43,9 @@ public class IndexService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_CLASS_PARAM,
-        classToReturn, RodaConstants.CONTROLLER_FIELD_PARAM, suggestRequest.getField(),
-        RodaConstants.CONTROLLER_QUERY_PARAM, suggestRequest.getQuery());
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_CLASS_PARAM, classToReturn,
+        RodaConstants.CONTROLLER_FIELD_PARAM, suggestRequest.getField(), RodaConstants.CONTROLLER_QUERY_PARAM,
+        suggestRequest.getQuery());
     }
   }
 
@@ -109,7 +109,7 @@ public class IndexService {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (GenericException | NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -135,7 +135,7 @@ public class IndexService {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (GenericException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {

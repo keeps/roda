@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,12 +34,12 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.user.CreateUserRequest;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.NotificationState;
@@ -46,12 +47,15 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaPrincipal;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.user.requests.CreateUserRequest;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.UserUtility;
+import org.roda.core.plugins.base.maintenance.ChangeRodaMemberStatusPlugin;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.exceptions.RESTException;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -74,41 +78,6 @@ public class MembersService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MembersService.class);
   private static final String RECAPTCHA_CODE_SECRET_PROPERTY = "ui.google.recaptcha.code.secret";
-  public User retrieveUser(String username) throws GenericException {
-    User user = RodaCoreFactory.getModelService().retrieveUser(username);
-    user.setExtra(retrieveUserExtra(username));
-    return user;
-  }
-
-  public void deleteUser(String username) throws GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deleteUser(username, true);
-    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
-  }
-
-  public Group retrieveGroup(String groupname) throws GenericException, NotFoundException {
-    return RodaCoreFactory.getModelService().retrieveGroup(groupname);
-  }
-
-  public void changeActiveMembers(SelectedItems<RODAMember> members, boolean active) throws GenericException,
-    RequestNotValidException, AuthorizationDeniedException, NotFoundException, AlreadyExistsException {
-    List<String> uuids = getMemberUuidFromSelectedItems(members);
-    for (String uuid : uuids) {
-      if (RodaPrincipal.isUser(uuid)) {
-        RodaCoreFactory.getModelService().deActivateUser(RodaPrincipal.getId(uuid), active, true);
-      }
-    }
-    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
-  }
-
-  public void deactivateUserAccessKeys(SelectedItems<RODAMember> members, String userId) throws GenericException,
-    RequestNotValidException, AuthorizationDeniedException, NotFoundException, AlreadyExistsException {
-    List<String> uuids = getMemberUuidFromSelectedItems(members);
-    for (String uuid : uuids) {
-      if (RodaPrincipal.isUser(uuid)) {
-        RodaCoreFactory.getModelService().deactivateUserAccessKeys(RodaPrincipal.getId(uuid), userId);
-      }
-    }
-  }
 
   private static List<String> getMemberUuidFromSelectedItems(SelectedItems<RODAMember> members)
     throws GenericException, RequestNotValidException {
@@ -127,49 +96,6 @@ public class MembersService {
     return uuids;
   }
 
-  public void deleteMembers(SelectedItems<RODAMember> members)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    List<String> uuids = getMemberUuidFromSelectedItems(members);
-    for (String uuid : uuids) {
-      String id = RodaPrincipal.getId(uuid);
-      if (RodaPrincipal.isUser(uuid)) {
-        RodaCoreFactory.getModelService().deleteUser(id, true);
-      } else {
-        RodaCoreFactory.getModelService().deleteGroup(id, true);
-      }
-    }
-    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
-  }
-
-  public User createUser(User user, SecureString password, Set<MetadataValue> extra)
-    throws GenericException, AlreadyExistsException, IllegalOperationException, NotFoundException,
-    AuthorizationDeniedException, RequestNotValidException, ValidationException {
-    user.setExtraLDAP(transformExtra(extra));
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
-    User addedUser = model.createUser(user, password, true);
-    PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), model, index, false);
-    index.commit(true, RODAMember.class);
-    return addedUser;
-  }
-
-  public Group createGroup(Group group)
-    throws GenericException, AlreadyExistsException, AuthorizationDeniedException {
-    Group newGroup = RodaCoreFactory.getModelService().createGroup(group, true);
-    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
-    return newGroup;
-  }
-
-  public void updateGroup(Group group) throws GenericException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().updateGroup(group, true);
-    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
-  }
-
-  public void deleteGroup(String groupname) throws GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deleteGroup(groupname, true);
-    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
-  }
-
   private static String transformExtra(Set<MetadataValue> values) {
     Handlebars handlebars = new Handlebars();
     Map<String, String> data = new HashMap<>();
@@ -179,7 +105,7 @@ public class MembersService {
 
     try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
       RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE)) {
-      String rawTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+      String rawTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
       Template tmpl = handlebars.compileInline(rawTemplate);
 
       if (values != null) {
@@ -194,11 +120,9 @@ public class MembersService {
         });
       }
 
-
-      // result = RodaUtils.indentXML(result);
       return tmpl.apply(data);
     } catch (IOException e) {
-      LOGGER.error("Error getting template from stream");
+      LOGGER.error("Error getting template from stream", e);
     }
 
     return "";
@@ -210,7 +134,7 @@ public class MembersService {
 
       try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
         RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE)) {
-        template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+        template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
       } catch (IOException e) {
         LOGGER.error("Error getting template from stream", e);
       }
@@ -256,32 +180,12 @@ public class MembersService {
     }
   }
 
-  public void requestPasswordReset(String servletPath, String email, String localeString,
-                                   String ipAddress, boolean isRecover)
-    throws GenericException, NotFoundException, IllegalOperationException, AuthorizationDeniedException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    User user = requestPasswordReset(email);
-    if (user != null) {
-      sendSetPasswordEmail(servletPath, user, localeString, isRecover);
-    } else {
-      user = new User(email);
-    }
-
-    // 20180112 hsilva: need to set ip address for registering the action
-    user.setIpAddress(ipAddress);
-
-    // register action
-    controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
-  }
-
   private static void sendSetPasswordEmail(String servletPath, User user, String localeString, boolean isRecover)
     throws GenericException {
     try {
       Messages messages = RodaCoreFactory.getI18NMessages(ServerTools.parseLocale(localeString));
 
       Notification notification = new Notification();
-      //notification.setSubject(messages.getTranslation(RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE_SUBJECT_TRANSLATION));
 
       notification.setFromUser(messages.getTranslation(RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE_FROM_TRANSLATION));
       notification.setRecipientUsers(Arrays.asList(user.getEmail()));
@@ -289,11 +193,9 @@ public class MembersService {
       String token = user.getResetPasswordToken();
       String username = user.getName();
 
-
       Map<String, Object> scopes = new HashMap<>();
       scopes.put("username", username);
       scopes.put("token", token);
-
 
       if (isRecover) {
         String recoverLoginURL = servletPath + "/#resetpassword";
@@ -301,7 +203,8 @@ public class MembersService {
           + URLEncoder.encode(username, RodaConstants.DEFAULT_ENCODING) + "/" + token;
         scopes.put("recoverLoginURL", recoverLoginURL);
         scopes.put("recoverLoginCompleteURL", recoverLoginCompleteURL);
-        notification.setSubject(messages.getTranslation(RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE_SUBJECT_TRANSLATION));
+        notification
+          .setSubject(messages.getTranslation(RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE_SUBJECT_TRANSLATION));
         RodaCoreFactory.getModelService().createNotification(notification,
           new EmailNotificationProcessor(RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE, scopes, localeString));
       } else {
@@ -320,6 +223,110 @@ public class MembersService {
     }
   }
 
+  private static User resetUser(User newUser, User oldUser) {
+    newUser.setActive(oldUser.isActive());
+    newUser.setDirectRoles(oldUser.getDirectRoles());
+    newUser.setAllRoles(oldUser.getAllRoles());
+    newUser.setGroups(oldUser.getGroups());
+    return newUser;
+  }
+
+  public User retrieveUser(String username) throws GenericException {
+    User user = RodaCoreFactory.getModelService().retrieveUser(username);
+    user.setExtra(retrieveUserExtra(username));
+    return user;
+  }
+
+  public void deleteUser(String username) throws GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteUser(username, true);
+    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+  }
+
+  public Group retrieveGroup(String groupname) throws GenericException, NotFoundException {
+    return RodaCoreFactory.getModelService().retrieveGroup(groupname);
+  }
+
+  public Job changeActiveMembers(SelectedItems<RODAMember> selectedItems, boolean active, User user)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RODA_MEMBER_ACTIVATE, Boolean.toString(active));
+
+    return CommonServicesUtils.createAndExecuteInternalJob("Change RODA users status", selectedItems,
+      ChangeRodaMemberStatusPlugin.class, user, pluginParameters, "Could not change RODA useres status");
+  }
+
+  public void deactivateUserAccessKeys(SelectedItems<RODAMember> members, String userId) throws GenericException,
+    RequestNotValidException, AuthorizationDeniedException, NotFoundException, AlreadyExistsException {
+    List<String> uuids = getMemberUuidFromSelectedItems(members);
+    for (String uuid : uuids) {
+      if (RodaPrincipal.isUser(uuid)) {
+        RodaCoreFactory.getModelService().deactivateUserAccessKeys(RodaPrincipal.getId(uuid), userId);
+      }
+    }
+  }
+
+  public void deleteMembers(SelectedItems<RODAMember> members)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    List<String> uuids = getMemberUuidFromSelectedItems(members);
+    for (String uuid : uuids) {
+      String id = RodaPrincipal.getId(uuid);
+      if (RodaPrincipal.isUser(uuid)) {
+        RodaCoreFactory.getModelService().deleteUser(id, true);
+      } else {
+        RodaCoreFactory.getModelService().deleteGroup(id, true);
+      }
+    }
+    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+  }
+
+  public User createUser(User user, SecureString password, Set<MetadataValue> extra)
+    throws GenericException, AlreadyExistsException, IllegalOperationException, NotFoundException,
+    AuthorizationDeniedException, RequestNotValidException, ValidationException {
+    user.setExtraLDAP(transformExtra(extra));
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+    User addedUser = model.createUser(user, password, true);
+    PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), model, index, false);
+    index.commit(true, RODAMember.class);
+    return addedUser;
+  }
+
+  public Group createGroup(Group group) throws GenericException, AlreadyExistsException, AuthorizationDeniedException {
+    Group newGroup = RodaCoreFactory.getModelService().createGroup(group, true);
+    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+    return newGroup;
+  }
+
+  public void updateGroup(Group group) throws GenericException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().updateGroup(group, true);
+    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+  }
+
+  public void deleteGroup(String groupname) throws GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteGroup(groupname, true);
+    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+  }
+
+  public void requestPasswordReset(String servletPath, String email, String localeString, String ipAddress,
+    boolean isRecover)
+    throws GenericException, NotFoundException, IllegalOperationException, AuthorizationDeniedException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    User user = requestPasswordReset(email);
+    if (user != null) {
+      sendSetPasswordEmail(servletPath, user, localeString, isRecover);
+    } else {
+      user = new User(email);
+    }
+
+    // 20180112 hsilva: need to set ip address for registering the action
+    user.setIpAddress(ipAddress);
+
+    // register action
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
+  }
+
   public User requestPasswordReset(String email)
     throws IllegalOperationException, NotFoundException, GenericException, AuthorizationDeniedException {
     return RodaCoreFactory.getModelService().requestPasswordReset(null, email, true, true);
@@ -330,9 +337,8 @@ public class MembersService {
     return RodaCoreFactory.getModelService().confirmUserEmail(username, email, emailConfirmationToken, true, true);
   }
 
-  public User updateUser(CreateUserRequest request)
-    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException,
-    ValidationException, RequestNotValidException {
+  public User updateUser(CreateUserRequest request) throws GenericException, AlreadyExistsException, NotFoundException,
+    AuthorizationDeniedException, ValidationException, RequestNotValidException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     request.getUser().setExtra(request.getValues());
@@ -364,23 +370,15 @@ public class MembersService {
     return finalModifiedUser;
   }
 
-  private static User resetUser(User newUser, User oldUser) {
-    newUser.setActive(oldUser.isActive());
-    newUser.setDirectRoles(oldUser.getDirectRoles());
-    newUser.setAllRoles(oldUser.getAllRoles());
-    newUser.setGroups(oldUser.getGroups());
-    return newUser;
-  }
-
   public User resetUserPassword(String username, SecureString password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException,
     AuthorizationDeniedException {
     return RodaCoreFactory.getModelService().resetUserPassword(username, password, resetPasswordToken, true, true);
   }
 
-  public User registerUser(HttpServletRequest request, User user, SecureString password, String captcha, Set<MetadataValue> extra, String localeString,
-    String servletPath)
-    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, AuthorizationDeniedException, RecaptchaException {
+  public User registerUser(HttpServletRequest request, User user, SecureString password, String captcha,
+    Set<MetadataValue> extra, String localeString, String servletPath) throws GenericException,
+    UserAlreadyExistsException, EmailAlreadyExistsException, AuthorizationDeniedException, RecaptchaException {
     boolean userRegistrationDisabled = RodaCoreFactory.getRodaConfiguration()
       .getBoolean(RodaConstants.USER_REGISTRATION_DISABLED, false);
     if (userRegistrationDisabled) {
@@ -410,8 +408,8 @@ public class MembersService {
     if (!user.isActive()) {
       try {
         boolean generateNewToken = false;
-        Notification notification = sendEmailVerification(servletPath, updatedUser.getName(),
-          generateNewToken, user.getIpAddress(), localeString);
+        Notification notification = sendEmailVerification(servletPath, updatedUser.getName(), generateNewToken,
+          user.getIpAddress(), localeString);
 
         if (notification.getState() == NotificationState.FAILED) {
           registeredUser.setActive(false);
@@ -432,9 +430,8 @@ public class MembersService {
   }
 
   public Notification sendEmailVerification(final String servletPath, final String username,
-                                            final boolean generateNewToken, String ipAddress, String localeString) throws GenericException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {
-    };
+    final boolean generateNewToken, String ipAddress, String localeString) throws GenericException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     User user = retrieveUser(username);
     // 20170523 hsilva: need to set ip address for registering the action
     user.setIpAddress(ipAddress);
@@ -481,8 +478,8 @@ public class MembersService {
       }
 
       if (captcha != null) {
-        RecaptchaUtils
-          .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
+        RecaptchaUtils.recaptchaVerify(
+          RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
       }
     } catch (RecaptchaException | GenericException e) {
       throw new RESTException(e);

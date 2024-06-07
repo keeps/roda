@@ -216,8 +216,9 @@ public class ShowRepresentationInformation extends Composite {
     }
 
     Services services = new Services("Retrieve representation information family metadata", "get");
-    services.representationInformationResource(s -> s.retrieveRepresentationInformationFamily(ri.getId(),
-      ri.getFamily(), LocaleInfo.getCurrentLocale().getLocaleName()))
+    services
+      .representationInformationResource(
+        s -> s.retrieveRepresentationInformationFamily(ri.getId(), LocaleInfo.getCurrentLocale().getLocaleName()))
       .whenComplete((representationInformationFamily, throwable) -> {
         if (throwable == null) {
           HtmlSnippetUtils.createExtraShow(extras, representationInformationFamily.getFamilyValues(), false);
@@ -269,7 +270,7 @@ public class ShowRepresentationInformation extends Composite {
       Filter aipFilter = new Filter();
       aipFilter.add(new OrFiltersParameters(aipParams));
       Services services = new Services("Count AIPs associated with representation information", "count");
-      CountRequest countRequest = new CountRequest(IndexedAIP.class.getName(), aipFilter, true);
+      CountRequest countRequest = new CountRequest(aipFilter, true);
       services.rodaEntityRestService(s -> s.count(countRequest), IndexedAIP.class).whenComplete((count,
         throwable) -> initEntityFiltersObjectPanel(count.getResult(), throwable, IndexedAIP.class.getSimpleName()));
     } else if (!representationParams.isEmpty()) {
@@ -277,7 +278,7 @@ public class ShowRepresentationInformation extends Composite {
       representationFilter.add(new OrFiltersParameters(representationParams));
 
       Services services = new Services("Count Representations associated with representation information", "count");
-      CountRequest countRequest = new CountRequest(IndexedRepresentation.class.getName(), representationFilter, true);
+      CountRequest countRequest = new CountRequest(representationFilter, true);
       services.rodaEntityRestService(s -> s.count(countRequest), IndexedRepresentation.class)
         .whenComplete((count, throwable) -> initEntityFiltersObjectPanel(count.getResult(), throwable,
           IndexedRepresentation.class.getSimpleName()));
@@ -286,7 +287,7 @@ public class ShowRepresentationInformation extends Composite {
       fileFilter.add(new OrFiltersParameters(fileParams));
 
       Services services = new Services("Count Files associated with representation information", "count");
-      CountRequest countRequest = new CountRequest(IndexedFile.class.getName(), fileFilter, true);
+      CountRequest countRequest = new CountRequest(fileFilter, true);
       services.rodaEntityRestService(s -> s.count(countRequest), IndexedFile.class).whenComplete((count,
         throwable) -> initEntityFiltersObjectPanel(count.getResult(), throwable, IndexedFile.class.getSimpleName()));
     } else {

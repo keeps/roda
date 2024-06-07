@@ -19,7 +19,6 @@ import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -88,7 +87,7 @@ public class Relation {
       Filter filter = new Filter(params);
 
       Services services = new Services("Find AIPs", "get");
-      FindRequest request = FindRequest.getBuilder(IndexedAIP.class.getName(), filter, false).withSorter(Sorter.NONE)
+      FindRequest request = FindRequest.getBuilder(filter, false).withSorter(Sorter.NONE)
         .withSublist(new Sublist(0, 1)).withFacets(Facets.NONE)
         .withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID)).build();
       services.aipResource(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()))

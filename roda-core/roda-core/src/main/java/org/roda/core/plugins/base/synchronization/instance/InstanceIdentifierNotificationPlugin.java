@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.base.synchronization.instanceIdentifier;
+package org.roda.core.plugins.base.synchronization.instance;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -47,9 +48,9 @@ import org.slf4j.LoggerFactory;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class InstanceIdentifierJobPlugin extends AbstractPlugin<Void> {
+public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierJobPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierNotificationPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
@@ -69,7 +70,7 @@ public class InstanceIdentifierJobPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticName() {
-    return "Job instance identifier";
+    return "Notification instance identifier";
   }
 
   @Override
@@ -152,7 +153,7 @@ public class InstanceIdentifierJobPlugin extends AbstractPlugin<Void> {
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new InstanceIdentifierJobPlugin();
+    return new InstanceIdentifierNotificationPlugin();
   }
 
   @Override
@@ -186,36 +187,36 @@ public class InstanceIdentifierJobPlugin extends AbstractPlugin<Void> {
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
-    List<String> detailsList = new ArrayList<>();
     PluginState pluginState = PluginState.SKIPPED;
+    List<String> detailsList = new ArrayList<>();
     int countFail = 0;
     int countSuccess = 0;
-    // Get Jobs from index
-    IterableIndexResult<Job> indexedJobs = retrieveList(index);
+    // Get Notifications from index
+    IterableIndexResult<Notification> indexedNotifications = retrieveList(index);
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-    for (Job indexedJob : indexedJobs) {
+
+    for (Notification indexedNotification : indexedNotifications) {
       try {
-        model.updateJobInstanceId(model.retrieveJob(indexedJob.getId()));
+        model.updateNotificationInstanceId(model.retrieveNotification(indexedNotification.getId()));
         countSuccess++;
-      } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
+      } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
         detailsList.add(e.getMessage());
         countFail++;
       }
     }
-
     StringBuilder details = new StringBuilder();
     if (countFail > 0) {
       pluginState = PluginState.FAILURE;
-      details.append("Updated the instance identifier on ").append(countSuccess).append(" Job's and failed to update ")
-        .append(countFail).append(".\n").append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
+      details.append("Updated the instance identifier on ").append(countSuccess)
+        .append(" Notifications and failed to update ").append(countFail).append(".\n")
+        .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
       pluginState = PluginState.SUCCESS;
-      details.append("Updated the instance identifier on ").append(countSuccess).append(" Job's");
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" Notifications.");
     }
 
     reportItem.setPluginDetails(details.toString());
-
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);
     pluginReport.addReport(reportItem);
@@ -227,10 +228,10 @@ public class InstanceIdentifierJobPlugin extends AbstractPlugin<Void> {
     return new Report();
   }
 
-  private IterableIndexResult<Job> retrieveList(final IndexService index)
+  private IterableIndexResult<Notification> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     final Filter filter = new Filter();
     RODAInstanceUtils.addLocalInstanceFilter(filter);
-    return index.findAll(Job.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
+    return index.findAll(Notification.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }

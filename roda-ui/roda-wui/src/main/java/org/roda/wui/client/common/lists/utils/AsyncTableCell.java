@@ -595,7 +595,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private CompletableFuture<IndexResult<T>> getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn) {
     String reason = "Get " + beautifyClassToReturn(getClassToReturn()) + " data";
     Services services = new Services(reason, "get");
-    FindRequest findRequest = FindRequest.getBuilder(getClassToReturn().getName(), getFilter(), getJustActive())
+    FindRequest findRequest = FindRequest.getBuilder(getFilter(), getJustActive())
       .withSublist(sublist).withFacets(getFacets()).withExportFacets(false).withSorter(sorter)
       .withFieldsToReturn(fieldsToReturn).withCollapse(getCollapse()).build();
     return services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),

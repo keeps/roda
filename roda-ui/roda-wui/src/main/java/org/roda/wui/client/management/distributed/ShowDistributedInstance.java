@@ -152,17 +152,14 @@ public class ShowDistributedInstance extends Composite {
 
   private void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
-      BrowserService.Util.getInstance().retrieveDistributedInstance(historyTokens.get(0),
-        new AsyncCallback<DistributedInstance>() {
-          @Override
-          public void onSuccess(DistributedInstance result) {
-            ShowDistributedInstance showDistributedInstance = new ShowDistributedInstance(result);
+      Services services = new Services("Get distributed instance", "get");
+      services.distributedInstanceResource(s -> s.getDistributedInstance(historyTokens.get(0)))
+        .whenComplete((distributedInstance, error) -> {
+          if (distributedInstance != null) {
+            ShowDistributedInstance showDistributedInstance = new ShowDistributedInstance(distributedInstance);
             callback.onSuccess(showDistributedInstance);
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
+          } else if (error != null) {
+            callback.onFailure(error);
             HistoryUtils.newHistory(Welcome.RESOLVER);
           }
         });
@@ -181,10 +178,10 @@ public class ShowDistributedInstance extends Composite {
         @Override
         public void onSuccess(Boolean confirm) {
           if (confirm) {
-            BrowserService.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
-              new NoAsyncCallback<Void>() {
-                @Override
-                public void onSuccess(Void result) {
+            Services services = new Services("Delete distributed instance", "delete");
+            services.distributedInstanceResource(s -> s.deleteDistributedInstance(distributedInstance.getId()))
+              .whenComplete((result, error) -> {
+                if (error == null) {
                   HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
                 }
               });

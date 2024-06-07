@@ -4341,7 +4341,7 @@ public class ModelService extends ModelObservable {
     try {
       binary = storage.getBinary(distributedInstancePath);
     } catch (NotFoundException e) {
-      throw new GenericException("Could not find the distributed instance" + distributedInstanceId, e);
+      throw new GenericException("Could not find the distributed instance " + distributedInstanceId, e);
     }
     DistributedInstance ret;
 

@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
@@ -754,7 +755,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Disassociate disposal schedule from AIP", "job");
-            services.disposalScheduleResource(s -> s.disassociatedDisposalSchedule(aips))
+            services
+              .disposalScheduleResource(
+                s -> s.disassociatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips)))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);
@@ -802,7 +805,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Associate disposal schedule", "job");
-            services.disposalScheduleResource(s -> s.associatedDisposalSchedule(aips, disposalSchedule.getId()))
+            services.disposalScheduleResource(s -> s
+              .associatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips), disposalSchedule.getId()))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);
@@ -890,7 +894,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             Services services = new Services("Apply disposal hold", "job");
             services
               .disposalHoldResource(
-                s -> s.applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(), override))
+                s -> s.applyDisposalHold(SelectedItemsUtils.convertToRESTRequest(aips), holdDialogResult.getDisposalHold().getId(), override))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(null);
@@ -934,7 +938,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Disassociate disposal holds", "job");
-            services.disposalHoldResource(s -> s.disassociateDisposalHold(aips, null, true))
+            services.disposalHoldResource(s -> s.disassociateDisposalHold(SelectedItemsUtils.convertToRESTRequest(aips), null, true))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);

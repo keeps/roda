@@ -3,9 +3,12 @@ package org.roda.core.data.v2.index.filter;
 import java.io.Serial;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
+@JsonTypeName("BlockJoinParentFilterParameter")
 public class BlockJoinParentFilterParameter extends FilterParameter {
 
   @Serial

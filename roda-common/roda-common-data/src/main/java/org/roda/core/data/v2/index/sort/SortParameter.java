@@ -7,12 +7,14 @@
  */
 package org.roda.core.data.v2.index.sort;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * @author Rui Castro
  */
 public class SortParameter implements Serializable {
+  @Serial
   private static final long serialVersionUID = 5682003551885541798L;
 
   private String name;

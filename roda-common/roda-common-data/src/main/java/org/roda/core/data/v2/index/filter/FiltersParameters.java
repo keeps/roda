@@ -10,6 +10,18 @@ package org.roda.core.data.v2.index.filter;
 import java.io.Serial;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonSubTypes({@JsonSubTypes.Type(value = OrFiltersParameters.class, name = "OrFiltersParameters"),
+  @JsonSubTypes.Type(value = AndFiltersParameters.class, name = "AndFiltersParameters")})
+@Schema(type = "object", subTypes = {OrFiltersParameters.class, AndFiltersParameters.class}, discriminatorMapping = {
+  @DiscriminatorMapping(value = "OrFiltersParameters", schema = OrFiltersParameters.class),
+  @DiscriminatorMapping(value = "AndFiltersParameters", schema = AndFiltersParameters.class)}, discriminatorProperty = "@type")
 public abstract class FiltersParameters extends FilterParameter {
   @Serial
   private static final long serialVersionUID = -7444113772637341849L;

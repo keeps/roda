@@ -7,11 +7,12 @@
  */
 package org.roda.core.data.v2.index.select;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.io.Serial;
+
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 
-import java.io.Serial;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeName("SelectedItemsFilter")
 public class SelectedItemsFilter<T extends IsIndexed> implements SelectedItems<T> {

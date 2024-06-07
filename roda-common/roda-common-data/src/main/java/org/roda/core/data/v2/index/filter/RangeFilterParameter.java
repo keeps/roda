@@ -10,10 +10,27 @@ package org.roda.core.data.v2.index.filter;
 import java.io.Serial;
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonSubTypes({@JsonSubTypes.Type(value = DateIntervalFilterParameter.class, name = "DateIntervalFilterParameter"),
+  @JsonSubTypes.Type(value = DateRangeFilterParameter.class, name = "DateRangeFilterParameter"),
+  @JsonSubTypes.Type(value = LongRangeFilterParameter.class, name = "LongRangeFilterParameter"),
+  @JsonSubTypes.Type(value = StringRangeFilterParameter.class, name = "StringRangeFilterParameter")})
+@Schema(type = "object", subTypes = {DateIntervalFilterParameter.class, DateRangeFilterParameter.class,
+  LongRangeFilterParameter.class, StringRangeFilterParameter.class}, discriminatorMapping = {
+    @DiscriminatorMapping(value = "DateIntervalFilterParameter", schema = DateIntervalFilterParameter.class),
+    @DiscriminatorMapping(value = "DateRangeFilterParameter", schema = DateRangeFilterParameter.class),
+    @DiscriminatorMapping(value = "LongRangeFilterParameter", schema = LongRangeFilterParameter.class),
+    @DiscriminatorMapping(value = "StringRangeFilterParameter", schema = StringRangeFilterParameter.class)}, discriminatorProperty = "@type")
 public abstract class RangeFilterParameter<T extends Serializable> extends FilterParameter {
   @Serial
   private static final long serialVersionUID = -2923383960685420739L;

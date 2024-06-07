@@ -174,7 +174,7 @@ public class IndexService {
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, User user, boolean justActive, final List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
-    FindRequest findRequest = FindRequest.getBuilder(returnClass.getName(), filter, justActive).withSorter(sorter)
+    FindRequest findRequest = FindRequest.getBuilder(filter, justActive).withSorter(sorter)
       .withSublist(sublist).withFacets(facets).withFieldsToReturn(fieldsToReturn).build();
     return SolrUtils.find(getSolrClient(), returnClass, findRequest, user);
   }

@@ -108,7 +108,9 @@ import config.i18n.client.ClientMessages;
 public class BrowseRepresentation extends Composite {
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static final List<String> fieldsToReturn = new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
+  private static SimplePanel container;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -136,69 +138,47 @@ public class BrowseRepresentation extends Composite {
       return "representation";
     }
   };
-
-  private static SimplePanel container;
-
-  private static final List<String> fieldsToReturn = new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
-
-  interface MyUiBinder extends UiBinder<Widget, BrowseRepresentation> {
-  }
-
-  private List<HandlerRegistration> handlers;
-  private IndexedAIP aip;
-  private IndexedRepresentation representation;
-  private String aipId;
-  private String repId;
-  private String repUUID;
-
   // Focus
   @UiField
   FocusPanel keyboardFocus;
-
-  // STATUS
-
   @UiField
   HTML aipState;
-
-  // DESCRIPTIVE METADATA
-
   @UiField
   TabPanel itemMetadata;
-
   @UiField
   Button newDescriptiveMetadata;
-
-  private SimplePanel descriptiveMetadataButtons;
-  private Map<Integer, HTMLPanel> descriptiveMetadataSavedButtons;
-
-  // FILES
-
   @UiField(provided = true)
   SearchWrapper filesSearch;
-
-  // DISSEMINATIONS
-
   @UiField(provided = true)
   SearchWrapper disseminationsSearch;
-
   @UiField
   FlowPanel center;
-
   @UiField
   NavigationToolbar<IndexedRepresentation> navigationToolbar;
 
+  // STATUS
   @UiField
   HTML representationIcon;
 
+  // DESCRIPTIVE METADATA
   @UiField
   FlowPanel representationTitle;
-
   @UiField
   FlowPanel risksEventsLogs;
-
   @UiField
   Label dateCreatedAndModified;
+  private final List<HandlerRegistration> handlers;
+
+  // FILES
+  private final IndexedAIP aip;
+
+  // DISSEMINATIONS
+  private final IndexedRepresentation representation;
+  private final String aipId;
+  private final String repId;
+  private final String repUUID;
+  private SimplePanel descriptiveMetadataButtons;
+  private Map<Integer, HTMLPanel> descriptiveMetadataSavedButtons;
 
   public BrowseRepresentation(BrowseRepresentationResponse response) {
     this.representation = response.getIndexedRepresentation();
@@ -252,7 +232,7 @@ public class BrowseRepresentation extends Composite {
     Services services = response.getServices();
     Filter dipsFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, representation.getUUID()));
-    CountRequest dipCountRequest = new CountRequest(RiskIncidence.class.getName(), new Filter(dipsFilter), true);
+    CountRequest dipCountRequest = new CountRequest(new Filter(dipsFilter), true);
     CompletableFuture<LongResponse> dipCounterCompletableFuture = services
       .rodaEntityRestService(s -> s.count(dipCountRequest), IndexedDIP.class).handle((longResponse, throwable1) -> {
         if (throwable1 != null) {
@@ -264,8 +244,7 @@ public class BrowseRepresentation extends Composite {
     AndFiltersParameters riskIncidenceFilter = new AndFiltersParameters(
       Arrays.asList(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()),
         new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, representation.getAipId())));
-    CountRequest riskIncidenceCountRequest = new CountRequest(RiskIncidence.class.getName(),
-      new Filter(riskIncidenceFilter), true);
+    CountRequest riskIncidenceCountRequest = new CountRequest(new Filter(riskIncidenceFilter), true);
     CompletableFuture<LongResponse> riskIncidenceCounterCompletableFuture = services
       .rodaEntityRestService(s -> s.count(riskIncidenceCountRequest), RiskIncidence.class)
       .handle((longResponse, throwable1) -> {
@@ -277,8 +256,7 @@ public class BrowseRepresentation extends Composite {
 
     Filter preservationEventFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representation.getUUID()));
-    CountRequest preservationEventsCountRequest = new CountRequest(IndexedPreservationEvent.class.getName(),
-      preservationEventFilter, true);
+    CountRequest preservationEventsCountRequest = new CountRequest(preservationEventFilter, true);
 
     CompletableFuture<LongResponse> preservationCounterCompletableFuture = services
       .rodaEntityRestService(s -> s.count(preservationEventsCountRequest), IndexedPreservationEvent.class)
@@ -643,5 +621,8 @@ public class BrowseRepresentation extends Composite {
   @UiHandler("newDescriptiveMetadata")
   void buttonNewDescriptiveMetadataEventsHandler(ClickEvent e) {
     newRepresentationDescriptiveMetadata();
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, BrowseRepresentation> {
   }
 }

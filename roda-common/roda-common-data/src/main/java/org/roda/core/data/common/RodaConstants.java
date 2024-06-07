@@ -344,7 +344,8 @@ public final class RodaConstants {
    */
 
   // common
-  public static final String API_REST_V2_DOWNLOAD_HANDLER = "/binary";
+  public static final String API_REST_V2_DOWNLOAD_HANDLER = "/download";
+  public static final String API_REST_V2_PREVIEW_HANDLER = "/preview";
   public static final String API_REST_V2_REPRESENTATION_OTHER_METADATA = "/other-metadata";
 
   // aips
@@ -387,6 +388,10 @@ public final class RodaConstants {
   public static final String API_V2_QUERY_PARAM_RESOURCE_ID = "resource-id";
   public static final String API_V2_QUERY_PARAM_DEFAULT_RESOURCE_ID = "default-resource-id";
   public static final String API_V2_QUERY_PARAM_RESOURCE_TYPE = "resource-type";
+
+  // distributed instances
+  public static final String API_REST_V2_DISTRIBUTED_INSTANCE = "api/v2/distributed-instances/";
+
   /**
    * END: API related (Version 2)
    */
@@ -1320,11 +1325,13 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_REPRESENTATION_TYPE = "parameter.representation_type";
   public static final String PLUGIN_PARAMS_OUTCOMEOBJECTID_TO_SOURCEOBJECTID_MAP = "parameter.outcomeobjectid_to_sourceobjectid_map";
   public static final String PLUGIN_PARAMS_NEW_TYPE = "parameter.new_type";
+  public static final String PLUGIN_PARAMS_NEW_STATUS = "parameter.new_status";
   public static final String PLUGIN_PARAMS_ACCEPT = "parameter.accept";
   public static final String PLUGIN_PARAMS_REJECT_REASON = "parameter.reject_reason";
   public static final String PLUGIN_PARAMS_RECURSIVE = "parameter.recursive";
   public static final String PLUGIN_PARAMS_DONT_CHECK_RELATIVES = "parameter.dont_check_relatives";
   public static final String PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER = "parameter.representation_information_filter";
+  public static final String PLUGIN_PARAMS_RODA_MEMBER_ACTIVATE = "parameter.activate";
 
   public static final String PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA = "parameter.validate_descriptive_metadata";
   public static final String PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE = "parameter.metadata_type";

@@ -7,10 +7,16 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+import java.io.Serial;
+
 /**
  * @author Rui Castro
  */
+@JsonTypeName("LikeFilterParameter")
 public class LikeFilterParameter extends FilterParameter {
+  @Serial
   private static final long serialVersionUID = 5402707366601834582L;
 
   private String expression;

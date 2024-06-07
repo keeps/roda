@@ -7,11 +7,17 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+import java.io.Serial;
+
 /**
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
+@JsonTypeName("NotSimpleFilterParameter")
 public class NotSimpleFilterParameter extends FilterParameter {
+  @Serial
   private static final long serialVersionUID = -2122986808484304112L;
 
   private String value;

@@ -96,11 +96,12 @@ public class FilesService {
       "Could not execute format identification using Siegfrid action");
   }
 
-  public Job deleteFiles(User user, DeleteRequest<IndexedFile> request)
+  public Job deleteFiles(User user, DeleteRequest request)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, request.getDetails());
-    return CommonServicesUtils.createAndExecuteInternalJob("Delete files", request.getItemsToDelete(),
+    return CommonServicesUtils.createAndExecuteInternalJob("Delete files",
+      CommonServicesUtils.convertSelectedItems(request.getItemsToDelete(), IndexedFile.class),
       DeleteRODAObjectPlugin.class, user, pluginParameters, "Could not execute file delete action");
   }
 

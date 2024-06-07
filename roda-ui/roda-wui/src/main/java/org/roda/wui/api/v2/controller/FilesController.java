@@ -21,6 +21,7 @@ import org.roda.core.data.v2.file.MoveFilesRequest;
 import org.roda.core.data.v2.file.RenameFolderRequest;
 import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
@@ -44,6 +45,7 @@ import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.FilesService;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.utils.ApiUtils;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.FileRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
@@ -85,12 +87,12 @@ public class FilesController implements FileRestService {
   @Autowired
   private IndexService indexService;
 
-  @RequestMapping(path = "{uuid}/binary", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-  @Operation(summary = "Downloads file", description = "Download a particular file", responses = {
+  @RequestMapping(path = "{uuid}/preview", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @Operation(summary = "Previews a file", description = "Previews a particular file using streaming capabilities", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamingResponseBody.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  public ResponseEntity<StreamingResponseBody> downloadBinary(
+  public ResponseEntity<StreamingResponseBody> previewBinary(
     @Parameter(description = "The UUID of the existing file", required = true) @PathVariable(name = "uuid") String fileUUID,
     @RequestHeader HttpHeaders headers) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -108,7 +110,45 @@ public class FilesController implements FileRestService {
       StreamResponse response = filesService.retrieveAIPRepresentationFile(file);
 
       return ApiUtils.rangeResponse(headers, response.getStream());
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (NotFoundException | GenericException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, fileUUID, state, RodaConstants.CONTROLLER_FILE_UUID_PARAM,
+        fileUUID);
+    }
+  }
+
+  @RequestMapping(path = "{uuid}/download", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @Operation(summary = "Downloads file", description = "Download a particular file", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamingResponseBody.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  public ResponseEntity<StreamingResponseBody> downloadBinary(
+    @Parameter(description = "The UUID of the existing file", required = true) @PathVariable(name = "uuid") String fileUUID) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
+      fileFields.add(RodaConstants.FILE_ISDIRECTORY);
+      IndexedFile file = indexService.retrieve(requestContext, IndexedFile.class, fileUUID, fileFields);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
+
+      StreamResponse response = filesService.retrieveAIPRepresentationFile(file);
+
+      return ApiUtils.okResponse(response);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (NotFoundException | GenericException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -206,7 +246,7 @@ public class FilesController implements FileRestService {
   }
 
   @Override
-  public Job deleteFiles(@RequestBody DeleteRequest<IndexedFile> deleteRequest) {
+  public Job deleteFiles(@RequestBody DeleteRequest deleteRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -214,7 +254,8 @@ public class FilesController implements FileRestService {
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), deleteRequest.getItemsToDelete());
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+        CommonServicesUtils.convertSelectedItems(deleteRequest.getItemsToDelete(), IndexedFile.class));
 
       return filesService.deleteFiles(requestContext.getUser(), deleteRequest);
     } catch (AuthorizationDeniedException e) {
@@ -262,7 +303,7 @@ public class FilesController implements FileRestService {
   }
 
   @Override
-  public Job identifyFileFormat(@RequestBody SelectedItems<IndexedFile> selected) {
+  public Job identifyFileFormat(@RequestBody SelectedItemsRequest selected) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -270,10 +311,12 @@ public class FilesController implements FileRestService {
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), selected);
+      SelectedItems<IndexedFile> indexedFileSelectedItems = CommonServicesUtils.convertSelectedItems(selected,
+        IndexedFile.class);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedFileSelectedItems);
 
       // delegate
-      return filesService.createFormatIdentificationJob(requestContext.getUser(), selected);
+      return filesService.createFormatIdentificationJob(requestContext.getUser(), indexedFileSelectedItems);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -282,8 +325,7 @@ public class FilesController implements FileRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        selected);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected);
     }
   }
 
@@ -329,8 +371,8 @@ public class FilesController implements FileRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
-        aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
         RodaConstants.CONTROLLER_DIRECTORY_PATH_PARAM, directories, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileName,
         RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }

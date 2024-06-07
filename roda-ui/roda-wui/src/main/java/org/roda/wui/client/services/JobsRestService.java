@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.generics.StringResponse;
-import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Jobs;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -37,9 +37,10 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
 
   @RequestMapping(method = RequestMethod.POST, path = "/obtain-command", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Obtains the cURL command for a job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {
-      @ApiResponse(responseCode = "200", description = "cURL command successfully built", content = @Content(schema = @Schema(implementation = String.class)))})
-  StringResponse obtainJobCommand(@Parameter(name = "job", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Job job);
-  
+    @ApiResponse(responseCode = "200", description = "cURL command successfully built", content = @Content(schema = @Schema(implementation = String.class)))})
+  StringResponse obtainJobCommand(
+    @Parameter(name = "job", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Job job);
+
   @RequestMapping(method = RequestMethod.POST, path = "", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Create job", description = "Creates a new job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {
     @ApiResponse(responseCode = "201", description = "Job created successfully", content = @Content(schema = @Schema(implementation = Job.class))),
@@ -55,18 +56,18 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
   Void stopJob(@PathVariable(name = "id") String id);
 
   @RequestMapping(method = RequestMethod.POST, path = "/approve", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Approve job", description = "Approves a job.", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), responses = {
+  @Operation(summary = "Approve job", description = "Approves a job.", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItemsRequest.class))), responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Jobs approveJob(
-    @Parameter(name = "jobId", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<Job> selectedJobs);
+    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selectedJobs);
 
   @RequestMapping(method = RequestMethod.POST, path = "/reject", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Reject job", description = "Rejects a job.", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), responses = {
+  @Operation(summary = "Reject job", description = "Rejects a job.", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItemsRequest.class))), responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Jobs rejectJob(
-    @Parameter(name = "jobId", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<Job> selectedJobs,
+    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selectedJobs,
     @Parameter(description = "Justification for why the job was rejected") @RequestParam(name = RodaConstants.API_QUERY_JOB_DETAILS) String details);
 
   @RequestMapping(method = RequestMethod.GET, path = "/{id}/reports", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,7 +85,7 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Report.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Report getJobReport(@PathVariable(name = "id") String id,
-                      @PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_REPORT_ID) String reportId);
+    @PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_REPORT_ID) String reportId);
 
   @RequestMapping(method = RequestMethod.POST, path = "/plugin-info", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get job plugin info", description = "Gets the information about the plugins executed on the job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {

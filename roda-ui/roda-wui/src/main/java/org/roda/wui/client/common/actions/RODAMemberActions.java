@@ -13,11 +13,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.requests.ChangeUserStatusRequest;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.CreateGroup;
 import org.roda.wui.client.management.CreateUser;
 import org.roda.wui.client.management.EditGroup;
@@ -25,6 +28,7 @@ import org.roda.wui.client.management.EditUser;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -151,10 +155,25 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
 
   private void activate(SelectedItems<RODAMember> objects, AsyncCallback<ActionImpact> callback) {
     Services services = new Services("Activate RODA member", "activate");
-    services.membersResource(s -> s.changeActive(objects, true)).whenComplete((res, error) -> {
+    ChangeUserStatusRequest request = new ChangeUserStatusRequest(SelectedItemsUtils.convertToRESTRequest(objects),
+      true);
+    services.membersResource(s -> s.changeActive(request)).whenComplete((res, error) -> {
       if (error == null) {
-        callback.onSuccess(Actionable.ActionImpact.UPDATED);
-        HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
+        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+        Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onSuccess(Actionable.ActionImpact.UPDATED);
+            HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
+          }
+
+          @Override
+          public void onSuccess(final Void nothing) {
+            callback.onSuccess(ActionImpact.NONE);
+            HistoryUtils.newHistory(ShowJob.RESOLVER, res.getId());
+          }
+        });
       }
     });
   }
@@ -170,10 +189,25 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
 
   private void deactivate(SelectedItems<RODAMember> objects, AsyncCallback<ActionImpact> callback) {
     Services services = new Services("Deactivate RODA member", "deactivate");
-    services.membersResource(s -> s.changeActive(objects, false)).whenComplete((res, error) -> {
+    ChangeUserStatusRequest request = new ChangeUserStatusRequest(SelectedItemsUtils.convertToRESTRequest(objects),
+      false);
+    services.membersResource(s -> s.changeActive(request)).whenComplete((res, error) -> {
       if (error == null) {
-        callback.onSuccess(Actionable.ActionImpact.UPDATED);
-        HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
+        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+        Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onSuccess(Actionable.ActionImpact.UPDATED);
+            HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
+          }
+
+          @Override
+          public void onSuccess(final Void nothing) {
+            callback.onSuccess(ActionImpact.NONE);
+            HistoryUtils.newHistory(ShowJob.RESOLVER, res.getId());
+          }
+        });
       }
     });
   }
@@ -185,7 +219,8 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Services services = new Services("Remove RODA members", "remove");
-            services.membersResource(s -> s.deleteMultipleMembers(objects)).whenComplete((res, error) -> {
+            services.membersResource(s -> s.deleteMultipleMembers(SelectedItemsUtils.convertToRESTRequest(objects)))
+              .whenComplete((res, error) -> {
               if (error == null) {
                 callback.onSuccess(Actionable.ActionImpact.DESTROYED);
                 HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());

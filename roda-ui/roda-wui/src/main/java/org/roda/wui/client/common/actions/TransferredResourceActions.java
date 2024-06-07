@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -232,7 +233,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   private void move(SelectedItems<TransferredResource> objects, AsyncCallback<ActionImpact> callback) {
     Services service = new Services("Moving transferred resource", "move");
 
-    service.transferredResource(s -> s.getSelectedTransferredResources(objects)).whenComplete((resources, error) -> {
+    service.transferredResource(s -> s.getSelectedTransferredResources(SelectedItemsUtils.convertToRESTRequest(objects))).whenComplete((resources, error) -> {
       if (resources != null && resources.getObjects() != null) {
         Filter filter = new Filter();
         filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
@@ -255,7 +256,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
         dialog.addValueChangeHandler(event -> {
           TransferredResource transferredResource = event.getValue();
           String resourceId = transferredResource == null ? null : transferredResource.getUUID();
-          service.transferredResource(s -> s.moveTransferredResources(objects, resourceId)).whenComplete((result, err) -> {
+          service.transferredResource(s -> s.moveTransferredResources(SelectedItemsUtils.convertToRESTRequest(objects), resourceId)).whenComplete((result, err) -> {
             if (result != null) {
               Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
 
@@ -311,7 +312,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                service.transferredResource(s -> s.deleteMultipleResources(objects)).whenComplete((value, error) -> {
+                service.transferredResource(s -> s.deleteMultipleResources(SelectedItemsUtils.convertToRESTRequest(objects))).whenComplete((value, error) -> {
                   if (error == null) {
                     Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
                     doActionCallbackDestroyed();

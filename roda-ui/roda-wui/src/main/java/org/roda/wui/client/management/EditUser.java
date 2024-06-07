@@ -10,6 +10,29 @@
  */
 package org.roda.wui.client.management;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+
+import org.roda.core.data.common.SecureString;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
+import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.user.requests.ChangeUserStatusRequest;
+import org.roda.core.data.v2.user.requests.CreateUserRequest;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.management.access.AccessKeyTablePanel;
+import org.roda.wui.client.management.access.CreateAccessKey;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -20,27 +43,8 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import config.i18n.client.ClientMessages;
-import org.roda.core.data.common.SecureString;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.user.CreateUserRequest;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.management.access.AccessKeyTablePanel;
-import org.roda.wui.client.management.access.CreateAccessKey;
-import org.roda.wui.client.services.Services;
-import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
-import java.util.HashSet;
-import java.util.List;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -183,13 +187,27 @@ public class EditUser extends Composite {
   void buttonDeActivateHandler(ClickEvent e) {
     user.setActive(!user.isActive());
     Services services = new Services("Update User", "update");
-    services.membersResource(s -> s.changeActive(SelectedItemsList.create(RODAMember.class, user.getUUID()), user.isActive()))
+
+    ChangeUserStatusRequest request = new ChangeUserStatusRequest(
+      new SelectedItemsListRequest(Arrays.asList(user.getUUID())), user.isActive());
+    services.membersResource(s -> s.changeActive(request))
       .whenComplete((res, error) -> {
         if (error == null) {
+          Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+          Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              HistoryUtils.newHistory(MemberManagement.RESOLVER);
+            }
+
+            @Override
+            public void onSuccess(final Void nothing) {
+              HistoryUtils.newHistory(ShowJob.RESOLVER, res.getId());
+            }
+          });
+
           HistoryUtils.newHistory(MemberManagement.RESOLVER);
-        } else {
-          user.setActive(!user.isActive());
-          errorMessage(error, null);
         }
       });
   }

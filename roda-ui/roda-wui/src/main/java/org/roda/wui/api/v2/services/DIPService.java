@@ -46,21 +46,22 @@ public class DIPService {
     return new StreamResponse(download);
   }
 
-  public Job deleteDIPsJob(DeleteRequest<IndexedDIP> request, User user)
+  public Job deleteDIPsJob(DeleteRequest request, User user)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, request.getDetails());
-    return CommonServicesUtils.createAndExecuteInternalJob("Delete DIPs", request.getItemsToDelete(),
+    return CommonServicesUtils.createAndExecuteInternalJob("Delete DIPs",
+      CommonServicesUtils.convertSelectedItems(request.getItemsToDelete(), IndexedDIP.class),
       DeleteRODAObjectPlugin.class, user, pluginParameters, "Could not execute delete DIP action");
   }
 
-  public Job updateDIPPermissions(User user, UpdatePermissionsRequest<IndexedDIP> request)
+  public Job updateDIPPermissions(User user, UpdatePermissionsRequest request)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON,
       JsonUtils.getJsonFromObject(request.getPermissions()));
     return CommonServicesUtils.createAndExecuteInternalJob("Update DIP permissions recursively",
-      request.getItemsToUpdate(), UpdatePermissionsPlugin.class, user, pluginParameters,
-      "Could not execute DIP permissions recursively action");
+      CommonServicesUtils.convertSelectedItems(request.getItemsToUpdate(), IndexedDIP.class),
+      UpdatePermissionsPlugin.class, user, pluginParameters, "Could not execute DIP permissions recursively action");
   }
 }

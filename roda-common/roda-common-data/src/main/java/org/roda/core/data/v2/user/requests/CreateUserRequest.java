@@ -1,8 +1,9 @@
-package org.roda.core.data.v2.user;
+package org.roda.core.data.v2.user.requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.v2.generics.MetadataValue;
+import org.roda.core.data.v2.user.User;
 
 import java.io.Serial;
 import java.io.Serializable;

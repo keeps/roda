@@ -52,22 +52,6 @@ public class NotificationController implements NotificationRestService {
   private HttpServletRequest request;
 
   @Override
-  public Notifications listNotifications(String start, String limit) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    // delegate action to controller
-    boolean justActive = false;
-    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-
-    FindRequest findRequest = FindRequest.getBuilder(Notification.class.getName(), Filter.ALL, justActive)
-      .withSublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())).build();
-
-    IndexResult<Notification> result = indexService.find(Notification.class, findRequest, requestContext);
-
-    return new Notifications(result.getResults());
-  }
-
-  @Override
   public Notification getNotification(String notificationId) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(requestContext, Notification.class, notificationId, new ArrayList<>());

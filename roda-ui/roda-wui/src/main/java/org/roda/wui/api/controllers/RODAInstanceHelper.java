@@ -44,7 +44,7 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
-import org.roda.core.plugins.base.synchronization.instanceIdentifier.LocalInstanceRegisterPlugin;
+import org.roda.core.plugins.base.synchronization.instance.LocalInstanceRegisterPlugin;
 import org.roda.core.plugins.base.synchronization.proccess.ImportSyncBundlePlugin;
 import org.roda.core.plugins.base.synchronization.proccess.SynchronizeInstancePlugin;
 import org.slf4j.Logger;
