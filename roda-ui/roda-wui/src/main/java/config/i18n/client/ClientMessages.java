@@ -920,6 +920,14 @@ public interface ClientMessages extends Messages {
 
   String riskRemoveConfirmDialogTitle();
 
+  String riskHistoryRemoveConfirmDialogTitle();
+
+  String riskHistoryRemoveConfirmDialogMessage();
+
+  String riskHistoryRevertConfirmDialogTitle();
+
+  String riskHistoryRevertConfirmDialogMessage();
+
   String riskRemoveSelectedConfirmDialogMessage(Long size);
 
   String riskRemoveConfirmDialogCancel();

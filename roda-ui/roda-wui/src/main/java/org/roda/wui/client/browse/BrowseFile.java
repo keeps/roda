@@ -115,7 +115,7 @@ public class BrowseFile extends Composite {
           } else {
             Filter riskIncidenceFilter = new Filter(
               new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, indexedFile.getId()));
-            CountRequest riskIncidenceCountRequest = new CountRequest(RiskIncidence.class.getName(),
+            CountRequest riskIncidenceCountRequest = new CountRequest(
               riskIncidenceFilter, true);
             CompletableFuture<LongResponse> riskCounterCompletableFuture = services
               .rodaEntityRestService(s -> s.count(riskIncidenceCountRequest), RiskIncidence.class)
@@ -128,7 +128,7 @@ public class BrowseFile extends Composite {
 
             Filter preservationEventFilter = new Filter(
               new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, indexedFile.getUUID()));
-            CountRequest preservationEventsCountRequest = new CountRequest(IndexedPreservationEvent.class.getName(),
+            CountRequest preservationEventsCountRequest = new CountRequest(
               preservationEventFilter, true);
 
             CompletableFuture<LongResponse> preservationCounterCompletableFuture = services
@@ -142,7 +142,7 @@ public class BrowseFile extends Composite {
 
             Filter dipsFilter = new Filter(
               new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, indexedFile.getUUID()));
-            CountRequest dipsCountRequest = new CountRequest(IndexedDIP.class.getName(), dipsFilter, true);
+            CountRequest dipsCountRequest = new CountRequest(dipsFilter, true);
             CompletableFuture<LongResponse> dipCounterCompletableFuture = services
               .rodaEntityRestService(s -> s.count(dipsCountRequest), IndexedDIP.class)
               .handle((longResponse, throwable3) -> {
@@ -223,7 +223,7 @@ public class BrowseFile extends Composite {
       response.getIndexedAIP().getPermissions(), () -> Scheduler.get().scheduleDeferred((Command) () -> {
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, indexedFile.getUUID()));
 
-        services.rodaEntityRestService(s -> s.count(new CountRequest(IndexedDIP.class.getName(), filter, justActive)),
+        services.rodaEntityRestService(s -> s.count(new CountRequest(filter, justActive)),
           IndexedDIP.class).whenComplete((longResponse, caught) -> {
             if (caught != null) {
               AsyncCallbackUtils.defaultFailureTreatment(caught);

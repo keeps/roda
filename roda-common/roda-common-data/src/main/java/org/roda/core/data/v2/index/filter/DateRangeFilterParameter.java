@@ -7,15 +7,20 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import java.io.Serial;
 import java.util.Date;
 
 import org.roda.core.data.common.RodaConstants.DateGranularity;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 /**
  * @author Luis Faria <lfaria@keep.pt>
  */
+@JsonTypeName("DateRangeFilterParameter")
 public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
 
+  @Serial
   private static final long serialVersionUID = -8039972534809175118L;
   private DateGranularity granularity = DateGranularity.DAY;
 

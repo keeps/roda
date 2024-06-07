@@ -9,7 +9,6 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.generics.LongResponse;
@@ -30,13 +29,11 @@ import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -89,9 +86,9 @@ public class AuditLogController implements AuditLogRestService {
   }
 
   @Override
-  @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
   public List<String> suggest(SuggestRequest suggestRequest) {
-    throw new RESTException(new NotImplementedException());
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.suggest(suggestRequest, LogEntry.class, requestContext);
   }
 
   @PostMapping(path = "/import", produces = MediaType.APPLICATION_JSON_VALUE)

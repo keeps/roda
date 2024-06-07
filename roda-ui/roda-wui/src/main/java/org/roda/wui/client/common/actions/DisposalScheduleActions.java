@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -121,7 +122,7 @@ public class DisposalScheduleActions extends AbstractActionable<IndexedAIP> {
             public void onSuccess(Boolean result) {
               if (result) {
                 Services services = new Services("Disassociate disposal schedule from AIP", "job");
-                services.disposalScheduleResource(s -> s.disassociatedDisposalSchedule(items))
+                services.disposalScheduleResource(s -> s.disassociatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(items)))
                   .whenComplete((job, throwable) -> {
                     if (throwable != null) {
                       callback.onFailure(throwable);

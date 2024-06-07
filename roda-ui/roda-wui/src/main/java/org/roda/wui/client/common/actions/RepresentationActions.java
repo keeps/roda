@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -275,7 +276,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                     @Override
                     public void onSuccess(String details) {
                       Services services = new Services("Change representation type", "update");
-                      ChangeRepresentationTypeRequest request = new ChangeRepresentationTypeRequest(representations,
+                      ChangeRepresentationTypeRequest request = new ChangeRepresentationTypeRequest(
+                        SelectedItemsUtils.convertToRESTRequest(representations),
                         newType, details);
                       services.representationResource(s -> s.changeRepresentationType(request))
                         .whenComplete((result, error) -> {
@@ -360,12 +362,27 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
               public void onSuccess(String details) {
                 Services services = new Services("Change representation status", "update");
                 ChangeRepresentationStatesRequest changeRepresentationStatesRequest = new ChangeRepresentationStatesRequest(
-                  representation.getUUID(), newStates, details);
+                  SelectedItemsUtils.convertToRESTRequest(
+                    objectToSelectedItems(representation, IndexedRepresentation.class)),
+                  newStates, details);
                 services.representationResource(s -> s.changeRepresentationStatus(changeRepresentationStatesRequest))
                   .whenComplete((result, error) -> {
                     if (error == null) {
                       Toast.showInfo(messages.dialogSuccess(), messages.changeStatusSuccessful());
-                      doActionCallbackUpdated();
+
+                      Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                        @Override
+                        public void onFailure(Throwable caught) {
+                          doActionCallbackUpdated();
+                        }
+
+                        @Override
+                        public void onSuccess(final Void nothing) {
+                          doActionCallbackNone();
+                          HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                        }
+                      });
                     }
                   });
               }

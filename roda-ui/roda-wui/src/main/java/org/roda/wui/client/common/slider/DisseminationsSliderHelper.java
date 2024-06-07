@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FindRequest;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -25,7 +24,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -93,7 +91,7 @@ public class DisseminationsSliderHelper {
     dipFields.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
       RodaConstants.DIP_DESCRIPTION, RodaConstants.DIP_DELETE_EXTERNAL_URL, RodaConstants.DIP_OPEN_EXTERNAL_URL));
 
-    FindRequest findRequest = FindRequest.getBuilder(IndexedDIP.class.getName(), filter, true).withSorter(sorter)
+    FindRequest findRequest = FindRequest.getBuilder(filter, true).withSorter(sorter)
       .withSublist(sublist).withFacets(facets).build();
 
     services.rodaEntityRestService(s -> s.find(findRequest, localeString), IndexedDIP.class)
@@ -116,7 +114,7 @@ public class DisseminationsSliderHelper {
     dipFields.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
       RodaConstants.DIP_DESCRIPTION, RodaConstants.DIP_DELETE_EXTERNAL_URL, RodaConstants.DIP_OPEN_EXTERNAL_URL));
 
-    FindRequest request = FindRequest.getBuilder(IndexedDIP.class.getName(), filter, true).withFieldsToReturn(dipFields).withSublist(sublist).withSorter(sorter).withFacets(facets).build();
+    FindRequest request = FindRequest.getBuilder(filter, true).withFieldsToReturn(dipFields).withSublist(sublist).withSorter(sorter).withFacets(facets).build();
 
     Services services = new Services("Find Indexed DIP", "get");
     services.dipResource(s -> s.find(request, localeString)).whenComplete((indexedDIPIndexResult, throwable) -> {

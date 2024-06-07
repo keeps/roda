@@ -3,6 +3,8 @@ package org.roda.wui.api.v2.exceptions;
 import java.util.UUID;
 
 import com.google.gwt.core.client.GWT;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -65,7 +67,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
       || ex.getCause() instanceof JobStateNotPendingException
       || ex.getCause() instanceof DisposalScheduleNotValidException
       || ex.getCause() instanceof DisposalHoldNotValidException
-      || ex.getCause() instanceof InvalidTokenException) {
+      || ex.getCause() instanceof InvalidTokenException
+      || ex.getCause() instanceof JwtException) {
       message = "Request was not valid";
       details = ex.getCause().getMessage();
       httpStatus = HttpStatus.BAD_REQUEST;

@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.risks.api.incidences.SelectedIncidences;
+import org.roda.core.data.v2.risks.api.incidences.UpdateRiskIncidences;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
@@ -159,8 +160,10 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
 
                     @Override
                     public void onSuccess(final String details) {
-
-                      service.riskIncidenceResource(s -> s.deleteRiskIncidences(objects, details))
+                      DeleteRequest request = new DeleteRequest();
+                      request.setSelectedItemsToDelete(objects);
+                      request.setDetails(details);
+                      service.riskIncidenceResource(s -> s.deleteRiskIncidences(request))
                         .whenComplete((value, error) -> {
                           if (error == null) {
                             Toast.showInfo(messages.runningInBackgroundTitle(),
@@ -206,8 +209,8 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
     dialog.addValueChangeHandler((ValueChangeHandler<RiskIncidence>) event -> {
       EditMultipleRiskIncidenceDialog editDialog = (EditMultipleRiskIncidenceDialog) event.getSource();
 
-      SelectedIncidences<RiskIncidence> selectedIncidences = new SelectedIncidences<>(objects,
-        editDialog.getMitigatedDescription(), editDialog.getSeverity(), editDialog.getStatus());
+      UpdateRiskIncidences selectedIncidences = new UpdateRiskIncidences(objects, editDialog.getMitigatedDescription(),
+        editDialog.getSeverity(), editDialog.getStatus());
 
       service.riskIncidenceResource(s -> s.updateMultipleIncidences(selectedIncidences))
         .whenComplete((value, error) -> {

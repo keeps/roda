@@ -35,15 +35,14 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.representation.ChangeRepresentationStatesRequest;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
+import org.roda.core.plugins.base.maintenance.ChangeRepresentationStatusPlugin;
 import org.roda.core.plugins.base.maintenance.ChangeTypePlugin;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.storage.Binary;
@@ -168,39 +167,14 @@ public class RepresentationService {
       DeleteRODAObjectPlugin.class, user, pluginParameters, "Could not execute representations delete action");
   }
 
-  public IndexedRepresentation changeRepresentationStates(User user, IndexedRepresentation representation,
-    ChangeRepresentationStatesRequest changeRepresentationStatesRequest)
+  public Job changeRepresentationStatus(User user, SelectedItems<IndexedRepresentation> selected, List<String> newStatus,
+                                        String details)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    String eventDescription = "The process of updating an object of the repository.";
-
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
-
-    List<LinkingIdentifier> sources = new ArrayList<>();
-    sources.add(PluginHelper.getLinkingIdentifier(representation.getAipId(), representation.getId(),
-      RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-
-    try {
-      model.changeRepresentationStates(representation.getAipId(), representation.getId(),
-        changeRepresentationStatesRequest.getNewStates(), user.getName());
-      index.commit(IndexedRepresentation.class);
-      StringBuilder outcomeText = new StringBuilder().append("The states of the representation '")
-        .append(representation.getId()).append("' were updated.");
-
-      model.createEvent(representation.getAipId(), representation.getId(), null, null,
-        RodaConstants.PreservationEventType.UPDATE, eventDescription, sources, null, PluginState.SUCCESS,
-        outcomeText.toString(), changeRepresentationStatesRequest.getDetails(), user.getName(), true);
-      return index.retrieve(IndexedRepresentation.class, changeRepresentationStatesRequest.getRepresentationId(),
-        RodaConstants.FILE_FIELDS_TO_RETURN);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      StringBuilder outcomeText = new StringBuilder().append("The states of the representation '")
-        .append(representation.getId()).append("' were not updated.");
-
-      model.createEvent(representation.getAipId(), representation.getId(), null, null,
-        RodaConstants.PreservationEventType.UPDATE, eventDescription, sources, null, PluginState.FAILURE,
-        outcomeText.toString(), changeRepresentationStatesRequest.getDetails(), user.getName(), true);
-      throw e;
-    }
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NEW_STATUS, String.join(",", newStatus));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    return CommonServicesUtils.createAndExecuteInternalJob("Change representation status", selected,
+        ChangeRepresentationStatusPlugin.class, user, pluginParameters, "Could not change representation status");
   }
 
   public Job createFormatIdentificationJob(User user, SelectedItems<?> selected)

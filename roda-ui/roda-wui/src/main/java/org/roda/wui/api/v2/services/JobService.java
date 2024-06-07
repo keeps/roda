@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -22,7 +21,6 @@ import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.StreamResponse;
@@ -31,7 +29,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -52,7 +49,6 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.servlets.ContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -338,36 +334,6 @@ public class JobService {
       pluginsInfo.addAll(aipToAipPlugins);
     }
     return pluginsInfo;
-  }
-
-  public <T extends IsRODAObject> Job createAndExecuteInternalJob(String name, SelectedItems<T> sourceObjects,
-                                                                         Class<?> plugin, User user, Map<String, String> pluginParameters, String exceptionMessage)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return createAndExecuteJob(name, sourceObjects, plugin, PluginType.INTERNAL, user, pluginParameters,
-      exceptionMessage);
-  }
-
-  public <T extends IsRODAObject> Job createAndExecuteJob(String name, SelectedItems<T> sourceObjects,
-                                                                  Class<?> plugin, PluginType pluginType, User user, Map<String, String> pluginParameters, String exceptionMessage)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName(name);
-    job.setSourceObjects(sourceObjects);
-    job.setPlugin(plugin.getCanonicalName());
-    job.setPluginType(pluginType);
-    job.setUsername(user.getName());
-    job.setPluginParameters(pluginParameters);
-    job.setPriority(getJobPriorityFromConfiguration());
-    job.setParallelism(getJobParallelismFromConfiguration());
-
-    try {
-      RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(job, true);
-    } catch (JobAlreadyStartedException e) {
-      LOGGER.error(exceptionMessage, e);
-    }
-
-    return job;
   }
 
   private JobParallelism getJobParallelismFromConfiguration() {

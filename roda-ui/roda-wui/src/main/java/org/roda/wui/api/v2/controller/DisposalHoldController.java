@@ -5,20 +5,26 @@ import java.util.Date;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.disposal.hold.DisposalHolds;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
-import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.DisposalHoldService;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.DisposalHoldRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
@@ -117,13 +123,12 @@ public class DisposalHoldController implements DisposalHoldRestService {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (AlreadyExistsException | RequestNotValidException | NotFoundException | GenericException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM,
-        hold);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM, hold);
     }
   }
 
@@ -141,7 +146,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (GenericException | RequestNotValidException | NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -163,7 +168,10 @@ public class DisposalHoldController implements DisposalHoldRestService {
       // delegate
       disposalHoldService.deleteDisposalHold(disposalHoldId);
       return null;
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | IllegalOperationException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -174,7 +182,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
   }
 
   @Override
-  public Job applyDisposalHold(@RequestBody SelectedItems<IndexedAIP> items, String disposalHoldId, boolean override) {
+  public Job applyDisposalHold(@RequestBody SelectedItemsRequest items, String disposalHoldId, boolean override) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -184,7 +192,8 @@ public class DisposalHoldController implements DisposalHoldRestService {
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // delegate
-      return disposalHoldService.applyDisposalHold(requestContext.getUser(), items, disposalHoldId, override);
+      return disposalHoldService.applyDisposalHold(requestContext.getUser(),
+        CommonServicesUtils.convertSelectedItems(items, IndexedAIP.class), disposalHoldId, override);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -193,14 +202,14 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        items, RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
         RodaConstants.CONTROLLER_DISPOSAL_HOLD_OVERRIDE_PARAM, override);
     }
   }
 
   @Override
-  public Job liftDisposalHoldBySelectedItems(@RequestBody SelectedItems<IndexedAIP> items, String disposalHoldId) {
+  public Job liftDisposalHoldBySelectedItems(@RequestBody SelectedItemsRequest items, String disposalHoldId) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -209,14 +218,15 @@ public class DisposalHoldController implements DisposalHoldRestService {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
       // delegate
-      return disposalHoldService.liftDisposalHold(requestContext.getUser(), items, disposalHoldId);
+      return disposalHoldService.liftDisposalHold(requestContext.getUser(),
+        CommonServicesUtils.convertSelectedItems(items, IndexedAIP.class), disposalHoldId);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        items, RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId);
     }
   }
 
@@ -245,14 +255,13 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, id, state,
-        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, id);
+      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM,
+        id);
     }
   }
 
   @Override
-  public Job disassociateDisposalHold(@RequestBody SelectedItems<IndexedAIP> items, String disposalHoldId,
-    boolean clear) {
+  public Job disassociateDisposalHold(@RequestBody SelectedItemsRequest items, String disposalHoldId, boolean clear) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -261,14 +270,15 @@ public class DisposalHoldController implements DisposalHoldRestService {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
       // delegate
-      return disposalHoldService.disassociateDisposalHold(requestContext.getUser(), items, disposalHoldId, clear);
+      return disposalHoldService.disassociateDisposalHold(requestContext.getUser(),
+        CommonServicesUtils.convertSelectedItems(items, IndexedAIP.class), disposalHoldId, clear);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        items, RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
         RodaConstants.CONTROLLER_DISPOSAL_HOLD_DISASSOCIATE_ALL, clear);
     }
   }

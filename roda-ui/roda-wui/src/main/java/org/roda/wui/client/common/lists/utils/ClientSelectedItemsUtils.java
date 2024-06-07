@@ -40,7 +40,7 @@ public class ClientSelectedItemsUtils {
       Filter filter = selectedItemsFilter.getFilter();
       boolean justActive = selectedItemsFilter.justActive();
 
-      CountRequest request = new CountRequest(classToReturn.getName(), filter, justActive);
+      CountRequest request = new CountRequest(filter, justActive);
       Services services = new Services("Count indexed objects", "count");
       services.rodaEntityRestService(s -> s.count(request), classToReturn).whenComplete((longResponse, throwable) -> {
         if (throwable != null) {

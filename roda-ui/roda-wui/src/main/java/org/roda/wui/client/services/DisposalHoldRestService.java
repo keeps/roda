@@ -5,8 +5,7 @@ import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHolds;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.springframework.http.HttpStatus;
@@ -66,22 +65,22 @@ public interface DisposalHoldRestService extends DirectRestService {
   Void deleteDisposalHold(
     @Parameter(description = "The ID of the disposal hold to delete.", required = true) @PathVariable(name = "id") String disposalHoldId);
 
-  @RequestMapping(method = RequestMethod.POST, path = "/apply", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Apply disposal hold to selected AIPs", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), responses = {
+  @RequestMapping(method = RequestMethod.POST, path = "/{id}/associate", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Apply disposal hold to selected AIPs", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItemsRequest.class))), responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class)))})
   Job applyDisposalHold(
-    @Parameter(description = "Selected AIPs", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<IndexedAIP> selectedItems,
-    @Parameter(description = "Disposal hold id", required = true) @RequestParam(name = "disposal-hold-id") String disposalHoldId,
+    @Parameter(description = "Selected AIPs", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selectedItems,
+    @Parameter(description = "Disposal hold id", required = true) @PathVariable(name = "id") String disposalHoldId,
     @Parameter(name = "override", description = "Lift all disposal holds associated and apply the selected disposal hold") @RequestParam(name = "override", required = false, defaultValue = "false") boolean override);
 
-  @RequestMapping(method = RequestMethod.POST, path = "/lift", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Lift disposal holds from selected AIPs", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), responses = {
+  @RequestMapping(method = RequestMethod.POST, path = "/{id}/lift", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Lift disposal holds from selected AIPs", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItemsRequest.class))), responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class)))})
   Job liftDisposalHoldBySelectedItems(
-    @Parameter(description = "Selected AIPs", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<IndexedAIP> selectedItems,
-    @Parameter(description = "disposal hold id", required = true) @RequestParam(name = "disposal-hold-id") String disposalHoldId);
+    @Parameter(description = "Selected AIPs", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selectedItems,
+    @Parameter(description = "disposal hold id", required = true) @PathVariable(name = "id") String disposalHoldId);
 
-  @RequestMapping(method = RequestMethod.PUT, path = "/lift/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(method = RequestMethod.PUT, path = "/{id}/lift", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Lift specific disposal hold", responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = DisposalHold.class))),
     @ApiResponse(responseCode = "404", description = "Disposal hold not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
@@ -89,11 +88,11 @@ public interface DisposalHoldRestService extends DirectRestService {
     @Parameter(description = "Disposal hold id", required = true) @PathVariable(name = "id") String id);
 
   @RequestMapping(method = RequestMethod.POST, path = "/disassociate", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Disassociate disposal hold from selected AIPs", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), responses = {
+  @Operation(summary = "Disassociate disposal hold from selected AIPs", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItemsRequest.class))), responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class)))})
   Job disassociateDisposalHold(
-    @Parameter(description = "Selected AIPs", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<IndexedAIP> selectedItems,
-    @Parameter(description = "Disposal hold id") @RequestParam(name = "disposal-hold-id", required = false) String disposalHoldId,
+    @Parameter(description = "Selected AIPs", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selectedItems,
+    @Parameter(description = "Disposal hold id") @PathVariable(name = "id", required = false) String disposalHoldId,
     @Parameter(name = "clear", description = "Disassociate all disposal holds associated to AIP") @RequestParam(name = "clear", required = false, defaultValue = "false") boolean clear);
 
   @RequestMapping(method = RequestMethod.GET, path = "/transitive/{aip-id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,7 +101,7 @@ public interface DisposalHoldRestService extends DirectRestService {
   DisposalTransitiveHoldsAIPMetadata listTransitiveHolds(
     @Parameter(description = "AIP identifier", required = true) @PathVariable(name = "aip-id") String aipId);
 
-  @RequestMapping(method = RequestMethod.GET, path = "/associate/{aip-id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(method = RequestMethod.GET, path = "/associations/{aip-id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "List holds associations", responses = {
     @ApiResponse(responseCode = "200", description = "List of disposal holds associated to an AIP", content = @Content(schema = @Schema(implementation = DisposalHoldsAIPMetadata.class)))})
   DisposalHoldsAIPMetadata listDisposalHoldsAssociation(

@@ -120,8 +120,10 @@ public class CreateAccessKey extends Composite {
       accessKey.setName(accessKeyUpdated.getName());
       accessKey.setExpirationDate(accessKeyUpdated.getExpirationDate());
       Services services = new Services("Create access key", "create");
-      CreateAccessKeyRequest createAccessKeyRequest = new CreateAccessKeyRequest(this.accessKey.getName(), this.accessKey.getExpirationDate(), this.accessKey.getUserName());
-      services.membersResource(s -> s.createAccessKey(createAccessKeyRequest)).whenComplete((response, error) -> {
+      CreateAccessKeyRequest createAccessKeyRequest = new CreateAccessKeyRequest(this.accessKey.getName(),
+        this.accessKey.getExpirationDate());
+      services.membersResource(s -> s.createAccessKey(user.getId(), createAccessKeyRequest))
+        .whenComplete((response, error) -> {
         if (response != null) {
           AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), response, new NoAsyncCallback<Boolean>() {
             @Override

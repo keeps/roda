@@ -14,13 +14,16 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * This is a parameter of a {@link Filter}.
  *
  * @author Rui Castro
  */
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonSubTypes({@Type(value = BasicSearchFilterParameter.class, name = "BasicSearchFilterParameter"),
   @Type(value = EmptyKeyFilterParameter.class, name = "EmptyKeyFilterParameter"),
   @Type(value = LikeFilterParameter.class, name = "LikeFilterParameter"),
@@ -35,6 +38,24 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
   @Type(value = AndFiltersParameters.class, name = "AndFiltersParameters"),
   @Type(value = AllFilterParameter.class, name = "AllFilterParameter"),
   @Type(value = BlockJoinParentFilterParameter.class, name = "BlockJoinParentFilterParameter")})
+@Schema(type = "object", subTypes = {BasicSearchFilterParameter.class, EmptyKeyFilterParameter.class,
+  LikeFilterParameter.class, NotSimpleFilterParameter.class, OneOfManyFilterParameter.class,
+  DateIntervalFilterParameter.class, DateRangeFilterParameter.class, LongRangeFilterParameter.class,
+  StringRangeFilterParameter.class, SimpleFilterParameter.class, OrFiltersParameters.class, AndFiltersParameters.class,
+  AllFilterParameter.class, BlockJoinParentFilterParameter.class}, discriminatorMapping = {
+    @DiscriminatorMapping(value = "BasicSearchFilterParameter", schema = BasicSearchFilterParameter.class),
+    @DiscriminatorMapping(value = "LikeFilterParameter", schema = LikeFilterParameter.class),
+    @DiscriminatorMapping(value = "NotSimpleFilterParameter", schema = NotSimpleFilterParameter.class),
+    @DiscriminatorMapping(value = "OneOfManyFilterParameter", schema = OneOfManyFilterParameter.class),
+    @DiscriminatorMapping(value = "DateIntervalFilterParameter", schema = DateIntervalFilterParameter.class),
+    @DiscriminatorMapping(value = "DateRangeFilterParameter", schema = DateRangeFilterParameter.class),
+    @DiscriminatorMapping(value = "LongRangeFilterParameter", schema = LongRangeFilterParameter.class),
+    @DiscriminatorMapping(value = "StringRangeFilterParameter", schema = StringRangeFilterParameter.class),
+    @DiscriminatorMapping(value = "SimpleFilterParameter", schema = SimpleFilterParameter.class),
+    @DiscriminatorMapping(value = "OrFiltersParameters", schema = OrFiltersParameters.class),
+    @DiscriminatorMapping(value = "AndFiltersParameters", schema = AndFiltersParameters.class),
+    @DiscriminatorMapping(value = "AllFilterParameter", schema = AllFilterParameter.class),
+    @DiscriminatorMapping(value = "BlockJoinParentFilterParameter", schema = BlockJoinParentFilterParameter.class),}, discriminatorProperty = "@type")
 public abstract class FilterParameter implements Serializable {
   @Serial
   private static final long serialVersionUID = 3744111668897879761L;

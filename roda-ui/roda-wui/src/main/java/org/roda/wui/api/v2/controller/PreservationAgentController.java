@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.LongResponse;
@@ -26,7 +25,6 @@ import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +32,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -88,17 +85,17 @@ public class PreservationAgentController implements PreservationAgentRestService
   }
 
   @Override
-  @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
   public List<String> suggest(SuggestRequest suggestRequest) {
-    throw new RESTException(new NotImplementedException());
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.suggest(suggestRequest, IndexedPreservationAgent.class, requestContext);
   }
 
-  @GetMapping(path = "/{id}/binary", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @GetMapping(path = "/{id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   @Operation(summary = "Downloads preservation agent file", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamingResponseBody.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  public ResponseEntity<StreamingResponseBody> downloadBinary(
+  public ResponseEntity<StreamingResponseBody> downloadPreservationAgent(
     @Parameter(description = "The id of the preservation agent", required = true) @PathVariable(name = "id") String id,
     @RequestHeader HttpHeaders headers) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};

@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -146,7 +144,6 @@ import org.roda.core.plugins.base.disposal.confirmation.PermanentlyDeleteRecords
 import org.roda.core.plugins.base.disposal.confirmation.RecoverDisposalConfirmationExecutionFailedPlugin;
 import org.roda.core.plugins.base.disposal.confirmation.RestoreRecordsPlugin;
 import org.roda.core.plugins.base.disposal.hold.ApplyDisposalHoldToAIPPlugin;
-import org.roda.core.plugins.base.disposal.hold.DisassociateDisposalHoldFromAIPPlugin;
 import org.roda.core.plugins.base.disposal.hold.LiftDisposalHoldPlugin;
 import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.base.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
@@ -158,7 +155,6 @@ import org.roda.core.plugins.base.maintenance.MovePlugin;
 import org.roda.core.plugins.base.maintenance.UpdatePermissionsPlugin;
 import org.roda.core.plugins.base.preservation.AppraisalPlugin;
 import org.roda.core.plugins.base.risks.UpdateIncidencesPlugin;
-import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -3089,17 +3085,6 @@ public class BrowserHelper {
 
     return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldPlugin.class, user,
       pluginParameters, "Could not execute lift disposal hold action");
-  }
-
-  public static Job disassociateDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
-    boolean clearAll)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL, Boolean.toString(clearAll));
-
-    return createAndExecuteInternalJob("Disassociate disposal hold", items, DisassociateDisposalHoldFromAIPPlugin.class,
-      user, pluginParameters, "Could not execute disassociate disposal hold action");
   }
 
   public static Job applyDisposalRules(User user, boolean applyToManuallyInclusive)

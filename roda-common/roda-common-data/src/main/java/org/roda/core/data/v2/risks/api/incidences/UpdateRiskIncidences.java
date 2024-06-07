@@ -8,41 +8,42 @@
 package org.roda.core.data.v2.risks.api.incidences;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import org.roda.core.data.v2.risks.RiskIncidence;
+import java.io.Serial;
+import java.io.Serializable;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonTypeName("SelectedIncidences")
-public class SelectedIncidences<T extends IsRODAObject> {
+public class UpdateRiskIncidences implements Serializable {
 
-  private SelectedItems<T> selectedItems;
+  @Serial
+  private static final long serialVersionUID = -878964145498801854L;
+
+  private SelectedItemsRequest selectedItems;
   private String mitigatedDescription;
   private String severity;
   private String status;
 
-  // Constructor
-  public SelectedIncidences(){
-    // do nothing
+  public UpdateRiskIncidences() {
+    // empty constructor
   }
 
-
-  public SelectedIncidences(SelectedItems<T> selectedItems, String mitigatedDescription, String severity, String status) {
-    this.selectedItems = selectedItems;
+  public UpdateRiskIncidences(SelectedItems<?> selectedItems, String mitigatedDescription, String severity,
+    String status) {
+    this.selectedItems = SelectedItemsUtils.convertToRESTRequest(selectedItems);
     this.mitigatedDescription = mitigatedDescription;
     this.severity = severity;
     this.status = status;
   }
 
-  public SelectedItems<T> getSelectedItems() {
+  public SelectedItemsRequest getSelectedItems() {
     return selectedItems;
   }
 
-  public void setSelectedItems(SelectedItems<T> selectedItems) {
+  public void setSelectedItems(SelectedItemsRequest selectedItems) {
     this.selectedItems = selectedItems;
   }
 

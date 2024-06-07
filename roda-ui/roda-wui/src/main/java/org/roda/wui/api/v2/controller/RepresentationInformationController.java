@@ -10,7 +10,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.StreamResponse;
@@ -41,14 +40,12 @@ import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -119,9 +116,9 @@ public class RepresentationInformationController implements RepresentationInform
   }
 
   @Override
-  @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
   public List<String> suggest(SuggestRequest suggestRequest) {
-    throw new RESTException(new NotImplementedException());
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.suggest(suggestRequest, RepresentationInformation.class, requestContext);
   }
 
   @Override
@@ -201,8 +198,7 @@ public class RepresentationInformationController implements RepresentationInform
   }
 
   @Override
-  public RepresentationInformationFamily retrieveRepresentationInformationFamily(String id, String familyType,
-    String localeString) {
+  public RepresentationInformationFamily retrieveRepresentationInformationFamily(String id, String localeString) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -212,7 +208,7 @@ public class RepresentationInformationController implements RepresentationInform
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // delegate
-      return representationInformationService.retrieveRepresentationInformationFamily(id, familyType, localeString);
+      return representationInformationService.retrieveRepresentationInformationFamily(id, localeString);
     } catch (NotFoundException | GenericException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
@@ -238,7 +234,8 @@ public class RepresentationInformationController implements RepresentationInform
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // delegate
-      return representationInformationService.retrieveRepresentationInformationFamily(familyType, localeString);
+      return representationInformationService.retrieveRepresentationInformationFamilyConfigurations(familyType,
+        localeString);
     } catch (NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
@@ -338,7 +335,7 @@ public class RepresentationInformationController implements RepresentationInform
     }
   }
 
-  @GetMapping(path = "{id}/binary", produces = MediaType.APPLICATION_XML_VALUE)
+  @GetMapping(path = "{id}/download", produces = MediaType.APPLICATION_XML_VALUE)
   @Operation(summary = "Downloads the representation information", description = "Downloads the representation information from the storage", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamResponse.class))),
     @ApiResponse(responseCode = "404", description = "Representation information not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})

@@ -382,9 +382,9 @@ public class EditPermissions extends Composite {
               });
           } else if (IndexedDIP.class.getName().equals(objectClass)) {
             Services services = new Services("Update DIP permissions", "update");
-            UpdatePermissionsRequest<IndexedDIP> request = new UpdatePermissionsRequest<>();
+            UpdatePermissionsRequest request = new UpdatePermissionsRequest();
             request.setPermissions(permissions);
-            request.setItemsToUpdate((SelectedItems<IndexedDIP>) selectedItems);
+            request.setSelectedItems(selectedItems);
             request.setDetails(details);
             services.dipResource(s -> s.updatePermissions(request)).whenComplete((job, throwable) -> {
               Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
@@ -444,7 +444,7 @@ public class EditPermissions extends Composite {
               .map(m -> new SimpleFilterParameter(RodaConstants.INDEX_UUID, m)).collect(Collectors.toList());
             OrFiltersParameters orFiltersParameters = new OrFiltersParameters(collect);
             FindRequest findRequest = FindRequest
-              .getBuilder(IndexedAIP.class.getName(), new Filter(orFiltersParameters), true)
+              .getBuilder(new Filter(orFiltersParameters), true)
               .withSublist(new Sublist(0, 20)).build();
             Services services = new Services("Find AIPs", "get");
             services.aipResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()))
@@ -668,7 +668,7 @@ public class EditPermissions extends Composite {
               .map(m -> new SimpleFilterParameter(RodaConstants.INDEX_UUID, m)).collect(Collectors.toList());
             OrFiltersParameters orFiltersParameters = new OrFiltersParameters(collect);
             FindRequest findRequest = FindRequest
-              .getBuilder(IndexedAIP.class.getName(), new Filter(orFiltersParameters), true)
+              .getBuilder(new Filter(orFiltersParameters), true)
               .withSublist(new Sublist(0, 20)).build();
             Services services = new Services("Find DIPs", "get");
             services.aipResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()))

@@ -22,8 +22,6 @@ public class CountRequest implements Serializable {
   @Serial
   private static final long serialVersionUID = -6793510712321710035L;
 
-  /** Class name of resources to return. */
-  private String classToReturn;
   /** Filter. */
   private Filter filter;
   /** Return only active resources? */
@@ -33,25 +31,18 @@ public class CountRequest implements Serializable {
    * Constructor.
    */
   public CountRequest() {
-    this(null, new Filter(), false);
+    this(new Filter(), false);
   }
 
   /**
    * Constructor.
    *
-   * @param classToReturn
-   *          Class name of resources to return.
    * @param filter
    *          Filter.
    */
-  public CountRequest(final String classToReturn, final Filter filter, final boolean onlyActive) {
-    this.classToReturn = classToReturn;
+  public CountRequest(final Filter filter, final boolean onlyActive) {
     this.filter = filter;
     this.onlyActive = onlyActive;
-  }
-
-  public String getClassToReturn() {
-    return classToReturn;
   }
 
   public Filter getFilter() {

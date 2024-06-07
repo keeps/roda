@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.index.CountRequest;
@@ -18,7 +19,6 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -240,13 +240,13 @@ public class ShowDisposalHold extends Composite {
             IndexedAIP.class.getName(), true);
 
           Services services = new Services("Lift disposal hold", "job");
-          CountRequest countRequest = new CountRequest(IndexedAIP.class.getName(), filter, true);
+          CountRequest countRequest = new CountRequest(filter, true);
           services.rodaEntityRestService(s -> s.count(countRequest), IndexedAIP.class)
             .whenComplete((longResponse, throwable) -> {
               if (longResponse.getResult() != 0) {
-                services
-                  .disposalHoldResource(
-                    s -> s.liftDisposalHoldBySelectedItems(selectedItemsFilter, disposalHold.getId()))
+                services.disposalHoldResource(
+                  s -> s.liftDisposalHoldBySelectedItems(SelectedItemsUtils.convertToRESTRequest(selectedItemsFilter),
+                    disposalHold.getId()))
                   .whenComplete((job, cause) -> {
                     if (cause != null) {
                       HistoryUtils.newHistory(InternalProcess.RESOLVER);

@@ -5,17 +5,21 @@ import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.NotImplementedException;
-import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
+import org.roda.core.data.exceptions.JobStateNotPendingException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.StringResponse;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SuggestRequest;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.Jobs;
@@ -36,14 +40,12 @@ import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -90,7 +92,10 @@ public class JobsController implements JobsRestService {
       controllerAssistant.checkRoles(requestContext.getUser());
 
       return jobService.createJob(job, true);
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | JobAlreadyStartedException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -110,7 +115,10 @@ public class JobsController implements JobsRestService {
       controllerAssistant.checkRoles(requestContext.getUser());
       // delegate
       jobService.stopJob(jobId);
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -121,7 +129,7 @@ public class JobsController implements JobsRestService {
   }
 
   @Override
-  public Jobs approveJob(SelectedItems<Job> selectedJobs) {
+  public Jobs approveJob(SelectedItemsRequest selectedJobs) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -130,7 +138,7 @@ public class JobsController implements JobsRestService {
     Jobs jobs = new Jobs();
 
     try {
-      if (selectedJobs instanceof SelectedItemsList<Job> jobsList) {
+      if (selectedJobs instanceof SelectedItemsListRequest jobsList) {
         for (String id : jobsList.getIds()) {
           Job job = model.retrieveJob(id);
           if (job.getState().equals(Job.JOB_STATE.PENDING_APPROVAL)) {
@@ -151,7 +159,11 @@ public class JobsController implements JobsRestService {
           }
         }
       }
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | JobAlreadyStartedException | JobStateNotPendingException | NotFoundException
+      | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -164,7 +176,7 @@ public class JobsController implements JobsRestService {
   }
 
   @Override
-  public Jobs rejectJob(SelectedItems<Job> selectedJobs, String details) {
+  public Jobs rejectJob(SelectedItemsRequest selectedJobs, String details) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -172,7 +184,7 @@ public class JobsController implements JobsRestService {
 
     Jobs jobs = new Jobs();
     try {
-      if (selectedJobs instanceof SelectedItemsList<Job> jobsList) {
+      if (selectedJobs instanceof SelectedItemsListRequest jobsList) {
         for (String id : jobsList.getIds()) {
           Job job = model.retrieveJob(id);
           if (job.getState().equals(Job.JOB_STATE.PENDING_APPROVAL)) {
@@ -187,7 +199,10 @@ public class JobsController implements JobsRestService {
           }
         }
       }
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | JobStateNotPendingException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -210,7 +225,10 @@ public class JobsController implements JobsRestService {
       // delegate action to controller
       return jobService.getJobReportsFromIndexResult(requestContext.getUser(), jobId, justFailed, start, limit,
         new ArrayList<>());
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -232,7 +250,10 @@ public class JobsController implements JobsRestService {
       controllerAssistant.checkRoles(requestContext.getUser());
       ModelService model = RodaCoreFactory.getModelService();
       return model.retrieveJobReport(jobId, jobReportId);
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -242,14 +263,13 @@ public class JobsController implements JobsRestService {
     }
   }
 
-  @GetMapping(path = "/{id}/attachment/{" + RodaConstants.API_PATH_PARAM_JOB_ATTACHMENT_ID
-    + "}", produces = ExtraMediaType.APPLICATION_ZIP)
-  @Operation(summary = "Get attachment", description = "Gets the attachments of a job", responses = {
+  @GetMapping(path = "/{id}/attachment/{attachment-id}", produces = ExtraMediaType.APPLICATION_ZIP)
+  @Operation(summary = "Gets the Job attachment", description = "Gets the attachments of a job", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseMessage.class)))})
   public ResponseEntity<StreamingResponseBody> retrieveJobAttachment(
     @Parameter(description = "The ID of the existing job", required = true) @PathVariable(name = "id") String id,
-    @Parameter(description = "The ID of the existing attachment", required = true) @PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_ATTACHMENT_ID) String attachmentId,
+    @Parameter(description = "The ID of the existing attachment", required = true) @PathVariable(name = "attachment-id") String attachmentId,
     WebRequest webRequest) {
 
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -262,7 +282,10 @@ public class JobsController implements JobsRestService {
 
       StreamResponse streamResponse = jobService.retrieveJobAttachment(id, attachmentId);
       return ApiUtils.okResponse(streamResponse, webRequest);
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -302,8 +325,8 @@ public class JobsController implements JobsRestService {
   }
 
   @Override
-  @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
   public List<String> suggest(SuggestRequest suggestRequest) {
-    throw new RESTException(new NotImplementedException());
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.suggest(suggestRequest, Job.class, requestContext);
   }
 }

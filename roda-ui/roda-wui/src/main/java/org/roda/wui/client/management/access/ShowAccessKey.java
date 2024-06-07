@@ -7,20 +7,9 @@
  */
 package org.roda.wui.client.management.access;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
-import config.i18n.client.ClientMessages;
+import java.util.Date;
+import java.util.List;
+
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.CreateAccessKeyRequest;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -37,8 +26,21 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
-import java.util.Date;
-import java.util.List;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -91,7 +93,13 @@ public class ShowAccessKey extends Composite {
   @UiField
   HTML statusValue;
   @UiField
-  Button buttonRegenerate, buttonRevoke, buttonDelete, buttonCancel;
+  Button buttonRegenerate;
+  @UiField
+  Button buttonRevoke;
+  @UiField
+  Button buttonDelete;
+  @UiField
+  Button buttonCancel;
   private AccessKey accessKey;
 
   public ShowAccessKey(AccessKey accessKey) {

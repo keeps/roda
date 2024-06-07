@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -142,7 +143,9 @@ public class DisposalCreateConfirmationReviewActions extends AbstractActionable<
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Disassociate disposal schedule from AIP", "job");
-            services.disposalScheduleResource(s -> s.disassociatedDisposalSchedule(aips))
+            services
+              .disposalScheduleResource(
+                s -> s.disassociatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips)))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);
@@ -190,7 +193,8 @@ public class DisposalCreateConfirmationReviewActions extends AbstractActionable<
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Associated disposal schedule", "job");
-            services.disposalScheduleResource(s -> s.associatedDisposalSchedule(aips, disposalSchedule.getId()))
+            services.disposalScheduleResource(s -> s
+              .associatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips), disposalSchedule.getId()))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);

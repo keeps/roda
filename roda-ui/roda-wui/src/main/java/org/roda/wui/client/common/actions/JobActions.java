@@ -8,11 +8,14 @@
 package org.roda.wui.client.common.actions;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -40,40 +43,21 @@ import config.i18n.client.ClientMessages;
 
 public class JobActions extends AbstractActionable<Job> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final Set<HistoryResolver> NEW_PROCESS_RESOLVERS = new HashSet<>(
+    Arrays.asList(IngestTransfer.RESOLVER, CreateDefaultJob.RESOLVER));
   private final HistoryResolver newProcessResolver;
 
   private JobActions(HistoryResolver newProcessResolver) {
     this.newProcessResolver = newProcessResolver;
   }
 
-  public enum JobAction implements Action<Job> {
-    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), STOP(RodaConstants.PERMISSION_METHOD_STOP_JOB),
-    INGEST_APPRAISAL(RodaConstants.PERMISSION_METHOD_APPRAISAL),
-    INGEST_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), APPROVE(RodaConstants.PERMISSION_METHOD_APPROVE_JOB),
-    REJECT(RodaConstants.PERMISSION_METHOD_REJECT_JOB);
-
-    private List<String> methods;
-
-    JobAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
+  public static JobActions get(HistoryResolver newProcessResolver) {
+    return new JobActions(newProcessResolver);
   }
 
   @Override
   public JobAction[] getActions() {
     return JobAction.values();
-  }
-
-  private static final Set<HistoryResolver> NEW_PROCESS_RESOLVERS = new HashSet<>(
-    Arrays.asList(IngestTransfer.RESOLVER, CreateDefaultJob.RESOLVER));
-
-  public static JobActions get(HistoryResolver newProcessResolver) {
-    return new JobActions(newProcessResolver);
   }
 
   @Override
@@ -195,17 +179,19 @@ public class JobActions extends AbstractActionable<Job> {
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Services services = new Services("Approve job", "Approve");
-            services.jobsResource(s -> s.approveJob(objectToSelectedItems(object, Job.class)))
+            services
+              .jobsResource(
+                s -> s.approveJob(new SelectedItemsListRequest(Collections.singletonList(object.getUUID()))))
               .whenComplete((value, error) -> {
-              if (error == null) {
-                // FIXME 20160826 hsilva: do proper handling of the success
-                doActionCallbackDestroyed();
-              } else {
-                // FIXME 20160826 hsilva: do proper handling of the failure
-                callback.onFailure(error);
-                doActionCallbackDestroyed();
-              }
-            });
+                if (error == null) {
+                  // FIXME 20160826 hsilva: do proper handling of the success
+                  doActionCallbackDestroyed();
+                } else {
+                  // FIXME 20160826 hsilva: do proper handling of the failure
+                  callback.onFailure(error);
+                  doActionCallbackDestroyed();
+                }
+              });
           } else {
             doActionCallbackNone();
           }
@@ -231,14 +217,15 @@ public class JobActions extends AbstractActionable<Job> {
                     @Override
                     public void onSuccess(final String details) {
                       Services services = new Services("Approve selected jobs", "Approve");
-                      services.jobsResource(s -> s.approveJob(objects)).whenComplete((value, error) -> {
-                        if (error == null) {
-                          doActionCallbackDestroyed();
-                        } else {
-                          callback.onFailure(error);
-                          doActionCallbackDestroyed();
-                        }
-                      });
+                      services.jobsResource(s -> s.approveJob(SelectedItemsUtils.convertToRESTRequest(objects)))
+                        .whenComplete((value, error) -> {
+                          if (error == null) {
+                            doActionCallbackDestroyed();
+                          } else {
+                            callback.onFailure(error);
+                            doActionCallbackDestroyed();
+                          }
+                        });
                     }
                   });
               } else {
@@ -263,7 +250,8 @@ public class JobActions extends AbstractActionable<Job> {
 
                 public void onSuccess(final String details) {
                   Services services = new Services("Reject job", "Reject");
-                  services.jobsResource(s -> s.rejectJob(objectToSelectedItems(object, Job.class), details))
+                  services.jobsResource(
+                    s -> s.rejectJob(new SelectedItemsListRequest(Collections.singletonList(object.getUUID())), details))
                     .whenComplete((value, error) -> {
                       if (error == null) {
                         // FIXME 20160826 hsilva: do proper handling of the success
@@ -300,14 +288,14 @@ public class JobActions extends AbstractActionable<Job> {
                     @Override
                     public void onSuccess(final String details) {
                       Services services = new Services("Reject selected jobs", "Reject");
-                      services.jobsResource(s -> s.rejectJob(objects, details)).whenComplete((value, error) -> {
+                      services.jobsResource(s -> s.rejectJob(SelectedItemsUtils.convertToRESTRequest(objects), details)).whenComplete((value, error) -> {
                         if (error == null) {
-                            doActionCallbackDestroyed();
-                          } else {
-                            callback.onFailure(error);
-                            doActionCallbackDestroyed();
-                          }
-                        });
+                          doActionCallbackDestroyed();
+                        } else {
+                          callback.onFailure(error);
+                          doActionCallbackDestroyed();
+                        }
+                      });
                     }
                   });
               } else {
@@ -350,5 +338,23 @@ public class JobActions extends AbstractActionable<Job> {
     jobActionableBundle.addGroup(managementGroup);
 
     return jobActionableBundle;
+  }
+
+  public enum JobAction implements Action<Job> {
+    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), STOP(RodaConstants.PERMISSION_METHOD_STOP_JOB),
+    INGEST_APPRAISAL(RodaConstants.PERMISSION_METHOD_APPRAISAL),
+    INGEST_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), APPROVE(RodaConstants.PERMISSION_METHOD_APPROVE_JOB),
+    REJECT(RodaConstants.PERMISSION_METHOD_REJECT_JOB);
+
+    private List<String> methods;
+
+    JobAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 }

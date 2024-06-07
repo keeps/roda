@@ -105,15 +105,15 @@ public class RestUtils {
   }
 
   public static SafeUri createRepresentationFileDownloadUri(String fileUuid, boolean contentDispositionInline) {
-    // api/v2/files/{file_uuid}/binary
+    // api/v2/files/{file_uuid}/preview
     String b = RodaConstants.API_REST_V2_FILES + URL.encodeQueryString(fileUuid)
-      + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER;
+      + RodaConstants.API_REST_V2_PREVIEW_HANDLER;
 
     return UriUtils.fromSafeConstant(b);
   }
 
   public static SafeUri createDipDownloadUri(String dipUUID) {
-    // api/v2/dips/{uuid}/binary
+    // api/v2/dips/{uuid}/download
     StringBuilder b = new StringBuilder();
     b.append(RodaConstants.API_REST_V2_DIPS).append(URL.encodeQueryString(dipUUID))
       .append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
@@ -491,8 +491,8 @@ public class RestUtils {
     // api/v1/index/findFORM?type=csv
 
     String url = RodaConstants.API_REST_V1_INDEX + "findFORM";
-    FindRequest request = FindRequest.getBuilder(classToReturnName, filter, onlyActive).withSorter(sorter)
-      .withSublist(sublist).withFacets(facets).withExportFacets(exportFacets).withFilename(filename).build();
+    FindRequest request = FindRequest.getBuilder(filter, onlyActive).withSorter(sorter).withSublist(sublist)
+      .withFacets(facets).withExportFacets(exportFacets).withFilename(filename).build();
 
     final FormPanel form = new FormPanel();
     form.setAction(URL.encode(url));

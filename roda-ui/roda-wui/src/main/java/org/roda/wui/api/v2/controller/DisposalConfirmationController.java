@@ -6,18 +6,17 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateRequest;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
 import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SuggestRequest;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.model.utils.UserUtility;
@@ -26,12 +25,12 @@ import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.DisposalConfirmationService;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.utils.ApiUtils;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.DisposalConfirmationRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -89,9 +87,9 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   }
 
   @Override
-  @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
   public List<String> suggest(SuggestRequest suggestRequest) {
-    throw new RESTException(new NotImplementedException());
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return indexService.suggest(suggestRequest, DisposalConfirmation.class, requestContext);
   }
 
   @RequestMapping(method = RequestMethod.GET, path = "/{id}/report/html", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -128,7 +126,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   }
 
   @Override
-  public Job destroyRecordsInDisposalConfirmation(@RequestBody SelectedItems<DisposalConfirmation> selectedItems) {
+  public Job destroyRecordsInDisposalConfirmation(@RequestBody SelectedItemsRequest selectedItems) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -138,7 +136,8 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // delegate
-      return disposalConfirmationService.destroyRecordsInDisposalConfirmation(requestContext.getUser(), selectedItems);
+      return disposalConfirmationService.destroyRecordsInDisposalConfirmation(requestContext.getUser(),
+        CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -152,8 +151,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   }
 
   @Override
-  public Job permanentlyDeleteRecordsInDisposalConfirmation(
-    @RequestBody SelectedItems<DisposalConfirmation> selectedItems) {
+  public Job permanentlyDeleteRecordsInDisposalConfirmation(@RequestBody SelectedItemsRequest selectedItems) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -164,7 +162,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
 
       // delegate
       return disposalConfirmationService.permanentlyDeleteRecordsInDisposalConfirmation(requestContext.getUser(),
-        selectedItems);
+        CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -178,7 +176,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   }
 
   @Override
-  public Job restoreDisposalConfirmation(@RequestBody SelectedItems<DisposalConfirmation> selectedItems) {
+  public Job restoreDisposalConfirmation(@RequestBody SelectedItemsRequest selectedItems) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -188,7 +186,8 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // delegate
-      return disposalConfirmationService.restoreRecordsInDisposalConfirmation(requestContext.getUser(), selectedItems);
+      return disposalConfirmationService.restoreRecordsInDisposalConfirmation(requestContext.getUser(),
+        CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -202,7 +201,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   }
 
   @Override
-  public Job recoverDisposalConfirmation(@RequestBody SelectedItems<DisposalConfirmation> selectedItems) {
+  public Job recoverDisposalConfirmation(@RequestBody SelectedItemsRequest selectedItems) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -213,7 +212,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
 
       // delegate
       return disposalConfirmationService.recoverDisposalConfirmationExecutionFailed(requestContext.getUser(),
-        selectedItems);
+        CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -227,8 +226,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   }
 
   @Override
-  public Job deleteDisposalConfirmation(@RequestBody SelectedItems<DisposalConfirmation> selectedItems,
-    String details) {
+  public Job deleteDisposalConfirmation(@RequestBody SelectedItemsRequest selectedItems, String details) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -238,7 +236,8 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // delegate
-      return disposalConfirmationService.deleteDisposalConfirmation(requestContext.getUser(), selectedItems, details);
+      return disposalConfirmationService.deleteDisposalConfirmation(requestContext.getUser(),
+        CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class), details);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);

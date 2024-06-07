@@ -27,6 +27,7 @@ public class DistributedInstance extends RODAInstance {
   private String description;
   private String accessKeyId;
   private String username;
+  private String token;
 
   public DistributedInstance() {
     setStatus(SynchronizingStatus.CREATED);
@@ -56,6 +57,14 @@ public class DistributedInstance extends RODAInstance {
 
   public void setUsername(String username) {
     this.username = username;
+  }
+
+  public String getToken() {
+    return token;
+  }
+
+  public void setToken(String token) {
+    this.token = token;
   }
 
   @Override

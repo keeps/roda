@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.base.synchronization.instanceIdentifier;
+package org.roda.core.plugins.base.synchronization.instance;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +24,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -48,9 +47,9 @@ import org.slf4j.LoggerFactory;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
+public class InstanceIdentifierJobPlugin extends AbstractPlugin<Void> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierDIPPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierJobPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
@@ -70,7 +69,7 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticName() {
-    return "DIP instance identifier";
+    return "Job instance identifier";
   }
 
   @Override
@@ -153,7 +152,7 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new InstanceIdentifierDIPPlugin();
+    return new InstanceIdentifierJobPlugin();
   }
 
   @Override
@@ -187,21 +186,20 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
-    List<String> detaislList = new ArrayList<>();
+    List<String> detailsList = new ArrayList<>();
     PluginState pluginState = PluginState.SKIPPED;
     int countFail = 0;
     int countSuccess = 0;
-    // Get DIP's from index
-    IterableIndexResult<IndexedDIP> indexedDIPS = retrieveList(index);
+    // Get Jobs from index
+    IterableIndexResult<Job> indexedJobs = retrieveList(index);
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-
-    for (IndexedDIP indexedDIP : indexedDIPS) {
+    for (Job indexedJob : indexedJobs) {
       try {
-        model.updateDIPInstanceId(model.retrieveDIP(indexedDIP.getId()));
+        model.updateJobInstanceId(model.retrieveJob(indexedJob.getId()));
         countSuccess++;
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-        detaislList.add(e.getMessage());
+        detailsList.add(e.getMessage());
         countFail++;
       }
     }
@@ -209,14 +207,15 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
     StringBuilder details = new StringBuilder();
     if (countFail > 0) {
       pluginState = PluginState.FAILURE;
-      details.append("Updated the instance identifier on ").append(countSuccess).append(" DIP's and failed to update ")
-        .append(countFail).append(".\n").append(LocalInstanceRegisterUtils.getDetailsFromList(detaislList));
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" Job's and failed to update ")
+        .append(countFail).append(".\n").append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
       pluginState = PluginState.SUCCESS;
-      details.append("Updated the instance identifier on ").append(countSuccess).append(" DIP's");
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" Job's");
     }
 
     reportItem.setPluginDetails(details.toString());
+
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);
     pluginReport.addReport(reportItem);
@@ -228,10 +227,10 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
     return new Report();
   }
 
-  private IterableIndexResult<IndexedDIP> retrieveList(final IndexService index)
+  private IterableIndexResult<Job> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     final Filter filter = new Filter();
     RODAInstanceUtils.addLocalInstanceFilter(filter);
-    return index.findAll(IndexedDIP.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
+    return index.findAll(Job.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }
