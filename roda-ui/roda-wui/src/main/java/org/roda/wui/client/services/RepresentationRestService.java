@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexedRepresentationRequest;
-import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -38,11 +37,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface RepresentationRestService extends RODAEntityRestService<IndexedRepresentation> {
 
   @RequestMapping(method = RequestMethod.POST, path = "/find-via-request", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Retrieves a representation", requestBody = @RequestBody(required = true, content = @Content(schema = @Schema(implementation = IndexedRepresentationRequest.class))), responses = {
+  @Operation(summary = "Retrieves a representation using a dedicated request", requestBody = @RequestBody(required = true, content = @Content(schema = @Schema(implementation = IndexedRepresentationRequest.class))), responses = {
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = IndexedFile.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "File not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  IndexedRepresentation retrieveIndexedRepresentation(IndexedRepresentationRequest request);
+  IndexedRepresentation retrieveIndexedRepresentationViaRequest(IndexedRepresentationRequest request);
 
   @RequestMapping(path = "/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{"
     + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID

@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -82,9 +81,7 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
-import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -177,14 +174,10 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.BrowseDipBundle;
-import org.roda.wui.client.browse.bundle.BrowseFileBundle;
-import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
-import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
@@ -317,189 +310,6 @@ public class BrowserHelper {
     }
 
     return bundle;
-  }
-
-  public static BrowseRepresentationBundle retrieveBrowseRepresentationBundle(User user, IndexedAIP aip,
-    IndexedRepresentation representation, Locale locale)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    BrowseRepresentationBundle bundle = new BrowseRepresentationBundle();
-
-    bundle.setAip(aip);
-    bundle.setRepresentation(representation);
-
-    // set aip ancestors
-    List<IndexedAIP> ancestors = retrieveAncestors(aip, user, aipAncestorsFieldsToReturn);
-    bundle.setAipAncestors(ancestors);
-
-    // set representation desc. metadata
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_LIST_REPRESENTATION_DESCRIPTIVE_METADATA)) {
-      try {
-        bundle.setRepresentationDescriptiveMetadata(
-          retrieveDescriptiveMetadataBundles(aip.getId(), representation.getId(), locale));
-      } catch (NotFoundException e) {
-        // do nothing
-      }
-    }
-
-    // Count DIPs
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_DIP)) {
-      Filter dipsFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, representation.getUUID()));
-      Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
-      bundle.setDipCount(dipCount);
-    } else {
-      bundle.setDipCount(-1L);
-    }
-
-    // Count risk incidences
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_RISK_INCIDENCE)) {
-
-      AndFiltersParameters andFiltersParameters = new AndFiltersParameters(
-        Arrays.asList(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()),
-          new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, representation.getAipId())));
-
-      Long riskIncidenceCount = RodaCoreFactory.getIndexService().count(RiskIncidence.class,
-        new Filter(andFiltersParameters));
-      bundle.setRiskIncidenceCount(riskIncidenceCount);
-    } else {
-      bundle.setRiskIncidenceCount(-1L);
-    }
-
-    // Count preservation events
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_PRESERVATION_EVENT)) {
-      Filter preservationEventFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representation.getUUID()));
-      Long preservationEventCount = RodaCoreFactory.getIndexService().count(IndexedPreservationEvent.class,
-        preservationEventFilter);
-      bundle.setPreservationEventCount(preservationEventCount);
-    } else {
-      bundle.setPreservationEventCount(-1L);
-    }
-
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION)) {
-      List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("ui.ri.rule.Representation")
-        .stream().map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
-        .collect(Collectors.toList());
-      bundle.setRepresentationInformationFields(rodaConfigurationAsList);
-    } else {
-      bundle.setRepresentationInformationFields(Collections.emptyList());
-    }
-
-    RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
-
-    if (RODAInstanceUtils.isConfiguredAsDistributedMode()
-      && RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
-      bundle.setLocalToInstance(aip.getInstanceId().equals(RODAInstanceUtils.getLocalInstanceIdentifier()));
-      retrieveDistributedInstanceName(aip.getInstanceId(), bundle.isLocalToInstance())
-        .ifPresent(bundle::setInstanceName);
-    }
-
-    return bundle;
-  }
-
-  public static BrowseFileBundle retrieveBrowseFileBundle(IndexedAIP aip, IndexedRepresentation representation,
-    IndexedFile file, User user) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    BrowseFileBundle bundle = new BrowseFileBundle();
-
-    bundle.setAip(aip);
-    bundle.setRepresentation(representation);
-    bundle.setFile(file);
-
-    // set aip ancestors
-    List<IndexedAIP> ancestors = retrieveAncestors(aip, user, aipAncestorsFieldsToReturn);
-    bundle.setAipAncestors(ancestors);
-
-    // set sibling count
-    String parentUUID = bundle.getFile().getParentUUID();
-
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
-      Filter siblingFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, bundle.getFile().getRepresentationUUID()));
-
-      if (parentUUID != null) {
-        siblingFilter.add(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, parentUUID));
-      } else {
-        siblingFilter.add(new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
-      }
-
-      boolean justActive = AIPState.ACTIVE.equals(aip.getState());
-      bundle.setTotalSiblingCount(count(IndexedFile.class, siblingFilter, justActive, user));
-    } else {
-      bundle.setTotalSiblingCount(-1L);
-    }
-
-    // Count DIPs
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_DIP)) {
-      Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, file.getUUID()));
-      Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
-      bundle.setDipCount(dipCount);
-    } else {
-      bundle.setDipCount(-1L);
-    }
-
-    // Count risk incidences
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_RISK_INCIDENCE)) {
-      Filter riskIncidenceFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, file.getId()));
-      Long riskIncidenceCount = RodaCoreFactory.getIndexService().count(RiskIncidence.class, riskIncidenceFilter);
-      bundle.setRiskIncidenceCount(riskIncidenceCount);
-    } else {
-      bundle.setRiskIncidenceCount(-1L);
-    }
-
-    // Count preservation events
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_PRESERVATION_EVENT)) {
-      Filter preservationEventFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, file.getUUID()));
-      Long preservationEventCount = RodaCoreFactory.getIndexService().count(IndexedPreservationEvent.class,
-        preservationEventFilter);
-      bundle.setPreservationEventCount(preservationEventCount);
-    } else {
-      bundle.setPreservationEventCount(-1L);
-    }
-
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION)) {
-      List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("ui.ri.rule.File").stream()
-        .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
-        .collect(Collectors.toList());
-      bundle.setRepresentationInformationFields(rodaConfigurationAsList);
-    } else {
-      bundle.setRepresentationInformationFields(Collections.emptyList());
-    }
-
-    if (file.isReference()) {
-      bundle.setAvailable(isShallowFileAvailable(file.getUUID()));
-    } else {
-      bundle.setAvailable(true);
-    }
-
-    RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
-
-    if (RODAInstanceUtils.isConfiguredAsDistributedMode()
-      && RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
-      bundle.setLocalToInstance(aip.getInstanceId().equals(RODAInstanceUtils.getLocalInstanceIdentifier()));
-      retrieveDistributedInstanceName(aip.getInstanceId(), bundle.isLocalToInstance())
-        .ifPresent(bundle::setInstanceName);
-    }
-
-    return bundle;
-  }
-
-  private static Boolean isShallowFileAvailable(String fileUUID) {
-    IndexService index = RodaCoreFactory.getIndexService();
-    try {
-      IndexedFile indexedFile = index.retrieve(IndexedFile.class, fileUUID, new ArrayList<>());
-      if (indexedFile.isReference()) {
-        String referenceURL = indexedFile.getReferenceURL();
-        final Protocol protocol = RodaCoreFactory.getProtocol(new URI(referenceURL));
-        return protocol.isAvailable();
-      }
-    } catch (URISyntaxException e) {
-      LOGGER.warn("Cannot convet referenceURL to URI: " + fileUUID);
-    } catch (GenericException | NotFoundException e) {
-      LOGGER.warn("File is not available: " + fileUUID);
-    }
-    return false;
   }
 
   private static Optional<String> retrieveDistributedInstanceName(String instanceId, boolean isLocalInstance)
@@ -727,90 +537,6 @@ public class BrowserHelper {
     }
 
     return ret;
-  }
-
-  public static BrowseDipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, User user, Locale locale)
-    throws GenericException, NotFoundException, RequestNotValidException {
-    BrowseDipBundle bundle = new BrowseDipBundle();
-
-    bundle.setDip(retrieve(IndexedDIP.class, dipUUID,
-      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE, RodaConstants.DIP_AIP_IDS,
-        RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS, RodaConstants.DIP_REPRESENTATION_IDS)));
-
-    List<String> dipFileFields = new ArrayList<>();
-
-    if (dipFileUUID != null) {
-      DIPFile dipFile = retrieve(DIPFile.class, dipFileUUID, dipFileFields);
-      bundle.setDipFile(dipFile);
-
-      List<DIPFile> dipFileAncestors = new ArrayList<>();
-      for (String dipFileAncestor : dipFile.getAncestorsUUIDs()) {
-        try {
-          dipFileAncestors.add(retrieve(DIPFile.class, dipFileAncestor,
-            Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIPFILE_DIP_ID, RodaConstants.DIPFILE_ID)));
-        } catch (NotFoundException e) {
-          // ignore
-        }
-      }
-
-      bundle.setDipFileAncestors(dipFileAncestors);
-    } else {
-      // if there is only one DIPFile in the DIP and it is NOT a directory
-      // then select it
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dipUUID));
-      Sublist sublist = new Sublist(0, 1);
-      IndexResult<DIPFile> dipFiles = find(DIPFile.class, filter, Sorter.NONE, sublist, Facets.NONE, user, false,
-        dipFileFields);
-      if (dipFiles.getTotalCount() == 1 && !dipFiles.getResults().get(0).isDirectory()) {
-        bundle.setDipFile(dipFiles.getResults().get(0));
-      }
-    }
-
-    List<String> aipFields = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-    aipFields.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL,
-      RodaConstants.AIP_DATE_FINAL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_GHOST));
-    List<String> representationFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_TYPE,
-      RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS,
-      RodaConstants.REPRESENTATION_ORIGINAL, RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID);
-    List<String> fileFields = new ArrayList<>();
-
-    // infer from DIP
-    IndexedDIP dip = bundle.getDip();
-    try {
-      if (!dip.getFileIds().isEmpty()) {
-        if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_RETRIEVE_AIP,
-          RodaConstants.PERMISSION_METHOD_RETRIEVE_FILE)) {
-          IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(dip.getFileIds().get(0)),
-            fileFields);
-          IndexedAIP aip = retrieve(IndexedAIP.class, file.getAipId(), aipFields);
-          bundle.setReferrer(file);
-          bundle.setReferrerBundle(retrieveBrowseFileBundle(aip,
-            retrieve(IndexedRepresentation.class, file.getRepresentationUUID(), representationFields), file, user));
-          bundle.setReferrerPermissions(aip.getPermissions());
-        }
-      } else if (!dip.getRepresentationIds().isEmpty()) {
-        if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_RETRIEVE_AIP,
-          RodaConstants.PERMISSION_METHOD_RETRIEVE_REPRESENTATION)) {
-          IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
-            IdUtils.getRepresentationId(dip.getRepresentationIds().get(0)), representationFields);
-          IndexedAIP aip = retrieve(IndexedAIP.class, representation.getAipId(), aipFields);
-          bundle.setReferrer(representation);
-          bundle.setReferrerBundle(retrieveBrowseRepresentationBundle(user, aip, representation, locale));
-          bundle.setReferrerPermissions(aip.getPermissions());
-        }
-      } else if (!dip.getAipIds().isEmpty()) {
-        if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_RETRIEVE_AIP)) {
-          IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, dip.getAipIds().get(0).getAipId(), aipFields);
-          bundle.setReferrer(aip);
-          bundle.setReferrerBundle(retrieveBrowseAipBundle(user, aip, locale));
-          bundle.setReferrerPermissions(aip.getPermissions());
-        }
-      }
-    } catch (AuthorizationDeniedException | NotFoundException e) {
-      // ignore this as it is normal to have access to the DIP but not its referrer
-    }
-
-    return bundle;
   }
 
   protected static List<IndexedAIP> retrieveAncestors(IndexedAIP aip, User user, List<String> fieldsToReturn)
@@ -2329,15 +2055,6 @@ public class BrowserHelper {
       pluginParameters, "Could not execute AIP permissions recursively action");
   }
 
-  public static Job updateDIPPermissions(User user, SelectedItems<IndexedDIP> dips, Permissions permissions,
-    String details) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    // TODO 20170222 nvieira it should create an event associated with DIP
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON, JsonUtils.getJsonFromObject(permissions));
-    return createAndExecuteInternalJob("Update DIP permissions recursively", dips, UpdatePermissionsPlugin.class, user,
-      pluginParameters, "Could not execute DIP permissions recursively action");
-  }
-
   public static Risk createRisk(Risk risk, User user, boolean commit)
     throws GenericException, AuthorizationDeniedException {
     risk.setCreatedBy(user.getName());
@@ -2819,14 +2536,6 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().updateDIP(dip);
   }
 
-  public static Job deleteDIPs(User user, SelectedItems<IndexedDIP> selected, String details)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    return createAndExecuteInternalJob("Delete DIP", selected, DeleteRODAObjectPlugin.class, user, pluginParameters,
-      "Could not execute DIP delete action");
-  }
-
   protected static EntityResponse retrieveDIP(String dipId, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
@@ -2989,11 +2698,6 @@ public class BrowserHelper {
   public static void deleteNotification(String notificationId)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().deleteNotification(notificationId);
-  }
-
-  public static Notification acknowledgeNotification(String notificationId, String ackToken)
-    throws GenericException, NotFoundException, AuthorizationDeniedException {
-    return RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, ackToken);
   }
 
   public static RepresentationInformation createRepresentationInformation(RepresentationInformation ri,

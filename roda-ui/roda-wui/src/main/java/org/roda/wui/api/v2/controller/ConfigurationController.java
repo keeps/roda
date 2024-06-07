@@ -10,6 +10,9 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.jobs.PluginInfoList;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.data.v2.properties.ConversionProfileOutcomeType;
+import org.roda.core.data.v2.properties.ConversionProfiles;
+import org.roda.core.data.v2.properties.DropdownPluginParameterItems;
 import org.roda.core.data.v2.properties.ObjectClassFields;
 import org.roda.core.data.v2.properties.ReindexPluginObject;
 import org.roda.core.data.v2.properties.ReindexPluginObjects;
@@ -63,7 +66,7 @@ public class ConfigurationController implements ConfigurationRestService {
       return configurationsService.retrieveObjectClassFields(localeString);
 
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), LogEntryState.SUCCESS);
+      controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
     }
   }
 
@@ -80,7 +83,7 @@ public class ConfigurationController implements ConfigurationRestService {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
@@ -108,8 +111,47 @@ public class ConfigurationController implements ConfigurationRestService {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
+  @Override
+  public Boolean retrieveShowEmbeddedDIP() {
+    return RodaCoreFactory.getRodaConfiguration().getBoolean("ui.dip.externalURL.showEmbedded", false);
+  }
+
+  @Override
+  public DropdownPluginParameterItems retrieveDropdownPluginItems(String parameterId, String localeString) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      return configurationsService.retrieveDropDownPluginParameterItems(parameterId, localeString);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext, state);
+    }
+  }
+
+  @Override
+  public ConversionProfiles retrieveConversionProfiles(String pluginId, ConversionProfileOutcomeType outcomeType,
+    String localeString) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      controllerAssistant.checkRoles(requestContext.getUser());
+      return configurationsService.retrieveConversionProfilePluginItems(pluginId, outcomeType, localeString);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext, state);
+    }
+  }
 }

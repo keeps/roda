@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,16 +16,14 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.services.Services;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -47,6 +44,122 @@ import com.google.gwt.user.client.ui.Label;
  *
  */
 public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<List<Group>> {
+
+  private final List<String> blacklist;
+  private final List<GroupCheckbox> groups;
+  private HashMap<String, Group> userSelections;
+  private boolean enabled;
+
+  /**
+   * Create a new group selection widget
+   *
+   * @param visible
+   *          start as visible or wait until its initialized
+   */
+  public GroupSelect() {
+    this.groups = new Vector<>();
+    this.blacklist = new Vector<>();
+    this.userSelections = new HashMap<>();
+    enabled = true;
+    this.addStyleName("groups");
+  }
+
+  public void init(final AsyncCallback<Boolean> callback) {
+    // TODO use RodaMemberList instead of a list of checkboxes
+
+    boolean isUser = false;
+    boolean justActive = true;
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.MEMBERS_FULLNAME, false));
+
+    Services services = new Services("Find RODA members", "get");
+    FindRequest request = FindRequest.getBuilder(RODAMember.class.getName(), filter, justActive).withSorter(sorter)
+      .build();
+    services.membersResource(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()))
+      .whenComplete((indexedResult, throwable) -> {
+        if (throwable != null) {
+          callback.onFailure(throwable);
+        } else {
+          for (RODAMember member : indexedResult.getResults()) {
+            if (member instanceof Group) {
+              Group group = (Group) member;
+              GroupCheckbox groupCheckbox = new GroupCheckbox(group, group.getFullName(), group.getId());
+              groups.add(groupCheckbox);
+            }
+          }
+
+          for (final GroupCheckbox groupCheckbox : groups) {
+            GroupSelect.this.add(groupCheckbox);
+            groupCheckbox.addValueChangeHandler(new ValueChangeHandler<Group>() {
+
+              @Override
+              public void onValueChange(ValueChangeEvent<Group> event) {
+                if (userSelections.keySet().contains(event.getValue().getId())) {
+                  userSelections.remove(event.getValue().getId());
+                } else {
+                  userSelections.put(event.getValue().getId(), event.getValue());
+                }
+                onChange();
+              }
+            });
+          }
+          callback.onSuccess(true);
+        }
+      });
+  }
+
+  public Map<String, Group> getUserSelections() {
+    return userSelections;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public Set<String> getMemberGroups() {
+    Set<String> memberGroups = new HashSet<>();
+    for (GroupCheckbox g : groups) {
+      if (g.isChecked()) {
+        memberGroups.add(g.getGroup().getId());
+      }
+    }
+    return memberGroups;
+  }
+
+  public void setMemberGroups(Set<String> memberGroups) {
+    Iterator<String> it = memberGroups.iterator();
+
+    while (it.hasNext()) {
+      String group = it.next();
+      boolean foundit = false;
+      for (Iterator<GroupCheckbox> j = groups.iterator(); j.hasNext() && !foundit;) {
+        GroupCheckbox g = j.next();
+        if (g.getGroup().getId().equals(group)) {
+          foundit = true;
+          g.setChecked(true);
+          userSelections.put(group, g.getGroup());
+        }
+      }
+    }
+  }
+
+  public void addGroupToBlacklist(String group) {
+    blacklist.add(group);
+  }
+
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<List<Group>> handler) {
+    return addHandler(handler, ValueChangeEvent.getType());
+  }
+
+  protected void onChange() {
+    ValueChangeEvent.fire(this, getValue());
+  }
+
+  public List<Group> getValue() {
+    return new Vector<>(getUserSelections().values());
+  }
 
   private class GroupCheckbox extends HorizontalPanel
     implements HasValueChangeHandlers<Group>, Comparable<GroupCheckbox> {
@@ -167,124 +280,5 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     private GroupSelect getOuterType() {
       return GroupSelect.this;
     }
-  }
-
-  private final List<String> blacklist;
-  private final List<GroupCheckbox> groups;
-  private HashMap<String, Group> userSelections;
-  private boolean enabled;
-
-  /**
-   * Create a new group selection widget
-   *
-   * @param visible
-   *          start as visible or wait until its initialized
-   */
-  public GroupSelect() {
-    this.groups = new Vector<>();
-    this.blacklist = new Vector<>();
-    this.userSelections = new HashMap<>();
-    enabled = true;
-    this.addStyleName("groups");
-  }
-
-  public void init(final AsyncCallback<Boolean> callback) {
-    // TODO use RodaMemberList instead of a list of checkboxes
-
-    boolean isUser = false;
-    boolean justActive = true;
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
-    Sorter sorter = new Sorter(new SortParameter(RodaConstants.MEMBERS_FULLNAME, false));
-
-    BrowserService.Util.getInstance().find(RODAMember.class.getName(), filter, sorter, Sublist.ALL, Facets.NONE,
-      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, new ArrayList<>(),
-      new AsyncCallback<IndexResult<RODAMember>>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
-        @Override
-        public void onSuccess(IndexResult<RODAMember> members) {
-          for (RODAMember member : members.getResults()) {
-            if (member instanceof Group) {
-              Group group = (Group) member;
-              GroupCheckbox groupCheckbox = new GroupCheckbox(group, group.getFullName(), group.getId());
-              groups.add(groupCheckbox);
-            }
-          }
-
-          for (final GroupCheckbox groupCheckbox : groups) {
-            GroupSelect.this.add(groupCheckbox);
-            groupCheckbox.addValueChangeHandler(new ValueChangeHandler<Group>() {
-
-              @Override
-              public void onValueChange(ValueChangeEvent<Group> event) {
-                if (userSelections.keySet().contains(event.getValue().getId())) {
-                  userSelections.remove(event.getValue().getId());
-                } else {
-                  userSelections.put(event.getValue().getId(), event.getValue());
-                }
-                onChange();
-              }
-            });
-          }
-          callback.onSuccess(true);
-        }
-      });
-  }
-
-  public Map<String, Group> getUserSelections() {
-    return userSelections;
-  }
-
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  public void setMemberGroups(Set<String> memberGroups) {
-    Iterator<String> it = memberGroups.iterator();
-
-    while (it.hasNext()) {
-      String group = it.next();
-      boolean foundit = false;
-      for (Iterator<GroupCheckbox> j = groups.iterator(); j.hasNext() && !foundit;) {
-        GroupCheckbox g = j.next();
-        if (g.getGroup().getId().equals(group)) {
-          foundit = true;
-          g.setChecked(true);
-          userSelections.put(group, g.getGroup());
-        }
-      }
-    }
-  }
-
-  public Set<String> getMemberGroups() {
-    Set<String> memberGroups = new HashSet<>();
-    for (GroupCheckbox g : groups) {
-      if (g.isChecked()) {
-        memberGroups.add(g.getGroup().getId());
-      }
-    }
-    return memberGroups;
-  }
-
-  public void addGroupToBlacklist(String group) {
-    blacklist.add(group);
-  }
-
-  @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<List<Group>> handler) {
-    return addHandler(handler, ValueChangeEvent.getType());
-  }
-
-  protected void onChange() {
-    ValueChangeEvent.fire(this, getValue());
-  }
-
-  public List<Group> getValue() {
-    return new Vector<>(getUserSelections().values());
   }
 }

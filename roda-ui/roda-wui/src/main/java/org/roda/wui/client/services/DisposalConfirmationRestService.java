@@ -29,14 +29,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "../api/v2/disposal/confirmations")
 public interface DisposalConfirmationRestService extends RODAEntityRestService<DisposalConfirmation> {
 
-  @RequestMapping(method = RequestMethod.GET, path = "/{id}/report", produces = MediaType.TEXT_PLAIN_VALUE)
-  @Operation(summary = "Retrieves the disposal confirmation report", responses = {
-    @ApiResponse(responseCode = "200", description = "Returns the disposal confirmation report", content = @Content(schema = @Schema(implementation = String.class))),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  String retrieveDisposalConfirmationReport(
-    @Parameter(description = "The ID of the disposal confirmation", required = true) @PathVariable("id") String disposalConfirmationId,
-    @Parameter(description = "Use a print-friendly layout", schema = @Schema(defaultValue = "false", implementation = Boolean.class)) @RequestParam(name = "to-print", defaultValue = "false", required = false) boolean toPrint);
-
   @RequestMapping(method = RequestMethod.POST, path = "/destroy", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Destroys the records in the disposal confirmations", description = "Creates an internal job to destroy the records in the disposal confirmations", responses = {
     @ApiResponse(responseCode = "200", description = "Job created")})

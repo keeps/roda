@@ -164,28 +164,4 @@ public class DipsResource {
     DIP updatedDIP = Dips.updateDIP(user, dip);
     return Response.ok(updatedDIP, mediaType).build();
   }
-
-  @DELETE
-  @Path("/{" + RodaConstants.API_PATH_PARAM_DIP_ID + "}")
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
-  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @Operation(summary = "Delete DIP", description = "Delete existing DIP", responses = {
-    @ApiResponse(responseCode = "204", description = "OK", content = @Content(schema = @Schema(implementation = Void.class))),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
-  public Response deleteDIP(
-    @Parameter(description = "The ID of the DIP to delete.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DIP_ID) String dipId,
-    @Parameter(description = "Reason to delete AIP", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
-    @Parameter(description = "Choose format in which to get the response", schema = @Schema(implementation = RodaConstants.APIMediaTypes.class)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
-    throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
-
-    // get user
-    User user = UserUtility.getApiUser(request);
-
-    // delegate action to controller
-    Browser.deleteDIPs(user, SelectedItemsList.create(IndexedDIP.class, dipId), details);
-
-    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "DIP deleted"), mediaType).build();
-  }
 }

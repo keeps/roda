@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -14,6 +15,7 @@ import java.io.Serializable;
  * @author Luis Faria <lfaria@keep.pt>
  */
 public abstract class RangeFilterParameter<T extends Serializable> extends FilterParameter {
+  @Serial
   private static final long serialVersionUID = -2923383960685420739L;
 
   private T fromValue;

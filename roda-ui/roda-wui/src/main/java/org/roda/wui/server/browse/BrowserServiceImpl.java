@@ -20,10 +20,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.SelectedItemsUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -32,17 +29,14 @@ import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
-import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
-import org.roda.core.data.v2.common.ConversionProfile;
+import org.roda.core.data.v2.properties.ConversionProfile;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -50,28 +44,12 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
-import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobMixIn;
-import org.roda.core.data.v2.jobs.JobParallelism;
-import org.roda.core.data.v2.jobs.JobPriority;
-import org.roda.core.data.v2.jobs.JobUserDetails;
-import org.roda.core.data.v2.jobs.PluginInfo;
-import org.roda.core.data.v2.jobs.PluginParameter;
-import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
-import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
@@ -81,27 +59,16 @@ import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
-import org.roda.core.util.IdUtils;
 import org.roda.wui.api.controllers.ApplicationAuth;
 import org.roda.wui.api.controllers.Browser;
-import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.api.controllers.RODAInstance;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.BrowseDipBundle;
-import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
-import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
-import org.roda.wui.client.ingest.process.JobBundle;
-import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.server.ServerTools;
-import org.roda.wui.servlets.ContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,33 +127,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveDescriptiveMetadataEditBundle(user, aipId, representationId, descId, locale);
-  }
-
-  @Override
-  public <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, String localeString, boolean justActive, List<String> fieldsToReturn)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    try {
-      User user = UserUtility.getUser(getThreadLocalRequest());
-      Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
-      IndexResult<T> result = Browser.find(classToReturn, filter, sorter, sublist, facets, user, justActive,
-        fieldsToReturn);
-      return I18nUtility.translate(result, classToReturn, localeString);
-    } catch (RuntimeException e) {
-      LOGGER.error("Unexpected error in find", e);
-      throw new GenericException(e);
-    } catch (GenericException e) {
-      LOGGER.error("Unexpected error in find", e);
-      throw e;
-    }
-  }
-
-  @Override
-  public <T extends IsIndexed> T retrieve(String classNameToReturn, String id, List<String> fieldsToReturn)
-    throws RODAException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
-    return Browser.retrieve(user, classToReturn, id, fieldsToReturn);
   }
 
   @Override
@@ -275,96 +215,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Set<Pair<String, String>> retrieveDropdownPluginItems(String parameterId, String localeString) {
-    Set<Pair<String, String>> items = new HashSet<>();
-    List<String> dropdownItems = RodaUtils
-      .copyList(RodaCoreFactory.getRodaConfiguration().getList("core.plugins.dropdown." + parameterId + "[]"));
-    Locale locale = ServerTools.parseLocale(localeString);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
-
-    for (String item : dropdownItems) {
-      String i18nProperty = RodaCoreFactory.getRodaConfiguration()
-        .getString("core.plugins.dropdown." + parameterId + "[]." + item + ".i18n");
-      items.add(Pair.of(messages.getTranslation(i18nProperty, item), item));
-    }
-
-    return items;
-  }
-
-  @Override
-  public Set<ConversionProfile> retrieveConversionProfilePluginItems(String pluginId, String repOrDip,
-    String localeString) {
-    Set<ConversionProfile> items = new HashSet<>();
-
-    String pluginName = RodaCoreFactory.getRodaConfiguration().getString("core.plugins.conversion.profile." + pluginId);
-
-    List<String> dropdownItems = RodaUtils.copyList(
-      RodaCoreFactory.getRodaConfiguration().getList("core.plugins.conversion.profile." + pluginName + ".profiles[]"));
-    Locale locale = ServerTools.parseLocale(localeString);
-
-    ResourceBundle pluginMessages = RodaCoreFactory.getPluginMessages(pluginId, locale);
-
-    for (String item : dropdownItems) {
-      ConversionProfile conversionProfile = retrieveConversionProfileItem(item, pluginName, pluginMessages);
-      if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION)
-        && conversionProfile.canBeUsedForRepresentation()) {
-        items.add(conversionProfile);
-      }
-
-      if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION)
-        && conversionProfile.canBeUsedForDissemination()) {
-        items.add(conversionProfile);
-      }
-    }
-
-    return items;
-  }
-
-  private ConversionProfile retrieveConversionProfileItem(String item, String pluginName,
-    ResourceBundle resourceBundle) {
-    ConversionProfile conversionProfile = new ConversionProfile();
-    Map<String, String> optionsValues = new HashMap<>();
-
-    String i18nKey = RodaCoreFactory.getRodaConfiguration()
-      .getString("core.plugins.conversion.profile." + pluginName + ".profiles.i18nPrefix");
-
-    String title;
-    String description;
-
-    try {
-      title = resourceBundle.getString(i18nKey + "." + item + ".title");
-    } catch (MissingResourceException e) {
-      title = i18nKey + "." + item + ".title";
-    }
-
-    try {
-      description = resourceBundle.getString(i18nKey + "." + item + ".description");
-    } catch (MissingResourceException e) {
-      description = i18nKey + "." + item + ".description";
-    }
-
-    conversionProfile.setTitle(title);
-    conversionProfile.setDescription(description);
-    conversionProfile.setProfile(item);
-
-    conversionProfile.setCanBeUsedForDissemination(RodaCoreFactory.getRodaConfiguration()
-      .getBoolean("core.plugins.conversion.profile." + pluginName + "." + item + ".canBeUsedForDissemination", false));
-    conversionProfile.setCanBeUsedForRepresentation(RodaCoreFactory.getRodaConfiguration()
-      .getBoolean("core.plugins.conversion.profile." + pluginName + "." + item + ".canBeUsedForRepresentation", false));
-
-    String[] options = RodaCoreFactory.getRodaConfiguration()
-      .getStringArray("core.plugins.conversion.profile." + pluginName + "." + item + ".options[]");
-    for (String option : options) {
-      String optionValue = RodaCoreFactory.getRodaConfiguration()
-        .getString("core.plugins.conversion.profile." + pluginName + "." + item + "." + option);
-      optionsValues.put(option, optionValue);
-    }
-    conversionProfile.setOptions(optionsValues);
-
-    return conversionProfile;
-  }
-
-  @Override
   public List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String representationId,
     String localeString) throws RODAException {
     User user = UserUtility.getUser(getThreadLocalRequest());
@@ -406,13 +256,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.updateAIPPermissions(user, aips, permissions, details, recursive);
   }
 
-  @Override
-  public Job updateDIPPermissions(SelectedItems<IndexedDIP> dips, Permissions permissions, String details)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.updateDIPPermissions(user, dips, permissions, details);
-  }
-
   private <T extends IsIndexed> SelectedItems<T> getAllItemsByClass(String selectedClass) {
     if (selectedClass == null || Void.class.getName().equals(selectedClass)) {
       return new SelectedItemsNone<>();
@@ -436,21 +279,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public BrowseDipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, String localeString)
-    throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveDipBundle(user, dipUUID, dipFileUUID, locale);
-  }
-
-  @Override
-  public Job deleteDIPs(SelectedItems<IndexedDIP> dips, String details)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.deleteDIPs(user, dips, details);
-  }
-
-  @Override
   public boolean hasDocumentation(String aipId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
@@ -462,18 +290,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, RequestNotValidException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.hasSubmissions(user, aipId);
-  }
-
-  @Override
-  public boolean showDIPEmbedded() {
-    return RodaCoreFactory.getRodaConfiguration().getBoolean("ui.dip.externalURL.showEmbedded", false);
-  }
-
-  @Override
-  public Notification acknowledgeNotification(String notificationId, String ackToken)
-    throws GenericException, NotFoundException, AuthorizationDeniedException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.acknowledgeNotification(user, notificationId, ackToken);
   }
 
   @Override
@@ -491,18 +307,15 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     if (isControlled) {
       types = RodaCoreFactory.getRodaConfigurationAsList("core.aip_type.value");
     } else {
-      try {
-        Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_TYPE));
-        IndexResult<IndexedAIP> result = find(IndexedAIP.class.getName(), Filter.ALL, Sorter.NONE, Sublist.NONE, facets,
-          locale, false, new ArrayList<>());
 
-        List<FacetFieldResult> facetResults = result.getFacetResults();
-        for (FacetValue facetValue : facetResults.get(0).getValues()) {
-          types.add(facetValue.getValue());
-        }
-      } catch (GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-        LOGGER.error("Could not execute find request on AIPs", e);
+      Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_TYPE));
+      IndexResult<IndexedAIP> result = null;
+
+      List<FacetFieldResult> facetResults = result.getFacetResults();
+      for (FacetValue facetValue : facetResults.get(0).getValues()) {
+        types.add(facetValue.getValue());
       }
+
     }
 
     return Pair.of(isControlled, types);

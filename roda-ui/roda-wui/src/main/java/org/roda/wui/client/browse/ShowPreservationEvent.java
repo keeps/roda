@@ -162,7 +162,7 @@ public class ShowPreservationEvent extends Composite {
       .thenCompose(event -> services.preservationEventsResource(s -> s.getPreservationAgents(event.getId()))
         .thenCompose(indexedPreservationAgents -> services
           .preservationEventsResource(s -> s.getLinkingIdentifierObjects(event.getId()))
-          .whenComplete((test, throwable) -> {
+          .whenComplete((linkingObjects, throwable) -> {
             if (throwable != null) {
               if (throwable instanceof NotFoundException) {
                 Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
@@ -173,7 +173,7 @@ public class ShowPreservationEvent extends Composite {
             } else {
               this.preservationEvent = event;
               this.agents = indexedPreservationAgents;
-              this.linkingObjects = test;
+              this.linkingObjects = linkingObjects;
               viewAction();
             }
           })));

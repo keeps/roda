@@ -7,9 +7,11 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import java.io.Serial;
 import java.util.List;
 
 public class OrFiltersParameters extends FiltersParameters {
+  @Serial
   private static final long serialVersionUID = -7444113772637341849L;
 
   /**

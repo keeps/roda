@@ -393,7 +393,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setOverdueDate(overdueDate);
     ret.setOnHold(disposalHoldStatus);
     ret.setDisposalConfirmationId(disposalConfirmationId);
-    ret.setDisposalScheduleAssociationType(aipDisposalScheduleAssociationType);
+    ret.setScheduleAssociationType(aipDisposalScheduleAssociationType);
 
     return ret;
   }

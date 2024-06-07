@@ -8,6 +8,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateRequest;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
@@ -21,19 +22,32 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.v2.exceptions.RESTException;
+import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.DisposalConfirmationService;
 import org.roda.wui.api.v2.services.IndexService;
+import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.client.services.DisposalConfirmationRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -80,8 +94,13 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
     throw new RESTException(new NotImplementedException());
   }
 
-  @Override
-  public String retrieveDisposalConfirmationReport(String disposalConfirmationId, boolean toPrint) {
+  @RequestMapping(method = RequestMethod.GET, path = "/{id}/report/html", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @Operation(summary = "Retrieves the disposal confirmation report", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns the disposal confirmation report", content = @Content(schema = @Schema(implementation = String.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  public ResponseEntity<StreamingResponseBody> retrieveDisposalConfirmationReport(
+    @Parameter(description = "The ID of the disposal confirmation", required = true) @PathVariable(name = "id") String disposalConfirmationId,
+    @Parameter(description = "Use a print-friendly layout", schema = @Schema(defaultValue = "false", implementation = Boolean.class)) @RequestParam(name = "to-print", defaultValue = "false", required = false) boolean toPrint) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -91,7 +110,10 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // delegate
-      return disposalConfirmationService.createDisposalConfirmationReport(disposalConfirmationId, toPrint);
+      StreamResponse disposalConfirmationReport = disposalConfirmationService
+        .createDisposalConfirmationReport(disposalConfirmationId, toPrint);
+
+      return ApiUtils.okResponse(disposalConfirmationReport, null);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);

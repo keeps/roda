@@ -2,6 +2,7 @@ package org.roda.wui.api.v2.services;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -25,6 +26,9 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.DefaultConsumesOutputStream;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateRequest;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
@@ -53,7 +57,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
-import com.github.jknack.handlebars.Options;
 import com.github.jknack.handlebars.Template;
 
 /**
@@ -68,6 +71,8 @@ public class DisposalConfirmationService {
   private static final String AIPS_FILE_PLACEHOLDER = "aipsFile";
   private static final String SCHEDULES_FILE_PLACEHOLDER = "schedulesFile";
   private static final String HOLDS_FILE_PLACEHOLDER = "holdsFile";
+
+  private static final String HTML_EXTENSION = ".html";
 
   private static final String DISPOSAL_CONFIRMATION_REPORT_HBS = "disposal_confirmation_report.html.hbs";
   private static final String DISPOSAL_CONFIRMATION_REPORT_PRINT_HBS = "disposal_confirmation_report_print.html.hbs";
@@ -149,7 +154,7 @@ public class DisposalConfirmationService {
     return data;
   }
 
-  public String createDisposalConfirmationReport(String confirmationId, boolean isToPrint)
+  public StreamResponse createDisposalConfirmationReport(String confirmationId, boolean isToPrint)
     throws RODAException, IOException {
     String jqCommandTemplate = RodaCoreFactory.getRodaConfigurationAsString(DISPOSAL_CONFIRMATION_COMMAND_PROPERTY);
 
@@ -170,7 +175,7 @@ public class DisposalConfirmationService {
     List<String> jqCommand = new ArrayList<>();
     Collections.addAll(jqCommand, jqCommandParams.split(" "));
 
-    String output = null;
+    String output;
     try {
       output = CommandUtility.execute(jqCommand);
     } catch (CommandException e) {
@@ -191,15 +196,21 @@ public class DisposalConfirmationService {
     String reportTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
 
     Handlebars handlebars = new Handlebars();
-    handlebars.registerHelper(HBS_DATEFORMAT_HELPER_NAME, new Helper<Long>() {
-      @Override
-      public Object apply(Long value, Options options) throws IOException {
-        ZonedDateTime date = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
-        return DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(date);
-      }
+    handlebars.registerHelper(HBS_DATEFORMAT_HELPER_NAME, (Helper<Long>) (value, options) -> {
+      ZonedDateTime date = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
+      return DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(date);
     });
     Template template = handlebars.compileInline(reportTemplate);
-    return template.apply(confirmationValues);
+    String apply = template.apply(confirmationValues);
+
+    final ConsumesOutputStream stream = new DefaultConsumesOutputStream(confirmationId + HTML_EXTENSION,
+      RodaConstants.MEDIA_TYPE_TEXT_HTML, out -> {
+        PrintStream printStream = new PrintStream(out);
+        printStream.print(apply);
+        printStream.close();
+      });
+
+    return new StreamResponse(stream);
   }
 
   private Path getDisposalConfirmationMetadataPath(String confirmationId) throws RequestNotValidException {

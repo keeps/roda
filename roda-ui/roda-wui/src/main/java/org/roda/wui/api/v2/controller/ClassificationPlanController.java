@@ -40,7 +40,7 @@ public class ClassificationPlanController {
   ClassificationPlanService classificationPlanService;
 
   @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Retrieves the classificaton plan from Catalogue", responses = {
+  @Operation(summary = "Retrieves the classification plan from Catalogue", responses = {
           @ApiResponse(responseCode = "200", description = "OK")})
   public ResponseEntity<StreamingResponseBody> getClassificationPlan(
     @Parameter(description = "Choose file name", schema = @Schema(defaultValue = "plan.json")) @RequestParam(value = "filename", defaultValue = "plan.json", required = false) String filename) {

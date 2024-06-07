@@ -22,6 +22,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.model.utils.UserUtility;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
@@ -73,7 +74,20 @@ public class AIPController implements AIPRestService {
   @Override
   public IndexedAIP findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, IndexedAIP.class, uuid, new ArrayList<>());
+
+    IndexedAIP retrieve = indexService.retrieve(requestContext, IndexedAIP.class, uuid, new ArrayList<>());
+
+    RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
+
+    if (RODAInstanceUtils.isConfiguredAsDistributedMode()
+        && RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
+      boolean isLocalInstance = retrieve.getInstanceId().equals(RODAInstanceUtils.getLocalInstanceIdentifier());
+      aipService.retrieveDistributedInstanceName(retrieve.getInstanceId(), isLocalInstance)
+          .ifPresent(retrieve::setInstanceName);
+      retrieve.setLocalInstance(isLocalInstance);
+    }
+
+    return retrieve;
   }
 
   @Override
@@ -122,7 +136,7 @@ public class AIPController implements AIPRestService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), id, state, RodaConstants.CONTROLLER_ID_PARAM, id);
+      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_ID_PARAM, id);
     }
   }
 
@@ -159,14 +173,27 @@ public class AIPController implements AIPRestService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
+    }
+  }
+
+  @Override
+  public List<String> retrieveAIPRuleProperties() {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    try {
+      // delegate
+      return aipService.getConfigurationAIPRules(requestContext.getUser());
+    } finally {
+      controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
     }
   }
 
   @GetMapping(path = "/{id}/representations/{representation-id}/metadata/descriptive/{descriptive-metadata-id}/html", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   @Operation(summary = "Retrieves descriptive metadata result", responses = {
-    @ApiResponse(responseCode = "200", description = "Returns an object ", content = @Content(schema = @Schema(implementation = StringResponse.class))),
+    @ApiResponse(responseCode = "200", description = "Returns an object ", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),})
@@ -198,7 +225,7 @@ public class AIPController implements AIPRestService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_METADATA_ID_PARAM,
         descriptiveMetadataId);
     }

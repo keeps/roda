@@ -15,12 +15,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.generics.UpdatePermissionsRequest;
+import org.roda.core.data.v2.index.FindRequest;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.OrFiltersParameters;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.HasPermissions;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
@@ -37,6 +46,7 @@ import org.roda.wui.client.common.dialogs.MemberSelectDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -52,6 +62,7 @@ import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -71,164 +82,34 @@ import config.i18n.client.ClientMessages;
 
 public class EditPermissions extends Composite {
 
-  public static final HistoryResolver AIP_RESOLVER = new HistoryResolver() {
-
-    @Override
-    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 1) {
-        final String aipId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), aipId,
-          RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN, new AsyncCallback<IndexedAIP>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              HistoryUtils.newHistory(BrowseTop.RESOLVER);
-              callback.onSuccess(null);
-            }
-
-            @Override
-            public void onSuccess(IndexedAIP aip) {
-              EditPermissions edit = new EditPermissions(IndexedAIP.class.getName(), aip);
-              edit.title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
-              edit.title.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
-              callback.onSuccess(edit);
-            }
-          });
-
-      } else if (historyTokens.isEmpty()) {
-        LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-        final SelectedItems<IndexedAIP> selected = (SelectedItems<IndexedAIP>) selectedItems.getSelectedItems();
-
-        if (!ClientSelectedItemsUtils.isEmpty(selected)) {
-          BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), selected,
-            RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN, new AsyncCallback<List<IndexedAIP>>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                HistoryUtils.newHistory(BrowseTop.RESOLVER);
-                callback.onSuccess(null);
-              }
-
-              @Override
-              public void onSuccess(List<IndexedAIP> aips) {
-                List<? extends HasPermissions> hasPermissionsObjects = aips;
-                EditPermissions edit = new EditPermissions(IndexedAIP.class.getName(), selected, hasPermissionsObjects);
-                callback.onSuccess(edit);
-              }
-            });
-        }
-      } else {
-        HistoryUtils.newHistory(BrowseTop.RESOLVER);
-        callback.onSuccess(null);
-      }
-    }
-
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {EditPermissions.AIP_RESOLVER}, false, callback);
-    }
-
-    @Override
-    public List<String> getHistoryPath() {
-      return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
-    }
-
-    @Override
-    public String getHistoryToken() {
-      return "edit_permissions";
-    }
-  };
-
-  public static final HistoryResolver DIP_RESOLVER = new HistoryResolver() {
-
-    @Override
-    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 1) {
-        final String dipId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieve(IndexedDIP.class.getName(), dipId,
-          RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN, new AsyncCallback<IndexedDIP>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              HistoryUtils.newHistory(BrowseDIP.RESOLVER, dipId);
-              callback.onSuccess(null);
-            }
-
-            @Override
-            public void onSuccess(IndexedDIP dip) {
-              EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), dip);
-              callback.onSuccess(edit);
-            }
-          });
-      } else if (historyTokens.isEmpty()) {
-        LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-        final SelectedItems<IndexedDIP> selected = (SelectedItems<IndexedDIP>) selectedItems.getSelectedItems();
-
-        if (!ClientSelectedItemsUtils.isEmpty(selected)) {
-          BrowserService.Util.getInstance().retrieve(IndexedDIP.class.getName(), selected,
-            RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN, new AsyncCallback<List<IndexedDIP>>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                HistoryUtils.newHistory(BrowseTop.RESOLVER);
-                callback.onSuccess(null);
-              }
-
-              @Override
-              public void onSuccess(List<IndexedDIP> dips) {
-                List<? extends HasPermissions> hasPermissionsObjects = dips;
-                EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), selected, hasPermissionsObjects);
-                callback.onSuccess(edit);
-              }
-            });
-        }
-      } else {
-        HistoryUtils.newHistory(BrowseTop.RESOLVER);
-        callback.onSuccess(null);
-      }
-    }
-
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {EditPermissions.DIP_RESOLVER}, false, callback);
-    }
-
-    @Override
-    public List<String> getHistoryPath() {
-      return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
-    }
-
-    @Override
-    public String getHistoryToken() {
-      return "edit_dip_permissions";
-    }
-  };
-
-  interface MyUiBinder extends UiBinder<Widget, EditPermissions> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private final String objectClass;
   @UiField
   FlowPanel editPermissionsDescription;
-
   @UiField
-  Label userPermissionsEmpty, groupPermissionsEmpty;
-
+  Label userPermissionsEmpty;
   @UiField
-  FlowPanel userPermissionsPanel, groupPermissionsPanel;
-
+  Label groupPermissionsEmpty;
+  @UiField
+  FlowPanel userPermissionsPanel;
+  @UiField
+  FlowPanel groupPermissionsPanel;
   @UiField
   Button buttonApplyToAll;
-
   @UiField
   TitlePanel title;
-
   private List<HasPermissions> objects = new ArrayList<>();
-  private String objectClass = null;
   private String objectId = null;
   private SelectedItems<?> selectedItems;
+
+  public EditPermissions(String objectClass, SelectedItems<?> items) {
+    this.objectClass = objectClass;
+    this.selectedItems = items;
+    initWidget(uiBinder.createAndBindUi(this));
+    buttonApplyToAll.setVisible(IndexedAIP.class.getName().equals(objectClass));
+    editPermissionsDescription.add(new HTMLWidgetWrapper("EditMultiplePermissionsDescription.html"));
+  }
 
   public EditPermissions(String objectClass, HasPermissions object) {
     this.objects.add(object);
@@ -393,6 +274,10 @@ public class EditPermissions extends Composite {
       filter.add(new NotSimpleFilterParameter(RodaConstants.MEMBERS_ID, groupname));
     }
 
+    if (getAssignedUserNames().isEmpty() && getAssignedGroupNames().isEmpty()) {
+      filter = new Filter(new BasicSearchFilterParameter(RodaConstants.INDEX_SEARCH, RodaConstants.INDEX_WILDCARD));
+    }
+
     MemberSelectDialog selectDialog = new MemberSelectDialog(messages.selectUserOrGroupToAdd(), filter);
     selectDialog.showAndCenter();
     selectDialog.addValueChangeHandler(new ValueChangeHandler<RODAMember>() {
@@ -496,27 +381,26 @@ public class EditPermissions extends Composite {
                 }
               });
           } else if (IndexedDIP.class.getName().equals(objectClass)) {
-            SelectedItems<IndexedDIP> dips = (SelectedItems<IndexedDIP>) selectedItems;
-            BrowserService.Util.getInstance().updateDIPPermissions(dips, permissions, details,
-              new LoadingAsyncCallback<Job>() {
+            Services services = new Services("Update DIP permissions", "update");
+            UpdatePermissionsRequest<IndexedDIP> request = new UpdatePermissionsRequest<>();
+            request.setPermissions(permissions);
+            request.setItemsToUpdate((SelectedItems<IndexedDIP>) selectedItems);
+            request.setDetails(details);
+            services.dipResource(s -> s.updatePermissions(request)).whenComplete((job, throwable) -> {
+              Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+              Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                 @Override
-                public void onSuccessImpl(Job result) {
-                  Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                public void onFailure(Throwable caught) {
+                  // do nothing
+                }
 
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
-
-                    @Override
-                    public void onSuccess(final Void nothing) {
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                    }
-                  });
+                @Override
+                public void onSuccess(final Void nothing) {
+                  HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
                 }
               });
+            });
           }
         }
       });
@@ -525,7 +409,77 @@ public class EditPermissions extends Composite {
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     apply(false);
-  }
+  }  public static final HistoryResolver AIP_RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      if (historyTokens.size() == 1) {
+        final String aipId = historyTokens.get(0);
+        Services services = new Services("Retrieve AIP", "get");
+        services.aipResource(s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()))
+          .whenComplete((aip, throwable) -> {
+            if (throwable != null) {
+              HistoryUtils.newHistory(BrowseTop.RESOLVER);
+              callback.onSuccess(null);
+            } else {
+              EditPermissions edit = new EditPermissions(IndexedAIP.class.getName(), aip);
+              edit.title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
+              edit.title.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
+              callback.onSuccess(edit);
+            }
+          });
+      } else if (historyTokens.isEmpty()) {
+        LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+
+        SelectedItems<? extends IsIndexed> selected = selectedItems.getSelectedItems();
+        if (selected instanceof SelectedItemsList<?>) {
+          if (!ClientSelectedItemsUtils.isEmpty(selected)) {
+            List<String> ids = ((SelectedItemsList<? extends IsIndexed>) selected).getIds();
+            List<FilterParameter> collect = ids.stream()
+              .map(m -> new SimpleFilterParameter(RodaConstants.INDEX_UUID, m)).collect(Collectors.toList());
+            OrFiltersParameters orFiltersParameters = new OrFiltersParameters(collect);
+            FindRequest findRequest = FindRequest
+              .getBuilder(IndexedAIP.class.getName(), new Filter(orFiltersParameters), true)
+              .withSublist(new Sublist(0, 20)).build();
+            Services services = new Services("Find AIPs", "get");
+            services.aipResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()))
+              .whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                  HistoryUtils.newHistory(BrowseTop.RESOLVER);
+                  callback.onFailure(throwable);
+                } else {
+                  List<? extends HasPermissions> hasPermissionsObjects = result.getResults();
+                  EditPermissions edit = new EditPermissions(IndexedAIP.class.getName(),
+                    (SelectedItems<IndexedAIP>) selectedItems.getSelectedItems(), hasPermissionsObjects);
+                  callback.onSuccess(edit);
+                }
+              });
+          }
+        } else {
+          EditPermissions editPermissions = new EditPermissions(IndexedAIP.class.getName(), selected);
+          callback.onSuccess(editPermissions);
+        }
+      } else {
+        HistoryUtils.newHistory(BrowseTop.RESOLVER);
+        callback.onSuccess(null);
+      }
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {EditPermissions.AIP_RESOLVER}, false, callback);
+    }
+
+    @Override
+    public List<String> getHistoryPath() {
+      return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    @Override
+    public String getHistoryToken() {
+      return "edit_permissions";
+    }
+  };
 
   @UiHandler("buttonApplyToAll")
   void buttonApplyToAllHandler(ClickEvent e) {
@@ -543,6 +497,9 @@ public class EditPermissions extends Composite {
     } else {
       HistoryUtils.newHistory(BrowseTop.RESOLVER);
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, EditPermissions> {
   }
 
   public class PermissionPanel extends Composite {
@@ -680,4 +637,68 @@ public class EditPermissions extends Composite {
       }
     }
   }
+
+
+
+  public static final HistoryResolver DIP_RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      if (historyTokens.size() == 1) {
+        final String dipId = historyTokens.get(0);
+        Services services = new Services("Retrieve DIP", "get");
+        services.dipResource(s -> s.findByUuid(dipId, LocaleInfo.getCurrentLocale().getLocaleName()))
+          .whenComplete((indexedDIP, throwable) -> {
+            if (throwable != null) {
+              HistoryUtils.newHistory(BrowseDIP.RESOLVER, dipId);
+              callback.onSuccess(null);
+            } else {
+              EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), indexedDIP);
+              callback.onSuccess(edit);
+            }
+          });
+      } else if (historyTokens.isEmpty()) {
+        LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+        final SelectedItems<IndexedDIP> selected = (SelectedItems<IndexedDIP>) selectedItems.getSelectedItems();
+
+        if (!ClientSelectedItemsUtils.isEmpty(selected)) {
+          BrowserService.Util.getInstance().retrieve(IndexedDIP.class.getName(), selected,
+            RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN, new AsyncCallback<List<IndexedDIP>>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                HistoryUtils.newHistory(BrowseTop.RESOLVER);
+                callback.onSuccess(null);
+              }
+
+              @Override
+              public void onSuccess(List<IndexedDIP> dips) {
+                List<? extends HasPermissions> hasPermissionsObjects = dips;
+                EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), selected, hasPermissionsObjects);
+                callback.onSuccess(edit);
+              }
+            });
+        }
+      } else {
+        HistoryUtils.newHistory(BrowseTop.RESOLVER);
+        callback.onSuccess(null);
+      }
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {EditPermissions.DIP_RESOLVER}, false, callback);
+    }
+
+    @Override
+    public List<String> getHistoryPath() {
+      return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    @Override
+    public String getHistoryToken() {
+      return "edit_dip_permissions";
+    }
+  };
+
 }

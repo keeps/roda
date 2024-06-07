@@ -100,7 +100,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USERNAME_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USERNAME_PARAM,
         name);
     }
   }
@@ -129,7 +129,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USERNAME_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USERNAME_PARAM,
         name);
     }
   }
@@ -149,7 +149,7 @@ public class MembersController implements MembersRestService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
     }
   }
 
@@ -174,7 +174,7 @@ public class MembersController implements MembersRestService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
     }
   }
 
@@ -194,7 +194,7 @@ public class MembersController implements MembersRestService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
     }
   }
 
@@ -217,7 +217,7 @@ public class MembersController implements MembersRestService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM,
         regenerateAccessKeyRequest);
     }
   }
@@ -245,7 +245,7 @@ public class MembersController implements MembersRestService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM,
         accessKeyRequest);
     }
   }
@@ -266,7 +266,7 @@ public class MembersController implements MembersRestService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
     }
   }
 
@@ -285,7 +285,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_GROUPNAME_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_GROUPNAME_PARAM,
         name);
     }
   }
@@ -306,7 +306,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_GROUPNAME_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_GROUPNAME_PARAM,
         name);
     }
     return null;
@@ -333,7 +333,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         members, RodaConstants.CONTROLLER_ACTIVATE_PARAM, activate);
     }
     return null;
@@ -355,7 +355,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
         members);
     }
     return null;
@@ -380,7 +380,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_GROUP_PARAM, group);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_GROUP_PARAM, group);
     }
   }
 
@@ -400,7 +400,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_GROUP_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_GROUP_PARAM,
         modifiedGroup);
     }
     return null;
@@ -423,7 +423,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USER_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USER_PARAM,
         requestContext.getUser());
     }
   }
@@ -445,7 +445,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USER_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USER_PARAM,
         userOperations.getUser());
     }
   }
@@ -464,7 +464,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), LogEntryState.SUCCESS,
+      controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS,
         RodaConstants.CONTROLLER_USER_PARAM, user);
     }
     return null;
@@ -499,7 +499,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), LogEntryState.SUCCESS,
+      controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS,
         RodaConstants.CONTROLLER_USER_PARAM, user);
     }
   }
@@ -512,7 +512,7 @@ public class MembersController implements MembersRestService {
     Set<MetadataValue> userExtra = membersService.retrieveDefaultExtraFormFields();
     CreateUserExtraFormFields createUserExtraFormFields = new CreateUserExtraFormFields(userExtra);
     // register action
-    controllerAssistant.registerAction(requestContext.getUser(), LogEntryState.SUCCESS);
+    controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
 
     return createUserExtraFormFields;
   }
@@ -596,7 +596,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USER_PARAM, user);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USER_PARAM, user);
     }
   }
 
@@ -618,7 +618,7 @@ public class MembersController implements MembersRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_USER_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USER_PARAM,
         createUserRequest.getUser());
     }
   }

@@ -43,9 +43,11 @@ public class IndexedAIP
   private AIPState state;
 
   private String type = null;
-  private String instanceId = null;
 
+  private String instanceId = null;
   private String instanceName = null;
+  private boolean isLocalInstance = false;
+
   private String level = null;
   private String title = null;
   private Date dateInitial = null;
@@ -563,7 +565,7 @@ public class IndexedAIP
     return scheduleAssociationType;
   }
 
-  public IndexedAIP setDisposalScheduleAssociationType(AIPDisposalScheduleAssociationType scheduleAssociationType) {
+  public IndexedAIP setScheduleAssociationType(AIPDisposalScheduleAssociationType scheduleAssociationType) {
     this.scheduleAssociationType = scheduleAssociationType;
     return this;
   }
@@ -771,5 +773,13 @@ public class IndexedAIP
 
   public void setInstanceName(String instanceName) {
     this.instanceName = instanceName;
+  }
+
+  public boolean isLocalInstance() {
+    return isLocalInstance;
+  }
+
+  public void setLocalInstance(boolean localInstance) {
+    isLocalInstance = localInstance;
   }
 }

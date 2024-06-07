@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
@@ -21,7 +21,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.BrowseTop;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
@@ -36,6 +36,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Relation {
 
+  private static Relation instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -58,8 +59,6 @@ public class Relation {
       return "relation";
     }
   };
-
-  private static Relation instance = null;
 
   /**
    * Get the singleton instance
@@ -88,17 +87,15 @@ public class Relation {
 
       Filter filter = new Filter(params);
 
-      BrowserService.Util.getInstance().find(IndexedAIP.class.getName(), filter, Sorter.NONE, new Sublist(0, 1),
-        Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), false, Arrays.asList(RodaConstants.INDEX_UUID),
-        new AsyncCallback<IndexResult<IndexedAIP>>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
+      Services services = new Services("Find AIPs", "get");
+      FindRequest request = FindRequest.getBuilder(IndexedAIP.class.getName(), filter, false).withSorter(Sorter.NONE)
+        .withSublist(new Sublist(0, 1)).withFacets(Facets.NONE)
+        .withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID)).build();
+      services.aipResource(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()))
+        .whenComplete((result, throwable) -> {
+          if (throwable != null) {
             HistoryUtils.newHistory(Search.RESOLVER);
-          }
-
-          @Override
-          public void onSuccess(IndexResult<IndexedAIP> result) {
+          } else {
             if (result.getTotalCount() == 1) {
               HistoryUtils.newHistory(BrowseTop.RESOLVER, result.getResults().get(0).getUUID());
             } else {

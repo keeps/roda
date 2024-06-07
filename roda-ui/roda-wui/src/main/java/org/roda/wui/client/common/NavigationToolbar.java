@@ -26,10 +26,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.BrowseDipBundle;
-import org.roda.wui.client.browse.bundle.BrowseFileBundle;
-import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
-import org.roda.wui.client.browse.bundle.Bundle;
 import org.roda.wui.client.common.actions.AbstractActionable;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
@@ -44,6 +40,7 @@ import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils.ProcessRelativeItem;
+import org.roda.wui.client.common.model.BrowseDIPResponse;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -70,61 +67,45 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 
 public class NavigationToolbar<T extends IsIndexed> extends Composite implements HasHandlers {
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  @UiField
+  AccessibleFocusPanel keyboardFocus;
+  @UiField
+  Label navigationToolbarHeader;
+  @UiField
+  BreadcrumbPanel breadcrumb;
+  @UiField
+  HTML aipState;
+  @UiField
+  HTML pageInformation;
+  @UiField
+  AccessibleFocusPanel disseminationsButton;
 
+  // breadcrumb on left side
+  @UiField
+  AccessibleFocusPanel searchButton;
+  @UiField
+  AccessibleFocusPanel nextButton;
+  @UiField
+  AccessibleFocusPanel previousButton;
+  ProcessRelativeItem<T> processor;
+
+  // buttons on the right side
+  @UiField
+  AccessibleFocusPanel infoSidebarButton;
+  @UiField
+  AccessibleFocusPanel actionsButton;
+  @UiField
+  FlowPanel toolbarPanel;
   private boolean requireControlKeyModifier = true;
   private boolean requireShiftKeyModifier = false;
   private boolean requireAltKeyModifier = false;
   private boolean skipButtonSetup = false;
-
-  interface MyUiBinder extends UiBinder<Widget, NavigationToolbar> {
-  }
-
-  @UiField
-  AccessibleFocusPanel keyboardFocus;
-
-  // breadcrumb on left side
-
-  @UiField
-  Label navigationToolbarHeader;
-
-  @UiField
-  BreadcrumbPanel breadcrumb;
-
-  @UiField
-  HTML aipState;
-
-  @UiField
-  HTML pageInformation;
-
-  // buttons on the right side
-
-  @UiField
-  AccessibleFocusPanel disseminationsButton;
-
-  @UiField
-  AccessibleFocusPanel searchButton;
-
-  @UiField
-  AccessibleFocusPanel nextButton, previousButton;
-  ProcessRelativeItem<T> processor;
-
-  @UiField
-  AccessibleFocusPanel infoSidebarButton;
-
-  @UiField
-  AccessibleFocusPanel actionsButton;
-
-  @UiField
-  FlowPanel toolbarPanel;
-
   private T currentObject = null;
   private Permissions permissions = null;
   private HandlerRegistration searchPopupClickHandler = null;
-
   private Map<Actionable.ActionImpact, Runnable> handlers = new EnumMap<>(Actionable.ActionImpact.class);
-
   private AsyncCallback<Actionable.ActionImpact> handler = new NoAsyncCallback<Actionable.ActionImpact>() {
     @Override
     public void onSuccess(Actionable.ActionImpact result) {
@@ -349,18 +330,14 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     }
   }
 
-  // Breadcrumb management
-
   public void clearBreadcrumb() {
     breadcrumb.clear();
   }
 
+  // Breadcrumb management
+
   public void updateBreadcrumb(BrowseAIPBundle bundle) {
     breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(bundle.getAIPAncestors(), bundle.getAip()));
-  }
-
-  public void updateBreadcrumb(BrowseRepresentationBundle bundle) {
-    breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle));
   }
 
   public void updateBreadcrumb(List<IndexedAIP> ancestors, IndexedAIP indexedAIP,
@@ -375,22 +352,19 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     aipState.setVisible(AIPState.ACTIVE != indexedAIP.getState());
   }
 
-  public void updateBreadcrumb(BrowseDipBundle bundle) {
-    breadcrumb.updatePath(
-      BreadcrumbUtils.getDipBreadcrumbs(bundle.getDip(), bundle.getDipFile(), bundle.getDipFileAncestors()));
+  public void updateBreadcrumb(IndexedDIP dip, DIPFile dipFile, List<DIPFile> ancestors) {
+    breadcrumb.updatePath(BreadcrumbUtils.getDipBreadcrumbs(dip, dipFile, ancestors));
   }
 
-  public void updateBreadcrumb(Bundle dipReferrerBundle) {
-    if (dipReferrerBundle instanceof BrowseFileBundle) {
-      BrowseFileBundle bundle = (BrowseFileBundle) dipReferrerBundle;
-      breadcrumb
-        .updatePath(BreadcrumbUtils.getFileBreadcrumbs(bundle.getAip(), bundle.getRepresentation(), bundle.getFile()));
-    } else if (dipReferrerBundle instanceof BrowseRepresentationBundle) {
-      BrowseRepresentationBundle bundle = (BrowseRepresentationBundle) dipReferrerBundle;
-      breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle.getAip(), bundle.getRepresentation()));
-    } else if (dipReferrerBundle instanceof BrowseAIPBundle) {
-      BrowseAIPBundle bundle = (BrowseAIPBundle) dipReferrerBundle;
-      breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(bundle.getAip()));
+  public void updateBreadcrumb(BrowseDIPResponse response) {
+    if (response.getReferred() instanceof IndexedFile) {
+      breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(response.getIndexedAIP(),
+        response.getIndexedRepresentation(), response.getIndexedFile()));
+    } else if (response.getReferred() instanceof IndexedRepresentation) {
+      breadcrumb.updatePath(
+        BreadcrumbUtils.getRepresentationBreadcrumbs(response.getIndexedAIP(), response.getIndexedRepresentation()));
+    } else if (response.getReferred() instanceof IndexedAIP) {
+      breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(response.getIndexedAIP()));
     }
   }
 
@@ -413,6 +387,9 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     searchPopupClickHandler = null;
   }
 
+  interface MyUiBinder extends UiBinder<Widget, NavigationToolbar> {
+  }
+
   private static class SearchPopup extends CalloutPopup {
     public SearchPopup(IndexedAIP aip) {
       super();
@@ -431,19 +408,8 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       // do nothing
     }
 
-    public enum SearchAipAction implements Action<IndexedAIP> {
-      SEARCH_DESCENDANTS(), SEARCH_PACKAGE();
-
-      private List<String> methods;
-
-      SearchAipAction(String... methods) {
-        this.methods = Arrays.asList(methods);
-      }
-
-      @Override
-      public List<String> getMethods() {
-        return this.methods;
-      }
+    public static SearchAipActions get() {
+      return INSTANCE;
     }
 
     @Override
@@ -454,10 +420,6 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     @Override
     public Action<IndexedAIP> actionForName(String name) {
       return SearchAipAction.valueOf(name);
-    }
-
-    public static SearchAipActions get() {
-      return INSTANCE;
     }
 
     @Override
@@ -520,6 +482,21 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
       actionableBundle.addGroup(searchGroup);
       return actionableBundle;
+    }
+
+    public enum SearchAipAction implements Action<IndexedAIP> {
+      SEARCH_DESCENDANTS(), SEARCH_PACKAGE();
+
+      private List<String> methods;
+
+      SearchAipAction(String... methods) {
+        this.methods = Arrays.asList(methods);
+      }
+
+      @Override
+      public List<String> getMethods() {
+        return this.methods;
+      }
     }
   }
 }

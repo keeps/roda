@@ -21,8 +21,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.file.CreateFolderRequest;
-import org.roda.core.data.v2.file.DeleteFilesRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
+import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -96,7 +96,7 @@ public class FilesService {
       "Could not execute format identification using Siegfrid action");
   }
 
-  public Job deleteFiles(User user, DeleteFilesRequest request)
+  public Job deleteFiles(User user, DeleteRequest<IndexedFile> request)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, request.getDetails());

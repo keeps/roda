@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DIPFILE)
 public class DIPFile implements IsModelObject, IsIndexed, HasId, SetsUUID, HasPermissionFilters {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   private static final int VERSION = 1;
 

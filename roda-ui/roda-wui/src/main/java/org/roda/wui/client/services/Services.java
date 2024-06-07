@@ -10,6 +10,7 @@ import org.fusesource.restygwt.client.REST;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -78,6 +79,10 @@ public class Services implements DirectRestService {
       return GWT.create(RepresentationRestService.class);
     } else if (AIPRestService.class.equals(serviceClass)) {
       return GWT.create(AIPRestService.class);
+    } else if (DIPRestService.class.equals(serviceClass)) {
+      return GWT.create(DIPRestService.class);
+    } else if (DIPFileRestService.class.equals(serviceClass)) {
+      return GWT.create(DIPFileRestService.class);
     } else {
       throw new IllegalArgumentException(serviceClass.getName() + " not supported");
     }
@@ -141,6 +146,8 @@ public class Services implements DirectRestService {
       service = GWT.create(RepresentationRestService.class);
     } else if (IndexedFile.class.getName().equals(objectClassString)) {
       service = GWT.create(FileRestService.class);
+    } else if (DIPFile.class.getName().equals(objectClassString)) {
+      service = GWT.create(DIPFileRestService.class);
     } else {
       throw new IllegalArgumentException(objectClassString + " not supported");
     }
@@ -172,7 +179,7 @@ public class Services implements DirectRestService {
   }
 
   public <T, O extends IsIndexed> CompletableFuture<T> rodaEntityRestService(
-      CheckedFunction<RODAEntityRestService<O>, T> method, String objectClassName) {
+    CheckedFunction<RODAEntityRestService<O>, T> method, String objectClassName) {
     return futureFromObjectClass(objectClassName, method);
   }
 
@@ -244,5 +251,13 @@ public class Services implements DirectRestService {
 
   public <T> CompletableFuture<T> aipResource(CheckedFunction<AIPRestService, T> method) {
     return future(AIPRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> dipResource(CheckedFunction<DIPRestService, T> method) {
+    return future(DIPRestService.class, method);
+  }
+
+  public <T> CompletableFuture<T> dipFileResource(CheckedFunction<DIPFileRestService, T> method) {
+    return future(DIPFileRestService.class, method);
   }
 }

@@ -7,9 +7,12 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class AIPLink implements Serializable {
+
+  @Serial
   private static final long serialVersionUID = 6222816570283361558L;
   private String aipId;
 

@@ -2,6 +2,7 @@ package org.roda.core.data.v2.properties;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -15,7 +16,7 @@ public class ReindexPluginObjects implements Serializable {
   private Set<ReindexPluginObject> pluginsObjects;
 
   public ReindexPluginObjects() {
-    // empty constructor
+    pluginsObjects = new HashSet<>();
   }
 
   public ReindexPluginObjects(Set<ReindexPluginObject> pluginsObjects) {

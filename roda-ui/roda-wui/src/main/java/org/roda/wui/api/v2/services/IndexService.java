@@ -43,7 +43,7 @@ public class IndexService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_CLASS_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_CLASS_PARAM,
         classToReturn, RodaConstants.CONTROLLER_FIELD_PARAM, suggestRequest.getField(),
         RodaConstants.CONTROLLER_QUERY_PARAM, suggestRequest.getQuery());
     }

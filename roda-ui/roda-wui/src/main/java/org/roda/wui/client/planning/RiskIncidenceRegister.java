@@ -60,7 +60,7 @@ import config.i18n.client.ClientMessages;
  */
 public class RiskIncidenceRegister extends Composite {
 
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -125,31 +125,20 @@ public class RiskIncidenceRegister extends Composite {
       return "riskincidenceregister";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, RiskIncidenceRegister> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   private static final List<String> aipFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
-
   private static final List<String> representationFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID,
       RodaConstants.REPRESENTATION_TYPE));
-
   private static final List<String> fileFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_PARENT_UUID, RodaConstants.FILE_PATH,
       RodaConstants.FILE_ANCESTORS_PATH, RodaConstants.FILE_ORIGINALNAME, RodaConstants.INDEX_ID,
       RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY));
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
   BreadcrumbPanel breadcrumb;
-
   @UiField
   FlowPanel riskIncidenceRegisterDescription;
-
   @UiField(provided = true)
   SearchWrapper searchWrapper;
 
@@ -222,10 +211,10 @@ public class RiskIncidenceRegister extends Composite {
      * representationId, LocaleInfo.getCurrentLocale().getLocaleName(),
      * representationFieldsToReturn, new AsyncCallback<BrowseRepresentationBundle>()
      * {
-     * 
+     *
      * @Override public void onFailure(Throwable caught) {
      * AsyncCallbackUtils.defaultFailureTreatment(caught); }
-     * 
+     *
      * @Override public void onSuccess(BrowseRepresentationBundle repBundle) {
      * breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(repBundle)
      * ); breadcrumb.setVisible(true); } });
@@ -240,22 +229,24 @@ public class RiskIncidenceRegister extends Composite {
     request.setAipId(aipId);
     request.setDirectoryPaths(filePath);
 
-    services.fileResource(s -> s.retrieveIndexedFile(request)).whenComplete((indexedFile, throwable) -> {
+    services.fileResource(s -> s.retrieveIndexedFileViaRequest(request))
+      .whenComplete((indexedFile, throwable) -> {
 
-      CompletableFuture<IndexedAIP> indexedAIPCompletableFuture = services
-        .aipResource(s -> s.findByUuid(indexedFile.getAipId(), LocaleInfo.getCurrentLocale().getLocaleName()));
-      CompletableFuture<IndexedRepresentation> indexedRepresentationCompletableFuture = services.representationResource(
-        s -> s.findByUuid(indexedFile.getRepresentationUUID(), LocaleInfo.getCurrentLocale().getLocaleName()));
+        CompletableFuture<IndexedAIP> indexedAIPCompletableFuture = services
+          .aipResource(s -> s.findByUuid(indexedFile.getAipId(), LocaleInfo.getCurrentLocale().getLocaleName()));
+        CompletableFuture<IndexedRepresentation> indexedRepresentationCompletableFuture = services
+          .representationResource(
+            s -> s.findByUuid(indexedFile.getRepresentationUUID(), LocaleInfo.getCurrentLocale().getLocaleName()));
 
-      CompletableFuture<Void> allFutures = CompletableFuture.allOf(indexedAIPCompletableFuture,
-        indexedRepresentationCompletableFuture);
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(indexedAIPCompletableFuture,
+          indexedRepresentationCompletableFuture);
 
-      allFutures.thenRun(() -> {
-        breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(indexedAIPCompletableFuture.join(),
-          indexedRepresentationCompletableFuture.join(), indexedFile));
-        breadcrumb.setVisible(true);
+        allFutures.thenRun(() -> {
+          breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(indexedAIPCompletableFuture.join(),
+            indexedRepresentationCompletableFuture.join(), indexedFile));
+          breadcrumb.setVisible(true);
+        });
       });
-    });
   }
 
   @Override
@@ -263,4 +254,9 @@ public class RiskIncidenceRegister extends Composite {
     super.onLoad();
     JavascriptUtils.stickSidebar();
   }
+
+  interface MyUiBinder extends UiBinder<Widget, RiskIncidenceRegister> {
+  }
+
+
 }

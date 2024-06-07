@@ -241,7 +241,7 @@ public class ShowDisposalHold extends Composite {
 
           Services services = new Services("Lift disposal hold", "job");
           CountRequest countRequest = new CountRequest(IndexedAIP.class.getName(), filter, true);
-          services.rodaEntityRestService(s -> s.count(countRequest), IndexedFile.class)
+          services.rodaEntityRestService(s -> s.count(countRequest), IndexedAIP.class)
             .whenComplete((longResponse, throwable) -> {
               if (longResponse.getResult() != 0) {
                 services
