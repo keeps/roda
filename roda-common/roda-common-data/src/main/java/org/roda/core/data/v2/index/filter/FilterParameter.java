@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({@JsonSubTypes.Type(value = BasicSearchFilterParameter.class, name = "BasicSearchFilterParameter"),
   @JsonSubTypes.Type(value = EmptyKeyFilterParameter.class, name = "EmptyKeyFilterParameter"),
   @JsonSubTypes.Type(value = LikeFilterParameter.class, name = "LikeFilterParameter"),
@@ -56,7 +56,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
     @DiscriminatorMapping(value = "OrFiltersParameters", schema = OrFiltersParameters.class),
     @DiscriminatorMapping(value = "AndFiltersParameters", schema = AndFiltersParameters.class),
     @DiscriminatorMapping(value = "AllFilterParameter", schema = AllFilterParameter.class),
-    @DiscriminatorMapping(value = "BlockJoinParentFilterParameter", schema = BlockJoinParentFilterParameter.class),}, discriminatorProperty = "@type")
+    @DiscriminatorMapping(value = "BlockJoinParentFilterParameter", schema = BlockJoinParentFilterParameter.class)}, discriminatorProperty = "type")
 public abstract class FilterParameter implements Serializable {
   @Serial
   private static final long serialVersionUID = 3744111668897879761L;
