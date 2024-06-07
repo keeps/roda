@@ -1,5 +1,48 @@
 # Changelog
 
+## v5.6.5 (07/06/2024)
+#### Bug fixes
+
+- Roda fails to resolve other metadata with folders #3219
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.6.4 (06/06/2024)
+#### Bug fixes
+
+- Roda fails to reindex due to problem with other metadata files #3218
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.6.3 (23/05/2024)
+#### Bug fixes
+
+- Revert webjars-locator functionality
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.6.2 (22/05/2024)
+#### Bug fixes
+
+- Base roda overwrites the configuration regarding user permissions in roda-config.properties #3189
+
+#### Security
+- Dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.6.1 (03/05/2024)
 #### Bug fixes
 
@@ -434,72 +477,4 @@ docker pull keeps/roda:v4.5.0
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.7.1
-```
----
-
-## v4.4.0 (17/06/2022)
-### :warning: Breaking Changes
-Solr 7.7 reached EOL meaning that is no longer supported and will not receive any security patches. As such RODA from version 4.4 onward will use Solr 8 as index system. If you have any implementation with Solr 7 you need to upgrade the Solr to version 8 and then rebuild all indexes on RODA.
-
-#### New features:
-
-- Upgrade Solr version from 7.7 to Solr 8.11.1
-- Upgrade GWT version from 2.9.0 to 2.10.0
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.4.0
-```
----
-
-## v4.3.1 (17/06/2022)
-#### Bug Fixes:
-
-- Edit descriptive metadata from an AIP with a disposal schedule gives an error #2190 
-- Multiple plugin assumes last plugin state in final report #2067
-- Preservation event and incident risk counters on representation panel #2064
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.3.1
-```
-
-
----
-
-## v4.3.0 (26/04/2022)
-#### New features:
-
--  Akka events with Zookeeper seed registration [#2001](https://github.com/keeps/roda/issues/2001)
-
-#### Enhancements:
-
--  Add error message to ClientLogger for fatal method [#2002](https://github.com/keeps/roda/issues/2002)
-
-#### Bug Fixes:
-
--  Ambiguous representation PREMIS relatedObjectIdentifierValue [#1993](https://github.com/keeps/roda/issues/1993)
--  Classification scheme won't load because of unrecognized field "type" [#1986](https://github.com/keeps/roda/issues/1986)
--  Reject assessment is creating premis events on AIP, change this event for Repository level [#1984](https://github.com/keeps/roda/issues/1984)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.3.0
-```
-
----
-
-## v3.7.0 (21/04/2022)
-
-#### New features:
-
--  Akka events with Zookeeper seed registration [#2001](https://github.com/keeps/roda/issues/2001)
-
-#### Enhancements:
-
--  Add error message to ClientLogger for fatal method [#2002](https://github.com/keeps/roda/issues/2002)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.7.0
 ```
