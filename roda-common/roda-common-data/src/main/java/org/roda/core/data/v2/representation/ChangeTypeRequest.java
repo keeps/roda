@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.roda.core.data.v2.generics.select.SelectedItemsFilterRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>

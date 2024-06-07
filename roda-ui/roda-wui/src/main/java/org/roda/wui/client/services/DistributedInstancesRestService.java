@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.fusesource.restygwt.client.DirectRestService;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.generics.CreateDistributedInstanceRequest;
 import org.roda.core.data.v2.generics.CreateLocalInstanceRequest;
 import org.roda.core.data.v2.jobs.Job;
