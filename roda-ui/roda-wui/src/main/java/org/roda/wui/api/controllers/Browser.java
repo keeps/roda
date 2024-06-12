@@ -320,33 +320,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static <T extends IsIndexed> List<T> retrieve(final User user, final Class<T> classToReturn,
-    final SelectedItems<T> selectedItems, final List<String> fieldsToReturn)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user, classToReturn);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // delegate
-      final List<T> objects = BrowserHelper.retrieve(classToReturn, selectedItems, fieldsToReturn);
-      for (T obj : objects) {
-        controllerAssistant.checkObjectPermissions(user, obj, classToReturn);
-      }
-
-      return objects;
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_ITEMS_PARAM, selectedItems);
-    }
-  }
-
   public static <T extends IsIndexed> void delete(final User user, final Class<T> classToReturn,
     final SelectedItems<T> ids) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};

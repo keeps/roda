@@ -103,10 +103,6 @@ public interface BrowserService extends RemoteService {
     String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
-  <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
-    List<String> fieldsToReturn)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException;
-
   Job updateAIPPermissions(SelectedItems<IndexedAIP> aips, Permissions permissions, String details, boolean recursive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     JobAlreadyStartedException;
@@ -142,35 +138,11 @@ public interface BrowserService extends RemoteService {
   DistributedInstance updateDistributedInstance(DistributedInstance distributedInstance)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
-  AccessKey createAccessKey(AccessKey accessKey) throws AuthorizationDeniedException, AlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException, IOException;
-
   AccessKeys listAccessKey()
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
 
   AccessKey retrieveAccessKey(String accessKeyId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
-
-  void deleteAccessKey(String accessKeyId)
-    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
-
-  AccessKey updateAccessKey(AccessKey accessKey)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
-
-  AccessKeys listAccessKeyByUser(String userId)
-    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
-
-  void deactivateUserAccessKeys(String userId)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
-
-  void deleteUserAccessKeys(String userId)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
-
-  AccessKey regenerateAccessKey(AccessKey accessKey) throws AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, GenericException, AuthenticationDeniedException;
-
-  AccessKey revokeAccessKey(AccessKey accessKey)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   void createLocalInstance(LocalInstance localInstance) throws AuthorizationDeniedException, GenericException;
 

@@ -130,15 +130,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
-    List<String> fieldsToReturn)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
-    return Browser.retrieve(user, classToReturn, selectedItems, fieldsToReturn);
-  }
-
-  @Override
   public Job moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
@@ -358,13 +349,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public AccessKey createAccessKey(AccessKey accessKey) throws AuthorizationDeniedException, AlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException, IOException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.createAccessKey(user, accessKey);
-  }
-
-  @Override
   public AccessKeys listAccessKey()
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
@@ -376,55 +360,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return ApplicationAuth.retrieveAccessKey(user, accessKeyId);
-  }
-
-  @Override
-  public AccessKey updateAccessKey(AccessKey accessKey)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.updateAccessKey(user, accessKey);
-  }
-
-  @Override
-  public void deleteAccessKey(String accessKeyId)
-    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    ApplicationAuth.deleteAccessKey(user, accessKeyId);
-  }
-
-  @Override
-  public AccessKeys listAccessKeyByUser(String userId)
-    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.listAccessKeyByUser(user, userId);
-  }
-
-  @Override
-  public void deactivateUserAccessKeys(String userId)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    ApplicationAuth.deactivateUserAccessKeys(user, userId);
-  }
-
-  @Override
-  public void deleteUserAccessKeys(String userId)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    ApplicationAuth.deleteUserAccessKeys(user, userId);
-  }
-
-  @Override
-  public AccessKey regenerateAccessKey(AccessKey accessKey) throws AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, GenericException, AuthenticationDeniedException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.regenerateAccessKey(user, accessKey);
-  }
-
-  @Override
-  public AccessKey revokeAccessKey(AccessKey accessKey)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.revokeAccessKey(user, accessKey);
   }
 
   @Override

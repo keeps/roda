@@ -572,27 +572,6 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(returnClass);
   }
 
-  protected static <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, SelectedItems<T> selectedItems,
-    List<String> fieldsToReturn) throws GenericException, NotFoundException, RequestNotValidException {
-    List<T> ret;
-
-    if (selectedItems instanceof SelectedItemsList) {
-      SelectedItemsList<T> selectedList = (SelectedItemsList<T>) selectedItems;
-      ret = RodaCoreFactory.getIndexService().retrieve(returnClass, selectedList.getIds(), fieldsToReturn);
-    } else if (selectedItems instanceof SelectedItemsFilter) {
-      SelectedItemsFilter<T> selectedFilter = (SelectedItemsFilter<T>) selectedItems;
-      int counter = RodaCoreFactory.getIndexService().count(returnClass, selectedFilter.getFilter()).intValue();
-      ret = RodaCoreFactory.getIndexService()
-        .find(returnClass, selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter), fieldsToReturn)
-        .getResults();
-    } else {
-      throw new RequestNotValidException(
-        "Unsupported SelectedItems implementation: " + selectedItems.getClass().getName());
-    }
-
-    return ret;
-  }
-
   public static void validateGetFileParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
