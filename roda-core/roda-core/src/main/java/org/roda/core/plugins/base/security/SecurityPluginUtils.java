@@ -2,6 +2,7 @@ package org.roda.core.plugins.base.security;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class SecurityPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SecurityPluginUtils.class);
 
-  public static URIBuilder getServiceURI(HttpServletRequest httpRequest) {
+  public static URIBuilder getServiceURI(HttpServletRequest httpRequest, List<String> paramsToRemove) {
     final String url = httpRequest.getRequestURL().toString();
     final String requestURI = httpRequest.getRequestURI();
     final String path = httpRequest.getParameter("path");
@@ -27,7 +28,9 @@ public class SecurityPluginUtils {
     Map<String, String[]> parameterMap = new HashMap<>(httpRequest.getParameterMap());
     parameterMap.remove("path");
     parameterMap.remove("hash");
-    parameterMap.remove("ticket");
+    for (String param : paramsToRemove) {
+      parameterMap.remove(param);
+    }
 
     URIBuilder uri = new URIBuilder();
 

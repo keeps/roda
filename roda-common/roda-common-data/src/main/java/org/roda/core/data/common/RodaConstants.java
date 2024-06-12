@@ -91,7 +91,6 @@ public final class RodaConstants {
 
   public static final List<String> DEFAULT_ALGORITHMS = Arrays.asList(SHA256);
 
-
   public enum DateGranularity {
     YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND
   }
@@ -166,6 +165,8 @@ public final class RodaConstants {
   public static final String UI_SERVICE_REPORTING_URL = "ui.service.reporting.url";
   public static final String UI_SERVICE_REPORTING_ACTIVE = "ui.service.reporting.active";
   public static final String UI_SERVICE_CAS_ACTIVE = "ui.service.cas.active";
+  public static final String UI_SERVICE_MULTI_METHOD_AUTHENTICATION_ACTIVE = "ui.service.multi.method.authentication.active";
+  public static final String UI_SERVICE_MULTI_METHOD_AUTHENTICATION_LIST = "ui.service.multi.method.authentication.item[]";
   public static final String UI_SERVICE_DROPFOLDER_ACTIVE = "ui.service.dropfolder.active";
 
   public static final String UI_SERVICE_MONITORING_DEFAULT_URL = "https://www.roda-enterprise.com";
@@ -754,8 +755,9 @@ public final class RodaConstants {
   public static final String CONTROLLER_REPRESENTATION_INFORMATION_FILTER_PARAM = "filter";
   public static final String CONTROLLER_ACTIVATE_PARAM = "activate";
   public static final String CONTROLLER_DETAILS_PARAM = "details";
-
   public static final String CONTROLLER_REQUEST_METRICS_PARAM = "metricsToObtain";
+  public static final String CONTROLLER_LOGIN_METHOD_PARAM = "loginMethod";
+
   /*
    * Core (storage, index, orchestrator, etc.)
    */
@@ -816,6 +818,10 @@ public final class RodaConstants {
   public static final String DEFAULT_MARKET_SUPPORT_URL = "https://www.roda-enterprise.com";
   public static final String ENVIRONMENT_COLLECT_VERSION = "roda.environment.collect.version";
   public static final String DEFAULT_ENVIRONMENT_COLLECT_VERSION = "true";
+
+  // Security Plugins
+  public static final String SECURITY_PLUGINS_ENABLE_PROPERTY = "core.plugins.external.security.enable";
+  public static final String SECURITY_PLUGINS_CONFIGURATIONS_PROPERTY = "core.plugins.external.security.configurations[]";
 
   public enum OrchestratorType {
     AKKA, AKKA_DISTRIBUTED

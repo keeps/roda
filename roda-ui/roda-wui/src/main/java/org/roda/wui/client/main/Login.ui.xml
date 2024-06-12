@@ -41,6 +41,7 @@
 				</g:Button>
 			</g:FlowPanel>
 		</g:FlowPanel>
+		<g:FlowPanel addStyleNames="loginPanel" ui:field="mmaPanel" visible="false"/>
 		<g:FlowPanel addStyleNames="loginPanel" ui:field="loggedInPanel" visible="false">
 			<g:HTML>
 				<h1>

@@ -33,13 +33,14 @@ public class SecurityManager {
   private List<String> allowedSecurityPlugins;
   private final SecurityService securityService;
 
-  private SecurityManager() {
-    this.securityService = new SecurityService();
+  private SecurityManager(boolean hasMultiMethodAuthentication) {
+    this.securityService = new SecurityService(hasMultiMethodAuthentication);
   }
 
   protected static SecurityManager getInstance(List<String> allowedSecurityPlugins) {
     if (instance == null) {
-      instance = new SecurityManager();
+      boolean hasMultiMethodAuthentication = allowedSecurityPlugins.size() > 1;
+      instance = new SecurityManager(hasMultiMethodAuthentication);
       instance.registerAllowedPlugin(allowedSecurityPlugins);
     }
     return instance;
@@ -61,25 +62,35 @@ public class SecurityManager {
   }
 
   public static class SecurityService extends SecurityObservable {
-    private SecurityService() {
+    private boolean multiMethodAuthentication = false;
+    private final String RODA_LOGIN_METHOD = "RODA_LOGIN_METHOD";
+
+    private SecurityService(boolean multiMethodAuthentication) {
+      this.multiMethodAuthentication = multiMethodAuthentication;
     }
 
-    public void login(String username, final Map<String, Object> attributes, final HttpServletRequest request)
-      throws RODAException {
+    public boolean isMultiMethodAuthentication() {
+      return multiMethodAuthentication;
+    }
+
+    public void login(String username, final String loginMethod, final Map<String, Object> attributes,
+      final HttpServletRequest request) throws RODAException {
       try {
         User requestUser = UserUtility.getUser(request, false);
+        request.getSession(true).setAttribute(RODA_LOGIN_METHOD, loginMethod);
 
         if (requestUser == null || !username.equals(requestUser.getName())) {
           // delegate
           User loggedUser = processLogin(username, attributes, request);
-
           // register action
-          notifyLogin(loggedUser, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM, loggedUser.getName());
+          notifyLogin(loggedUser, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM, loggedUser.getName(),
+            RodaConstants.CONTROLLER_LOGIN_METHOD_PARAM, loginMethod);
         }
       } catch (AuthenticationDeniedException e) {
         User guest = UserUtility.getGuest(request.getRemoteAddr());
         // register action
-        notifyLogin(guest, LogEntryState.FAILURE, RodaConstants.CONTROLLER_USERNAME_PARAM, guest.getName());
+        notifyLogin(guest, LogEntryState.FAILURE, RodaConstants.CONTROLLER_USERNAME_PARAM, guest.getName(),
+          RodaConstants.CONTROLLER_LOGIN_METHOD_PARAM, loginMethod);
         throw e;
       }
     }
@@ -141,11 +152,13 @@ public class SecurityManager {
     }
 
     public void logout(HttpServletRequest request, List<String> extraAttributesToBeRemovedFromSession) {
+      String loginMethod = (String) request.getSession().getAttribute(RODA_LOGIN_METHOD);
+      request.getSession().removeAttribute(RODA_LOGIN_METHOD);
       User user = UserUtility.getUser(request);
       UserUtility.removeUserFromSession(request, extraAttributesToBeRemovedFromSession);
       // register action
-      notifyLogout(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
-        user.getName());
+      notifyLogout(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM, user.getName(),
+        RodaConstants.CONTROLLER_LOGIN_METHOD_PARAM, loginMethod);
     }
 
   }

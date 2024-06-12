@@ -14,6 +14,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.http.client.utils.URIBuilder;
+import org.roda.wui.api.v2.controller.MembersController;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -22,13 +28,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.apache.http.client.utils.URIBuilder;
-import org.roda.wui.api.controllers.UserLogin;
-import org.roda.wui.api.v2.controller.MembersController;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Internal authentication filter for web requests.
@@ -89,7 +88,12 @@ public class InternalWebAuthFilter implements Filter {
     } else if (requestURI.endsWith("/logout")) {
       MembersController.logout(httpRequest, Collections.emptyList());
 
-      redirect(httpResponse, uri.setFragment("welcome"));
+      String rodaLoginMethod = (String) ((HttpServletRequest) request).getSession().getAttribute("RODA_LOGIN_METHOD");
+      if (rodaLoginMethod != null && !rodaLoginMethod.isEmpty()) {
+        redirect(httpResponse, uri.setPath("/" + rodaLoginMethod + "/logout"));
+      } else {
+        redirect(httpResponse, uri.setFragment("welcome"));
+      }
     } else {
       chain.doFilter(request, response);
     }
