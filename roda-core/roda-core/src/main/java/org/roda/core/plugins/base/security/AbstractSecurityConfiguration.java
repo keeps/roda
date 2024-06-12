@@ -1,15 +1,15 @@
 package org.roda.core.plugins.base.security;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.plugins.SecurityManager;
 
 import jakarta.annotation.PostConstruct;
-import org.roda.core.plugins.SecurityManager;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 
-public class AbstractSecurityConfiguration {
+public abstract class AbstractSecurityConfiguration {
   private SecurityManager.SecurityService securityService;
 
   public void setSecurityService(SecurityManager.SecurityService securityService) {

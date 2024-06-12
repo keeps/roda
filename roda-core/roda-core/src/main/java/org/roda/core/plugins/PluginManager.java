@@ -103,7 +103,7 @@ public class PluginManager {
   private Timer loadPluginsTimer = null;
   private Map<Path, JarPlugins> jarPluginCache = new HashMap<>();
   private Map<String, ClassLoader> jarPluginClassloaderCache = new HashMap<>();
-  private Map<String, ClassLoader> jarStartupPluginsClassloaderCache = new HashMap<>();
+  private Map<String, URLClassLoader> jarStartupPluginsClassloaderCache = new HashMap<>();
   private Map<String, Plugin<? extends IsRODAObject>> internalPluginChache = new HashMap<>();
   private Map<String, Plugin<? extends IsRODAObject>> externalPluginChache = new HashMap<>();
   private Map<PluginType, List<PluginInfo>> pluginInfoPerType = new EnumMap<>(PluginType.class);
@@ -509,8 +509,9 @@ public class PluginManager {
   }
 
   private void init() {
-    // retrieve allowed security
-    allowedSecurityPlugins = RodaCoreFactory.getRodaConfigurationAsList("core", "plugins", "security", "list");
+    // retrieve allowed security plugins
+    allowedSecurityPlugins = RodaCoreFactory
+      .getRodaConfigurationAsList(RodaConstants.SECURITY_PLUGINS_CONFIGURATIONS_PROPERTY);
     securityManager = SecurityManager.getInstance(allowedSecurityPlugins);
     // load, for the first time, all the plugins (internal & external)
     loadPlugins();
@@ -754,12 +755,11 @@ public class PluginManager {
 
   private void addStartupPluginJars(Path jarPath, Attributes mainAttributes, List<URL> jarClasspath)
     throws IOException {
-    boolean addSecurityPlugins = RodaCoreFactory.getProperty("core.plugins.security.enable", false);
+    boolean addSecurityPlugins = RodaCoreFactory.getProperty(RodaConstants.SECURITY_PLUGINS_ENABLE_PROPERTY, false);
     if (addSecurityPlugins) {
       // Add jars from authenticate plugins to a compound class loader
       String authPluginClassNamesString = mainAttributes.getValue(RODA_AUTH_PLUGIN_MANIFEST_KEY);
       if (authPluginClassNamesString != null && allowedSecurityPlugins.contains(authPluginClassNamesString)) {
-        // for development purpose
         boolean optIn = RodaCoreFactory.getProperty(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
         CertificateInfo certificateInfo = PluginCertificateUtils.loadAndCheckCertificates(jarPath);
         if (!certificateInfo.isNotVerified() || optIn) {
@@ -1080,16 +1080,16 @@ public class PluginManager {
     }
   }
 
-  public Optional<CompoundClassLoader> getEssentialPluginsClassLoader() {
-    Optional<CompoundClassLoader> oCompoundClassLoader = Optional.empty();
+  public Optional<URLClassLoader> getEssentialPluginsClassLoader() {
+    Optional<URLClassLoader> oURLClassLoader = Optional.empty();
+    HashSet<URL> urls = new HashSet<>();
     if (!jarStartupPluginsClassloaderCache.isEmpty()) {
-      CompoundClassLoader compoundClassLoader = new CompoundClassLoader();
-      for (ClassLoader pluginClassloader : jarStartupPluginsClassloaderCache.values()) {
-        compoundClassLoader.addLoader(pluginClassloader);
+      for (URLClassLoader pluginClassloader : jarStartupPluginsClassloaderCache.values()) {
+        urls.addAll(Arrays.asList(pluginClassloader.getURLs()));
       }
-      oCompoundClassLoader = Optional.of(compoundClassLoader);
+      oURLClassLoader = Optional.of(new URLClassLoader(urls.toArray(new URL[] {}), getClass().getClassLoader()));
     }
-    return oCompoundClassLoader;
+    return oURLClassLoader;
   }
 
   public void registerSecurityObserver(SecurityObserver observer) {
