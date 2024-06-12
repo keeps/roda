@@ -77,9 +77,6 @@ public interface BrowserServiceAsync {
   void deleteDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
     String versionId, AsyncCallback<Void> callback);
 
-  <T extends IsIndexed> void retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
-    List<String> fieldsToReturn, AsyncCallback<List<T>> asyncCallback);
-
   void updateAIPPermissions(SelectedItems<IndexedAIP> aips, Permissions permissions, String details, boolean recursive,
     AsyncCallback<Job> callback);
 
@@ -106,25 +103,9 @@ public interface BrowserServiceAsync {
 
   void deleteDistributedInstance(String distributedInstanceId, AsyncCallback<Void> async);
 
-  void createAccessKey(AccessKey accessKey, AsyncCallback<AccessKey> async);
-
   void listAccessKey(AsyncCallback<AccessKeys> async);
 
   void retrieveAccessKey(String accessKeyId, AsyncCallback<AccessKey> async);
-
-  void deleteAccessKey(String accessKeyId, AsyncCallback<Void> async);
-
-  void updateAccessKey(AccessKey accessKey, AsyncCallback<AccessKey> async);
-
-  void listAccessKeyByUser(String userId, AsyncCallback<AccessKeys> async);
-
-  void deactivateUserAccessKeys(String userId, AsyncCallback<Void> async);
-
-  void deleteUserAccessKeys(String userId, AsyncCallback<Void> async);
-
-  void regenerateAccessKey(AccessKey accessKey, AsyncCallback<AccessKey> async);
-
-  void revokeAccessKey(AccessKey accessKey, AsyncCallback<AccessKey> async);
 
   void createLocalInstance(LocalInstance localInstance, AsyncCallback async);
 

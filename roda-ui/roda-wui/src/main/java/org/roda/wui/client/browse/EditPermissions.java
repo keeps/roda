@@ -409,6 +409,11 @@ public class EditPermissions extends Composite {
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     apply(false);
+  }
+
+  @UiHandler("buttonApplyToAll")
+  void buttonApplyToAllHandler(ClickEvent e) {
+    apply(true);
   }  public static final HistoryResolver AIP_RESOLVER = new HistoryResolver() {
 
     @Override
@@ -480,11 +485,6 @@ public class EditPermissions extends Composite {
       return "edit_permissions";
     }
   };
-
-  @UiHandler("buttonApplyToAll")
-  void buttonApplyToAllHandler(ClickEvent e) {
-    apply(true);
-  }
 
   @UiHandler("buttonClose")
   void buttonCancelHandler(ClickEvent e) {
@@ -659,25 +659,34 @@ public class EditPermissions extends Composite {
           });
       } else if (historyTokens.isEmpty()) {
         LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-        final SelectedItems<IndexedDIP> selected = (SelectedItems<IndexedDIP>) selectedItems.getSelectedItems();
 
-        if (!ClientSelectedItemsUtils.isEmpty(selected)) {
-          BrowserService.Util.getInstance().retrieve(IndexedDIP.class.getName(), selected,
-            RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN, new AsyncCallback<List<IndexedDIP>>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                HistoryUtils.newHistory(BrowseTop.RESOLVER);
-                callback.onSuccess(null);
-              }
-
-              @Override
-              public void onSuccess(List<IndexedDIP> dips) {
-                List<? extends HasPermissions> hasPermissionsObjects = dips;
-                EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), selected, hasPermissionsObjects);
-                callback.onSuccess(edit);
-              }
-            });
+        SelectedItems<? extends IsIndexed> selected = selectedItems.getSelectedItems();
+        if (selected instanceof SelectedItemsList<?>) {
+          if (!ClientSelectedItemsUtils.isEmpty(selected)) {
+            List<String> ids = ((SelectedItemsList<? extends IsIndexed>) selected).getIds();
+            List<FilterParameter> collect = ids.stream()
+              .map(m -> new SimpleFilterParameter(RodaConstants.INDEX_UUID, m)).collect(Collectors.toList());
+            OrFiltersParameters orFiltersParameters = new OrFiltersParameters(collect);
+            FindRequest findRequest = FindRequest
+              .getBuilder(IndexedAIP.class.getName(), new Filter(orFiltersParameters), true)
+              .withSublist(new Sublist(0, 20)).build();
+            Services services = new Services("Find DIPs", "get");
+            services.aipResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()))
+              .whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                  HistoryUtils.newHistory(BrowseTop.RESOLVER);
+                  callback.onFailure(throwable);
+                } else {
+                  List<? extends HasPermissions> hasPermissionsObjects = result.getResults();
+                  EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(),
+                    (SelectedItems<IndexedAIP>) selectedItems.getSelectedItems(), hasPermissionsObjects);
+                  callback.onSuccess(edit);
+                }
+              });
+          }
+        } else {
+          EditPermissions editPermissions = new EditPermissions(IndexedDIP.class.getName(), selected);
+          callback.onSuccess(editPermissions);
         }
       } else {
         HistoryUtils.newHistory(BrowseTop.RESOLVER);
