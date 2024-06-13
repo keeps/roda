@@ -1,4 +1,4 @@
-# Join Our Community
+# Join Us
 
 Welcome to RODA Users Group (RUG)! We are thrilled to have you using or contributing to RODA Community. To improve our project and foster a vibrant community, we invite you to participate in the following ways:
 
