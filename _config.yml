@@ -3,6 +3,7 @@ header_pages:
   - documentation/README.md
   - deploys/README.md
   - SECURITY.md
+  - join_our_community.md
 plugins:
   - jemoji
 github_username:  keeps
