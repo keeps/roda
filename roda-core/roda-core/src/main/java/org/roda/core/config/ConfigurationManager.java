@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -42,7 +43,6 @@ import com.google.common.cache.LoadingCache;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -52,7 +52,6 @@ public class ConfigurationManager {
   private final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManager.class);
   private static ConfigurationManager instance;
   private boolean instantiated = false;
-  private boolean instantiatedWithoutErrors = true;
   // Configuration related objects
   private CompositeConfiguration rodaConfiguration = null;
   private RodaConstants.NodeType nodeType;
@@ -127,16 +126,22 @@ public class ConfigurationManager {
   public static ConfigurationManager getInstance() {
     if (instance == null) {
       instance = new ConfigurationManager();
+      instance.loadConfiguration();
     }
     return instance;
   }
 
-  public boolean isInstantiated() {
-    return instantiated;
+  // for test only
+  public static void resetInstanceAfterTest() {
+    instance = null;
   }
 
-  public boolean isInstantiatedWithoutErrors() {
-    return instantiatedWithoutErrors;
+  private ConfigurationManager() {
+    // do nothing
+  }
+
+  public boolean isInstantiated() {
+    return instantiated;
   }
 
   public Configuration getRodaConfiguration() {
@@ -239,6 +244,14 @@ public class ConfigurationManager {
     this.reportPath = reportPath;
   }
 
+  public Path getPluginsPath() {
+    return getConfigPath().resolve(RodaConstants.CORE_PLUGINS_FOLDER);
+  }
+
+  public Path getProtocolsPath() {
+    return getConfigPath().resolve(RodaConstants.CORE_PROTOCOLS_FOLDER);
+  }
+
   public Path getSynchronizationDirectoryPath() {
     return synchronizationDirectoryPath;
   }
@@ -255,28 +268,30 @@ public class ConfigurationManager {
     LOGGER.info("Added configuration: '{}'", configuration);
   }
 
-  public void loadConfiguration() throws ConfigurationException {
-    if (!instantiated) {
+  private void loadConfiguration() {
+    nodeType = RodaConstants.NodeType
+      .valueOf(getProperty(RodaConstants.CORE_NODE_TYPE, RodaConstants.DEFAULT_NODE_TYPE.name()));
 
-      // basic settings
-      configSymbolicLinksAllowed = !Boolean
-        .parseBoolean(System.getenv(RodaConstants.ENV_CONFIG_SYMBOLIC_LINKS_FORBIDDEN));
+    // basic settings
+    configSymbolicLinksAllowed = !Boolean
+      .parseBoolean(System.getenv(RodaConstants.ENV_CONFIG_SYMBOLIC_LINKS_FORBIDDEN));
 
-      // determine RODA HOME
-      rodaHomePath = determineRodaHomePath();
-      LOGGER.debug("RODA HOME is {}", rodaHomePath);
+    // determine RODA HOME
+    rodaHomePath = determineRodaHomePath();
+    LOGGER.debug("RODA HOME is {}", rodaHomePath);
 
-      // load core configurations
-      rodaPropertiesCache = new HashMap<>();
-      rodaConfiguration = new CompositeConfiguration();
-      configurationFiles = new ArrayList<>();
+    // load core configurations
+    rodaPropertiesCache = new HashMap<>();
+    rodaConfiguration = new CompositeConfiguration();
+    configurationFiles = new ArrayList<>();
 
-      for (String configuration : CONFIGURATIONS) {
+    for (String configuration : CONFIGURATIONS) {
+      try {
         addConfiguration(configuration);
         LOGGER.debug("Loaded {}", configuration);
+      } catch (ConfigurationException e) {
+        throw new RuntimeException("Unable to load configuration for RODA " + configuration + ". Aborting...", e);
       }
-
-      instantiated = true;
     }
   }
 

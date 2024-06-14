@@ -365,6 +365,10 @@ public class RodaUtils {
       InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
       Path destinyPath;
 
+      // 20240619 gbarros: this is needed in order to avoid npe for security plugins that already loaded on classpath during the bootstrap
+      if(originStream == null){
+        continue;
+      }
       String resourceFileName = resource;
 
       // Removing ":" escape

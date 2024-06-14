@@ -288,16 +288,9 @@ public class RodaCoreFactory {
     return nodeType != NodeType.REPLICA;
   }
 
-  public static void instantiate(LdapUtility ldapUtility) {
-    RodaCoreFactory.ldapUtility = ldapUtility;
-    RodaCoreFactory.instantiate();
-  }
-
   public static void instantiate() {
     configurationManager = ConfigurationManager.getInstance();
-    NodeType nodeType = NodeType
-      .valueOf(getProperty(RodaConstants.CORE_NODE_TYPE, RodaConstants.DEFAULT_NODE_TYPE.name()));
-
+    NodeType nodeType = configurationManager.getNodeType();
     if (nodeType == NodeType.PRIMARY) {
       instantiate(NodeType.PRIMARY);
     } else if (nodeType == NodeType.TEST) {
@@ -359,6 +352,8 @@ public class RodaCoreFactory {
     INSTANTIATE_CONFIGURE_LOGBACK = false;
     INSTANTIATE_EXAMPLE_RESOURCES = false;
     instantiated = false;
+    configurationManager = ConfigurationManager.getInstance();
+    configurationManager.setNodeType(NodeType.TEST);
     instantiate(NodeType.TEST);
   }
 
@@ -396,47 +391,19 @@ public class RodaCoreFactory {
     instantiate(NodeType.REPLICA);
   }
 
-  public static void bootstrap() {
-    try {
-      configurationManager = ConfigurationManager.getInstance();
-      configurationManager.loadConfiguration();
-      configurationManager.configureLogback();
-      directoryInitializer = DirectoryInitializer.getInstance(configurationManager);
-      pluginManager = PluginManager.instantiatePluginManager(getConfigPath(), getPluginsPath());
-      directoryInitializer.instantiateExampleResources();
-      pluginManager.getEssentialPluginsClassLoader()
-        .ifPresent(compoundClassLoader -> Thread.currentThread().setContextClassLoader(compoundClassLoader));
-    } catch (ConfigurationException | PluginManagerException e) {
-      LOGGER.error("Error instantiating " + RodaCoreFactory.class.getSimpleName(), e);
-      instantiatedWithoutErrors = false;
-    }
-  }
-
   private static void instantiate(NodeType nodeType) {
     RodaCoreFactory.nodeType = nodeType;
 
     if (!instantiated) {
       try {
         // load core configurations
-        configurationManager = ConfigurationManager.getInstance();
-        configurationManager.setNodeType(nodeType);
-        configurationManager.loadConfiguration();
         if (INSTANTIATE_CONFIGURE_LOGBACK) {
           configurationManager.configureLogback();
+          LOGGER.debug("Finished logback configuration");
         }
-        if (!configurationManager.isInstantiatedWithoutErrors()) {
-          instantiatedWithoutErrors = false;
-        }
-        LOGGER.debug("Finished loading configurations");
 
         // instantiate essential directories
-        directoryInitializer = DirectoryInitializer.getInstance(configurationManager);
-        // if (INSTANTIATE_EXAMPLE_RESOURCES) {
-        // directoryInitializer.instantiateExampleResources();
-        // }
-        if (!directoryInitializer.isInstantiatedWithoutErrors()) {
-          instantiatedWithoutErrors = false;
-        }
+        instantiateEssentialDirectories();
         LOGGER.debug("Finished instantiating essential directories");
 
         // initialize working directory
@@ -489,7 +456,7 @@ public class RodaCoreFactory {
         LOGGER.debug("Finished instantiating node specific objects");
 
         // verify if is necessary to perform a model/index migration
-        MigrationManager migrationManager = new MigrationManager(ConfigurationManager.getInstance().getDataPath());
+        MigrationManager migrationManager = new MigrationManager(configurationManager.getDataPath());
         if (NodeType.PRIMARY == nodeType
           && migrationManager.isNecessaryToPerformMigration(getSolr(), tempIndexConfigsPath)) {
           // migrationManager.setupModelMigrations();
@@ -523,9 +490,6 @@ public class RodaCoreFactory {
 
         instantiated = true;
 
-      } catch (ConfigurationException e) {
-        LOGGER.error("Error loading roda properties", e);
-        instantiatedWithoutErrors = false;
       } catch (GenericException e) {
         if (!migrationMode) {
           LOGGER.error("Error instantiating storage model", e);
@@ -546,7 +510,7 @@ public class RodaCoreFactory {
 
   private static void initializeDisposalBinDirectory() {
     try {
-      String disposalBinFolder = ConfigurationManager.getInstance().getConfigurationString("disposal_bin.folder",
+      String disposalBinFolder = configurationManager.getConfigurationString("disposal_bin.folder",
         RodaConstants.CORE_DISPOSAL_BIN_FOLDER);
       disposalBinDirectoryPath = getDataPath().resolve(disposalBinFolder);
       Files.createDirectories(disposalBinDirectoryPath);
@@ -558,7 +522,7 @@ public class RodaCoreFactory {
 
   private static void initializeFileShallowTmpDirectoryPath() {
     try {
-      String fileShallowTmpFolder = ConfigurationManager.getInstance().getConfigurationString("file_shallow_tmp.folder",
+      String fileShallowTmpFolder = configurationManager.getConfigurationString("file_shallow_tmp.folder",
         RodaConstants.CORE_FILE_SHALLOW_TMP_FOLDER);
       fileShallowTmpDirectoryPath = Files.createTempDirectory(getWorkingDirectory(), fileShallowTmpFolder);
       toDeleteDuringShutdown.add(fileShallowTmpDirectoryPath);
@@ -570,8 +534,8 @@ public class RodaCoreFactory {
 
   private static void initializeLocalInstanceConfigDirectory() {
     try {
-      final String localInstanceFolder = ConfigurationManager.getInstance()
-        .getConfigurationString("local_instance.folder", RodaConstants.CORE_LOCAL_INSTANCE_FOLDER);
+      final String localInstanceFolder = configurationManager.getConfigurationString("local_instance.folder",
+        RodaConstants.CORE_LOCAL_INSTANCE_FOLDER);
       localInstanceConfigPath = getConfigPath().resolve(localInstanceFolder);
       Files.createDirectories(localInstanceConfigPath);
     } catch (final IOException e) {
@@ -582,7 +546,7 @@ public class RodaCoreFactory {
 
   private static void initializeSynchronizationStateDir() {
     try {
-      String synchronizationFolder = ConfigurationManager.getInstance().getConfigurationString("synchronization.folder",
+      String synchronizationFolder = configurationManager.getConfigurationString("synchronization.folder",
         RodaConstants.CORE_SYNCHRONIZATION_FOLDER);
       Path synchronizationDirectoryPath = getDataPath().resolve(synchronizationFolder);
       configurationManager.setSynchronizationDirectoryPath(synchronizationDirectoryPath);
@@ -596,7 +560,7 @@ public class RodaCoreFactory {
 
   private static void initializeJobAttachmentsDir() {
     try {
-      String jobAttachmentsFolder = ConfigurationManager.getInstance().getConfigurationString("jobAttachments.folder",
+      String jobAttachmentsFolder = configurationManager.getConfigurationString("jobAttachments.folder",
         RodaConstants.CORE_JOB_ATTACHMENTS_FOLDER);
       jobAttachmentsDirectoryPath = getDataPath().resolve(jobAttachmentsFolder);
       Files.createDirectories(jobAttachmentsDirectoryPath);
@@ -608,13 +572,21 @@ public class RodaCoreFactory {
 
   private static void initializeMarketDir() {
     try {
-      String marketFolder = ConfigurationManager.getInstance().getConfigurationString("market.folder",
+      String marketFolder = configurationManager.getConfigurationString("market.folder",
         RodaConstants.CORE_MARKET_FOLDER);
       marketDirectoryPath = getConfigPath().resolve(marketFolder);
       Files.createDirectories(marketDirectoryPath);
     } catch (IOException e) {
       throw new RuntimeException("Unable to create market DIRECTORY " + marketDirectoryPath + ", Aborting...", e);
     }
+  }
+
+  public static void setLdapUtility(LdapUtility ldapUtility) {
+    RodaCoreFactory.ldapUtility = ldapUtility;
+  }
+
+  public static void setConfigurationManager(ConfigurationManager configurationManager) {
+    RodaCoreFactory.configurationManager = configurationManager;
   }
 
   public static String getProperty(String property, String defaultValue) {
@@ -680,7 +652,17 @@ public class RodaCoreFactory {
   }
 
   public static void setConfigSymbolicLinksAllowed(boolean configSymbolicLinksAllowed) {
-    ConfigurationManager.getInstance().setConfigSymbolicLinksAllowed(configSymbolicLinksAllowed);
+    configurationManager.setConfigSymbolicLinksAllowed(configSymbolicLinksAllowed);
+  }
+
+  private static void instantiateEssentialDirectories() {
+    directoryInitializer = DirectoryInitializer.getInstance(configurationManager);
+    if (INSTANTIATE_EXAMPLE_RESOURCES) {
+      directoryInitializer.instantiateExampleResources();
+    }
+    if (!directoryInitializer.isInstantiatedWithoutErrors()) {
+      instantiatedWithoutErrors = false;
+    }
   }
 
   private static void initializeWorkingDirectory() {
@@ -747,14 +729,13 @@ public class RodaCoreFactory {
         if (!hasFileResources) {
           try {
             RodaUtils.copyFilesFromClasspath(RodaConstants.CORE_DEFAULT_FOLDER + "/",
-              ConfigurationManager.getInstance().getRodaHomePath(), true);
+              configurationManager.getRodaHomePath(), true);
           } catch (IOException e) {
             instantiatedWithoutErrors = false;
           }
-          Path staticDataDefaultFolder = ConfigurationManager.getInstance().getRodaHomePath()
+          Path staticDataDefaultFolder = configurationManager.getRodaHomePath()
             .resolve(RodaConstants.CORE_DEFAULT_FOLDER).resolve(RodaConstants.CORE_DATA_FOLDER);
-          Path targetPath = ConfigurationManager.getInstance().getRodaHomePath()
-            .resolve(RodaConstants.CORE_DATA_FOLDER);
+          Path targetPath = configurationManager.getRodaHomePath().resolve(RodaConstants.CORE_DATA_FOLDER);
 
           if (FSUtils.exists(staticDataDefaultFolder)) {
             try {
@@ -788,8 +769,7 @@ public class RodaCoreFactory {
           // 20160712 hsilva: it needs to be this way as the resources are
           // copied to the file system and storage can be of a different type
           // (e.g. fedora)
-          FileStorageService fileStorageService = new FileStorageService(
-            ConfigurationManager.getInstance().getStoragePath());
+          FileStorageService fileStorageService = new FileStorageService(configurationManager.getStoragePath());
 
           getIndexService().reindexRisks(fileStorageService);
           getIndexService().reindexRepresentationInformation(fileStorageService);
@@ -817,7 +797,7 @@ public class RodaCoreFactory {
       }
 
       try {
-        pluginManager = PluginManager.instantiatePluginManager(getConfigPath(), getPluginsPath());
+        pluginManager = PluginManager.instantiatePluginManager(configurationManager);
       } catch (PluginManagerException e) {
         LOGGER.error("Error instantiating PluginManager", e);
         instantiatedWithoutErrors = false;
@@ -887,12 +867,11 @@ public class RodaCoreFactory {
         Constructor<?> constructor = storageClass.getConstructor(Path.class, String.class);
 
         LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(),
-          ConfigurationManager.getInstance().getStoragePath());
+          configurationManager.getStoragePath());
         String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
           RodaConstants.TRASH_CONTAINER);
 
-        return (StorageService) constructor.newInstance(ConfigurationManager.getInstance().getStoragePath(),
-          trashDirName);
+        return (StorageService) constructor.newInstance(configurationManager.getStoragePath(), trashDirName);
       } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException
         | InvocationTargetException e) {
         LOGGER.warn("Error instantiating storage service defined on properties, falling back to a default service", e);
@@ -902,11 +881,10 @@ public class RodaCoreFactory {
     StorageType storageType = StorageType.valueOf(
       getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE, RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
     if (storageType == RodaConstants.StorageType.FILESYSTEM) {
-      LOGGER.debug("Going to instantiate Filesystem on '{}'", ConfigurationManager.getInstance().getStoragePath());
+      LOGGER.debug("Going to instantiate Filesystem on '{}'", configurationManager.getStoragePath());
       String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
         RodaConstants.TRASH_CONTAINER);
-      StorageService fileStorageService = new FileStorageService(ConfigurationManager.getInstance().getStoragePath(),
-        trashDirName);
+      StorageService fileStorageService = new FileStorageService(configurationManager.getStoragePath(), trashDirName);
       return fileStorageService;
     } else {
       LOGGER.error("Unknown storage service '{}'", storageType.name());
@@ -1341,10 +1319,6 @@ public class RodaCoreFactory {
       if (INSTANTIATE_PLUGIN_ORCHESTRATOR) {
         pluginOrchestrator.shutdown();
       }
-      if (nodeType == NodeType.TEST) {
-        // final cleanup
-        FSUtils.deletePathQuietly(workingDirectoryPath);
-      }
 
       if (getProperty(RodaConstants.CORE_EVENTS_ENABLED, false)) {
         eventsManager.shutdown();
@@ -1358,6 +1332,15 @@ public class RodaCoreFactory {
       // stop prometheus metrics server
       if (prometheusMetricsServer != null) {
         prometheusMetricsServer.stop();
+      }
+
+      if (nodeType == NodeType.TEST) {
+        // final cleanup
+        FSUtils.deletePathQuietly(workingDirectoryPath);
+        ConfigurationManager.resetInstanceAfterTest();
+        DirectoryInitializer.resetInstanceAfterTest();
+        configurationManager = null;
+        directoryInitializer = null;
       }
 
       // delete resources that are no longer needed
@@ -1467,6 +1450,10 @@ public class RodaCoreFactory {
     return transferredResourcesScanner;
   }
 
+  public static ConfigurationManager getConfigurationManager() {
+    return configurationManager;
+  }
+
   public static NodeType getNodeType() {
     return nodeType;
   }
@@ -1542,12 +1529,12 @@ public class RodaCoreFactory {
 
   @Deprecated
   public static Path getPluginsPath() {
-    return configurationManager.getConfigPath().resolve(RodaConstants.CORE_PLUGINS_FOLDER);
+    return configurationManager.getPluginsPath();
   }
 
   @Deprecated
   public static Path getProtocolsPath() {
-    return configurationManager.getConfigPath().resolve(RodaConstants.CORE_PROTOCOLS_FOLDER);
+    return configurationManager.getProtocolsPath();
   }
 
   public static ProtocolManager getProtocolManager() {
