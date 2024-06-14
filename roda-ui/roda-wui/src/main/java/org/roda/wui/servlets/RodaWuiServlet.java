@@ -12,7 +12,6 @@ import java.io.Serial;
 import org.apache.commons.configuration.ConfigurationException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.model.utils.LdapUtility;
-import org.roda.core.plugins.SecurityManager;
 import org.roda.wui.security.SecurityObserverImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,8 @@ public class RodaWuiServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     LOGGER.info("Starting up RODA, please wait...");
-    RodaCoreFactory.instantiate(ldapUtility);
+    RodaCoreFactory.setLdapUtility(ldapUtility);
+    RodaCoreFactory.instantiate();
     if (!RodaCoreFactory.instantiatedWithoutErrors()) {
       LOGGER.error(
         "RODA Core didn't start because errors have occurred! Therefore, RODA WUI cannot be started. Please see RODA logs to understand why...");

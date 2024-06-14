@@ -35,7 +35,7 @@ public class SecurityPluginUtils {
     URIBuilder uri = new URIBuilder();
 
     // Setting RODA host via config
-    String rodaServerName = RodaCoreFactory.getRodaConfigurationAsString("core.auth.cas.serviceUrl");
+    String rodaServerName = RodaCoreFactory.getRodaConfigurationAsString("core.plugins.external.security.roda.serviceUrl");
     if (StringUtils.isNotBlank(rodaServerName)) {
       URI rodaServerNameUri = URI.create(rodaServerName);
       uri.setScheme(rodaServerNameUri.getScheme());

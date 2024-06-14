@@ -45,6 +45,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.utils.JsonUtils;
@@ -100,6 +101,7 @@ public class PluginManager {
    * The default Plugin Manager instance.
    */
   private static PluginManager defaultPluginManager = null;
+  private final ConfigurationManager configurationManager;
   private Timer loadPluginsTimer = null;
   private Map<Path, JarPlugins> jarPluginCache = new HashMap<>();
   private Map<String, ClassLoader> jarPluginClassloaderCache = new HashMap<>();
@@ -120,8 +122,8 @@ public class PluginManager {
    *
    * @throws PluginManagerException
    */
-  private PluginManager() throws PluginManagerException {
-    // do nothing
+  private PluginManager(ConfigurationManager configurationManager) throws PluginManagerException {
+    this.configurationManager = configurationManager;
   }
 
   /**
@@ -131,13 +133,14 @@ public class PluginManager {
    *
    * @throws PluginManagerException
    */
-  public static synchronized PluginManager instantiatePluginManager(Path rodaConfigPath, Path rodaPluginsPath)
+  public static synchronized PluginManager instantiatePluginManager(ConfigurationManager configurationManager)
     throws PluginManagerException {
     if (defaultPluginManager == null) {
-      RODA_CONFIG_PATH = rodaConfigPath;
-      RODA_PLUGINS_PATH = rodaPluginsPath;
-      RODA_PLUGINS_SHARED_PATH = rodaPluginsPath.resolve(RodaConstants.CORE_PLUGINS_SHARED_FOLDER);
-      defaultPluginManager = new PluginManager();
+      RODA_CONFIG_PATH = configurationManager.getConfigPath();
+      RODA_PLUGINS_PATH = configurationManager.getPluginsPath();
+      RODA_PLUGINS_SHARED_PATH = configurationManager.getPluginsPath()
+        .resolve(RodaConstants.CORE_PLUGINS_SHARED_FOLDER);
+      defaultPluginManager = new PluginManager(configurationManager);
       defaultPluginManager.init();
     }
     return defaultPluginManager;
@@ -460,7 +463,7 @@ public class PluginManager {
       plugin = cachedInternalPlugin.cloneMe();
     }
 
-    boolean internalPluginTakesPrecedence = RodaCoreFactory.getRodaConfiguration()
+    boolean internalPluginTakesPrecedence = configurationManager.getRodaConfiguration()
       .getBoolean("core.plugins.internal.take_precedence_over_external", true);
     Plugin<? extends IsRODAObject> cachedExternalPlugin = externalPluginChache.get(pluginID);
     if ((plugin == null || !internalPluginTakesPrecedence) && cachedExternalPlugin != null) {
@@ -510,7 +513,7 @@ public class PluginManager {
 
   private void init() {
     // retrieve allowed security plugins
-    allowedSecurityPlugins = RodaCoreFactory
+    allowedSecurityPlugins = configurationManager
       .getRodaConfigurationAsList(RodaConstants.SECURITY_PLUGINS_CONFIGURATIONS_PROPERTY);
     securityManager = SecurityManager.getInstance(allowedSecurityPlugins);
     // load, for the first time, all the plugins (internal & external)
@@ -525,7 +528,7 @@ public class PluginManager {
 
   private void loadPlugins() {
     // reload blacklisted plugins
-    blacklistedPlugins = RodaCoreFactory.getRodaConfigurationAsList("core", "plugins", "blacklist");
+    blacklistedPlugins = configurationManager.getRodaConfigurationAsList("core", "plugins", "blacklist");
 
     // load "external" RODA plugins, i.e., those available in the plugins folder
     if (FSUtils.exists(RODA_PLUGINS_PATH) && FSUtils.isDirectory(RODA_PLUGINS_PATH)) {
@@ -617,7 +620,7 @@ public class PluginManager {
 
   private void loadInternalPlugins() {
     Reflections reflections = new Reflections(
-      RodaCoreFactory.getRodaConfigurationAsString("core", "plugins", "internal", "package"));
+      configurationManager.getRodaConfigurationAsString("core", "plugins", "internal", "package"));
     Set<Class<? extends AbstractPlugin>> plugins = reflections.getSubTypesOf(AbstractPlugin.class);
     plugins.addAll(reflections.getSubTypesOf(AbstractAIPComponentsPlugin.class));
 
@@ -644,7 +647,7 @@ public class PluginManager {
       .toString();
     try {
       List<MarketInfo> marketInfoList = JsonUtils
-        .getListFromJsonLines(RodaCoreFactory.getConfigurationFileAsStream(marketPluginFile), MarketInfo.class);
+        .getListFromJsonLines(configurationManager.getConfigurationFileAsStream(marketPluginFile), MarketInfo.class);
 
       LOGGER.info("Loading information from plugins available on the market");
       for (MarketInfo marketInfo : marketInfoList) {
@@ -755,12 +758,13 @@ public class PluginManager {
 
   private void addStartupPluginJars(Path jarPath, Attributes mainAttributes, List<URL> jarClasspath)
     throws IOException {
-    boolean addSecurityPlugins = RodaCoreFactory.getProperty(RodaConstants.SECURITY_PLUGINS_ENABLE_PROPERTY, false);
+    boolean addSecurityPlugins = configurationManager.getProperty(RodaConstants.SECURITY_PLUGINS_ENABLE_PROPERTY,
+      false);
     if (addSecurityPlugins) {
       // Add jars from authenticate plugins to a compound class loader
       String authPluginClassNamesString = mainAttributes.getValue(RODA_AUTH_PLUGIN_MANIFEST_KEY);
       if (authPluginClassNamesString != null && allowedSecurityPlugins.contains(authPluginClassNamesString)) {
-        boolean optIn = RodaCoreFactory.getProperty(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
+        boolean optIn = configurationManager.getProperty(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
         CertificateInfo certificateInfo = PluginCertificateUtils.loadAndCheckCertificates(jarPath);
         if (!certificateInfo.isNotVerified() || optIn) {
           LOGGER.info("Adding startup jars from auth plugin " + authPluginClassNamesString);
@@ -840,7 +844,7 @@ public class PluginManager {
         // Let's load Plugin properties
         for (Path propertiesFile : p.pluginProperties) {
           try {
-            RodaCoreFactory.addExternalConfiguration(propertiesFile);
+            configurationManager.addExternalConfiguration(propertiesFile);
           } catch (ConfigurationException e) {
             LOGGER.warn("Could not load plugin configuration: " + propertiesFile, e);
           }
@@ -854,7 +858,7 @@ public class PluginManager {
         CertificateInfo certificateInfo = PluginCertificateUtils.loadAndCheckCertificates(p.jarPath);
 
         // for development purpose
-        boolean optIn = RodaCoreFactory.getProperty(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
+        boolean optIn = configurationManager.getProperty(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
 
         // Let's load the Plugin
         List<Plugin<? extends IsRODAObject>> plugins = loadPlugin(p.jarPath, p.pluginClassNames, classloader);

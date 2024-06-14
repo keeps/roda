@@ -33,6 +33,11 @@ public class DirectoryInitializer {
     return instance;
   }
 
+  // for test only
+  public static void resetInstanceAfterTest() {
+    instance = null;
+  }
+
   private DirectoryInitializer(ConfigurationManager configurationManager) {
     this.configurationManager = configurationManager;
   }
@@ -58,8 +63,7 @@ public class DirectoryInitializer {
           Files.createDirectories(path);
         }
       } catch (IOException e) {
-        LOGGER.error("Unable to create " + path, e);
-        instantiatedWithoutErrors = false;
+        throw new RuntimeException("Unable to create essential RODA directory " + path + ". Aborting...", e);
       }
     }
   }
