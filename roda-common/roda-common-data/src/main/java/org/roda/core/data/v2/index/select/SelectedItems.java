@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonSubTypes({@Type(value = SelectedItemsAll.class, name = "SelectedItemsAll"),
   @Type(value = SelectedItemsNone.class, name = "SelectedItemsNone"),
   @Type(value = SelectedItemsList.class, name = "SelectedItemsList"),
