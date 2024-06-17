@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties({"returnLite"})
 public class Filter implements Serializable {
+  @Serial
   private static final long serialVersionUID = -5544859696646804386L;
 
   public static final Filter ALL = new Filter(new AllFilterParameter());
