@@ -7,33 +7,12 @@
  */
 package org.roda.wui.client.common;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.common.actions.AbstractActionable;
-import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.actions.AipActions;
-import org.roda.wui.client.common.actions.DisseminationActions;
-import org.roda.wui.client.common.actions.DisseminationFileActions;
-import org.roda.wui.client.common.actions.FileActions;
-import org.roda.wui.client.common.actions.RepresentationActions;
-import org.roda.wui.client.common.actions.TransferredResourceActions;
+import org.roda.core.data.v2.ip.*;
+import org.roda.wui.client.common.actions.*;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -58,11 +37,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 
 import config.i18n.client.ClientMessages;
 
@@ -336,8 +311,9 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
   // Breadcrumb management
 
-  public void updateBreadcrumb(BrowseAIPBundle bundle) {
-    breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(bundle.getAIPAncestors(), bundle.getAip()));
+  public void updateBreadcrumb(IndexedAIP aip, List<IndexedAIP> ancestors) {
+    breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(ancestors, aip));
+
   }
 
   public void updateBreadcrumb(List<IndexedAIP> ancestors, IndexedAIP indexedAIP,

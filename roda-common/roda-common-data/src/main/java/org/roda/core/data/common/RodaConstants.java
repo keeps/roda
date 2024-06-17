@@ -337,6 +337,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_DIPFILES = "api/v1/dipfiles/";
   public static final String API_REST_V1_DISTRIBUTED_INSTANCE = "api/v1/distributed_instances/";
 
+
   public static final String API_REST_V1_REPRESENTATION_OTHER_METADATA = "otherMetadata";
 
   /**

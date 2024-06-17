@@ -10,7 +10,6 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -20,15 +19,10 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.generics.MetadataValue;
-import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.ip.metadata.*;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
-import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
-import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -36,6 +30,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -55,15 +50,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 
 import config.i18n.client.ClientMessages;
 
@@ -133,8 +120,8 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private boolean inXML = false;
 
-  private List<SupportedMetadataTypeBundle> metadataTypes = new ArrayList<>();
-  private SupportedMetadataTypeBundle selectedBundle = null;
+  private Set<MetadataValue> values = null;
+  private String template = "";
   private TextArea metadataXML;
   private String metadataTextFromForm = null;
 
@@ -192,58 +179,54 @@ public class CreateDescriptiveMetadata extends Composite {
 
       @Override
       public void onChange(ChangeEvent event) {
+        GWT.log("VOU MUDAR");
         String value = type.getSelectedValue();
 
-        selectedBundle = null;
-        if (StringUtils.isNotBlank(value)) {
-          for (SupportedMetadataTypeBundle bundle : metadataTypes) {
-            if (bundle.getId().equals(value)) {
-              selectedBundle = bundle;
-              break;
+        Services service = new Services("Retrieve descriptive metadata", "get");
+
+        service
+          .aipResource(s -> s.retrieveAIPSupportedMetadata(aipId, value, LocaleInfo.getCurrentLocale().getLocaleName()))
+          .whenComplete((result, error) -> {
+            if (error == null) {
+              template = result.getTemplate();
+              values = result.getValue();
+              updateFormOrXML();
             }
-          }
+          });
+
+        if (StringUtils.isNotBlank(value)) {
 
           id.setText(value + RodaConstants.PREMIS_SUFFIX);
         } else {
           id.setText("");
         }
 
-        updateFormOrXML();
       }
     });
 
-    BrowserService.Util.getInstance().retrieveSupportedMetadata(aipId, representationId,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(List<SupportedMetadataTypeBundle> metadataTypes) {
-          CreateDescriptiveMetadata.this.metadataTypes = metadataTypes;
-
-          for (SupportedMetadataTypeBundle b : metadataTypes) {
-            if (b.getVersion() != null) {
-              type.addItem(b.getLabel(), b.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + b.getVersion());
-            } else {
-              type.addItem(b.getLabel(), b.getType());
-            }
+    Services service = new Services("Retrieve supported metadata", "get");
+    service.aipResource(s -> s.retrieveSupportedMetadataTypes(LocaleInfo.getCurrentLocale().getLocaleName()))
+      .whenComplete((value, error) -> {
+        if (error != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(error);
+        } else {
+          for (SupportedMetadata sm : value) {
+            type.addItem(sm.getLabel(), sm.getId());
           }
-
           type.addItem(messages.otherItem(), "");
           type.setSelectedIndex(0);
-          selectedBundle = metadataTypes.get(0);
 
-          if (selectedBundle.getVersion() != null) {
-            id.setText(selectedBundle.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + selectedBundle.getVersion()
-              + RodaConstants.PREMIS_SUFFIX);
-          } else {
-            id.setText(selectedBundle.getType() + RodaConstants.PREMIS_SUFFIX);
-          }
+          service.aipResource(s -> s.retrieveAIPSupportedMetadata(aipId, type.getSelectedValue(),
+            LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, caught) -> {
+              if (caught == null) {
+                template = result.getTemplate();
+                values = result.getValue();
+                updateFormOrXML();
+              }
+            });
 
-          updateFormOrXML();
+          id.setText(type.getSelectedValue() + RodaConstants.PREMIS_SUFFIX);
+
         }
       });
 
@@ -254,28 +237,27 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   protected static void initTitle(String aipId, TitlePanel title) {
-    BrowserService.Util.getInstance().retrieveBrowseAIPBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
-      new ArrayList<>(Arrays.asList(RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE)),
-      new NoAsyncCallback<BrowseAIPBundle>() {
-        @Override
-        public void onSuccess(BrowseAIPBundle aipBundle) {
-          IndexedAIP aip = aipBundle.getAip();
+    GWT.log("tas fdd");
+    Services service = new Services("Get AIP", "get");
+    service.aipResource(s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName())).thenCompose(
+      aip -> service.aipResource(s -> s.getDescriptiveMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName()))
+        .whenComplete((value, error) -> {
+          if (error == null) {
+            if (aip.getLevel() != null) {
+              title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
+            } else {
+              title.setIcon(DescriptionLevelUtils.getTopIconSafeHtml());
+            }
 
-          if (aip.getLevel() != null) {
-            title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
-          } else {
-            title.setIcon(DescriptionLevelUtils.getTopIconSafeHtml());
+            if (aip.getTitle() != null) {
+              title.setText(aip.getTitle());
+            } else if (value.getDescriptiveMetadataInfoList().isEmpty()) {
+              title.setText(messages.newArchivalPackage());
+            } else {
+              title.setText(aipId);
+            }
           }
-
-          if (aip.getTitle() != null) {
-            title.setText(aip.getTitle());
-          } else if (aipBundle.getDescriptiveMetadata().isEmpty()) {
-            title.setText(messages.newArchivalPackage());
-          } else {
-            title.setText(aipId);
-          }
-        }
-      });
+        }));
   }
 
   @Override
@@ -284,9 +266,9 @@ public class CreateDescriptiveMetadata extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
-  private void createForm(SupportedMetadataTypeBundle bundle) {
+  private void createForm() {
     formOrXML.clear();
-    FormUtilities.create(formOrXML, bundle.getValues(), true);
+    FormUtilities.create(formOrXML, values, true);
   }
 
   public void setInXML(boolean inXML) {
@@ -302,7 +284,7 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   private void updateFormOrXML() {
-    if (selectedBundle != null && selectedBundle.getValues() != null && !selectedBundle.getValues().isEmpty()) {
+    if (values != null && !values.isEmpty()) {
       showXml.setVisible(true);
       if (inXML) {
         updateMetadataXML();
@@ -320,7 +302,7 @@ public class CreateDescriptiveMetadata extends Composite {
               public void onSuccess(Boolean aBoolean) {
                 if (aBoolean) {
                   formOrXML.clear();
-                  createForm(selectedBundle);
+                  createForm();
                 } else {
                   setInXML(!inXML);
                 }
@@ -328,13 +310,13 @@ public class CreateDescriptiveMetadata extends Composite {
             });
         } else {
           formOrXML.clear();
-          createForm(selectedBundle);
+          createForm();
         }
       }
     } else {
       formOrXML.clear();
-      if (selectedBundle != null) {
-        metadataXML.setText(selectedBundle.getTemplate());
+      if (!template.equals("")) {
+        metadataXML.setText(template);
       } else {
         metadataXML.setText("");
       }
@@ -344,18 +326,20 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   private void updateMetadataXML() {
-    BrowserService.Util.getInstance().retrieveDescriptiveMetadataPreview(selectedBundle, new AsyncCallback<String>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
 
-      @Override
-      public void onSuccess(String preview) {
+    Services service = new Services("Update Descriptive metadata", "get");
+
+    DescriptiveMetadataPreviewRequest previewRequest = new DescriptiveMetadataPreviewRequest(type.getSelectedValue(),
+      values);
+    GWT.log("request -> " + previewRequest);
+    service.aipResource(s -> s.retrieveDescriptiveMetadataPreview(previewRequest)).whenComplete((value, error) -> {
+      if (error != null) {
+        AsyncCallbackUtils.defaultFailureTreatment(error);
+      } else {
         formOrXML.clear();
-        metadataXML.setText(preview);
+        metadataXML.setText(value.getPreview());
         formOrXML.add(metadataXML);
-        metadataTextFromForm = preview;
+        metadataTextFromForm = value.getPreview();
       }
     });
   }
@@ -363,57 +347,56 @@ public class CreateDescriptiveMetadata extends Composite {
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     buttonApply.setEnabled(false);
-    String idText = id.getText();
-    String typeText = selectedBundle != null ? selectedBundle.getType() : messages.otherItem(); // Other
-    String typeVersion = selectedBundle != null ? selectedBundle.getVersion() : null;
-    String template = selectedBundle != null ? selectedBundle.getTemplate() : null;
+    String idText = type.getSelectedValue();
+    String filename = id.getText();
+    String typeText = idText.contains("_") ? idText.substring(0, idText.lastIndexOf("_")) : messages.otherItem();
+    String typeVersion = idText.contains("_") ? idText.substring(idText.lastIndexOf("_") + 1) : null;
     String xmlText = metadataXML.getText();
     boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
 
-    if (idText.length() > 0) {
-      Set<MetadataValue> values = null;
+    if (idText.length() > 0 && filename.endsWith(".xml")) {
       // we only send the values map if the user hasn't overriden the form by
       // modifying the XML directly
-      if (!hasOverridenTheForm && selectedBundle != null) {
-        values = selectedBundle.getValues();
+      CreateDescriptiveMetadataRequest body;
+      if (!hasOverridenTheForm && !values.isEmpty()) {
+        body = new DescriptiveMetadataRequestForm(idText, filename, typeText, typeVersion, template, true, null,
+          values);
+      } else {
+        body = new DescriptiveMetadataRequestXML(idText, filename, typeText, typeVersion, template, true, null,
+          xmlText);
       }
-      DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, typeVersion,
-        xmlText, template, values, true, null);
+      Services service = new Services("Create Descriptive metadata", "create");
+      // GWT.
+      if (representationId == null) {
 
-      BrowserService.Util.getInstance().createDescriptiveMetadataFile(aipId, representationId, newBundle,
-        new AsyncCallback<Void>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            if (caught instanceof ValidationException) {
-              ValidationException e = (ValidationException) caught;
-              updateErrors(e);
+        service.aipResource(s -> s.createAIPDescriptiveMetadata(aipId, body)).whenComplete((value, error) -> {
+          if (error != null) {
+            if (error instanceof ValidationException) {
+              ValidationException o = (ValidationException) error;
+              updateErrors(o);
               idError.setVisible(false);
-            } else if (caught instanceof AlreadyExistsException) {
+            } else if (error instanceof AlreadyExistsException) {
               idError.setVisible(true);
               idError.setHTML(SafeHtmlUtils.fromSafeConstant(messages.fileAlreadyExists()));
               errors.setVisible(false);
             } else {
               idError.setVisible(false);
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
+              AsyncCallbackUtils.defaultFailureTreatment(error);
             }
             buttonApply.setEnabled(true);
-          }
-
-          @Override
-          public void onSuccess(Void result) {
+          } else {
             errors.setText("");
             errors.setVisible(false);
             Toast.showInfo(messages.dialogSuccess(), messages.metadataFileCreated());
-            if (representationId == null) {
-              HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
-            } else {
-              HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
-            }
+            HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
           }
         });
+      } else {
+        // route will be created on representations
+      }
+
     } else {
-      Toast.showError("Please fill the mandatory fields");
+      Toast.showError("Please fill the mandatory fields correctly");
       buttonApply.setEnabled(true);
     }
 
@@ -440,20 +423,20 @@ public class CreateDescriptiveMetadata extends Composite {
   private void cancel() {
     if (isNew) {
       if (representationId == null) {
+
+        Services service = new Services("Delete AIP", "deletion");
+
         SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId),
           IndexedAIP.class.getName());
-        BrowserService.Util.getInstance().deleteAIP(selected, null, new AsyncCallback<Job>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
+        service.aipResource(s -> s.deleteAIPs(selected, null)).whenComplete((value, error) -> {
+          if (error != null) {
             HistoryUtils.newHistory(InternalProcess.RESOLVER);
-          }
-
-          @Override
-          public void onSuccess(Job result) {
+          } else {
             HistoryUtils.newHistory(LastSelectedItemsSingleton.getInstance().getLastHistory());
           }
         });
+
       } else {
         HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
       }
