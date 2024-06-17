@@ -19,6 +19,7 @@ import org.roda.wui.client.common.dialogs.AccessKeyDialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.EditUser;
 import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.management.ShowUser;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -128,7 +129,7 @@ public class CreateAccessKey extends Composite {
           AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), response, new NoAsyncCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
-              HistoryUtils.newHistory(EditUser.RESOLVER, response.getUserName());
+              HistoryUtils.newHistory(ShowUser.RESOLVER, response.getUserName());
             }
           });
         }

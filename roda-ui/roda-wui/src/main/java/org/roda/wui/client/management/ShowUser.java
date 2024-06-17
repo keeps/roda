@@ -13,7 +13,6 @@ import java.util.Set;
 
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
@@ -23,6 +22,7 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
+import org.roda.wui.client.management.access.AccessKeyTablePanel;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -83,34 +83,29 @@ public class ShowUser extends Composite {
       return "show_user";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, ShowUser> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private ActionableWidgetBuilder<RODAMember> actionableWidgetBuilder;
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private final User user;
-
-  private UserExtraBundle userExtraBundle = null;
-
   @UiField
-  Label userNameValue, fullnameValue, emailValue;
-
+  Label userNameValue;
+  @UiField
+  Label fullnameValue;
+  @UiField
+  Label emailValue;
   @UiField
   HTML stateValue;
-
   @UiField
-  FlowPanel extraValue, permissionList, groupList;
-
+  FlowPanel extraValue;
+  @UiField
+  FlowPanel permissionList;
+  @UiField
+  FlowPanel groupList;
+  @UiField
+  FlowPanel accessKeyTablePanel;
   @UiField
   SimplePanel actionsSidebar;
-
   @UiField
   FlowPanel contentFlowPanel;
-
   @UiField
   FlowPanel sidebarFlowPanel;
 
@@ -138,17 +133,19 @@ public class ShowUser extends Composite {
     // Permissions
     buildPermissionList();
 
+    accessKeyTablePanel.add(new AccessKeyTablePanel(user.getId()));
+
     // Sidebar
     RODAMemberActions rodaMemberActions = RODAMemberActions.get();
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(rodaMemberActions).withBackButton()
-      .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
-        @Override
-        public void onSuccess(Actionable.ActionImpact result) {
-          if (result.equals(Actionable.ActionImpact.DESTROYED)) {
-            HistoryUtils.newHistory(MemberManagement.RESOLVER);
+    ActionableWidgetBuilder<RODAMember> actionableWidgetBuilder = new ActionableWidgetBuilder<>(rodaMemberActions).withBackButton()
+        .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+          @Override
+          public void onSuccess(Actionable.ActionImpact result) {
+            if (result.equals(Actionable.ActionImpact.DESTROYED)) {
+              HistoryUtils.newHistory(MemberManagement.RESOLVER);
+            }
           }
-        }
-      });
+        });
 
     SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, rodaMemberActions.hasAnyRoles());
     actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(this.user)));
@@ -191,5 +188,8 @@ public class ShowUser extends Composite {
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.stickSidebar();
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowUser> {
   }
 }
