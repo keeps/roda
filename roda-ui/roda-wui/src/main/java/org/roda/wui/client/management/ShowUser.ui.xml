@@ -65,6 +65,7 @@
 						<g:FlowPanel styleName="value" ui:field="permissionList" />
 					</g:FlowPanel>
 
+					<g:FlowPanel ui:field="accessKeyTablePanel" />
 				</g:FlowPanel>
 			</g:FlowPanel>
 

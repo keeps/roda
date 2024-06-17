@@ -26,6 +26,7 @@ import org.roda.wui.client.management.CreateUser;
 import org.roda.wui.client.management.EditGroup;
 import org.roda.wui.client.management.EditUser;
 import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.management.access.CreateAccessKey;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -58,21 +59,8 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
     // do nothing
   }
 
-  public enum RODAMemberAction implements Action<RODAMember> {
-    NEW_USER(RodaConstants.PERMISSION_METHOD_CREATE_USER), NEW_GROUP(RodaConstants.PERMISSION_METHOD_CREATE_GROUP),
-    ACTIVATE(RodaConstants.PERMISSION_METHOD_UPDATE_USER), DEACTIVATE(RodaConstants.PERMISSION_METHOD_UPDATE_USER),
-    EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_USER), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_USER);
-
-    private List<String> methods;
-
-    RODAMemberAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
+  public static RODAMemberActions get() {
+    return GENERAL_INSTANCE;
   }
 
   @Override
@@ -83,10 +71,6 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   @Override
   public RODAMemberAction actionForName(String name) {
     return RODAMemberAction.valueOf(name);
-  }
-
-  public static RODAMemberActions get() {
-    return GENERAL_INSTANCE;
   }
 
   @Override
@@ -100,7 +84,8 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
       if (object.isUser()) {
         return (action.equals(RODAMemberAction.DEACTIVATE) && object.isActive())
           || (action.equals(RODAMemberAction.ACTIVATE) && !object.isActive())
-          || (action.equals(RODAMemberAction.REMOVE) || (action.equals(RODAMemberAction.EDIT)));
+          || (action.equals(RODAMemberAction.REMOVE) || (action.equals(RODAMemberAction.EDIT)
+            || (action.equals(RODAMemberAction.NEW_ACCESS_KEY) && object.isUser())));
       } else {
         return POSSIBLE_ACTIONS_ON_GROUP.contains(action);
       }
@@ -135,6 +120,8 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
       edit(object, callback);
     } else if (action.equals(RODAMemberAction.REMOVE)) {
       remove(objectToSelectedItems(object, RODAMember.class), callback);
+    } else if (action.equals(RODAMemberAction.NEW_ACCESS_KEY)) {
+      createNewAccessKey(callback, object);
     } else {
       unsupportedAction(action, callback);
     }
@@ -221,11 +208,11 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
             Services services = new Services("Remove RODA members", "remove");
             services.membersResource(s -> s.deleteMultipleMembers(SelectedItemsUtils.convertToRESTRequest(objects)))
               .whenComplete((res, error) -> {
-              if (error == null) {
-                callback.onSuccess(Actionable.ActionImpact.DESTROYED);
-                HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
-              }
-            });
+                if (error == null) {
+                  callback.onSuccess(Actionable.ActionImpact.DESTROYED);
+                  HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
+                }
+              });
           }
         }
 
@@ -246,6 +233,11 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
     HistoryUtils.newHistory(CreateGroup.RESOLVER.getHistoryPath());
   }
 
+  private void createNewAccessKey(AsyncCallback<ActionImpact> callback, RODAMember user) {
+    callback.onSuccess(ActionImpact.NONE);
+    HistoryUtils.newHistory(CreateAccessKey.RESOLVER, user.getName());
+  }
+
   @Override
   public ActionableBundle<RODAMember> createActionsBundle() {
     ActionableBundle<RODAMember> transferredResourcesActionableBundle = new ActionableBundle<>();
@@ -262,9 +254,29 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
       "fas fa-user-check");
     actionableGroup.addButton(messages.editUserDeactivate(), RODAMemberAction.DEACTIVATE, ActionImpact.UPDATED,
       "fas fa-user-times");
+    actionableGroup.addButton(messages.addAccessKeyButton(), RODAMemberAction.NEW_ACCESS_KEY, ActionImpact.UPDATED,
+      "btn-block btn-key");
     actionableGroup.addButton(messages.editUserRemove(), RODAMemberAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
     transferredResourcesActionableBundle.addGroup(actionableGroup);
     return transferredResourcesActionableBundle;
+  }
+
+  public enum RODAMemberAction implements Action<RODAMember> {
+    NEW_USER(RodaConstants.PERMISSION_METHOD_CREATE_USER), NEW_GROUP(RodaConstants.PERMISSION_METHOD_CREATE_GROUP),
+    ACTIVATE(RodaConstants.PERMISSION_METHOD_UPDATE_USER), DEACTIVATE(RodaConstants.PERMISSION_METHOD_UPDATE_USER),
+    EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_USER), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_USER),
+    NEW_ACCESS_KEY(RodaConstants.PERMISSION_METHOD_CREATE_ACCESS_KEY);
+
+    private List<String> methods;
+
+    RODAMemberAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 }

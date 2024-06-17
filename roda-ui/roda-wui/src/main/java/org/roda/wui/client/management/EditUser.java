@@ -108,16 +108,10 @@ public class EditUser extends Composite {
   Button buttonRemove;
 
   @UiField
-  Button buttonAddAccessKey;
-
-  @UiField
   Button buttonCancel;
 
   @UiField(provided = true)
   UserDataPanel userDataPanel;
-
-  @UiField
-  FlowPanel accessKeyTablePanel;
 
   /**
    * Create a new panel to edit a user
@@ -138,7 +132,6 @@ public class EditUser extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    accessKeyTablePanel.add(new AccessKeyTablePanel(user.getId()));
     userDataPanel.setUsernameReadOnly(true);
 
     buttonDeActivate.setEnabled(true);
@@ -171,7 +164,7 @@ public class EditUser extends Composite {
           CreateUserRequest userOperations = new CreateUserRequest(updatedUser, password, userDataPanel.getUserExtra());
           services.membersResource(s -> s.updateUser(userOperations)).whenComplete((res, error) -> {
             if (error == null) {
-              HistoryUtils.newHistory(MemberManagement.RESOLVER);
+              HistoryUtils.newHistory(ShowUser.RESOLVER, res.getId());
             } else {
               errorMessage(error, updatedUser);
             }
@@ -210,11 +203,6 @@ public class EditUser extends Composite {
           HistoryUtils.newHistory(MemberManagement.RESOLVER);
         }
       });
-  }
-
-  @UiHandler("buttonAddAccessKey")
-  void buttonAddAccessKeyHandler(ClickEvent e) {
-    HistoryUtils.newHistory(CreateAccessKey.RESOLVER, user.getName());
   }
 
   @UiHandler("buttonRemove")
