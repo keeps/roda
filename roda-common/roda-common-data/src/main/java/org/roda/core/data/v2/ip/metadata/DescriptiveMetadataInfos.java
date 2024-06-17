@@ -5,9 +5,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * @author Carlos Afonso <cafonso@keep.pt>
  */
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class DescriptiveMetadataInfos implements Serializable {
 
   @Serial

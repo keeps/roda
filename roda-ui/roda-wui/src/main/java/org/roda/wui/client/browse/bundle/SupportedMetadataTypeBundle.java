@@ -7,11 +7,12 @@
  */
 package org.roda.wui.client.browse.bundle;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.roda.core.data.v2.generics.MetadataValue;
 
-public class SupportedMetadataTypeBundle implements Bundle {
+public class SupportedMetadataTypeBundle implements Serializable {
 
   private static final long serialVersionUID = 1L;
 

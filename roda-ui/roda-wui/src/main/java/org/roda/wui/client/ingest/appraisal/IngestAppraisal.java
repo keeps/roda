@@ -118,16 +118,20 @@ public class IngestAppraisal extends Composite {
       new AsyncTableCellOptions<>(IndexedRepresentation.class, "IngestAppraisal_searchRepresentations")
         .withJustActive(false).withFilter(BASE_FILTER).bindOpener());
 
-    ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-      new AsyncTableCellOptions<>(IndexedFile.class, "IngestAppraisal_searchFiles").withJustActive(false)
-        .withFilter(BASE_FILTER).bindOpener());
-
+    /*
+     * ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new
+     * ConfigurableAsyncTableCell<>(), new
+     * AsyncTableCellOptions<>(IndexedFile.class,
+     * "IngestAppraisal_searchFiles").withJustActive(false)
+     * .withFilter(BASE_FILTER).bindOpener());
+     */
     // add lists to search
     searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName()).createListAndSearchPanel(aipListBuilder)
-      .createListAndSearchPanel(representationListBuilder).createListAndSearchPanel(fileListBuilder);
+      .createListAndSearchPanel(representationListBuilder);// .createListAndSearchPanel(fileListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
     ingestAppraisalDescription.add(new HTMLWidgetWrapper("IngestAppraisalDescription.html"));
+
   }
 
   public static IngestAppraisal getInstance() {

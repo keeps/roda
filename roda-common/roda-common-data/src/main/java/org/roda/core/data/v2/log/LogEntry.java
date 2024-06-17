@@ -43,6 +43,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private long duration;
 
   // REST API requests
+  @JsonIgnore
   private AuditLogRequestHeaders auditLogRequestHeaders = null;
 
   private String instanceId = "";

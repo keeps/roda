@@ -3,9 +3,12 @@ package org.roda.core.data.v2.ip.metadata;
 import java.io.Serial;
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * @author Carlos Afonso <cafonso@keep.pt>
  */
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class DescriptiveMetadataInfo implements Serializable {
   @Serial
   private static final long serialVersionUID = -9057023345058040380L;
@@ -47,4 +50,5 @@ public class DescriptiveMetadataInfo implements Serializable {
   public void setHasHistory(boolean hasHistory) {
     this.hasHistory = hasHistory;
   }
+
 }
