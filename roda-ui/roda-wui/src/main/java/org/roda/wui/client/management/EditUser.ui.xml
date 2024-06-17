@@ -10,7 +10,6 @@
 			<g:FlowPanel addStyleNames="col_10 content">
 				<common:TitlePanel text="{messages.editUserTitle}" iconClass="User" />
 				<u:UserDataPanel ui:field="userDataPanel" />
-				<g:FlowPanel ui:field="accessKeyTablePanel" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
@@ -25,9 +24,6 @@
 						<g:Button addStyleNames="btn btn-block btn-check btn-user-activation"
 							ui:field="buttonDeActivate">
 							<ui:text from='{messages.editUserActivate}' />
-						</g:Button>
-						<g:Button addStyleNames="btn btn-block btn-key" ui:field="buttonAddAccessKey">
-							<ui:text from='{messages.addAccessKeyButton}' />
 						</g:Button>
 						<g:Button addStyleNames="btn btn-block btn-danger btn-ban btn-user-activation"
 							ui:field="buttonRemove">
