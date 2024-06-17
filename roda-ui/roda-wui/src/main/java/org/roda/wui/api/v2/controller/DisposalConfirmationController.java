@@ -6,7 +6,10 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateRequest;
@@ -33,10 +36,10 @@ import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -92,9 +95,11 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
     return indexService.suggest(suggestRequest, DisposalConfirmation.class, requestContext);
   }
 
-  @RequestMapping(method = RequestMethod.GET, path = "/{id}/report/html", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @GetMapping(path = "/{id}/report/html", produces = MediaType.TEXT_HTML_VALUE)
   @Operation(summary = "Retrieves the disposal confirmation report", responses = {
     @ApiResponse(responseCode = "200", description = "Returns the disposal confirmation report", content = @Content(schema = @Schema(implementation = String.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   public ResponseEntity<StreamingResponseBody> retrieveDisposalConfirmationReport(
     @Parameter(description = "The ID of the disposal confirmation", required = true) @PathVariable(name = "id") String disposalConfirmationId,
@@ -187,11 +192,11 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
 
       // delegate
       return disposalConfirmationService.restoreRecordsInDisposalConfirmation(requestContext.getUser(),
-        CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
+          CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -212,11 +217,11 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
 
       // delegate
       return disposalConfirmationService.recoverDisposalConfirmationExecutionFailed(requestContext.getUser(),
-        CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
+          CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -290,6 +295,8 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 }

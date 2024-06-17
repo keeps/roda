@@ -92,7 +92,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (GenericException | IllegalOperationException | RequestNotValidException | NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -156,32 +156,6 @@ public class DisposalHoldController implements DisposalHoldRestService {
   }
 
   @Override
-  public Void deleteDisposalHold(String disposalHoldId) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // delegate
-      disposalHoldService.deleteDisposalHold(disposalHoldId);
-      return null;
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (GenericException | IllegalOperationException | NotFoundException | RequestNotValidException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, disposalHoldId, state,
-        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId);
-    }
-  }
-
-  @Override
   public Job applyDisposalHold(@RequestBody SelectedItemsRequest items, String disposalHoldId, boolean override) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
@@ -197,7 +171,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (GenericException | RequestNotValidException | NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -220,7 +194,10 @@ public class DisposalHoldController implements DisposalHoldRestService {
       // delegate
       return disposalHoldService.liftDisposalHold(requestContext.getUser(),
         CommonServicesUtils.convertSelectedItems(items, IndexedAIP.class), disposalHoldId);
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -250,7 +227,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (GenericException | NotFoundException | RequestNotValidException | IllegalOperationException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -272,7 +249,10 @@ public class DisposalHoldController implements DisposalHoldRestService {
       // delegate
       return disposalHoldService.disassociateDisposalHold(requestContext.getUser(),
         CommonServicesUtils.convertSelectedItems(items, IndexedAIP.class), disposalHoldId, clear);
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -296,7 +276,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -318,7 +298,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (GenericException | RequestNotValidException | NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {

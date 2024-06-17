@@ -47,15 +47,27 @@ public class ConfigurationController implements ConfigurationRestService {
 
   @Override
   public Viewers retrieveViewersProperties() {
-    return configurationsService.getViewerConfigurations();
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    try {
+      return configurationsService.getViewerConfigurations();
+    } finally {
+      controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
+    }
   }
 
   @Override
   public SharedProperties retrieveSharedProperties(String localeString) {
-    Locale locale = ServerTools.parseLocale(localeString);
-    SharedProperties sharedProperties = new SharedProperties();
-    sharedProperties.setProperties(RodaCoreFactory.getRodaSharedProperties(locale));
-    return sharedProperties;
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    try {
+      Locale locale = ServerTools.parseLocale(localeString);
+      SharedProperties sharedProperties = new SharedProperties();
+      sharedProperties.setProperties(RodaCoreFactory.getRodaSharedProperties(locale));
+      return sharedProperties;
+    } finally {
+      controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
+    }
   }
 
   @Override
@@ -117,7 +129,13 @@ public class ConfigurationController implements ConfigurationRestService {
 
   @Override
   public Boolean retrieveShowEmbeddedDIP() {
-    return RodaCoreFactory.getRodaConfiguration().getBoolean("ui.dip.externalURL.showEmbedded", false);
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    try {
+      return RodaCoreFactory.getRodaConfiguration().getBoolean("ui.dip.externalURL.showEmbedded", false);
+    } finally {
+      controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
+    }
   }
 
   @Override
