@@ -10,12 +10,7 @@ import org.fusesource.restygwt.client.REST;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -67,6 +62,8 @@ public class Services implements DirectRestService {
       return GWT.create(RiskRestService.class);
     } else if (PreservationEventRestService.class.equals(serviceClass)) {
       return GWT.create(PreservationEventRestService.class);
+    } else if (LogEntryService.class.equals(serviceClass)) {
+      return GWT.create(LogEntryService.class);
     } else if (RepresentationInformationRestService.class.equals(serviceClass)) {
       return GWT.create(RepresentationInformationRestService.class);
     } else if (MembersRestService.class.equals(serviceClass)) {
@@ -132,8 +129,6 @@ public class Services implements DirectRestService {
       service = GWT.create(PreservationEventRestService.class);
     } else if (IndexedPreservationAgent.class.getName().equals(objectClassString)) {
       service = GWT.create(PreservationAgentRestService.class);
-    } else if (LogEntry.class.getName().equals(objectClassString)) {
-      service = GWT.create(AuditLogRestService.class);
     } else if (RepresentationInformation.class.getName().equals(objectClassString)) {
       service = GWT.create(RepresentationInformationRestService.class);
     } else if (Job.class.getName().equals(objectClassString)) {
@@ -148,6 +143,8 @@ public class Services implements DirectRestService {
       service = GWT.create(RepresentationRestService.class);
     } else if (IndexedFile.class.getName().equals(objectClassString)) {
       service = GWT.create(FileRestService.class);
+    } else if (LogEntry.class.getName().equals(objectClassString)) {
+      service = GWT.create(LogEntryService.class);
     } else if (DIPFile.class.getName().equals(objectClassString)) {
       service = GWT.create(DIPFileRestService.class);
     } else {

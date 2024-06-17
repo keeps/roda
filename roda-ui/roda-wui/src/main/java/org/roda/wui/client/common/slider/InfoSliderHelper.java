@@ -7,14 +7,8 @@
  */
 package org.roda.wui.client.common.slider;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
@@ -26,7 +20,6 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
-import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
@@ -35,33 +28,19 @@ import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
-import org.roda.wui.common.client.tools.ConfigurationManager;
-import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.tools.*;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.*;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 
@@ -236,205 +215,8 @@ public class InfoSliderHelper {
     populate(infoSliderPanel, values);
   }
 
-  public static void updateInfoSliderPanel(BrowseAIPBundle bundle, SliderPanel infoSliderPanel) {
-    IndexedAIP aip = bundle.getAip();
 
-    HashMap<String, Widget> values = new HashMap<>();
-    infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedAIP.class.getName())));
 
-    values.put(messages.itemId(), createIdHTML(bundle));
-
-    if (aip.getCreatedOn() != null && StringUtils.isNotBlank(aip.getCreatedBy())) {
-      values.put(messages.aipCreated(),
-        new InlineHTML(messages.dateCreatedOrUpdated(Humanize.formatDateTime(aip.getCreatedOn()), aip.getCreatedBy())));
-    }
-
-    if (aip.getUpdatedOn() != null && StringUtils.isNotBlank(aip.getUpdatedBy())) {
-      values.put(messages.aipUpdated(),
-        new InlineHTML(messages.dateCreatedOrUpdated(Humanize.formatDateTime(aip.getUpdatedOn()), aip.getUpdatedBy())));
-    }
-
-    if (StringUtils.isNotBlank(aip.getLevel())) {
-      values.put(messages.aipLevel(), createAipLevelHTML(bundle));
-    }
-
-    if (StringUtils.isNotBlank(aip.getType())) {
-      values.put(messages.aipType(), createAipTypeHTML(bundle));
-    }
-
-    addLinkIfCentralInstance(values, bundle.getInstanceName(), bundle.isLocalToInstance(), aip.getInstanceId());
-
-    if (!aip.getIngestSIPIds().isEmpty()) {
-      FlowPanel sipIds = new FlowPanel();
-      for (String ingestSIPId : aip.getIngestSIPIds()) {
-        sipIds.add(new HTMLPanel("p", ingestSIPId));
-      }
-      values.put(messages.sipId(), sipIds);
-    }
-
-    if (StringUtils.isNotBlank(aip.getIngestJobId())) {
-      Anchor anchor = new Anchor();
-      anchor.setText(aip.getIngestJobId());
-      anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, aip.getIngestJobId(),
-        RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
-
-      values.put(messages.processIdTitle(), anchor);
-    }
-
-    if (!aip.getIngestUpdateJobIds().isEmpty()) {
-      FlowPanel jobIdsList = new FlowPanel();
-      jobIdsList.addStyleName("slider-info-entry-value-aip-ingest-jobs");
-
-      for (String updateJobId : aip.getIngestUpdateJobIds()) {
-        Anchor anchor = new Anchor();
-        anchor.setText(updateJobId);
-        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, updateJobId,
-          RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
-        jobIdsList.add(anchor);
-      }
-
-      values.put(messages.updateProcessIdTitle(), jobIdsList);
-    }
-
-    if (!bundle.getAip().getPermissions().getUsers().equals(new Permissions().getUsers())
-      || !bundle.getAip().getPermissions().getGroups().equals(new Permissions().getGroups())) {
-      values.put(messages.aipPermissionDetails(), createAipPermissionDetailsHTML(bundle));
-    }
-    populate(infoSliderPanel, values);
-  }
-
-  private static Widget createAipPermissionDetailsHTML(BrowseAIPBundle bundle) {
-    Permissions permissions = bundle.getAip().getPermissions();
-
-    final String CSS_HAS_PERMISSION = "";
-    final String CSS_NO_PERMISSION = " slider-aip-permissions-table-icon-fade";
-
-    List<Entry<String, Set<Permissions.PermissionType>>> entryList = new ArrayList<>();
-    for (String username : new TreeSet<>(permissions.getUsernames())) {
-      entryList.add(new AbstractMap.SimpleEntry<>("u-" + username, permissions.getUserPermissions(username)));
-    }
-    for (String groupname : new TreeSet<>(permissions.getGroupnames())) {
-      entryList.add(new AbstractMap.SimpleEntry<>("g-" + groupname, permissions.getGroupPermissions(groupname)));
-    }
-
-    CellTable<Entry<String, Set<Permissions.PermissionType>>> table = new CellTable<>();
-    table.addStyleName("slider-aip-permissions-table");
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> userGroupIconColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        if (object.getKey().startsWith("u-")) {
-          return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>");
-        } else {
-          return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-users'></i>");
-        }
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> nameColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String name = object.getKey().substring(2);
-        return SafeHtmlUtils.fromSafeConstant(
-          "<span title='" + SafeHtmlUtils.htmlEscape(name) + "'>" + SafeHtmlUtils.htmlEscape(name) + "</span>");
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconReadColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String extraIconCss = object.getValue().contains(Permissions.PermissionType.READ) ? CSS_HAS_PERMISSION
-          : CSS_NO_PERMISSION;
-        return SafeHtmlUtils
-          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.READ)
-            + "' class='fa fa-eye" + extraIconCss + "'></i>");
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconCreateColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String extraIconCss = object.getValue().contains(Permissions.PermissionType.CREATE) ? CSS_HAS_PERMISSION
-          : CSS_NO_PERMISSION;
-        return SafeHtmlUtils
-          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.CREATE)
-            + "' class='fa fa-sitemap" + extraIconCss + "'></i>");
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconEditColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String extraIconCss = object.getValue().contains(Permissions.PermissionType.UPDATE) ? CSS_HAS_PERMISSION
-          : CSS_NO_PERMISSION;
-        return SafeHtmlUtils
-          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.UPDATE)
-            + "' class='fa fa-edit" + extraIconCss + "'></i>");
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconDeleteColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String extraIconCss = object.getValue().contains(Permissions.PermissionType.DELETE) ? CSS_HAS_PERMISSION
-          : CSS_NO_PERMISSION;
-        return SafeHtmlUtils
-          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.DELETE)
-            + "' class='fa fa-ban" + extraIconCss + "'></i>");
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconGrantColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String extraIconCss = object.getValue().contains(Permissions.PermissionType.GRANT) ? CSS_HAS_PERMISSION
-          : CSS_NO_PERMISSION;
-        return SafeHtmlUtils
-          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.GRANT)
-            + "' class='fa fa-unlock" + extraIconCss + "'></i>");
-      }
-    };
-
-    table.addColumn(userGroupIconColumn);
-    table.addColumn(nameColumn);
-    table.addColumn(iconReadColumn);
-    table.addColumn(iconCreateColumn);
-    table.addColumn(iconEditColumn);
-    table.addColumn(iconDeleteColumn);
-    table.addColumn(iconGrantColumn);
-
-    table.setColumnWidth(userGroupIconColumn, 23, Style.Unit.PX);
-    table.setColumnWidth(iconReadColumn, 23, Style.Unit.PX);
-    table.setColumnWidth(iconCreateColumn, 23, Style.Unit.PX);
-    table.setColumnWidth(iconEditColumn, 23, Style.Unit.PX);
-    table.setColumnWidth(iconDeleteColumn, 23, Style.Unit.PX);
-    table.setColumnWidth(iconGrantColumn, 23, Style.Unit.PX);
-
-    nameColumn.setCellStyleNames("nowrap slider-aip-permissions-table-name");
-
-    AipActions aipActions = AipActions.get();
-    if (aipActions.canAct(AipActions.AipAction.UPDATE_PERMISSIONS, bundle.getAip())) {
-      table.addStyleName("slider-aip-permissions-table-with-grant");
-      SingleSelectionModel<Entry<String, Set<Permissions.PermissionType>>> selectionModel = new SingleSelectionModel<>(
-        item -> item.getKey().substring(2));
-      selectionModel
-        .addSelectionChangeHandler(event -> aipActions.act(AipActions.AipAction.UPDATE_PERMISSIONS, bundle.getAip()));
-      table.setSelectionModel(selectionModel);
-    }
-
-    ListDataProvider<Entry<String, Set<Permissions.PermissionType>>> dataProvider = new ListDataProvider<>(entryList);
-    dataProvider.addDataDisplay(table);
-
-    return table;
-  }
 
   private static Widget createAipPermissionDetailsHTML(IndexedAIP aip) {
     Permissions permissions = aip.getPermissions();
@@ -820,17 +602,7 @@ public class InfoSliderHelper {
     return panel;
   }
 
-  private static FlowPanel createIdHTML(BrowseAIPBundle bundle) {
-    IndexedAIP aip = bundle.getAip();
-    FlowPanel panel = new FlowPanel();
-    final String riFilter = RepresentationInformationUtils
-      .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.INDEX_UUID, aip.getId());
 
-    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(aip.getId()),
-      riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.INDEX_UUID),
-      "browseFileInformationIcon");
-    return panel;
-  }
 
   private static FlowPanel createIdHTML(BrowseRepresentationResponse response) {
     IndexedRepresentation representation = response.getIndexedRepresentation();
@@ -855,15 +627,7 @@ public class InfoSliderHelper {
     return panel;
   }
 
-  private static FlowPanel createAipTypeHTML(BrowseAIPBundle bundle) {
-    IndexedAIP aip = bundle.getAip();
-    FlowPanel panel = new FlowPanel();
-    final String riFilter = RepresentationInformationUtils
-      .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.AIP_TYPE, aip.getType());
-    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(aip.getType()),
-      riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_TYPE));
-    return panel;
-  }
+
 
   private static FlowPanel createAipLevelHTML(BrowseAIPResponse response) {
     IndexedAIP aip = response.getIndexedAIP();
@@ -878,18 +642,6 @@ public class InfoSliderHelper {
     return panel;
   }
 
-  private static FlowPanel createAipLevelHTML(BrowseAIPBundle bundle) {
-    IndexedAIP aip = bundle.getAip();
-    FlowPanel panel = new FlowPanel();
-
-    final String riFilter = RepresentationInformationUtils
-      .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.AIP_LEVEL, aip.getLevel());
-    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-      SafeHtmlUtils.fromString(DescriptionLevelUtils.getElementLevelLabel(aip.getLevel())), riFilter, panel,
-      bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_LEVEL));
-
-    return panel;
-  }
 
   private static FlowPanel createRepresentationTypeHTML(BrowseRepresentationResponse response) {
     IndexedRepresentation representation = response.getIndexedRepresentation();

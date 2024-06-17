@@ -449,7 +449,7 @@ public class BrowseDIP extends Composite {
       topNavigationToolbar.withPermissions(response.getPermissions());
       topNavigationToolbar.updateBreadcrumb(response);
       topNavigationToolbar.build();
-      Sliders.createDisseminationSlider(center, topNavigationToolbar.getDisseminationsButton(), response.getReferred());
+      Sliders.createDisseminationSlider(center, topNavigationToolbar.getDisseminationsButton(), response.getReferred(), services);
       buildInfoSlider(center, topNavigationToolbar.getInfoSidebarButton(), response);
 
       container.insert(topNavigationToolbar, 0);

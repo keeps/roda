@@ -16,17 +16,26 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.index.CountRequest;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.InstanceState;
+import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -41,6 +50,7 @@ import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -50,10 +60,13 @@ import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.association.DisposalPolicyAssociationPanel;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
+import org.roda.wui.client.services.AIPRestService;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -102,34 +115,104 @@ public class BrowseAIP extends Composite {
 
   public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
     container = new SimplePanel();
-    refresh(id, new AsyncCallback<BrowseAIPBundle>() {
+    refresh(id, new AsyncCallback<IndexedAIP>() {
       @Override
       public void onFailure(Throwable caught) {
         callback.onFailure(caught);
       }
 
       @Override
-      public void onSuccess(BrowseAIPBundle result) {
+      public void onSuccess(IndexedAIP result) {
         callback.onSuccess(container);
       }
     });
   }
 
-  private static void refresh(String id, AsyncCallback<BrowseAIPBundle> callback) {
-    BrowserService.Util.getInstance().retrieveBrowseAIPBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
-      fieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
+  private static void refresh(String id, AsyncCallback<IndexedAIP> callback) {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
+    Services service = new Services("Retrieve AIP", "get");
+    GWT.log("REFRESH");
+    service
+      .rodaEntityRestService(s -> s.findByUuid(id, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class)
+      .whenComplete((aip, error) -> { // get aip
+        // ancestors
+        if (error != null) {
+          GWT.log("erro -> " + error);
+          if (error instanceof NotFoundException) {
+            Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
+            HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
+          } else {
+            AsyncCallbackUtils.defaultFailureTreatment(error);
         }
+        } else {
+          CompletableFuture<List<IndexedAIP>> futureAncestors = service.aipResource(s -> s.getAncestors(id));
 
-        @Override
-        public void onSuccess(BrowseAIPBundle bundle) {
-          container.setWidget(new BrowseAIP(bundle));
-          callback.onSuccess(bundle);
+          CompletableFuture<List<String>> futureRepFields = service
+            .aipResource(AIPRestService::getRepresentationInformationFields);
+
+          CompletableFuture<InstanceState> futureInstance = service
+            .aipResource(s -> s.getInstanceName(id, LocaleInfo.getCurrentLocale().getLocaleName()));
+
+          CompletableFuture<DescriptiveMetadataInfos> futureDescriptiveMetadataInfos = service
+            .aipResource(s -> s.getDescriptiveMetadata(id, LocaleInfo.getCurrentLocale().getLocaleName()));
+
+          CompletableFuture<LongResponse> futureChildAipCount = service
+            .rodaEntityRestService(
+              s -> s.count(new FindRequest.FindRequestBuilder(
+                new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, id)), false).build()),
+              IndexedAIP.class);
+
+          CompletableFuture<LongResponse> futureRepCount = service.rodaEntityRestService(
+            s -> s.count(new CountRequest(
+              new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, id)), false)),
+            IndexedRepresentation.class);
+
+          CompletableFuture<LongResponse> futureDipCount = service
+            .rodaEntityRestService(s -> s.count(new CountRequest(
+              new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, id)), false)), IndexedDIP.class);
+
+          CompletableFuture<LongResponse> futureIncidenceCount = service.rodaEntityRestService(
+            s -> s.count(new CountRequest(
+              new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, id)), false)),
+            RiskIncidence.class);
+
+          CompletableFuture<LongResponse> futureEventCount = service.rodaEntityRestService(
+            s -> s.count(new CountRequest(
+              new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, id)), false)),
+            IndexedPreservationEvent.class);
+
+          CompletableFuture<LongResponse> futureLogCount = service
+            .rodaEntityRestService(
+              s -> s.count(new CountRequest(
+                new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, id)), false)),
+              LogEntry.class);
+
+          CompletableFuture.allOf(futureChildAipCount, futureRepCount, futureDipCount, futureAncestors, futureAncestors,
+            futureRepFields, futureInstance, futureDescriptiveMetadataInfos, futureIncidenceCount, futureEventCount,
+            futureLogCount).thenApply(v -> {
+              BrowseAIPResponse rp = new BrowseAIPResponse();
+              rp.setIndexedAIP(aip);
+              rp.setAncestors(futureAncestors.join());
+              rp.setRepresentationInformationFields(futureRepFields.join());
+              rp.setInstance(futureInstance.join());
+              rp.setDescriptiveMetadataInfos(futureDescriptiveMetadataInfos.join());
+              rp.setChildAipsCount(futureChildAipCount.join());
+              rp.setRepresentationCount(futureRepCount.join());
+              rp.setDipCount(futureDipCount.join());
+              rp.setIncidenceCount(futureIncidenceCount.join());
+              rp.setEventCount(futureEventCount.join());
+              rp.setLogCount(futureLogCount.join());
+              return rp;
+            }).whenComplete((value, throwable) -> {
+
+              if (throwable == null) {
+                container.setWidget(new BrowseAIP(value));
+                callback.onSuccess(aip);
+              }
+            });
         }
       });
+
   }
 
   private static final List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -207,8 +290,8 @@ public class BrowseAIP extends Composite {
   @UiField
   Label dateCreatedAndModified;
 
-  private BrowseAIP(BrowseAIPBundle bundle) {
-    aip = bundle.getAip();
+  private BrowseAIP(BrowseAIPResponse response) {
+    aip = response.getIndexedAIP();
     aipId = aip.getId();
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
@@ -232,12 +315,12 @@ public class BrowseAIP extends Composite {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
       ListBuilder<IndexedRepresentation> representationsListBuilder;
       if (aip.getState().equals(AIPState.DESTROYED) || aip.isOnHold() || aip.getDisposalConfirmationId() != null) {
-        representationsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+        representationsListBuilder = new ListBuilder<>(ConfigurableAsyncTableCell::new,
           new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
             .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
             .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener());
       } else {
-        representationsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+        representationsListBuilder = new ListBuilder<>(ConfigurableAsyncTableCell::new,
           new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
             .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
             .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener()
@@ -247,7 +330,7 @@ public class BrowseAIP extends Composite {
       SearchWrapper representationsSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(representationsListBuilder);
       representationsCard.setWidget(representationsSearchWrapper);
-      representationsCard.setVisible(bundle.getRepresentationCount() > 0);
+      representationsCard.setVisible(response.getRepresentationCount().getResult() > 0);
     } else {
       representationsCard.setVisible(false);
     }
@@ -255,7 +338,7 @@ public class BrowseAIP extends Composite {
     // DISSEMINATIONS
 
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_DIP)) {
-      ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(() -> new DIPList(),
+      ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(DIPList::new,
         new AsyncTableCellOptions<>(IndexedDIP.class, "BrowseAIP_disseminations")
           .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId())))
           .withJustActive(justActive).withSummary(messages.listOfDisseminations()).bindOpener()
@@ -264,7 +347,7 @@ public class BrowseAIP extends Composite {
       SearchWrapper disseminationsSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(disseminationsListBuilder);
       disseminationsCard.setWidget(disseminationsSearchWrapper);
-      disseminationsCard.setVisible(bundle.getDipCount() > 0);
+      disseminationsCard.setVisible(response.getDipCount().getResult() > 0);
     } else {
       disseminationsCard.setVisible(false);
     }
@@ -273,13 +356,13 @@ public class BrowseAIP extends Composite {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
       ListBuilder<IndexedAIP> aipChildrenListBuilder;
       if (aip.getState().equals(AIPState.DESTROYED) || aip.isOnHold() || aip.getDisposalConfirmationId() != null) {
-        aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+        aipChildrenListBuilder = new ListBuilder<>(ConfigurableAsyncTableCell::new,
           new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
             .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
             .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener());
 
       } else {
-        aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+        aipChildrenListBuilder = new ListBuilder<>(ConfigurableAsyncTableCell::new,
           new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
             .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
             .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener().withActionable(aipActions)
@@ -289,7 +372,7 @@ public class BrowseAIP extends Composite {
       SearchWrapper aipChildrenSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(aipChildrenListBuilder);
       aipChildrenCard.setWidget(aipChildrenSearchWrapper);
-      aipChildrenCard.setVisible(bundle.getChildAIPCount() > 0);
+      aipChildrenCard.setVisible(response.getChildAipsCount().getResult() > 0);
     } else {
       aipChildrenCard.setVisible(false);
     }
@@ -329,27 +412,28 @@ public class BrowseAIP extends Composite {
     }
 
     // IDENTIFICATION
-    updateSectionIdentification(bundle);
-
+    updateSectionIdentification(response);
+    GWT.log("REPRESENTAITON");
     // DISPOSAL
     updateDisposalInformation();
 
     // DESCRIPTIVE METADATA
-    updateSectionDescriptiveMetadata(bundle);
+    updateSectionDescriptiveMetadata(response.getDescriptiveMetadataInfos());
 
     // REPRESENTATIONS
-    if (bundle.getRepresentationCount() == 0 && aip.getState().equals(AIPState.ACTIVE) && !aip.isOnHold()
+    GWT.log("REPRESENTAITON");
+    if (response.getRepresentationCount().getResult() == 0 && aip.getState().equals(AIPState.ACTIVE) && !aip.isOnHold()
       && aip.getDisposalConfirmationId() == null) {
       addRepresentation.setWidget(new ActionableWidgetBuilder<>(representationActions).buildListWithObjects(
         new ActionableObject<>(IndexedRepresentation.class),
         Collections.singletonList(RepresentationActions.RepresentationAction.NEW)));
     }
 
-    addRepresentation.setVisible(bundle.getRepresentationCount() == 0 && aip.getState().equals(AIPState.ACTIVE));
+    addRepresentation.setVisible(response.getRepresentationCount().getResult() == 0 && aip.getState().equals(AIPState.ACTIVE));
 
     // AIP CHILDREN
     if (aip.getState().equals(AIPState.ACTIVE)) {
-      if (bundle.getChildAIPCount() > 0) {
+      if (response.getChildAipsCount().getResult() > 0) {
         LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
       } else {
         if (!aip.isOnHold() && aip.getDisposalConfirmationId() == null) {
@@ -359,25 +443,25 @@ public class BrowseAIP extends Composite {
         }
       }
 
-      addChildAip.setVisible(bundle.getChildAIPCount() == 0);
+      addChildAip.setVisible(response.getRepresentationCount().getResult() == 0);
     }
 
     keyboardFocus.setFocus(true);
   }
 
-  private void updateSectionDescriptiveMetadata(BrowseAIPBundle bundle) {
+  private void updateSectionDescriptiveMetadata(DescriptiveMetadataInfos descriptiveMetadataInfos) {
     final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<>();
-    final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
+    final Map<String, DescriptiveMetadataInfo> metadataInfos = new HashMap<>();
 
-    List<DescriptiveMetadataViewBundle> descMetadata = bundle.getDescriptiveMetadata();
+    List<DescriptiveMetadataInfo> descMetadata = descriptiveMetadataInfos.getDescriptiveMetadataInfoList();
     if (descMetadata != null) {
-      for (DescriptiveMetadataViewBundle descMetadatum : descMetadata) {
+      for (DescriptiveMetadataInfo descMetadatum : descMetadata) {
         String title = descMetadatum.getLabel() != null ? descMetadatum.getLabel() : descMetadatum.getId();
         HTML container = new HTML();
         container.addStyleName("metadataContent");
         descriptiveMetadata.add(container, title);
         descriptiveMetadataContainers.add(Pair.of(descMetadatum.getId(), container));
-        bundles.put(descMetadatum.getId(), descMetadatum);
+        metadataInfos.put(descMetadatum.getId(), descMetadatum);
       }
     }
 
@@ -386,8 +470,8 @@ public class BrowseAIP extends Composite {
         Pair<String, HTML> pair = descriptiveMetadataContainers.get(event.getSelectedItem());
         String descId = pair.getFirst();
         final HTML html = pair.getSecond();
-        final DescriptiveMetadataViewBundle descBundle = bundles.get(descId);
-        if (html.getText().length() == 0) {
+        final DescriptiveMetadataInfo descBundle = metadataInfos.get(descId);
+        if (html.getText().isEmpty()) {
           getDescriptiveMetadataHTML(aipId, descId, descBundle, event.getSelectedItem(), new AsyncCallback<SafeHtml>() {
 
             @Override
@@ -465,31 +549,26 @@ public class BrowseAIP extends Composite {
     WCAGUtilities.getInstance().makeAccessible(descriptiveMetadata.getElement());
   }
 
-  private void updateSectionIdentification(BrowseAIPBundle bundle) {
-    IndexedAIP aip = bundle.getAip();
+  private void updateSectionIdentification(BrowseAIPResponse response) {
 
     title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
     title.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
-
-    Sliders.createAipInfoSlider(center, navigationToolbar.getInfoSidebarButton(), bundle);
+    Sliders.createAipInfoSlider(center, navigationToolbar.getInfoSidebarButton(), response);
 
     risksEventsLogs.clear();
-    long incidenceCount = bundle.getRiskIncidenceCount();
-    long eventCount = bundle.getPreservationEventCount();
-    long logCount = bundle.getLogCount();
 
-    if (incidenceCount >= 0) {
-      Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()),
+    if (response.getIncidenceCount().getResult() >= 0) {
+      Anchor risksLink = new Anchor(messages.aipRiskIncidences(response.getIncidenceCount().getResult()),
         HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, aip.getId()));
       risksEventsLogs.add(risksLink);
     }
 
-    if (eventCount >= 0) {
-      Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()),
+    if (response.getEventCount().getResult() >= 0) {
+      Anchor eventsLink = new Anchor(messages.aipEvents(response.getEventCount().getResult()),
         HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, aip.getId()));
 
-      if (incidenceCount >= 0) {
-        if (logCount >= 0) {
+      if (response.getIncidenceCount().getResult() >= 0) {
+        if (response.getLogCount().getResult() >= 0) {
           risksEventsLogs.add(new Label(", "));
         } else {
           risksEventsLogs.add(new Label(" " + messages.and() + " "));
@@ -499,18 +578,18 @@ public class BrowseAIP extends Composite {
       risksEventsLogs.add(eventsLink);
     }
 
-    if (logCount >= 0) {
-      Anchor logsLink = new Anchor(messages.aipLogs(bundle.getLogCount()),
+    if (response.getLogCount().getResult() >= 0) {
+      Anchor logsLink = new Anchor(messages.aipLogs(response.getLogCount().getResult()),
         HistoryUtils.createHistoryHashLink(UserLog.RESOLVER, aip.getId()));
 
-      if (incidenceCount >= 0 || eventCount >= 0) {
+      if (response.getIncidenceCount().getResult() >= 0 || response.getEventCount().getResult() >= 0) {
         risksEventsLogs.add(new Label(" " + messages.and() + " "));
       }
 
       risksEventsLogs.add(logsLink);
     }
 
-    navigationToolbar.updateBreadcrumb(bundle);
+    navigationToolbar.updateBreadcrumb(aip, response.getAncestors());
 
     if (aip.getCreatedOn() != null && StringUtils.isNotBlank(aip.getCreatedBy()) && aip.getUpdatedOn() != null
       && StringUtils.isNotBlank(aip.getUpdatedBy())) {
@@ -537,8 +616,8 @@ public class BrowseAIP extends Composite {
     }
   }
 
-  private void getDescriptiveMetadataHTML(final String aipId, final String descId,
-    final DescriptiveMetadataViewBundle bundle, final Integer selectedIndex, final AsyncCallback<SafeHtml> callback) {
+  private void getDescriptiveMetadataHTML(final String aipId, final String descId, final DescriptiveMetadataInfo bundle,
+    final Integer selectedIndex, final AsyncCallback<SafeHtml> callback) {
     SafeUri uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
     try {

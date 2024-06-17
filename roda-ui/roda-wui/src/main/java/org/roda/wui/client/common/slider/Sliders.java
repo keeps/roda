@@ -9,7 +9,6 @@ package org.roda.wui.client.common.slider;
 
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.model.BrowseFileResponse;
 import org.roda.wui.client.common.model.BrowseRepresentationResponse;
@@ -39,13 +38,6 @@ public class Sliders {
     return slider;
   }
 
-  public static <T extends IsIndexed> SliderPanel createDisseminationSlider(FlowPanel container,
-    FocusPanel toggleButton, T object) {
-    SliderPanel slider = createSlider(container, toggleButton);
-    DisseminationsSliderHelper.updateDisseminationsObjectSliderPanel(object, slider);
-    return slider;
-  }
-
   public static SliderPanel createAipInfoSlider(FlowPanel container, FocusPanel toggleButton,
     BrowseAIPResponse response) {
     SliderPanel slider = createSlider(container, toggleButton);
@@ -67,9 +59,4 @@ public class Sliders {
     return slider;
   }
 
-  public static SliderPanel createAipInfoSlider(FlowPanel container, FocusPanel toggleButton, BrowseAIPBundle bundle) {
-    SliderPanel slider = createSlider(container, toggleButton);
-    InfoSliderHelper.updateInfoSliderPanel(bundle, slider);
-    return slider;
-  }
 }
