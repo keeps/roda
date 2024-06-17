@@ -53,11 +53,6 @@ public class DisposalHoldService {
     return RodaCoreFactory.getModelService().retrieveDisposalHold(id);
   }
 
-  public void deleteDisposalHold(String disposalHoldId) throws GenericException, RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException, IllegalOperationException {
-    RodaCoreFactory.getModelService().deleteDisposalHold(disposalHoldId);
-  }
-
   public DisposalTransitiveHoldsAIPMetadata listTransitiveDisposalHolds(String aipId) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     return RodaCoreFactory.getModelService().listTransitiveDisposalHolds(aipId);
   }
