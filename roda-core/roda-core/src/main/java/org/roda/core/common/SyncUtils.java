@@ -270,7 +270,7 @@ public class SyncUtils {
   public static Path requestRemoteActions(LocalInstance localInstance) throws GenericException {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "remote_actions"
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE + "remote_actions"
         + RodaConstants.API_SEP + localInstance.getId();
 
       CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -319,10 +319,9 @@ public class SyncUtils {
     LocalInstance localInstance) {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "remove"
-        + RodaConstants.API_SEP + "bundle" + RodaConstants.API_QUERY_START + RodaConstants.SYNCHRONIZATION_BUNDLE_NAME
-        + RodaConstants.API_QUERY_ASSIGN_SYMBOL + bundleName + RodaConstants.API_QUERY_SEP
-        + RodaConstants.SYNCHRONIZATION_BUNDLE_DIRECTORY + RodaConstants.API_QUERY_ASSIGN_SYMBOL + bundleDirectory;
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE + "remove"
+        + RodaConstants.API_SEP + "bundle" + RodaConstants.API_SEP + bundleName + RodaConstants.API_SEP
+        + bundleDirectory;
 
       CloseableHttpClient httpClient = HttpClientBuilder.create().build();
       HttpGet httpGet = new HttpGet(localInstance.getCentralInstanceURL() + resource);
@@ -332,8 +331,8 @@ public class SyncUtils {
 
       HttpResponse response = httpClient.execute(httpGet);
 
-      if (response.getStatusLine().getStatusCode() == RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
-        EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+      if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_NO_CONTENT) {
+        throw new GenericException("Error deleting sync bundle.");
       }
     } catch (AuthenticationDeniedException | GenericException | IOException e) {
       // do nothing
@@ -370,7 +369,7 @@ public class SyncUtils {
     throws GenericException {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "update";
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE + "distributed";
 
       CloseableHttpClient httpClient = HttpClientBuilder.create().build();
       HttpPut httpPut = new HttpPut(localInstance.getCentralInstanceURL() + resource);
@@ -393,7 +392,7 @@ public class SyncUtils {
   public static Long getUpdatesFromDistributedInstance(LocalInstance localInstance) throws GenericException {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE
         + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_GET_UPDATES + RodaConstants.API_SEP + localInstance.getId();
 
       CloseableHttpClient httpClient = HttpClientBuilder.create().build();

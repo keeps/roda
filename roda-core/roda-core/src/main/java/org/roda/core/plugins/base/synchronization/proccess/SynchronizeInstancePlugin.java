@@ -25,6 +25,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
@@ -35,6 +36,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.base.multiple.DefaultMultipleStepPlugin;
+import org.roda.core.plugins.base.multiple.NoObjectsMultipleStepPlugin;
 import org.roda.core.plugins.base.multiple.Step;
 import org.roda.core.plugins.base.synchronization.packages.AipPackagePlugin;
 import org.roda.core.plugins.base.synchronization.packages.DipPackagePlugin;
@@ -49,7 +51,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAObject> {
+public class SynchronizeInstancePlugin extends NoObjectsMultipleStepPlugin {
   private static final Logger LOGGER = LoggerFactory.getLogger(SynchronizeInstancePlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   private static List<Step> steps = new ArrayList<>();
@@ -194,7 +196,7 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
   }
 
   @Override
-  public Plugin<IsRODAObject> cloneMe() {
+  public Plugin cloneMe() {
     return new SynchronizeInstancePlugin();
   }
 
@@ -209,7 +211,7 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
   }
 
   @Override
-  public List<Class<IsRODAObject>> getObjectClasses() {
+  public List<Class<Void>> getObjectClasses() {
     return Collections.emptyList();
   }
 

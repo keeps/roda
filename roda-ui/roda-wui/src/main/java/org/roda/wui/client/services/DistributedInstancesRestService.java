@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.fusesource.restygwt.client.DirectRestService;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.generics.CreateDistributedInstanceRequest;
 import org.roda.core.data.v2.generics.CreateLocalInstanceRequest;
@@ -67,7 +68,7 @@ public interface DistributedInstancesRestService extends DirectRestService {
   DistributedInstance createDistributedInstance(
     @Parameter(name = "distributed-instance", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) CreateDistributedInstanceRequest distributedInstance);
 
-  @RequestMapping(path = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/distributed", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Update distributed instance", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = DistributedInstance.class))), description = "Updates a new distributed instance", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DistributedInstance.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
@@ -111,9 +112,9 @@ public interface DistributedInstancesRestService extends DirectRestService {
   Void deleteLocalConfiguration(
     @Parameter(name = "local-instance", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) LocalInstance localInstance);
 
-  @RequestMapping(path = "/local/synchronize", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/synchronize", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Synchronize instances", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = LocalInstance.class))) ,description = "Synchronizes instances", responses = {
-    @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = Job.class))),
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job synchronize(
     @Parameter(name = "local-instance", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) LocalInstance localInstance);
@@ -123,6 +124,21 @@ public interface DistributedInstancesRestService extends DirectRestService {
     @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = DistributedInstance.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   DistributedInstance status(
+    @Parameter(description = "The instance id") @PathVariable(name = "id") String id);
+
+  @RequestMapping(path = "/register", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(summary = "Register distributed instance", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = LocalInstance.class))), description = "Registers a distributed instance", responses = {
+    @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = DistributedInstance.class))),
+    @ApiResponse(responseCode = "409", description = "Conflict", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  DistributedInstance registerDistributedInstance(
+    @Parameter(name = "local-instance", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) LocalInstance localInstance);
+
+  @RequestMapping(path = "/updates/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get central instance updates", description = "Get central instance updates", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Long getCentralInstanceUpdates(
     @Parameter(description = "The instance id") @PathVariable(name = "id") String id);
 
   @RequestMapping(path = "/local", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
