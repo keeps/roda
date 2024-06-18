@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.risks.RiskVersion;
+import org.roda.core.data.v2.ip.metadata.ResourceVersion;
 import org.roda.core.data.v2.risks.RiskVersions;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -140,11 +140,11 @@ public class RiskHistory extends Composite {
 
   private void init() {
     // sort
-    List<RiskVersion> versionList = new ArrayList<>(riskVersions.getVersions());
+    List<ResourceVersion> versionList = new ArrayList<>(riskVersions.getVersions());
     versionList.sort((v1, v2) -> (int) (v2.getCreatedDate().getTime() - v1.getCreatedDate().getTime()));
 
     // create list layout
-    for (RiskVersion version : versionList) {
+    for (ResourceVersion version : versionList) {
       String versionKey = version.getId();
       String message = messages.versionAction(version.getProperties().get(RodaConstants.VERSION_ACTION));
       Date createdDate = version.getCreatedDate();

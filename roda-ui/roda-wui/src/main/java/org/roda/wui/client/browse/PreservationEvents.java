@@ -196,7 +196,6 @@ public class PreservationEvents extends Composite {
       .whenComplete((aip, error) -> { // get aip
         // ancestors
         if (error != null) {
-          GWT.log("erro -> " + error);
           if (error instanceof NotFoundException) {
             Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
             HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));

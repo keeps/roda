@@ -179,7 +179,6 @@ public class CreateDescriptiveMetadata extends Composite {
 
       @Override
       public void onChange(ChangeEvent event) {
-        GWT.log("VOU MUDAR");
         String value = type.getSelectedValue();
 
         Services service = new Services("Retrieve descriptive metadata", "get");
@@ -213,7 +212,7 @@ public class CreateDescriptiveMetadata extends Composite {
           for (SupportedMetadata sm : value) {
             type.addItem(sm.getLabel(), sm.getId());
           }
-          type.addItem(messages.otherItem(), "");
+          type.addItem(messages.otherItem(), "Other");
           type.setSelectedIndex(0);
 
           service.aipResource(s -> s.retrieveAIPSupportedMetadata(aipId, type.getSelectedValue(),
@@ -237,7 +236,6 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   protected static void initTitle(String aipId, TitlePanel title) {
-    GWT.log("tas fdd");
     Services service = new Services("Get AIP", "get");
     service.aipResource(s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName())).thenCompose(
       aip -> service.aipResource(s -> s.getDescriptiveMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName()))
@@ -331,7 +329,6 @@ public class CreateDescriptiveMetadata extends Composite {
 
     DescriptiveMetadataPreviewRequest previewRequest = new DescriptiveMetadataPreviewRequest(type.getSelectedValue(),
       values);
-    GWT.log("request -> " + previewRequest);
     service.aipResource(s -> s.retrieveDescriptiveMetadataPreview(previewRequest)).whenComplete((value, error) -> {
       if (error != null) {
         AsyncCallbackUtils.defaultFailureTreatment(error);
@@ -349,7 +346,7 @@ public class CreateDescriptiveMetadata extends Composite {
     buttonApply.setEnabled(false);
     String idText = type.getSelectedValue();
     String filename = id.getText();
-    String typeText = idText.contains("_") ? idText.substring(0, idText.lastIndexOf("_")) : messages.otherItem();
+    String typeText = idText.contains("_")  ? idText.substring(0, idText.lastIndexOf("_")) : idText;
     String typeVersion = idText.contains("_") ? idText.substring(idText.lastIndexOf("_") + 1) : null;
     String xmlText = metadataXML.getText();
     boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
