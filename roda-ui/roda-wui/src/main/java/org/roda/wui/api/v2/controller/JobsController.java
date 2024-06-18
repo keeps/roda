@@ -11,6 +11,7 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.StringResponse;

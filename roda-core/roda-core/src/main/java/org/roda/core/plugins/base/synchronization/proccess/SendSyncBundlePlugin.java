@@ -194,7 +194,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
 
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE
         + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC + RodaConstants.API_SEP + localInstance.getId();
       return RESTClientUtility.sendPostRequestWithCompressedFile(localInstance.getCentralInstanceURL(), resource,
         zipPath, accessToken);

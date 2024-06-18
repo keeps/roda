@@ -1,46 +1,12 @@
 package org.roda.wui.api.v2.controller;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
-import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.SyncUtils;
-import org.roda.core.common.TokenManager;
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.EntityResponse;
-import org.roda.core.data.v2.StreamResponse;
-import org.roda.core.data.v2.generics.CreateDistributedInstanceRequest;
-import org.roda.core.data.v2.generics.CreateLocalInstanceRequest;
-import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.log.LogEntryState;
-import org.roda.core.data.v2.synchronization.SynchronizingStatus;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.central.DistributedInstances;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.core.data.v2.user.User;
-import org.roda.core.model.utils.UserUtility;
-import org.roda.core.storage.utils.RODAInstanceUtils;
-import org.roda.wui.api.controllers.RODAInstance;
-import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.api.v2.exceptions.RESTException;
-import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
-import org.roda.wui.api.v2.services.DistributedInstanceService;
-import org.roda.wui.api.v2.services.MembersService;
-import org.roda.wui.client.services.DistributedInstancesRestService;
-import org.roda.wui.common.ControllerAssistant;
-import org.roda.wui.common.model.RequestContext;
-import org.roda.wui.common.utils.RequestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,6 +15,79 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response;
+
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.SyncUtils;
+import org.roda.core.common.TokenManager;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.EntityResponse;
+import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.v2.generics.CreateDistributedInstanceRequest;
+import org.roda.core.data.v2.generics.CreateLocalInstanceRequest;
+import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.data.v2.ri.RepresentationInformation;
+import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstances;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
+import org.roda.core.data.v2.user.User;
+import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
+import org.roda.core.storage.utils.RODAInstanceUtils;
+import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.ObjectResponse;
+import org.roda.wui.api.v2.exceptions.RESTException;
+import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
+import org.roda.wui.api.v2.services.DistributedInstanceService;
+import org.roda.wui.api.v2.services.MembersService;
+import org.roda.wui.client.services.DistributedInstancesRestService;
+import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.model.RequestContext;
+import org.roda.wui.common.utils.RequestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -65,6 +104,8 @@ public class DistributedInstancesController implements DistributedInstancesRestS
 
   @Autowired
   private DistributedInstanceService distributedInstanceService;
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DistributedInstancesController.class);
 
   @Override
   public DistributedInstances getDistributedInstances() {
@@ -171,6 +212,29 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     } finally {
       controllerAssistant.registerAction(requestContext.getUser(), state,
         RodaConstants.CONTROLLER_DISTRIBUTED_INSTANCE_PARAM, distributedInstance);
+    }
+  }
+
+  @Override
+  public DistributedInstance registerDistributedInstance(@RequestBody LocalInstance localInstance) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      DistributedInstance distributedInstance = RodaCoreFactory.getModelService()
+        .retrieveDistributedInstance(localInstance.getId());
+      distributedInstance.setStatus(SynchronizingStatus.ACTIVE);
+      return RodaCoreFactory.getModelService().updateDistributedInstance(distributedInstance, requestContext.getUser().getId());
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
     }
   }
 
@@ -348,6 +412,46 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     }
   }
 
+  @RequestMapping(path = "/remove/bundle/{name}/{dir}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(summary = "Delete distributed instance", description = "Deletes a distributed instance", responses = {
+    @ApiResponse(responseCode = "204", description = "No Content"),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Void deleteSyncBundle(
+    @Parameter(description = "The sync bundle name") @PathVariable(name = "name") String name,
+    @Parameter(description = "The sync bundle directory") @PathVariable(name = "dir") String directory) {
+    String message = null;
+
+    if (RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER.equals(directory)) {
+      Path syncBundlePath = SyncUtils.getSyncIncomingBundlePath(name);
+      try {
+        Boolean deleteFromIncome = Files.deleteIfExists(syncBundlePath);
+        if (deleteFromIncome == true) {
+          message = "Deleted bundle from income folder with success";
+        } else {
+          message = "Could not find bundle in income folder";
+        }
+      } catch (IOException e) {
+        LOGGER.error("Can not delete bundle from income folder because " + e.getMessage());
+      }
+    } else {
+      Path syncBundlePath = SyncUtils.getSyncOutcomeBundlePath(name);
+      try {
+        Boolean deleteFromOutcome = Files.deleteIfExists(syncBundlePath);
+        if (deleteFromOutcome == true) {
+          message = "Deleted bundle from outcome folder with success";
+        } else {
+          message = "Could not find bundle in outcome folder";
+        }
+      } catch (IOException e) {
+        LOGGER.error("Can not delete bundle from outcome folder because " + e.getMessage());
+      }
+    }
+    LOGGER.info(message);
+    return null;
+  }
+
+
   @Override
   public DistributedInstance status(String id) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -390,15 +494,53 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     }
   }
 
+  @Override
+  public Long getCentralInstanceUpdates(String id) {
+    try {
+      Long total = 0L;
+      ModelService model = RodaCoreFactory.getModelService();
+      IndexService index = RodaCoreFactory.getIndexService();
+
+      DistributedInstance distributedInstance = model.retrieveDistributedInstance(id);
+      Date lastSynchronizationDate = distributedInstance.getLastSynchronizationDate();
+      Date toDate = new Date();
+      // get Jobs
+      final Filter jobFilter = new Filter();
+      jobFilter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, id));
+      jobFilter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.CREATED.name()));
+      jobFilter.add(new DateIntervalFilterParameter(RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE,
+        lastSynchronizationDate, toDate));
+      total += index.count(Job.class, jobFilter);
+
+      // get Risks
+      final Filter riskFilter = new Filter();
+      riskFilter.add(new DateIntervalFilterParameter(RodaConstants.RISK_UPDATED_ON, RodaConstants.RISK_UPDATED_ON,
+        lastSynchronizationDate, toDate));
+      total += index.count(IndexedRisk.class, riskFilter);
+
+      // get RepresentationInformation
+      final Filter repFilter = new Filter();
+      repFilter.add(new DateIntervalFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON,
+        RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON, lastSynchronizationDate, toDate));
+      total += index.count(RepresentationInformation.class, riskFilter);
+
+      return total;
+    } catch (RODAException e) {
+      throw new RESTException(e);
+    }
+
+  }
+
   @RequestMapping(path = "/remote_actions/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get instance status", description = "Gets instance status", responses = {
     @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = Response.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Response remoteActions(@Parameter(description = "The instance id") @PathVariable(name = "id") String id) {
     // get user
-    User user = UserUtility.getApiUser(request);
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    User user = requestContext.getUser();
     try {
-      EntityResponse response = RODAInstance.retrieveRemoteActions(user, id);
+      EntityResponse response = retrieveRemoteActions(user, id);
       if (response instanceof StreamResponse) {
         return ApiUtils.okResponse((StreamResponse) response);
       } else {
@@ -406,6 +548,85 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       }
     } catch (RODAException e) {
       throw new RESTException(e);
+    }
+  }
+
+  public EntityResponse retrieveRemoteActions(User user, String instanceIdentifier)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      try {
+        return distributedInstanceService.createCentralSyncBundle(instanceIdentifier);
+      } catch (NotFoundException e) {
+        return new ObjectResponse<>(null, null);
+      }
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
+        instanceIdentifier);
+    }
+  }
+
+  @RequestMapping(path = "/sync/status/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get synchronization status" ,description = "Gets synchronization status", responses = {
+    @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = Response.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Response synchronizationStatus(
+    @Parameter(description = "The instance id") @PathVariable(name = "id") String id,
+    @Parameter(description = "The entity class") @RequestParam(name = RodaConstants.API_QUERY_KEY_CLASS) String entityClass,
+    @Parameter(description = "The type") @RequestParam(name = RodaConstants.API_QUERY_KEY_TYPE) String type) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      return ApiUtils.okResponse((StreamResponse) distributedInstanceService.retrieveLastSyncFileByClass(id, entityClass, type));
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
+        id);
+    }
+  }
+
+  @RequestMapping(path = "/sync/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Import sync bundle", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = MultipartFile.class))), description = "Imports sync bundle", responses = {
+    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = Job.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Job importSyncBundle(
+    @Parameter(content = @Content(mediaType = "multipart/form-data", schema = @Schema(implementation = MultipartFile.class)), description = "Multipart file") @RequestPart(value = "file") MultipartFile resource,
+    @Parameter(description = "The instance id") @PathVariable(name = "id") String id) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {
+    };
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      return distributedInstanceService.importSyncBundle(requestContext.getUser(), id, resource);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext.getUser(), state,
+        RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
     }
   }
 }

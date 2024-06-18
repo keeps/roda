@@ -147,7 +147,7 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
       try {
         LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
         AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-        String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+        String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE
           + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER;
         RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), resource,
           accessToken);
