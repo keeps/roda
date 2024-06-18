@@ -19,8 +19,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({@Type(value = SelectedItemsAll.class, name = "all"),
-    @Type(value = SelectedItemsNone.class, name = "none"), @Type(value = SelectedItemsList.class, name = "list"),
-    @Type(value = SelectedItemsFilter.class, name = "filter")})
+  @Type(value = SelectedItemsNone.class, name = "none"), @Type(value = SelectedItemsList.class, name = "list"),
+  @Type(value = SelectedItemsFilter.class, name = "filter")})
 @FunctionalInterface
 public interface SelectedItems<T extends IsRODAObject> extends Serializable {
   String getSelectedClass();

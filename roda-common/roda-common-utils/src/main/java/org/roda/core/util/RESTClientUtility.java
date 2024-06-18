@@ -93,7 +93,7 @@ public final class RESTClientUtility {
       HttpEntity responseEntity = response.getEntity();
 
       int responseStatusCode = response.getStatusLine().getStatusCode();
-      if (responseStatusCode == 200) {
+      if (responseStatusCode == 201) {
         if (elementClass != null) {
           return JsonUtils.getObjectFromJson(responseEntity.getContent(), elementClass);
         } else {
