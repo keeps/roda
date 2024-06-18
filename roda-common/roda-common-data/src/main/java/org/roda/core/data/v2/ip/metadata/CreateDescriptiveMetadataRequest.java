@@ -1,5 +1,6 @@
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -10,38 +11,44 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "requestType")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = DescriptiveMetadataRequestForm.class, name = "DescriptiveMetadataRequestForm"),
   @JsonSubTypes.Type(value = DescriptiveMetadataRequestXML.class, name = "DescriptiveMetadataRequestXML")})
+@Schema(type = "object", subTypes = {DescriptiveMetadataRequestForm.class,
+  DescriptiveMetadataRequestXML.class}, discriminatorMapping = {
+    @DiscriminatorMapping(value = "DescriptiveMetadataRequestForm", schema = DescriptiveMetadataRequestForm.class),
+    @DiscriminatorMapping(value = "DescriptiveMetadataRequestXML", schema = DescriptiveMetadataRequestXML.class)}, discriminatorProperty = "@type")
 public abstract class CreateDescriptiveMetadataRequest implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = 7673112012182240190L;
 
   private String id;
   private String filename;
   private String type;
   private String version;
-  private String rawTemplate;
   private boolean similar;
   private Permissions permissions;
 
-  public CreateDescriptiveMetadataRequest() {
-    // do nothing
+  protected CreateDescriptiveMetadataRequest() {
+    // empty constructor
   }
 
-  public CreateDescriptiveMetadataRequest(String id, String filename, String type, String version, String rawTemplate,
-    boolean similar, Permissions permissions) {
+  protected CreateDescriptiveMetadataRequest(String id, String filename, String type, String version, boolean similar, Permissions permissions) {
     this.id = id;
     this.filename = filename;
     this.type = type;
     this.version = version;
-    this.rawTemplate = rawTemplate;
     this.similar = similar;
     this.permissions = permissions;
   }
 
-  public CreateDescriptiveMetadataRequest(String id, String filename, String type, String version,
+  protected CreateDescriptiveMetadataRequest(String id, String filename, String type, String version,
     Permissions permissions) {
     this.id = id;
     this.filename = filename;
@@ -82,14 +89,6 @@ public abstract class CreateDescriptiveMetadataRequest implements Serializable {
     this.version = version;
   }
 
-  public String getRawTemplate() {
-    return rawTemplate;
-  }
-
-  public void setRawTemplate(String rawTemplate) {
-    this.rawTemplate = rawTemplate;
-  }
-
   public boolean isSimilar() {
     return similar;
   }
@@ -106,15 +105,9 @@ public abstract class CreateDescriptiveMetadataRequest implements Serializable {
     this.permissions = permissions;
   }
 
-  public String getXml() {
-    return null;
-  }
+  public abstract String getXml();
 
-  public void setXml(String xml) {
-    // do nothing
-  }
+  public abstract void setXml(String xml);
 
-  public Set<MetadataValue> getValues() {
-    return null;
-  }
+  public abstract Set<MetadataValue> getValues();
 }

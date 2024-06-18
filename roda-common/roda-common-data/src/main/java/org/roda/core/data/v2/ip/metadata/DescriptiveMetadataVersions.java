@@ -1,5 +1,8 @@
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.Permissions;
@@ -7,19 +10,21 @@ import org.roda.core.data.v2.ip.Permissions;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class DescriptiveMetadataVersionsResponse {
+public class DescriptiveMetadataVersions implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = 2936574469592046228L;
 
   private DescriptiveMetadataInfo descriptiveMetadata;
   private List<ResourceVersion> versions;
   private Permissions permissions;
 
-  public DescriptiveMetadataVersionsResponse() {
-    super();
+  public DescriptiveMetadataVersions() {
+    versions = new ArrayList<>();
   }
 
-  public DescriptiveMetadataVersionsResponse(DescriptiveMetadataInfo descriptiveMetadata,
-                                             List<ResourceVersion> versions, Permissions permissions) {
-    super();
+  public DescriptiveMetadataVersions(DescriptiveMetadataInfo descriptiveMetadata,
+                                     List<ResourceVersion> versions, Permissions permissions) {
     this.descriptiveMetadata = descriptiveMetadata;
     this.versions = versions;
     this.permissions = permissions;

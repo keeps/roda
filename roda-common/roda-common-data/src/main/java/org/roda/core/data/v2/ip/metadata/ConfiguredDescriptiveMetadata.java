@@ -1,24 +1,25 @@
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Carlos Afonso <cafonso@keep.pt>
  */
 
-@JsonInclude(JsonInclude.Include.ALWAYS)
-public class SupportedMetadata implements Serializable {
+public class ConfiguredDescriptiveMetadata implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = -4876421800298148087L;
 
   private String label;
   private String id;
 
-  public SupportedMetadata() {
+  public ConfiguredDescriptiveMetadata() {
     // do nothing
   }
 
-  public SupportedMetadata(String label, String id) {
+  public ConfiguredDescriptiveMetadata(String label, String id) {
     this.label = label;
     this.id = id;
   }

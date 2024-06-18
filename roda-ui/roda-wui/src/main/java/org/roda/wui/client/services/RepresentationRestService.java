@@ -10,7 +10,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.representation.ChangeRepresentationStatesRequest;
-import org.roda.core.data.v2.representation.ChangeRepresentationTypeRequest;
+import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.core.data.v2.representation.RepresentationTypeOptions;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.springframework.http.HttpStatus;
@@ -69,10 +69,10 @@ public interface RepresentationRestService extends RODAEntityRestService<Indexed
     @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
   @RequestMapping(path = "/type", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Changes the representation type via search query", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ChangeRepresentationTypeRequest.class))), description = "", responses = {
+  @Operation(summary = "Changes the representation type via search query", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ChangeTypeRequest.class))), description = "", responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Job changeRepresentationType(ChangeRepresentationTypeRequest request);
+  Job changeRepresentationType(ChangeTypeRequest request);
 
   @RequestMapping(path = "/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Delete representation", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), description = "Deletes a new representation on an AIP", responses = {

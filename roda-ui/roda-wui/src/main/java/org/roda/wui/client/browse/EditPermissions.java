@@ -35,10 +35,8 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -359,27 +357,27 @@ public class EditPermissions extends Composite {
         @Override
         public void onSuccess(String details) {
           if (IndexedAIP.class.getName().equals(objectClass)) {
-            SelectedItems<IndexedAIP> aips = (SelectedItems<IndexedAIP>) selectedItems;
-            BrowserService.Util.getInstance().updateAIPPermissions(aips, permissions, details, recursive,
-              new LoadingAsyncCallback<Job>() {
+            Services services = new Services("Update AIP permissions", "update");
+            UpdatePermissionsRequest request = new UpdatePermissionsRequest();
+            request.setPermissions(permissions);
+            request.setDetails(details);
+            request.setRecursive(recursive);
+            request.setSelectedItems(selectedItems);
+            services.aipResource(s -> s.updatePermissions(request)).whenComplete((job, throwable) -> {
+              Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+              Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                 @Override
-                public void onSuccessImpl(Job result) {
-                  Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                public void onFailure(Throwable caught) {
+                  // do nothing
+                }
 
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
-
-                    @Override
-                    public void onSuccess(final Void nothing) {
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                    }
-                  });
+                @Override
+                public void onSuccess(final Void nothing) {
+                  HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
                 }
               });
+            });
           } else if (IndexedDIP.class.getName().equals(objectClass)) {
             Services services = new Services("Update DIP permissions", "update");
             UpdatePermissionsRequest request = new UpdatePermissionsRequest();
@@ -414,7 +412,9 @@ public class EditPermissions extends Composite {
   @UiHandler("buttonApplyToAll")
   void buttonApplyToAllHandler(ClickEvent e) {
     apply(true);
-  }  public static final HistoryResolver AIP_RESOLVER = new HistoryResolver() {
+  }
+
+  public static final HistoryResolver AIP_RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
@@ -443,8 +443,7 @@ public class EditPermissions extends Composite {
             List<FilterParameter> collect = ids.stream()
               .map(m -> new SimpleFilterParameter(RodaConstants.INDEX_UUID, m)).collect(Collectors.toList());
             OrFiltersParameters orFiltersParameters = new OrFiltersParameters(collect);
-            FindRequest findRequest = FindRequest
-              .getBuilder(new Filter(orFiltersParameters), true)
+            FindRequest findRequest = FindRequest.getBuilder(new Filter(orFiltersParameters), true)
               .withSublist(new Sublist(0, 20)).build();
             Services services = new Services("Find AIPs", "get");
             services.aipResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()))
@@ -638,8 +637,6 @@ public class EditPermissions extends Composite {
     }
   }
 
-
-
   public static final HistoryResolver DIP_RESOLVER = new HistoryResolver() {
 
     @Override
@@ -667,8 +664,7 @@ public class EditPermissions extends Composite {
             List<FilterParameter> collect = ids.stream()
               .map(m -> new SimpleFilterParameter(RodaConstants.INDEX_UUID, m)).collect(Collectors.toList());
             OrFiltersParameters orFiltersParameters = new OrFiltersParameters(collect);
-            FindRequest findRequest = FindRequest
-              .getBuilder(new Filter(orFiltersParameters), true)
+            FindRequest findRequest = FindRequest.getBuilder(new Filter(orFiltersParameters), true)
               .withSublist(new Sublist(0, 20)).build();
             Services services = new Services("Find DIPs", "get");
             services.aipResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()))

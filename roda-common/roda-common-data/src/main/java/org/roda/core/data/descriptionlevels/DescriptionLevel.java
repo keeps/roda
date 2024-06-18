@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.descriptionlevels;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -17,6 +18,7 @@ import java.io.Serializable;
  * @author Luis Faria <lfaria@keep.pt>
  */
 public class DescriptionLevel implements Serializable {
+  @Serial
   private static final long serialVersionUID = 9038357012292858570L;
 
   // description level

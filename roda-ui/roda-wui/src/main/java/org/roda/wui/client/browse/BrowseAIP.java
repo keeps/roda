@@ -33,7 +33,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.InstanceState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -111,182 +110,62 @@ import config.i18n.client.ClientMessages;
  */
 public class BrowseAIP extends Composite {
 
-  private static SimplePanel container;
-
-  public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
-    container = new SimplePanel();
-    refresh(id, new AsyncCallback<IndexedAIP>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      @Override
-      public void onSuccess(IndexedAIP result) {
-        callback.onSuccess(container);
-      }
-    });
-  }
-
-  private static void refresh(String id, AsyncCallback<IndexedAIP> callback) {
-
-    Services service = new Services("Retrieve AIP", "get");
-    service
-      .rodaEntityRestService(s -> s.findByUuid(id, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class)
-      .whenComplete((aip, error) -> { // get aip
-        // ancestors
-        if (error != null) {
-          if (error instanceof NotFoundException) {
-            Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
-            HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
-          } else {
-            AsyncCallbackUtils.defaultFailureTreatment(error);
-        }
-        } else {
-          CompletableFuture<List<IndexedAIP>> futureAncestors = service.aipResource(s -> s.getAncestors(id));
-
-          CompletableFuture<List<String>> futureRepFields = service
-            .aipResource(AIPRestService::getRepresentationInformationFields);
-
-          CompletableFuture<InstanceState> futureInstance = service
-            .aipResource(s -> s.getInstanceName(id, LocaleInfo.getCurrentLocale().getLocaleName()));
-
-          CompletableFuture<DescriptiveMetadataInfos> futureDescriptiveMetadataInfos = service
-            .aipResource(s -> s.getDescriptiveMetadata(id, LocaleInfo.getCurrentLocale().getLocaleName()));
-
-          CompletableFuture<LongResponse> futureChildAipCount = service
-            .rodaEntityRestService(
-              s -> s.count(new FindRequest.FindRequestBuilder(
-                new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, id)), false).build()),
-              IndexedAIP.class);
-
-          CompletableFuture<LongResponse> futureRepCount = service.rodaEntityRestService(
-            s -> s.count(new CountRequest(
-              new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, id)), false)),
-            IndexedRepresentation.class);
-
-          CompletableFuture<LongResponse> futureDipCount = service
-            .rodaEntityRestService(s -> s.count(new CountRequest(
-              new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, id)), false)), IndexedDIP.class);
-
-          CompletableFuture<LongResponse> futureIncidenceCount = service.rodaEntityRestService(
-            s -> s.count(new CountRequest(
-              new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, id)), false)),
-            RiskIncidence.class);
-
-          CompletableFuture<LongResponse> futureEventCount = service.rodaEntityRestService(
-            s -> s.count(new CountRequest(
-              new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, id)), false)),
-            IndexedPreservationEvent.class);
-
-          CompletableFuture<LongResponse> futureLogCount = service
-            .rodaEntityRestService(
-              s -> s.count(new CountRequest(
-                new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, id)), false)),
-              LogEntry.class);
-
-          CompletableFuture.allOf(futureChildAipCount, futureRepCount, futureDipCount, futureAncestors, futureAncestors,
-            futureRepFields, futureInstance, futureDescriptiveMetadataInfos, futureIncidenceCount, futureEventCount,
-            futureLogCount).thenApply(v -> {
-              BrowseAIPResponse rp = new BrowseAIPResponse();
-              rp.setIndexedAIP(aip);
-              rp.setAncestors(futureAncestors.join());
-              rp.setRepresentationInformationFields(futureRepFields.join());
-              rp.setInstance(futureInstance.join());
-              rp.setDescriptiveMetadataInfos(futureDescriptiveMetadataInfos.join());
-              rp.setChildAipsCount(futureChildAipCount.join());
-              rp.setRepresentationCount(futureRepCount.join());
-              rp.setDipCount(futureDipCount.join());
-              rp.setIncidenceCount(futureIncidenceCount.join());
-              rp.setEventCount(futureEventCount.join());
-              rp.setLogCount(futureLogCount.join());
-              return rp;
-            }).whenComplete((value, throwable) -> {
-
-              if (throwable == null) {
-                container.setWidget(new BrowseAIP(value));
-                callback.onSuccess(aip);
-              }
-            });
-        }
-      });
-
-  }
-
   private static final List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static SimplePanel container;
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
   static {
     fieldsToReturn.addAll(
       Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_STATE, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL,
         RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID, RodaConstants.INGEST_UPDATE_JOB_IDS));
   }
 
-  interface MyUiBinder extends UiBinder<Widget, BrowseAIP> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private String aipId;
-  private IndexedAIP aip;
-
   // Focus
   @UiField
   FocusPanel keyboardFocus;
-
-  // HEADER
-
   @UiField
   NavigationToolbar<IndexedAIP> navigationToolbar;
-
-  // STATUS
-
   @UiField
   HTML aipState;
-
   // IDENTIFICATION
   @UiField
   TitlePanel title;
-
-  // DESCRIPTIVE METADATA
-
   @UiField
   TabPanel descriptiveMetadata;
-
   @UiField
   Button newDescriptiveMetadata;
 
-  private SimplePanel descriptiveMetadataButtons;
-  private Map<Integer, HTMLPanel> descriptiveMetadataSavedButtons;
-
+  // HEADER
   // REPRESENTATIONS
   @UiField
   SimplePanel addRepresentation;
 
+  // STATUS
   @UiField
   SimplePanel representationsCard;
-
   // DISSEMINATIONS
   @UiField
   SimplePanel disseminationsCard;
 
+  // DESCRIPTIVE METADATA
   // AIP CHILDREN
   @UiField
   SimplePanel aipChildrenCard;
-
   @UiField
   SimplePanel addChildAip;
-
   @UiField
   FlowPanel risksEventsLogs;
-
   @UiField
   FlowPanel disposalPolicy;
-
   @UiField
   FlowPanel center;
-
   @UiField
   Label dateCreatedAndModified;
+  private String aipId;
+  private IndexedAIP aip;
+  private SimplePanel descriptiveMetadataButtons;
+  private Map<Integer, HTMLPanel> descriptiveMetadataSavedButtons;
 
   private BrowseAIP(BrowseAIPResponse response) {
     aip = response.getIndexedAIP();
@@ -425,7 +304,8 @@ public class BrowseAIP extends Composite {
         Collections.singletonList(RepresentationActions.RepresentationAction.NEW)));
     }
 
-    addRepresentation.setVisible(response.getRepresentationCount().getResult() == 0 && aip.getState().equals(AIPState.ACTIVE));
+    addRepresentation
+      .setVisible(response.getRepresentationCount().getResult() == 0 && aip.getState().equals(AIPState.ACTIVE));
 
     // AIP CHILDREN
     if (aip.getState().equals(AIPState.ACTIVE)) {
@@ -443,6 +323,101 @@ public class BrowseAIP extends Composite {
     }
 
     keyboardFocus.setFocus(true);
+  }
+
+  public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
+    container = new SimplePanel();
+    refresh(id, new AsyncCallback<IndexedAIP>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
+      }
+
+      @Override
+      public void onSuccess(IndexedAIP result) {
+        callback.onSuccess(container);
+      }
+    });
+  }
+
+  private static void refresh(String id, AsyncCallback<IndexedAIP> callback) {
+
+    Services service = new Services("Retrieve AIP", "get");
+    service
+      .rodaEntityRestService(s -> s.findByUuid(id, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class)
+      .whenComplete((aip, error) -> {
+        if (error != null) {
+          if (error instanceof NotFoundException) {
+            Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
+            HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
+          } else {
+            AsyncCallbackUtils.defaultFailureTreatment(error);
+          }
+        } else {
+          CompletableFuture<List<IndexedAIP>> futureAncestors = service.aipResource(s -> s.getAncestors(id));
+
+          CompletableFuture<List<String>> futureRepFields = service
+            .aipResource(AIPRestService::retrieveAIPRuleProperties);
+
+          CompletableFuture<DescriptiveMetadataInfos> futureDescriptiveMetadataInfos = service
+            .aipResource(s -> s.getDescriptiveMetadata(id, LocaleInfo.getCurrentLocale().getLocaleName()));
+
+          CompletableFuture<LongResponse> futureChildAipCount = service
+            .rodaEntityRestService(
+              s -> s.count(new FindRequest.FindRequestBuilder(
+                new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, id)), false).build()),
+              IndexedAIP.class);
+
+          CompletableFuture<LongResponse> futureRepCount = service.rodaEntityRestService(
+            s -> s.count(
+              new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, id)), false)),
+            IndexedRepresentation.class);
+
+          CompletableFuture<LongResponse> futureDipCount = service.rodaEntityRestService(
+            s -> s.count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, id)), false)),
+            IndexedDIP.class);
+
+          CompletableFuture<LongResponse> futureIncidenceCount = service.rodaEntityRestService(
+            s -> s.count(
+              new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, id)), false)),
+            RiskIncidence.class);
+
+          CompletableFuture<LongResponse> futureEventCount = service.rodaEntityRestService(
+            s -> s.count(new CountRequest(
+              new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, id)), false)),
+            IndexedPreservationEvent.class);
+
+          CompletableFuture<LongResponse> futureLogCount = service.rodaEntityRestService(
+            s -> s.count(
+              new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, id)), false)),
+            LogEntry.class);
+
+          CompletableFuture
+            .allOf(futureChildAipCount, futureRepCount, futureDipCount, futureAncestors, futureAncestors,
+              futureRepFields, futureDescriptiveMetadataInfos, futureIncidenceCount, futureEventCount, futureLogCount)
+            .thenApply(v -> {
+              BrowseAIPResponse rp = new BrowseAIPResponse();
+              rp.setIndexedAIP(aip);
+              rp.setAncestors(futureAncestors.join());
+              rp.setRepresentationInformationFields(futureRepFields.join());
+              rp.setDescriptiveMetadataInfos(futureDescriptiveMetadataInfos.join());
+              rp.setChildAipsCount(futureChildAipCount.join());
+              rp.setRepresentationCount(futureRepCount.join());
+              rp.setDipCount(futureDipCount.join());
+              rp.setIncidenceCount(futureIncidenceCount.join());
+              rp.setEventCount(futureEventCount.join());
+              rp.setLogCount(futureLogCount.join());
+              return rp;
+            }).whenComplete((value, throwable) -> {
+
+              if (throwable == null) {
+                container.setWidget(new BrowseAIP(value));
+                callback.onSuccess(aip);
+              }
+            });
+        }
+      });
+
   }
 
   private void updateSectionDescriptiveMetadata(DescriptiveMetadataInfos descriptiveMetadataInfos) {
@@ -735,5 +710,8 @@ public class BrowseAIP extends Composite {
       HistoryUtils.newHistory(BrowseTop.RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(),
         RodaConstants.RODA_OBJECT_AIP, aipId);
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, BrowseAIP> {
   }
 }

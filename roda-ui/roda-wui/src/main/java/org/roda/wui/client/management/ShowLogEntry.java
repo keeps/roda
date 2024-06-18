@@ -58,7 +58,9 @@ public class ShowLogEntry extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         Services services = new Services("Retrieve audit log", "get");
-        services.rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0), LocaleInfo.getCurrentLocale().getLocaleName()), LogEntry.class)
+        services
+          .rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0), LocaleInfo.getCurrentLocale().getLocaleName()),
+            LogEntry.class)
           .whenComplete((logEntry, throwable) -> {
             if (throwable == null) {
               ShowLogEntry logEntryPanel = new ShowLogEntry(logEntry);
@@ -201,24 +203,26 @@ public class ShowLogEntry extends Composite {
     logStateLabel.setVisible(logEntry.getState() != null);
     logStateValue.setVisible(logEntry.getState() != null);
 
-    Label relatedAuditLogs = new Label();
-    relatedAuditLogs.addStyleName("h5");
-    relatedAuditLogs.setText(messages.relatedAuditLogs());
-    expandedAuditLogs.add(relatedAuditLogs);
+    expandedAuditLogsList.setVisible(false);
 
-    Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.LOG_REQUEST_HEADER_UUID, logEntry.getAuditLogRequestHeaders().getUuid()));
+    if (logEntry.getAuditLogRequestHeaders() != null) {
+      Label relatedAuditLogs = new Label();
+      relatedAuditLogs.addStyleName("h5");
+      relatedAuditLogs.setText(messages.relatedAuditLogs());
+      expandedAuditLogs.add(relatedAuditLogs);
 
-    ListBuilder<LogEntry> auditLogListBuilder = new ListBuilder<>(() -> new LogEntryList(false),
-      new AsyncTableCellOptions<>(LogEntry.class, "AuditLogs_triggeredLogs")
-        .withFilter(filter)
-        .withSummary(messages.listOfAIPs()).bindOpener());
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.LOG_REQUEST_HEADER_UUID,
+        logEntry.getAuditLogRequestHeaders().getUuid()));
 
-    SearchWrapper aipsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(auditLogListBuilder);
-    expandedAuditLogsList.setWidget(aipsSearchWrapper);
-    expandedAuditLogsList.setVisible(true);
+      ListBuilder<LogEntry> auditLogListBuilder = new ListBuilder<>(() -> new LogEntryList(false),
+        new AsyncTableCellOptions<>(LogEntry.class, "AuditLogs_triggeredLogs").withFilter(filter)
+          .withSummary(messages.listOfAIPs()).bindOpener());
+
+      SearchWrapper aipsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(auditLogListBuilder);
+      expandedAuditLogsList.setWidget(aipsSearchWrapper);
+      expandedAuditLogsList.setVisible(true);
+    }
   }
-
 
   @Override
   protected void onLoad() {

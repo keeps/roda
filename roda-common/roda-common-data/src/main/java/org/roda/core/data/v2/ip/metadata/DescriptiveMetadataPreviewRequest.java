@@ -1,5 +1,6 @@
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -9,6 +10,9 @@ import org.roda.core.data.v2.generics.MetadataValue;
  * @author Carlos Afonso <cafonso@keep.pt>
  */
 public class DescriptiveMetadataPreviewRequest implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = -5444437924544332926L;
 
   private String id;
   private Set<MetadataValue> value;

@@ -32,7 +32,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.representation.ChangeRepresentationStatesRequest;
-import org.roda.core.data.v2.representation.ChangeRepresentationTypeRequest;
+import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.core.data.v2.representation.RepresentationTypeOptions;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.storage.utils.RODAInstanceUtils;
@@ -273,7 +273,7 @@ public class RepresentationController implements RepresentationRestService {
   }
 
   @Override
-  public Job changeRepresentationType(@RequestBody ChangeRepresentationTypeRequest changeRepresentationTypeRequest) {
+  public Job changeRepresentationType(@RequestBody ChangeTypeRequest changeRepresentationTypeRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;

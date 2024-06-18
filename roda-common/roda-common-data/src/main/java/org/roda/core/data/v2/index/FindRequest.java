@@ -124,7 +124,7 @@ public class FindRequest extends CountRequest {
       this.onlyActive = onlyActive;
       // optional with defaults if not set
       this.sorter = Sorter.NONE;
-      this.sublist = new Sublist(0, 100);
+      this.sublist = new Sublist(0, 10);
       this.facets = Facets.NONE;
       this.exportFacets = false;
       this.fieldsToReturn = Collections.emptyList();

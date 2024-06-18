@@ -842,6 +842,12 @@ public class ModelService extends ModelObservable {
     return storage.listBinaryVersions(binaryPath);
   }
 
+  public BinaryVersion revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
+    Map<String, String> properties)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return revertDescriptiveMetadataVersion(aipId, null, descriptiveMetadataId, versionId, properties);
+  }
+
   public BinaryVersion revertDescriptiveMetadataVersion(String aipId, String representationId,
     String descriptiveMetadataId, String versionId, Map<String, String> properties)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
@@ -2172,8 +2178,8 @@ public class ModelService extends ModelObservable {
             LOGGER.info("The action log file ({}) was moved to Master successfully!", path);
             Files.delete(path);
           } else {
-            LOGGER.error(
-              "The action log file ({}) was not moved to Master due to http response error: {}", path, httpExitCode);
+            LOGGER.error("The action log file ({}) was not moved to Master due to http response error: {}", path,
+              httpExitCode);
           }
         }
       }

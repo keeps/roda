@@ -27,7 +27,6 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.InstanceState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.NavigationToolbar;
@@ -62,6 +61,38 @@ import config.i18n.client.ClientMessages;
  */
 public class PreservationEvents extends Composite {
 
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final List<String> aipFieldsToReturn = new ArrayList<>(
+    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));  public static final HistoryResolver PLANNING_RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      getInstance().planningResolve(historyTokens, callback);
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRole(this, callback);
+    }
+
+    @Override
+    public List<String> getHistoryPath() {
+      return ListUtils.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    @Override
+    public String getHistoryToken() {
+      return "events";
+    }
+  };
+  private static final List<String> representationFieldsToReturn = new ArrayList<>(
+    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID,
+      RodaConstants.REPRESENTATION_TYPE));
+  private static final List<String> fileFieldsToReturn = new ArrayList<>(
+    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_PARENT_UUID, RodaConstants.FILE_PATH,
+      RodaConstants.FILE_ANCESTORS_PATH, RodaConstants.FILE_ORIGINALNAME, RodaConstants.INDEX_ID,
+      RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY));
+  private static PreservationEvents instance = null;
   public static final HistoryResolver BROWSE_RESOLVER = new HistoryResolver() {
 
     @Override
@@ -84,67 +115,19 @@ public class PreservationEvents extends Composite {
       return "events";
     }
   };
-
-  public static final HistoryResolver PLANNING_RESOLVER = new HistoryResolver() {
-
-    @Override
-    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      getInstance().planningResolve(historyTokens, callback);
-    }
-
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRole(this, callback);
-    }
-
-    @Override
-    public List<String> getHistoryPath() {
-      return ListUtils.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
-    }
-
-    @Override
-    public String getHistoryToken() {
-      return "events";
-    }
-  };
-
-  private static PreservationEvents instance = null;
-
-  interface MyUiBinder extends UiBinder<Widget, PreservationEvents> {
-  }
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private static final List<String> aipFieldsToReturn = new ArrayList<>(
-    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
-
-  private static final List<String> representationFieldsToReturn = new ArrayList<>(
-    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID,
-      RodaConstants.REPRESENTATION_TYPE));
-
-  private static final List<String> fileFieldsToReturn = new ArrayList<>(
-    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_PARENT_UUID, RodaConstants.FILE_PATH,
-      RodaConstants.FILE_ANCESTORS_PATH, RodaConstants.FILE_ORIGINALNAME, RodaConstants.INDEX_ID,
-      RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY));
-
   @UiField(provided = true)
   PreservationEventsSearch eventsSearch;
-
   @UiField
   FlowPanel pageDescription;
-
   @UiField
   NavigationToolbar navigationToolbar;
-
   private String aipId;
   private String representationUUID;
   private String fileUUID;
-
   public PreservationEvents() {
     this(null);
   }
-
   public PreservationEvents(final String aipId) {
     this(aipId, null);
   }
@@ -206,32 +189,29 @@ public class PreservationEvents extends Composite {
           CompletableFuture<List<IndexedAIP>> futureAncestors = service.aipResource(s -> s.getAncestors(aipId));
 
           CompletableFuture<List<String>> futureRepFields = service
-            .aipResource(AIPRestService::getRepresentationInformationFields);
-
-          CompletableFuture<InstanceState> futureInstance = service
-            .aipResource(s -> s.getInstanceName(aipId, LocaleInfo.getCurrentLocale().getLocaleName()));
+            .aipResource(AIPRestService::retrieveAIPRuleProperties);
 
           CompletableFuture<DescriptiveMetadataInfos> futureDescriptiveMetadataInfos = service
             .aipResource(s -> s.getDescriptiveMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName()));
 
-          CompletableFuture<LongResponse> futureChildAipCount = service
-            .rodaEntityRestService(
-              s -> s.count(new FindRequest.FindRequestBuilder(
-                new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId)), false).build()),
-              IndexedAIP.class);
+          CompletableFuture<LongResponse> futureChildAipCount = service.rodaEntityRestService(
+            s -> s.count(new FindRequest.FindRequestBuilder(
+              new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId)), false).build()),
+            IndexedAIP.class);
 
           CompletableFuture<LongResponse> futureRepCount = service.rodaEntityRestService(
-            s -> s.count(
-              new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId)), false)),
+            s -> s.count(new CountRequest(
+              new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId)), false)),
             IndexedRepresentation.class);
 
           CompletableFuture<LongResponse> futureDipCount = service.rodaEntityRestService(
-            s -> s.count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, aipId)), false)),
+            s -> s
+              .count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, aipId)), false)),
             IndexedDIP.class);
 
           CompletableFuture<LongResponse> futureIncidenceCount = service.rodaEntityRestService(
-            s -> s.count(
-              new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId)), false)),
+            s -> s.count(new CountRequest(
+              new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId)), false)),
             RiskIncidence.class);
 
           CompletableFuture<LongResponse> futureEventCount = service.rodaEntityRestService(
@@ -240,18 +220,18 @@ public class PreservationEvents extends Composite {
             IndexedPreservationEvent.class);
 
           CompletableFuture<LongResponse> futureLogCount = service.rodaEntityRestService(
-            s -> s.count(
-              new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aipId)), false)),
+            s -> s.count(new CountRequest(
+              new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aipId)), false)),
             LogEntry.class);
 
-          CompletableFuture.allOf(futureChildAipCount, futureRepCount, futureDipCount, futureAncestors, futureAncestors,
-            futureRepFields, futureInstance, futureDescriptiveMetadataInfos, futureIncidenceCount, futureEventCount,
-            futureLogCount).thenApply(v -> {
+          CompletableFuture
+            .allOf(futureChildAipCount, futureRepCount, futureDipCount, futureAncestors, futureAncestors,
+              futureRepFields, futureDescriptiveMetadataInfos, futureIncidenceCount, futureEventCount, futureLogCount)
+            .thenApply(v -> {
               BrowseAIPResponse rp = new BrowseAIPResponse();
               rp.setIndexedAIP(aip);
               rp.setAncestors(futureAncestors.join());
               rp.setRepresentationInformationFields(futureRepFields.join());
-              rp.setInstance(futureInstance.join());
               rp.setDescriptiveMetadataInfos(futureDescriptiveMetadataInfos.join());
               rp.setChildAipsCount(futureChildAipCount.join());
               rp.setRepresentationCount(futureRepCount.join());
@@ -275,22 +255,26 @@ public class PreservationEvents extends Composite {
 
   private void setupRepresentationToolbar() {
     Services services = new Services("Build navigation toolbar", "get");
-    services.representationResource(s -> s.findByUuid(representationUUID, LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((indexedRepresentation, throwable) -> {
-      navigationToolbar.withObject(indexedRepresentation);
+    services
+      .representationResource(s -> s.findByUuid(representationUUID, LocaleInfo.getCurrentLocale().getLocaleName()))
+      .whenComplete((indexedRepresentation, throwable) -> {
+        navigationToolbar.withObject(indexedRepresentation);
 
-      CompletableFuture<List<IndexedAIP>> getAncestorsFuture = services.aipResource(s -> s.getAncestors(indexedRepresentation.getAipId()));
-      CompletableFuture<IndexedAIP> indexedAIPCompletableFuture = services.aipResource(s -> s.findByUuid(indexedRepresentation.getAipId(), LocaleInfo.getCurrentLocale().getLocaleName()));
+        CompletableFuture<List<IndexedAIP>> getAncestorsFuture = services
+          .aipResource(s -> s.getAncestors(indexedRepresentation.getAipId()));
+        CompletableFuture<IndexedAIP> indexedAIPCompletableFuture = services.aipResource(
+          s -> s.findByUuid(indexedRepresentation.getAipId(), LocaleInfo.getCurrentLocale().getLocaleName()));
 
-      CompletableFuture<Void> allFutures = CompletableFuture.allOf(getAncestorsFuture, indexedAIPCompletableFuture);
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(getAncestorsFuture, indexedAIPCompletableFuture);
 
-      allFutures.thenRun(() -> {
-        // All futures completed
-        navigationToolbar.updateBreadcrumb(getAncestorsFuture.join(), indexedAIPCompletableFuture.join(),
-          indexedRepresentation);
-        navigationToolbar.build();
-        navigationToolbar.setVisible(true);
+        allFutures.thenRun(() -> {
+          // All futures completed
+          navigationToolbar.updateBreadcrumb(getAncestorsFuture.join(), indexedAIPCompletableFuture.join(),
+            indexedRepresentation);
+          navigationToolbar.build();
+          navigationToolbar.setVisible(true);
+        });
       });
-    });
   }
 
   private void setupFileToolbar() {
@@ -367,4 +351,9 @@ public class PreservationEvents extends Composite {
       callback.onSuccess(null);
     }
   }
+
+  interface MyUiBinder extends UiBinder<Widget, PreservationEvents> {
+  }
+
+
 }

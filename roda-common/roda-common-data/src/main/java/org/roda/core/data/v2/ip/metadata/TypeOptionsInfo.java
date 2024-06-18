@@ -1,17 +1,18 @@
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Carlos Afonso <cafonso@keep.pt>
  */
-@JsonInclude(JsonInclude.Include.ALWAYS)
-public class TypeOptionsInfo {
+public class TypeOptionsInfo implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = 8624436299370640300L;
 
   private boolean isControlled;
-
   private List<String> types;
 
   public TypeOptionsInfo() {

@@ -1,8 +1,15 @@
 package org.roda.wui.api.v2.utils;
 
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.DownloadUtils;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.storage.BinaryConsumesOutputStream;
+import org.roda.core.storage.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRange;
@@ -84,6 +91,24 @@ public class ApiUtils {
     }
 
     return new ResponseEntity<>(responseStream, responseHeaders, HttpStatus.PARTIAL_CONTENT);
+  }
+
+  public static StreamResponse download(Resource resource)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    return download(resource, null);
+  }
+
+  public static StreamResponse download(Resource resource, String fileName)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource, fileName);
+    return new StreamResponse(download);
+  }
+
+  public static StreamResponse download(Resource resource, String fileName, boolean addTopDirectory)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource, fileName,
+        addTopDirectory);
+    return new StreamResponse(download);
   }
 
   private ApiUtils() {

@@ -40,29 +40,21 @@ public class RestUtils {
   }
 
   public static SafeUri createAIPDownloadUri(String aipId) {
+    // api/v2/aips/{id}/download
 
-    // api/v1/aips/{aip_id}
-    StringBuilder b = new StringBuilder();
-    // base uri
-    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER)
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId));
+    String b = RodaConstants.API_REST_V2_AIPS + RodaConstants.API_SEP + URL.encodeQueryString(aipId)
+      + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER;
 
-    return UriUtils.fromSafeConstant(b.toString());
+    return UriUtils.fromSafeConstant(b);
   }
 
   public static SafeUri createAIPPartDownloadUri(String aipId, String part) {
+    // api/v2/aips/{aip_id}/download/{part}
 
-    // api/v1/aips/binary/{aip_id}/{part}
-    StringBuilder b = new StringBuilder();
-    // base uri
-    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER)
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
-      .append(URL.encodeQueryString(part));
+    String b = RodaConstants.API_REST_V2_AIPS + RodaConstants.API_SEP + URL.encodeQueryString(aipId)
+      + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER + RodaConstants.API_SEP + URL.encodeQueryString(part);
 
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
-
-    return UriUtils.fromSafeConstant(b.toString());
+    return UriUtils.fromSafeConstant(b);
   }
 
   public static SafeUri createRepresentationDownloadUri(String aipId, String representationId) {
@@ -166,19 +158,19 @@ public class RestUtils {
   }
 
   public static SafeUri createDescriptiveMetadataDownloadUri(String aipId, String descId, String versionId) {
+    // api/v2/aips/{id}/metadata/descriptive/{descriptive-metadata-id}/download?version-id={versionId}
 
-    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=xml&version_id={versionId}
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_DESCRIPTIVE_METADATA).append(RodaConstants.API_SEP).append(descId);
-    // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_SEP).append("metadata").append(RodaConstants.API_SEP).append("descriptive")
+      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(descId)).append(RodaConstants.API_SEP)
+      .append("download");
 
+    // version
     if (versionId != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION_ID)
-        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
+      b.append(RodaConstants.API_QUERY_START).append("version-id").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+        .append(URL.encodeQueryString(versionId));
     }
 
     return UriUtils.fromSafeConstant(b.toString());
@@ -189,28 +181,21 @@ public class RestUtils {
   }
 
   public static SafeUri createDescriptiveMetadataHTMLUri(String aipId, String descId, String versionId) {
-    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=html&version_id={versionId}
+    // api/v2/aips/{id}/metadata/descriptive/{descriptive-metadata-id}/html?lang=en&version-id={versionId}
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_DESCRIPTIVE_METADATA);
-
-    if (descId != null) {
-      b.append(RodaConstants.API_SEP).append(descId);
-    }
-
-    // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML);
-
-    if (versionId != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION_ID)
-        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
-    }
+    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_SEP).append("metadata").append(RodaConstants.API_SEP).append("descriptive")
+      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(descId)).append(RodaConstants.API_SEP).append("html");
 
     // locale
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+
+    if (versionId != null) {
+      b.append(RodaConstants.API_QUERY_SEP).append("version-id").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+        .append(URL.encodeQueryString(versionId));
+    }
 
     return UriUtils.fromSafeConstant(b.toString());
   }
@@ -244,16 +229,11 @@ public class RestUtils {
   }
 
   public static SafeUri createPreservationMetadataDownloadUri(String aipId) {
-    // api/v2/aips/binary/{aip_id}/preservation_metadata
+    // api/v2/aips/{id}/download/preservation
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER)
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_PRESERVATION_METADATA);
-
-    // locale
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
+    .append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER).append(RodaConstants.API_SEP).append("preservation");
 
     return UriUtils.fromSafeConstant(b.toString());
   }

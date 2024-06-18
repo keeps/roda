@@ -1,5 +1,6 @@
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -10,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class DescriptiveMetadataPreview implements Serializable {
 
+  @Serial
+  private static final long serialVersionUID = 1868606330058572708L;
   private String preview;
 
   public DescriptiveMetadataPreview(String preview) {

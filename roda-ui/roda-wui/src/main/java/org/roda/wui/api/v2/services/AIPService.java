@@ -1,10 +1,10 @@
 package org.roda.wui.api.v2.services;
 
 import static org.roda.wui.api.controllers.BrowserHelper.listDescriptiveMetadataVersions;
-import static org.roda.wui.api.v2.utils.CommonServicesUtils.createAndExecuteInternalJob;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,27 +37,28 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.DefaultConsumesOutputStream;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.generics.MetadataValue;
-import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.generics.UpdatePermissionsRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadataList;
 import org.roda.core.data.v2.ip.metadata.CreateDescriptiveMetadataRequest;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataRequestForm;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataVersionsResponse;
-import org.roda.core.data.v2.ip.metadata.InstanceState;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataVersions;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.ResourceVersion;
-import org.roda.core.data.v2.ip.metadata.SupportedMetadata;
 import org.roda.core.data.v2.ip.metadata.SupportedMetadataValue;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
@@ -71,27 +71,23 @@ import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.maintenance.ChangeTypePlugin;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.base.maintenance.MovePlugin;
+import org.roda.core.plugins.base.maintenance.UpdatePermissionsPlugin;
 import org.roda.core.plugins.base.preservation.AppraisalPlugin;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.utils.RODAInstanceUtils;
-import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.api.v2.exceptions.RESTException;
-import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.common.model.RequestContext;
+import org.roda.core.storage.StringContentPayload;
+import org.roda.wui.api.v2.utils.ApiUtils;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
+import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.diff.DefaultNodeMatcher;
-import org.xmlunit.diff.Diff;
-import org.xmlunit.diff.ElementSelectors;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -99,25 +95,63 @@ import org.xmlunit.diff.ElementSelectors;
 @Service
 public class AIPService {
   private static final Logger LOGGER = LoggerFactory.getLogger(AIPService.class);
+  private static final String HTML_EXT = ".html";
+
+  public StreamResponse downloadAIPDescriptiveMetadata(String aipId, String metadataId, String versionId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    ModelService modelService = RodaCoreFactory.getModelService();
+    Binary descriptiveMetadataBinary;
+    if (versionId == null) {
+      descriptiveMetadataBinary = modelService.retrieveDescriptiveMetadataBinary(aipId, metadataId);
+
+    } else {
+      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, metadataId);
+      BinaryVersion binaryVersion = modelService.getStorage().getBinaryVersion(storagePath, versionId);
+      descriptiveMetadataBinary = binaryVersion.getBinary();
+    }
+
+    return new StreamResponse(
+      new BinaryConsumesOutputStream(descriptiveMetadataBinary, RodaConstants.MEDIA_TYPE_APPLICATION_XML));
+  }
+
+  public StreamResponse retrieveAIPDescriptiveMetadata(String aipId, String metadataId, String versionId,
+    String localeString)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    ModelService model = RodaCoreFactory.getModelService();
+    Binary descriptiveMetadataBinary;
+    if (versionId != null) {
+      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, metadataId);
+      BinaryVersion binaryVersion = model.getStorage().getBinaryVersion(storagePath, versionId);
+      descriptiveMetadataBinary = binaryVersion.getBinary();
+    } else {
+      descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
+    }
+
+    String filename = descriptiveMetadataBinary.getStoragePath().getName() + HTML_EXT;
+    DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, metadataId);
+    String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
+      descriptiveMetadata.getType(), descriptiveMetadata.getVersion(), ServerTools.parseLocale(localeString));
+
+    ConsumesOutputStream stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_APPLICATION_XML,
+      out -> {
+        PrintStream printStream = new PrintStream(out);
+        printStream.print(htmlDescriptive);
+        printStream.close();
+      });
+
+    return new StreamResponse(stream);
+  }
 
   public List<IndexedAIP> getAncestors(IndexedAIP indexedAIP, User user) throws GenericException {
     return RodaCoreFactory.getIndexService().retrieveAncestors(indexedAIP, user, new ArrayList<>());
-  }
-
-  private static final String HTML_EXT = ".html";
-  private IndexService indexService;
-
-  @Autowired
-  public void setIndexService(IndexService service) {
-    this.indexService = service;
   }
 
   public Job deleteAIP(User user, SelectedItems<IndexedAIP> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    return createAndExecuteInternalJob("Delete AIP", selected, DeleteRODAObjectPlugin.class, user, pluginParameters,
-      "Could not execute AIP delete action");
+    return CommonServicesUtils.createAndExecuteInternalJob("Delete AIP", selected, DeleteRODAObjectPlugin.class, user,
+      pluginParameters, "Could not execute AIP delete action");
   }
 
   public List<IndexedAIP> retrieveAncestors(IndexedAIP aip, User user, List<String> fieldsToReturn)
@@ -128,35 +162,19 @@ public class AIPService {
   public List<String> getRepresentationInformation(User user) {
     if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION)) {
       return RodaCoreFactory.getRodaConfigurationAsList("ui.ri.rule.AIP").stream()
-        .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
-        .collect(Collectors.toList());
+        .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS)).toList();
     } else {
       return Collections.emptyList();
     }
   }
 
-  public InstanceState getInstanceInformation(IndexedAIP aip)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException {
-    InstanceState instanceState = new InstanceState();
-
-    if (RODAInstanceUtils.isConfiguredAsDistributedMode()
-      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
-      instanceState.setLocalToInstance(aip.getInstanceId().equals(RODAInstanceUtils.getLocalInstanceIdentifier()));
-      retrieveDistributedInstanceName(aip.getInstanceId(), instanceState.isLocalToInstance())
-        .ifPresent(instanceState::setInstanceName);
-    }
-
-    return instanceState;
-  }
-
   public DescriptiveMetadataInfos retrieveDescriptiveMetadataList(User user, String aipId, final Locale locale)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_LIST_AIP_DESCRIPTIVE_METADATA)) {
-
       return retrieveDescriptiveMetadataInfos(aipId, null, locale);
 
     }
-    return null;
+    return new DescriptiveMetadataInfos();
   }
 
   private DescriptiveMetadataInfos retrieveDescriptiveMetadataInfos(String aipId, String representationId,
@@ -263,14 +281,14 @@ public class AIPService {
   }
 
   public boolean hasDocumentation(String aipId)
-    throws RequestNotValidException, AuthorizationDeniedException, GenericException {
+    throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
     StoragePath documentationPath = DefaultStoragePath.parse(aipPath, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
     try {
       Long counter = RodaCoreFactory.getStorageService().countResourcesUnderContainer(documentationPath, false);
       return counter > 0;
     } catch (NotFoundException e) {
-      throw new RESTException(e);
+      return false;
     }
   }
 
@@ -282,7 +300,7 @@ public class AIPService {
       Long counter = RodaCoreFactory.getStorageService().countResourcesUnderContainer(documentationPath, false);
       return counter > 0;
     } catch (NotFoundException e) {
-      throw new RESTException(e);
+      return false;
     }
   }
 
@@ -291,8 +309,8 @@ public class AIPService {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NEW_TYPE, newType);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    return createAndExecuteInternalJob("Change AIP type", selected, ChangeTypePlugin.class, user, pluginParameters,
-      "Could not change AIP type");
+    return CommonServicesUtils.createAndExecuteInternalJob("Change AIP type", selected, ChangeTypePlugin.class, user,
+      pluginParameters, "Could not change AIP type");
   }
 
   public Job appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
@@ -300,13 +318,8 @@ public class AIPService {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ACCEPT, Boolean.toString(accept));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REJECT_REASON, rejectReason);
-    return createAndExecuteInternalJob("AIP appraisal", selected, AppraisalPlugin.class, user, pluginParameters,
-      "Could not execute appraisal action on AIP");
-  }
-
-  public <T extends IsIndexed> T retrieve(RequestContext rc, Class<T> returnClass, String id,
-    List<String> fieldsToReturn) {
-    return indexService.retrieve(rc, returnClass, id, fieldsToReturn);
+    return CommonServicesUtils.createAndExecuteInternalJob("AIP appraisal", selected, AppraisalPlugin.class, user,
+      pluginParameters, "Could not execute appraisal action on AIP");
   }
 
   public Job moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId, String details)
@@ -314,8 +327,8 @@ public class AIPService {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ID, parentId);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    return createAndExecuteInternalJob("Move AIP in hierarchy", selected, MovePlugin.class, user, pluginParameters,
-      "Could not execute move job");
+    return CommonServicesUtils.createAndExecuteInternalJob("Move AIP in hierarchy", selected, MovePlugin.class, user,
+      pluginParameters, "Could not execute move job");
   }
 
   public StreamResponse retrieveAIP(String aipId)
@@ -325,33 +338,53 @@ public class AIPService {
     return ApiUtils.download(directory, aipId);
   }
 
+  public DescriptiveMetadata revertDescriptiveMetadataVersion(User user, String aipId, String descriptiveMetadataId,
+    String versionId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+
+    Map<String, String> properties = new HashMap<>();
+    properties.put(RodaConstants.VERSION_USER, user.getId());
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.REVERTED.toString());
+
+    RodaCoreFactory.getModelService().revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId,
+      properties);
+
+    return RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
+  }
+
   public StreamResponse retrieveAIPPart(String aipId, String part)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
 
-    if (RodaConstants.STORAGE_DIRECTORY_SUBMISSION.equals(part)) {
-      Directory directory = RodaCoreFactory.getModelService().getSubmissionDirectory(aipId);
-      return ApiUtils.download(directory, part);
-    } else if (RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION.equals(part)) {
-      Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId);
-      return ApiUtils.download(directory, part);
-    } else if (RodaConstants.STORAGE_DIRECTORY_SCHEMAS.equals(part)) {
-      Directory directory = RodaCoreFactory.getModelService().getSchemasDirectory(aipId);
-      return ApiUtils.download(directory, part);
-    } else {
-      throw new GenericException("Unsupported part: " + part);
+    switch (part) {
+      case RodaConstants.STORAGE_DIRECTORY_SUBMISSION -> {
+        Directory directory = RodaCoreFactory.getModelService().getSubmissionDirectory(aipId);
+        return ApiUtils.download(directory, part);
+      }
+      case RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION -> {
+        Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId);
+        return ApiUtils.download(directory, part);
+      }
+      case RodaConstants.STORAGE_DIRECTORY_SCHEMAS -> {
+        Directory directory = RodaCoreFactory.getModelService().getSchemasDirectory(aipId);
+        return ApiUtils.download(directory, part);
+      }
+      case null, default -> throw new GenericException("Unsupported part: " + part);
     }
   }
 
-  public String retrieveDescriptiveMetadataPreview(String id, Set<MetadataValue> values) throws GenericException {
+  public String retrieveDescriptiveMetadataPreview(String aipId, String representationId, String descriptiveMetadataId,
+    Set<MetadataValue> values)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     String rawTemplate = "";
 
-    String result;
+    String result = "";
     try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-      RodaConstants.METADATA_TEMPLATE_FOLDER + "/" + id + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
+      RodaConstants.METADATA_TEMPLATE_FOLDER + "/" + descriptiveMetadataId
+        + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
 
       if (templateStream != null) {
         Map<String, String> data = new HashMap<>();
-        rawTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+        rawTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         // assume that values set is not empty
         if (values != null) {
           values.forEach(metadataValue -> {
@@ -367,7 +400,11 @@ public class AIPService {
 
         result = HandlebarsUtility.executeHandlebars(rawTemplate, data);
       } else {
-        result = rawTemplate;
+        descriptiveMetadataId += ".xml";
+        Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aipId, representationId,
+          descriptiveMetadataId);
+        InputStream inputStream = binary.getContent().createInputStream();
+        result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -391,29 +428,27 @@ public class AIPService {
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, createdBy);
   }
 
-  public List<SupportedMetadata> retrieveSupportedMetadataTypes(Locale locale) {
+  public ConfiguredDescriptiveMetadataList retrieveSupportedMetadataTypes(Locale locale) {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     List<String> types = RodaUtils
       .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.UI_BROWSER_METADATA_DESCRIPTIVE_TYPES));
 
-    List<SupportedMetadata> supportedMetadata = new ArrayList<>();
+    ConfiguredDescriptiveMetadataList supportedMetadata = new ConfiguredDescriptiveMetadataList();
 
-    if (types != null) {
-      for (String id : types) {
-        String type = id;
-        String version = null;
-        if (id.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
-          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1);
-          type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
-        }
-        String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
-        if (version != null) {
-          key += RodaConstants.METADATA_VERSION_SEPARATOR + version.toLowerCase();
-        }
-        String label = messages.getTranslation(key, type);
-
-        supportedMetadata.add(new SupportedMetadata(label, id));
+    for (String id : types) {
+      String type = id;
+      String version = null;
+      if (id.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
+        version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1);
+        type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
       }
+      String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
+      if (version != null) {
+        key += RodaConstants.METADATA_VERSION_SEPARATOR + version.toLowerCase();
+      }
+      String label = messages.getTranslation(key, type);
+
+      supportedMetadata.addObject(new ConfiguredDescriptiveMetadata(label, id));
     }
 
     return supportedMetadata;
@@ -429,11 +464,11 @@ public class AIPService {
       RodaConstants.METADATA_TEMPLATE_FOLDER + "/" + metadataType + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
 
       if (templateStream != null) {
-        template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+        template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         values = ServerTools.transform(template);
         for (MetadataValue mv : values) {
           String generator = mv.get("auto-generate");
-          if (generator != null && generator.length() > 0) {
+          if (generator != null && !generator.isEmpty()) {
             String value;
             if (representation != null) {
               value = ServerTools.autoGenerateRepresentationValue(representation, generator);
@@ -462,15 +497,14 @@ public class AIPService {
           String i18nPrefix = mv.get("optionsLabelI18nKeyPrefix");
           if (i18nPrefix != null) {
             Map<String, String> terms = messages.getTranslations(i18nPrefix, String.class, false);
-            if (terms.size() > 0) {
+            if (!terms.isEmpty()) {
               try {
                 String options = mv.get("options");
                 List<String> optionsList = JsonUtils.getListFromJson(options, String.class);
 
                 if (optionsList != null) {
                   Map<String, Map<String, String>> i18nMap = new HashMap<>();
-                  for (int i = 0; i < optionsList.size(); i++) {
-                    String value = optionsList.get(i);
+                  for (String value : optionsList) {
                     String translation = terms.get(i18nPrefix + "." + value);
                     if (translation == null) {
                       translation = value;
@@ -542,7 +576,7 @@ public class AIPService {
         }
       }
 
-      if (agents.size() > 0) {
+      if (!agents.isEmpty()) {
         for (Map.Entry<String, ZipEntryInfo> entry : agents.entrySet()) {
           zipEntries.add(entry.getValue());
         }
@@ -552,94 +586,26 @@ public class AIPService {
     } catch (IOException e) {
       throw new GenericException(e);
     }
-
   }
 
-  public CreateDescriptiveMetadataRequest retrieveSpecificDescriptiveMetadata(User user, IndexedAIP aip,
-    IndexedRepresentation representation, String descriptiveMetadataId, Locale locale)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    String representationId = representation != null ? representation.getId() : null;
 
-    DescriptiveMetadata metadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aip.getId(),
-      representationId, descriptiveMetadataId);
-    return retrieveSpecificDescriptiveMetadata(user, aip, representation, descriptiveMetadataId, metadata.getType(),
-      metadata.getVersion(), locale);
+  public Job updateAIPPermissions(User user, UpdatePermissionsRequest request)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    final String eventDescription = "The process of updating an object of the repository.";
+
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON,
+      JsonUtils.getJsonFromObject(request.getPermissions()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, Boolean.toString(request.isRecursive()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, request.getDetails());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, eventDescription);
+
+    return CommonServicesUtils.createAndExecuteInternalJob("Update AIP permissions recursively",
+      CommonServicesUtils.convertSelectedItems(request.getItemsToUpdate(), IndexedAIP.class),
+      UpdatePermissionsPlugin.class, user, pluginParameters, "Could not execute AIP permissions recursively action");
   }
 
-  public CreateDescriptiveMetadataRequest retrieveSpecificDescriptiveMetadata(User user, IndexedAIP aip,
-    IndexedRepresentation representation, String descriptiveMetadataId, String type, String version, Locale locale)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    CreateDescriptiveMetadataRequest ret;
-    InputStream inputStream = null;
-    try {
-      String representationId = representation != null ? representation.getId() : null;
-      Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), representationId,
-        descriptiveMetadataId);
-      inputStream = binary.getContent().createInputStream();
-      String xml = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 
-      // Get the supported metadata type with the same type and version
-      // We need this to try to get the values for the form
-      SupportedMetadataTypeBundle metadataTypeBundle = null;
-      SupportedMetadataValue smv = retrieveSupportedMetadata(user, aip, representation, type, locale);
-
-      boolean similar = false;
-      // Get the values using XPath
-      Set<MetadataValue> values = null;
-      String template = null;
-
-      if (smv != null) {
-        template = smv.getTemplate();
-        if (smv.getValue() != null) {
-          values = smv.getValue();
-          for (MetadataValue mv : values) {
-            // clear the auto-generated values
-            // mv.set("value", null);
-            String xpathRaw = mv.get("xpath");
-            if (xpathRaw != null && xpathRaw.length() > 0) {
-              String[] xpaths = xpathRaw.split("##%##");
-              String value;
-              List<String> allValues = new ArrayList<>();
-              for (String xpath : xpaths) {
-                allValues.addAll(ServerTools.applyXpath(xml, xpath));
-              }
-              // if any of the values is different, concatenate all values in a
-              // string, otherwise return the value
-              boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
-              if (allEqual && !allValues.isEmpty()) {
-                value = allValues.get(0);
-              } else {
-                value = String.join(" / ", allValues);
-              }
-              mv.set("value", value.trim());
-            }
-          }
-
-          // Identity check. Test if the original XML is equal to the result of
-          // applying the extracted values to the template
-          String templateWithValues = retrieveDescriptiveMetadataPreview(descriptiveMetadataId, values);
-
-          if (StringUtils.isNotBlank(templateWithValues)) {
-            Diff diff = DiffBuilder.compare(xml).withTest(templateWithValues).ignoreComments().ignoreWhitespace()
-              .checkForIdentical().checkForSimilar()
-              .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
-              .withNodeFilter(node -> !node.getNodeName().equals("schemaLocation")).build();
-
-            similar = !diff.hasDifferences();
-          }
-        }
-      }
-
-      ret = new DescriptiveMetadataRequestForm(descriptiveMetadataId, "", type, version, xml, similar,
-        aip.getPermissions(), values);
-    } catch (IOException e) {
-      throw new GenericException("Error getting descriptive metadata edit: " + e.getMessage());
-    } finally {
-      IOUtils.closeQuietly(inputStream);
-    }
-
-    return ret;
-  }
 
   public void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId,
     String deletedBy)
@@ -648,11 +614,23 @@ public class AIPService {
       deletedBy);
   }
 
-  public DescriptiveMetadata updateDescriptiveMetadataFile(String aipId, String representationId,
-    String descriptiveMetadataId, String descriptiveMetadataType, String descriptiveMetadataVersion,
-    ContentPayload descriptiveMetadataPayload, Map<String, String> properties, String updatedBy)
-    throws GenericException, AuthorizationDeniedException, ValidationException, RequestNotValidException,
-    NotFoundException {
+  public DescriptiveMetadata updateDescriptiveMetadataFile(User user, String aipId,
+    CreateDescriptiveMetadataRequest request) throws GenericException, AuthorizationDeniedException,
+    ValidationException, RequestNotValidException, NotFoundException {
+    return updateDescriptiveMetadataFile(user, aipId, null, request);
+  }
+
+  public DescriptiveMetadata updateDescriptiveMetadataFile(User user, String aipId, String representationId,
+    CreateDescriptiveMetadataRequest request) throws GenericException, AuthorizationDeniedException,
+    ValidationException, RequestNotValidException, NotFoundException {
+    Map<String, String> properties = new HashMap<>();
+    properties.put(RodaConstants.VERSION_USER, user.getId());
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
+
+    String filename = request.getFilename();
+    String descriptiveMetadataType = request.getType();
+    String descriptiveMetadataVersion = request.getVersion();
+    StringContentPayload descriptiveMetadataPayload = new StringContentPayload(request.getXml());
 
     ValidationReport report = ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload,
       descriptiveMetadataType, descriptiveMetadataVersion, false);
@@ -661,9 +639,8 @@ public class AIPService {
       throw new ValidationException(report);
     }
 
-    return RodaCoreFactory.getModelService().updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, properties, updatedBy);
-
+    return RodaCoreFactory.getModelService().updateDescriptiveMetadata(aipId, representationId, filename,
+      descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, properties, user.getId());
   }
 
   public Optional<String> retrieveDistributedInstanceName(String instanceId, boolean isLocalInstance) {
@@ -674,7 +651,7 @@ public class AIPService {
       if (RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
         if (isLocalInstance) {
           return Optional.of(RodaCoreFactory.getProperty(RodaConstants.CENTRAL_INSTANCE_NAME_PROPERTY,
-              RodaConstants.DEFAULT_CENTRAL_INSTANCE_NAME));
+            RodaConstants.DEFAULT_CENTRAL_INSTANCE_NAME));
         } else {
           DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceId);
           return Optional.of(distributedInstance.getName());
@@ -697,37 +674,44 @@ public class AIPService {
     }
   }
 
-  public DescriptiveMetadataVersionsResponse retrieveDescriptiveMetadataVersionsResponse(IndexedAIP aip,
-    String representationId, String metadataId, String localeString)
+  public DescriptiveMetadataVersions retrieveDescriptiveMetadataVersions(IndexedAIP aip, String metadataId,
+    String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    return retrieveDescriptiveMetadataVersions(aip, null, metadataId, localeString);
+  }
 
+  public DescriptiveMetadataVersions retrieveDescriptiveMetadataVersions(IndexedAIP aip, String representationId,
+    String metadataId, String localeString)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    DescriptiveMetadataVersions versions = new DescriptiveMetadataVersions();
+    List<ResourceVersion> versionResponses = new ArrayList<>();
     Locale locale = ServerTools.parseLocale(localeString);
-
-    DescriptiveMetadataVersionsResponse response = new DescriptiveMetadataVersionsResponse();
 
     DescriptiveMetadata descriptiveMetadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aip.getId(),
       representationId, metadataId);
-
     DescriptiveMetadataInfo descriptiveMetadataInfo = retrieveDescriptiveMetadataInfo(aip.getId(), representationId,
       descriptiveMetadata, locale);
 
-    response.setDescriptiveMetadata(descriptiveMetadataInfo);
-
-    List<ResourceVersion> versionResponses = new ArrayList<>();
-
-    try (CloseableIterable<BinaryVersion> it = listDescriptiveMetadataVersions(aip.getId(), representationId,
-      metadataId)) {
-      for (BinaryVersion v : it) {
-        versionResponses.add(new ResourceVersion(v.getId(), v.getCreatedDate(), v.getProperties()));
+    try (CloseableIterable<BinaryVersion> binaryVersions = listDescriptiveMetadataVersions(aip.getId(),
+      representationId, metadataId)) {
+      for (BinaryVersion binaryVersion : binaryVersions) {
+        versionResponses.add(
+          new ResourceVersion(binaryVersion.getId(), binaryVersion.getCreatedDate(), binaryVersion.getProperties()));
       }
     } catch (IOException e) {
       throw new GenericException(e);
     }
 
-    response.setVersions(versionResponses);
+    versions.setDescriptiveMetadata(descriptiveMetadataInfo);
+    versions.setVersions(versionResponses);
+    versions.setPermissions(aip.getPermissions());
 
-    response.setPermissions(aip.getPermissions());
-    return response;
+    return versions;
+  }
+
+  public void deleteDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    deleteDescriptiveMetadataVersion(aipId, null, descriptiveMetadataId, versionId);
   }
 
   public void deleteDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
@@ -737,5 +721,4 @@ public class AIPService {
       descriptiveMetadataId);
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
   }
-
 }
