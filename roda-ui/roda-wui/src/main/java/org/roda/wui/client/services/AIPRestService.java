@@ -6,7 +6,15 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.metadata.*;
+import org.roda.core.data.v2.ip.metadata.CreateDescriptiveMetadataRequest;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreview;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreviewRequest;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataVersionsResponse;
+import org.roda.core.data.v2.ip.metadata.InstanceState;
+import org.roda.core.data.v2.ip.metadata.SupportedMetadata;
+import org.roda.core.data.v2.ip.metadata.SupportedMetadataValue;
+import org.roda.core.data.v2.ip.metadata.TypeOptionsInfo;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.model.GenericOkResponse;
@@ -195,4 +203,30 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String id,
     @Parameter(name = "body", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) CreateDescriptiveMetadataRequest content);
 
+  @RequestMapping(path = "/{aipId}/metadata/{metadataId}/versions", method = RequestMethod.GET)
+  @Operation(summary = "Get descriptive metadata versions", description = "Get descriptive metadata versions", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), responses = {
+    @ApiResponse(responseCode = "200", description = "Returns an object with all the descriptive metadata versions", content = @Content(schema = @Schema(implementation = DescriptiveMetadataVersionsResponse.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  DescriptiveMetadataVersionsResponse retrieveDescriptiveMetadataVersionsResponse(
+    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "aipId") String aipId,
+    @Parameter(description = "The metadata identifier", required = true) @PathVariable(name = "metadataId") String metadataId,
+    @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
+
+  @RequestMapping(path = "/{aipId}/metadata/{descriptiveMetadataId}/{version}/delete", method = RequestMethod.DELETE)
+  @Operation(summary = "Delete version", description = "Delete descriptive metadata version related to aip", responses = {
+    @ApiResponse(responseCode = "204", description = "No Content"),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Void deleteDescriptiveMetadataVersion(
+    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "aipId") String aipId,
+    @Parameter(description = "The metadata identifier", required = true) @PathVariable(name = "descriptiveMetadataId") String descriptiveMetadataId,
+    @Parameter(description = "The metadata identifier", required = true) @PathVariable(name = "version") String versionId);
+
+  @RequestMapping(path = "/{aipId}/metadata/{descriptiveMetadataId}/{version}/revert", method = RequestMethod.PUT)
+  @Operation(summary = "Changes AIP type", description = "Changes the AIP type", responses = {
+    @ApiResponse(responseCode = "204", description = "No Content"),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Void revertDescriptiveMetadataVersion(
+    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "aipId") String aipId,
+    @Parameter(description = "The metadata identifier", required = true) @PathVariable(name = "descriptiveMetadataId") String descriptiveMetadataId,
+    @Parameter(description = "The metadata identifier", required = true) @PathVariable(name = "version") String versionId);
 }

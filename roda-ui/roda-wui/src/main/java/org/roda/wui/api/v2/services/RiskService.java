@@ -17,12 +17,12 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.ResourceVersion;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskMitigationProperties;
 import org.roda.core.data.v2.risks.RiskMitigationTerms;
-import org.roda.core.data.v2.risks.RiskVersion;
 import org.roda.core.data.v2.risks.RiskVersions;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.ModelUtils;
@@ -70,7 +70,7 @@ public class RiskService {
       CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getStorageService().listBinaryVersions(storagePath)) {
 
       for (BinaryVersion bv : iterable) {
-        versions.addObject(new RiskVersion(bv.getId(), bv.getCreatedDate(), bv.getProperties()));
+        versions.addObject(new ResourceVersion(bv.getId(), bv.getCreatedDate(), bv.getProperties()));
       }
     } catch (IOException e) {
       throw new GenericException(e.getMessage() != null ? e.getMessage() : "");

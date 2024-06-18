@@ -43,12 +43,11 @@ public class DescriptiveMetadataInfo implements Serializable {
     this.label = label;
   }
 
-  public boolean hasHistory() {
+  public boolean isHasHistory() {
     return hasHistory;
   }
 
   public void setHasHistory(boolean hasHistory) {
     this.hasHistory = hasHistory;
   }
-
 }

@@ -1758,6 +1758,14 @@ public interface ClientMessages extends Messages {
 
   String editDescriptiveMetadataFormLabel();
 
+  String descriptiveHistoryRemoveConfirmDialogTitle();
+
+  String descriptiveHistoryRemoveConfirmDialogMessage();
+
+  String descriptiveHistoryRevertConfirmDialogTitle();
+
+  String descriptiveHistoryRevertConfirmDialogMessage();
+
   /********************* SLIDER *************************/
 
   String cannotJumpToPrevious();

@@ -131,13 +131,11 @@ public class BrowseAIP extends Composite {
   private static void refresh(String id, AsyncCallback<IndexedAIP> callback) {
 
     Services service = new Services("Retrieve AIP", "get");
-    GWT.log("REFRESH");
     service
       .rodaEntityRestService(s -> s.findByUuid(id, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class)
       .whenComplete((aip, error) -> { // get aip
         // ancestors
         if (error != null) {
-          GWT.log("erro -> " + error);
           if (error instanceof NotFoundException) {
             Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
             HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
@@ -413,7 +411,6 @@ public class BrowseAIP extends Composite {
 
     // IDENTIFICATION
     updateSectionIdentification(response);
-    GWT.log("REPRESENTAITON");
     // DISPOSAL
     updateDisposalInformation();
 
@@ -421,7 +418,6 @@ public class BrowseAIP extends Composite {
     updateSectionDescriptiveMetadata(response.getDescriptiveMetadataInfos());
 
     // REPRESENTATIONS
-    GWT.log("REPRESENTAITON");
     if (response.getRepresentationCount().getResult() == 0 && aip.getState().equals(AIPState.ACTIVE) && !aip.isOnHold()
       && aip.getDisposalConfirmationId() == null) {
       addRepresentation.setWidget(new ActionableWidgetBuilder<>(representationActions).buildListWithObjects(
@@ -633,7 +629,7 @@ public class BrowseAIP extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
+            if (bundle.isHasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
               RodaConstants.PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE)) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
@@ -686,7 +682,7 @@ public class BrowseAIP extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
+            if (bundle.isHasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
               RodaConstants.PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE)) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,

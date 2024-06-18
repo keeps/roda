@@ -254,7 +254,6 @@ public class RestUtils {
     // locale
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
-    GWT.log("AQUI CRL -> " + b.toString());
 
     return UriUtils.fromSafeConstant(b.toString());
   }
