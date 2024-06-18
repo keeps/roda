@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.IntStream;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.generics.MetadataValue;
@@ -51,7 +52,16 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -70,7 +80,6 @@ public class EditDescriptiveMetadata extends Composite {
         final String aipId = historyTokens.get(0);
         final String representationId = historyTokens.size() == 3 ? historyTokens.get(1) : null;
         final String descriptiveMetadataId = new HTML(historyTokens.get(historyTokens.size() - 1)).getText();
-        GWT.log(descriptiveMetadataId);
 
         Services service = new Services("Get aip lock", "get");
         service.aipResource(s -> s.requestAIPLock(aipId)).whenComplete((value, error) -> {
@@ -90,7 +99,6 @@ public class EditDescriptiveMetadata extends Composite {
                 // representation method to do
               }
 
-              GWT.log("teste");
             } else {
               HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
               Toast.showInfo(messages.editDescMetadataLockedTitle(), messages.editDescMetadataLockedText());
@@ -151,9 +159,9 @@ public class EditDescriptiveMetadata extends Composite {
   private Set<MetadataValue> values = null;
   private Set<MetadataValue> supportedMetadataValues = null;
   private String template = "";
-  private String supportedTemplate = "";
   private String packageId = "";
   private Permissions permissions = null;
+  private String initialTypeFetched = "";
 
   private boolean inXML = false;
   private TextArea metadataXML;
@@ -168,15 +176,14 @@ public class EditDescriptiveMetadata extends Composite {
    *          the user to edit
    */
   public EditDescriptiveMetadata(final String aipId, final String representationId,
-    final CreateDescriptiveMetadataRequest bundleParam) {
-    GWT.log("vou comecar a editar");
+    final CreateDescriptiveMetadataRequest responseParams) {
     this.aipId = aipId;
     this.representationId = representationId;
-    this.values = bundleParam.getValues();
-    this.template = bundleParam.getRawTemplate();
-    this.permissions = bundleParam.getPermissions();
-    this.isSimilar = bundleParam.isSimilar();
-    this.packageId = bundleParam.getId();
+    this.values = responseParams.getValues();
+    this.template = responseParams.getRawTemplate();
+    this.permissions = responseParams.getPermissions();
+    this.isSimilar = responseParams.isSimilar();
+    this.packageId = responseParams.getId();
 
     aipLocked = true;
 
@@ -190,7 +197,6 @@ public class EditDescriptiveMetadata extends Composite {
     }
 
     supportedMetadataValues = newValues;
-    supportedTemplate = template;
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -200,8 +206,13 @@ public class EditDescriptiveMetadata extends Composite {
     metadataXML.addStyleName("form-textbox metadata-edit-area metadata-form-textbox");
     metadataXML.setTitle("Metadata edit area");
 
-    id.setText(bundleParam.getId());
+    id.setText(responseParams.getId());
     id.setEnabled(false);
+
+    initialTypeFetched = responseParams.getType();
+    initialTypeFetched = (responseParams.getVersion() != null)
+      ? (initialTypeFetched + RodaConstants.METADATA_VERSION_SEPARATOR + responseParams.getVersion())
+      : initialTypeFetched;
 
     type.addChangeHandler(new ChangeHandler() {
       @Override
@@ -227,9 +238,6 @@ public class EditDescriptiveMetadata extends Composite {
             if (error == null) {
               values = result.getValue();
               template = result.getTemplate();
-              supportedTemplate = result.getTemplate();
-              supportedMetadataValues = result.getValue();
-              GWT.log(values.toString());
               updateFormOrXML();
             }
           });
@@ -245,13 +253,16 @@ public class EditDescriptiveMetadata extends Composite {
           for (SupportedMetadata sm : value) {
             type.addItem(sm.getLabel(), sm.getId());
           }
-          type.addItem(messages.otherItem(), "");
+          type.addItem(messages.otherItem(), "Other");
+
+          // get the type from the dropdown that corresponds to what we are going to edit
+          // initially
+          IntStream.range(0, type.getItemCount()).filter(i -> type.getValue(i).equals(initialTypeFetched)).findFirst()
+            .ifPresent(i -> type.setSelectedIndex(i));
 
           service.aipResource(s -> s.retrieveAIPSupportedMetadata(aipId, type.getSelectedValue(),
             LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, caught) -> {
               if (caught == null) {
-                GWT.log("result -> " + result.toString());
-                template = result.getTemplate();
                 values = result.getValue();
                 updateFormOrXML();
               }
@@ -391,7 +402,6 @@ public class EditDescriptiveMetadata extends Composite {
 
       DescriptiveMetadataPreviewRequest previewRequest = new DescriptiveMetadataPreviewRequest(type.getSelectedValue(),
         values);
-      GWT.log("request -> " + previewRequest);
       service.aipResource(s -> s.retrieveDescriptiveMetadataPreview(previewRequest)).whenComplete((value, error) -> {
         if (error != null) {
           AsyncCallbackUtils.defaultFailureTreatment(error);
@@ -494,7 +504,7 @@ public class EditDescriptiveMetadata extends Composite {
           if (confirm) {
             Services service = new Services("Delete Metadata File", "delete");
 
-            service.aipResource(s -> s.deleteDescriptiveMetadataFile(aipId, type.getSelectedValue()))
+            service.aipResource(s -> s.deleteDescriptiveMetadataFile(aipId, packageId))
               .whenComplete((value, error) -> {
                 if (error == null) {
                   Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());

@@ -653,7 +653,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private void changeType(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
     Services service = new Services("Change AIP type", "update");
-    GWT.log("TYPE OPTIONS");
     service.aipResource(s -> s.getTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName()))
       .whenComplete((value, error) -> {
         if (error == null) {

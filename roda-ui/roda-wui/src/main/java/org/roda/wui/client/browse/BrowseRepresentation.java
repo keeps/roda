@@ -519,7 +519,7 @@ public class BrowseRepresentation extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
+            if (bundle.isHasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
               RodaConstants.PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE)) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
@@ -571,7 +571,7 @@ public class BrowseRepresentation extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
+            if (bundle.isHasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
               RodaConstants.PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE)) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
