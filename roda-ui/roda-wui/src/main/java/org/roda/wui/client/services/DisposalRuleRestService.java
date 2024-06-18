@@ -40,8 +40,9 @@ public interface DisposalRuleRestService extends DirectRestService {
   DisposalRule updateDisposalRule(DisposalRule disposalRule);
 
   @RequestMapping(method = RequestMethod.POST, path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
   @Operation(summary = "Create disposal rule", description = "Create a new disposal rule", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = DisposalRule.class))), responses = {
-    @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = DisposalRule.class))),
+    @ApiResponse(responseCode = "201", description = "Disposal rul created", content = @Content(schema = @Schema(implementation = DisposalRule.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   DisposalRule createDisposalRule(DisposalRule disposalRule);
 

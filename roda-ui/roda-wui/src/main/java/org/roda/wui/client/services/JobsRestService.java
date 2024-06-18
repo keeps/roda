@@ -42,6 +42,7 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
     @Parameter(name = "job", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Job job);
 
   @RequestMapping(method = RequestMethod.POST, path = "", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
   @Operation(summary = "Create job", description = "Creates a new job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {
     @ApiResponse(responseCode = "201", description = "Job created successfully", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})

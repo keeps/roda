@@ -3,12 +3,16 @@ package org.roda.core.data.v2.representation;
 import java.io.Serial;
 import java.io.Serializable;
 
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.roda.core.data.v2.generics.select.SelectedItemsFilterRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class ChangeRepresentationTypeRequest implements Serializable {
+public class ChangeTypeRequest implements Serializable {
 
   @Serial
   private static final long serialVersionUID = -2706255856347304025L;
@@ -17,11 +21,11 @@ public class ChangeRepresentationTypeRequest implements Serializable {
   private String type;
   private String details;
 
-  public ChangeRepresentationTypeRequest() {
+  public ChangeTypeRequest() {
     // empty constructor
   }
 
-  public ChangeRepresentationTypeRequest(SelectedItemsRequest items, String type, String details) {
+  public ChangeTypeRequest(SelectedItemsRequest items, String type, String details) {
     this.items = items;
     this.type = type;
     this.details = details;

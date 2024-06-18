@@ -8,6 +8,7 @@ import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadat
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * @author Miguel Guimaraes <mguimarães@keep.pt>
@@ -46,6 +48,7 @@ public interface DisposalHoldRestService extends DirectRestService {
   DisposalHold updateDisposalHold(DisposalHold hold);
 
   @RequestMapping(method = RequestMethod.POST, path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
   @Operation(summary = "Create disposal hold", description = "Create a new disposal hold", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = DisposalHold.class))), responses = {
     @ApiResponse(responseCode = "201", description = "Disposal hold created", content = @Content(schema = @Schema(implementation = DisposalHold.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
