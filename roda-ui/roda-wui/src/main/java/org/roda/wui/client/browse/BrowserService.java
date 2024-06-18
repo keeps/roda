@@ -9,7 +9,6 @@ package org.roda.wui.client.browse;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -17,27 +16,15 @@ import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
-import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
-import org.roda.core.data.v2.properties.ConversionProfile;
-import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
-import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -56,71 +43,7 @@ public interface BrowserService extends RemoteService {
   BrowseAIPBundle retrieveBrowseAIPBundle(String aipId, String localeString, List<String> aipFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
-    String descId, String type, String version, String localeString)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
-    String descId, String localeString)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  Job moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-    AlreadyExistsException, ValidationException;
-
-  String createAIP(String parentId, String type) throws AuthorizationDeniedException, GenericException,
-    NotFoundException, RequestNotValidException, AlreadyExistsException;
-
-  Job deleteAIP(SelectedItems<IndexedAIP> aips, String details)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
-  void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-
-  void updateDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle bundle)
-    throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
-    RequestNotValidException;
-
-  void createDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle newBundle)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-    AlreadyExistsException, ValidationException;
-
-  String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws AuthorizationDeniedException,
-    GenericException, ValidationException, NotFoundException, RequestNotValidException;
-
-  List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String representationUUID, String locale)
-    throws RODAException;
-
-  DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId, String representationId,
-    String descriptiveMetadataId, String localeString)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
-
-  void revertDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
-    String versionId)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
-
-  void deleteDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
-    String versionId)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
-
-  Job updateAIPPermissions(SelectedItems<IndexedAIP> aips, Permissions permissions, String details, boolean recursive)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
-    JobAlreadyStartedException;
-
-  Job appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
-
-  Job changeAIPType(SelectedItems<IndexedAIP> selectedAIP, String newType, String details)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  boolean hasDocumentation(String aipId)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException;
-
-  boolean hasSubmissions(String aipId) throws AuthorizationDeniedException, RequestNotValidException, GenericException;
-
   int getExportLimit();
-
-  Pair<Boolean, List<String>> retrieveAIPTypeOptions(String locale);
 
   DistributedInstance createDistributedInstance(DistributedInstance distributedInstance)
     throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,
@@ -166,10 +89,6 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   String getCrontabValue(String locale);
-
-  boolean requestAIPLock(String aipId);
-
-  void releaseAIPLock(String aipId);
 
   /**
    * Utilities

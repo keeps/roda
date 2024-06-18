@@ -103,7 +103,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     requestReasonColumn = new TextColumn<LogEntry>() {
       @Override
       public String getValue(LogEntry logEntry) {
-        if (logEntry == null) {
+        if (logEntry == null || logEntry.getAuditLogRequestHeaders() == null) {
           return null;
         }
 

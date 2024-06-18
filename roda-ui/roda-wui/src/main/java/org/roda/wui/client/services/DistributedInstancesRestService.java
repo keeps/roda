@@ -51,7 +51,7 @@ public interface DistributedInstancesRestService extends DirectRestService {
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   LocalInstance getLocalInstance();
 
-  @RequestMapping(path = "/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete distributed instance", description = "Deletes a distributed instance", responses = {
     @ApiResponse(responseCode = "204", description = "No Content"),
@@ -96,14 +96,14 @@ public interface DistributedInstancesRestService extends DirectRestService {
   LocalInstance subscribeLocalInstance(
     @Parameter(name = "local-instance", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) LocalInstance localInstance);
 
-  @RequestMapping(path = "/local/instance-configuration", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/local/instance-configuration", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete local instance configuration", description = "Deletes local instance configuration", responses = {
     @ApiResponse(responseCode = "204", description = "No content"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Void deleteLocalInstanceConfiguration();
 
-  @RequestMapping(path = "/local/configuration", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/local/configuration", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete local configuration", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = LocalInstance.class))) ,description = "Deletes local configuration", responses = {
     @ApiResponse(responseCode = "204", description = "No content"),

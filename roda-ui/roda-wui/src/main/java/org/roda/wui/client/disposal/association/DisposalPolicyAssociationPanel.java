@@ -24,7 +24,6 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.InstanceState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.PreservationEvents;
@@ -64,7 +63,7 @@ import config.i18n.client.ClientMessages;
 public class DisposalPolicyAssociationPanel extends Composite {
   private static final List<String> fieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_AIP, RodaConstants.AIP_TITLE, RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME));
-
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public String getHistoryToken() {
@@ -101,10 +100,7 @@ public class DisposalPolicyAssociationPanel extends Composite {
               CompletableFuture<List<IndexedAIP>> futureAncestors = service.aipResource(s -> s.getAncestors(aipId));
 
               CompletableFuture<List<String>> futureRepFields = service
-                .aipResource(AIPRestService::getRepresentationInformationFields);
-
-              CompletableFuture<InstanceState> futureInstance = service
-                .aipResource(s -> s.getInstanceName(aipId, LocaleInfo.getCurrentLocale().getLocaleName()));
+                .aipResource(AIPRestService::retrieveAIPRuleProperties);
 
               CompletableFuture<DescriptiveMetadataInfos> futureDescriptiveMetadataInfos = service
                 .aipResource(s -> s.getDescriptiveMetadata(aipId, LocaleInfo.getCurrentLocale().getLocaleName()));
@@ -140,13 +136,12 @@ public class DisposalPolicyAssociationPanel extends Composite {
                 LogEntry.class);
 
               CompletableFuture.allOf(futureChildAipCount, futureRepCount, futureDipCount, futureAncestors,
-                futureAncestors, futureRepFields, futureInstance, futureDescriptiveMetadataInfos, futureIncidenceCount,
+                futureAncestors, futureRepFields, futureDescriptiveMetadataInfos, futureIncidenceCount,
                 futureEventCount, futureLogCount).thenApply(v -> {
                   BrowseAIPResponse rp = new BrowseAIPResponse();
                   rp.setIndexedAIP(aip);
                   rp.setAncestors(futureAncestors.join());
                   rp.setRepresentationInformationFields(futureRepFields.join());
-                  rp.setInstance(futureInstance.join());
                   rp.setDescriptiveMetadataInfos(futureDescriptiveMetadataInfos.join());
                   rp.setChildAipsCount(futureChildAipCount.join());
                   rp.setRepresentationCount(futureRepCount.join());
@@ -167,42 +162,26 @@ public class DisposalPolicyAssociationPanel extends Composite {
       }
     }
   };
-
-  private IndexedAIP aip;
-
-  @UiField
-  NavigationToolbar<IndexedAIP> navigationToolbar;
-
-  @UiField
-  TitlePanel titlePanel;
-
-  @UiField
-  FlowPanel content;
-
-  @UiField
-  DisposalPolicySummaryPanel disposalPolicySummaryPanel;
-
-  @UiField(provided = true)
-  DisposalConfirmationPanel disposalConfirmationPanel;
-
-  @UiField(provided = true)
-  RetentionPeriodPanel retentionPeriodPanel;
-
-  @UiField(provided = true)
-  DisposalHoldsPanel disposalHoldsPanel;
-
-  @UiField
-  SimplePanel actionsSidebar;
-
-  ActionableWidgetBuilder<IndexedAIP> actionableWidgetBuilder;
-
-  interface MyUiBinder extends UiBinder<Widget, DisposalPolicyAssociationPanel> {
-  }
-
   private static DisposalPolicyAssociationPanel.MyUiBinder uiBinder = GWT
     .create(DisposalPolicyAssociationPanel.MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  @UiField
+  NavigationToolbar<IndexedAIP> navigationToolbar;
+  @UiField
+  TitlePanel titlePanel;
+  @UiField
+  FlowPanel content;
+  @UiField
+  DisposalPolicySummaryPanel disposalPolicySummaryPanel;
+  @UiField(provided = true)
+  DisposalConfirmationPanel disposalConfirmationPanel;
+  @UiField(provided = true)
+  RetentionPeriodPanel retentionPeriodPanel;
+  @UiField(provided = true)
+  DisposalHoldsPanel disposalHoldsPanel;
+  @UiField
+  SimplePanel actionsSidebar;
+  ActionableWidgetBuilder<IndexedAIP> actionableWidgetBuilder;
+  private IndexedAIP aip;
   public DisposalPolicyAssociationPanel(BrowseAIPResponse response) {
     disposalConfirmationPanel = new DisposalConfirmationPanel(response.getIndexedAIP().getDisposalConfirmationId());
 
@@ -238,5 +217,8 @@ public class DisposalPolicyAssociationPanel extends Composite {
 
     actionsSidebar
       .setWidget(actionableWidgetBuilder.withBackButton().buildListWithObjects(new ActionableObject<>(aip)));
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, DisposalPolicyAssociationPanel> {
   }
 }

@@ -19,7 +19,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.representation.ChangeRepresentationStatesRequest;
-import org.roda.core.data.v2.representation.ChangeRepresentationTypeRequest;
+import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
@@ -276,7 +276,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                     @Override
                     public void onSuccess(String details) {
                       Services services = new Services("Change representation type", "update");
-                      ChangeRepresentationTypeRequest request = new ChangeRepresentationTypeRequest(
+                      ChangeTypeRequest request = new ChangeTypeRequest(
                         SelectedItemsUtils.convertToRESTRequest(representations),
                         newType, details);
                       services.representationResource(s -> s.changeRepresentationType(request))

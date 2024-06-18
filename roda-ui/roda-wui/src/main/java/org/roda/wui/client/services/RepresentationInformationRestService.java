@@ -9,6 +9,7 @@ import org.roda.core.data.v2.ri.RepresentationInformationFamilyOptions;
 import org.roda.core.data.v2.ri.RepresentationInformationFilterRequest;
 import org.roda.core.data.v2.ri.RepresentationInformationRelationOptions;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -31,16 +33,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface RepresentationInformationRestService extends RODAEntityRestService<RepresentationInformation> {
 
   @RequestMapping(path = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
   @Operation(summary = "Creates a representation information", description = "Creates a representation information", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RepresentationInformationCreateRequest.class))), responses = {
-      @ApiResponse(responseCode = "201", description = "Representation information created", content = @Content(schema = @Schema(implementation = RepresentationInformation.class))),
-      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+    @ApiResponse(responseCode = "201", description = "Representation information created", content = @Content(schema = @Schema(implementation = RepresentationInformation.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   RepresentationInformation createRepresentationInformation(RepresentationInformationCreateRequest request);
 
   @RequestMapping(path = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
   @Operation(summary = "Updates an existing representation information", description = "Updates an existing representation information", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RepresentationInformationCreateRequest.class))), responses = {
-      @ApiResponse(responseCode = "201", description = "Representation information created", content = @Content(schema = @Schema(implementation = RepresentationInformation.class))),
-      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
-      @ApiResponse(responseCode = "404", description = "Representation information not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+    @ApiResponse(responseCode = "201", description = "Representation information created", content = @Content(schema = @Schema(implementation = RepresentationInformation.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Representation information not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   RepresentationInformation updateRepresentationInformation(RepresentationInformationCreateRequest request);
 
   @RequestMapping(path = "/{id}/family", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -77,13 +81,13 @@ public interface RepresentationInformationRestService extends RODAEntityRestServ
 
   @RequestMapping(path = "/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Delete multiple representation information via search query", description = "Deletes one or more representation information", responses = {
-    @ApiResponse(responseCode = "201", description = "Created job", content = @Content(schema = @Schema(implementation = Job.class)))})
+    @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class)))})
   Job deleteMultipleRepresentationInformation(
     @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<RepresentationInformation> selected);
 
   @RequestMapping(path = "/filter", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Add a Filter to a set of selected representation information", requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = RepresentationInformationFilterRequest.class))), responses = {
-    @ApiResponse(responseCode = "201", description = "Created job", content = @Content(schema = @Schema(implementation = Job.class)))})
+    @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class)))})
   Job addFilterToRepresentationInformation(
     @Parameter(name = "request", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RepresentationInformationFilterRequest.class))) RepresentationInformationFilterRequest request);
 }

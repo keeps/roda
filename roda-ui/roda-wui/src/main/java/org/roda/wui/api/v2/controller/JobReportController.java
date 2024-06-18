@@ -28,10 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping(path = "/api/v2/job-reports")
-@Tag(name = JobReportController.SWAGGER_ENDPOINT)
 public class JobReportController implements JobReportRestService {
-  public static final String SWAGGER_ENDPOINT = "v2 job-reports";
-
   @Autowired
   private HttpServletRequest request;
 

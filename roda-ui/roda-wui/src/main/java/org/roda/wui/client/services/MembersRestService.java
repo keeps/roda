@@ -2,7 +2,6 @@ package org.roda.wui.client.services;
 
 import java.util.Set;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
@@ -57,7 +56,8 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class)))})
   User getAuthenticatedUser();
 
-  @RequestMapping(path = "/users/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/users/{id}", method = RequestMethod.DELETE)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete user", description = "Deletes an existing user", responses = {
     @ApiResponse(responseCode = "204", description = "No Content"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
@@ -71,7 +71,7 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   Group getGroup(
     @Parameter(description = "The group identifier") @PathVariable(name = "id") String name);
 
-  @RequestMapping(path = "/groups/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/groups/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete group", description = "Deletes an existing group", responses = {
     @ApiResponse(responseCode = "204", description = "No Content"),
@@ -141,7 +141,7 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   User updateMyUser(
     @Parameter(name = "user", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) CreateUserRequest userOperations);
 
-  @RequestMapping(path = "/users/{id}/reset-password", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/users/{id}/reset-password", method = RequestMethod.PATCH)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Resets user password", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ResetPasswordRequest.class))), description = "Resets a user password", responses = {
     @ApiResponse(responseCode = "204", description = "Password changed"),
@@ -193,7 +193,7 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @Parameter(name = "login-request", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) LoginRequest loginRequest)
     throws AuthenticationDeniedException;
 
-  @RequestMapping(path = "/users/access-keys/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/users/access-keys/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete access key", description = "Deletes an access key", responses = {
     @ApiResponse(responseCode = "204", description = "No Content"),

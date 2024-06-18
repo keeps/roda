@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.tools.ZipEntryInfo;
@@ -133,7 +134,6 @@ public class DownloadUtils {
   }
 
   public static StreamResponse createZipStreamResponse(List<ZipEntryInfo> zipEntries, String zipName) {
-
     final ConsumesOutputStream stream = new ConsumesOutputStream() {
 
       @Override

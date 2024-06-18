@@ -23,9 +23,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.DipFilePreview;
-import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -34,6 +32,7 @@ import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -92,7 +91,8 @@ public class BrowseAIPPortal extends Composite {
 
   // Focus
   @UiField
-  FocusPanel keyboardFocus;  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  FocusPanel keyboardFocus;
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -149,8 +149,9 @@ public class BrowseAIPPortal extends Composite {
   Label dateCreatedAndModified;
   private String aipId;
   private IndexedAIP aip;
-  private BrowseAIPPortal(BrowseAIPBundle bundle) {
-    aip = bundle.getAip();
+
+  private BrowseAIPPortal(BrowseAIPResponse rp) {
+    aip = rp.getIndexedAIP();
     aipId = aip.getId();
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
@@ -231,8 +232,8 @@ public class BrowseAIPPortal extends Composite {
       boolean browseAIPPortalCustomizationEnabled = ConfigurationManager.getBoolean(false,
         RodaConstants.UI_LISTS_PROPERTY, "BrowseAIPPortal_aipChildren", RodaConstants.UI_LISTS_ENABLE_CUSTOMIZATION);
 
-      if (StringUtils.isNotBlank(bundle.getAip().getLevel()) && browseAIPPortalCustomizationEnabled) {
-        listId = "BrowseAIPPortal_aipChildren_" + bundle.getAip().getLevel();
+      if (StringUtils.isNotBlank(aip.getLevel()) && browseAIPPortalCustomizationEnabled) {
+        listId = "BrowseAIPPortal_aipChildren_" + aip.getLevel();
       } else {
         listId = "BrowseAIPPortal_aipChildren";
       }
@@ -246,8 +247,8 @@ public class BrowseAIPPortal extends Composite {
       SearchWrapper aipChildrenSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(aipChildrenListBuilder);
       aipChildrenCard.setWidget(aipChildrenSearchWrapper);
-      aipChildrenCard.setVisible(bundle.getChildAIPCount() > 0);
-      preChildren.setVisible(bundle.getChildAIPCount() > 0);
+      aipChildrenCard.setVisible(rp.getChildAipsCount().getResult() > 0);
+      preChildren.setVisible(rp.getChildAipsCount().getResult() > 0);
     }
     // CSS
     addStyleName("browse browse_aip");
@@ -258,7 +259,7 @@ public class BrowseAIPPortal extends Composite {
       firstElement.setAttribute("title", "browse input");
     }
 
-    IndexedAIP aip = bundle.getAip();
+
     title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
     title.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
 
@@ -295,7 +296,7 @@ public class BrowseAIPPortal extends Composite {
     updateSectionDescriptiveMetadata();
 
     // AIP CHILDREN
-    if (bundle.getChildAIPCount() > 0) {
+    if (rp.getChildAipsCount().getResult() > 0) {
       LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     }
 
@@ -304,34 +305,39 @@ public class BrowseAIPPortal extends Composite {
 
   public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
     container = new SimplePanel();
-    refresh(id, new AsyncCallback<BrowseAIPBundle>() {
+    refresh(id, new AsyncCallback<BrowseAIPResponse>() {
       @Override
       public void onFailure(Throwable caught) {
         callback.onFailure(caught);
       }
 
       @Override
-      public void onSuccess(BrowseAIPBundle result) {
+      public void onSuccess(BrowseAIPResponse result) {
         callback.onSuccess(container);
       }
     });
   }
 
-  private static void refresh(String id, AsyncCallback<BrowseAIPBundle> callback) {
-    BrowserService.Util.getInstance().retrieveBrowseAIPBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
-      fieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
+  private static void refresh(String id, AsyncCallback<BrowseAIPResponse> callback) {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
+    Services service = new Services("Retrieve AIP", "get");
+    service
+      .rodaEntityRestService(s -> s.findByUuid(id, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class)
+      .thenCompose(result -> service
+        .rodaEntityRestService(s -> s.count(new FindRequest.FindRequestBuilder(
+          new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, id)), false).build()), IndexedAIP.class)
+        .whenComplete((childAIPCount, error) -> {
+          if (error == null) {
 
-        @Override
-        public void onSuccess(BrowseAIPBundle bundle) {
-          container.setWidget(new BrowseAIPPortal(bundle));
-          callback.onSuccess(bundle);
-        }
-      });
+            BrowseAIPResponse aipResponse = new BrowseAIPResponse();
+            aipResponse.setIndexedAIP(result);
+            aipResponse.setChildAipsCount(childAIPCount);
+            container.setWidget(new BrowseAIPPortal(aipResponse));
+          } else {
+            callback.onFailure(error);
+          }
+        }));
+
   }
 
   private void updateSectionDescriptiveMetadata() {
@@ -407,7 +413,4 @@ public class BrowseAIPPortal extends Composite {
 
   interface MyUiBinder extends UiBinder<Widget, BrowseAIPPortal> {
   }
-
-
-
 }

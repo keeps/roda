@@ -10,16 +10,20 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.MetadataValue;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.metadata.*;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
+import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.CreateDescriptiveMetadataRequest;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreviewRequest;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataRequestForm;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataRequestXML;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -50,7 +54,15 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -106,57 +118,37 @@ public class CreateDescriptiveMetadata extends Composite {
       return "create_metadata";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, CreateDescriptiveMetadata> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private final String aipId;
   private final String representationId;
   private final boolean isNew;
-
-  private boolean inXML = false;
-
-  private Set<MetadataValue> values = null;
-  private String template = "";
-  private TextArea metadataXML;
-  private String metadataTextFromForm = null;
-
   @UiField
   TextBox id;
-
   @UiField
   ListBox type;
-
   @UiField
   FocusPanel showXml;
-
   @UiField
   HTML showXmlIconXML;
-
   @UiField
   HTML showXmlIconForm;
-
   @UiField
   FlowPanel formOrXML;
-
   @UiField
   Button buttonApply;
-
   @UiField
   Button buttonCancel;
-
   @UiField
   HTML errors;
-
   @UiField
   HTML idError;
-
   @UiField
   TitlePanel title;
+  private boolean inXML = false;
+  private Set<MetadataValue> values = null;
+  private TextArea metadataXML;
+  private String metadataTextFromForm = null;
 
   /**
    * Create a new panel to edit a user
@@ -175,10 +167,12 @@ public class CreateDescriptiveMetadata extends Composite {
 
     initTitle(aipId, title);
 
+
     type.addChangeHandler(new ChangeHandler() {
 
       @Override
       public void onChange(ChangeEvent event) {
+        setInXML(false);
         String value = type.getSelectedValue();
 
         Services service = new Services("Retrieve descriptive metadata", "get");
@@ -187,19 +181,16 @@ public class CreateDescriptiveMetadata extends Composite {
           .aipResource(s -> s.retrieveAIPSupportedMetadata(aipId, value, LocaleInfo.getCurrentLocale().getLocaleName()))
           .whenComplete((result, error) -> {
             if (error == null) {
-              template = result.getTemplate();
               values = result.getValue();
               updateFormOrXML();
             }
           });
 
         if (StringUtils.isNotBlank(value)) {
-
           id.setText(value + RodaConstants.PREMIS_SUFFIX);
         } else {
           id.setText("");
         }
-
       }
     });
 
@@ -209,7 +200,7 @@ public class CreateDescriptiveMetadata extends Composite {
         if (error != null) {
           AsyncCallbackUtils.defaultFailureTreatment(error);
         } else {
-          for (SupportedMetadata sm : value) {
+          for (ConfiguredDescriptiveMetadata sm : value.getList()) {
             type.addItem(sm.getLabel(), sm.getId());
           }
           type.addItem(messages.otherItem(), "Other");
@@ -218,13 +209,13 @@ public class CreateDescriptiveMetadata extends Composite {
           service.aipResource(s -> s.retrieveAIPSupportedMetadata(aipId, type.getSelectedValue(),
             LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, caught) -> {
               if (caught == null) {
-                template = result.getTemplate();
                 values = result.getValue();
                 updateFormOrXML();
               }
             });
 
           id.setText(type.getSelectedValue() + RodaConstants.PREMIS_SUFFIX);
+          id.setEnabled(false);
 
         }
       });
@@ -313,23 +304,19 @@ public class CreateDescriptiveMetadata extends Composite {
       }
     } else {
       formOrXML.clear();
-      if (!template.equals("")) {
-        metadataXML.setText(template);
-      } else {
-        metadataXML.setText("");
-      }
+      metadataXML.setText("");
       formOrXML.add(metadataXML);
       showXml.setVisible(false);
     }
   }
 
   private void updateMetadataXML() {
-
-    Services service = new Services("Update Descriptive metadata", "get");
+    Services service = new Services("Preview descriptive metadata", "get");
 
     DescriptiveMetadataPreviewRequest previewRequest = new DescriptiveMetadataPreviewRequest(type.getSelectedValue(),
       values);
-    service.aipResource(s -> s.retrieveDescriptiveMetadataPreview(previewRequest)).whenComplete((value, error) -> {
+    service.aipResource(s -> s.retrieveDescriptiveMetadataPreview(aipId, previewRequest))
+      .whenComplete((value, error) -> {
       if (error != null) {
         AsyncCallbackUtils.defaultFailureTreatment(error);
       } else {
@@ -346,20 +333,20 @@ public class CreateDescriptiveMetadata extends Composite {
     buttonApply.setEnabled(false);
     String idText = type.getSelectedValue();
     String filename = id.getText();
-    String typeText = idText.contains("_")  ? idText.substring(0, idText.lastIndexOf("_")) : idText;
+    String typeText = idText.contains("_") ? idText.substring(0, idText.lastIndexOf("_")) : idText;
     String typeVersion = idText.contains("_") ? idText.substring(idText.lastIndexOf("_") + 1) : null;
     String xmlText = metadataXML.getText();
     boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
 
-    if (idText.length() > 0 && filename.endsWith(".xml")) {
+    if (!idText.isEmpty() && filename.endsWith(".xml")) {
       // we only send the values map if the user hasn't overriden the form by
       // modifying the XML directly
       CreateDescriptiveMetadataRequest body;
       if (!hasOverridenTheForm && !values.isEmpty()) {
-        body = new DescriptiveMetadataRequestForm(idText, filename, typeText, typeVersion, template, true, null,
+        body = new DescriptiveMetadataRequestForm(idText, filename, typeText, typeVersion, true, null,
           values);
       } else {
-        body = new DescriptiveMetadataRequestXML(idText, filename, typeText, typeVersion, template, true, null,
+        body = new DescriptiveMetadataRequestXML(idText, filename, typeText, typeVersion, true, null,
           xmlText);
       }
       Services service = new Services("Create Descriptive metadata", "create");
@@ -423,10 +410,11 @@ public class CreateDescriptiveMetadata extends Composite {
 
         Services service = new Services("Delete AIP", "deletion");
 
-        SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId),
-          IndexedAIP.class.getName());
+        DeleteRequest request = new DeleteRequest();
+        request.setItemsToDelete(new SelectedItemsListRequest(Collections.singletonList(aipId)));
+        request.setDetails("");
 
-        service.aipResource(s -> s.deleteAIPs(selected, null)).whenComplete((value, error) -> {
+        service.aipResource(s -> s.deleteAIPs(request)).whenComplete((value, error) -> {
           if (error != null) {
             HistoryUtils.newHistory(InternalProcess.RESOLVER);
           } else {
@@ -444,6 +432,9 @@ public class CreateDescriptiveMetadata extends Composite {
         HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
       }
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, CreateDescriptiveMetadata> {
   }
 
 }

@@ -7,13 +7,22 @@
  */
 package org.roda.wui.client.common.actions;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.SelectedItemsUtils;
+import org.roda.core.data.v2.aip.AssessmentRequest;
+import org.roda.core.data.v2.aip.MoveRequest;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
+import org.roda.core.data.v2.generics.DeleteRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -23,6 +32,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -297,31 +307,35 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                       Services service = new Services("Move AIP", "move");
 
-                      service.aipResource(s -> s.moveAIPInHierarchy(selected, parentId, details))
-                        .whenComplete((value, error) -> {
-                          if (error == null) {
-                            Toast.showInfo(messages.moveItemTitle(), messages.movingAIP());
+                      MoveRequest request = new MoveRequest();
+                      request.setParentId(parentId);
+                      request.setDetails(details);
+                      request.setItemsToMove(SelectedItemsUtils.convertToRESTRequest(selected));
 
-                            Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
+                      service.aipResource(s -> s.moveAIPInHierarchy(request)).whenComplete((value, error) -> {
+                        if (error == null) {
+                          Toast.showInfo(messages.moveItemTitle(), messages.movingAIP());
 
-                              @Override
-                              public void onFailure(Throwable caught) {
-                                doActionCallbackNone();
-                                if (value != null) {
-                                  HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
-                                } else {
-                                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                                }
-                              }
+                          Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                              @Override
-                              public void onSuccess(final Void nothing) {
-                                doActionCallbackNone();
+                            @Override
+                            public void onFailure(Throwable caught) {
+                              doActionCallbackNone();
+                              if (value != null) {
                                 HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
+                              } else {
+                                HistoryUtils.newHistory(InternalProcess.RESOLVER);
                               }
-                            });
-                          }
-                        });
+                            }
+
+                            @Override
+                            public void onSuccess(final Void nothing) {
+                              doActionCallbackNone();
+                              HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
+                            }
+                          });
+                        }
+                      });
                     }
                   });
               }
@@ -386,23 +400,26 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                         @Override
                         public void onSuccess(String details) {
-
                           Services service = new Services("Move AIP", "move");
 
-                          service.aipResource(s -> s.moveAIPInHierarchy(selected, parentId, details))
-                            .whenComplete((value, error) -> {
-                              if (error == null) {
-                                Toast.showInfo(messages.runningInBackgroundTitle(),
-                                  messages.runningInBackgroundDescription());
+                          MoveRequest request = new MoveRequest();
+                          request.setParentId(parentId);
+                          request.setDetails(details);
+                          request.setItemsToMove(SelectedItemsUtils.convertToRESTRequest(selected));
 
-                                doActionCallbackNone();
-                                if (value != null) {
-                                  HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
-                                } else {
-                                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                                }
+                          service.aipResource(s -> s.moveAIPInHierarchy(request)).whenComplete((value, error) -> {
+                            if (error == null) {
+                              Toast.showInfo(messages.runningInBackgroundTitle(),
+                                messages.runningInBackgroundDescription());
+
+                              doActionCallbackNone();
+                              if (value != null) {
+                                HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
+                              } else {
+                                HistoryUtils.newHistory(InternalProcess.RESOLVER);
                               }
-                            });
+                            }
+                          });
                         }
                       });
                   }
@@ -443,28 +460,27 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                 @Override
                 public void onSuccess(final String details) {
-                  final String parentId = aip.getParentID();
+                  DeleteRequest request = new DeleteRequest();
+                  request.setDetails(details);
+                  request.setItemsToDelete(new SelectedItemsListRequest(Collections.singletonList(aip.getUUID())));
+                  services.aipResource(s -> s.deleteAIPs(request)).whenComplete((value, error) -> {
+                    if (error == null) {
+                      Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                  services.aipResource(s -> s.deleteAIPs(objectToSelectedItems(aip, IndexedAIP.class), details))
-                    .whenComplete((value, error) -> {
+                        @Override
+                        public void onFailure(Throwable caught) {
+                          Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(1L));
+                          doActionCallbackDestroyed();
+                        }
 
-                      if (error == null) {
-                        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
-
-                          @Override
-                          public void onFailure(Throwable caught) {
-                            Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(1L));
-                            doActionCallbackDestroyed();
-                          }
-
-                          @Override
-                          public void onSuccess(final Void nothing) {
-                            doActionCallbackNone();
-                            HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
-                          }
-                        });
-                      }
-                    });
+                        @Override
+                        public void onSuccess(final Void nothing) {
+                          doActionCallbackNone();
+                          HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
+                        }
+                      });
+                    }
+                  });
                 }
               });
           } else {
@@ -493,8 +509,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                     @Override
                     public void onSuccess(final String details) {
+                      DeleteRequest request = new DeleteRequest();
+                      request.setDetails(details);
+                      request.setSelectedItemsToDelete(selected);
 
-                      service.aipResource(s -> s.deleteAIPs(selected, details)).whenComplete((value, error) -> {
+                      service.aipResource(s -> s.deleteAIPs(request)).whenComplete((value, error) -> {
                         if (error == null) {
                           Toast.showInfo(messages.runningInBackgroundTitle(),
                             messages.runningInBackgroundDescription());
@@ -555,7 +574,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     Services service = new Services("Accept assessment", "post");
 
-    service.aipResource(s -> s.appraisal(aips, true, null)).whenComplete((value, error) -> {
+    AssessmentRequest request = new AssessmentRequest();
+    request.setItems(SelectedItemsUtils.convertToRESTRequest(aips));
+    request.setAccept(true);
+
+    service.aipResource(s -> s.appraisal(request)).whenComplete((value, error) -> {
       if (error == null) {
         Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
@@ -588,7 +611,12 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(final String rejectReason) {
           Services service = new Services("Reject Assessment", "post");
 
-          service.aipResource(s -> s.appraisal(aips, false, rejectReason)).whenComplete((value, error) -> {
+          AssessmentRequest request = new AssessmentRequest();
+          request.setItems(SelectedItemsUtils.convertToRESTRequest(aips));
+          request.setAccept(true);
+          request.setRejectReason(rejectReason);
+
+          service.aipResource(s -> s.appraisal(request)).whenComplete((value, error) -> {
             if (error == null) {
               Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
@@ -614,18 +642,21 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void downloadDocumentation(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
-
     Services service = new Services("Download documentation", "get");
 
-    service.aipResource(s -> s.getDocumentation(aip.getId())).whenComplete((value, error) -> {
-      if (error == null) {
-        SafeUri downloadUri = RestUtils.createAIPPartDownloadUri(aip.getId(),
-          RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
-        callback.onSuccess(Actionable.ActionImpact.NONE);
-        Window.Location.assign(downloadUri.asString());
+    service.aipResource(s -> s.getDocumentation(aip.getId())).whenComplete((value, throwable) -> {
+      if (throwable == null) {
+        if (Boolean.TRUE.equals(value)) {
+          SafeUri downloadUri = RestUtils.createAIPPartDownloadUri(aip.getId(),
+            RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+          callback.onSuccess(Actionable.ActionImpact.NONE);
+          Window.Location.assign(downloadUri.asString());
+        } else {
+          Toast.showInfo(messages.downloadNoDocumentationTitle(), messages.downloadNoDocumentationDescription());
+          callback.onSuccess(Actionable.ActionImpact.NONE);
+        }
       } else {
-        Toast.showInfo(messages.downloadNoDocumentationTitle(), messages.downloadNoDocumentationDescription());
-        callback.onSuccess(Actionable.ActionImpact.NONE);
+        callback.onFailure(throwable);
       }
     });
   }
@@ -634,15 +665,19 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     Services service = new Services("Download submission", "get");
 
-    service.aipResource(s -> s.getSubmissions(aip.getId())).whenComplete((value, error) -> {
-      if (error == null) {
-        SafeUri downloadUri = RestUtils.createAIPPartDownloadUri(aip.getId(),
-          RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
-        callback.onSuccess(Actionable.ActionImpact.NONE);
-        Window.Location.assign(downloadUri.asString());
+    service.aipResource(s -> s.getSubmissions(aip.getId())).whenComplete((value, throwable) -> {
+      if (throwable == null) {
+        if (value) {
+          SafeUri downloadUri = RestUtils.createAIPPartDownloadUri(aip.getId(),
+            RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+          callback.onSuccess(Actionable.ActionImpact.NONE);
+          Window.Location.assign(downloadUri.asString());
+        } else {
+          Toast.showInfo(messages.downloadNoSubmissionsTitle(), messages.downloadNoSubmissionsDescription());
+          callback.onSuccess(Actionable.ActionImpact.NONE);
+        }
       } else {
-        Toast.showInfo(messages.downloadNoSubmissionsTitle(), messages.downloadNoSubmissionsDescription());
-        callback.onSuccess(Actionable.ActionImpact.NONE);
+        callback.onFailure(throwable);
       }
     });
   }
@@ -668,27 +703,31 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                     @Override
                     public void onSuccess(String details) {
-                      service.aipResource(s -> s.changeAIPType(aips, newType, details)).whenComplete((value, error) -> {
+                      ChangeTypeRequest request = new ChangeTypeRequest();
+                      request.setType(newType);
+                      request.setDetails(details);
+                      request.setItems(SelectedItemsUtils.convertToRESTRequest(aips));
+                      service.aipResource(s -> s.changeAIPType(request)).whenComplete((value, error) -> {
 
                         if (error == null) {
-                            Toast.showInfo(messages.runningInBackgroundTitle(),
-                              messages.runningInBackgroundDescription());
+                          Toast.showInfo(messages.runningInBackgroundTitle(),
+                            messages.runningInBackgroundDescription());
 
-                            Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                          Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
-                              @Override
-                              public void onFailure(Throwable caught) {
-                                doActionCallbackUpdated();
-                              }
+                            @Override
+                            public void onFailure(Throwable caught) {
+                              doActionCallbackUpdated();
+                            }
 
-                              @Override
-                              public void onSuccess(final Void nothing) {
-                                doActionCallbackNone();
+                            @Override
+                            public void onSuccess(final Void nothing) {
+                              doActionCallbackNone();
                               HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
-                              }
-                            });
-                          }
-                        });
+                            }
+                          });
+                        }
+                      });
                     }
                   });
               }
@@ -885,10 +924,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Apply disposal hold", "job");
-            services
-              .disposalHoldResource(
-                s -> s.applyDisposalHold(SelectedItemsUtils.convertToRESTRequest(aips), holdDialogResult.getDisposalHold().getId(), override))
-              .whenComplete((job, throwable) -> {
+            services.disposalHoldResource(s -> s.applyDisposalHold(SelectedItemsUtils.convertToRESTRequest(aips),
+              holdDialogResult.getDisposalHold().getId(), override)).whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(null);
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
@@ -931,7 +968,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Disassociate disposal holds", "job");
-            services.disposalHoldResource(s -> s.disassociateDisposalHold(SelectedItemsUtils.convertToRESTRequest(aips), null, true))
+            services
+              .disposalHoldResource(
+                s -> s.disassociateDisposalHold(SelectedItemsUtils.convertToRESTRequest(aips), null, true))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);

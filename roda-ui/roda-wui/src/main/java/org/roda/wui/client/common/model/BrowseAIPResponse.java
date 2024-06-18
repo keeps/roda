@@ -1,13 +1,12 @@
 package org.roda.wui.client.common.model;
 
-import org.roda.core.data.v2.generics.LongResponse;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
-import org.roda.core.data.v2.ip.metadata.InstanceState;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+
+import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -20,7 +19,6 @@ public class BrowseAIPResponse implements Serializable {
   private IndexedAIP indexedAIP;
   private List<String> representationInformationFields;
   private List<IndexedAIP> ancestors;
-  private InstanceState instance;
   private DescriptiveMetadataInfos descriptiveMetadataInfos;
   private LongResponse childAipsCount;
   private LongResponse representationCount;
@@ -28,8 +26,6 @@ public class BrowseAIPResponse implements Serializable {
   private LongResponse incidenceCount;
   private LongResponse eventCount;
   private LongResponse logCount;
-
-
 
   public BrowseAIPResponse() {
     // empty constructor
@@ -57,14 +53,6 @@ public class BrowseAIPResponse implements Serializable {
 
   public void setAncestors(List<IndexedAIP> ancestors) {
     this.ancestors = ancestors;
-  }
-
-  public InstanceState getInstance() {
-    return instance;
-  }
-
-  public void setInstance(InstanceState instance) {
-    this.instance = instance;
   }
 
   public DescriptiveMetadataInfos getDescriptiveMetadataInfos() {
@@ -122,6 +110,5 @@ public class BrowseAIPResponse implements Serializable {
   public void setLogCount(LongResponse logCount) {
     this.logCount = logCount;
   }
-
 
 }

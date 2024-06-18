@@ -41,6 +41,7 @@ public interface DisposalScheduleRestService extends DirectRestService {
     @Parameter(description = "The ID of the disposal schedule to retrieve.", required = true) @PathVariable(name = "id") String id);
 
   @RequestMapping(method = RequestMethod.POST, path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
   @Operation(summary = "Create disposal schedule", description = "Create a new schedule schedule", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = DisposalSchedule.class))), responses = {
     @ApiResponse(responseCode = "201", description = "Disposal schedule created", content = @Content(schema = @Schema(implementation = DisposalSchedule.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
