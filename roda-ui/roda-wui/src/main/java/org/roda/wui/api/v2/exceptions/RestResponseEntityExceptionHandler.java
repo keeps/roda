@@ -2,9 +2,6 @@ package org.roda.wui.api.v2.exceptions;
 
 import java.util.UUID;
 
-import com.google.gwt.core.client.GWT;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.security.SignatureException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -18,6 +15,7 @@ import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +28,8 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import io.jsonwebtoken.JwtException;
+
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -37,12 +37,18 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
   protected ResponseEntity<Object> handleRestException(RuntimeException ex, WebRequest request) {
     String message = "Internal server error";
     String details = "";
+    Object objectDetails = null;
     HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     UUID errorID = UUID.randomUUID();
     if (ex.getCause() instanceof AuthorizationDeniedException) {
       message = "Forbidden";
       details = ex.getCause().getMessage();
       httpStatus = HttpStatus.FORBIDDEN;
+    } else if (ex.getCause() instanceof ValidationException validationException) {
+      message = "Validation error";
+      objectDetails = validationException.getReport();
+      details = ex.getCause().getMessage();
+      httpStatus = HttpStatus.BAD_REQUEST;
     } else if (ex.getCause() instanceof AuthenticationDeniedException) {
       message = "Unauthorized access";
       details = ex.getCause().getMessage();
@@ -81,7 +87,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     LoggerFactory.getLogger(RestResponseEntityExceptionHandler.class).warn(warn);
 
     ErrorResponseMessage body = new ErrorResponseMessage(httpStatus.value(), errorID.toString(), message, details,
-      ((ServletWebRequest) request).getRequest().getRequestURI());
+      ((ServletWebRequest) request).getRequest().getRequestURI(), objectDetails);
 
     HttpHeaders responseHeaders = new HttpHeaders();
     responseHeaders.setContentType(MediaType.APPLICATION_JSON);

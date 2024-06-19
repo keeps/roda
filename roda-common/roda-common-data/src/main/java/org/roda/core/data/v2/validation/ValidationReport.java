@@ -7,11 +7,13 @@
  */
 package org.roda.core.data.v2.validation;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ValidationReport implements Serializable {
+  @Serial
   private static final long serialVersionUID = 4670965331325954161L;
 
   private List<ValidationIssue> issues;

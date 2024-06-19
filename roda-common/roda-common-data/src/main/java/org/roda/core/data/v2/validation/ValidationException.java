@@ -7,9 +7,12 @@
  */
 package org.roda.core.data.v2.validation;
 
+import java.io.Serial;
+
 import org.roda.core.data.exceptions.RODAException;
 
 public class ValidationException extends RODAException {
+  @Serial
   private static final long serialVersionUID = -7922205193060735117L;
 
   private ValidationReport report;

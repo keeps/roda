@@ -1,31 +1,31 @@
 package org.roda.wui.client.services;
 
-import com.google.gwt.core.client.GWT;
-import config.i18n.client.ClientMessages;
 import org.fusesource.restygwt.client.Method;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.wui.client.main.Login;
-import org.roda.wui.client.welcome.Welcome;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.widgets.Toast;
+import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.v2.validation.ValidationReport;
 
+import com.github.nmorel.gwtjackson.client.ObjectMapper;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class MethodCallThrowableTreatment {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ValidationReportMapper VALIDATION_REPORT_MAPPER = GWT.create(ValidationReportMapper.class);
 
   private MethodCallThrowableTreatment() {
     // empty constructor
   }
-
   // TODO: Add more common failures
 
   public static Throwable treatCommonFailures(Method method, Throwable throwable) {
@@ -39,7 +39,16 @@ public class MethodCallThrowableTreatment {
       throwable = new AuthorizationDeniedException();
     } else if (method.getResponse().getStatusCode() == Response.SC_CONFLICT) {
       throwable = new AlreadyExistsException();
+    } else if (method.getResponse().getStatusCode() == Response.SC_BAD_REQUEST) {
+      if (parse.isObject().get("message").toString().replace("\"", "").equals("Validation error")) {
+        ValidationReport details = VALIDATION_REPORT_MAPPER.read(parse.isObject().get("objectDetails").toString());
+        throwable = new ValidationException(details);
+      }
     }
+
     return throwable;
+  }
+
+  public static interface ValidationReportMapper extends ObjectMapper<ValidationReport> {
   }
 }
