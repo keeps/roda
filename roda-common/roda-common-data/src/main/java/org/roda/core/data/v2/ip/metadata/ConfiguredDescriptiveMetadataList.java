@@ -2,8 +2,8 @@ package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -12,17 +12,17 @@ public class ConfiguredDescriptiveMetadataList implements Serializable {
   @Serial
   private static final long serialVersionUID = 2412293709745299277L;
 
-  private Set<ConfiguredDescriptiveMetadata> list = new HashSet<>();
+  private List<ConfiguredDescriptiveMetadata> list = new ArrayList<>();
 
   public ConfiguredDescriptiveMetadataList() {
     // empty constructor
   }
 
-  public Set<ConfiguredDescriptiveMetadata> getList() {
+  public List<ConfiguredDescriptiveMetadata> getList() {
     return list;
   }
 
-  public void setList(Set<ConfiguredDescriptiveMetadata> list) {
+  public void setList(List<ConfiguredDescriptiveMetadata> list) {
     this.list = list;
   }
 

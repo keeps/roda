@@ -527,7 +527,6 @@ public class AIPService {
     }
 
     return new SupportedMetadataValue(template, values);
-
   }
 
   // Get preservation metadata

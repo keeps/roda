@@ -93,16 +93,29 @@ public class EditDescriptiveMetadata extends Composite {
                     IndexedAIP.class)
                   .thenCompose(
                     aip -> service.aipResource(s -> s.retrieveAIPSupportedMetadata(aipId, filename.replace(".xml", ""),
-                  LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, throwable) -> {
-                    if (throwable != null) {
-                      callback.onFailure(throwable);
-                    } else {
-                      callback
-                        .onSuccess(new EditDescriptiveMetadata(aipId, null, filename, result, aip.getPermissions()));
-                    }
-                  }));
+                      LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, throwable) -> {
+                        if (throwable != null) {
+                          callback.onFailure(throwable);
+                        } else {
+                          callback.onSuccess(
+                            new EditDescriptiveMetadata(aipId, null, filename, result, aip.getPermissions()));
+                        }
+                      }));
               } else {
-                // representation method to do
+                service
+                  .rodaEntityRestService(s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()),
+                    IndexedAIP.class)
+                  .thenCompose(aip -> service
+                    .aipResource(s -> s.retrieveRepresentationSupportedMetadata(aipId, representationId,
+                      filename.replace(".xml", ""), LocaleInfo.getCurrentLocale().getLocaleName()))
+                    .whenComplete((result, throwable) -> {
+                      if (throwable != null) {
+                        callback.onFailure(throwable);
+                      } else {
+                        callback.onSuccess(
+                          new EditDescriptiveMetadata(aipId, representationId, filename, result, aip.getPermissions()));
+                      }
+                    }));
               }
             } else {
               HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
@@ -180,8 +193,8 @@ public class EditDescriptiveMetadata extends Composite {
    * @param filename
    * @param aipPermissions
    */
-  public EditDescriptiveMetadata(final String aipId, final String representationId,
-    String filename, final SupportedMetadataValue responseParams, Permissions aipPermissions) {
+  public EditDescriptiveMetadata(final String aipId, final String representationId, String filename,
+    final SupportedMetadataValue responseParams, Permissions aipPermissions) {
     this.aipId = aipId;
     this.representationId = representationId;
     this.values = responseParams.getValue();
@@ -213,7 +226,6 @@ public class EditDescriptiveMetadata extends Composite {
     id.setText(filename);
     id.setEnabled(false);
 
-
     type.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
@@ -230,16 +242,27 @@ public class EditDescriptiveMetadata extends Composite {
           typeString = value;
         }
 
-        Services service = new Services("Retrieve descripitive metadta", "get");
+        Services service = new Services("Retrieve descriptive metadata", "get");
 
-        service
-          .aipResource(s -> s.retrieveAIPSupportedMetadata(aipId, value, LocaleInfo.getCurrentLocale().getLocaleName()))
-          .whenComplete((result, error) -> {
-            if (error == null) {
-              values = result.getValue();
-              updateFormOrXML();
-            }
-          });
+        if (representationId == null) {
+          service
+            .aipResource(
+              s -> s.retrieveAIPSupportedMetadata(aipId, value, LocaleInfo.getCurrentLocale().getLocaleName()))
+            .whenComplete((result, error) -> {
+              if (error == null) {
+                values = result.getValue();
+                updateFormOrXML();
+              }
+            });
+        } else {
+          service.aipResource(s -> s.retrieveRepresentationSupportedMetadata(aipId, representationId, value,
+            LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, error) -> {
+              if (error == null) {
+                values = result.getValue();
+                updateFormOrXML();
+              }
+            });
+        }
       }
     });
 
@@ -374,13 +397,13 @@ public class EditDescriptiveMetadata extends Composite {
   }
 
   private void updateMetadataXML() {
-      // Apply the form values to the template (server)
-      Services service = new Services("Update Descriptive metadata", "get");
+    // Apply the form values to the template (server)
+    Services service = new Services("Update Descriptive metadata", "get");
 
-      DescriptiveMetadataPreviewRequest previewRequest = new DescriptiveMetadataPreviewRequest(type.getSelectedValue(),
-        values);
-      service.aipResource(s -> s.retrieveDescriptiveMetadataPreview(aipId, previewRequest))
-        .whenComplete((value, error) -> {
+    DescriptiveMetadataPreviewRequest previewRequest = new DescriptiveMetadataPreviewRequest(type.getSelectedValue(),
+      values);
+    service.aipResource(s -> s.retrieveDescriptiveMetadataPreview(aipId, previewRequest))
+      .whenComplete((value, error) -> {
         if (error != null) {
           AsyncCallbackUtils.defaultFailureTreatment(error);
         } else {
@@ -406,12 +429,12 @@ public class EditDescriptiveMetadata extends Composite {
         values);
       service.aipResource(s -> s.retrieveDescriptiveMetadataPreview(aipId, previewRequest))
         .whenComplete((value, error) -> {
-        if (error != null) {
-          AsyncCallbackUtils.defaultFailureTreatment(error);
-        } else {
-          updateMetadataOnServer(value.getPreview());
-        }
-      });
+          if (error != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(error);
+          } else {
+            updateMetadataOnServer(value.getPreview());
+          }
+        });
     }
   }
 

@@ -88,7 +88,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
         if (isAIP) {
           newAIP = historyTokens.size() == 3 && historyTokens.get(2).equals(NEW);
-          create = new CreateDescriptiveMetadata(aipId, null, newAIP);
+          create = new CreateDescriptiveMetadata(aipId, newAIP);
         } else {
           final String representationId = historyTokens.get(2);
           newAIP = historyTokens.size() == 4 && historyTokens.get(3).equals(NEW);
@@ -150,15 +150,9 @@ public class CreateDescriptiveMetadata extends Composite {
   private TextArea metadataXML;
   private String metadataTextFromForm = null;
 
-  /**
-   * Create a new panel to edit a user
-   *
-   * @param user
-   *          the user to edit
-   */
-  public CreateDescriptiveMetadata(String aipId, String representationId, boolean isNew) {
+  public CreateDescriptiveMetadata(String aipId, boolean isNew) {
     this.aipId = aipId;
-    this.representationId = representationId;
+    this.representationId = null;
     this.isNew = isNew;
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -166,7 +160,6 @@ public class CreateDescriptiveMetadata extends Composite {
     metadataXML.addStyleName("form-textbox metadata-edit-area metadata-form-textbox");
 
     initTitle(aipId, title);
-
 
     type.addChangeHandler(new ChangeHandler() {
 
@@ -208,6 +201,71 @@ public class CreateDescriptiveMetadata extends Composite {
 
           service.aipResource(s -> s.retrieveAIPSupportedMetadata(aipId, type.getSelectedValue(),
             LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, caught) -> {
+              if (caught == null) {
+                values = result.getValue();
+                updateFormOrXML();
+              }
+            });
+
+          id.setText(type.getSelectedValue() + RodaConstants.PREMIS_SUFFIX);
+          id.setEnabled(false);
+
+        }
+      });
+
+    Element firstElement = showXml.getElement().getFirstChildElement();
+    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
+      firstElement.setAttribute("title", "browse input");
+    }
+  }
+
+  public CreateDescriptiveMetadata(String aipId, String representationId, boolean isNew) {
+    this.aipId = aipId;
+    this.representationId = representationId;
+    this.isNew = isNew;
+
+    initWidget(uiBinder.createAndBindUi(this));
+    metadataXML = new TextArea();
+    metadataXML.addStyleName("form-textbox metadata-edit-area metadata-form-textbox");
+
+    initTitle(aipId, title);
+
+    type.addChangeHandler(event -> {
+      setInXML(false);
+      String value = type.getSelectedValue();
+
+      Services service = new Services("Retrieve descriptive metadata", "get");
+      service.aipResource(s -> s.retrieveRepresentationSupportedMetadata(aipId, representationId, value,
+        LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, error) -> {
+          if (error == null) {
+            values = result.getValue();
+            updateFormOrXML();
+          }
+        });
+
+      if (StringUtils.isNotBlank(value)) {
+        id.setText(value + RodaConstants.PREMIS_SUFFIX);
+      } else {
+        id.setText("");
+      }
+    });
+
+    Services service = new Services("Retrieve supported metadata", "get");
+    service.aipResource(s -> s.retrieveSupportedMetadataTypes(LocaleInfo.getCurrentLocale().getLocaleName()))
+      .whenComplete((value, error) -> {
+        if (error != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(error);
+        } else {
+          for (ConfiguredDescriptiveMetadata sm : value.getList()) {
+            type.addItem(sm.getLabel(), sm.getId());
+          }
+          type.addItem(messages.otherItem(), "Other");
+          type.setSelectedIndex(0);
+
+          service
+            .aipResource(s -> s.retrieveRepresentationSupportedMetadata(aipId, representationId,
+              type.getSelectedValue(), LocaleInfo.getCurrentLocale().getLocaleName()))
+            .whenComplete((result, caught) -> {
               if (caught == null) {
                 values = result.getValue();
                 updateFormOrXML();
@@ -317,15 +375,15 @@ public class CreateDescriptiveMetadata extends Composite {
       values);
     service.aipResource(s -> s.retrieveDescriptiveMetadataPreview(aipId, previewRequest))
       .whenComplete((value, error) -> {
-      if (error != null) {
-        AsyncCallbackUtils.defaultFailureTreatment(error);
-      } else {
-        formOrXML.clear();
-        metadataXML.setText(value.getPreview());
-        formOrXML.add(metadataXML);
-        metadataTextFromForm = value.getPreview();
-      }
-    });
+        if (error != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(error);
+        } else {
+          formOrXML.clear();
+          metadataXML.setText(value.getPreview());
+          formOrXML.add(metadataXML);
+          metadataTextFromForm = value.getPreview();
+        }
+      });
   }
 
   @UiHandler("buttonApply")
@@ -343,16 +401,13 @@ public class CreateDescriptiveMetadata extends Composite {
       // modifying the XML directly
       CreateDescriptiveMetadataRequest body;
       if (!hasOverridenTheForm && !values.isEmpty()) {
-        body = new DescriptiveMetadataRequestForm(idText, filename, typeText, typeVersion, true, null,
-          values);
+        body = new DescriptiveMetadataRequestForm(idText, filename, typeText, typeVersion, true, null, values);
       } else {
-        body = new DescriptiveMetadataRequestXML(idText, filename, typeText, typeVersion, true, null,
-          xmlText);
+        body = new DescriptiveMetadataRequestXML(idText, filename, typeText, typeVersion, true, null, xmlText);
       }
       Services service = new Services("Create Descriptive metadata", "create");
-      // GWT.
-      if (representationId == null) {
 
+      if (representationId == null) {
         service.aipResource(s -> s.createAIPDescriptiveMetadata(aipId, body)).whenComplete((value, error) -> {
           if (error != null) {
             if (error instanceof ValidationException) {
@@ -376,6 +431,29 @@ public class CreateDescriptiveMetadata extends Composite {
           }
         });
       } else {
+        service.aipResource(s -> s.createRepresentationDescriptiveMetadata(aipId, representationId, body))
+          .whenComplete((value, error) -> {
+            if (error != null) {
+              if (error instanceof ValidationException) {
+                ValidationException o = (ValidationException) error;
+                updateErrors(o);
+                idError.setVisible(false);
+              } else if (error instanceof AlreadyExistsException) {
+                idError.setVisible(true);
+                idError.setHTML(SafeHtmlUtils.fromSafeConstant(messages.fileAlreadyExists()));
+                errors.setVisible(false);
+              } else {
+                idError.setVisible(false);
+                AsyncCallbackUtils.defaultFailureTreatment(error);
+              }
+              buttonApply.setEnabled(true);
+            } else {
+              errors.setText("");
+              errors.setVisible(false);
+              Toast.showInfo(messages.dialogSuccess(), messages.metadataFileCreated());
+              HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+            }
+          });
         // route will be created on representations
       }
 
