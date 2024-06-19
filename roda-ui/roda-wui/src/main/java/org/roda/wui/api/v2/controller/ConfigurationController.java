@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Locale;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.jobs.PluginInfoList;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -46,6 +48,20 @@ public class ConfigurationController implements ConfigurationRestService {
   ConfigurationsService configurationsService;
 
   @Override
+  public LongResponse retrieveExportLimit() {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    try {
+      long value = RodaCoreFactory.getRodaConfiguration().getInt("ui.list.export_limit",
+        RodaConstants.DEFAULT_LIST_EXPORT_LIMIT);
+      return new LongResponse(value);
+    } finally {
+      controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
+    }
+  }
+
+  @Override
   public Viewers retrieveViewersProperties() {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
@@ -56,10 +72,21 @@ public class ConfigurationController implements ConfigurationRestService {
     }
   }
 
+
+  /**
+   * This method retrieves shared properties based on the provided locale string.
+   *
+   * @param localeString
+   *          The locale string to determine the language of the shared
+   *          properties.
+   * @return SharedProperties The shared properties object containing properties
+   *         based on the provided locale.
+   */
   @Override
   public SharedProperties retrieveSharedProperties(String localeString) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
     try {
       Locale locale = ServerTools.parseLocale(localeString);
       SharedProperties sharedProperties = new SharedProperties();

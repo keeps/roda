@@ -20,7 +20,7 @@ public abstract class CSVOutputStream implements ConsumesOutputStream {
   /** The filename. */
   private final String filename;
   /** The CSV field delimiter. */
-  private final char delimiter;
+  private final String delimiter;
 
   /**
    * Constructor.
@@ -30,9 +30,13 @@ public abstract class CSVOutputStream implements ConsumesOutputStream {
    * @param delimiter
    *          the CSV field delimiter.
    */
-  public CSVOutputStream(final String filename, final char delimiter) {
+  protected CSVOutputStream(final String filename, final String delimiter) {
     this.filename = filename;
     this.delimiter = delimiter;
+  }
+
+  public String getDelimiter() {
+    return delimiter;
   }
 
   @Override
@@ -45,7 +49,5 @@ public abstract class CSVOutputStream implements ConsumesOutputStream {
     return ExtraMediaType.TEXT_CSV;
   }
 
-  protected CSVFormat getFormat() {
-    return CSVFormat.EXCEL.withDelimiter(this.delimiter);
-  }
+  public abstract CSVFormat getFormat();
 }

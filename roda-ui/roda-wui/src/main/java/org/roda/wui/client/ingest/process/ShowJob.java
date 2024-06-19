@@ -63,6 +63,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.process.Process;
+import org.roda.wui.client.services.ConfigurationRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -448,20 +449,18 @@ public class ShowJob extends Composite {
         button.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {
-            BrowserService.Util.getInstance().getExportLimit(new AsyncCallback<Integer>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-
-              @Override
-              public void onSuccess(Integer result) {
-                Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(result));
-                RestUtils.requestCSVExport(Job.class.getName(), filter, Sorter.NONE, new Sublist(0, result),
-                  Facets.NONE, true, false, "job.csv");
-              }
-            });
+            Services services = new Services("Retrieve export limit", "retrieve");
+            services.configurationsResource(ConfigurationRestService::retrieveExportLimit)
+              .whenComplete((longResponse, throwable) -> {
+                if (throwable != null) {
+                  AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                } else {
+                  Toast.showInfo(messages.exportListTitle(),
+                    messages.exportListMessage(longResponse.getResult().intValue()));
+                  RestUtils.requestCSVExport(Job.class, filter, Sorter.NONE,
+                    new Sublist(0, longResponse.getResult().intValue()), Facets.NONE, true, false, "job.csv");
+                }
+              });
           }
         });
 
@@ -499,24 +498,19 @@ public class ShowJob extends Composite {
 
           Button button = new Button(messages.downloadButton());
           button.addStyleName("btn btn-separator-left btn-link");
-          button.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-              BrowserService.Util.getInstance().getExportLimit(new AsyncCallback<Integer>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
-
-                @Override
-                public void onSuccess(Integer result) {
-                  Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(result));
-                  RestUtils.requestCSVExport(Job.class.getName(), filter, Sorter.NONE, new Sublist(0, result),
-                    Facets.NONE, true, false, "job.csv");
+          button.addClickHandler(event -> {
+            Services services = new Services("Retrieve export limit", "retrieve");
+            services.configurationsResource(ConfigurationRestService::retrieveExportLimit)
+              .whenComplete((longResponse, throwable) -> {
+                if (throwable != null) {
+                  AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                } else {
+                  Toast.showInfo(messages.exportListTitle(),
+                    messages.exportListMessage(longResponse.getResult().intValue()));
+                  RestUtils.requestCSVExport(Job.class, filter, Sorter.NONE,
+                    new Sublist(0, longResponse.getResult().intValue()), Facets.NONE, true, false, "job.csv");
                 }
               });
-            }
           });
 
           selectedList.add(button);
@@ -738,28 +732,29 @@ public class ShowJob extends Composite {
 
     if (value != null && !value.isEmpty()) {
       Services services = new Services("Retrieve AIP", "get");
-      services.aipResource(s -> s.findByUuid(value, LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((indexedAIP, throwable) -> {
-        if (throwable != null) {
-          if (throwable.getCause() instanceof NotFoundException) {
-            Label itemTitle = new Label(value);
-            itemTitle.addStyleName("itemText");
-            aipPanel.clear();
-            aipPanel.add(itemTitle);
+      services.aipResource(s -> s.findByUuid(value, LocaleInfo.getCurrentLocale().getLocaleName()))
+        .whenComplete((indexedAIP, throwable) -> {
+          if (throwable != null) {
+            if (throwable.getCause() instanceof NotFoundException) {
+              Label itemTitle = new Label(value);
+              itemTitle.addStyleName("itemText");
+              aipPanel.clear();
+              aipPanel.add(itemTitle);
+            } else {
+              AsyncCallbackUtils.defaultFailureTreatment(throwable.getCause());
+            }
           } else {
-            AsyncCallbackUtils.defaultFailureTreatment(throwable.getCause());
-          }
-        } else {
-          Label itemTitle = new Label();
-          HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(indexedAIP.getLevel());
-          itemIconHtmlPanel.addStyleName("itemIcon");
-          itemTitle.setText(indexedAIP.getTitle() != null ? indexedAIP.getTitle() : indexedAIP.getId());
-          itemTitle.addStyleName("itemText");
+            Label itemTitle = new Label();
+            HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(indexedAIP.getLevel());
+            itemIconHtmlPanel.addStyleName("itemIcon");
+            itemTitle.setText(indexedAIP.getTitle() != null ? indexedAIP.getTitle() : indexedAIP.getId());
+            itemTitle.addStyleName("itemText");
 
-          aipPanel.clear();
-          aipPanel.add(itemIconHtmlPanel);
-          aipPanel.add(itemTitle);
-        }
-      });
+            aipPanel.clear();
+            aipPanel.add(itemIconHtmlPanel);
+            aipPanel.add(itemTitle);
+          }
+        });
     } else {
       HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getTopIconHTMLPanel();
       aipPanel.clear();

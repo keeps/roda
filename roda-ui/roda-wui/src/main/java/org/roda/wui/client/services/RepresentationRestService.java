@@ -3,8 +3,8 @@ package org.roda.wui.client.services;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.IndexedRepresentationRequest;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
@@ -75,11 +75,11 @@ public interface RepresentationRestService extends RODAEntityRestService<Indexed
   Job changeRepresentationType(ChangeTypeRequest request);
 
   @RequestMapping(path = "/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Delete representation", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), description = "Deletes a new representation on an AIP", responses = {
+  @Operation(summary = "Delete representation", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItemsRequest.class))), description = "Deletes a new representation on an AIP", responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job deleteRepresentation(
-    @Parameter(name = "selectedRepresentations", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<IndexedRepresentation> items,
+    @Parameter(name = "selectedRepresentations", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest items,
     @Parameter(description = "Reason to delete representation") @RequestParam(name = RodaConstants.API_QUERY_PARAM_DETAILS) String details);
 
   @RequestMapping(path = "status", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -89,11 +89,11 @@ public interface RepresentationRestService extends RODAEntityRestService<Indexed
   Job changeRepresentationStatus(ChangeRepresentationStatesRequest changeRepresentationStatesRequest);
 
   @RequestMapping(path = "/identify", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Creates a preservation action to identify the file formats via search query", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItems.class))), description = "Identifies the file format for a set of files within the representation", responses = {
+  @Operation(summary = "Creates a preservation action to identify the file formats via search query", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItemsRequest.class))), description = "Identifies the file format for a set of files within the representation", responses = {
     @ApiResponse(responseCode = "200", description = "Created job to identify the format associated to the files within the representation", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job createFormatIdentificationJob(
-    @Parameter(name = "selectedRepresentations", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<IndexedRepresentation> items);
+    @Parameter(name = "selectedRepresentations", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest items);
 
   @RequestMapping(method = RequestMethod.GET, path = "/configuration/rules", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Retrieves from the configuration the rules for the Representation information", responses = {

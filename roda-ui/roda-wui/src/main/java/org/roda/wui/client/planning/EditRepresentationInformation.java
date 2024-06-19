@@ -7,11 +7,12 @@
  */
 package org.roda.wui.client.planning;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationCreateRequest;
 import org.roda.wui.client.common.UserLogin;
@@ -138,33 +139,33 @@ public class EditRepresentationInformation extends Composite {
   void buttonRemoveHandler(ClickEvent e) {
     Services services = new Services("Delete representation information", "delete");
     services
-      .representationInformationResource(s -> s.deleteMultipleRepresentationInformation(
-        SelectedItemsList.create(RepresentationInformation.class.getName(), ri.getUUID())))
+      .representationInformationResource(s -> s
+        .deleteMultipleRepresentationInformation(new SelectedItemsListRequest(Collections.singletonList(ri.getUUID()))))
       .whenComplete((job, throwable) -> {
         if (throwable == null) {
           Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            Timer timer = new Timer() {
-              @Override
-              public void run() {
-                HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER);
-              }
-            };
+            @Override
+            public void onFailure(Throwable caught) {
+              Timer timer = new Timer() {
+                @Override
+                public void run() {
+                  HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER);
+                }
+              };
 
-            timer.schedule(RodaConstants.ACTION_TIMEOUT);
-          }
+              timer.schedule(RodaConstants.ACTION_TIMEOUT);
+            }
 
-          @Override
-          public void onSuccess(final Void nothing) {
-            HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-          }
-        });
-      } else {
-        HistoryUtils.newHistory(InternalProcess.RESOLVER);
-      }
-    });
+            @Override
+            public void onSuccess(final Void nothing) {
+              HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+            }
+          });
+        } else {
+          HistoryUtils.newHistory(InternalProcess.RESOLVER);
+        }
+      });
   }
 
   @UiHandler("buttonCancel")

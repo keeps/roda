@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
@@ -37,7 +38,7 @@ public class FacetsCSVOutputStream extends CSVOutputStream {
    * @param delimiter
    *          the CSV field delimiter.
    */
-  public FacetsCSVOutputStream(final List<FacetFieldResult> facets, final String filename, final char delimiter) {
+  public FacetsCSVOutputStream(final List<FacetFieldResult> facets, final String filename, final String delimiter) {
     super(filename, delimiter);
     this.facets = facets;
   }
@@ -45,7 +46,7 @@ public class FacetsCSVOutputStream extends CSVOutputStream {
   @Override
   public void consumeOutputStream(final OutputStream out) throws IOException {
     final OutputStreamWriter writer = new OutputStreamWriter(out);
-    final CSVPrinter printer = getFormat().withHeader("field", "label", "value", "count").print(writer);
+    final CSVPrinter printer = getFormat().print(writer);
 
     for (FacetFieldResult facet : this.facets) {
       final String field = facet.getField();
@@ -67,4 +68,9 @@ public class FacetsCSVOutputStream extends CSVOutputStream {
     return -1;
   }
 
+  @Override
+  public CSVFormat getFormat() {
+    return CSVFormat.Builder.create(CSVFormat.EXCEL).setHeader("field", "label", "value", "count")
+      .setDelimiter(getDelimiter()).build();
+  }
 }

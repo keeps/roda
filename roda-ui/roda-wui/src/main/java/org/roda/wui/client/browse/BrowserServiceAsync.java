@@ -31,8 +31,6 @@ public interface BrowserServiceAsync {
   void retrieveBrowseAIPBundle(String aipId, String localeString, List<String> aipFieldsToReturn,
     AsyncCallback<BrowseAIPBundle> callback);
 
-  void getExportLimit(AsyncCallback<Integer> asyncCallback);
-
   void createDistributedInstance(DistributedInstance distributedInstance, AsyncCallback<DistributedInstance> async);
 
   void listDistributedInstances(AsyncCallback<DistributedInstances> async);
@@ -42,10 +40,6 @@ public interface BrowserServiceAsync {
   void updateDistributedInstance(DistributedInstance distributedInstance, AsyncCallback<DistributedInstance> async);
 
   void deleteDistributedInstance(String distributedInstanceId, AsyncCallback<Void> async);
-
-  void listAccessKey(AsyncCallback<AccessKeys> async);
-
-  void retrieveAccessKey(String accessKeyId, AsyncCallback<AccessKey> async);
 
   void createLocalInstance(LocalInstance localInstance, AsyncCallback async);
 

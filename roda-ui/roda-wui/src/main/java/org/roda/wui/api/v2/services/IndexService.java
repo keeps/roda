@@ -2,22 +2,32 @@ package org.roda.wui.api.v2.services;
 
 import java.util.List;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SuggestRequest;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.data.v2.user.User;
+import org.roda.wui.api.v1.utils.FacetsCSVOutputStream;
+import org.roda.wui.api.v1.utils.ResultsCSVOutputStream;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.model.RequestContext;
+import org.roda.wui.common.server.RodaStreamingOutput;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -82,10 +92,65 @@ public class IndexService {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-
       // register action
       controllerAssistant.registerAction(context, state, RodaConstants.CONTROLLER_CLASS_PARAM,
         classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, findRequest.getFilter(),
+        RodaConstants.CONTROLLER_SORTER_PARAM, findRequest.getSorter(), RodaConstants.CONTROLLER_SUBLIST_PARAM,
+        findRequest.getSublist());
+    }
+  }
+
+  public <T extends IsIndexed> StreamResponse exportToCSV(User user, String findRequestString, Class<T> returnClass,
+    RequestContext requestContext) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    FindRequest findRequest;
+    try {
+      findRequest = JsonUtils.getObjectFromJson(findRequestString, FindRequest.class);
+    } catch (GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state);
+    }
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser(), returnClass);
+      String csvDelimiter = RodaCoreFactory.getRodaConfiguration().getString("csv.delimiter");
+
+      if (StringUtils.isBlank(csvDelimiter)) {
+        csvDelimiter = CSVFormat.DEFAULT.getDelimiterString();
+      }
+
+      if (findRequest.isExportFacets()) {
+        IndexResult<T> result = RodaCoreFactory.getIndexService().find(returnClass, findRequest.getFilter(),
+          Sorter.NONE, Sublist.NONE, findRequest.getFacets(), user, findRequest.isOnlyActive(),
+          findRequest.getFieldsToReturn());
+
+        return new RodaStreamingOutput(
+          new FacetsCSVOutputStream(result.getFacetResults(), findRequest.getFilename(), csvDelimiter))
+          .toStreamResponse();
+      } else {
+        IndexResult<T> result = RodaCoreFactory.getIndexService().find(returnClass, findRequest.getFilter(),
+          findRequest.getSorter(), findRequest.getSublist(), findRequest.getFacets(), user, findRequest.isOnlyActive(),
+          findRequest.getFieldsToReturn());
+
+        return new RodaStreamingOutput(new ResultsCSVOutputStream<>(result, findRequest.getFilename(), csvDelimiter))
+          .toStreamResponse();
+      }
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (RequestNotValidException | GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_CLASS_PARAM,
+        returnClass.getName(), RodaConstants.CONTROLLER_FILTER_PARAM, findRequest.getFilter(),
         RodaConstants.CONTROLLER_SORTER_PARAM, findRequest.getSorter(), RodaConstants.CONTROLLER_SUBLIST_PARAM,
         findRequest.getSublist());
     }
