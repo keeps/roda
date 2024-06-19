@@ -224,7 +224,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                 @Override
                 public void onSuccess(String details) {
                   Services services = new Services("Delete representation", "delete");
-                  services.representationResource(s -> s.deleteRepresentation(selectedList, details))
+                  services.representationResource(s -> s.deleteRepresentation(SelectedItemsUtils.convertToRESTRequest(selectedList), details))
                     .whenComplete((result, error) -> {
                       if (result != null) {
                         Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
@@ -327,7 +327,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   private void identifyFormats(SelectedItems<IndexedRepresentation> selected,
     final AsyncCallback<ActionImpact> callback) {
     Services services = new Services("Create format identification job", "create");
-    services.representationResource(s -> s.createFormatIdentificationJob(selected)).whenComplete((result, error) -> {
+    services.representationResource(s -> s.createFormatIdentificationJob(SelectedItemsUtils.convertToRESTRequest(selected))).whenComplete((result, error) -> {
       if (result != null) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
 

@@ -14,7 +14,6 @@ import org.roda.core.data.v2.index.filter.Filter;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeName("SelectedItemsFilter")
 public class SelectedItemsFilter<T extends IsIndexed> implements SelectedItems<T> {
 
   @Serial

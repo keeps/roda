@@ -12,7 +12,6 @@ import org.roda.core.data.v2.IsRODAObject;
 
 import java.io.Serial;
 
-@JsonTypeName("SelectedItemsAll")
 public class SelectedItemsAll<T extends IsRODAObject> implements SelectedItems<T> {
 
   @Serial

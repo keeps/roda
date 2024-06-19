@@ -350,23 +350,38 @@ public final class RodaConstants {
   public static final String API_REST_V2_REPRESENTATION_OTHER_METADATA = "/other-metadata";
 
   // aips
-  public static final String API_REST_V2_AIPS = "api/v2/aips";
+  public static final String API_REST_V2_AIPS = "api/v2/aips/";
+
+  // representations
+  public static final String API_REST_V2_REPRESENTATIONS = "api/v2/representations";
+
+  // files
+  public static final String API_REST_V2_FILES = "api/v2/files/";
 
   // transferred resource
-  public static final String API_REST_V2_RESOURCES = "api/v2/transfers/";
+  public static final String API_REST_V2_TRANSFERRED_RESOURCES = "api/v2/transfers/";
   public static final String API_REST_V2_TRANSFERRED_RESOURCE_CREATE_RESOURCE = "create/resource";
+
+  // Report
+  public static final String API_REST_V2_JOB_REPORT = "api/v2/job-report/";
 
   // jobs
   public static final String API_REST_V2_JOBS = "api/v2/jobs/";
 
-  // files
-  public static final String API_REST_V2_FILES = "api/v2/files/";
+  // audit logs
+  public static final String API_REST_V2_AUDIT_LOGS = "api/v2/audit-logs/";
+
+  // notifications
+  public static final String API_REST_V2_NOTIFICATIONS = "api/v2/notifications/";
 
   // dips
   public static final String API_REST_V2_DIPS = "api/v2/dips/";
 
   // representation-information
   public static final String API_REST_V2_REPRESENTATION_INFORMATION = "api/v2/representation-information/";
+
+  // risks
+  public static final String API_REST_V2_RISKS = "api/v2/risks/";
 
   // preservation events
   public static final String API_REST_V2_PRESERVATION_EVENTS = "api/v2/preservation/events/";
@@ -397,7 +412,6 @@ public final class RodaConstants {
    * END: API related (Version 2)
    */
 
-  public static final String API_REST_V2_REPRESENTATIONS = "api/v2/representations";
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";

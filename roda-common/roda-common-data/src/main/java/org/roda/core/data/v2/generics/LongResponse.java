@@ -8,7 +8,6 @@ import java.io.Serializable;
  */
 public class LongResponse implements Serializable {
 
-
   @Serial
   private static final long serialVersionUID = 5965085690339865049L;
 

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -252,7 +253,7 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
                 Services services = new Services("Delete representation information", "delete");
-                services.representationInformationResource(s -> s.deleteMultipleRepresentationInformation(objects))
+                services.representationInformationResource(s -> s.deleteMultipleRepresentationInformation(SelectedItemsUtils.convertToRESTRequest(objects)))
                   .whenComplete((job, throwable) -> {
                     if (throwable == null) {
                       Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),

@@ -92,12 +92,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public int getExportLimit() {
-    return RodaCoreFactory.getRodaConfiguration().getInt("ui.list.export_limit",
-      RodaConstants.DEFAULT_LIST_EXPORT_LIMIT);
-  }
-
-  @Override
   public DistributedInstance createDistributedInstance(DistributedInstance distributedInstance)
     throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,
     RequestNotValidException, IllegalOperationException {
@@ -131,20 +125,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     RODAInstance.deleteDistributedInstance(user, distributedInstanceId);
-  }
-
-  @Override
-  public AccessKeys listAccessKey()
-    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.listAccessKey(user);
-  }
-
-  @Override
-  public AccessKey retrieveAccessKey(String accessKeyId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.retrieveAccessKey(user, accessKeyId);
   }
 
   @Override

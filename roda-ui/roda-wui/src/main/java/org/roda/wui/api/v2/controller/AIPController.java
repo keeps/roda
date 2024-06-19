@@ -95,7 +95,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping(path = "/api/v2/aips")
-public class AIPController implements AIPRestService {
+public class AIPController implements AIPRestService, Exportable {
 
   @Autowired
   HttpServletRequest request;
@@ -149,6 +149,82 @@ public class AIPController implements AIPRestService {
   public List<String> suggest(@RequestBody SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, IndexedAIP.class, requestContext);
+  }
+
+  @GetMapping(path = "/{id}/representation/{representation-id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @Operation(summary = "Downloads representation", description = "Download a particular representation", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  public ResponseEntity<StreamingResponseBody> getRepresentationBinary(
+    @Parameter(description = "The ID of the existing aip", required = true) @PathVariable(name = "id") String aipId,
+    @Parameter(description = "The ID of the existing representation", required = true) @PathVariable(name = "representation-id") String representationId,
+    @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      String indexedRepresentationId = IdUtils.getRepresentationId(aipId, representationId);
+      IndexedRepresentation representation = RodaCoreFactory.getIndexService().retrieve(IndexedRepresentation.class,
+        indexedRepresentationId, new ArrayList<>());
+
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), representation);
+      StreamResponse streamResponse = representationService.retrieveAIPRepresentationBinary(representation);
+
+      return ApiUtils.okResponse(streamResponse);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
+    }
+  }
+
+  @GetMapping(path = "/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID
+    + "}/other-metadata/binary", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @Operation(summary = "Downloads representation", description = "Download a particular representation", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  public ResponseEntity<StreamingResponseBody> getRepresentationOtherMetadataBinary(
+    @Parameter(description = "The ID of the existing aip", required = true) @PathVariable(name = RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @Parameter(description = "The ID of the existing representation", required = true) @PathVariable(name = RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      String indexedRepresentationId = IdUtils.getRepresentationId(aipId, representationId);
+      IndexedRepresentation representation = RodaCoreFactory.getIndexService().retrieve(IndexedRepresentation.class,
+        indexedRepresentationId, new ArrayList<>());
+
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), representation);
+
+      StreamResponse streamResponse = representationService.retrieveAIPRepresentationOtherMetadata(representation);
+
+      return ApiUtils.okResponse(streamResponse, null);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
+    }
   }
 
   @Override
@@ -608,9 +684,8 @@ public class AIPController implements AIPRestService {
       controllerAssistant.checkIfAIPInConfirmation(aip);
 
       if (descriptiveMetadataRequest instanceof DescriptiveMetadataRequestForm) {
-        payload = new StringContentPayload(
-          aipService.retrieveDescriptiveMetadataPreview(aipId, null, metadataId,
-            descriptiveMetadataRequest.getValues()));
+        payload = new StringContentPayload(aipService.retrieveDescriptiveMetadataPreview(aipId, null, metadataId,
+          descriptiveMetadataRequest.getValues()));
       } else {
         payload = new StringContentPayload(descriptiveMetadataRequest.getXml());
       }
@@ -979,7 +1054,6 @@ public class AIPController implements AIPRestService {
     }
   }
 
-
   @Override
   public boolean requestAIPLock(String aipId) {
     boolean lockEnabled = RodaCoreFactory.getRodaConfiguration().getBoolean("core.aip.lockToEdit", false);
@@ -1010,7 +1084,6 @@ public class AIPController implements AIPRestService {
     return JsonUtils.getJsonFromObject(new GenericOkResponse("Lock for AIP " + aipId + " released"),
       GenericOkResponse.class);
   }
-
 
   @Override
   public Void deleteDescriptiveMetadataFile(String aipId, String metadataId) {
@@ -1122,6 +1195,7 @@ public class AIPController implements AIPRestService {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
+
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
 
@@ -1137,7 +1211,7 @@ public class AIPController implements AIPRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
         aipId, RodaConstants.CONTROLLER_METADATA_ID_PARAM, metadataId);
     }
   }
@@ -1214,4 +1288,11 @@ public class AIPController implements AIPRestService {
     }
   }
 
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils.okResponse(
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedAIP.class, requestContext));
+  }
 }

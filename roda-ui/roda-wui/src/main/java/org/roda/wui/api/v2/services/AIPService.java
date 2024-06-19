@@ -378,9 +378,9 @@ public class AIPService {
     String rawTemplate = "";
 
     String result = "";
-    try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-      RodaConstants.METADATA_TEMPLATE_FOLDER + "/" + descriptiveMetadataId
-        + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
+    try (
+      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
+        + "/" + descriptiveMetadataId + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
 
       if (templateStream != null) {
         Map<String, String> data = new HashMap<>();
@@ -588,7 +588,6 @@ public class AIPService {
     }
   }
 
-
   public Job updateAIPPermissions(User user, UpdatePermissionsRequest request)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     final String eventDescription = "The process of updating an object of the repository.";
@@ -604,8 +603,6 @@ public class AIPService {
       CommonServicesUtils.convertSelectedItems(request.getItemsToUpdate(), IndexedAIP.class),
       UpdatePermissionsPlugin.class, user, pluginParameters, "Could not execute AIP permissions recursively action");
   }
-
-
 
   public void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId,
     String deletedBy)

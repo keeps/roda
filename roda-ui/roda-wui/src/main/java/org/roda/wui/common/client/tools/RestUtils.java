@@ -26,8 +26,6 @@ import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
-import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -42,7 +40,7 @@ public class RestUtils {
   public static SafeUri createAIPDownloadUri(String aipId) {
     // api/v2/aips/{id}/download
 
-    String b = RodaConstants.API_REST_V2_AIPS + RodaConstants.API_SEP + URL.encodeQueryString(aipId)
+    String b = RodaConstants.API_REST_V2_AIPS + URL.encodeQueryString(aipId)
       + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER;
 
     return UriUtils.fromSafeConstant(b);
@@ -51,7 +49,7 @@ public class RestUtils {
   public static SafeUri createAIPPartDownloadUri(String aipId, String part) {
     // api/v2/aips/{aip_id}/download/{part}
 
-    String b = RodaConstants.API_REST_V2_AIPS + RodaConstants.API_SEP + URL.encodeQueryString(aipId)
+    String b = RodaConstants.API_REST_V2_AIPS + URL.encodeQueryString(aipId)
       + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER + RodaConstants.API_SEP + URL.encodeQueryString(part);
 
     return UriUtils.fromSafeConstant(b);
@@ -82,18 +80,6 @@ public class RestUtils {
     // locale
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
-
-    return UriUtils.fromSafeConstant(b.toString());
-  }
-
-  public static SafeUri createRepresentationPartDownloadUri(String aipId, String representationId, String part) {
-
-    // api/v1/representations/{aip_id}/{representation_id}/{part}
-    StringBuilder b = new StringBuilder();
-    // base uri
-    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_SEP)
-      .append(URL.encodeQueryString(part));
 
     return UriUtils.fromSafeConstant(b.toString());
   }
@@ -139,20 +125,6 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-  public static SafeUri createDescriptiveMetadataDownloadUri(String aipId) {
-
-    // api/v1/aips/{aip_id}/descriptive_metadata/?acceptFormat=zip
-    StringBuilder b = new StringBuilder();
-    // base uri
-    b.append(RodaConstants.API_REST_V1_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_DESCRIPTIVE_METADATA).append(RodaConstants.API_SEP);
-    // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP);
-
-    return UriUtils.fromSafeConstant(b.toString());
-  }
-
   public static SafeUri createDescriptiveMetadataDownloadUri(String aipId, String descId) {
     return createDescriptiveMetadataDownloadUri(aipId, descId, null);
   }
@@ -162,10 +134,9 @@ public class RestUtils {
 
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append("metadata").append(RodaConstants.API_SEP).append("descriptive")
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(descId)).append(RodaConstants.API_SEP)
-      .append("download");
+    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+      .append("metadata").append(RodaConstants.API_SEP).append("descriptive").append(RodaConstants.API_SEP)
+      .append(URL.encodeQueryString(descId)).append(RodaConstants.API_SEP).append("download");
 
     // version
     if (versionId != null) {
@@ -184,9 +155,9 @@ public class RestUtils {
     // api/v2/aips/{id}/metadata/descriptive/{descriptive-metadata-id}/html?lang=en&version-id={versionId}
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append("metadata").append(RodaConstants.API_SEP).append("descriptive")
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(descId)).append(RodaConstants.API_SEP).append("html");
+    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+      .append("metadata").append(RodaConstants.API_SEP).append("descriptive").append(RodaConstants.API_SEP)
+      .append(URL.encodeQueryString(descId)).append(RodaConstants.API_SEP).append("html");
 
     // locale
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
@@ -232,43 +203,10 @@ public class RestUtils {
     // api/v2/aips/{id}/download/preservation
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
-    .append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER).append(RodaConstants.API_SEP).append("preservation");
+    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER).append(RodaConstants.API_SEP).append("preservation");
 
     return UriUtils.fromSafeConstant(b.toString());
-  }
-
-  public static String createRepresentationPreservationMetadataUri(String aipId, String representationId,
-    int startAgent, int limitAgent, int startEvent, int limitEvent, int startFile, int limitFile) {
-    // api/v1/representations/{aip_id}/{representation_id}/preservation_metadata/?acceptFormat=zip
-    StringBuilder b = new StringBuilder();
-    // base uri
-    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_PRESERVATION_METADATA).append(RodaConstants.API_SEP);
-    // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP);
-
-    // start and limits
-    b.append(RodaConstants.API_QUERY_SEP).append("startAgent").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(startAgent);
-    b.append(RodaConstants.API_QUERY_SEP).append("limitAgent").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(limitAgent);
-    b.append(RodaConstants.API_QUERY_SEP).append("startEvent").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(startEvent);
-    b.append(RodaConstants.API_QUERY_SEP).append("limitEvent").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(limitEvent);
-    b.append(RodaConstants.API_QUERY_SEP).append("startFile").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(startFile);
-    b.append(RodaConstants.API_QUERY_SEP).append("limitFile").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(limitFile);
-
-    // locale
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
-
-    return b.toString();
   }
 
   public static SafeUri createRepresentationDescriptiveMetadataDownloadUri(String aipId, String representationId,
@@ -303,11 +241,10 @@ public class RestUtils {
 
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append("representations").append(RodaConstants.API_SEP)
-      .append(URL.encodeQueryString(representationId)).append(RodaConstants.API_SEP).append("metadata")
-      .append(RodaConstants.API_SEP).append("descriptive").append(RodaConstants.API_SEP)
-      .append(URL.encodeQueryString(descId)).append(RodaConstants.API_SEP).append("html");
+    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+      .append("representations").append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId))
+      .append(RodaConstants.API_SEP).append("metadata").append(RodaConstants.API_SEP).append("descriptive")
+      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(descId)).append(RodaConstants.API_SEP).append("html");
 
     // locale
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
@@ -346,7 +283,7 @@ public class RestUtils {
     // api/v2/transfers/create/resource?parent-uuid={parentUUID}&locale={locale}&commit=true
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_RESOURCES);
+    b.append(RodaConstants.API_REST_V2_TRANSFERRED_RESOURCES);
 
     b.append(RodaConstants.API_REST_V2_TRANSFERRED_RESOURCE_CREATE_RESOURCE);
 
@@ -399,8 +336,8 @@ public class RestUtils {
   public static SafeUri createTransferredResourceDownloadUri(String resourceId) {
     // api/v2/transfers/{transferred_resource_uuid}/binary
 
-    return UriUtils
-      .fromSafeConstant(RodaConstants.API_REST_V2_RESOURCES + resourceId + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
+    return UriUtils.fromSafeConstant(
+      RodaConstants.API_REST_V2_TRANSFERRED_RESOURCES + resourceId + RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
   }
 
   public static SafeUri createRepresentationInformationDownloadUri(String riId) {
@@ -465,20 +402,16 @@ public class RestUtils {
   }
 
   public static SafeUri createJobAttachmentDownloadUri(String jobId, String attachmentId) {
-    // api/v1/jobs/{jobId}/attachment/{attachmentId}
+    // api/v2/jobs/{id}/attachment/{attachment-id}
     return UriUtils.fromSafeConstant(RodaConstants.API_REST_V2_JOBS + jobId + "/attachment/" + attachmentId);
   }
 
-  public static <T extends IsIndexed> void requestCSVExport(Class<T> classToReturnName, Filter filter, Sorter sorter,
+  public static <T extends IsIndexed> void requestCSVExport(Class<T> classToReturn, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, boolean onlyActive, boolean exportFacets, String filename) {
-    requestCSVExport(classToReturnName.getName(), filter, sorter, sublist, facets, onlyActive, exportFacets, filename);
-  }
+    // api/v2/<resource>/export/csv?findRequest={findRequest}
 
-  public static <T extends IsIndexed> void requestCSVExport(String classToReturnName, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, boolean onlyActive, boolean exportFacets, String filename) {
-    // api/v1/index/findFORM?type=csv
+    String url = retrieveRestAPIBase(classToReturn) + "export/csv";
 
-    String url = RodaConstants.API_REST_V1_INDEX + "findFORM";
     FindRequest request = FindRequest.getBuilder(filter, onlyActive).withSorter(sorter).withSublist(sublist)
       .withFacets(facets).withExportFacets(exportFacets).withFilename(filename).build();
 
@@ -489,29 +422,24 @@ public class RestUtils {
     FlowPanel layout = new FlowPanel();
     form.setWidget(layout);
     layout.add(new Hidden("findRequest", FIND_REQUEST_MAPPER.write(request)));
-    layout.add(new Hidden("type", "csv"));
 
     form.setVisible(false);
     RootPanel.get().add(form);
 
-    // using submit instead of submit completed because Chrome doesn't created
+    // using submit instead of submit completed because Chrome doesn't create
     // the other event
-    form.addSubmitHandler(new SubmitHandler() {
+    form.addSubmitHandler(event -> {
 
-      @Override
-      public void onSubmit(SubmitEvent event) {
+      Timer timer = new Timer() {
 
-        Timer timer = new Timer() {
+        @Override
+        public void run() {
+          RootPanel.get().remove(form);
+        }
+      };
 
-          @Override
-          public void run() {
-            RootPanel.get().remove(form);
-          }
-        };
-
-        // remove form 10 seconds in the future
-        timer.schedule(10000);
-      }
+      // remove form 10 seconds in the future
+      timer.schedule(10000);
     });
 
     form.submit();
@@ -536,5 +464,40 @@ public class RestUtils {
   }
 
   public static interface FindRequestMapper extends ObjectMapper<FindRequest> {
+  }
+
+  private static <T extends IsIndexed> String retrieveRestAPIBase(Class<T> classToReturn) {
+    switch (classToReturn.getName()) {
+      case "org.roda.core.data.v2.ip.IndexedAIP":
+        return RodaConstants.API_REST_V2_AIPS;
+      case "org.roda.core.data.v2.ip.IndexedRepresentation":
+        return RodaConstants.API_REST_V2_REPRESENTATIONS;
+      case "org.roda.core.data.v2.jobs.Job":
+        return RodaConstants.API_REST_V2_JOBS;
+      case "org.roda.core.data.v2.ip.TransferredResource":
+        return RodaConstants.API_REST_V2_TRANSFERRED_RESOURCES;
+      case "org.roda.core.data.v2.ip.IndexedFile":
+        return RodaConstants.API_REST_V2_FILES;
+      case "org.roda.core.data.v2.jobs.IndexedReport":
+        return RodaConstants.API_REST_V2_JOB_REPORT;
+      case "org.roda.core.data.v2.log.LogEntry":
+        return RodaConstants.API_REST_V2_AUDIT_LOGS;
+      case "org.roda.core.data.v2.notifications":
+        return RodaConstants.API_REST_V2_NOTIFICATIONS;
+      case "org.roda.core.data.v2.user.RODAMember":
+        return RodaConstants.API_REST_V2_MEMBERS;
+      case "org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation":
+        return RodaConstants.API_REST_V2_DISPOSAL_CONFIRMATION;
+      case "org.roda.core.data.v2.ri.RepresentationInformation":
+        return RodaConstants.API_REST_V2_REPRESENTATION_INFORMATION;
+      case "org.roda.core.data.v2.risks.IndexedRisk":
+        return RodaConstants.API_REST_V2_RISKS;
+      case "org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent":
+        return RodaConstants.API_REST_V2_PRESERVATION_EVENTS;
+      case "org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent":
+        return RodaConstants.API_REST_V2_PRESERVATION_AGENTS;
+      default:
+        return null;
+    }
   }
 }

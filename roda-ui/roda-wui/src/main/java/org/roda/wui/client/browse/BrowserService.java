@@ -43,8 +43,6 @@ public interface BrowserService extends RemoteService {
   BrowseAIPBundle retrieveBrowseAIPBundle(String aipId, String localeString, List<String> aipFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  int getExportLimit();
-
   DistributedInstance createDistributedInstance(DistributedInstance distributedInstance)
     throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,
     RequestNotValidException, IOException, IllegalOperationException;
@@ -60,12 +58,6 @@ public interface BrowserService extends RemoteService {
 
   DistributedInstance updateDistributedInstance(DistributedInstance distributedInstance)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
-
-  AccessKeys listAccessKey()
-    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
-
-  AccessKey retrieveAccessKey(String accessKeyId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
   void createLocalInstance(LocalInstance localInstance) throws AuthorizationDeniedException, GenericException;
 
