@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +49,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadataList;
@@ -96,6 +98,7 @@ import org.springframework.stereotype.Service;
 public class AIPService {
   private static final Logger LOGGER = LoggerFactory.getLogger(AIPService.class);
   private static final String HTML_EXT = ".html";
+  private static final String XML_EXT = ".xml";
 
   public StreamResponse downloadAIPDescriptiveMetadata(String aipId, String metadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
@@ -338,6 +341,21 @@ public class AIPService {
     return ApiUtils.download(directory, aipId);
   }
 
+  public DescriptiveMetadata revertDescriptiveMetadataVersion(User user, String aipId, String representationId,
+    String descriptiveMetadataId, String versionId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+
+    Map<String, String> properties = new HashMap<>();
+    properties.put(RodaConstants.VERSION_USER, user.getId());
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.REVERTED.toString());
+
+    RodaCoreFactory.getModelService().revertDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId,
+      versionId, properties);
+
+    return RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aipId, representationId,
+      descriptiveMetadataId);
+  }
+
   public DescriptiveMetadata revertDescriptiveMetadataVersion(User user, String aipId, String descriptiveMetadataId,
     String versionId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
@@ -375,9 +393,9 @@ public class AIPService {
   public String retrieveDescriptiveMetadataPreview(String aipId, String representationId, String descriptiveMetadataId,
     Set<MetadataValue> values)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    String rawTemplate = "";
+    String rawTemplate;
 
-    String result = "";
+    String result;
     try (
       InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
         + "/" + descriptiveMetadataId + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
@@ -391,7 +409,7 @@ public class AIPService {
             String val = metadataValue.get("value");
             if (val != null) {
               val = val.replaceAll("\\s", "");
-              if (!"".equals(val)) {
+              if (!val.isEmpty()) {
                 data.put(metadataValue.get("name"), metadataValue.get("value"));
               }
             }
@@ -400,14 +418,13 @@ public class AIPService {
 
         result = HandlebarsUtility.executeHandlebars(rawTemplate, data);
       } else {
-        descriptiveMetadataId += ".xml";
         Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aipId, representationId,
-          descriptiveMetadataId);
+          descriptiveMetadataId + XML_EXT);
         InputStream inputStream = binary.getContent().createInputStream();
         result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
       }
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new GenericException(e);
     }
     return result;
   }
@@ -455,79 +472,154 @@ public class AIPService {
   }
 
   public SupportedMetadataValue retrieveSupportedMetadata(User user, IndexedAIP aip,
-    IndexedRepresentation representation, String metadataType, Locale locale) throws GenericException {
+    IndexedRepresentation representation, String descriptiveMetadataId, Locale locale)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
 
-    String template = "";
+    String template;
     Set<MetadataValue> values = new HashSet<>();
-    try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-      RodaConstants.METADATA_TEMPLATE_FOLDER + "/" + metadataType + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
+    try (
+      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
+        + "/" + descriptiveMetadataId + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
 
-      if (templateStream != null) {
+      if (checkIfDescriptiveMetadataExists(aip, representation)) {
         template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
-        values = ServerTools.transform(template);
-        for (MetadataValue mv : values) {
-          String generator = mv.get("auto-generate");
-          if (generator != null && !generator.isEmpty()) {
-            String value;
-            if (representation != null) {
-              value = ServerTools.autoGenerateRepresentationValue(representation, generator);
-            } else {
-              value = ServerTools.autoGenerateAIPValue(aip, user, generator);
-            }
+        String representationId = representation != null ? representation.getId() : null;
+        Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(),
+          representationId, descriptiveMetadataId + XML_EXT);
+        String xml = IOUtils.toString(binary.getContent().createInputStream(), StandardCharsets.UTF_8);
 
-            if (value != null) {
-              mv.set("value", value);
-            }
-          }
+        Set<MetadataValue> result = getMetadataValuesFromDescriptiveMetadataFile(template, xml);
 
-          String labels = mv.get("label");
-          String labelI18N = mv.get("labeli18n");
-          if (labels != null && labelI18N != null) {
-            Map<String, String> labelsMaps = JsonUtils.getMapFromJson(labels);
-            try {
-              labelsMaps.put(locale.toString(), RodaCoreFactory.getI18NMessages(locale).getTranslation(labelI18N));
-            } catch (MissingResourceException e) {
-              LOGGER.debug("Missing resource: {}", labelI18N);
-            }
-            labels = JsonUtils.getJsonFromObject(labelsMaps);
-            mv.set("label", labels);
-          }
-
-          String i18nPrefix = mv.get("optionsLabelI18nKeyPrefix");
-          if (i18nPrefix != null) {
-            Map<String, String> terms = messages.getTranslations(i18nPrefix, String.class, false);
-            if (!terms.isEmpty()) {
-              try {
-                String options = mv.get("options");
-                List<String> optionsList = JsonUtils.getListFromJson(options, String.class);
-
-                if (optionsList != null) {
-                  Map<String, Map<String, String>> i18nMap = new HashMap<>();
-                  for (String value : optionsList) {
-                    String translation = terms.get(i18nPrefix + "." + value);
-                    if (translation == null) {
-                      translation = value;
-                    }
-                    Map<String, String> term = new HashMap<>();
-                    term.put(locale.toString(), translation);
-                    i18nMap.put(value, term);
-                  }
-                  mv.set("optionsLabels", JsonUtils.getJsonFromObject(i18nMap));
-                }
-              } catch (MissingResourceException e) {
-                LOGGER.error(e.getMessage(), e);
-              }
-            }
-          }
+        return new SupportedMetadataValue(result);
+      } else {
+        if (templateStream != null) {
+          template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+          Set<MetadataValue> result = getDefaultDescriptiveMetadataValues(template, aip, representation, user, locale,
+            messages);
+          return new SupportedMetadataValue(result);
         }
       }
     } catch (IOException e) {
       LOGGER.error("Error getting the template from the stream", e);
     }
 
-    return new SupportedMetadataValue(template, values);
+    return new SupportedMetadataValue(values);
+  }
 
+  private boolean checkIfDescriptiveMetadataExists(IndexedAIP aip, IndexedRepresentation representation)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    if (representation != null) {
+      Representation modelRepresentation = RodaCoreFactory.getModelService().retrieveRepresentation(aip.getId(),
+        representation.getId());
+      return !modelRepresentation.getDescriptiveMetadata().isEmpty();
+    } else {
+      AIP aipModel = RodaCoreFactory.getModelService().retrieveAIP(aip.getId());
+      return !aipModel.getDescriptiveMetadata().isEmpty();
+    }
+  }
+
+  private Set<MetadataValue> getDefaultDescriptiveMetadataValues(String template, IndexedAIP aip,
+    IndexedRepresentation representation, User user, Locale locale, Messages messages) throws GenericException {
+    Set<MetadataValue> values = ServerTools.transform(template);
+    Set<MetadataValue> result = new TreeSet<>();
+    for (MetadataValue mv : values) {
+      String generator = mv.get("auto-generate");
+      if (generator != null && !generator.isEmpty()) {
+        String value;
+        if (representation != null) {
+          value = ServerTools.autoGenerateRepresentationValue(representation, generator);
+        } else {
+          value = ServerTools.autoGenerateAIPValue(aip, user, generator);
+        }
+
+        if (value != null) {
+          mv.set("value", value);
+        }
+      }
+
+      getMetadataValueLabels(mv, locale, messages);
+      getMetadataValueI18nPrefix(mv, locale, messages);
+      result.add(mv);
+    }
+
+    return result;
+  }
+
+  private void getMetadataValueI18nPrefix(MetadataValue metadataValue, Locale locale, Messages messages)
+    throws GenericException {
+    String i18nPrefix = metadataValue.get("optionsLabelI18nKeyPrefix");
+    if (i18nPrefix != null) {
+      Map<String, String> terms = messages.getTranslations(i18nPrefix, String.class, false);
+      if (!terms.isEmpty()) {
+        try {
+          String options = metadataValue.get("options");
+          List<String> optionsList = JsonUtils.getListFromJson(options, String.class);
+
+          if (optionsList != null) {
+            Map<String, Map<String, String>> i18nMap = new HashMap<>();
+            for (String value : optionsList) {
+              String translation = terms.get(i18nPrefix + "." + value);
+              if (translation == null) {
+                translation = value;
+              }
+              Map<String, String> term = new HashMap<>();
+              term.put(locale.toString(), translation);
+              i18nMap.put(value, term);
+            }
+            metadataValue.set("optionsLabels", JsonUtils.getJsonFromObject(i18nMap));
+          }
+        } catch (MissingResourceException e) {
+          LOGGER.error(e.getMessage(), e);
+        }
+      }
+    }
+  }
+
+  private void getMetadataValueLabels(MetadataValue metadataValue, Locale locale, Messages messages) {
+    String labels = metadataValue.get("label");
+    String labelI18N = metadataValue.get("labeli18n");
+    if (labels != null && labelI18N != null) {
+      Map<String, String> labelsMaps = JsonUtils.getMapFromJson(labels);
+      try {
+        labelsMaps.put(locale.toString(), messages.getTranslation(labelI18N));
+      } catch (MissingResourceException e) {
+        LOGGER.debug("Missing resource: {}", labelI18N);
+      }
+      labels = JsonUtils.getJsonFromObject(labelsMaps);
+      metadataValue.set("label", labels);
+    }
+  }
+
+  private Set<MetadataValue> getMetadataValuesFromDescriptiveMetadataFile(String template, String xml) {
+    Set<MetadataValue> values = ServerTools.transform(template);
+    Set<MetadataValue> result = new TreeSet<>();
+
+    for (MetadataValue mv : values) {
+      String xpathRaw = mv.get("xpath");
+      if (xpathRaw != null && !xpathRaw.isEmpty()) {
+        String[] xpaths = xpathRaw.split("##%##");
+        String value;
+        List<String> allValues = new ArrayList<>();
+        for (String xpath : xpaths) {
+          allValues.addAll(ServerTools.applyXpath(xml, xpath));
+        }
+        // if any of the values is different, concatenate all values in a
+        // string, otherwise return the value
+        boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.getFirst().trim()));
+        if (allEqual && !allValues.isEmpty()) {
+          value = allValues.getFirst();
+        } else {
+          value = String.join(" / ", allValues);
+        }
+        mv.set("value", value.trim());
+      }
+      // getMetadataValueLabels(mv, locale, messages);
+      // getMetadataValueI18nPrefix(mv, locale, messages);
+      result.add(mv);
+    }
+
+    return result;
   }
 
   // Get preservation metadata

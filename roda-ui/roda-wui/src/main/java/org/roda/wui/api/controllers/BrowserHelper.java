@@ -489,7 +489,7 @@ public class BrowserHelper {
             // clear the auto-generated values
             // mv.set("value", null);
             String xpathRaw = mv.get("xpath");
-            if (xpathRaw != null && xpathRaw.length() > 0) {
+            if (xpathRaw != null && !xpathRaw.isEmpty()) {
               String[] xpaths = xpathRaw.split("##%##");
               String value;
               List<String> allValues = new ArrayList<>();

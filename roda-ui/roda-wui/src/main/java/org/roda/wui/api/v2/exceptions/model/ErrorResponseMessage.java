@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class ErrorResponseMessage implements Serializable {
 
   @Serial
@@ -16,6 +18,8 @@ public class ErrorResponseMessage implements Serializable {
   private final String details;
   private final Instant timestamp;
   private final String instance;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Object objectDetails;
 
   public ErrorResponseMessage(int status, String errorId, String message, String details, String instance) {
     this.status = status;
@@ -24,6 +28,16 @@ public class ErrorResponseMessage implements Serializable {
     this.details = details;
     this.timestamp = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     this.instance = instance;
+  }
+
+  public ErrorResponseMessage(int status, String errorId, String message, String details, String instance, Object objectDetails) {
+    this.status = status;
+    this.errorId = errorId;
+    this.message = message;
+    this.details = details;
+    this.timestamp = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    this.instance = instance;
+    this.objectDetails = objectDetails;
   }
 
   public int getStatus() {
@@ -48,5 +62,9 @@ public class ErrorResponseMessage implements Serializable {
 
   public String getInstance() {
     return instance;
+  }
+
+  public Object getObjectDetails() {
+    return objectDetails;
   }
 }
