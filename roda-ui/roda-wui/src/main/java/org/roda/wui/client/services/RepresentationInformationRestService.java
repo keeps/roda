@@ -1,6 +1,6 @@
 package org.roda.wui.client.services;
 
-import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationCreateRequest;
@@ -83,7 +83,7 @@ public interface RepresentationInformationRestService extends RODAEntityRestServ
   @Operation(summary = "Delete multiple representation information via search query", description = "Deletes one or more representation information", responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class)))})
   Job deleteMultipleRepresentationInformation(
-    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItems<RepresentationInformation> selected);
+    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selected);
 
   @RequestMapping(path = "/filter", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Add a Filter to a set of selected representation information", requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = RepresentationInformationFilterRequest.class))), responses = {

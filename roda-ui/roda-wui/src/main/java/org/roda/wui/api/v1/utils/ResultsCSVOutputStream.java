@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Date;
 
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -39,7 +40,7 @@ public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream
    * @param delimiter
    *          the CSV field delimiter.
    */
-  public ResultsCSVOutputStream(final IndexResult<T> results, final String filename, final char delimiter) {
+  public ResultsCSVOutputStream(final IndexResult<T> results, final String filename, final String delimiter) {
     super(filename, delimiter);
     this.results = results;
   }
@@ -51,7 +52,7 @@ public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream
     boolean isFirst = true;
     for (final T result : this.results.getResults()) {
       if (isFirst) {
-        printer = getFormat().withHeader(result.toCsvHeaders().toArray(new String[0])).print(writer);
+        printer = getFormat(result.toCsvHeaders().toArray(new String[0])).print(writer);
         isFirst = false;
       }
       printer.printRecord(result.toCsvValues());
@@ -67,5 +68,14 @@ public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream
   @Override
   public long getSize() {
     return -1;
+  }
+
+  @Override
+  public CSVFormat getFormat() {
+    return CSVFormat.Builder.create(CSVFormat.EXCEL).setDelimiter(getDelimiter()).build();
+  }
+
+  public CSVFormat getFormat(String[] headers) {
+    return CSVFormat.Builder.create(CSVFormat.EXCEL).setHeader(headers).setDelimiter(getDelimiter()).build();
   }
 }

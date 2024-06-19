@@ -14,6 +14,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
@@ -35,6 +36,7 @@ import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.RepresentationInformationService;
 import org.roda.wui.api.v2.services.TranslationService;
 import org.roda.wui.api.v2.utils.ApiUtils;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.RepresentationInformationRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
@@ -108,7 +110,8 @@ public class RepresentationInformationController implements RepresentationInform
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION)) {
+    if (UserUtility.hasPermissions(requestContext.getUser(),
+      RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION)) {
       return new LongResponse(indexService.count(RepresentationInformation.class, countRequest, requestContext));
     } else {
       return new LongResponse(-1L);
@@ -287,8 +290,7 @@ public class RepresentationInformationController implements RepresentationInform
   }
 
   @Override
-  public Job deleteMultipleRepresentationInformation(
-    @RequestBody SelectedItems<RepresentationInformation> selectedItems) {
+  public Job deleteMultipleRepresentationInformation(@RequestBody SelectedItemsRequest selectedItems) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -296,8 +298,11 @@ public class RepresentationInformationController implements RepresentationInform
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      return representationInformationService.deleteRepresentationInformationByJob(selectedItems,
-        requestContext.getUser());
+
+      SelectedItems<RepresentationInformation> representationInformationSelectedItems = CommonServicesUtils
+        .convertSelectedItems(selectedItems, RepresentationInformation.class);
+      return representationInformationService
+        .deleteRepresentationInformationByJob(representationInformationSelectedItems, requestContext.getUser());
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);

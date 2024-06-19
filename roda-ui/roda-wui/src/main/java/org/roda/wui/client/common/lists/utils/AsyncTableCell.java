@@ -39,7 +39,6 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -49,6 +48,7 @@ import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.services.ConfigurationRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -66,7 +66,6 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -274,25 +273,19 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
     toggleSidePanel(createAndBindFacets(sidePanel));
 
-    csvDownloadButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        BrowserService.Util.getInstance().getExportLimit(new AsyncCallback<Integer>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Integer result) {
-            Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(result));
+    csvDownloadButton.addClickHandler(event -> {
+      Services services = new Services("Retrieve export limit", "get");
+      services.configurationsResource(ConfigurationRestService::retrieveExportLimit)
+        .whenComplete((limit, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(limit.getResult().intValue()));
             RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
-              new Sublist(0, result), getFacets(), getJustActive(), false, notNullSummary + ".csv");
+              new Sublist(0, limit.getResult().intValue()), getFacets(), getJustActive(), false,
+              notNullSummary + ".csv");
           }
         });
-      }
     });
 
     selectionModel = new SingleSelectionModel<>(getKeyProvider());
@@ -595,9 +588,9 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private CompletableFuture<IndexResult<T>> getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn) {
     String reason = "Get " + beautifyClassToReturn(getClassToReturn()) + " data";
     Services services = new Services(reason, "get");
-    FindRequest findRequest = FindRequest.getBuilder(getFilter(), getJustActive())
-      .withSublist(sublist).withFacets(getFacets()).withExportFacets(false).withSorter(sorter)
-      .withFieldsToReturn(fieldsToReturn).withCollapse(getCollapse()).build();
+    FindRequest findRequest = FindRequest.getBuilder(getFilter(), getJustActive()).withSublist(sublist)
+      .withFacets(getFacets()).withExportFacets(false).withSorter(sorter).withFieldsToReturn(fieldsToReturn)
+      .withCollapse(getCollapse()).build();
     return services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       getClassToReturn());
   }
