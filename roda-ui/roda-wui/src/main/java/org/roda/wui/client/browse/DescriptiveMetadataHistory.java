@@ -84,7 +84,7 @@ public class DescriptiveMetadataHistory extends Composite {
         service.aipResource(s -> s.requestAIPLock(aipId)).whenComplete((value, error) -> {
           if (value) {
             if (representationId == null) {
-              service.aipResource(s -> s.retrieveDescriptiveMetadataVersions(aipId, descriptiveMetadataId,
+              service.aipResource(s -> s.retrieveAIPDescriptiveMetadataVersions(aipId, descriptiveMetadataId,
                 LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, throwable) -> {
                   if (throwable != null) {
                     AsyncCallbackUtils.defaultFailureTreatment(throwable);
@@ -95,7 +95,18 @@ public class DescriptiveMetadataHistory extends Composite {
                   }
                 });
             } else {
-              // representations
+              service
+                .aipResource(s -> s.retrieveRepresentationDescriptiveMetadataVersions(aipId, representationId,
+                  descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName()))
+                .whenComplete((result, throwable) -> {
+                  if (throwable != null) {
+                    AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                  } else {
+                    DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, null,
+                      descriptiveMetadataId, result);
+                    callback.onSuccess(widget);
+                  }
+                });
             }
           }
         });
@@ -370,17 +381,30 @@ public class DescriptiveMetadataHistory extends Composite {
           if (result) {
             Services service = new Services("Revert descriptive metadata version", "put");
 
-            service
-              .aipResource(s -> s.revertAIPDescriptiveMetadataVersion(aipId, descriptiveMetadataId, selectedVersion))
-              .whenComplete((value, error) -> {
-                if (error != null) {
-                  AsyncCallbackUtils.defaultFailureTreatment(error);
-                } else {
-                  Toast.showInfo(messages.dialogDone(), messages.versionReverted());
-                  HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
-                }
-              });
+            if (representationId == null) {
 
+              service
+                .aipResource(s -> s.revertAIPDescriptiveMetadataVersion(aipId, descriptiveMetadataId, selectedVersion))
+                .whenComplete((value, error) -> {
+                  if (error != null) {
+                    AsyncCallbackUtils.defaultFailureTreatment(error);
+                  } else {
+                    Toast.showInfo(messages.dialogDone(), messages.versionReverted());
+                    HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
+                  }
+                });
+
+            } else {
+              service.aipResource(s -> s.revertRepresentationDescriptiveMetadataVersion(aipId, representationId,
+                descriptiveMetadataId, selectedVersion)).whenComplete((value, error) -> {
+                  if (error != null) {
+                    AsyncCallbackUtils.defaultFailureTreatment(error);
+                  } else {
+                    Toast.showInfo(messages.dialogDone(), messages.versionReverted());
+                    HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId, representationId);
+                  }
+                });
+            }
           }
         }
       });
@@ -401,7 +425,7 @@ public class DescriptiveMetadataHistory extends Composite {
             if (representationId == null) {
               service
                 .aipResource(s -> s.deleteDescriptiveMetadataVersion(aipId, descriptiveMetadataId, selectedVersion))
-                .thenCompose(unused -> service.aipResource(s -> s.retrieveDescriptiveMetadataVersions(aipId,
+                .thenCompose(unused -> service.aipResource(s -> s.retrieveAIPDescriptiveMetadataVersions(aipId,
                   descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName())))
                 .whenComplete((value, error) -> {
                   if (error != null) {
@@ -416,6 +440,26 @@ public class DescriptiveMetadataHistory extends Composite {
                     }
                   }
                 });
+            } else {
+              service
+                .aipResource(s -> s.deleteRepresentationDescriptiveMetadataVersion(aipId, representationId,
+                  descriptiveMetadataId, selectedVersion))
+                .thenCompose(unused -> service
+                  .aipResource(s -> s.retrieveRepresentationDescriptiveMetadataVersions(aipId, representationId,
+                    descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName()))
+                  .whenComplete((value, error) -> {
+                    if (error != null) {
+                      AsyncCallbackUtils.defaultFailureTreatment(error);
+                    } else {
+                      if (value.getVersions().isEmpty()) {
+                        HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
+                      } else {
+                        descriptiveMetadataVersions = value;
+                        clean();
+                        init();
+                      }
+                    }
+                  }));
             }
           }
         }
@@ -427,7 +471,7 @@ public class DescriptiveMetadataHistory extends Composite {
     Services service = new Services("Get descriptive metadata versions", "get");
 
     if (representationId == null) {
-      service.aipResource(s -> s.retrieveDescriptiveMetadataVersions(aipId, descriptiveMetadataId,
+      service.aipResource(s -> s.retrieveAIPDescriptiveMetadataVersions(aipId, descriptiveMetadataId,
         LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((value, error) -> {
           if (error != null) {
             AsyncCallbackUtils.defaultFailureTreatment(error);
@@ -438,9 +482,17 @@ public class DescriptiveMetadataHistory extends Composite {
           }
         });
     } else {
-      // do for representation
+      service.aipResource(s -> s.retrieveRepresentationDescriptiveMetadataVersions(aipId, representationId,
+        descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            DescriptiveMetadataHistory.this.descriptiveMetadataVersions = result;
+            clean();
+            init();
+          }
+        });
     }
-
   }
 
   protected void clean() {

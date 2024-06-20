@@ -44,8 +44,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -226,43 +224,27 @@ public class EditDescriptiveMetadata extends Composite {
     id.setText(filename);
     id.setEnabled(false);
 
-    type.addChangeHandler(new ChangeHandler() {
-      @Override
-      public void onChange(ChangeEvent changeEvent) {
-        setInXML(false);
-        String typeString = null;
-        String version = null;
-        String value = type.getSelectedValue();
-        if (value.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
-          typeString = value.substring(0, value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
-          version = value.substring(value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, value.length());
-        }
-
-        if (typeString == null) {
-          typeString = value;
-        }
-
-        Services service = new Services("Retrieve descriptive metadata", "get");
-
-        if (representationId == null) {
-          service
-            .aipResource(
-              s -> s.retrieveAIPSupportedMetadata(aipId, value, LocaleInfo.getCurrentLocale().getLocaleName()))
-            .whenComplete((result, error) -> {
-              if (error == null) {
-                values = result.getValue();
-                updateFormOrXML();
-              }
-            });
-        } else {
-          service.aipResource(s -> s.retrieveRepresentationSupportedMetadata(aipId, representationId, value,
-            LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, error) -> {
-              if (error == null) {
-                values = result.getValue();
-                updateFormOrXML();
-              }
-            });
-        }
+    type.addChangeHandler(changeEvent -> {
+      setInXML(false);
+      String value = type.getSelectedValue();
+      Services service = new Services("Retrieve descriptive metadata", "get");
+      if (representationId == null) {
+        service
+          .aipResource(s -> s.retrieveAIPSupportedMetadata(aipId, value, LocaleInfo.getCurrentLocale().getLocaleName()))
+          .whenComplete((result, error) -> {
+            if (error == null) {
+              values = result.getValue();
+              updateFormOrXML();
+            }
+          });
+      } else {
+        service.aipResource(s -> s.retrieveRepresentationSupportedMetadata(aipId, representationId, value,
+          LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, error) -> {
+            if (error == null) {
+              values = result.getValue();
+              updateFormOrXML();
+            }
+          });
       }
     });
 
@@ -458,26 +440,45 @@ public class EditDescriptiveMetadata extends Composite {
 
             Services service = new Services("Update descriptive metadata", "update");
 
-            service.aipResource(s -> s.updateDescriptiveMetadataFile(aipId, request)).whenComplete((value, error) -> {
-              if (error != null) {
-                if (error instanceof ValidationException) {
-                  ValidationException e = (ValidationException) error;
-                  updateErrors(e);
-                } else {
-                  AsyncCallbackUtils.defaultFailureTreatment(error);
-                }
-              } else {
-                errors.setText("");
-                errors.setVisible(false);
-                Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
-                back();
-              }
-            });
+            if (representationId != null) {
+              service.aipResource(s -> s.updateRepresentationDescriptiveMetadataFile(aipId, representationId, request))
+                .whenComplete((value, error) -> {
+                  if (error != null) {
+                    if (error instanceof ValidationException) {
+                      ValidationException e = (ValidationException) error;
+                      updateErrors(e);
+                    } else {
+                      AsyncCallbackUtils.defaultFailureTreatment(error);
+                    }
+                  } else {
+                    errors.setText("");
+                    errors.setVisible(false);
+                    Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
+                    back();
+                  }
+                });
+            } else {
 
+              service.aipResource(s -> s.updateAIPDescriptiveMetadataFile(aipId, request))
+                .whenComplete((value, error) -> {
+                  if (error != null) {
+                    if (error instanceof ValidationException) {
+                      ValidationException e = (ValidationException) error;
+                      updateErrors(e);
+                    } else {
+                      AsyncCallbackUtils.defaultFailureTreatment(error);
+                    }
+                  } else {
+                    errors.setText("");
+                    errors.setVisible(false);
+                    Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
+                    back();
+                  }
+                });
+            }
           }
         }
       });
-
   }
 
   protected void updateErrors(ValidationException e) {
@@ -500,16 +501,28 @@ public class EditDescriptiveMetadata extends Composite {
         public void onSuccess(Boolean confirm) {
           if (confirm) {
             Services service = new Services("Delete descriptive metadata file", "delete");
+            if (representationId == null) {
+              service.aipResource(s -> s.deleteDescriptiveMetadataFile(aipId, filename))
+                .whenComplete((value, error) -> {
+                  if (error == null) {
+                    Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
+                    back();
+                  } else {
+                    AsyncCallbackUtils.defaultFailureTreatment(error);
+                  }
+                });
 
-            service.aipResource(s -> s.deleteDescriptiveMetadataFile(aipId, filename)).whenComplete((value, error) -> {
-              if (error == null) {
-                Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
-                back();
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(error);
-              }
-            });
-
+            } else {
+              service.aipResource(s -> s.deleteRepresentationDescriptiveMetadataFile(aipId, representationId, filename))
+                .whenComplete((value, error) -> {
+                  if (error == null) {
+                    Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
+                    back();
+                  } else {
+                    AsyncCallbackUtils.defaultFailureTreatment(error);
+                  }
+                });
+            }
           }
         }
 

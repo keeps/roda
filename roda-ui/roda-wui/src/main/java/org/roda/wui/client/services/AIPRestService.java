@@ -98,6 +98,18 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
     @Parameter(description = "The descriptive metadata identifier") @PathVariable(name = "descriptive-metadata-id") String metadataId);
 
+  @RequestMapping(path = "/{id}/representation/{representation-id}/metadata/descriptive/{descriptive-metadata-id}", method = RequestMethod.DELETE)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(summary = "Delete metadata file", description = "Delete metadata file related to representation", responses = {
+    @ApiResponse(responseCode = "204", description = "No Content"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Void deleteRepresentationDescriptiveMetadataFile(
+    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
+    @Parameter(description = "The representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
+    @Parameter(description = "The descriptive metadata identifier") @PathVariable(name = "descriptive-metadata-id") String metadataId);
+
   @RequestMapping(path = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @Operation(summary = "Creates an AIP", description = "Creates a new AIP", responses = {
@@ -146,7 +158,7 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job moveAIPInHierarchy(MoveRequest moveRequest);
 
-  @RequestMapping(path = "/{id}/representations/{representation-id}/metadata/descriptive/information", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/{id}/representations/{representation-id}/metadata/descriptive", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Retrieves descriptive metadata information for a specific representation", responses = {
     @ApiResponse(responseCode = "200", description = "Returns an object with all the representation descriptive metadata", content = @Content(schema = @Schema(implementation = DescriptiveMetadataInfos.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
@@ -223,6 +235,18 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @Parameter(description = "The descriptive metadata identifier", required = true) @PathVariable(name = "descriptive-metadata-id") String descriptiveMetadataId,
     @Parameter(description = "The version identifier", required = true) @PathVariable(name = "version-id") String versionId);
 
+  @RequestMapping(path = "/{id}/representation/{representation-id}metadata/descriptive/{descriptive-metadata-id}/versions/{version-id}/revert", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Reverts representation descriptive metadata to the an older version", description = "Reverts representation descriptive metadata to the an older version", responses = {
+    @ApiResponse(responseCode = "200", description = "Reverted descriptive metadata"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  DescriptiveMetadata revertRepresentationDescriptiveMetadataVersion(
+    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
+    @Parameter(description = "The representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
+    @Parameter(description = "The descriptive metadata identifier", required = true) @PathVariable(name = "descriptive-metadata-id") String descriptiveMetadataId,
+    @Parameter(description = "The version identifier", required = true) @PathVariable(name = "version-id") String versionId);
+
   @RequestMapping(path = "/{id}/metadata/descriptive/{descriptive-metadata-id}/versions/{version-id}/delete", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete an AIP descriptive metadata version", description = "Deletes a descriptive metadata version related to an AIP", responses = {
@@ -235,14 +259,39 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @Parameter(description = "The descriptive metadata identifier", required = true) @PathVariable(name = "descriptive-metadata-id") String descriptiveMetadataId,
     @Parameter(description = "The version identifier", required = true) @PathVariable(name = "version-id") String versionId);
 
+  @RequestMapping(path = "/{id}/representation/{representation-id}/metadata/descriptive/{descriptive-metadata-id}/versions/{version-id}/delete", method = RequestMethod.DELETE)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(summary = "Delete an AIP descriptive metadata version", description = "Deletes a descriptive metadata version related to a representation", responses = {
+    @ApiResponse(responseCode = "204", description = "No Content"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Void deleteRepresentationDescriptiveMetadataVersion(
+    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
+    @Parameter(description = "The representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
+    @Parameter(description = "The descriptive metadata identifier", required = true) @PathVariable(name = "descriptive-metadata-id") String descriptiveMetadataId,
+    @Parameter(description = "The version identifier", required = true) @PathVariable(name = "version-id") String versionId);
+
   @RequestMapping(path = "/{id}/metadata/descriptive/{descriptive-metadata-id}/versions", method = RequestMethod.GET)
   @Operation(summary = "Get descriptive metadata versions", description = "Get descriptive metadata versions", responses = {
     @ApiResponse(responseCode = "200", description = "Returns an object with all the descriptive metadata versions", content = @Content(schema = @Schema(implementation = DescriptiveMetadataVersions.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  DescriptiveMetadataVersions retrieveDescriptiveMetadataVersions(
+  DescriptiveMetadataVersions retrieveAIPDescriptiveMetadataVersions(
     @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
+    @Parameter(description = "The descriptive metadata identifier", required = true) @PathVariable(name = "descriptive-metadata-id") String metadataId,
+    @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
+
+  @RequestMapping(path = "/{id}/representation/{representation-id}/metadata/descriptive/{descriptive-metadata-id}/versions", method = RequestMethod.GET)
+  @Operation(summary = "Get descriptive metadata versions from", description = "Get descriptive metadata versions", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns an object with all the descriptive metadata versions", content = @Content(schema = @Schema(implementation = DescriptiveMetadataVersions.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  DescriptiveMetadataVersions retrieveRepresentationDescriptiveMetadataVersions(
+    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
+    @Parameter(description = "The representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
     @Parameter(description = "The descriptive metadata identifier", required = true) @PathVariable(name = "descriptive-metadata-id") String metadataId,
     @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
@@ -252,8 +301,19 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  DescriptiveMetadata updateDescriptiveMetadataFile(
+  DescriptiveMetadata updateAIPDescriptiveMetadataFile(
     @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String id,
+    CreateDescriptiveMetadataRequest content);
+
+  @RequestMapping(path = "/{id}/representation/{representation-id}/metadata/descriptive", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Updates a representation descriptive metadata", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CreateDescriptiveMetadataRequest.class))), responses = {
+    @ApiResponse(responseCode = "200", description = "Descriptive metadata updated"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  DescriptiveMetadata updateRepresentationDescriptiveMetadataFile(
+    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
+    @Parameter(description = "The representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
     CreateDescriptiveMetadataRequest content);
 
   @RequestMapping(path = "/permissions/update", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)

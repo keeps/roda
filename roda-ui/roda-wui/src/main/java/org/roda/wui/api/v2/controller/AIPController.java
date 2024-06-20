@@ -797,7 +797,7 @@ public class AIPController implements AIPRestService, Exportable {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (GenericException | NotFoundException e) {
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -833,7 +833,7 @@ public class AIPController implements AIPRestService, Exportable {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (GenericException | NotFoundException e) {
+    } catch (GenericException | RequestNotValidException | NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -1205,7 +1205,44 @@ public class AIPController implements AIPRestService, Exportable {
   }
 
   @Override
-  public DescriptiveMetadata updateDescriptiveMetadataFile(String aipId,
+  public Void deleteRepresentationDescriptiveMetadataFile(String aipId, String representationId, String metadataId) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // Check object permissions
+      IndexedAIP aip = indexService.retrieve(requestContext, IndexedAIP.class, aipId,
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
+      // delegate
+      aipService.deleteDescriptiveMetadataFile(aipId, representationId, metadataId, requestContext.getUser().getId());
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_METADATA_ID_PARAM, metadataId);
+    }
+    return null;
+  }
+
+  @Override
+  public DescriptiveMetadata updateAIPDescriptiveMetadataFile(String aipId,
     @RequestBody CreateDescriptiveMetadataRequest content) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
@@ -1242,6 +1279,44 @@ public class AIPController implements AIPRestService, Exportable {
   }
 
   @Override
+  public DescriptiveMetadata updateRepresentationDescriptiveMetadataFile(String aipId, String representationId,
+    @RequestBody CreateDescriptiveMetadataRequest content) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedAIP aip = indexService.retrieve(requestContext, IndexedAIP.class, aipId,
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
+      // delegate
+      return aipService.updateDescriptiveMetadataFile(requestContext.getUser(), aipId, representationId, content);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException | ValidationException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
+        RodaConstants.CONTROLLER_METADATA_ID_PARAM, content.getId());
+    }
+  }
+
+  @Override
   public Job updatePermissions(UpdatePermissionsRequest updateRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
@@ -1270,7 +1345,7 @@ public class AIPController implements AIPRestService, Exportable {
   }
 
   @Override
-  public DescriptiveMetadataVersions retrieveDescriptiveMetadataVersions(String aipId, String metadataId,
+  public DescriptiveMetadataVersions retrieveAIPDescriptiveMetadataVersions(String aipId, String metadataId,
     String locale) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
@@ -1295,6 +1370,36 @@ public class AIPController implements AIPRestService, Exportable {
       // register action
       controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
         RodaConstants.CONTROLLER_METADATA_ID_PARAM, metadataId);
+    }
+  }
+
+  @Override
+  public DescriptiveMetadataVersions retrieveRepresentationDescriptiveMetadataVersions(String aipId,
+    String representationId, String metadataId, String localeString) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
+
+      // delegate
+      return aipService.retrieveDescriptiveMetadataVersions(aip, representationId, metadataId, localeString);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_METADATA_ID_PARAM,
+        metadataId);
     }
   }
 
@@ -1326,6 +1431,40 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
         RodaConstants.CONTROLLER_METADATA_ID_PARAM, descriptiveMetadataId, RodaConstants.CONTROLLER_VERSION_ID_PARAM,
         versionId);
+    }
+
+    return null;
+  }
+
+  @Override
+  public Void deleteRepresentationDescriptiveMetadataVersion(String aipId, String representationId,
+    String descriptiveMetadataId, String versionId) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
+
+      // delegate
+      aipService.deleteDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId, versionId);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_METADATA_ID_PARAM,
+        descriptiveMetadataId, RodaConstants.CONTROLLER_VERSION_ID_PARAM, versionId);
     }
 
     return null;
@@ -1367,6 +1506,45 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
         RodaConstants.CONTROLLER_METADATA_ID_PARAM, descriptiveMetadataId, RodaConstants.CONTROLLER_VERSION_ID_PARAM,
         versionId);
+    }
+  }
+
+  @Override
+  public DescriptiveMetadata revertRepresentationDescriptiveMetadataVersion(String aipId, String representationId,
+    String descriptiveMetadataId, String versionId) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
+      // delegate
+      return aipService.revertDescriptiveMetadataVersion(requestContext.getUser(), aipId, representationId,
+        descriptiveMetadataId, versionId);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_METADATA_ID_PARAM,
+        descriptiveMetadataId, RodaConstants.CONTROLLER_VERSION_ID_PARAM, versionId);
     }
   }
 
