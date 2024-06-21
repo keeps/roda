@@ -20,7 +20,7 @@ RUN set -ex; \
     rm -rf /usr/local/tomcat/webapps/ROOT
 
 # Install web application
-COPY ./target/  /usr/local/tomcat/webapps/ROOT
+COPY ./target/roda-wui-*.war  .
 
 # Fix configuration & do some final cleanup
 RUN mkdir -p /usr/local/tomcat/conf/Catalina/localhost
@@ -39,6 +39,8 @@ RUN set -ex; \
     rm -rf /var/lib/apt/lists/*
 
 ENV RODA_HOME=/roda \
+    LDAP_SERVER_URL=ldap://openldap \
+    LDAP_SERVER_PORT=1389 \
     SIEGFRIED_MODE=server \
     SIEGFRIED_SERVER_URL=http://siegfried:5138 \
     RODA_USER="roda" \
