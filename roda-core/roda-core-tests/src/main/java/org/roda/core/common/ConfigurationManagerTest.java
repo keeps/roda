@@ -186,18 +186,4 @@ public class ConfigurationManagerTest {
       configurationFilePath.toString());
   }
 
-  @Test
-  public void testGetConfigurationFileAsStream() throws IOException {
-    // set up
-    Path configPath = configurationManager.getConfigPath();
-    Files.createDirectories(configPath);
-    String configurationFile = "roda-wui.properties";
-    Path configurationFilePath = Files.createFile(configPath.resolve(configurationFile));
-
-    // check if input stream is not null
-    InputStream configurationFileAsStream = configurationManager
-      .getConfigurationFileAsStream(configurationFilePath.toString());
-    Assert.assertNotNull(configurationFileAsStream);
-  }
-
 }

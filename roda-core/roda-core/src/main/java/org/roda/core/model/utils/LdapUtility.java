@@ -210,11 +210,11 @@ public class LdapUtility {
     this.rodaAdministratorsDN = configuration.getString("core.ldap.rodaAdministratorsDN",
       "cn=administrators,ou=groups,dc=roda,dc=org");
 
-    final String ldapUrl = configuration.getString("core.ldap.url", RodaConstants.CORE_LDAP_DEFAULT_URL);
-    final int ldapPort = configuration.getInt("core.ldap.port", RodaConstants.CORE_LDAP_DEFAULT_PORT);
-    final String ldapAdminPassword = configuration.getString("core.ldap.adminPassword", "roda");
-
     if (nodeType != RodaConstants.NodeType.TEST) {
+      final String ldapUrl = configuration.getString("core.ldap.url", RodaConstants.CORE_LDAP_DEFAULT_URL);
+      final int ldapPort = configuration.getInt("core.ldap.port", RodaConstants.CORE_LDAP_DEFAULT_PORT);
+      final String ldapAdminPassword = configuration.getString("core.ldap.adminPassword", "roda");
+
       LdapContextSource contextSource = new LdapContextSource();
       contextSource.setUrl(ldapUrl + ":" + ldapPort);
       contextSource.setBase(ldapRootDN);
