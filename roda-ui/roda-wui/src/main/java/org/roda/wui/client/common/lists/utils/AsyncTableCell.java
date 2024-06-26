@@ -214,7 +214,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
             HistoryUtils.resolve(getVisibleItems().get(0), true);
           }
 
-          if (getVisibleItems().isEmpty()) {
+          if (tIndexResult.getResults().isEmpty()) {
             AsyncTableCell.this.addStyleName("table-empty");
           } else {
             AsyncTableCell.this.removeStyleName("table-empty");
