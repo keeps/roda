@@ -77,7 +77,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "/api/v2/files")
-public class FilesController implements FileRestService {
+public class FilesController implements FileRestService, Exportable {
   @Autowired
   private HttpServletRequest request;
 
@@ -424,5 +424,13 @@ public class FilesController implements FileRestService {
     } finally {
       controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
     }
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils.okResponse(
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedFile.class, requestContext));
   }
 }
