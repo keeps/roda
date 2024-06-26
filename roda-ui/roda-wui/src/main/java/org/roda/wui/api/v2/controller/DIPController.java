@@ -53,7 +53,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping(path = "/api/v2/dips")
-public class DIPController implements DIPRestService {
+public class DIPController implements DIPRestService, Exportable {
 
   @Autowired
   private HttpServletRequest request;
@@ -170,5 +170,13 @@ public class DIPController implements DIPRestService {
         updateRequest.getItemsToUpdate(), RodaConstants.CONTROLLER_PERMISSIONS_PARAM, updateRequest.getPermissions(),
         RodaConstants.CONTROLLER_DETAILS_PARAM, updateRequest.getDetails());
     }
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils.okResponse(
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedDIP.class, requestContext));
   }
 }

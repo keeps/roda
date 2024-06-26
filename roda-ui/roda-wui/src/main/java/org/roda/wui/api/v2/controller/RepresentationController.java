@@ -41,6 +41,7 @@ import org.roda.wui.api.controllers.BrowserHelper;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.RepresentationService;
+import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.RepresentationRestService;
 import org.roda.wui.common.ControllerAssistant;
@@ -50,9 +51,11 @@ import org.roda.wui.common.utils.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -62,7 +65,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "/api/v2/representations")
-public class RepresentationController implements RepresentationRestService {
+public class RepresentationController implements RepresentationRestService, Exportable {
   private static final Logger LOGGER = LoggerFactory.getLogger(RepresentationController.class);
   @Autowired
   private HttpServletRequest request;
@@ -385,5 +388,13 @@ public class RepresentationController implements RepresentationRestService {
     } finally {
       controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
     }
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
+      IndexedRepresentation.class, requestContext));
   }
 }

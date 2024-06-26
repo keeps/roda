@@ -65,7 +65,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping(path = "/api/v2/representation-information")
-public class RepresentationInformationController implements RepresentationInformationRestService {
+public class RepresentationInformationController implements RepresentationInformationRestService, Exportable {
   @Autowired
   HttpServletRequest request;
 
@@ -368,5 +368,13 @@ public class RepresentationInformationController implements RepresentationInform
       controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM,
         id);
     }
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
+      RepresentationInformation.class, requestContext));
   }
 }

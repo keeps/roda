@@ -55,6 +55,7 @@ import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.model.GenericOkResponse;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.MembersService;
+import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.client.services.MembersRestService;
@@ -65,10 +66,12 @@ import org.roda.wui.common.utils.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.NamingException;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -81,7 +84,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping(path = "/api/v2/members")
-public class MembersController implements MembersRestService {
+public class MembersController implements MembersRestService, Exportable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MembersController.class);
   @Autowired
@@ -774,5 +777,13 @@ public class MembersController implements MembersRestService {
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, RODAMember.class, requestContext);
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils.okResponse(
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, RODAMember.class, requestContext));
   }
 }

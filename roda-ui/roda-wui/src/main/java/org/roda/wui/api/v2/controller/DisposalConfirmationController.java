@@ -56,7 +56,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping(path = "/api/v2/disposal/confirmations")
-public class DisposalConfirmationController implements DisposalConfirmationRestService {
+public class DisposalConfirmationController implements DisposalConfirmationRestService, Exportable {
 
   @Autowired
   HttpServletRequest request;
@@ -298,5 +298,13 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
     } finally {
       controllerAssistant.registerAction(requestContext, state);
     }
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
+      DisposalConfirmation.class, requestContext));
   }
 }
