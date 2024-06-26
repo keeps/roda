@@ -82,6 +82,8 @@ jobs:
           RODA_CORE_SOLR_TYPE: CLOUD
           RODA_CORE_SOLR_CLOUD_URLS: localhost:2181
           SIEGFRIED_MODE: standalone
+          LDAP_SERVER_URL: ldap://localhost
+          LDAP_SERVER_PORT: 1389
       - name: Package
         run:
           mvn $MAVEN_CLI_OPTS -Dmaven.test.skip=true package
@@ -90,3 +92,5 @@ jobs:
           RODA_CORE_SOLR_TYPE: CLOUD
           RODA_CORE_SOLR_CLOUD_URLS: localhost:2181
           SIEGFRIED_MODE: standalone
+          LDAP_SERVER_URL: ldap://localhost
+          LDAP_SERVER_PORT: 1389
