@@ -67,7 +67,7 @@ jobs:
       - name: Copy target to docker context
         run: |
           mkdir -p docker/target
-          cp -r roda-ui/roda-wui/target/roda-wui-$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)/* docker/target
+          cp -r roda-ui/roda-wui/target/roda-wui-$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout).war docker/target
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3 
         with:
