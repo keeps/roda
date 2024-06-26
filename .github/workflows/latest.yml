@@ -70,7 +70,7 @@ jobs:
       - name: Copy target to docker context
         run: |
           mkdir -p docker/target
-          cp -r roda-ui/roda-wui/target/roda-wui-$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)/* docker/target
+          cp -r roda-ui/roda-wui/target/roda-wui-$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout).war docker/target
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
