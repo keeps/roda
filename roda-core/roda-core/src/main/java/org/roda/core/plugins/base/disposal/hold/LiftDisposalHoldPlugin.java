@@ -54,6 +54,7 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(LiftDisposalHoldPlugin.class);
 
   private String disposalHoldId;
+  private String details;
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
@@ -62,12 +63,17 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
       PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
         PluginParameter.PluginParameterType.STRING).isMandatory(true).isReadOnly(false)
         .withDescription("Disposal hold identifier").build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details", PluginParameter.PluginParameterType.STRING)
+        .isMandatory(false).withDescription("Details that will be used when creating event").build());
   }
 
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS));
     return parameters;
   }
 
@@ -77,6 +83,10 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID)) {
       disposalHoldId = parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID);
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DETAILS)) {
+      details = parameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS);
     }
   }
 
@@ -148,6 +158,7 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
 
   private void processAIP(IndexService index, ModelService model, Report report, Job cachedJob,
     JobPluginInfo jobPluginInfo, List<AIP> aips) {
+    report.addPluginDetails(details);
 
     if (StringUtils.isNotBlank(disposalHoldId)) {
       try {

@@ -20,6 +20,7 @@ import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposalhold.LiftBySelectedItemsRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
@@ -183,7 +184,8 @@ public class DisposalHoldController implements DisposalHoldRestService {
   }
 
   @Override
-  public Job liftDisposalHoldBySelectedItems(@RequestBody SelectedItemsRequest items, String disposalHoldId) {
+  public Job liftDisposalHoldBySelectedItems(@RequestBody LiftBySelectedItemsRequest liftBySelectedItemsRequest,
+    String disposalId) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -193,7 +195,8 @@ public class DisposalHoldController implements DisposalHoldRestService {
       controllerAssistant.checkRoles(requestContext.getUser());
       // delegate
       return disposalHoldService.liftDisposalHold(requestContext.getUser(),
-        CommonServicesUtils.convertSelectedItems(items, IndexedAIP.class), disposalHoldId);
+        CommonServicesUtils.convertSelectedItems(liftBySelectedItemsRequest.getSelectedItems(), IndexedAIP.class),
+        disposalId, liftBySelectedItemsRequest.getDetails());
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -202,8 +205,8 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
-        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+        liftBySelectedItemsRequest.getSelectedItems(), RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalId);
     }
   }
 

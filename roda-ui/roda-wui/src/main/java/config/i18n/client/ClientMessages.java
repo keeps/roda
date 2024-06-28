@@ -2153,9 +2153,21 @@ public interface ClientMessages extends Messages {
 
   String disassociateDisposalHoldDialogMessage(@PluralCount int size);
 
+  String disassociateDisposalHoldReasonDialogTitle();
+
+  String disassociateDisposalHoldReasonDialogMessage();
+
   String disassociateDisposalScheduleDialogTitle();
 
   String disassociateDisposalScheduleDialogMessage(@PluralCount int size);
+
+  String liftDisposalHoldDialogTitle();
+
+  String liftDisposalHoldDialogMessage(@PluralCount int size);
+
+  String liftDisposalHoldReasonDialogTitle();
+
+  String liftDisposalHoldReasonDialogMessage();
 
   String disposalHoldAssociatedOn();
 
@@ -2264,6 +2276,10 @@ public interface ClientMessages extends Messages {
   String disposalConfirmationShowRecordsRetentionPeriodCalculationError();
 
   String updateDisposalHoldMessage();
+
+  String updateDisposalHoldTitle();
+
+  String updateDisposalHoldLabel();
 
   String searchPrefilterDescendantsOf(String title);
 

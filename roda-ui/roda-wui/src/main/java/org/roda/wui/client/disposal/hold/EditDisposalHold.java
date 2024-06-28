@@ -12,6 +12,7 @@ import java.util.List;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
@@ -113,17 +114,30 @@ public class EditDisposalHold extends Composite {
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     if (disposalHoldDataPanel.isChanged() && disposalHoldDataPanel.isValid()) {
-      DisposalHold disposalHoldUpdated = disposalHoldDataPanel.getDisposalHold();
-      disposalHold.setTitle(disposalHoldUpdated.getTitle());
-      disposalHold.setMandate(disposalHoldUpdated.getMandate());
-      disposalHold.setDescription(disposalHoldUpdated.getDescription());
-      disposalHold.setScopeNotes(disposalHoldUpdated.getScopeNotes());
-      Services services = new Services("Update disposal hold", "update");
-      services.disposalHoldResource(s -> s.updateDisposalHold(disposalHold)).whenComplete((hold, throwable) -> {
-        if (throwable != null) {
-          AsyncCallbackUtils.defaultFailureTreatment(throwable);
-        } else {
-          HistoryUtils.newHistory(ShowDisposalHold.RESOLVER, hold.getId());
+      Dialogs.showConfirmDialog(messages.updateDisposalHoldTitle(), messages.updateDisposalHoldLabel(),
+        messages.cancelButton(), messages.confirmButton(), new AsyncCallback<Boolean>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            // do nothing
+          }
+
+          @Override
+          public void onSuccess(Boolean confirm) {
+            if (confirm) {
+              DisposalHold disposalHoldUpdated = disposalHoldDataPanel.getDisposalHold();
+              disposalHold.setTitle(disposalHoldUpdated.getTitle());
+              disposalHold.setMandate(disposalHoldUpdated.getMandate());
+              disposalHold.setDescription(disposalHoldUpdated.getDescription());
+              disposalHold.setScopeNotes(disposalHoldUpdated.getScopeNotes());
+              Services services = new Services("Update disposal hold", "update");
+              services.disposalHoldResource(s -> s.updateDisposalHold(disposalHold)).whenComplete((hold, throwable) -> {
+                if (throwable != null) {
+                  AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                } else {
+                  HistoryUtils.newHistory(ShowDisposalHold.RESOLVER, hold.getId());
+                }
+              });
+            }
         }
       });
     } else {
