@@ -13,6 +13,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
+import org.roda.core.data.v2.generics.select.SelectedItemsFilterRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -258,8 +260,7 @@ public class ShowDisposalHold extends Composite {
                     public void onSuccess(final String details) {
                       Filter filter = new Filter(
                         new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId()));
-                      SelectedItemsFilter<IndexedAIP> selectedItemsFilter = new SelectedItemsFilter<>(filter,
-                        IndexedAIP.class.getName(), true);
+                      SelectedItemsRequest selectedItemsRequest = new SelectedItemsFilterRequest(filter, true);
 
                       Services services = new Services("Lift disposal hold", "job");
                       CountRequest countRequest = new CountRequest(filter, true);
@@ -267,7 +268,7 @@ public class ShowDisposalHold extends Composite {
                         .whenComplete((longResponse, throwable) -> {
                           if (longResponse.getResult() != 0) {
                             LiftBySelectedItemsRequest request = new LiftBySelectedItemsRequest();
-                            request.setSelectedItems(selectedItemsFilter);
+                            request.setSelectedItems(selectedItemsRequest);
                             request.setDetails(details);
                             services
                               .disposalHoldResource(

@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * @author Alexandre Flores <aflores@keep.pt>
  */
-@JsonInclude(JsonInclude.Include.ALWAYS)
 public class LiftBySelectedItemsRequest implements Serializable {
 
   @Serial
@@ -32,11 +31,6 @@ public class LiftBySelectedItemsRequest implements Serializable {
 
   public void setSelectedItems(SelectedItemsRequest selectedItems) {
     this.selectedItems = selectedItems;
-  }
-
-  @JsonIgnore
-  public void setSelectedItems(SelectedItems<?> selectedItems) {
-    this.selectedItems = SelectedItemsUtils.convertToRESTRequest(selectedItems);
   }
 
   public String getDetails() {
