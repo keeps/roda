@@ -44,7 +44,9 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreview;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreviewRequest;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataRequestForm;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataRequestXML;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataVersions;
+import org.roda.core.data.v2.ip.metadata.SelectedType;
 import org.roda.core.data.v2.ip.metadata.SupportedMetadataValue;
 import org.roda.core.data.v2.ip.metadata.TypeOptionsInfo;
 import org.roda.core.data.v2.jobs.Job;
@@ -623,9 +625,9 @@ public class AIPController implements AIPRestService, Exportable {
 
       if (createDescriptiveMetadataRequest instanceof DescriptiveMetadataRequestForm) {
         payload = new StringContentPayload(aipService.retrieveDescriptiveMetadataPreview(aipId, representationId,
-          metadataId, createDescriptiveMetadataRequest.getValues()));
+          metadataId, ((DescriptiveMetadataRequestForm) createDescriptiveMetadataRequest).getValues()));
       } else {
-        payload = new StringContentPayload(createDescriptiveMetadataRequest.getXml());
+        payload = new StringContentPayload(((DescriptiveMetadataRequestXML)createDescriptiveMetadataRequest).getXml());
       }
 
       // delegate
@@ -730,9 +732,9 @@ public class AIPController implements AIPRestService, Exportable {
 
       if (descriptiveMetadataRequest instanceof DescriptiveMetadataRequestForm) {
         payload = new StringContentPayload(aipService.retrieveDescriptiveMetadataPreview(aipId, null, metadataId,
-          descriptiveMetadataRequest.getValues()));
+          ((DescriptiveMetadataRequestForm) descriptiveMetadataRequest).getValues()));
       } else {
-        payload = new StringContentPayload(descriptiveMetadataRequest.getXml());
+        payload = new StringContentPayload(((DescriptiveMetadataRequestXML) descriptiveMetadataRequest).getXml());
       }
 
       // delegate
@@ -1133,6 +1135,63 @@ public class AIPController implements AIPRestService, Exportable {
       // register action
       controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_TEMPLATE_PARAM,
         previewRequest.getId());
+    }
+  }
+
+  @Override
+  public boolean isRepresentationMetadataSimilar(String aipId, String representationId, String metadataId,
+    @RequestBody SelectedType selectedType) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
+              RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
+
+      // delegate
+      return aipService.isMetadataSimilar(aip, representationId, metadataId, selectedType);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_TEMPLATE_PARAM,
+              selectedType);
+    }
+
+  }
+
+  @Override
+  public boolean isAIPMetadataSimilar(String aipId, String metadataId,
+    @RequestBody SelectedType selectedType) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
+              RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
+
+      // delegate
+      return aipService.isMetadataSimilar(aip, null, metadataId, selectedType);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_TEMPLATE_PARAM,
+              selectedType);
     }
   }
 

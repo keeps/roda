@@ -25,6 +25,7 @@ import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.CreateDescriptiveMetadataRequest;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreviewRequest;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataRequestXML;
+import org.roda.core.data.v2.ip.metadata.SelectedType;
 import org.roda.core.data.v2.ip.metadata.SupportedMetadataValue;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
@@ -176,11 +177,11 @@ public class EditDescriptiveMetadata extends Composite {
   private String metadataId = "";
   private String filename = "";
   private Permissions permissions = null;
-
   private boolean inXML = false;
   private TextArea metadataXML;
   private String metadataTextFromForm = null;
   private boolean aipLocked;
+  private boolean isSimilar;
 
   /**
    * Create a new panel to edit a descriptive metadata
@@ -199,6 +200,7 @@ public class EditDescriptiveMetadata extends Composite {
     this.filename = filename;
     this.permissions = aipPermissions;
     this.metadataId = filename.replace(".xml", "");
+    this.isSimilar = true;
 
     aipLocked = true;
 
@@ -231,20 +233,26 @@ public class EditDescriptiveMetadata extends Composite {
       if (representationId == null) {
         service
           .aipResource(s -> s.retrieveAIPSupportedMetadata(aipId, value, LocaleInfo.getCurrentLocale().getLocaleName()))
-          .whenComplete((result, error) -> {
+          .thenCompose(result -> service
+            .aipResource(s -> s.isAIPMetadataSimilar(aipId, metadataId, new SelectedType(value, result.getValue())))
+            .whenComplete((similar, error) -> {
             if (error == null) {
+              isSimilar = similar;
               values = result.getValue();
               updateFormOrXML();
             }
-          });
+            }));
       } else {
         service.aipResource(s -> s.retrieveRepresentationSupportedMetadata(aipId, representationId, value,
-          LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, error) -> {
+          LocaleInfo.getCurrentLocale().getLocaleName()))
+          .thenCompose(result -> service.aipResource(s -> s.isRepresentationMetadataSimilar(aipId, representationId,
+            metadataId, new SelectedType(value, result.getValue()))).whenComplete((similar, error) -> {
             if (error == null) {
+              isSimilar = similar;
               values = result.getValue();
               updateFormOrXML();
             }
-          });
+          }));
       }
     });
 
@@ -314,6 +322,7 @@ public class EditDescriptiveMetadata extends Composite {
 
   private void updateFormOrXML() {
     if (values != null && !values.isEmpty()) {
+      formSimilarDanger.setVisible(!isSimilar);
       showXml.setVisible(true);
       if (inXML) {
         updateMetadataXML();
@@ -344,7 +353,7 @@ public class EditDescriptiveMetadata extends Composite {
       }
     } else {
       setInXML(true);
-      formSimilarDanger.setVisible(false);
+      formSimilarDanger.setVisible(!isSimilar);
       formOrXML.clear();
       updateMetadataXML();
       formOrXML.add(metadataXML);

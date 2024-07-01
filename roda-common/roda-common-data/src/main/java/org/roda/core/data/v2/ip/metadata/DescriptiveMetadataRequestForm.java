@@ -30,17 +30,7 @@ public class DescriptiveMetadataRequestForm extends CreateDescriptiveMetadataReq
     this.values = values;
   }
 
-  @Override
-  public String getXml() {
-    return null;
-  }
 
-  @Override
-  public void setXml(String xml) {
-    // do nothing
-  }
-
-  @Override
   public Set<MetadataValue> getValues() {
     return values;
   }
