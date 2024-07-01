@@ -60,7 +60,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping(path = "/api/v2/transfers")
 @Tag(name = TransferredResourceController.SWAGGER_ENDPOINT)
-public class TransferredResourceController implements TransferredResourceRestService {
+public class TransferredResourceController implements TransferredResourceRestService, Exportable {
   public static final String SWAGGER_ENDPOINT = "v2 transfers";
 
   @Autowired
@@ -327,5 +327,13 @@ public class TransferredResourceController implements TransferredResourceRestSer
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, TransferredResource.class, requestContext);
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils.okResponse(
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, TransferredResource.class, requestContext));
   }
 }

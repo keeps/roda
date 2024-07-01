@@ -24,18 +24,21 @@ import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.model.GenericOkResponse;
 import org.roda.wui.api.v2.services.AuditLogService;
 import org.roda.wui.api.v2.services.IndexService;
+import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.client.services.AuditLogRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,7 +52,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping(path = "/api/v2/audit-logs")
-public class AuditLogController implements AuditLogRestService {
+public class AuditLogController implements AuditLogRestService, Exportable {
   @Autowired
   HttpServletRequest request;
 
@@ -121,5 +124,13 @@ public class AuditLogController implements AuditLogRestService {
     } finally {
       controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_FILENAME_PARAM, filename);
     }
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils.okResponse(
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, LogEntry.class, requestContext));
   }
 }

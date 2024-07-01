@@ -63,7 +63,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "/api/v2/jobs")
-public class JobsController implements JobsRestService {
+public class JobsController implements JobsRestService, Exportable {
   @Autowired
   private HttpServletRequest request;
 
@@ -328,5 +328,13 @@ public class JobsController implements JobsRestService {
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, Job.class, requestContext);
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils
+      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, Job.class, requestContext));
   }
 }
