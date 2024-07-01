@@ -57,10 +57,12 @@ import org.roda.core.data.v2.ip.metadata.CreateDescriptiveMetadataRequest;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataRequestXML;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataVersions;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.ResourceVersion;
+import org.roda.core.data.v2.ip.metadata.SelectedType;
 import org.roda.core.data.v2.ip.metadata.SupportedMetadataValue;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
@@ -90,6 +92,10 @@ import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.ElementSelectors;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -395,7 +401,7 @@ public class AIPService {
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     String rawTemplate;
 
-    String result;
+    String result = "";
     try (
       InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
         + "/" + descriptiveMetadataId + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
@@ -418,10 +424,15 @@ public class AIPService {
 
         result = HandlebarsUtility.executeHandlebars(rawTemplate, data);
       } else {
-        Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aipId, representationId,
-          descriptiveMetadataId + XML_EXT);
-        InputStream inputStream = binary.getContent().createInputStream();
-        result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        StorageService ss = RodaCoreFactory.getModelService().getStorage();
+        if (ss.exists(
+          ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, descriptiveMetadataId + XML_EXT))) {
+
+          Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aipId, representationId,
+            descriptiveMetadataId + XML_EXT);
+          InputStream inputStream = binary.getContent().createInputStream();
+          result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        }
       }
     } catch (IOException e) {
       throw new GenericException(e);
@@ -482,7 +493,7 @@ public class AIPService {
       InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
         + "/" + descriptiveMetadataId + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
 
-      if (checkIfDescriptiveMetadataExists(aip, representation)) {
+      if (checkIfDescriptiveMetadataExists(aip, representation, descriptiveMetadataId + XML_EXT)) {
         template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         String representationId = representation != null ? representation.getId() : null;
         Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(),
@@ -507,16 +518,30 @@ public class AIPService {
     return new SupportedMetadataValue(values);
   }
 
-  private boolean checkIfDescriptiveMetadataExists(IndexedAIP aip, IndexedRepresentation representation)
+  private boolean checkIfDescriptiveMetadataExists(IndexedAIP aip, IndexedRepresentation representation,
+    String descriptiveMetadaId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     if (representation != null) {
       Representation modelRepresentation = RodaCoreFactory.getModelService().retrieveRepresentation(aip.getId(),
         representation.getId());
-      return !modelRepresentation.getDescriptiveMetadata().isEmpty();
+      if (!modelRepresentation.getDescriptiveMetadata().isEmpty()) {
+        for (DescriptiveMetadata dm : modelRepresentation.getDescriptiveMetadata()) {
+          if (dm.getId().equals(descriptiveMetadaId)) {
+            return true;
+          }
+        }
+      }
     } else {
       AIP aipModel = RodaCoreFactory.getModelService().retrieveAIP(aip.getId());
-      return !aipModel.getDescriptiveMetadata().isEmpty();
+      if (!aipModel.getDescriptiveMetadata().isEmpty()) {
+        for (DescriptiveMetadata dm : aipModel.getDescriptiveMetadata()) {
+          if (dm.getId().equals(descriptiveMetadaId)) {
+            return true;
+          }
+        }
+      }
     }
+    return false;
   }
 
   private Set<MetadataValue> getDefaultDescriptiveMetadataValues(String template, IndexedAIP aip,
@@ -719,7 +744,8 @@ public class AIPService {
     String filename = request.getFilename();
     String descriptiveMetadataType = request.getType();
     String descriptiveMetadataVersion = request.getVersion();
-    StringContentPayload descriptiveMetadataPayload = new StringContentPayload(request.getXml());
+    StringContentPayload descriptiveMetadataPayload = new StringContentPayload(
+      ((DescriptiveMetadataRequestXML) request).getXml());
 
     ValidationReport report = ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload,
       descriptiveMetadataType, descriptiveMetadataVersion, false);
@@ -810,4 +836,32 @@ public class AIPService {
       descriptiveMetadataId);
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
   }
+
+  public boolean isMetadataSimilar(IndexedAIP aip, String representationId, String metadataId,
+    SelectedType selectedType)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    boolean isSimilar = false;
+
+    try {
+      Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), representationId,
+        metadataId + XML_EXT);
+      InputStream inputStream = binary.getContent().createInputStream();
+      String xml = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+      String selectedTypeTemplate = retrieveDescriptiveMetadataPreview(aip.getId(), representationId,
+        selectedType.getMetadataId(), selectedType.getValue());
+
+      if (selectedTypeTemplate != "") {
+        Diff diff = DiffBuilder.compare(xml).withTest(selectedTypeTemplate).ignoreComments().ignoreWhitespace()
+          .checkForIdentical().checkForSimilar().withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+          .withNodeFilter(node -> !node.getNodeName().equals("schemaLocation")).build();
+
+        isSimilar = !diff.hasDifferences();
+      }
+
+    } catch (IOException e) {
+      throw new GenericException(e);
+    }
+    return isSimilar;
+  }
+
 }
