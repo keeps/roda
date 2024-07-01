@@ -250,7 +250,7 @@ public class Login extends Composite {
     Services services = new Services("Resend email", "resend");
     services
       .membersResource(
-        s -> s.sendEmailVerification(username.getText(), true, LocaleInfo.getCurrentLocale().getLocaleName()))
+        s -> s.sendEmailVerification(username.getText(), LocaleInfo.getCurrentLocale().getLocaleName()))
       .whenComplete((result, error) -> {
         if (result != null) {
           if (result.getState() == NotificationState.COMPLETED) {
