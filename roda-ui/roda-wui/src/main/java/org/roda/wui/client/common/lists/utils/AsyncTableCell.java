@@ -211,7 +211,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
           setResult(tIndexResult);
           if (redirectOnSingleResult && originalFilter.equals(AsyncTableCell.this.getFilter())
             && tIndexResult.getResults().size() == 1) {
-            HistoryUtils.resolve(tIndexResult.getResults().getFirst(), true);
+            HistoryUtils.resolve(tIndexResult.getResults().get(0), true);
           }
 
           if (tIndexResult.getResults().isEmpty()) {
