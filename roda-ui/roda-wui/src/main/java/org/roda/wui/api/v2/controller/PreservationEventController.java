@@ -58,7 +58,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping(path = "/api/v2/preservation/events")
-public class PreservationEventController implements PreservationEventRestService {
+public class PreservationEventController implements PreservationEventRestService, Exportable {
 
   @Autowired
   HttpServletRequest request;
@@ -228,5 +228,13 @@ public class PreservationEventController implements PreservationEventRestService
       controllerAssistant.registerAction(requestContext, id, state,
         RodaConstants.CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM, id);
     }
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
+      IndexedPreservationEvent.class, requestContext));
   }
 }

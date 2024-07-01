@@ -47,7 +47,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping(path = "/api/v2/preservation/agents")
-public class PreservationAgentController implements PreservationAgentRestService {
+public class PreservationAgentController implements PreservationAgentRestService, Exportable {
 
   @Autowired
   HttpServletRequest request;
@@ -117,5 +117,13 @@ public class PreservationAgentController implements PreservationAgentRestService
       controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_AGENT_ID_PARAM,
         id);
     }
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    // delegate
+    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
+      IndexedPreservationAgent.class, requestContext));
   }
 }
