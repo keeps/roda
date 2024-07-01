@@ -210,11 +210,11 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
         return AsyncTableCell.this.getData(sublist, sorter, fieldsToReturn).thenApply(tIndexResult -> {
           setResult(tIndexResult);
           if (redirectOnSingleResult && originalFilter.equals(AsyncTableCell.this.getFilter())
-            && getVisibleItems().size() == 1) {
-            HistoryUtils.resolve(getVisibleItems().get(0), true);
+            && tIndexResult.getResults().size() == 1) {
+            HistoryUtils.resolve(tIndexResult.getResults().get(0), true);
           }
 
-          if (getVisibleItems().isEmpty()) {
+          if (tIndexResult.getResults().isEmpty()) {
             AsyncTableCell.this.addStyleName("table-empty");
           } else {
             AsyncTableCell.this.removeStyleName("table-empty");
