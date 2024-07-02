@@ -2317,7 +2317,7 @@ public class ModelService extends ModelObservable {
         UserUtility.getLdapUtility().setUserPassword(user.getId(), password);
       }
 
-      User updatedUser = UserUtility.getLdapUtility().modifyUser(user);
+      User updatedUser = UserUtility.getLdapUtility().modifyUser(user, true);
       if (notify && writeIsAllowed) {
         notifyUserUpdated(updatedUser).failOnError();
       }
@@ -2346,7 +2346,7 @@ public class ModelService extends ModelObservable {
 
       if (user.isActive() != activate) {
         user.setActive(activate);
-        User updatedUser = UserUtility.getLdapUtility().modifyUser(user);
+        User updatedUser = UserUtility.getLdapUtility().modifyUser(user, false);
         if (notify && writeIsAllowed) {
           notifyUserUpdated(updatedUser).failOnError();
         }
@@ -2420,6 +2420,10 @@ public class ModelService extends ModelObservable {
 
   public User retrieveUser(String name) throws GenericException {
     return UserUtility.getLdapUtility().getUser(name);
+  }
+
+  public String retrieveExtraLdap(String name) throws GenericException {
+    return UserUtility.getLdapUtility().getExtraLDAP(name);
   }
 
   public Group retrieveGroup(String name) throws GenericException, NotFoundException {

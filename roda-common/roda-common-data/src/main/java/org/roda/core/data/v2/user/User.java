@@ -13,13 +13,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.generics.MetadataValue;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.roda.core.data.v2.generics.MetadataValue;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 
 /**
@@ -54,8 +53,6 @@ public class User extends RodaPrincipal {
   private String emailConfirmationToken = null;
   /** LDAP info. */
   private String emailConfirmationTokenExpirationDate = null;
-  /** LDAP description. */
-  String extraLDAP = null;
 
   private Set<MetadataValue> extra = null;
 
@@ -78,7 +75,7 @@ public class User extends RodaPrincipal {
 
   public User(final User user) {
     this(user.getId(), user.getName(), user.getFullName(), user.isActive(), user.getAllRoles(), user.getDirectRoles(),
-      user.getGroups(), user.getEmail(), user.isGuest(), user.getIpAddress(), user.getExtra(), user.getExtraLDAP(),
+      user.getGroups(), user.getEmail(), user.isGuest(), user.getIpAddress(), user.getExtra(),
       user.getResetPasswordToken(), user.getResetPasswordTokenExpirationDate(), user.getEmailConfirmationToken(),
       user.getEmailConfirmationTokenExpirationDate());
   }
@@ -108,13 +105,13 @@ public class User extends RodaPrincipal {
               final Set<String> allRoles, final Set<String> directRoles, final Set<String> groups,
               final String resetPasswordToken, final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
               final String emailConfirmationTokenExpirationDate) {
-    this(id, name, name, true, allRoles, directRoles, groups, email, guest, ipAddress, null, null, resetPasswordToken,
+    this(id, name, name, true, allRoles, directRoles, groups, email, guest, ipAddress, null, resetPasswordToken,
       resetPasswordTokenExpirationDate, emailConfirmationToken, emailConfirmationTokenExpirationDate);
   }
 
   public User(final String id, final String name, final String fullName, final boolean active,
     final Set<String> allRoles, final Set<String> directRoles, final Set<String> groups, final String email,
-    final boolean guest, final String ipAddress, final Set<MetadataValue> extra, final String extraLDAP, final String resetPasswordToken,
+    final boolean guest, final String ipAddress, final Set<MetadataValue> extra, final String resetPasswordToken,
     final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
     final String emailConfirmationTokenExpirationDate) {
     super(id, name, fullName, active, allRoles, directRoles);
@@ -124,7 +121,6 @@ public class User extends RodaPrincipal {
     this.guest = guest;
     this.ipAddress = ipAddress;
     this.extra = extra;
-    this.extraLDAP = extraLDAP;
     this.resetPasswordToken = resetPasswordToken;
     this.resetPasswordTokenExpirationDate = resetPasswordTokenExpirationDate;
     this.emailConfirmationToken = emailConfirmationToken;
@@ -156,13 +152,6 @@ public class User extends RodaPrincipal {
     return this;
   }
 
-  public String getExtraLDAP() {
-    return extraLDAP;
-  }
-
-  public void setExtraLDAP(String extraLDAP) {
-    this.extraLDAP = extraLDAP;
-  }
 
   /**
    * Get {@link User}'s extra information.
