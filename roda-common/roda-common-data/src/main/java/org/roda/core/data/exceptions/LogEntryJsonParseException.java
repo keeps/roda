@@ -7,8 +7,11 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 public class LogEntryJsonParseException extends RODAException {
 
+  @Serial
   private static final long serialVersionUID = -8336065269567551582L;
 
   private String filename;

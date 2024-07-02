@@ -10,7 +10,6 @@ package org.roda.core.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -24,8 +23,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -67,6 +65,10 @@ import com.fasterxml.jackson.core.JsonParser;
  */
 public class SyncUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SyncUtils.class);
+
+  private SyncUtils() {
+    // private constructor
+  }
 
   /**
    * Central Bundle methods
@@ -141,7 +143,7 @@ public class SyncUtils {
   public static Path getBundleWorkingDirectory(String instanceId) throws IOException {
     Path tempDirectory = Files.createTempDirectory(RodaCoreFactory.getWorkingDirectory(),
       RodaConstants.CORE_SYNCHRONIZATION_FOLDER + instanceId);
-    LOGGER.debug("Creating " + tempDirectory);
+    LOGGER.debug("Creating temporary directory {}", tempDirectory);
     return tempDirectory;
   }
 
@@ -183,7 +185,7 @@ public class SyncUtils {
     throws NotFoundException, GenericException, IOException {
     Path outcomePath = RodaCoreFactory.getSynchronizationDirectoryPath()
       .resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER).resolve(filename);
-    LOGGER.debug("Compress files to " + outcomePath);
+    LOGGER.debug("Compress files to {}", outcomePath);
 
     if (FSUtils.exists(outcomePath)) {
       FSUtils.deletePath(outcomePath);
@@ -193,7 +195,7 @@ public class SyncUtils {
   }
 
   public static void extract(Path workingDir, Path incomingPath) throws IOException {
-    LOGGER.debug("Extracting files to " + workingDir);
+    LOGGER.debug("Extracting files to {}", workingDir);
     ZipUtility.extractFilesFromZIP(incomingPath.toFile(), workingDir.toFile(), true);
   }
 
@@ -244,8 +246,8 @@ public class SyncUtils {
   public static DistributedInstance requestInstanceStatus(LocalInstance localInstance) throws GenericException {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE + "status"
-        + RodaConstants.API_SEP + localInstance.getId();
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE + RodaConstants.API_SEP
+        + localInstance.getId();
 
       CloseableHttpClient httpClient = HttpClientBuilder.create().build();
       HttpGet httpGet = new HttpGet(localInstance.getCentralInstanceURL() + resource);
@@ -270,7 +272,7 @@ public class SyncUtils {
   public static Path requestRemoteActions(LocalInstance localInstance) throws GenericException {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE + "remote_actions"
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE + "remote/actions"
         + RodaConstants.API_SEP + localInstance.getId();
 
       CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -361,24 +363,26 @@ public class SyncUtils {
    *           if some i/o error occurs.
    */
   public static JsonParser createJsonParser(Path path) throws IOException {
-    final JsonFactory jfactory = new JsonFactory();
-    return jfactory.createParser(path.toFile());
+    final JsonFactory factory = new JsonFactory();
+    return factory.createParser(path.toFile());
   }
 
-  public static void updateDistributedInstance(LocalInstance localInstance, DistributedInstance distributedInstance)
-    throws GenericException {
+  public static void updateDistributedInstanceSyncStatus(LocalInstance localInstance,
+    DistributedInstance distributedInstance) throws GenericException {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE + "distributed";
+      String resource = RodaConstants.API_SEP + "api/v2/distributed-instances/" + distributedInstance.getId()
+        + "/status?activate=false";
 
       CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-      HttpPut httpPut = new HttpPut(localInstance.getCentralInstanceURL() + resource);
-      httpPut.setEntity(new StringEntity(JsonUtils.getJsonFromObject(distributedInstance)));
-      httpPut.addHeader("Authorization", "Bearer " + accessToken.getToken());
-      httpPut.addHeader("content-type", "application/json");
-      httpPut.addHeader("Accept", "application/json");
+      HttpPatch httpPatch = new HttpPatch(localInstance.getCentralInstanceURL() + resource);
+      // httpPatch.setEntity(new
+      // StringEntity(JsonUtils.getJsonFromObject(distributedInstance)));
+      httpPatch.addHeader("Authorization", "Bearer " + accessToken.getToken());
+      httpPatch.addHeader("content-type", "application/json");
+      httpPatch.addHeader("Accept", "application/json");
 
-      HttpResponse response = httpClient.execute(httpPut);
+      HttpResponse response = httpClient.execute(httpPatch);
 
       if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
         throw new GenericException(
@@ -417,5 +421,4 @@ public class SyncUtils {
       throw new GenericException("Unable to retrieve instance status: " + e.getMessage());
     }
   }
-
 }

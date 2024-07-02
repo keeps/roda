@@ -7,6 +7,25 @@
  */
 package org.roda.wui.client.management.distributed;
 
+import java.util.List;
+
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
+import org.roda.wui.client.browse.BrowseTop;
+import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.DistributedInstancesRestService;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -17,24 +36,8 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
-import config.i18n.client.ClientMessages;
-import org.roda.core.data.v2.synchronization.SynchronizingStatus;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
-import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.process.InternalProcess;
-import org.roda.wui.client.services.Services;
-import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
-import java.util.List;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -45,16 +48,15 @@ public class ShowLocalInstanceConfiguration extends Composite {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       Services services = new Services("Get local instance", "get");
-      services.distributedInstanceResource(s -> s.getLocalInstance())
-        .whenComplete((localInstance, error) -> {
-          if (!localInstance.equals(new LocalInstance())) {
-            ShowLocalInstanceConfiguration showLocalInstanceConfiguration = new ShowLocalInstanceConfiguration(
-              localInstance);
-            callback.onSuccess(showLocalInstanceConfiguration);
-          } else {
-            HistoryUtils.newHistory(CreateLocalInstanceConfiguration.RESOLVER);
-          }
-        });
+      services.distributedInstanceResource(s -> s.getLocalInstance()).whenComplete((localInstance, error) -> {
+        if (!localInstance.equals(new LocalInstance())) {
+          ShowLocalInstanceConfiguration showLocalInstanceConfiguration = new ShowLocalInstanceConfiguration(
+            localInstance);
+          callback.onSuccess(showLocalInstanceConfiguration);
+        } else {
+          HistoryUtils.newHistory(CreateLocalInstanceConfiguration.RESOLVER);
+        }
+      });
     }
 
     @Override
@@ -133,7 +135,6 @@ public class ShowLocalInstanceConfiguration extends Composite {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            GWT.log("TEST:::");
             Services services = new Services("Subscribe local instance", "subscribe");
             services.distributedInstanceResource(s -> s.subscribeLocalInstance(localInstance))
               .whenComplete((subscribedLocalInstance, error) -> {
@@ -162,13 +163,12 @@ public class ShowLocalInstanceConfiguration extends Composite {
   @UiHandler("buttonSynchronize")
   void buttonSynchronizeHandler(ClickEvent e) {
     Services services = new Services("Synchronize", "synchronize");
-    services.distributedInstanceResource(s -> s.synchronize(localInstance))
-      .whenComplete((job, error) -> {
-        if (job != null) {
-          Toast.showInfo("Create Job", "Success");
-          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-        }
-      });
+    services.distributedInstanceResource(s -> s.synchronize(localInstance)).whenComplete((job, error) -> {
+      if (job != null) {
+        Toast.showInfo("Create Job", "Success");
+        HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+      }
+    });
   }
 
   @UiHandler("buttonUnsubscribe")
@@ -190,13 +190,14 @@ public class ShowLocalInstanceConfiguration extends Composite {
         super.onSuccess(result);
         if (result) {
           Services services = new Services("Delete local instance configuration", "delete");
-          services.distributedInstanceResource(s -> s.deleteLocalInstanceConfiguration())
+          services.distributedInstanceResource(DistributedInstancesRestService::unsubscribeLocalInstance)
             .whenComplete((res, error) -> {
               if (error == null) {
                 super.onSuccess(true);
-                Dialogs.showConfirmDialog(messages.removeInstanceIdFromRepository(),
-                  messages.removeInstanceIdFromRepositoryMessage(), messages.dialogNo(), messages.dialogYes(),
-                  confirmRemoveInstanceIdentifier());
+                Toast.showInfo(messages.successfullyUnsubscribedTitle(), messages.successfullyUnsubscribedMessage());
+                HistoryUtils.newHistory(BrowseTop.RESOLVER);
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(error);
               }
             });
         }
@@ -211,7 +212,7 @@ public class ShowLocalInstanceConfiguration extends Composite {
         super.onSuccess(result);
         if (result) {
           Services services = new Services("Delete local configuration", "delete");
-          services.distributedInstanceResource(s -> s.deleteLocalConfiguration(new LocalInstance()))
+          services.distributedInstanceResource(DistributedInstancesRestService::deleteLocalConfiguration)
             .whenComplete((res, error) -> {
               if (error == null) {
                 Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {

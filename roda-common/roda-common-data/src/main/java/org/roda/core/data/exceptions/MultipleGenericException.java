@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
  *
  */
 public class MultipleGenericException extends GenericException {
+  @Serial
   private static final long serialVersionUID = 3865896551745064851L;
 
   private transient List<Exception> causes = new ArrayList<>();
@@ -41,9 +43,7 @@ public class MultipleGenericException extends GenericException {
     List<Exception> causes = new ArrayList<>();
 
     for (ReturnWithExceptions<?, ?> item : list) {
-      for (Exception e : item.getExceptions()) {
-        causes.add(e);
-      }
+      causes.addAll(item.getExceptions());
     }
 
     return new MultipleGenericException(causes);

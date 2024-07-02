@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * Thrown to indicate that an User with the same name already exists when a new
  * one is trying to be created.
@@ -15,6 +17,7 @@ package org.roda.core.data.exceptions;
  */
 public class UserAlreadyExistsException extends AlreadyExistsException {
 
+  @Serial
   private static final long serialVersionUID = 6493339963861919270L;
 
   /**

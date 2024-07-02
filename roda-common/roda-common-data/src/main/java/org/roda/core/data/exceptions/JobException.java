@@ -7,7 +7,10 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 public class JobException extends RODAException {
+  @Serial
   private static final long serialVersionUID = 1893131595923947285L;
 
   public JobException() {

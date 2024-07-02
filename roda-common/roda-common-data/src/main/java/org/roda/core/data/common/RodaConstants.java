@@ -700,7 +700,10 @@ public final class RodaConstants {
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM = "disposalConfirmationId";
 
   public static final String CONTROLLER_DISTRIBUTED_INSTANCE_PARAM = RODA_OBJECT_DISTRIBUTED_INSTANCE;
+  public static final String CONTROLLER_DISTRIBUTED_INSTANCE_ID_PARAM = "distributedInstanceId";
+  public static final String CONTROLLER_DISTRIBUTED_INSTANCE_STATUS_PARAM = "activate";
   public static final String CONTROLLER_LOCAL_INSTANCE_PARAM = RODA_OBJECT_LOCAL_INSTANCE;
+  public static final String CONTROLLER_LOCAL_INSTANCE_ID_PARAM = "localInstanceId";
   public static final String CONTROLLER_ACCESS_KEY_PARAM = RODA_OBJECT_ACCESS_KEY;
 
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip, transferred_resource_original_name";

@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for bootstrapping the RODA application tha needs to
+ * This class is responsible for bootstrapping the RODA application that needs to
  * be done before starting the spring boot application. It initializes the
  * configuration manager, directory initializer, and plugin manager. It also
  * sets the context class loader for the current thread.

@@ -2375,6 +2375,10 @@ public interface ClientMessages extends Messages {
 
   String removeLocalConfigurationMessage();
 
+  String successfullyUnsubscribedTitle();
+
+  String successfullyUnsubscribedMessage();
+
   String removeInstanceIdFromRepository();
 
   String removeInstanceIdFromRepositoryMessage();

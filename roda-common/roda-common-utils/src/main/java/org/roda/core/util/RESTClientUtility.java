@@ -78,6 +78,34 @@ public final class RESTClientUtility {
     }
   }
 
+  public static <T extends Serializable> T sendPostRequestWithoutBody(Class<T> elementClass, String url, String resource,
+    AccessToken accessToken) throws GenericException {
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    HttpPost httpPost = new HttpPost(url + resource);
+    httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
+    httpPost.addHeader("content-type", "application/json");
+    httpPost.addHeader("Accept", "application/json");
+
+    try {
+      HttpResponse response;
+      response = httpClient.execute(httpPost);
+      HttpEntity responseEntity = response.getEntity();
+      int responseStatusCode = response.getStatusLine().getStatusCode();
+
+      if (responseStatusCode == 201) {
+        if (elementClass != null) {
+          return JsonUtils.getObjectFromJson(responseEntity.getContent(), elementClass);
+        } else {
+          return null;
+        }
+      } else {
+        throw new GenericException("POST request response status code: " + responseStatusCode);
+      }
+    } catch (IOException e) {
+      throw new GenericException("Error sending POST request", e);
+    }
+  }
+
   public static <T extends Serializable> T sendPostRequest(Object element, Class<T> elementClass, String url,
     String resource, AccessToken accessToken) throws GenericException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();

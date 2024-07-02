@@ -7,10 +7,13 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class RetentionPeriodCalculationException extends RODAException {
+  @Serial
   private static final long serialVersionUID = -834809453076076692L;
 
   public RetentionPeriodCalculationException() {

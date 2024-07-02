@@ -7,12 +7,15 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * Thrown to indicate that the execution of some operation is not permited.
  *
  * @author Rui Castro
  */
 public class IllegalOperationException extends RODAServiceException {
+  @Serial
   private static final long serialVersionUID = -8118340939329992654L;
 
   /**

@@ -235,7 +235,7 @@ public class RODAInstance extends RodaWuiController {
       DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(RodaCoreFactory.getLocalInstance());
       distributedInstance.setStatus(SynchronizingStatus.INACTIVE);
 
-      SyncUtils.updateDistributedInstance(RodaCoreFactory.getLocalInstance(), distributedInstance);
+      SyncUtils.updateDistributedInstanceSyncStatus(RodaCoreFactory.getLocalInstance(), distributedInstance);
     } catch (GenericException e) {
       // Do nothing distributed instance was removed
     }

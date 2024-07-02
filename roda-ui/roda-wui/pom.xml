@@ -109,6 +109,10 @@
                                 <directory>${project.build.directory}/${project.build.finalName}</directory>
                             </directories>
                             <environmentVariables>
+                                <LDAP_SERVER_URL>ldap://localhost</LDAP_SERVER_URL>
+                                <LDAP_SERVER_PORT>1389</LDAP_SERVER_PORT>
+                                <SIEGFRIED_MODE>server</SIEGFRIED_MODE>
+                                <SIEGFRIED_SERVER_URL>http://localhost:5138</SIEGFRIED_SERVER_URL>
                                 <RODA_CORE_SOLR_CLOUD_URLS>localhost:2181</RODA_CORE_SOLR_CLOUD_URLS>
                             </environmentVariables>
                             <jvmArguments>
@@ -163,6 +167,10 @@
                                 <directory>${project.build.directory}/${project.build.finalName}</directory>
                             </directories>
                             <environmentVariables>
+                                <LDAP_SERVER_URL>ldap://localhost</LDAP_SERVER_URL>
+                                <LDAP_SERVER_PORT>1388</LDAP_SERVER_PORT>
+                                <SIEGFRIED_MODE>server</SIEGFRIED_MODE>
+                                <SIEGFRIED_SERVER_URL>http://localhost:5139</SIEGFRIED_SERVER_URL>
                                 <RODA_CORE_SOLR_CLOUD_URLS>localhost:2182</RODA_CORE_SOLR_CLOUD_URLS>
                             </environmentVariables>
                             <jvmArguments>

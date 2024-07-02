@@ -7,10 +7,13 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class DisposalScheduleNotValidException extends GenericException {
+  @Serial
   private static final long serialVersionUID = 809098516488134186L;
 
   /**

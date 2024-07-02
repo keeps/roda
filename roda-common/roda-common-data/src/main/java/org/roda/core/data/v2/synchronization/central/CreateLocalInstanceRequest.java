@@ -1,6 +1,4 @@
-package org.roda.core.data.v2.generics;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
+package org.roda.core.data.v2.synchronization.central;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -8,7 +6,7 @@ import java.io.Serializable;
 /**
  * @author António Lindo <alindo@keep.pt>
  */
-@JsonInclude(JsonInclude.Include.ALWAYS)
+
 public class CreateLocalInstanceRequest implements Serializable {
   @Serial
   private static final long serialVersionUID = -2706255856347304025L;
@@ -18,7 +16,7 @@ public class CreateLocalInstanceRequest implements Serializable {
   private String centralInstanceURL;
 
   public CreateLocalInstanceRequest() {
-
+    // empty constructor
   }
 
   public CreateLocalInstanceRequest(String id, String accessKey, String centralInstanceURL) {

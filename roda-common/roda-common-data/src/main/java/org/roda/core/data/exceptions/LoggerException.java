@@ -7,12 +7,15 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * Thrown to indicate that some error occurred in the Logger.
  *
  * @author Rui Castro
  */
 public class LoggerException extends RODAException {
+  @Serial
   private static final long serialVersionUID = 9061875666831921195L;
 
   /**

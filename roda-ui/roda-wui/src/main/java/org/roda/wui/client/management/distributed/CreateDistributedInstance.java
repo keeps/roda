@@ -18,7 +18,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.accessKey.AccessKey;
-import org.roda.core.data.v2.generics.CreateDistributedInstanceRequest;
+import org.roda.core.data.v2.synchronization.central.CreateDistributedInstanceRequest;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;

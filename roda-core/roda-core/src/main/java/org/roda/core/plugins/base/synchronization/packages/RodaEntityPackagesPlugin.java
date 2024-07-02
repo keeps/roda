@@ -166,12 +166,11 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
         createPackage(index, model, indexResult);
       }
 
-      state = PluginState.SUCCESS;
       outcomeText = "Package created with " + totalCount + " item(s) of entity " + getEntity();
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
     } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException
       | AlreadyExistsException e) {
-      LOGGER.error("Error on create package for entity " + getEntity(), e);
+      LOGGER.error("Error on create package for entity {}", getEntity(), e);
       state = PluginState.FAILURE;
       jobPluginInfo.incrementObjectsProcessedWithFailure();
       outcomeText = "Error on create package for entity " + getEntity();

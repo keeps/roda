@@ -7,12 +7,15 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
 public class AlreadyExistsException extends RODAException {
 
+  @Serial
   private static final long serialVersionUID = -6744205569453461540L;
 
   public AlreadyExistsException() {

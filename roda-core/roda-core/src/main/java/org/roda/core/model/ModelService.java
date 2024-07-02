@@ -4381,6 +4381,7 @@ public class ModelService extends ModelObservable {
 
     String distributedInstanceAsJson = JsonUtils.getJsonFromObject(distributedInstance);
     StoragePath distributedInstancePath = ModelUtils.getDistributedInstanceStoragePath(distributedInstance.getId());
+
     if (distributedInstancePath != null) {
       storage.updateBinaryContent(distributedInstancePath, new StringContentPayload(distributedInstanceAsJson), false,
         false);

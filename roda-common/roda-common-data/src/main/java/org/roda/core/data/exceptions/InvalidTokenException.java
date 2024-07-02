@@ -7,14 +7,17 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
- * Thrown to indicate the the email confirmation token or password change token
+ * Thrown to indicate the email confirmation token or password change token
  * is invalid. A token can be invalid because is not the expected token or
  * because it already expired.
  *
  * @author Rui Castro
  */
 public class InvalidTokenException extends RODAException {
+  @Serial
   private static final long serialVersionUID = -182450030953675819L;
 
   /**

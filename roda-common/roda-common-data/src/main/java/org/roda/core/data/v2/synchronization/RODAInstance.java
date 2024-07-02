@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.synchronization;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,10 +22,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public abstract class RODAInstance implements Serializable, IsModelObject {
   private static final int VERSION = 1;
+  @Serial
   private static final long serialVersionUID = -3816835903133713036L;
 
   private String id;
-
   private String name;
 
   private Date lastSynchronizationDate;

@@ -7,7 +7,10 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 public class LockingException extends RODAException {
+  @Serial
   private static final long serialVersionUID = 8700288419110883827L;
 
   public LockingException() {

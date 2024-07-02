@@ -7,11 +7,14 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
 public class NotFoundException extends RODAException {
+  @Serial
   private static final long serialVersionUID = -1656013708463576500L;
 
   public NotFoundException() {

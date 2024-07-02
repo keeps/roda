@@ -163,7 +163,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
     JobPluginInfo jobPluginInfo, Job cachedJob) {
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-    PluginState pluginState = PluginState.SKIPPED;
+    PluginState pluginState;
     String outcomeDetailsText = "There are no updates from the central instance";
 
     try {

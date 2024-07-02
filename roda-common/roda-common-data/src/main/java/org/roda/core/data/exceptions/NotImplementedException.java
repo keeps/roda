@@ -7,10 +7,13 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class NotImplementedException extends RODAException {
+  @Serial
   private static final long serialVersionUID = -6744205569453461540L;
 
   public NotImplementedException() {

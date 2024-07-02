@@ -233,8 +233,8 @@ public class LdapUtility {
       ldapTemplate.setContextSource(contextSource);
     }
 
-    bootstrap();
-    createRoles(configuration);
+    bootstrap(configuration);
+
   }
 
   /**
@@ -244,7 +244,7 @@ public class LdapUtility {
    * @throws Exception
    *           if there were some problems while initializing the system
    */
-  private void bootstrap() throws Exception {
+  private void bootstrap(Configuration configuration) throws Exception {
     if (!dnExists(LdapUtils.emptyLdapName())) {
       // Add root DN
       addRootEntry();
@@ -259,6 +259,8 @@ public class LdapUtility {
       addOrganizationUnitIfNotExists(ldapGroupsDN);
 
       applyLdif();
+
+      createRoles(configuration);
     }
   }
 

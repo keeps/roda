@@ -7,12 +7,15 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * Thrown to indicate that the specified email was is already used.
  *
  * @author Rui Castro
  */
 public class EmailAlreadyExistsException extends AlreadyExistsException {
+  @Serial
   private static final long serialVersionUID = 3392813159441368655L;
 
   /**

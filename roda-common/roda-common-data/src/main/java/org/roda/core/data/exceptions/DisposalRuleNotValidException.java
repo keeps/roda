@@ -7,11 +7,14 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class DisposalRuleNotValidException extends GenericException {
 
+  @Serial
   private static final long serialVersionUID = 2413699496731974126L;
 
   /**
