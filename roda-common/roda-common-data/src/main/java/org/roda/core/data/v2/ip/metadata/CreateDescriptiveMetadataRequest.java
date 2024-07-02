@@ -105,9 +105,4 @@ public abstract class CreateDescriptiveMetadataRequest implements Serializable {
     this.permissions = permissions;
   }
 
-  public abstract String getXml();
-
-  public abstract void setXml(String xml);
-
-  public abstract Set<MetadataValue> getValues();
 }
