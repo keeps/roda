@@ -2,13 +2,16 @@ package org.roda.core.model.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -20,6 +23,7 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.ldap.LdapName;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
@@ -37,6 +41,7 @@ import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RoleAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.repository.LdapGroupRepository;
@@ -62,6 +67,9 @@ import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.ldap.support.LdapNameBuilder;
 import org.springframework.ldap.support.LdapUtils;
 import org.springframework.stereotype.Component;
+
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -345,6 +353,32 @@ public class LdapUtility {
   }
 
   /**
+   * Returns the descripton of the ldap User with name <code>uid</code> or
+   * <code>null</code> if it doesn't exist.
+   *
+   * @param name
+   *          the name of the desired User.
+   *
+   * @return the ldap description of the User with name <code>name</code> or
+   *         <code>null</code> if it doesn't exist.
+   *
+   * @throws GenericException
+   *           if the user information could not be retrieved from the LDAP
+   *           server.
+   */
+  public String getExtraLDAP(final String name) throws GenericException {
+    try {
+      LdapUser ldapUser = ldapUserRepository.findByUid(name);
+      if (ldapUser != null) {
+        return ldapUser.getDescription();
+      }
+      return null;
+    } catch (NamingException e) {
+      throw new GenericException("Error getting user " + name, e);
+    }
+  }
+
+  /**
    * Returns the {@link User} with email <code>email</code> or <code>null</code>
    * if it doesn't exist.
    *
@@ -403,7 +437,7 @@ public class LdapUtility {
     }
 
     try {
-      LdapUser ldapUser = getLdapUserFromUser(user);
+      LdapUser ldapUser = getLdapUserFromUser(user, true);
       ldapUser.setNew(true);
       ldapUserRepository.save(ldapUser);
       setMemberDirectRoles(getUserDN(user.getName()), user.getDirectRoles());
@@ -450,9 +484,9 @@ public class LdapUtility {
    * @throws GenericException
    *           if some error occurred.
    */
-  public User modifyUser(final User modifiedUser)
+  public User modifyUser(final User modifiedUser, final boolean changeExtra)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, GenericException {
-    modifyUser(modifiedUser, null, true, false);
+    modifyUser(modifiedUser, null, true, false, changeExtra);
     return getUser(modifiedUser.getName());
   }
 
@@ -505,7 +539,7 @@ public class LdapUtility {
    */
   public User modifySelfUser(final User modifiedUser, SecureString newPassword)
     throws NotFoundException, EmailAlreadyExistsException, IllegalOperationException, GenericException {
-    modifyUser(modifiedUser, newPassword, false, false);
+    modifyUser(modifiedUser, newPassword, false, false, true);
     return getUser(modifiedUser.getName());
   }
 
@@ -823,7 +857,7 @@ public class LdapUtility {
       user.setEmailConfirmationTokenExpirationDate(null);
 
       try {
-        return modifyUser(user);
+        return modifyUser(user, false);
       } catch (final IllegalOperationException | EmailAlreadyExistsException e) {
         throw new GenericException("Error confirming user email - " + e.getMessage(), e);
       }
@@ -873,7 +907,7 @@ public class LdapUtility {
       user.setResetPasswordToken(IdUtils.createUUID());
       user.setResetPasswordTokenExpirationDate(DateTime.now().plusDays(1).toDateTimeISO().toInstant().toString());
       try {
-        return modifyUser(user);
+        return modifyUser(user, false);
       } catch (final EmailAlreadyExistsException e) {
         throw new GenericException("Error setting password reset token - " + e.getMessage(), e);
       }
@@ -934,7 +968,7 @@ public class LdapUtility {
         setUserPassword(username, password);
         user.setResetPasswordToken(null);
         user.setResetPasswordTokenExpirationDate(null);
-        return modifyUser(user);
+        return modifyUser(user, false);
       } catch (final IllegalOperationException | EmailAlreadyExistsException e) {
         throw new GenericException("Error reseting user password - " + e.getMessage(), e);
       }
@@ -1051,8 +1085,6 @@ public class LdapUtility {
     user.setEmail(ldapUser.getEmail());
     user.setGuest(false);
 
-    user.setExtraLDAP(ldapUser.getDescription());
-
     if (Strings.isNotBlank(ldapUser.getInfo())) {
       final String infoStr = ldapUser.getInfo();
 
@@ -1076,7 +1108,7 @@ public class LdapUtility {
     return user;
   }
 
-  private LdapUser getLdapUserFromUser(final User user) {
+  private LdapUser getLdapUserFromUser(final User user, final boolean changeExtra) {
     LdapUser ldapUser = new LdapUser();
     ldapUser.setUid(user.getId());
     LdapName userDN = LdapNameBuilder.newInstance(removeBaseDN(ldapPeopleDN)).add(UID, user.getId()).build();
@@ -1102,8 +1134,10 @@ public class LdapUtility {
       ldapUser.setEmail(user.getEmail());
     }
 
-    if (user.getExtraLDAP() != null) {
-      ldapUser.setDescription(user.getExtraLDAP());
+    if (!changeExtra) {
+      ldapUser.setDescription(ldapUserRepository.findByUid(user.getId()).getDescription());
+    } else if (user.getExtra() != null) {
+      ldapUser.setDescription(transformExtra(user.getExtra()));
     }
 
     final String[] infoParts = new String[] {user.getEmailConfirmationToken(),
@@ -1297,7 +1331,7 @@ public class LdapUtility {
    *           if some error occurred.
    */
   private void modifyUser(final User modifiedUser, SecureString newPassword, final boolean modifyRolesAndGroups,
-    final boolean force)
+    final boolean force, final boolean changeExtra)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, GenericException {
 
     if (!force && this.ldapProtectedUsers.contains(modifiedUser.getName())) {
@@ -1311,7 +1345,7 @@ public class LdapUtility {
           "The email address " + modifiedUser.getEmail() + " is already used by another user.");
       }
 
-      final LdapUser modifiedLdapUser = getLdapUserFromUser(modifiedUser);
+      final LdapUser modifiedLdapUser = getLdapUserFromUser(modifiedUser, changeExtra);
       Name userDN = modifiedLdapUser.getDn();
 
       Optional<LdapUser> oCurrentLdapUser = ldapUserRepository.findById(userDN);
@@ -1707,7 +1741,7 @@ public class LdapUtility {
         admin = addUser(admin);
       }
       admin.setActive(true);
-      modifyUser(admin, password, false, true);
+      modifyUser(admin, password, false, true, true);
 
       Group administrators;
       try {
@@ -1759,4 +1793,40 @@ public class LdapUtility {
   private Name removeBaseDN(Name dn) {
     return LdapUtils.removeFirst(dn, LdapUtils.newLdapName(ldapRootDN));
   }
+
+
+  public String transformExtra(Set<MetadataValue> values) {
+    Handlebars handlebars = new Handlebars();
+    Map<String, String> data = new HashMap<>();
+    handlebars.registerHelper("field", (o, options) -> options.fn());
+
+    try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+      RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE)) {
+      String rawTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+      Template tmpl = handlebars.compileInline(rawTemplate);
+
+      if (values != null) {
+        values.forEach(metadataValue -> {
+          String val = metadataValue.get("value");
+          if (val != null) {
+            val = val.replaceAll("\\s", "");
+            if (!"".equals(val)) {
+              data.put(metadataValue.get("name"), metadataValue.get("value"));
+            }
+          }
+        });
+      }
+
+      return tmpl.apply(data);
+    } catch (IOException e) {
+      LOGGER.error("Error getting template from stream", e);
+    }
+
+    return "";
+  }
+
+
+
+
+
 }

@@ -177,8 +177,8 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   CreateUserExtraFormFields getDefaultUserExtra();
 
-  @RequestMapping(path = "/users/{id}/send-verification", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Send verification email", description = "Sends verification email", responses = {
+  @RequestMapping(path = "/users/{id}/resend-verification", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Resend verification email", description = "Resends verification email", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Notification.class)))})
   Notification sendEmailVerification(
     @Parameter(description = "User identifier") @PathVariable(name = "id") String id,
