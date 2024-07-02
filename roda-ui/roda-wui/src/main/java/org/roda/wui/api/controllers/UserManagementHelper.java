@@ -75,7 +75,7 @@ public class UserManagementHelper {
   public static User registerUser(User user, SecureString password, UserExtraBundle extra, String localeString,
     String servletPath)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, AuthorizationDeniedException {
-    user.setExtraLDAP(getUserExtra(extra));
+    //user.setExtraLDAP(getUserExtra(extra));
     User updatedUser = UserUtility.resetGroupsAndRoles(user);
 
     User registeredUser = RodaCoreFactory.getModelService().registerUser(updatedUser, password, true);
@@ -104,7 +104,7 @@ public class UserManagementHelper {
   public static User createUser(User user, SecureString password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, IllegalOperationException, NotFoundException,
     AuthorizationDeniedException, RequestNotValidException, ValidationException {
-    user.setExtraLDAP(getUserExtra(extra));
+    //user.setExtraLDAP(getUserExtra(extra));
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     User addedUser = model.createUser(user, password, true);
@@ -146,7 +146,7 @@ public class UserManagementHelper {
     ValidationException, RequestNotValidException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
-    user.setExtraLDAP(getUserExtra(extra));
+    //user.setExtraLDAP(getUserExtra(extra));
     User modifiedUser = RodaCoreFactory.getModelService().updateUser(user, password, true);
     PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), model, index, false);
     RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
@@ -158,7 +158,7 @@ public class UserManagementHelper {
     ValidationException, RequestNotValidException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
-    modifiedUser.setExtraLDAP(getUserExtra(extra));
+    //modifiedUser.setExtraLDAP(getUserExtra(extra));
 
     User currentUser = model.retrieveUser(modifiedUser.getName());
     User resetUser = resetUser(modifiedUser, currentUser);
@@ -279,7 +279,7 @@ public class UserManagementHelper {
 
       try {
         User user = RodaCoreFactory.getModelService().retrieveUser(name);
-        String userExtra = user.getExtraLDAP();
+        String userExtra = "";
 
         if (userExtra != null && !values.isEmpty()) {
           for (MetadataValue mv : values) {

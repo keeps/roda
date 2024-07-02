@@ -75,7 +75,7 @@ public class LdapUtilityTest extends AbstractTestNGSpringContextTests {
     User user = addTestUser();
 
     user.setFullName("Test user full name changed");
-    ldapUtility.modifyUser(user);
+    ldapUtility.modifyUser(user, false);
 
     User retrieveUser = ldapUtility.getUser(user.getName());
 
@@ -112,7 +112,7 @@ public class LdapUtilityTest extends AbstractTestNGSpringContextTests {
     SecureString pass = new SecureString("123456".toCharArray());
     ldapUtility.setUserPassword(user.getName(), pass);
     user.setFullName("Other user");
-    ldapUtility.modifyUser(user);
+    ldapUtility.modifyUser(user, false);
 
     User authenticatedUser = ldapUtility.getAuthenticatedUser(user.getName(), pass.toString());
     assertNotNull(authenticatedUser);
