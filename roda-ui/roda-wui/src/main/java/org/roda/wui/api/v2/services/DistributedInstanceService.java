@@ -1,5 +1,11 @@
 package org.roda.wui.api.v2.services;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.common.synchronization.BundleManifestCreator;
@@ -10,26 +16,25 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.EntityResponse;
+import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
+import org.roda.core.data.v2.synchronization.central.CreateDistributedInstanceRequest;
+import org.roda.core.data.v2.synchronization.central.CreateLocalInstanceRequest;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.UpdateDistributedInstanceRequest;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.plugins.base.synchronization.instance.LocalInstanceRegisterPlugin;
 import org.roda.core.plugins.base.synchronization.proccess.ImportSyncBundlePlugin;
 import org.roda.core.plugins.base.synchronization.proccess.SynchronizeInstancePlugin;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.wui.api.controllers.BrowserHelper;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -40,19 +45,43 @@ public class DistributedInstanceService {
   @Autowired
   private JobService jobsService;
 
-  public DistributedInstance createDistributedInstance(DistributedInstance distributedInstance, User user)
+  public void deleteDistributedInstance(MembersService membersService, String id)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    final DistributedInstance distributedInstance = RodaCoreFactory.getModelService().retrieveDistributedInstance(id);
+    final String username = RodaConstants.DISTRIBUTED_INSTANCE_USER_PREFIX + distributedInstance.getName();
+    RodaCoreFactory.getModelService().deleteDistributedInstance(id);
+    membersService.deleteUser(username);
+  }
+
+  public DistributedInstance createDistributedInstance(
+    CreateDistributedInstanceRequest createDistributedInstanceRequest, User user)
     throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
     RequestNotValidException, IllegalOperationException {
+    DistributedInstance distributedInstance = new DistributedInstance();
+
+    distributedInstance.setName(createDistributedInstanceRequest.getName());
+    distributedInstance.setDescription(createDistributedInstanceRequest.getDescription());
+
     return RodaCoreFactory.getModelService().createDistributedInstance(distributedInstance, user.getName());
   }
 
-  public void applyInstanceIdToRodaObject(LocalInstance localInstance, User user, boolean doRegister)
+  public LocalInstance subscribe(LocalInstance localInstance, User user)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    localInstance.setStatus(SynchronizingStatus.APPLYINGIDENTIFIER);
+    RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
+    applyInstanceIdToRodaObject(localInstance.getId(), user, true);
+    RODAInstanceUtils.createDistributedGroup(user);
+    localInstance.setAccessKey(null);
+    return localInstance;
+  }
+
+  public void applyInstanceIdToRodaObject(String id, User user, boolean doRegister)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Map<String, String> pluginParameters = new HashMap<>();
     if (doRegister) {
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, "true");
     }
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, id);
 
     CommonServicesUtils.createAndExecuteInternalJob("Local Instance Register", SelectedItemsNone.create(),
       LocalInstanceRegisterPlugin.class, user, pluginParameters, "Could not register the localInstance");
@@ -66,7 +95,7 @@ public class DistributedInstanceService {
       SynchronizeInstancePlugin.class, user, new HashMap<>(), "Could not execute bundle job");
   }
 
-  public EntityResponse createCentralSyncBundle(String instanceIdentifier) throws AuthorizationDeniedException,
+  public StreamResponse createCentralSyncBundle(String instanceIdentifier) throws AuthorizationDeniedException,
     AlreadyExistsException, RequestNotValidException, GenericException, NotFoundException {
 
     try {
@@ -85,8 +114,8 @@ public class DistributedInstanceService {
     }
   }
 
-  public EntityResponse retrieveLastSyncFileByClass(final String instanceIdentifier, final String entityClass,
-                                                           final String type) throws GenericException, NotFoundException {
+  public StreamResponse retrieveLastSyncFileByClass(final String instanceIdentifier, final String entityClass,
+    final String type) {
     final StringBuilder fileNameBuilder = new StringBuilder();
     fileNameBuilder.append(type).append("_").append(instanceIdentifier).append("_").append(entityClass)
       .append(".jsonl");
@@ -112,5 +141,45 @@ public class DistributedInstanceService {
     } catch (IOException e) {
       throw new GenericException("Failed during sync package import", e);
     }
+  }
+
+  public DistributedInstance updateDistributionInstance(UpdateDistributedInstanceRequest request, User user)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    DistributedInstance distributedInstance = RodaCoreFactory.getModelService()
+      .retrieveDistributedInstance(request.getId());
+
+    distributedInstance.setDescription(request.getDescription());
+
+    if (StringUtils.isNotBlank(request.getName())) {
+      distributedInstance.setName(request.getName());
+    } else {
+      throw new RequestNotValidException("Name cannot be empty");
+    }
+
+    return RodaCoreFactory.getModelService().updateDistributedInstance(distributedInstance, user.getId());
+  }
+
+  public DistributedInstance updateDistributionInstanceStatus(String id, boolean activate, User user)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    DistributedInstance distributedInstance = RodaCoreFactory.getModelService().retrieveDistributedInstance(id);
+    if (activate) {
+      distributedInstance.setStatus(SynchronizingStatus.ACTIVE);
+    } else {
+      distributedInstance.setStatus(SynchronizingStatus.INACTIVE);
+    }
+    return RodaCoreFactory.getModelService().updateDistributedInstance(distributedInstance, user.getId());
+  }
+
+  public LocalInstance createLocalInstance(CreateLocalInstanceRequest createLocalInstanceRequest)
+    throws GenericException {
+    LocalInstance localInstance = new LocalInstance();
+    localInstance.setCentralInstanceURL(createLocalInstanceRequest.getCentralInstanceURL());
+    localInstance.setAccessKey(createLocalInstanceRequest.getAccessKey());
+    localInstance.setId(createLocalInstanceRequest.getId());
+
+    RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
+    localInstance.setAccessKey(null);
+
+    return localInstance;
   }
 }

@@ -7,10 +7,13 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class DisposalRuleAlreadyExistsException extends AlreadyExistsException {
+  @Serial
   private static final long serialVersionUID = -4589782633937474385L;
 
   /**

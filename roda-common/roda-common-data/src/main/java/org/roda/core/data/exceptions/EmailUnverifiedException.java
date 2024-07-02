@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * Thrown to indicate that was not possible to authenticate {@link User} because
  * it's email address is not verified.
@@ -14,6 +16,7 @@ package org.roda.core.data.exceptions;
  * @author Rui Castro <rui.castro@gmail.com>
  */
 public class EmailUnverifiedException extends AuthenticationDeniedException {
+  @Serial
   private static final long serialVersionUID = 4619089972230221210L;
 
   /**

@@ -7,6 +7,19 @@
  */
 package org.roda.wui.client.management.distributed;
 
+import java.util.List;
+
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.UpdateDistributedInstanceRequest;
+import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -17,19 +30,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import config.i18n.client.ClientMessages;
-import org.roda.core.data.v2.synchronization.SynchronizingStatus;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.wui.client.common.NoAsyncCallback;
-import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.services.Services;
-import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.ListUtils;
 
-import java.util.List;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -99,9 +101,9 @@ public class EditDistributedInstance extends Composite {
         buttonChangeStatus.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent clickEvent) {
-            distributedInstance.setStatus(SynchronizingStatus.INACTIVE);
-            Services services = new Services("Update distributed instance", "update");
-            services.distributedInstanceResource(s -> s.updateDistributedInstance(distributedInstance))
+            Services services = new Services("Update distributed instance status", "update");
+            services
+              .distributedInstanceResource(s -> s.updateDistributedInstanceSyncStatus(distributedInstance.getId(), false))
               .whenComplete((updatedDistributedInstance, error) -> {
                 if (updatedDistributedInstance != null) {
                   HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
@@ -116,9 +118,9 @@ public class EditDistributedInstance extends Composite {
         buttonChangeStatus.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent clickEvent) {
-            distributedInstance.setStatus(SynchronizingStatus.ACTIVE);
-            Services services = new Services("Update distributed instance", "update");
-            services.distributedInstanceResource(s -> s.updateDistributedInstance(distributedInstance))
+            Services services = new Services("Update distributed instance status", "update");
+            services
+              .distributedInstanceResource(s -> s.updateDistributedInstanceSyncStatus(distributedInstance.getId(), true))
               .whenComplete((updatedDistributedInstance, error) -> {
                 if (updatedDistributedInstance != null) {
                   HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
@@ -142,11 +144,12 @@ public class EditDistributedInstance extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (distributedInstanceDataPanel.isValid()) {
       DistributedInstance distributedInstanceUpdated = distributedInstanceDataPanel.getDistributedInstance();
-      distributedInstance.setName(distributedInstanceUpdated.getName());
-      distributedInstance.setDescription(distributedInstanceUpdated.getDescription());
+      UpdateDistributedInstanceRequest request = new UpdateDistributedInstanceRequest(
+        distributedInstanceUpdated.getId(), distributedInstanceUpdated.getName(),
+        distributedInstanceUpdated.getDescription());
       // distributedInstance.setNameIdentifier(distributedInstanceUpdated.getNameIdentifier());
       Services services = new Services("Update distributed instance", "update");
-      services.distributedInstanceResource(s -> s.updateDistributedInstance(this.distributedInstance))
+      services.distributedInstanceResource(s -> s.updateDistributedInstance(request))
         .whenComplete((updatedDistributedInstance, error) -> {
           if (updatedDistributedInstance != null) {
             HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);

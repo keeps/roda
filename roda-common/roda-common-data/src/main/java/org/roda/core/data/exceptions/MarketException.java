@@ -7,10 +7,13 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class MarketException extends RODAException {
+  @Serial
   private static final long serialVersionUID = 5663037203596674543L;
 
   public MarketException() {

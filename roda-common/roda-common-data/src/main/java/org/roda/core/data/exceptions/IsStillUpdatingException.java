@@ -7,8 +7,11 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 public class IsStillUpdatingException extends RODAException {
 
+  @Serial
   private static final long serialVersionUID = 7420264596411093449L;
 
   public IsStillUpdatingException() {

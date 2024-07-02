@@ -7,7 +7,10 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 public class NotLockableAtTheTimeException extends LockingException {
+  @Serial
   private static final long serialVersionUID = 7257377928175910597L;
 
   public NotLockableAtTheTimeException() {

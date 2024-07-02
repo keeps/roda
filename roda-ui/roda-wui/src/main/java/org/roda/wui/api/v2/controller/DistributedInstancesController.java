@@ -8,29 +8,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.core.Response;
-
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.EntityResponse;
 import org.roda.core.data.v2.StreamResponse;
-import org.roda.core.data.v2.generics.CreateDistributedInstanceRequest;
-import org.roda.core.data.v2.generics.CreateLocalInstanceRequest;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -39,19 +28,19 @@ import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
+import org.roda.core.data.v2.synchronization.central.CreateDistributedInstanceRequest;
+import org.roda.core.data.v2.synchronization.central.CreateLocalInstanceRequest;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
+import org.roda.core.data.v2.synchronization.central.UpdateDistributedInstanceRequest;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.storage.utils.RODAInstanceUtils;
-import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.DistributedInstanceService;
 import org.roda.wui.api.v2.services.MembersService;
+import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.client.services.DistributedInstancesRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
@@ -61,15 +50,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -77,17 +70,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * @author António Lindo <alindo@keep.pt>
@@ -116,13 +98,17 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
+
       return RodaCoreFactory.getModelService().listDistributedInstances();
-    } catch (RODAException | IOException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | RequestNotValidException | IOException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
@@ -135,13 +121,18 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
+
       return RodaCoreFactory.getModelService().retrieveDistributedInstance(id);
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, id, state,
+        RodaConstants.CONTROLLER_DISTRIBUTED_INSTANCE_ID_PARAM, id);
     }
   }
 
@@ -156,13 +147,15 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       controllerAssistant.checkRoles(requestContext.getUser());
       LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
       return Objects.requireNonNullElseGet(localInstance, LocalInstance::new);
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state,
-        RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
@@ -175,17 +168,20 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      final DistributedInstance distributedInstance = RodaCoreFactory.getModelService().retrieveDistributedInstance(id);
-      final String username = RodaConstants.DISTRIBUTED_INSTANCE_USER_PREFIX + distributedInstance.getName();
-      RodaCoreFactory.getModelService().deleteDistributedInstance(id);
-      membersService.deleteUser(username);
+
+      // delegate
+      distributedInstanceService.deleteDistributedInstance(membersService, id);
       return null;
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, id, state,
+        RodaConstants.CONTROLLER_DISTRIBUTED_INSTANCE_ID_PARAM, id);
     }
   }
 
@@ -195,51 +191,32 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
-    DistributedInstance distributedInstance = new DistributedInstance();
+
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      distributedInstance.setName(createDistributedInstanceRequest.getName());
-      distributedInstance.setDescription(createDistributedInstanceRequest.getDescription());
-      DistributedInstance createdInstance = distributedInstanceService.createDistributedInstance(distributedInstance,
-        requestContext.getUser());
+
+      DistributedInstance createdInstance = distributedInstanceService
+        .createDistributedInstance(createDistributedInstanceRequest, requestContext.getUser());
       createdInstance
         .setToken(RodaCoreFactory.getModelService().retrieveAccessKey(createdInstance.getAccessKeyId()).getKey());
       return createdInstance;
-    } catch (RODAException e) {
+    } catch (AlreadyExistsException | NotFoundException | RequestNotValidException | GenericException
+      | IllegalOperationException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state,
-        RodaConstants.CONTROLLER_DISTRIBUTED_INSTANCE_PARAM, distributedInstance);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_DISTRIBUTED_INSTANCE_PARAM,
+        createDistributedInstanceRequest);
     }
   }
 
   @Override
-  public DistributedInstance registerDistributedInstance(@RequestBody LocalInstance localInstance) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-      DistributedInstance distributedInstance = RodaCoreFactory.getModelService()
-        .retrieveDistributedInstance(localInstance.getId());
-      distributedInstance.setStatus(SynchronizingStatus.ACTIVE);
-      return RodaCoreFactory.getModelService().updateDistributedInstance(distributedInstance, requestContext.getUser().getId());
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
-    }
-  }
-
-  @Override
-  public DistributedInstance updateDistributedInstance(@RequestBody DistributedInstance distributedInstance) {
+  public DistributedInstance updateDistributedInstance(
+    @RequestBody UpdateDistributedInstanceRequest distributedInstance) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -247,14 +224,43 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      return RodaCoreFactory.getModelService().updateDistributedInstance(distributedInstance,
-        requestContext.getUser().getId());
-    } catch (RODAException e) {
+
+      // delegate
+      return distributedInstanceService.updateDistributionInstance(distributedInstance, requestContext.getUser());
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state);
+      controllerAssistant.registerAction(requestContext, state);
+    }
+  }
+
+  @Override
+  public DistributedInstance updateDistributedInstanceSyncStatus(String id, boolean activate) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      return distributedInstanceService.updateDistributionInstanceStatus(id, activate, requestContext.getUser());
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, id, state,
+        RodaConstants.CONTROLLER_DISTRIBUTED_INSTANCE_ID_PARAM, id,
+        RodaConstants.CONTROLLER_DISTRIBUTED_INSTANCE_STATUS_PARAM, activate);
     }
   }
 
@@ -271,12 +277,14 @@ public class DistributedInstancesController implements DistributedInstancesRestS
 
       TokenManager.getInstance().getAccessToken(localInstance);
       TokenManager.getInstance().removeToken();
-    } catch (RODAException | IllegalArgumentException e) {
+    } catch (AuthenticationDeniedException | AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      responseList.add(e.toString());
+    } catch (GenericException e) {
       state = LogEntryState.FAILURE;
       responseList.add(e.toString());
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state,
-        RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
     }
 
     return responseList;
@@ -286,25 +294,24 @@ public class DistributedInstancesController implements DistributedInstancesRestS
   public LocalInstance createLocalInstance(@RequestBody CreateLocalInstanceRequest createLocalInstanceRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
     LogEntryState state = LogEntryState.SUCCESS;
-    LocalInstance localInstance = new LocalInstance();
+
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      localInstance.setCentralInstanceURL(createLocalInstanceRequest.getCentralInstanceURL());
-      localInstance.setAccessKey(createLocalInstanceRequest.getAccessKey());
-      localInstance.setId(createLocalInstanceRequest.getId());
-      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
-      localInstance.setAccessKey(null);
-      return localInstance;
-    } catch (RODAException e) {
+
+      // delegate
+      return distributedInstanceService.createLocalInstance(createLocalInstanceRequest);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
-        localInstance);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
+        createLocalInstanceRequest);
     }
   }
 
@@ -317,73 +324,73 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      // Apply Identifiers
-      localInstance.setStatus(SynchronizingStatus.APPLYINGIDENTIFIER);
-      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
-      distributedInstanceService.applyInstanceIdToRodaObject(localInstance, requestContext.getUser(), true);
-      RODAInstanceUtils.createDistributedGroup(requestContext.getUser());
-      localInstance.setAccessKey(null);
-      return localInstance;
-    } catch (RODAException e) {
+
+      // delegate
+      return distributedInstanceService.subscribe(localInstance, requestContext.getUser());
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state,
-        RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
+        localInstance);
     }
   }
 
   @Override
-  public Void deleteLocalInstanceConfiguration() {
+  public Void unsubscribeLocalInstance() {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      try {
-        // Deleting from distributed
-        DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(RodaCoreFactory.getLocalInstance());
-        distributedInstance.setStatus(SynchronizingStatus.INACTIVE);
 
-        SyncUtils.updateDistributedInstance(RodaCoreFactory.getLocalInstance(), distributedInstance);
-      } catch (GenericException e) {
-        // Do nothing distributed instance was removed
-      }
+      DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(RodaCoreFactory.getLocalInstance());
+      distributedInstance.setStatus(SynchronizingStatus.INACTIVE);
+      SyncUtils.updateDistributedInstanceSyncStatus(RodaCoreFactory.getLocalInstance(), distributedInstance);
+
       // Deleting from remote
       TokenManager.getInstance().removeToken();
       RodaCoreFactory.createOrUpdateLocalInstance(null);
+
       return null;
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state,
-        RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
   @Override
-  public Void deleteLocalConfiguration(@RequestBody LocalInstance localInstance) {
+  public Void deleteLocalConfiguration() {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    List<String> responseList = new ArrayList();
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
     LogEntryState state = LogEntryState.SUCCESS;
+
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      distributedInstanceService.applyInstanceIdToRodaObject(localInstance, requestContext.getUser(), false);
+
+      // delegate
+      distributedInstanceService.applyInstanceIdToRodaObject(null, requestContext.getUser(), false);
       return null;
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state,
-        RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
@@ -397,84 +404,34 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
+
       if (!SynchronizingStatus.ACTIVE.equals(localInstance.getStatus())) {
         state = LogEntryState.FAILURE;
         throw new GenericException("The instance isn't in Active state.");
       } else {
         return distributedInstanceService.synchronize(requestContext.getUser(), localInstance);
       }
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       controllerAssistant.registerAction(requestContext.getUser(), state,
-        RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+        RodaConstants.CONTROLLER_LOCAL_INSTANCE_ID_PARAM, localInstance.getId());
     }
   }
 
-  @RequestMapping(path = "/remove/bundle/{name}/{dir}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @Operation(summary = "Delete distributed instance", description = "Deletes a distributed instance", responses = {
-    @ApiResponse(responseCode = "204", description = "No Content"),
+  @PostMapping(path = "/{id}/register", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(summary = "Register distributed instance", description = "Registers a distributed instance", responses = {
+    @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = DistributedInstance.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Void deleteSyncBundle(
-    @Parameter(description = "The sync bundle name") @PathVariable(name = "name") String name,
-    @Parameter(description = "The sync bundle directory") @PathVariable(name = "dir") String directory) {
-    String message = null;
-
-    if (RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER.equals(directory)) {
-      Path syncBundlePath = SyncUtils.getSyncIncomingBundlePath(name);
-      try {
-        Boolean deleteFromIncome = Files.deleteIfExists(syncBundlePath);
-        if (deleteFromIncome == true) {
-          message = "Deleted bundle from income folder with success";
-        } else {
-          message = "Could not find bundle in income folder";
-        }
-      } catch (IOException e) {
-        LOGGER.error("Can not delete bundle from income folder because " + e.getMessage());
-      }
-    } else {
-      Path syncBundlePath = SyncUtils.getSyncOutcomeBundlePath(name);
-      try {
-        Boolean deleteFromOutcome = Files.deleteIfExists(syncBundlePath);
-        if (deleteFromOutcome == true) {
-          message = "Deleted bundle from outcome folder with success";
-        } else {
-          message = "Could not find bundle in outcome folder";
-        }
-      } catch (IOException e) {
-        LOGGER.error("Can not delete bundle from outcome folder because " + e.getMessage());
-      }
-    }
-    LOGGER.info(message);
-    return null;
-  }
-
-
-  @Override
-  public DistributedInstance status(String id) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-    try {
-      // check permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-      return RodaCoreFactory.getModelService().retrieveDistributedInstance(id);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
-        id);
-    }
-
-  }
-
-  @Override
-  public LocalInstance updateLocalInstanceConfiguration(@RequestBody LocalInstance localInstance) {
+  public DistributedInstance registerDistributedInstance(
+    @Parameter(description = "The instance identifier") @PathVariable(name = "id") String id) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -482,20 +439,33 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
-      return RodaCoreFactory.getLocalInstance();
-    } catch (RODAException e) {
+
+      DistributedInstance distributedInstance = RodaCoreFactory.getModelService().retrieveDistributedInstance(id);
+      distributedInstance.setStatus(SynchronizingStatus.ACTIVE);
+      return RodaCoreFactory.getModelService().updateDistributedInstance(distributedInstance,
+        requestContext.getUser().getId());
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      // register action
       controllerAssistant.registerAction(requestContext.getUser(), state,
-        RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+        RodaConstants.CONTROLLER_LOCAL_INSTANCE_ID_PARAM, id);
     }
   }
 
-  @Override
-  public Long getCentralInstanceUpdates(String id) {
+  @GetMapping(path = "/updates/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get central instance updates", description = "Get central instance updates", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  private Long getCentralInstanceUpdates(
+    @Parameter(description = "The instance id") @PathVariable(name = "id") String id) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
     try {
       Long total = 0L;
       ModelService model = RodaCoreFactory.getModelService();
@@ -525,63 +495,127 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       total += index.count(RepresentationInformation.class, riskFilter);
 
       return total;
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
       throw new RESTException(e);
     }
-
   }
 
-  @RequestMapping(path = "/remote_actions/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Get instance status", description = "Gets instance status", responses = {
-    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = Response.class))),
+  @DeleteMapping(path = "/remove/bundle/{name}/{dir}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(summary = "Delete distributed instance", description = "Deletes a distributed instance", responses = {
+    @ApiResponse(responseCode = "204", description = "No Content"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Response remoteActions(@Parameter(description = "The instance id") @PathVariable(name = "id") String id) {
-    // get user
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    User user = requestContext.getUser();
-    try {
-      EntityResponse response = retrieveRemoteActions(user, id);
-      if (response instanceof StreamResponse) {
-        return ApiUtils.okResponse((StreamResponse) response);
-      } else {
-        return Response.noContent().build();
-      }
-    } catch (RODAException e) {
-      throw new RESTException(e);
-    }
-  }
-
-  public EntityResponse retrieveRemoteActions(User user, String instanceIdentifier)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+  void deleteSyncBundle(@Parameter(description = "The sync bundle name") @PathVariable(name = "name") String name,
+    @Parameter(description = "The sync bundle directory") @PathVariable(name = "dir") String directory) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check permissions
-    controllerAssistant.checkRoles(user);
-
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      // delegate
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    }
+
+    String message = null;
+
+    if (RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER.equals(directory)) {
+      Path syncBundlePath = SyncUtils.getSyncIncomingBundlePath(name);
       try {
-        return distributedInstanceService.createCentralSyncBundle(instanceIdentifier);
-      } catch (NotFoundException e) {
-        return new ObjectResponse<>(null, null);
+        boolean deleteFromIncome = Files.deleteIfExists(syncBundlePath);
+        if (deleteFromIncome) {
+          message = "Deleted bundle from income folder with success";
+        } else {
+          message = "Could not find bundle in income folder";
+        }
+      } catch (IOException e) {
+        LOGGER.error("Can not delete bundle from income folder because {}", e.getMessage());
       }
-    } catch (RODAException e) {
+    } else {
+      Path syncBundlePath = SyncUtils.getSyncOutcomeBundlePath(name);
+      try {
+        boolean deleteFromOutcome = Files.deleteIfExists(syncBundlePath);
+        if (deleteFromOutcome) {
+          message = "Deleted bundle from outcome folder with success";
+        } else {
+          message = "Could not find bundle in outcome folder";
+        }
+      } catch (IOException e) {
+        LOGGER.error("Can not delete bundle from outcome folder because {}", e.getMessage());
+      }
+    }
+    LOGGER.info(message);
+  }
+
+  @Override
+  public LocalInstance updateLocalInstanceConfiguration(@RequestBody LocalInstance localInstance) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
+      return RodaCoreFactory.getLocalInstance();
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
-        instanceIdentifier);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
+        localInstance);
     }
   }
 
-  @RequestMapping(path = "/sync/status/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Get synchronization status" ,description = "Gets synchronization status", responses = {
-    @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = Response.class))),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Response synchronizationStatus(
+  @GetMapping(path = "/remote/actions/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @Operation(summary = "Get instance status", description = "Gets instance status", responses = {
+    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "409", description = "Conflict", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  public ResponseEntity<StreamingResponseBody> remoteActions(
+    @Parameter(description = "The instance id") @PathVariable(name = "id") String id) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      StreamResponse response = distributedInstanceService.createCentralSyncBundle(id);
+
+      return ApiUtils.okResponse(response);
+    } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
+        id);
+    }
+  }
+
+  @GetMapping(path = "/sync/status/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get synchronization status", description = "Gets synchronization status", responses = {
+    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  ResponseEntity<StreamingResponseBody> synchronizationStatus(
     @Parameter(description = "The instance id") @PathVariable(name = "id") String id,
     @Parameter(description = "The entity class") @RequestParam(name = RodaConstants.API_QUERY_KEY_CLASS) String entityClass,
     @Parameter(description = "The type") @RequestParam(name = RodaConstants.API_QUERY_KEY_TYPE) String type) {
@@ -593,10 +627,11 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
+
       // delegate
-      return ApiUtils.okResponse((StreamResponse) distributedInstanceService.retrieveLastSyncFileByClass(id, entityClass, type));
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
+      return ApiUtils.okResponse(distributedInstanceService.retrieveLastSyncFileByClass(id, entityClass, type));
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
     } finally {
       // register action
@@ -605,23 +640,28 @@ public class DistributedInstancesController implements DistributedInstancesRestS
     }
   }
 
-  @RequestMapping(path = "/sync/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(path = "/sync/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Import sync bundle", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = MultipartFile.class))), description = "Imports sync bundle", responses = {
     @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = Job.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Job importSyncBundle(
+  public Job importSyncBundle(
     @Parameter(content = @Content(mediaType = "multipart/form-data", schema = @Schema(implementation = MultipartFile.class)), description = "Multipart file") @RequestPart(value = "file") MultipartFile resource,
     @Parameter(description = "The instance id") @PathVariable(name = "id") String id) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {
-    };
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
+
       return distributedInstanceService.importSyncBundle(requestContext.getUser(), id, resource);
-    } catch (RODAException e) {
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {

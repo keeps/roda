@@ -1,6 +1,6 @@
 services:
   zoo:
-    image: docker.io/zookeeper:3.9.2
+    image: docker.io/zookeeper:3.9-jre-17
     restart: unless-stopped
     ports:
       - "2182:2181"
@@ -57,10 +57,11 @@ services:
       - LDAP_ADMIN_PASSWORD=roda
       - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
     volumes:
-      - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
+      - ldap_data:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 volumes:
   zookeeper_data:
   zookeeper_datalog:
   solr_data:
   clam_data:
   siegfried_data:
+  ldap_data:

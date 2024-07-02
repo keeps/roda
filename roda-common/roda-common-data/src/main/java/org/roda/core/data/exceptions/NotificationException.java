@@ -7,7 +7,12 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 public class NotificationException extends RODAException {
+
+  @Serial
+  private static final long serialVersionUID = -1007761117626340269L;
 
   public NotificationException() {
     super();

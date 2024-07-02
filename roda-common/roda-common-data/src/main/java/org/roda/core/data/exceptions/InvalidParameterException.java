@@ -9,12 +9,15 @@ package org.roda.core.data.exceptions;
 
 import org.roda.core.data.v2.jobs.PluginParameter;
 
+import java.io.Serial;
+
 /**
  * Thrown to indicate that a {@link PluginParameter} is wrong.
  *
  * @author Rui Castro
  */
 public class InvalidParameterException extends RODAException {
+  @Serial
   private static final long serialVersionUID = 4040123614898012034L;
 
   /**

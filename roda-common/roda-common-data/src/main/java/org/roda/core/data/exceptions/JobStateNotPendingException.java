@@ -7,11 +7,14 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * @author Shahzod Yusupov <syusupov@keep.pt>
  */
 public class JobStateNotPendingException extends RODAException {
 
+  @Serial
   private static final long serialVersionUID = -829610996201922888L;
 
   public JobStateNotPendingException() {

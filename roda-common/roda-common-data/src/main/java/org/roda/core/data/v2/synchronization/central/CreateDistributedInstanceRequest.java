@@ -1,4 +1,4 @@
-package org.roda.core.data.v2.generics;
+package org.roda.core.data.v2.synchronization.central;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

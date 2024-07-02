@@ -41,8 +41,6 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -64,6 +62,7 @@ import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.process.Process;
 import org.roda.wui.client.services.ConfigurationRestService;
+import org.roda.wui.client.services.DistributedInstancesRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -274,22 +273,17 @@ public class ShowJob extends Composite {
       String distributedMode = ConfigurationManager.getStringWithDefault(
         RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
       if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
-        BrowserService.Util.getInstance().retrieveDistributedInstance(job.getInstanceId(),
-          new AsyncCallback<DistributedInstance>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              BrowserService.Util.getInstance().retrieveLocalInstance(new NoAsyncCallback<LocalInstance>() {
-                @Override
-                public void onSuccess(LocalInstance localInstance) {
+        Services services = new Services("Retrieve distributed instance", "retrieve");
+        services.distributedInstanceResource(s -> s.getDistributedInstance(job.getInstanceId()))
+          .whenComplete((distributedInstance, throwable) -> {
+            if (throwable != null) {
+              services.distributedInstanceResource(DistributedInstancesRestService::getLocalInstance)
+                .whenComplete((localInstance, throwable1) -> {
                   Label instanceNameLabel = new Label(localInstance.getName());
                   instanceNameLabel.addStyleName("value");
                   instancePanel.add(instanceNameLabel);
-                }
-              });
-            }
-
-            @Override
-            public void onSuccess(DistributedInstance distributedInstance) {
+                });
+            } else {
               Anchor anchor = new Anchor();
               anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, job.getInstanceId()));
               anchor.setText(distributedInstance.getName());

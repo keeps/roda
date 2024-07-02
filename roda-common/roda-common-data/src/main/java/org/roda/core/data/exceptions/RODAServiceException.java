@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.exceptions;
 
+import java.io.Serial;
+
 /**
  * Thrown when something wrong happens inside a RODA service and the request
  * could not be complete.
@@ -14,6 +16,7 @@ package org.roda.core.data.exceptions;
  * @author Rui Castro
  */
 public class RODAServiceException extends RODAException {
+  @Serial
   private static final long serialVersionUID = 4068129466745626125L;
 
   /**

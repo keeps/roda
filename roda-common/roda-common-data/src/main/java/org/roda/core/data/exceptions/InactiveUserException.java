@@ -9,6 +9,8 @@ package org.roda.core.data.exceptions;
 
 import org.roda.core.data.v2.user.User;
 
+import java.io.Serial;
+
 /**
  * Thrown to indicate that was not possible to authenticate {@link User} because
  * it is not active.
@@ -16,6 +18,7 @@ import org.roda.core.data.v2.user.User;
  * @author Rui Castro <rui.castro@gmail.com>
  */
 public class InactiveUserException extends AuthenticationDeniedException {
+  @Serial
   private static final long serialVersionUID = -1893919532523481577L;
 
   /**

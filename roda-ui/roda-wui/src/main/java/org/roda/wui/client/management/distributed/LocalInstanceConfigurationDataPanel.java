@@ -218,7 +218,7 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
   @UiHandler("buttonTest")
   void buttonTestHandler(ClickEvent e) {
     if (isValid()) {
-      Services services = new Services("Get distributed instance", "get");
+      Services services = new Services("Test local instance configuration", "test");
       services.distributedInstanceResource(s -> s.testLocalInstanceConfiguration(getLocalInstance()))
         .whenComplete((result, error) -> {
           if (result != null) {

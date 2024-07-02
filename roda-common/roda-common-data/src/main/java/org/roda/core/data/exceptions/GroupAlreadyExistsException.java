@@ -9,6 +9,8 @@ package org.roda.core.data.exceptions;
 
 import org.roda.core.data.v2.user.Group;
 
+import java.io.Serial;
+
 /**
  * Thrown to indicate that a {@link Group} with the same name already exists
  * when a new one is trying to be created.
@@ -17,6 +19,7 @@ import org.roda.core.data.v2.user.Group;
  */
 public class GroupAlreadyExistsException extends AlreadyExistsException {
 
+  @Serial
   private static final long serialVersionUID = 6493339963861919270L;
 
   /**
