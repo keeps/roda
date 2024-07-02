@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Set;
 
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -19,6 +20,7 @@ import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.RODAMemberActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.utils.FormUtilities;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
@@ -120,6 +122,10 @@ public class ShowUser extends Composite {
     fullnameValue.setText(user.getFullName());
     emailValue.setText(user.getEmail());
     stateValue.setHTML(HtmlSnippetUtils.getUserStateHtml(user));
+
+    if (!user.getExtra().isEmpty()) {
+      HtmlSnippetUtils.createExtraShow(extraValue, user.getExtra(), false);
+    }
 
     // Groups
     if (user.getGroups().isEmpty()) {
