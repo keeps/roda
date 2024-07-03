@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,9 +64,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -96,40 +92,8 @@ public class MembersService {
     return uuids;
   }
 
-  private static String transformExtra(Set<MetadataValue> values) {
-    Handlebars handlebars = new Handlebars();
-    Map<String, String> data = new HashMap<>();
-    handlebars.registerHelper("field", (o, options) -> {
-      return options.fn();
-    });
 
-    try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-      RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE)) {
-      String rawTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
-      Template tmpl = handlebars.compileInline(rawTemplate);
-
-      if (values != null) {
-        values.forEach(metadataValue -> {
-          String val = metadataValue.get("value");
-          if (val != null) {
-            val = val.replaceAll("\\s", "");
-            if (!"".equals(val)) {
-              data.put(metadataValue.get("name"), metadataValue.get("value"));
-            }
-          }
-        });
-      }
-
-      return tmpl.apply(data);
-    } catch (IOException e) {
-      LOGGER.error("Error getting template from stream", e);
-    }
-
-    return "";
-  }
-
-  public static Set<MetadataValue> retrieveUserExtra(String name) {
-    if (!RodaConstants.SYSTEM_USERS.contains(name)) {
+  public static Set<MetadataValue> retrieveUserExtra(String extraLDAP) {
       String template = null;
 
       try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
@@ -141,43 +105,33 @@ public class MembersService {
 
       Set<MetadataValue> values = ServerTools.transform(template);
 
-      try {
-        User user = RodaCoreFactory.getModelService().retrieveUser(name);
-        String userExtra = user.getExtraLDAP();
-
-        if (userExtra != null && !values.isEmpty()) {
-          for (MetadataValue mv : values) {
-            // clear the auto-generated values
-            // mv.set("value", null);
-            String xpathRaw = mv.get("xpath");
-            if (xpathRaw != null && xpathRaw.length() > 0) {
-              String[] xpaths = xpathRaw.split("##%##");
-              String value;
-              List<String> allValues = new ArrayList<>();
-              for (String xpath : xpaths) {
-                allValues.addAll(ServerTools.applyXpath(userExtra, xpath));
-              }
-              // if any of the values is different, concatenate all values in a
-              // string, otherwise return the value
-              boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
-              if (allEqual && !allValues.isEmpty()) {
-                value = allValues.get(0);
-              } else {
-                value = String.join(" / ", allValues);
-              }
-              mv.set("value", value.trim());
+      if (extraLDAP != null && !values.isEmpty()) {
+        for (MetadataValue mv : values) {
+          // clear the auto-generated values
+          // mv.set("value", null);
+          String xpathRaw = mv.get("xpath");
+          if (xpathRaw != null && xpathRaw.length() > 0) {
+            String[] xpaths = xpathRaw.split("##%##");
+            String value;
+            List<String> allValues = new ArrayList<>();
+            for (String xpath : xpaths) {
+              allValues.addAll(ServerTools.applyXpath(extraLDAP, xpath));
             }
+            // if any of the values is different, concatenate all values in a
+            // string, otherwise return the value
+            boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
+            if (allEqual && !allValues.isEmpty()) {
+              value = allValues.get(0);
+            } else {
+              value = String.join(" / ", allValues);
+            }
+            mv.set("value", value.trim());
           }
         }
-
-      } catch (GenericException e) {
-        // do nothing
       }
 
       return values;
-    } else {
-      return new HashSet<>();
-    }
+
   }
 
   private static void sendSetPasswordEmail(String servletPath, User user, String localeString, boolean isRecover)
@@ -233,7 +187,7 @@ public class MembersService {
 
   public User retrieveUser(String username) throws GenericException {
     User user = RodaCoreFactory.getModelService().retrieveUser(username);
-    user.setExtra(retrieveUserExtra(username));
+    user.setExtra(retrieveUserExtra(RodaCoreFactory.getModelService().retrieveExtraLdap(username)));
     return user;
   }
 
@@ -283,7 +237,7 @@ public class MembersService {
   public User createUser(User user, SecureString password, Set<MetadataValue> extra)
     throws GenericException, AlreadyExistsException, IllegalOperationException, NotFoundException,
     AuthorizationDeniedException, RequestNotValidException, ValidationException {
-    user.setExtraLDAP(transformExtra(extra));
+    user.setExtra(extra);
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     User addedUser = model.createUser(user, password, true);
@@ -342,7 +296,6 @@ public class MembersService {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     request.getUser().setExtra(request.getValues());
-    request.getUser().setExtraLDAP(transformExtra(request.getValues()));
     User modifiedUser = RodaCoreFactory.getModelService().updateUser(request.getUser(), request.getPassword(), true);
     PremisV3Utils.createOrUpdatePremisUserAgentBinary(request.getUser().getName(), model, index, false);
     RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
@@ -360,7 +313,6 @@ public class MembersService {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     modifiedUser.setExtra(extra);
-    modifiedUser.setExtraLDAP(transformExtra(extra));
     User currentUser = model.retrieveUser(modifiedUser.getName());
     User resetUser = resetUser(modifiedUser, currentUser);
 
@@ -399,7 +351,6 @@ public class MembersService {
 
     user.setIpAddress(ipAddress);
 
-    user.setExtraLDAP(transformExtra(extra));
     User updatedUser = UserUtility.resetGroupsAndRoles(user);
 
     User registeredUser = RodaCoreFactory.getModelService().registerUser(updatedUser, password, true);

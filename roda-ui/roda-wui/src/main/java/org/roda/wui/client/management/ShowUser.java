@@ -10,7 +10,6 @@ package org.roda.wui.client.management;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Set;
-
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -120,6 +119,10 @@ public class ShowUser extends Composite {
     fullnameValue.setText(user.getFullName());
     emailValue.setText(user.getEmail());
     stateValue.setHTML(HtmlSnippetUtils.getUserStateHtml(user));
+
+    if (!user.getExtra().isEmpty()) {
+      HtmlSnippetUtils.createExtraShow(extraValue, user.getExtra(), false);
+    }
 
     // Groups
     if (user.getGroups().isEmpty()) {
