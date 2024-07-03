@@ -13,9 +13,7 @@ package org.roda.wui.client.management;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.NotificationAcknowledgeRequest;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;

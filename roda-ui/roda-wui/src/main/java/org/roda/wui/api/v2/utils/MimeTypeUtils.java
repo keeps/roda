@@ -5,11 +5,11 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api.controllers;
+package org.roda.wui.api.v2.utils;
 
 import jakarta.activation.MimetypesFileTypeMap;
 
-public class MimeTypeHelper {
+public class MimeTypeUtils {
 
   private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
   private static final MimetypesFileTypeMap MIMEMAP = new MimetypesFileTypeMap();

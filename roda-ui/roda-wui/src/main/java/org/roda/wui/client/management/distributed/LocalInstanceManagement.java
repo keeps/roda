@@ -9,10 +9,7 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.services.DistributedInstancesRestService;

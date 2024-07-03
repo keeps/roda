@@ -21,7 +21,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.UserUtility;
-import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.api.v2.controller.MembersController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

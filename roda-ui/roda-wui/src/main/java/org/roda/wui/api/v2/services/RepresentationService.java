@@ -47,7 +47,7 @@ import org.roda.core.plugins.base.maintenance.ChangeTypePlugin;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.Directory;
-import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
@@ -167,14 +167,14 @@ public class RepresentationService {
       DeleteRODAObjectPlugin.class, user, pluginParameters, "Could not execute representations delete action");
   }
 
-  public Job changeRepresentationStatus(User user, SelectedItems<IndexedRepresentation> selected, List<String> newStatus,
-                                        String details)
+  public Job changeRepresentationStatus(User user, SelectedItems<IndexedRepresentation> selected,
+    List<String> newStatus, String details)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NEW_STATUS, String.join(",", newStatus));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
     return CommonServicesUtils.createAndExecuteInternalJob("Change representation status", selected,
-        ChangeRepresentationStatusPlugin.class, user, pluginParameters, "Could not change representation status");
+      ChangeRepresentationStatusPlugin.class, user, pluginParameters, "Could not change representation status");
   }
 
   public Job createFormatIdentificationJob(User user, SelectedItems<?> selected)

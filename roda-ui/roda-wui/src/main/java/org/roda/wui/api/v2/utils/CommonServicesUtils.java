@@ -1,15 +1,24 @@
 package org.roda.wui.api.v2.utils;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.Messages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.generics.select.SelectedItemsFilterRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
@@ -17,12 +26,15 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.util.IdUtils;
+import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,5 +117,50 @@ public class CommonServicesUtils {
     }
 
     throw new RequestNotValidException("Selected items must be either a list or a filter");
+  }
+
+  public static void getMetadataValueI18nPrefix(MetadataValue metadataValue, Locale locale, Messages messages)
+      throws GenericException {
+    String i18nPrefix = metadataValue.get("optionsLabelI18nKeyPrefix");
+    if (i18nPrefix != null) {
+      Map<String, String> terms = messages.getTranslations(i18nPrefix, String.class, false);
+      if (!terms.isEmpty()) {
+        try {
+          String options = metadataValue.get("options");
+          List<String> optionsList = JsonUtils.getListFromJson(options, String.class);
+
+          if (optionsList != null) {
+            Map<String, Map<String, String>> i18nMap = new HashMap<>();
+            for (String value : optionsList) {
+              String translation = terms.get(i18nPrefix + "." + value);
+              if (translation == null) {
+                translation = value;
+              }
+              Map<String, String> term = new HashMap<>();
+              term.put(locale.toString(), translation);
+              i18nMap.put(value, term);
+            }
+            metadataValue.set("optionsLabels", JsonUtils.getJsonFromObject(i18nMap));
+          }
+        } catch (MissingResourceException e) {
+          LOGGER.error(e.getMessage(), e);
+        }
+      }
+    }
+  }
+
+  public static void getMetadataValueLabels(MetadataValue metadataValue, Locale locale, Messages messages) {
+    String labels = metadataValue.get("label");
+    String labelI18N = metadataValue.get("labeli18n");
+    if (labels != null && labelI18N != null) {
+      Map<String, String> labelsMaps = JsonUtils.getMapFromJson(labels);
+      try {
+        labelsMaps.put(locale.toString(), messages.getTranslation(labelI18N));
+      } catch (MissingResourceException e) {
+        LOGGER.debug("Missing resource: {}", labelI18N);
+      }
+      labels = JsonUtils.getJsonFromObject(labelsMaps);
+      metadataValue.set("label", labels);
+    }
   }
 }

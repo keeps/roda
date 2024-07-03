@@ -42,7 +42,6 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.BadgePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -99,7 +98,8 @@ import config.i18n.client.ClientMessages;
 public class CreateDefaultJob extends Composite {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
@@ -183,6 +183,7 @@ public class CreateDefaultJob extends Composite {
   private boolean isListEmpty = true;
   private JobPriority priority = JobPriority.MEDIUM;
   private JobParallelism parallelism = JobParallelism.NORMAL;
+
   public CreateDefaultJob() {
     highPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.HIGH, false));
     mediumPriorityRadioButton = new RadioButton("priority",
@@ -196,11 +197,12 @@ public class CreateDefaultJob extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     Services services = new Services("Retrieve plugin information", "get");
-    services.configurationsResource(s -> s.retrievePluginsInfo(pluginTypes)).whenComplete((pluginInfoList, throwable) -> {
+    services.configurationsResource(s -> s.retrievePluginsInfo(pluginTypes))
+      .whenComplete((pluginInfoList, throwable) -> {
         if (throwable == null) {
           init(pluginInfoList.getPluginInfoList());
         }
-    });
+      });
   }
 
   @Override
@@ -749,7 +751,5 @@ public class CreateDefaultJob extends Composite {
 
   public interface MyUiBinder extends UiBinder<Widget, CreateDefaultJob> {
   }
-
-
 
 }

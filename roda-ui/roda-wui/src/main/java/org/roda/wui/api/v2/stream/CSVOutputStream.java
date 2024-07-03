@@ -5,10 +5,11 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api.v1.utils;
+package org.roda.wui.api.v2.stream;
 
 import org.apache.commons.csv.CSVFormat;
 import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.wui.api.v2.utils.ExtraMediaType;
 
 /**
  * Abstract CSV output stream.

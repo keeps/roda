@@ -172,46 +172,11 @@ public class RodaConfig {
    * REST related servlets/servlet-mappings
    *******************************************/
   @Bean
-  public ServletRegistrationBean<HttpServlet> restAPI() {
-    ServletRegistrationBean<HttpServlet> bean;
-    bean = new ServletRegistrationBean<>(new org.glassfish.jersey.servlet.ServletContainer());
-    bean.addInitParameter("jakarta.ws.rs.Application", "org.roda.wui.api.v1.RestApplication");
-
-    bean.setLoadOnStartup(2);
-    bean.addUrlMappings("/api/v1/*");
-    return bean;
-  }
-
-  @Bean
   public ServletRegistrationBean<HttpServlet> clientLogger() {
     ServletRegistrationBean<HttpServlet> bean;
     bean = new ServletRegistrationBean<>(new org.roda.wui.common.server.ClientLoggerImpl());
     bean.setLoadOnStartup(2);
     bean.addUrlMappings("/gwtrpc/wuilogger");
-    return bean;
-  }
-
-  @Bean
-  public ServletRegistrationBean<HttpServlet> userManagementService() {
-    ServletRegistrationBean<HttpServlet> bean;
-    bean = new ServletRegistrationBean<>(new org.roda.wui.server.management.UserManagementServiceImpl());
-    bean.addUrlMappings("/gwtrpc/UserManagementService");
-    return bean;
-  }
-
-  @Bean
-  public ServletRegistrationBean<HttpServlet> userLoginService() {
-    ServletRegistrationBean<HttpServlet> bean;
-    bean = new ServletRegistrationBean<>(new org.roda.wui.server.common.UserLoginServiceImpl());
-    bean.addUrlMappings("/gwtrpc/userlogin");
-    return bean;
-  }
-
-  @Bean
-  public ServletRegistrationBean<HttpServlet> browserService() {
-    ServletRegistrationBean<HttpServlet> bean;
-    bean = new ServletRegistrationBean<>(new org.roda.wui.server.browse.BrowserServiceImpl());
-    bean.addUrlMappings("/gwtrpc/browserservice");
     return bean;
   }
 

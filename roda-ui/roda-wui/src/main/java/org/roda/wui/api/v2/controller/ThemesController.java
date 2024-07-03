@@ -1,11 +1,11 @@
 package org.roda.wui.api.v2.controller;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.roda.core.common.ProvidesInputStream;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.wui.api.controllers.Theme;
+import org.roda.wui.api.v2.services.ThemeService;
 import org.roda.wui.api.v2.utils.ApiUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,12 +18,16 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v2/themes")
 @Tag(name = ThemesController.SWAGGER_ENDPOINT)
 public class ThemesController {
   public static final String SWAGGER_ENDPOINT = "v2 themes";
+
+  @Autowired
+  ThemeService themeService;
 
   @GetMapping()
   public ResponseEntity<StreamingResponseBody> getResource(
@@ -33,10 +37,11 @@ public class ThemesController {
     @Parameter(description = "The resource type, can be internal or plugin", schema = @Schema(implementation = RodaConstants.ResourcesTypes.class, defaultValue = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_TYPE)) @RequestParam(defaultValue = RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_TYPE, name = "resource-type", required = false) String type,
     WebRequest request) {
 
-    Pair<String, ProvidesInputStream> themeResource = Theme.getThemeResource(resourceId, fallbackResourceId, type);
+    Pair<String, ProvidesInputStream> themeResource = themeService.getThemeResource(resourceId, fallbackResourceId,
+      type);
 
     if (themeResource.getSecond() != null) {
-      return ApiUtils.okResponse(Theme.getThemeResourceStreamResponse(themeResource, type), request);
+      return ApiUtils.okResponse(themeService.getThemeResourceStreamResponse(themeResource, type), request);
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found: " + resourceId);
     }

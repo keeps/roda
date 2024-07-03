@@ -8,6 +8,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.StreamResponse;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.Resource;
 import org.springframework.http.CacheControl;
@@ -109,6 +110,34 @@ public class ApiUtils {
     ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource, fileName,
         addTopDirectory);
     return new StreamResponse(download);
+  }
+
+  /**
+   * Returns valid start (pair first element) and limit (pair second element)
+   * paging parameters defaulting to start = 0 and limit = 100 if none or invalid
+   * values are provided.
+   */
+  public static Pair<Integer, Integer> processPagingParams(String start, String limit) {
+    Integer startInteger;
+    Integer limitInteger;
+    try {
+      startInteger = Integer.parseInt(start);
+      if (startInteger < 0) {
+        startInteger = 0;
+      }
+    } catch (NumberFormatException e) {
+      startInteger = 0;
+    }
+    try {
+      limitInteger = Integer.parseInt(limit);
+      if (limitInteger < 0) {
+        limitInteger = 100;
+      }
+    } catch (NumberFormatException e) {
+      limitInteger = 100;
+    }
+
+    return Pair.of(startInteger, limitInteger);
   }
 
   private ApiUtils() {

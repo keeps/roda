@@ -239,7 +239,7 @@ public class RepresentationInformationController implements RepresentationInform
       // delegate
       return representationInformationService.retrieveRepresentationInformationFamilyConfigurations(familyType,
         localeString);
-    } catch (NotFoundException e) {
+    } catch (NotFoundException | GenericException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } catch (AuthorizationDeniedException e) {

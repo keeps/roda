@@ -30,7 +30,6 @@ import org.roda.core.plugins.base.synchronization.instance.LocalInstanceRegister
 import org.roda.core.plugins.base.synchronization.proccess.ImportSyncBundlePlugin;
 import org.roda.core.plugins.base.synchronization.proccess.SynchronizeInstancePlugin;
 import org.roda.core.storage.utils.RODAInstanceUtils;
-import org.roda.wui.api.controllers.BrowserHelper;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -136,7 +135,7 @@ public class DistributedInstanceService {
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path.toString());
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH, workingDir.toString());
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, instanceIdentifier);
-      return BrowserHelper.createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(),
+      return CommonServicesUtils.createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(),
         ImportSyncBundlePlugin.class, user, pluginParameters, "Could not execute bundle job");
     } catch (IOException e) {
       throw new GenericException("Failed during sync package import", e);

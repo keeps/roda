@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.fusesource.restygwt.client.DirectRestService;
 import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.jobs.PluginInfoList;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.properties.ConversionProfileOutcomeType;
@@ -34,7 +35,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "../api/v2/configurations")
 public interface ConfigurationRestService extends DirectRestService {
 
-  @RequestMapping(method = RequestMethod.GET, path = "/exports/limit")
+  @RequestMapping(method = RequestMethod.GET, path = "/cron", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Retrieves the cron value", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns the cron value", content = @Content(schema = @Schema(implementation = StringResponse.class)))})
+  StringResponse retrieveCronValue(
+    @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
+
+  @RequestMapping(method = RequestMethod.GET, path = "/exports/limit", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Retrieves the export limit value", responses = {
     @ApiResponse(responseCode = "200", description = "Returns the export limit value", content = @Content(schema = @Schema(implementation = LongResponse.class)))})
   LongResponse retrieveExportLimit();

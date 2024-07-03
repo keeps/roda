@@ -11,11 +11,9 @@
 package org.roda.wui.client.main;
 
 import java.util.List;
-import java.util.Map;
 
 import org.fusesource.restygwt.client.Defaults;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.resources.MyResources;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.services.RODADispatcher;
@@ -36,7 +34,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.RootPanel;

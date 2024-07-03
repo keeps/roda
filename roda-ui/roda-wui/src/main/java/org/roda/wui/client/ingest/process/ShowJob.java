@@ -41,7 +41,6 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
@@ -590,26 +589,22 @@ public class ShowJob extends Composite {
     String distributedMode = ConfigurationManager.getStringWithDefault(
       RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
 
-    if (distributedMode.equals(RodaConstants.DistributedModeType.LOCAL.name())) {
-      if (Job.JOB_STATE.SCHEDULED.equals(job.getState())) {
-        BrowserService.Util.getInstance().getCrontabValue(LocaleInfo.getCurrentLocale().getLocaleName(),
-          new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-              // do nothing
+    if (distributedMode.equals(RodaConstants.DistributedModeType.LOCAL.name())
+      && Job.JOB_STATE.SCHEDULED.equals(job.getState())) {
+      Services services = new Services("Retrieve job schedule info", "retrieve");
+      services.configurationsResource(s -> s.retrieveCronValue(LocaleInfo.getCurrentLocale().getLocaleName()))
+        .whenComplete((stringResponse, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            String description = stringResponse.getValue();
+            if (StringUtils.isNotBlank(description)) {
+              scheduleInfoLabel.setVisible(true);
+              scheduleInfo.setVisible(true);
+              scheduleInfo.setText(description);
             }
-
-            @Override
-            public void onSuccess(String description) {
-              if (StringUtils.isNotBlank(description)) {
-                scheduleInfoLabel.setVisible(true);
-                scheduleInfo.setVisible(true);
-                scheduleInfo.setText(description);
-              }
-            }
-          });
-
-      }
+          }
+        });
     }
 
     // set state details

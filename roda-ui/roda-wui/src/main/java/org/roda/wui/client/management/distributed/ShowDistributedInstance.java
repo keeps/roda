@@ -10,7 +10,6 @@ package org.roda.wui.client.management.distributed;
 import java.util.List;
 
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;

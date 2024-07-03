@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api.v1.utils;
+package org.roda.wui.api.v2.utils;
 
 /**
  * An abstraction for extra media types. Instances are immutable.
