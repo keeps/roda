@@ -14,7 +14,6 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.services.Services;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

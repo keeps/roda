@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.json.client.JSONValue;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
@@ -26,7 +24,6 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.TransferredResourceList;
@@ -106,7 +103,8 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
     List<PluginParameter> missingMandatoryParameters = getWorkflowOptions().getMissingMandatoryParameters();
     if (missingMandatoryParameters.isEmpty()) {
 
-      Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(), getSelectedPlugin().getId(), getWorkflowOptions().getValue());
+      Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(),
+        getSelectedPlugin().getId(), getWorkflowOptions().getValue());
       Services services = new Services("Create job", "create");
       services.jobsResource(s -> s.createJob(job)).whenComplete((job1, throwable) -> {
         if (throwable != null) {
@@ -150,7 +148,8 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
     if (missingMandatoryParameters.isEmpty()) {
 
       Services services = new Services("Obtain cURL command", "get");
-      Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(), getSelectedPlugin().getId(), getWorkflowOptions().getValue());
+      Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(),
+        getSelectedPlugin().getId(), getWorkflowOptions().getValue());
 
       services.jobsResource(s -> s.obtainJobCommand(job)).whenComplete((result, throwable) -> {
         Dialogs.showInformationDialog(messages.createJobCurlCommand(), result.getValue(), messages.closeButton(), true);

@@ -48,7 +48,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.IdUtils;
-import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v2.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -62,10 +62,9 @@ public class JobService {
     String command = RodaCoreFactory.getRodaConfiguration().getString("ui.createJob.curl");
     if (command != null) {
       command = command.replace("{{jsonObject}}",
-          StringEscapeUtils.escapeJava(JsonUtils.getJsonFromObject(job, JobMixIn.class)));
+        StringEscapeUtils.escapeJava(JsonUtils.getJsonFromObject(job, JobMixIn.class)));
 
-      command = command.replace("{{RODA_CONTEXT_PATH}}",
-          StringEscapeUtils.escapeJava(path));
+      command = command.replace("{{RODA_CONTEXT_PATH}}", StringEscapeUtils.escapeJava(path));
       return command;
     } else {
       return "";
@@ -175,7 +174,7 @@ public class JobService {
   }
 
   public Reports getJobReportsFromIndexResult(User user, String jobId, boolean justFailed, String start, String limit,
-    List<String> fieldsToReturn) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
     Reports reports = new Reports();
 
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
@@ -185,10 +184,9 @@ public class JobService {
     if (justFailed) {
       filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_PLUGIN_STATE, PluginState.FAILURE.toString()));
     }
-    IndexResult<IndexedReport> listJobReportsIndexResult = org.roda.wui.api.controllers.Browser.find(
-      IndexedReport.class, filter, Sorter.NONE,
-      new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user, justActive,
-      fieldsToReturn);
+    IndexResult<IndexedReport> listJobReportsIndexResult = RodaCoreFactory.getIndexService().find(IndexedReport.class,
+      filter, Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE,
+      user, justActive, fieldsToReturn);
 
     for (IndexedReport report : listJobReportsIndexResult.getResults()) {
       reports.addObject(report);

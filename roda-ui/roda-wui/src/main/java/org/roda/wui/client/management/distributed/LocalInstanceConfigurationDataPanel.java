@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.StringUtils;

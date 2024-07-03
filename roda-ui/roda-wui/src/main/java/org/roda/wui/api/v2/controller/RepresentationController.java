@@ -37,7 +37,6 @@ import org.roda.core.data.v2.representation.RepresentationTypeOptions;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
-import org.roda.wui.api.controllers.BrowserHelper;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.RepresentationService;
@@ -189,8 +188,9 @@ public class RepresentationController implements RepresentationRestService, Expo
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      // TODO CHANGE TO AIP NEW CONTROLLER
-      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+
+      IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state

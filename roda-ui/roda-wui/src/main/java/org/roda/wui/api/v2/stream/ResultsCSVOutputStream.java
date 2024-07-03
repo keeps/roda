@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.api.v1.utils;
+package org.roda.wui.api.v2.stream;
 
 import java.io.IOException;
 import java.io.OutputStream;

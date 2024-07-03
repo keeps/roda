@@ -1,7 +1,5 @@
 package org.roda.wui.api.v2.services;
 
-import static org.roda.wui.api.controllers.BrowserHelper.createAndExecuteInternalJob;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +26,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.storage.BinaryVersion;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -81,7 +80,7 @@ public class RiskService {
 
   public Job deleteRisk(User user, SelectedItems<IndexedRisk> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    return createAndExecuteInternalJob("Delete risks", selected, DeleteRODAObjectPlugin.class, user,
+    return CommonServicesUtils.createAndExecuteInternalJob("Delete risks", selected, DeleteRODAObjectPlugin.class, user,
       Collections.emptyMap(), "Could not execute risk delete action");
   }
 

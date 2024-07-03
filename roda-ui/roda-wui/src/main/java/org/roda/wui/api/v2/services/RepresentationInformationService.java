@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -23,6 +24,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
@@ -47,7 +49,6 @@ import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.StorageService;
-import org.roda.wui.api.controllers.BrowserHelper;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.common.model.RequestContext;
@@ -144,11 +145,11 @@ public class RepresentationInformationService {
     }
   }
 
-  public RepresentationInformationFamily retrieveRepresentationInformationFamilyConfigurations(String familyType, String localeString)
-    throws NotFoundException {
+  public RepresentationInformationFamily retrieveRepresentationInformationFamilyConfigurations(String familyType,
+    String localeString) throws NotFoundException, GenericException {
     Locale locale = ServerTools.parseLocale(localeString);
-    List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
-      .retrieveExtraSupportedMetadata(RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family"), locale);
+    List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = retrieveSupportedMetadataTypes(
+      RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family"), locale);
 
     SupportedMetadataTypeBundle searchResult = supportedMetadataTypeBundles.stream()
       .filter(p -> p.getType().equals(familyType)).findFirst().orElseThrow(() -> new NotFoundException(
@@ -160,11 +161,12 @@ public class RepresentationInformationService {
     return representationInformationFamily;
   }
 
-  public RepresentationInformationFamily retrieveRepresentationInformationFamily(String representationInformationId, String localeString)
+  public RepresentationInformationFamily retrieveRepresentationInformationFamily(String representationInformationId,
+    String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Locale locale = ServerTools.parseLocale(localeString);
-    List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
-      .retrieveExtraSupportedMetadata(RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family"), locale);
+    List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = retrieveSupportedMetadataTypes(
+      RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family"), locale);
 
     RepresentationInformation ri = RodaCoreFactory.getModelService()
       .retrieveRepresentationInformation(representationInformationId);
@@ -179,6 +181,67 @@ public class RepresentationInformationService {
     representationInformationFamily.setFamilyValues(familyValues);
 
     return representationInformationFamily;
+  }
+
+  private List<SupportedMetadataTypeBundle> retrieveSupportedMetadataTypes(List<String> types, Locale locale)
+    throws GenericException {
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    List<SupportedMetadataTypeBundle> supportedMetadata = new ArrayList<>();
+    if (types != null) {
+      for (String id : types) {
+        String type = id;
+        String version = null;
+        if (id.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
+          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1);
+          type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
+        }
+        String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
+        if (version != null) {
+          key += RodaConstants.METADATA_VERSION_SEPARATOR + version.toLowerCase();
+        }
+        String label = messages.getTranslation(key, type);
+
+        String template = null;
+        Set<MetadataValue> values = new HashSet<>();
+        try (InputStream templateStream = RodaCoreFactory
+          .getConfigurationFileAsStream(RodaConstants.METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER + "/"
+            + ((version != null) ? type + RodaConstants.METADATA_VERSION_SEPARATOR + version : type)
+            + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
+
+          if (templateStream != null) {
+            template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+            values = ServerTools.transform(template);
+            for (MetadataValue mv : values) {
+              String generator = mv.get("auto-generate");
+              if (generator != null && !generator.isEmpty()) {
+                mv.set("value", "");
+              }
+              String labels = mv.get("label");
+              String labelI18N = mv.get("labeli18n");
+              if (labels != null && labelI18N != null) {
+                Map<String, String> labelsMaps = JsonUtils.getMapFromJson(labels);
+                try {
+                  labelsMaps.put(locale.toString(), RodaCoreFactory.getI18NMessages(locale).getTranslation(labelI18N));
+                } catch (MissingResourceException e) {
+                  LOGGER.debug("Missing resource: {}", labelI18N);
+                }
+                labels = JsonUtils.getJsonFromObject(labelsMaps);
+                mv.set("label", labels);
+              }
+
+              CommonServicesUtils.getMetadataValueLabels(mv, locale, messages);
+              CommonServicesUtils.getMetadataValueI18nPrefix(mv, locale, messages);
+            }
+          }
+        } catch (IOException e) {
+          LOGGER.error("Error getting the template from the stream", e);
+        }
+
+        supportedMetadata.add(new SupportedMetadataTypeBundle(id, type, version, label, template, values));
+      }
+    }
+
+    return supportedMetadata;
   }
 
   private Set<MetadataValue> parseMetadataValues(Set<MetadataValue> values, String xml) {
@@ -254,8 +317,8 @@ public class RepresentationInformationService {
     List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
       RodaConstants.REPRESENTATION_INFORMATION_NAME);
 
-    FindRequest findRequest = FindRequest.getBuilder(filter, true)
-      .withFieldsToReturn(fieldsToReturn).withChildren(true).build();
+    FindRequest findRequest = FindRequest.getBuilder(filter, true).withFieldsToReturn(fieldsToReturn).withChildren(true)
+      .build();
     IndexResult<RepresentationInformation> indexResult = indexService.find(RepresentationInformation.class, findRequest,
       requestContext);
 

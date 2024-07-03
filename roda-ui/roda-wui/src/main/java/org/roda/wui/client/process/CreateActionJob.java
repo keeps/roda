@@ -22,7 +22,6 @@ import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -38,7 +37,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
@@ -97,7 +95,8 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
     getButtonCreate().setEnabled(false);
     String jobName = getName().getText();
 
-    Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(), getSelectedPlugin().getId(), getWorkflowOptions().getValue());
+    Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(),
+      getSelectedPlugin().getId(), getWorkflowOptions().getValue());
     Services services = new Services("Create job", "create");
     services.jobsResource(s -> s.createJob(job)).whenComplete((job1, throwable) -> {
       if (throwable != null) {
@@ -115,7 +114,8 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
     String jobName = getName().getText();
 
     Services services = new Services("Obtain cURL command", "get");
-    Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(), getSelectedPlugin().getId(), getWorkflowOptions().getValue());
+    Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(),
+      getSelectedPlugin().getId(), getWorkflowOptions().getValue());
 
     services.jobsResource(s -> s.obtainJobCommand(job)).whenComplete((result, throwable) -> {
       if (throwable != null) {

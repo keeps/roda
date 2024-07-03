@@ -59,7 +59,7 @@ import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.server.ServerTools;
-import org.roda.wui.server.management.RecaptchaUtils;
+import org.roda.wui.api.v2.utils.RecaptchaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

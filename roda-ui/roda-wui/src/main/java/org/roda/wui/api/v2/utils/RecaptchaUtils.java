@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.server.management;
+package org.roda.wui.api.v2.utils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

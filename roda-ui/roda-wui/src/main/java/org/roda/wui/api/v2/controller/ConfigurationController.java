@@ -3,12 +3,14 @@ package org.roda.wui.api.v2.controller;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.jobs.PluginInfoList;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -32,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import it.burning.cron.CronExpressionDescriptor;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -46,6 +49,17 @@ public class ConfigurationController implements ConfigurationRestService {
 
   @Autowired
   ConfigurationsService configurationsService;
+
+  @Override
+  public StringResponse retrieveCronValue(String localeString) {
+    String syncSchedule = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization.scheduleInfo");
+    String description = null;
+    if (StringUtils.isNotBlank(syncSchedule)) {
+      CronExpressionDescriptor.setDefaultLocale(localeString.split("_")[0]);
+      description = CronExpressionDescriptor.getDescription(syncSchedule);
+    }
+    return new StringResponse(description);
+  }
 
   @Override
   public LongResponse retrieveExportLimit() {
@@ -71,7 +85,6 @@ public class ConfigurationController implements ConfigurationRestService {
       controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
     }
   }
-
 
   /**
    * This method retrieves shared properties based on the provided locale string.

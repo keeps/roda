@@ -19,7 +19,6 @@ import org.apereo.cas.client.util.CommonUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.api.v2.controller.MembersController;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.slf4j.Logger;
@@ -125,7 +124,7 @@ public class CasWebAuthFilter implements Filter {
       try {
         if (httpRequest.getUserPrincipal() != null) {
           try {
-            UserLogin.casLogin(httpRequest.getUserPrincipal().getName(), httpRequest);
+            MembersController.casLogin(httpRequest.getUserPrincipal().getName(), httpRequest);
           } catch (InactiveUserException e) {
             LOGGER.error("Error authenticating CAS user", e);
             httpResponse.sendRedirect(uri.build().toString() + "#theme/ErrorInactiveAccount.html");
@@ -139,20 +138,21 @@ public class CasWebAuthFilter implements Filter {
 
         httpResponse.sendRedirect(uri.build().toString());
       } catch (URISyntaxException e) {
-        LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
+        LOGGER.error("Could not generate service URL, redirecting to base path {}", path, e);
         httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
           "Unexpected error, see server logs for details");
       }
 
     } else if (url.endsWith("/logout")) {
 
-      MembersController.logout(httpRequest, Arrays.asList("edu.yale.its.tp.cas.client.filter.user", "_const_cas_assertion_"));
+      MembersController.logout(httpRequest,
+        Arrays.asList("edu.yale.its.tp.cas.client.filter.user", "_const_cas_assertion_"));
 
       String service;
       try {
         service = uri.build().toString();
       } catch (URISyntaxException e) {
-        LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
+        LOGGER.error("Could not generate service URL, redirecting to base path {}", path, e);
         service = path;
       }
 
