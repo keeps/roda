@@ -62,9 +62,9 @@ public interface DisposalRuleRestService extends DirectRestService {
     @Parameter(description = "The ID of the disposal rule to delete.", required = true) @PathVariable(name = "id") String id);
 
   @RequestMapping(method = RequestMethod.POST, path = "/apply", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Apply disposal rule to repository", description = "Applies the set of rules defined to the all repository. AIPs which their disposal schedule was manually associated may it can be override using the query parameter.", responses = {
+  @Operation(summary = "Apply disposal rule to repository", description = "Applies the set of rules defined to the all repository. An AIP's manually associated disposal schedules may be overwritten by specifying the appropriate query parameter.", responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job applyDisposalRules(
-    @Parameter(description = "If true disposal schedules that were manually associated to an intellectual entity may be associated to a different disposal schedule", content = @Content(schema = @Schema(implementation = boolean.class, defaultValue = "false"))) @RequestParam(name = "includeManually", required = false, defaultValue = "false") boolean includeManually);
+    @Parameter(description = "If true, overrides manually associated disposal schedules.", content = @Content(schema = @Schema(implementation = boolean.class, defaultValue = "false"))) @RequestParam(name = "overrideManualAssociations", required = false, defaultValue = "false") boolean overrideManualAssociations);
 }

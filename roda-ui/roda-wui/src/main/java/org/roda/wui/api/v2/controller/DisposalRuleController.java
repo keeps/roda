@@ -169,7 +169,7 @@ public class DisposalRuleController implements DisposalRuleRestService {
   }
 
   @Override
-  public Job applyDisposalRules(boolean includeManually) {
+  public Job applyDisposalRules(boolean overrideManualAssociations) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -178,7 +178,7 @@ public class DisposalRuleController implements DisposalRuleRestService {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
       // delegate
-      return disposalRuleService.applyDisposalRules(requestContext.getUser(), includeManually);
+      return disposalRuleService.applyDisposalRules(requestContext.getUser(), overrideManualAssociations);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -188,7 +188,7 @@ public class DisposalRuleController implements DisposalRuleRestService {
     } finally {
       // register action
       controllerAssistant.registerAction(requestContext, state,
-        RodaConstants.CONTROLLER_DISPOSAL_RULE_OVERRIDE_MANUAL_PARAM, includeManually);
+        RodaConstants.CONTROLLER_DISPOSAL_RULE_OVERRIDE_MANUAL_PARAM, overrideManualAssociations);
     }
   }
 }

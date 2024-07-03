@@ -57,7 +57,7 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
       PluginParameter
         .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL, "Override disposal schedule",
           PluginParameter.PluginParameterType.BOOLEAN)
-        .withDefaultValue("false").withDescription("Overrides disposal schedules manually associated").build());
+        .withDefaultValue("false").withDescription("Overrides manually associated disposal schedules.").build());
   }
 
   private boolean overrideManualAssociations = false;

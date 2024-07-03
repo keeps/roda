@@ -61,11 +61,11 @@ public class DisposalRuleService {
     RodaCoreFactory.getModelService().deleteDisposalRule(id, user.getName());
   }
 
-  public Job applyDisposalRules(User user, boolean applyToManuallyInclusive)
+  public Job applyDisposalRules(User user, boolean overrideManualAssociations)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL,
-      Boolean.toString(applyToManuallyInclusive));
+      Boolean.toString(overrideManualAssociations));
 
     return CommonServicesUtils.createAndExecuteInternalJob("Apply disposal rules to repository",
       new SelectedItemsFilter<>(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())),
