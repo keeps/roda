@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
+import org.roda.core.data.v2.ip.disposalhold.UpdateDisposalHoldRequest;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -118,8 +119,10 @@ public class EditDisposalHold extends Composite {
       disposalHold.setMandate(disposalHoldUpdated.getMandate());
       disposalHold.setDescription(disposalHoldUpdated.getDescription());
       disposalHold.setScopeNotes(disposalHoldUpdated.getScopeNotes());
+      UpdateDisposalHoldRequest request = new UpdateDisposalHoldRequest();
+      request.setDisposalHold(disposalHold);
       Services services = new Services("Update disposal hold", "update");
-      services.disposalHoldResource(s -> s.updateDisposalHold(disposalHold)).whenComplete((hold, throwable) -> {
+      services.disposalHoldResource(s -> s.updateDisposalHold(request)).whenComplete((hold, throwable) -> {
         if (throwable != null) {
           AsyncCallbackUtils.defaultFailureTreatment(throwable);
         } else {

@@ -11,14 +11,16 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
-import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
+import org.roda.core.data.v2.generics.select.SelectedItemsFilterRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
+import org.roda.core.data.v2.ip.disposalhold.UpdateDisposalHoldRequest;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -44,6 +46,7 @@ import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -194,6 +197,7 @@ public class ShowDisposalHold extends Composite {
       Label aipTitle = new Label();
       aipTitle.addStyleName("h5");
       aipTitle.setText(messages.disposalHoldListAips());
+      aipListTitle.clear();
       aipListTitle.add(aipTitle);
 
       aipsListCard.setWidget(aipsSearchWrapper);
@@ -223,78 +227,111 @@ public class ShowDisposalHold extends Composite {
       liftHoldBtn.setText(messages.liftButton());
 
       liftHoldBtn.addClickHandler(clickEvent -> {
-        if (disposalHold.getFirstTimeUsed() == null) {
-          disposalHold.setState(DisposalHoldState.LIFTED);
-          Services services = new Services("Update disposal hold", "update");
-          services.disposalHoldResource(s -> s.updateDisposalHold(disposalHold)).whenComplete((hold, throwable) -> {
-            if (throwable != null) {
-              AsyncCallbackUtils.defaultFailureTreatment(throwable);
-            } else {
-              HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+        Dialogs.showConfirmDialog(messages.liftDisposalHoldDialogTitle(), messages.liftDisposalHoldDialogMessage(1),
+          messages.cancelButton(), messages.confirmButton(), new AsyncCallback<Boolean>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+              // do nothing
             }
-          });
-        } else {
-          Filter filter = new Filter(
-            new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId()));
-          SelectedItemsFilter<IndexedAIP> selectedItemsFilter = new SelectedItemsFilter<>(filter,
-            IndexedAIP.class.getName(), true);
 
-          Services services = new Services("Lift disposal hold", "job");
-          CountRequest countRequest = new CountRequest(filter, true);
-          services.rodaEntityRestService(s -> s.count(countRequest), IndexedAIP.class)
-            .whenComplete((longResponse, throwable) -> {
-              if (longResponse.getResult() != 0) {
-                services.disposalHoldResource(
-                  s -> s.liftDisposalHoldBySelectedItems(SelectedItemsUtils.convertToRESTRequest(selectedItemsFilter),
-                    disposalHold.getId()))
-                  .whenComplete((job, cause) -> {
-                    if (cause != null) {
-                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                    } else {
-                      Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-
-                        @Override
-                        public void onFailure(Throwable caught) {
-                          Toast.showInfo(messages.runningInBackgroundTitle(),
-                            messages.runningInBackgroundDescription());
-
-                          Timer timer = new Timer() {
-                            @Override
-                            public void run() {
-                              refresh();
-                            }
-                          };
-
-                          timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                        }
-
-                        @Override
-                        public void onSuccess(final Void nothing) {
-                          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                        }
-                      });
+            @Override
+            public void onSuccess(Boolean confirm) {
+              if (confirm) {
+                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  new AsyncCallback<String>() {
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                      // do nothing
                     }
-                  });
-              } else {
-                services.disposalHoldResource(s -> s.liftDisposalHold(disposalHold.getId()))
-                  .whenComplete((result, cause) -> {
-                    if (cause != null) {
-                      AsyncCallbackUtils.defaultFailureTreatment(cause);
-                    } else {
-                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.updateDisposalHoldMessage());
-                      Timer timer = new Timer() {
-                        @Override
-                        public void run() {
-                          refresh();
-                        }
-                      };
 
-                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                    @Override
+                    public void onSuccess(String details) {
+                      if (disposalHold.getFirstTimeUsed() == null) {
+                        disposalHold.setState(DisposalHoldState.LIFTED);
+                        UpdateDisposalHoldRequest request = new UpdateDisposalHoldRequest();
+                        request.setDisposalHold(disposalHold);
+                        request.setDetails(details);
+                        Services services = new Services("Update disposal hold", "update");
+                        services.disposalHoldResource(s -> s.updateDisposalHold(request))
+                          .whenComplete((hold, throwable) -> {
+                            if (throwable != null) {
+                              AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                            } else {
+                              HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+                            }
+                          });
+                      } else {
+                        Filter filter = new Filter(
+                          new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId()));
+                        SelectedItemsRequest selectedItems = new SelectedItemsFilterRequest(filter, true);
+
+                        Services services = new Services("Lift disposal hold", "job");
+                        CountRequest countRequest = new CountRequest(filter, true);
+                        services.rodaEntityRestService(s -> s.count(countRequest), IndexedAIP.class)
+                          .whenComplete((longResponse, throwable) -> {
+                            if (longResponse.getResult() != 0) {
+                              DisassociateDisposalHoldRequest request = new DisassociateDisposalHoldRequest();
+                              request.setClear(false);
+                              request.setDetails(details);
+                              request.setSelectedItems(selectedItems);
+                              services
+                                .disposalHoldResource(s -> s.disassociateDisposalHold(request, disposalHold.getId()))
+                                .whenComplete((job, cause) -> {
+                                  if (cause != null) {
+                                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                                  } else {
+                                    Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(),
+                                      new AsyncCallback<Void>() {
+
+                                        @Override
+                                        public void onFailure(Throwable caught) {
+                                          Toast.showInfo(messages.runningInBackgroundTitle(),
+                                            messages.runningInBackgroundDescription());
+
+                                          Timer timer = new Timer() {
+                                            @Override
+                                            public void run() {
+                                              refresh();
+                                            }
+                                          };
+
+                                          timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                                        }
+
+                                        @Override
+                                        public void onSuccess(final Void nothing) {
+                                          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                                        }
+                                      });
+                                  }
+                                });
+                            } else {
+                              services.disposalHoldResource(s -> s.liftDisposalHold(disposalHold.getId(), details))
+                                .whenComplete((result, cause) -> {
+                                  if (cause != null) {
+                                    AsyncCallbackUtils.defaultFailureTreatment(cause);
+                                  } else {
+                                    Toast.showInfo(messages.runningInBackgroundTitle(),
+                                      messages.updateDisposalHoldMessage());
+                                    Timer timer = new Timer() {
+                                      @Override
+                                      public void run() {
+                                        refresh();
+                                      }
+                                    };
+
+                                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                                  }
+                                });
+                            }
+                          });
+                      }
                     }
                   });
               }
-            });
-        }
+            }
+          });
       });
       buttonsPanel.add(liftHoldBtn);
     }
