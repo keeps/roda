@@ -27,18 +27,12 @@ public class DescriptiveMetadataRequestXML extends CreateDescriptiveMetadataRequ
     this.xml = xml;
   }
 
-  @Override
   public String getXml() {
     return xml;
   }
 
-  @Override
   public void setXml(String xml) {
     this.xml = xml;
   }
 
-  @Override
-  public Set<MetadataValue> getValues() {
-    return Set.of();
-  }
 }

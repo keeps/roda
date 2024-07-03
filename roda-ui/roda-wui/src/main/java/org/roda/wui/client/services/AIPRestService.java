@@ -15,6 +15,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreview;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreviewRequest;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataVersions;
+import org.roda.core.data.v2.ip.metadata.SelectedType;
 import org.roda.core.data.v2.ip.metadata.SupportedMetadataValue;
 import org.roda.core.data.v2.ip.metadata.TypeOptionsInfo;
 import org.roda.core.data.v2.jobs.Job;
@@ -332,4 +333,22 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
   DescriptiveMetadataPreview retrieveDescriptiveMetadataPreview(
     @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String id,
     @Parameter(name = "previewRequest", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) DescriptiveMetadataPreviewRequest previewRequest);
+
+  @RequestMapping(path = "/{id}/metadata/descriptive/{descriptive-metadata-id}/similar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Check if selected descriptive metadata is similar to original", description = "Get aip metadata similarity", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CreateDescriptiveMetadataRequest.class))), responses = {
+    @ApiResponse(responseCode = "200", description = "Is the metadata similar", content = @Content(schema = @Schema(implementation = Boolean.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  boolean isAIPMetadataSimilar(@PathVariable(name = "id") String aipId,
+    @PathVariable(name = "descriptive-metadata-id") String metadataId,
+    @Parameter(name = "selected metadata values", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedType selectedType);
+
+  @RequestMapping(path = "/{id}/representation/{representation-id}/metadata/descriptive/{descriptive-metadata-id}/similar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Check if selected descriptive metadata is similar to original", description = "Get aip metadata similarity", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CreateDescriptiveMetadataRequest.class))), responses = {
+    @ApiResponse(responseCode = "200", description = "Is the metadata similar", content = @Content(schema = @Schema(implementation = Boolean.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  boolean isRepresentationMetadataSimilar(@PathVariable(name = "id") String aipId,
+    @PathVariable(name = "representation-id") String representationId,
+    @PathVariable(name = "descriptive-metadata-id") String metadataId,
+    @Parameter(name = "selected metadata values", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedType selectedType);
+
 }
