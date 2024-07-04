@@ -54,14 +54,17 @@ public class PekkoEventsHandlerAndNotifierActor extends AbstractActor {
 
   private final ActorRef replicator = DistributedData.get(context().system()).replicator();
   private final Cluster cluster = Cluster.get(context().system());
+
+  private final EventsHandler eventsHandler;
+  private final String instanceSenderId;
+
   private final Key<GSet<ObjectKey>> objectKeysKey = GSetKey.create("objectKeys");
-  private final Replicator.WriteConsistency writeConsistency;
-  private EventsHandler eventsHandler;
-  private String instanceSenderId;
   private Set<ObjectKey> objectKeys = new HashSet<>();
 
+  private final Replicator.WriteConsistency writeConsistency;
+
   public PekkoEventsHandlerAndNotifierActor(final EventsHandler eventsHandler, final String writeConsistency,
-                                            final int writeConsistencyTimeoutInSeconds) {
+    final int writeConsistencyTimeoutInSeconds) {
     this.eventsHandler = eventsHandler;
     this.instanceSenderId = self().toString();
     this.writeConsistency = instantiateWriteConsistency(writeConsistency, writeConsistencyTimeoutInSeconds);
@@ -85,15 +88,13 @@ public class PekkoEventsHandlerAndNotifierActor extends AbstractActor {
 
   @Override
   public Receive createReceive() {
-    return receiveBuilder().match(EventUserCreated.class, e -> handleUserCreated(e))
-      .match(EventUserUpdated.class, e -> handleUserUpdated(e)).match(EventUserDeleted.class, e -> handleUserDeleted(e))
-      .match(EventGroupCreated.class, e -> handleGroupCreated(e))
-      .match(EventGroupUpdated.class, e -> handleGroupUpdated(e))
-      .match(EventGroupDeleted.class, e -> handleGroupDeleted(e)).match(Replicator.Changed.class, c -> handleChanged(c))
-      .match(Replicator.UpdateSuccess.class, e -> handleUpdateSuccess(e))
-      .match(Replicator.UpdateFailure.class, e -> handleUpdateFailure(e)).matchAny(msg -> {
-        LOGGER.warn("Received unknown message '{}'", msg);
-      }).build();
+    return receiveBuilder().match(EventUserCreated.class, this::handleUserCreated)
+      .match(EventUserUpdated.class, this::handleUserUpdated).match(EventUserDeleted.class, this::handleUserDeleted)
+      .match(EventGroupCreated.class, this::handleGroupCreated).match(EventGroupUpdated.class, this::handleGroupUpdated)
+      .match(EventGroupDeleted.class, this::handleGroupDeleted).match(Replicator.Changed.class, this::handleChanged)
+      .match(Replicator.UpdateSuccess.class, this::handleUpdateSuccess)
+      .match(Replicator.UpdateFailure.class, this::handleUpdateFailure)
+      .matchAny(msg -> LOGGER.warn("Received unknown message '{}'", msg)).build();
   }
 
   private void handleUpdateSuccess(Replicator.UpdateSuccess e) {
@@ -133,7 +134,7 @@ public class PekkoEventsHandlerAndNotifierActor extends AbstractActor {
     String objectId = e.key().id().replaceFirst(CACHE_PREFIX, "");
     Option<CRDTWrapper> option = e.dataValue().get(objectId);
     if (option.isDefined()) {
-      CRDTWrapper wrapper = (CRDTWrapper) option.get();
+      CRDTWrapper wrapper = option.get();
       if (!wrapper.getInstanceId().equals(instanceSenderId)) {
         if (objectId.startsWith(USER_KEY_PREFIX)) {
           try (

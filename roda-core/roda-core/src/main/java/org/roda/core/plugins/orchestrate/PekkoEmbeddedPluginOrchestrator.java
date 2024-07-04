@@ -26,10 +26,10 @@ import org.apache.pekko.dispatch.OnComplete;
 import org.apache.pekko.pattern.Patterns;
 import org.apache.pekko.util.Timeout;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.pekko.PekkoUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.pekko.DeadLetterActor;
 import org.roda.core.common.pekko.Messages;
-import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.common.pekko.PekkoUtils;
 import org.roda.core.common.pekko.messages.jobs.JobPartialUpdate;
 import org.roda.core.common.pekko.messages.jobs.JobStateUpdated;
 import org.roda.core.common.pekko.messages.jobs.JobsManagerNotLockableAtTheTime;
@@ -118,7 +118,8 @@ public class PekkoEmbeddedPluginOrchestrator implements PluginOrchestrator {
     // 20170105 hsilva: subscribe all dead letter so they are logged
     jobsSystem.eventStream().subscribe(jobsSystem.actorOf(Props.create(DeadLetterActor.class)), AllDeadLetters.class);
 
-    jobsManager = jobsSystem.actorOf(Props.create(PekkoJobsManager.class, maxNumberOfJobsInParallel, maxNumberOfLimitedJobsInParallel), "jobsManager");
+    jobsManager = jobsSystem.actorOf(
+      Props.create(PekkoJobsManager.class, maxNumberOfJobsInParallel, maxNumberOfLimitedJobsInParallel), "jobsManager");
 
   }
 

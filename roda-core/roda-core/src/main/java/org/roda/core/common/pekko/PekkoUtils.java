@@ -40,5 +40,4 @@ public final class PekkoUtils {
 
     return pekkoConfig;
   }
-
 }

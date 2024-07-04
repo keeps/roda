@@ -61,7 +61,7 @@
 		<level value="DEBUG" />
 		<!-- <level value="TRACE" /> -->
 		<appender-ref ref="CORE_FILEOUT" />
-		<!-- <appender-ref ref="AKKA_FILE" /> -->
+		<!-- <appender-ref ref="PEKKO_FILE" /> -->
 		<appender-ref ref="METRICS" />
 	</logger>
 
@@ -108,7 +108,7 @@
 
 	<!--logger name="org.roda.core.common.pekko">
 		<level value="TRACE" />
-		<appender-ref ref="AKKA" />
+		<appender-ref ref="PEKKO" />
 	</logger-->
 
 	<logger name="gov.loc.repository.bagit" additivity="false">

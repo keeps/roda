@@ -14,8 +14,8 @@ import org.apache.pekko.actor.ActorRef;
 import org.apache.pekko.actor.Props;
 import org.apache.pekko.actor.Terminated;
 import org.apache.pekko.routing.RoundRobinPool;
-import org.roda.core.common.pekko.PekkoBaseActor;
 import org.roda.core.common.pekko.Messages;
+import org.roda.core.common.pekko.PekkoBaseActor;
 import org.roda.core.common.pekko.messages.AbstractMessage;
 import org.roda.core.common.pekko.messages.jobs.JobCleanup;
 import org.roda.core.common.pekko.messages.jobs.JobInfoUpdated;
@@ -58,22 +58,22 @@ import com.google.common.collect.Iterables;
 public class PekkoJobStateInfoActor extends PekkoBaseActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(PekkoJobStateInfoActor.class);
 
-  private JobInfo jobInfo;
-  private Plugin<?> plugin;
-  private ActorRef jobCreator;
-  private ActorRef jobsManager;
-  private ActorRef workersRouter;
-  private ActorRef backgroundWorkersRouter;
+  private final JobInfo jobInfo;
+  private final Plugin<?> plugin;
+  private final ActorRef jobCreator;
+  private final ActorRef jobsManager;
+  private final ActorRef workersRouter;
+  private final ActorRef backgroundWorkersRouter;
   boolean stopping = false;
   boolean errorDuringBeforeAll = false;
-  private String jobId;
+  private final String jobId;
 
   // metrics
   // private Map<String, Histogram> stateMessagesMetrics;
-  private Histogram stateMessagesMetricsHistogram;
+  private final Histogram stateMessagesMetricsHistogram;
 
   public PekkoJobStateInfoActor(Plugin<?> plugin, ActorRef jobCreator, ActorRef jobsManager, String jobId,
-                                int numberOfJobsWorkers, int numberOfLimitedJobsWorkers) {
+    int numberOfJobsWorkers, int numberOfLimitedJobsWorkers) {
     super();
     jobInfo = new JobInfo();
     this.plugin = plugin;

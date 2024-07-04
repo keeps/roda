@@ -7,6 +7,9 @@
  */
 package org.roda.core.events;
 
+import java.io.Serial;
+
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
@@ -17,7 +20,6 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
-import org.roda.core.data.common.SecureString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

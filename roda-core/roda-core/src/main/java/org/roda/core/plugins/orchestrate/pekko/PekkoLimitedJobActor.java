@@ -14,8 +14,8 @@ import org.apache.pekko.actor.OneForOneStrategy;
 import org.apache.pekko.actor.Props;
 import org.apache.pekko.actor.SupervisorStrategy;
 import org.apache.pekko.japi.pf.DeciderBuilder;
-import org.roda.core.common.pekko.PekkoBaseActor;
 import org.roda.core.common.pekko.Messages;
+import org.roda.core.common.pekko.PekkoBaseActor;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -39,9 +39,9 @@ import org.slf4j.LoggerFactory;
 public class PekkoLimitedJobActor extends PekkoBaseActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(PekkoLimitedJobActor.class);
 
-  private ActorRef jobsManager;
+  private final ActorRef jobsManager;
 
-  private SupervisorStrategy strategy = new OneForOneStrategy(false, DeciderBuilder.matchAny(e -> {
+  private final SupervisorStrategy strategy = new OneForOneStrategy(false, DeciderBuilder.matchAny(e -> {
     LOGGER.error("A child actor of {} has thrown an exception", PekkoLimitedJobActor.class.getSimpleName(), e);
     for (ActorRef actorRef : getContext().getChildren()) {
       actorRef.tell(Messages.newJobStateUpdated(null, Job.JOB_STATE.FAILED_TO_COMPLETE, e), ActorRef.noSender());
@@ -58,8 +58,7 @@ public class PekkoLimitedJobActor extends PekkoBaseActor {
   @Override
   public void onReceive(Object msg) throws Exception {
     super.setup(msg);
-    if (msg instanceof Job) {
-      Job job = (Job) msg;
+    if (msg instanceof Job job) {
       Plugin<? extends IsRODAObject> plugin = super.getPluginManager().getPlugin(job.getPlugin());
       if (plugin == null) {
         JobsHelper.updateJobState(job, super.getModel(), Job.JOB_STATE.FAILED_TO_COMPLETE,

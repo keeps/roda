@@ -23,17 +23,12 @@ public class PrioritizedMailbox extends UnboundedStablePriorityMailbox {
     super(new PriorityGenerator() {
       @Override
       public int gen(Object message) {
-        if (message instanceof AbstractMessage) {
-          switch (((AbstractMessage) message).getJobPriority()) {
-            case LOW:
-              return PrioritizedMessage.LOW;
-            case HIGH:
-              return PrioritizedMessage.HIGH;
-            case MEDIUM:
-            default:
-              return PrioritizedMessage.MEDIUM;
-
-          }
+        if (message instanceof AbstractMessage msg) {
+          return switch (msg.getJobPriority()) {
+            case LOW -> PrioritizedMessage.LOW;
+            case HIGH -> PrioritizedMessage.HIGH;
+            default -> PrioritizedMessage.MEDIUM;
+          };
         } else {
           return PrioritizedMessage.MEDIUM;
         }

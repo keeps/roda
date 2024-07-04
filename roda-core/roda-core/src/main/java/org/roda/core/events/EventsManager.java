@@ -18,15 +18,13 @@ public class EventsManager implements EventsNotifier {
   @Serial
   private static final long serialVersionUID = 3733394744862836327L;
 
-  private EventsNotifier eventsNotifier;
-  private EventsHandler eventsHandler;
-  private NodeType nodeType;
-  private boolean enabled;
+  private final EventsNotifier eventsNotifier;
+  private final EventsHandler eventsHandler;
+  private final boolean enabled;
 
   public EventsManager(EventsNotifier eventsNotifier, EventsHandler eventsHandler, NodeType nodeType, boolean enabled) {
     this.eventsNotifier = eventsNotifier;
     this.eventsHandler = eventsHandler;
-    this.nodeType = nodeType;
     this.enabled = enabled;
   }
 

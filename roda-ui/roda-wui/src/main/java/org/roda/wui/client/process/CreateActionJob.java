@@ -104,7 +104,7 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
         AsyncCallbackUtils.defaultFailureTreatment(throwable);
       } else {
         Toast.showInfo(messages.dialogDone(), messages.processCreated());
-        HistoryUtils.newHistory(IngestProcess.RESOLVER);
+        HistoryUtils.newHistory(ActionProcess.RESOLVER);
       }
     });
   }

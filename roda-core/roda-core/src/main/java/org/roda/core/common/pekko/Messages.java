@@ -55,7 +55,7 @@ public class Messages {
   }
 
   public static <T extends IsRODAObject> PluginBeforeAllExecuteIsReady<T> newPluginBeforeAllExecuteIsReady(
-      Plugin<T> plugin) {
+    Plugin<T> plugin) {
     return new PluginBeforeAllExecuteIsReady<>(plugin);
   }
 
@@ -65,17 +65,17 @@ public class Messages {
   }
 
   public static <T extends IsRODAObject> PluginExecuteIsReady<T> newPluginExecuteIsReady(Plugin<T> plugin,
-                                                                                         List<LiteOptionalWithCause> list) {
+    List<LiteOptionalWithCause> list) {
     return new PluginExecuteIsReady<>(plugin, list);
   }
 
   public static JobsManagerJobEnded newJobsManagerJobEnded(String jobId, String plugin, PluginType type, long duration,
-                                                           JobStats jobStats, JobParallelism jobParallelism) {
+    JobStats jobStats, JobParallelism jobParallelism) {
     return new JobsManagerJobEnded(jobId, plugin, type, duration, jobStats, jobParallelism);
   }
 
   public static JobsManagerAcquireLock newJobsManagerAcquireLock(List<String> lites, boolean waitForLockIfLocked,
-                                                                 int secondsToExpire, String requestUuid) {
+    int secondsToExpire, String requestUuid) {
     return new JobsManagerAcquireLock(lites, waitForLockIfLocked, secondsToExpire, requestUuid);
   }
 
@@ -144,7 +144,7 @@ public class Messages {
   }
 
   public static <T extends IsRODAObject> PluginAfterAllExecuteIsReady<T> newPluginAfterAllExecuteIsReady(
-      Plugin<T> plugin) {
+    Plugin<T> plugin) {
     return new PluginAfterAllExecuteIsReady<>(plugin);
   }
 

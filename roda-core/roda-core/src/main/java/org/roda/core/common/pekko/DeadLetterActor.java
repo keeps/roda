@@ -7,22 +7,20 @@
  */
 package org.roda.core.common.pekko;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.pekko.actor.DeadLetter;
 import org.apache.pekko.actor.UntypedAbstractActor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeadLetterActor extends UntypedAbstractActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(DeadLetterActor.class);
 
   @Override
   public void onReceive(Object message) {
-    if (message instanceof DeadLetter) {
-      DeadLetter letter = (DeadLetter) message;
-      if (!(letter.message() instanceof String && "Done".equals(String.class.cast(letter.message())))) {
+    if (message instanceof DeadLetter letter
+      && !(letter.message() instanceof String && "Done".equals(letter.message()))) {
         LOGGER.debug("Dead letter: {}", message);
       }
-    }
+
   }
 }

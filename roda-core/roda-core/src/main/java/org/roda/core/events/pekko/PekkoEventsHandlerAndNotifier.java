@@ -27,13 +27,12 @@ import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.pekko.PekkoUtils;
 import org.roda.core.common.pekko.Messages;
+import org.roda.core.common.pekko.PekkoUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.events.AbstractEventsHandler;
-import org.roda.core.events.EventsHandler;
 import org.roda.core.events.EventsNotifier;
 import org.roda.core.index.utils.ZkController;
 import org.roda.core.model.ModelService;
@@ -53,9 +52,9 @@ public class PekkoEventsHandlerAndNotifier extends AbstractEventsHandler impleme
 
   private static final String EVENTS_SYSTEM = "EventsSystem";
 
-  private ActorSystem eventsSystem;
-  private ActorRef eventsNotifierAndHandlerActor;
-  private String instanceSenderId;
+  private final ActorSystem eventsSystem;
+  private final ActorRef eventsNotifierAndHandlerActor;
+  private final String instanceSenderId;
   private boolean shuttingDown = false;
 
   public PekkoEventsHandlerAndNotifier() {
@@ -77,15 +76,14 @@ public class PekkoEventsHandlerAndNotifier extends AbstractEventsHandler impleme
     String writeConsistency = RodaCoreFactory.getProperty("core.events.pekko.writeConsistency", "");
     int writeConsistencyTimeoutInSeconds = RodaCoreFactory
       .getProperty("core.events.pekko.writeConsistencyTimeoutInSeconds", 3);
-    return eventsSystem.actorOf(Props.create(PekkoEventsHandlerAndNotifierActor.class, (EventsHandler) this,
+    return eventsSystem.actorOf(Props.create(PekkoEventsHandlerAndNotifierActor.class, this,
       writeConsistency, writeConsistencyTimeoutInSeconds), "eventsNotifierAndHandlerActor");
   }
 
   @Override
   public void notifyUserCreated(ModelService model, User user) {
     LOGGER.debug("notifyUserCreated '{}'", user);
-    eventsNotifierAndHandlerActor.tell(Messages.newEventUserCreated(user, instanceSenderId),
-      ActorRef.noSender());
+    eventsNotifierAndHandlerActor.tell(Messages.newEventUserCreated(user, instanceSenderId), ActorRef.noSender());
   }
 
   @Override
@@ -98,8 +96,7 @@ public class PekkoEventsHandlerAndNotifier extends AbstractEventsHandler impleme
   @Override
   public void notifyMyUserUpdated(ModelService model, User user, User updatedUser) {
     LOGGER.debug("notifyMyUserUpdated '{}'", user);
-    eventsNotifierAndHandlerActor.tell(Messages.newEventUserUpdated(user, true, instanceSenderId),
-      ActorRef.noSender());
+    eventsNotifierAndHandlerActor.tell(Messages.newEventUserUpdated(user, true, instanceSenderId), ActorRef.noSender());
   }
 
   @Override
@@ -184,9 +181,7 @@ public class PekkoEventsHandlerAndNotifier extends AbstractEventsHandler impleme
           // do nothing and carry on
         });
 
-        zkClient.getChildren(zkSeedsNode, false).forEach(seed -> {
-          processAndAddSeedNode(seedNodes, seed);
-        });
+        zkClient.getChildren(zkSeedsNode, false).forEach(seed -> processAndAddSeedNode(seedNodes, seed));
 
         String separator = RodaCoreFactory.getProperty("core.events.pekko.address.separator", ":");
 
@@ -219,5 +214,4 @@ public class PekkoEventsHandlerAndNotifier extends AbstractEventsHandler impleme
       // do nothing and carry on
     }
   }
-
 }
