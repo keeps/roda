@@ -98,7 +98,7 @@
         <java_version>21</java_version>
         <gwt.version>2.11.0</gwt.version>
         <cas.client.version>4.0.4</cas.client.version>
-        <jersey.version>3.1.6</jersey.version>
+        <jersey.version>3.1.7</jersey.version>
         <swagger.version>2.2.22</swagger.version>
         <jackson.version>2.17.1</jackson.version>
         <spring.version>6.1.6</spring.version>
