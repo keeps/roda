@@ -236,8 +236,12 @@ public class RestUtils {
 
   public static SafeUri createRepresentationDescriptiveMetadataHTMLUri(String aipId, String representationId,
     String descId) {
+    return createRepresentationDescriptiveMetadataHTMLUri(aipId, representationId, descId, null);
+  }
 
-    // api/v2/aips/{id}/representations/{representation-id}/metadata/descriptive/{descriptive-metadata-id}/html
+  public static SafeUri createRepresentationDescriptiveMetadataHTMLUri(String aipId, String representationId,
+    String descId, String versionId) {
+    // api/v2/aips/{id}/representations/{representation-id}/metadata/descriptive/{descriptive-metadata-id}/html?lang=en&version-id={versionId}
 
     StringBuilder b = new StringBuilder();
     // base uri
@@ -249,6 +253,12 @@ public class RestUtils {
     // locale
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+
+    // version
+    if (versionId != null) {
+      b.append(RodaConstants.API_QUERY_SEP).append("version-id").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+        .append(URL.encodeQueryString(versionId));
+    }
 
     return UriUtils.fromSafeConstant(b.toString());
   }

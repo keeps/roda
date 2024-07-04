@@ -236,7 +236,7 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @Parameter(description = "The descriptive metadata identifier", required = true) @PathVariable(name = "descriptive-metadata-id") String descriptiveMetadataId,
     @Parameter(description = "The version identifier", required = true) @PathVariable(name = "version-id") String versionId);
 
-  @RequestMapping(path = "/{id}/representation/{representation-id}metadata/descriptive/{descriptive-metadata-id}/versions/{version-id}/revert", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(path = "/{id}/representation/{representation-id}/metadata/descriptive/{descriptive-metadata-id}/versions/{version-id}/revert", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Reverts representation descriptive metadata to the an older version", description = "Reverts representation descriptive metadata to the an older version", responses = {
     @ApiResponse(responseCode = "200", description = "Reverted descriptive metadata"),
     @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),

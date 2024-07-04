@@ -859,7 +859,8 @@ public class ModelService extends ModelObservable {
     BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, properties);
     storage.revertBinaryVersion(binaryPath, versionId);
 
-    notifyDescriptiveMetadataUpdated(retrieveDescriptiveMetadata(aipId, descriptiveMetadataId)).failOnError();
+    notifyDescriptiveMetadataUpdated(retrieveDescriptiveMetadata(aipId, representationId, descriptiveMetadataId))
+      .failOnError();
 
     return currentVersion;
   }
