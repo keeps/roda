@@ -23,6 +23,22 @@ jobs:
         env:
           ZK_HOST: zookeeper:2181
         options: -e cloud
+      mailhog:
+        image: mailhog/mailhog:v1.0.1
+        ports:
+          - 1025:1025
+      openldap:
+        image: docker.io/bitnami/openldap:2.6
+        ports:
+          - 1389:1389
+          - 1636:1636
+        env:
+          BITNAMI_DEBUG: true
+          LDAP_ROOT: dc=roda,dc=org
+          LDAP_SKIP_DEFAULT_TREE: yes
+          LDAP_ADMIN_USERNAME: admin
+          LDAP_ADMIN_PASSWORD: roda
+          LDAP_EXTRA_SCHEMAS: cosine,inetorgperson,nis,pbkdf2
 
     steps:
       - uses: actions/checkout@v4
@@ -64,6 +80,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RODA_CORE_SOLR_TYPE: CLOUD
           RODA_CORE_SOLR_CLOUD_URLS: localhost:2181
+          SIEGFRIED_MODE: standalone
+          LDAP_SERVER_URL: ldap://localhost
+          LDAP_SERVER_PORT: 1389
       - name: Copy target to docker context
         run: |
           mkdir -p docker/target
