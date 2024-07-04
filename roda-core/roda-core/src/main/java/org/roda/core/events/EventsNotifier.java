@@ -14,20 +14,20 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 
 public interface EventsNotifier extends Serializable {
-  public void notifyUserCreated(ModelService model, User user);
+  void notifyUserCreated(ModelService model, User user);
 
-  public void notifyUserUpdated(ModelService model, User user, User updatedUser);
+  void notifyUserUpdated(ModelService model, User user, User updatedUser);
 
-  public void notifyMyUserUpdated(ModelService model, User user, User updatedUser);
+  void notifyMyUserUpdated(ModelService model, User user, User updatedUser);
 
-  public void notifyUserDeleted(ModelService model, String id);
+  void notifyUserDeleted(ModelService model, String id);
 
-  public void notifyGroupCreated(ModelService model, Group group);
+  void notifyGroupCreated(ModelService model, Group group);
 
-  public void notifyGroupUpdated(ModelService model, Group group, Group updatedGroup);
+  void notifyGroupUpdated(ModelService model, Group group, Group updatedGroup);
 
-  public void notifyGroupDeleted(ModelService model, String id);
+  void notifyGroupDeleted(ModelService model, String id);
 
-  public void shutdown();
+  void shutdown();
 
 }

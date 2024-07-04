@@ -9,14 +9,14 @@
 	</appender>
 
 
-	<!-- <logger name="org.roda.core.plugins.orchestrate.akka" additivity="false"> -->
+	<!-- <logger name="org.roda.core.plugins.orchestrate.pekko" additivity="false"> -->
 	<!-- <level value="TRACE" /> -->
 	<!-- <appender-ref ref="STDOUT" /> -->
 	<!-- </logger> -->
 
-	<logger name="org.roda.core.plugins.orchestrate.akka.AkkaWorkerActor" level="off" additivity="false" />
+	<logger name="org.roda.core.plugins.orchestrate.pekko.PekkoWorkerActor" level="off" additivity="false" />
 
-	<logger name="org.roda.core.plugins.orchestrate.akka.DeadLetterActor" level="off" additivity="false" />
+	<logger name="org.roda.core.plugins.orchestrate.pekko.DeadLetterActor" level="off" additivity="false" />
 
 	<logger name="org.roda" level="info" additivity="false">
 		<appender-ref ref="STDOUT" />

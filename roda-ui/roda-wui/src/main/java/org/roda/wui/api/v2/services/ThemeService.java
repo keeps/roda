@@ -36,29 +36,29 @@ public class ThemeService {
     String resourceId;
 
     if (RodaConstants.ResourcesTypes.PLUGINS.toString().equals(type)) {
-      resourcePath = RodaCoreFactory.getConfigurationManager().getConfigPath()
+      resourcePath = RodaCoreFactory.getConfigPath()
         .resolve(RodaConstants.CORE_PLUGINS_FOLDER);
       resourceId = RodaConstants.CORE_PLUGINS_FOLDER + "/" + normalizedID;
     } else {
-      resourcePath = RodaCoreFactory.getConfigurationManager().getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER);
+      resourcePath = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER);
       resourceId = RodaConstants.CORE_THEME_FOLDER + "/" + normalizedID;
     }
 
-    URL url = RodaCoreFactory.getConfigurationManager().getConfigurationFile(resourceId);
+    URL url = RodaCoreFactory.getConfigurationFile(resourceId);
     if (url != null) {
       ret = Pair.of(id,
-        () -> RodaCoreFactory.getConfigurationManager().getConfigurationFileAsStream(resourcePath, normalizedID));
+        () -> RodaCoreFactory.getConfigurationFileAsStream(resourcePath, normalizedID));
     } else {
-      ret = Pair.of(normalizedFallBackResource, () -> RodaCoreFactory.getConfigurationManager()
-        .getConfigurationFileAsStream(resourcePath, normalizedFallBackResource));
+      ret = Pair.of(normalizedFallBackResource,
+        () -> RodaCoreFactory.getConfigurationFileAsStream(resourcePath, normalizedFallBackResource));
     }
 
     return ret;
   }
 
-  public StreamResponse getThemeResourceStreamResponse(final Pair<String, ProvidesInputStream> themeResourceInputstream,
+  public StreamResponse getThemeResourceStreamResponse(final Pair<String, ProvidesInputStream> themeResourceInputStream,
     String type) {
-    final String resourceId = themeResourceInputstream.getFirst();
+    final String resourceId = themeResourceInputStream.getFirst();
     final String mimeType = MimeTypeUtils.getContentType(resourceId);
 
     ConsumesOutputStream stream = new ConsumesOutputStream() {
@@ -75,7 +75,7 @@ public class ThemeService {
 
       @Override
       public void consumeOutputStream(OutputStream out) throws IOException {
-        try (InputStream in = themeResourceInputstream.getSecond().createInputStream()) {
+        try (InputStream in = themeResourceInputStream.getSecond().createInputStream()) {
           IOUtils.copy(in, out);
         }
       }
@@ -104,11 +104,10 @@ public class ThemeService {
     Date modifiedDate;
     URL file;
     if (RodaConstants.ResourcesTypes.PLUGINS.toString().equals(type)) {
-      file = RodaCoreFactory.getConfigurationManager()
+      file = RodaCoreFactory
         .getConfigurationFile(RodaConstants.CORE_PLUGINS_FOLDER + "/" + resourceId);
     } else {
-      file = RodaCoreFactory.getConfigurationManager()
-        .getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + resourceId);
+      file = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + resourceId);
     }
 
     if ("file".equalsIgnoreCase(file.getProtocol())) {

@@ -37,31 +37,31 @@
 		</rollingPolicy>
 	</appender>
 
-	<appender name="AKKA_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${roda.home}/log/roda-core-akka.log</file>
+	<appender name="PEKKO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${roda.home}/log/roda-core-pekko.log</file>
 		<append>true</append>
 		<encoder>
-			<pattern>%d [%X{akkaSourceActor} %X{akkaSourceThread}] %-5level %logger{36} - %msg%n</pattern>
+			<pattern>%d [%X{pekkoSourceActor} %X{pekkoSourceThread}] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<!-- rollover daily -->
-			<fileNamePattern>${roda.home}/log/roda-core-akka-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+			<fileNamePattern>${roda.home}/log/roda-core-pekko-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
 			<!-- each file should be at most 1GB -->
 			<maxFileSize>1GB</maxFileSize>
 		</rollingPolicy>
 	</appender>
 
-	<appender name="AKKA" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="AKKA_FILE" />
+	<appender name="PEKKO" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="PEKKO_FILE" />
 	</appender>
 
 	<appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender" />
 
-	<logger name="org.roda.core.plugins.orchestrate.akka" additivity="false">
+	<logger name="org.roda.core.plugins.orchestrate.pekko" additivity="false">
 		<level value="DEBUG" />
 		<!-- <level value="TRACE" /> -->
 		<appender-ref ref="CORE_FILEOUT" />
-		<!-- <appender-ref ref="AKKA_FILE" /> -->
+		<!-- <appender-ref ref="PEKKO_FILE" /> -->
 		<appender-ref ref="METRICS" />
 	</logger>
 
@@ -101,14 +101,14 @@
 		<appender-ref ref="METRICS" />
 	</logger>
 
-	<logger name="akka" additivity="false">
+	<logger name="org.apache.pekko" additivity="false">
 		<level value="INFO" />
-		<appender-ref ref="AKKA" />
+		<appender-ref ref="PEKKO" />
 	</logger>
 
-	<!--logger name="org.roda.core.common.akka">
+	<!--logger name="org.roda.core.common.pekko">
 		<level value="TRACE" />
-		<appender-ref ref="AKKA" />
+		<appender-ref ref="PEKKO" />
 	</logger-->
 
 	<logger name="gov.loc.repository.bagit" additivity="false">

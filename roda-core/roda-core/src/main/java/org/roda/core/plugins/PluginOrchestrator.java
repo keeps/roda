@@ -9,7 +9,7 @@ package org.roda.core.plugins;
 
 import java.util.List;
 
-import org.roda.core.common.akka.Messages.JobPartialUpdate;
+import org.roda.core.common.pekko.messages.jobs.JobPartialUpdate;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
