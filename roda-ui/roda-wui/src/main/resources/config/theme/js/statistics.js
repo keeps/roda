@@ -73,55 +73,115 @@
     	buildDataUrl(element, false);
     }
 
-    function buildDataUrl(element, noLimits) {
+    function buildDataUrl(element) {
       var returnClass = $(element).data("source-class");
 
-      var filters = $(element).data("source-filters") ? $(element).data(
-        "source-filters").split(/\s*[ ,]\s*/) : [];
-      var filterParams = filters.map(function(filter) {
-        return "filter=" + filter
-      }).join("&");
-
-      var facets = $(element).data("source-facets") ? $(element).data(
-        "source-facets").split(/\s*[ ,]\s*/) : [];
-      var facetParams = facets.map(function(facet) {
-        return "facet=" + facet
-      }).join("&");
-
-
-      var onlyActive = $(element).data("source-only-active") || "false";
       var lang = document.locale;
 
       var pathname = window.location.pathname;
       var url;
-      if(noLimits) {
-    	  url = pathname + "api/v1/index?returnClass=" +
-          returnClass + "&" +
-          filterParams + "&" +
-          facetParams +
-          "&lang=" + lang +
-          "&onlyActive=" + onlyActive;
-      } else {
-	      var start = $(element).data("source-start") || 0;
-	      var limit = $(element).data("source-limit") || 0;
-	      var facetLimit = $(element).data("view-limit") || 100;
-
-	      url = pathname + "api/v1/index?returnClass=" +
-	          returnClass + "&" +
-	          filterParams + "&" +
-	          facetParams +
-	          "&start=" + start +
-	          "&limit=" + limit +
-	          "&facetLimit=" + facetLimit +
-	          "&lang=" + lang +
-	          "&onlyActive=" + onlyActive;
-      }
+    	url = pathname + "api/v2/" + getRespectiveEndpoint(returnClass) + "/find?" + "lang=" + lang
       return url;
+    }
+
+    function buildDownloadUrl(element) {
+      var returnClass = $(element).data("source-class");
+
+      var lang = document.locale;
+
+      var pathname = window.location.pathname;
+      var url;
+        url = pathname + "api/v2/" + getRespectiveEndpoint(returnClass) + "/export/csv"
+      return url;
+    }
+
+
+    function buildBody(element) {
+      var jsonBody = {};
+
+        // Handle sorter
+        var sorter = $(element).data("source-sorter");
+        if (sorter) {
+          jsonBody.sorter = {
+            parameters: sorter.split(/\s*[ ,]\s*/).map(function(param) {
+              return { name: param, descending: false };
+            })
+          };
+        }
+
+        // Handle sublist
+        var start = $(element).data("source-start");
+        var limit = $(element).data("source-limit");
+        jsonBody.sublist = {
+          firstElementIndex: start !== undefined ? start : 0,
+          maximumElementCount: limit !== undefined ? limit : 20
+        };
+
+        // Handle facets
+        var facets = $(element).data("source-facets");
+        if (facets) {
+          jsonBody.facets = {
+            parameters: {}
+          };
+
+          facets.split(/\s*[ ,]\s*/).forEach(function(facet) {
+            jsonBody.facets.parameters[facet] = {
+              type: "SimpleFacetParameter",
+              limit: 100,
+              name: facet,
+              values: [],
+              minCount: 1,
+              sort: "INDEX"
+            };
+          });
+
+          jsonBody.facets.query = "";
+        }
+
+        // Handle exportFacets
+        var exportFacets = $(element).data("source-export-facets");
+        jsonBody.exportFacets = exportFacets !== undefined ? exportFacets : false;
+
+        // Handle filename
+        var filename = $(element).data("source-filename");
+        jsonBody.filename = filename || null;
+
+        // Handle fieldsToReturn (example values; adjust dynamically as needed)
+        var fieldsToReturn = $(element).data("source-fields-to-return");
+        jsonBody.fieldsToReturn = fieldsToReturn ? fieldsToReturn.split(/\s*[ ,]\s*/) : [];
+
+        // Handle collapse
+        var collapse = $(element).data("source-collapse");
+        jsonBody.collapse = collapse || null;
+
+        // Handle children
+        var children = $(element).data("source-children");
+        jsonBody.children = children !== undefined ? children : false;
+
+        // Handle filters
+        var filters = $(element).data("source-filters");
+
+        if (filters) {
+          jsonBody.filter = {
+            parameters: filters.split(/\s*[ ,]\s*/).map(function(filter) {
+              return createFilter(filter);
+            })
+          };
+        }
+
+        // Handle onlyActive
+        var onlyActive = $(element).data("source-only-active");
+        jsonBody.onlyActive = onlyActive !== undefined ? onlyActive === "true" : true;
+
+        return JSON.stringify(jsonBody);
     }
 
     function fetchIndexData(element, viewCallback) {
       $.ajax({
-        url: buildDataUrl(element)
+        url: buildDataUrl(element),
+        type: 'POST',
+        contentType: 'application/json',
+        data: buildBody(element)
       }).done(function(data) {
         viewCallback(element, data);
       });
@@ -136,14 +196,8 @@
     }
 
     function initViewDownload(element, dataFunction) {
-      var noLimits = true;
-      var url = buildDataUrl(element, noLimits);
       if (element.data("view-field") == "facetResults") {
-        url = url + "&exportFacets=true";
         var filename = element.data("view-filename");
-        if (filename) {
-          url = url + "&filename=" + filename;
-        }
       }
 
       element.click(function() {
@@ -152,9 +206,9 @@
           accepts: {
             text: type
           },
-          url: url + "&acceptFormat=csv",
-          processData: false,
-          dataType: 'text',
+          url: buildDownloadUrl(element) + "?findRequest=" + encodeURIComponent(buildBody(element)),
+          type: 'POST',
+          contentType: 'application/x-www-form-urlencoded',
           success: function(data) {
             saveAs(new Blob([data], {
               type: type
@@ -501,6 +555,52 @@ function rgbaRandomOpaqueColorAsString() {
   var color = rgbRandomColor();
   color.alpha = 1;
   return rgbaRandomColorAsString(color);
+}
+
+function getRespectiveEndpoint(returnClass) {
+  switch (returnClass) {
+    case "org.roda.core.data.v2.ip.IndexedAIP":
+      return "aips"
+    case "org.roda.core.data.v2.log.LogEntry":
+      return "audit-logs"
+    case "org.roda.core.data.v2.ip.IndexedRepresentation":
+      return "representations"
+    case "org.roda.core.data.v2.ip.IndexedFile":
+      return "files"
+    case "org.roda.core.data.v2.jobs.Job":
+      return "jobs"
+    case "org.roda.core.data.v2.jobs.IndexedReport":
+      return "job-reports"
+    case "org.roda.core.data.v2.user.RODAMember":
+      return "members"
+    case "org.roda.core.data.v2.ip.TransferredResource":
+      return "transfers"
+    case "org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent":
+      return "preservation/events"
+    case "org.roda.core.data.v2.risks.IndexedRisk":
+      return "risks"
+    case "org.roda.core.data.v2.risks.RiskIncidence":
+      return "incidences"
+    case "org.roda.core.data.v2.notifications.Notification":
+      return "notifications"
+    default:
+      break
+  }
+}
+
+function createFilter(filter) {
+  if (filter == "any") {
+    return {
+      "type": "AllFilterParameter"
+    };
+  } else {
+        var parts = filter.split('=');
+        return {
+          "type": "SimpleFilterParameter",
+          name: parts[0],
+          value: parts[1]
+        };
+      }
 }
 
 /*** START ARRAY.FROM workaround ***/
