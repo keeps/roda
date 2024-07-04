@@ -38,9 +38,9 @@ public class DisposalRuleActions {
           if (result) {
             DisposalDialogs.showApplyRules(messages.applyDisposalRulesDialogTitle(), new NoAsyncCallback<Boolean>() {
               @Override
-              public void onSuccess(Boolean applyToManuallyInclusive) {
+              public void onSuccess(Boolean overrideManualAssociations) {
                 Services services = new Services("Apply disposal rules", "job");
-                services.disposalRuleResource(s -> s.applyDisposalRules(applyToManuallyInclusive))
+                services.disposalRuleResource(s -> s.applyDisposalRules(overrideManualAssociations))
                   .whenComplete((job, throwable) -> {
                     if (throwable != null) {
                       AsyncCallbackUtils.defaultFailureTreatment(throwable);
