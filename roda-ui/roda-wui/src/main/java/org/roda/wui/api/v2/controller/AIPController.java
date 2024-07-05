@@ -848,66 +848,81 @@ public class AIPController implements AIPRestService, Exportable {
 
   @Override
   public AIP createAIP(String parentId, String type) {
+    if (parentId == null) {
+      return createAIPTop(type);
+    } else {
+      return createAIPBelow(parentId, type);
+    }
+  }
+
+  public AIP createAIPTop(String type) {
 
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
 
-    if (parentId == null) {
-      try {
-        controllerAssistant.checkRoles(requestContext.getUser());
-        Permissions permissions = new Permissions();
+    try {
+      controllerAssistant.checkRoles(requestContext.getUser());
+      Permissions permissions = new Permissions();
 
-        // delegate
-        return aipService.createAIP(requestContext.getUser(), null, type, permissions);
-      } catch (AlreadyExistsException | NotFoundException | RequestNotValidException | GenericException e) {
-        state = LogEntryState.FAILURE;
-        throw new RESTException(e);
-      } catch (AuthorizationDeniedException e) {
-        state = LogEntryState.UNAUTHORIZED;
-        throw new RESTException(e);
-      } finally {
-        // register action
-        controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_TYPE_PARAM, type);
-      }
-    } else {
-      try {
-        Permissions permissions = new Permissions();
-
-        IndexedAIP parentSDO = indexService.retrieve(requestContext, IndexedAIP.class, parentId,
-          RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-        controllerAssistant.checkObjectPermissions(requestContext.getUser(), parentSDO);
-
-        // check state
-        controllerAssistant.checkAIPstate(parentSDO);
-
-        // check if AIP is in a disposal confirmation
-        controllerAssistant.checkIfAIPInConfirmation(parentSDO);
-
-        Permissions parentPermissions = parentSDO.getPermissions();
-
-        for (String name : parentPermissions.getUsernames()) {
-          permissions.setUserPermissions(name, parentPermissions.getUserPermissions(name));
-        }
-
-        for (String name : parentPermissions.getGroupnames()) {
-          permissions.setGroupPermissions(name, parentPermissions.getGroupPermissions(name));
-        }
-
-        // delegate
-        return aipService.createAIP(requestContext.getUser(), parentId, type, permissions);
-      } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException e) {
-        state = LogEntryState.FAILURE;
-        throw new RESTException(e);
-      } catch (AuthorizationDeniedException e) {
-        state = LogEntryState.UNAUTHORIZED;
-        throw new RESTException(e);
-      } finally {
-        // register action
-        controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_PARENT_ID_PARAM, parentId,
-          RodaConstants.CONTROLLER_TYPE_PARAM, type);
-      }
+      // delegate
+      return aipService.createAIP(requestContext.getUser(), null, type, permissions);
+    } catch (AlreadyExistsException | NotFoundException | RequestNotValidException | GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_TYPE_PARAM, type);
     }
+
+  }
+
+  public AIP createAIPBelow(String parentId, String type) {
+
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      Permissions permissions = new Permissions();
+
+      IndexedAIP parentSDO = indexService.retrieve(requestContext, IndexedAIP.class, parentId,
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), parentSDO);
+
+      // check state
+      controllerAssistant.checkAIPstate(parentSDO);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(parentSDO);
+
+      Permissions parentPermissions = parentSDO.getPermissions();
+
+      for (String name : parentPermissions.getUsernames()) {
+        permissions.setUserPermissions(name, parentPermissions.getUserPermissions(name));
+      }
+
+      for (String name : parentPermissions.getGroupnames()) {
+        permissions.setGroupPermissions(name, parentPermissions.getGroupPermissions(name));
+      }
+
+      // delegate
+      return aipService.createAIP(requestContext.getUser(), parentId, type, permissions);
+    } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_PARENT_ID_PARAM, parentId,
+        RodaConstants.CONTROLLER_TYPE_PARAM, type);
+    }
+
   }
 
   @Override
