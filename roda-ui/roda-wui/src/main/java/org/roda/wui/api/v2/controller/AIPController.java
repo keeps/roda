@@ -153,7 +153,7 @@ public class AIPController implements AIPRestService, Exportable {
     return indexService.suggest(suggestRequest, IndexedAIP.class, requestContext);
   }
 
-  @GetMapping(path = "/{id}/representation/{representation-id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @GetMapping(path = "/{id}/representations/{representation-id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   @Operation(summary = "Downloads representation", description = "Download a particular representation", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
@@ -386,46 +386,6 @@ public class AIPController implements AIPRestService, Exportable {
     }
   }
 
-  @GetMapping(path = "/{id}/representations/{representation-id}/metadata/descriptive/{descriptive-metadata-id}/html", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-  @Operation(summary = "Retrieves descriptive metadata result", responses = {
-    @ApiResponse(responseCode = "200", description = "Returns an object ", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
-    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
-    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),})
-  ResponseEntity<StreamingResponseBody> retrieveRepresentationDescriptiveMetadataHTML(
-    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
-    @Parameter(description = "The representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
-    @Parameter(description = "The descriptive metadata identifier", required = true) @PathVariable(name = "descriptive-metadata-id") String descriptiveMetadataId,
-    @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      IndexedRepresentation representation = RodaCoreFactory.getIndexService().retrieve(IndexedRepresentation.class,
-        IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), representation);
-
-      // delegate
-      StreamResponse streamResponse = representationService.retrieveRepresentationDescriptiveMetadata(aipId,
-        representationId, descriptiveMetadataId, localeString);
-      return ApiUtils.okResponse(streamResponse, null);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RequestNotValidException | GenericException | NotFoundException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
-        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_METADATA_ID_PARAM,
-        descriptiveMetadataId);
-    }
-  }
-
   @GetMapping(path = "{id}/download/documentation", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   @Operation(summary = "Downloads documentation", description = "Download AIP documentation", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
@@ -593,6 +553,89 @@ public class AIPController implements AIPRestService, Exportable {
     } finally {
       // register action
       controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
+    }
+  }
+
+  @GetMapping(path = "/{id}/representations/{representation-id}/metadata/descriptive/{descriptive-metadata-id}/download", produces = MediaType.APPLICATION_XML_VALUE)
+  @Operation(summary = "Retrieves representation's descriptive metadata", description = "Retrieves the representation's XML descriptive metadata", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns an object ", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),})
+  ResponseEntity<StreamingResponseBody> downloadRepresentationDescriptiveMetadata(
+    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
+    @Parameter(description = "The AIP's representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
+    @Parameter(description = "The descriptive metadata identifier", required = true) @PathVariable(name = "descriptive-metadata-id") String descriptiveMetadataId,
+    @Parameter(description = "The version identifier") @RequestParam(name = "version-id", required = false) String versionId) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedRepresentation indexedRepresentation = RodaCoreFactory.getIndexService().retrieve(
+        IndexedRepresentation.class, IdUtils.getRepresentationId(aipId, representationId),
+        RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentation);
+
+      // delegate
+      StreamResponse streamResponse = aipService.downloadRepresentationDescriptiveMetadata(aipId, representationId,
+        descriptiveMetadataId, versionId);
+      return ApiUtils.okResponse(streamResponse);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (RequestNotValidException | GenericException | NotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_METADATA_ID_PARAM, descriptiveMetadataId);
+    }
+  }
+
+  @GetMapping(path = "/{id}/representations/{representation-id}/metadata/descriptive/{descriptive-metadata-id}/html", produces = MediaType.TEXT_HTML_VALUE)
+  @Operation(summary = "Retrieves representation's descriptive metadata", description = "Retrieves the representation's descriptive metadata with the visualization template applied and internationalized", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns an object ", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),})
+  ResponseEntity<StreamingResponseBody> retrieveRepresentationDescriptiveMetadataHTML(
+    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
+    @Parameter(description = "The AIP's representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
+    @Parameter(description = "The representation's descriptive metadata identifier", required = true) @PathVariable(name = "descriptive-metadata-id") String descriptiveMetadataId,
+    @Parameter(description = "The version identifier") @RequestParam(name = "version-id", required = false) String versionId,
+    @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedRepresentation indexedRepresentation = RodaCoreFactory.getIndexService().retrieve(
+        IndexedRepresentation.class, IdUtils.getRepresentationId(aipId, representationId),
+        RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentation);
+
+      // delegate
+      StreamResponse streamResponse = aipService.retrieveRepresentationDescriptiveMetadata(aipId, representationId,
+        descriptiveMetadataId, versionId, localeString);
+      return ApiUtils.okResponse(streamResponse);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (RequestNotValidException | GenericException | NotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_METADATA_ID_PARAM, descriptiveMetadataId);
     }
   }
 

@@ -102,7 +102,7 @@ public class DescriptiveMetadataHistory extends Composite {
                   if (throwable != null) {
                     AsyncCallbackUtils.defaultFailureTreatment(throwable);
                   } else {
-                    DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, null,
+                    DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, representationId,
                       descriptiveMetadataId, result);
                     callback.onSuccess(widget);
                   }
@@ -284,7 +284,7 @@ public class DescriptiveMetadataHistory extends Composite {
     SafeUri uri;
     if (inHTML) {
       if (representationId != null) {
-        uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(aipId, representationId, descId);
+        uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(aipId, representationId, descId, versionKey);
       } else {
         uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId, versionKey);
       }
@@ -401,7 +401,8 @@ public class DescriptiveMetadataHistory extends Composite {
                     AsyncCallbackUtils.defaultFailureTreatment(error);
                   } else {
                     Toast.showInfo(messages.dialogDone(), messages.versionReverted());
-                    HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId, representationId);
+                    HistoryUtils.newHistory(BrowseTop.RESOLVER, RodaConstants.RODA_OBJECT_REPRESENTATION, aipId,
+                      representationId);
                   }
                 });
             }
