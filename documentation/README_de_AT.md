@@ -26,6 +26,7 @@ In dieser Dokumentation finden Sie unter anderem Informationen zu folgenden Them
     - [Metadatenformate](Metadaten_Formate.md)
     - [Externe Authentifizierung mit CAS-Protokoll](Central_Authentication_Service.md)
     - [Entsorgungsmerkmal](Entsorgung.md)
+    - [Standard-AIP-Berechtigungen](Permissions.md)
 - Beitrag
     - [Leitfaden für Entwickler](Leitfaden_Entwickler.md)
     - [Übersetzungsleitfaden](Übersetzung_Leitfaden.md)
