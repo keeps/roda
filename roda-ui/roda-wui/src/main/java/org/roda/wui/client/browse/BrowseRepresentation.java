@@ -520,7 +520,7 @@ public class BrowseRepresentation extends Composite {
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
             if (bundle.isHasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
-              RodaConstants.PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE)) {
+              RodaConstants.PERMISSION_METHOD_RETRIEVE_REPRESENTATION_DESCRIPTIVE_METADATA_VERSIONS)) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
                 descId);
@@ -530,7 +530,7 @@ public class BrowseRepresentation extends Composite {
             }
             // Edit link
             if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
-              RodaConstants.PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE)) {
+              RodaConstants.PERMISSION_METHOD_UPDATE_REPRESENTATION_DESCRIPTIVE_METADATA_FILE)) {
               String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId,
                 descId);
               String editLinkHtml = "<a href='" + editLink
@@ -572,7 +572,7 @@ public class BrowseRepresentation extends Composite {
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
             if (bundle.isHasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
-              RodaConstants.PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE)) {
+              RodaConstants.PERMISSION_METHOD_RETRIEVE_REPRESENTATION_DESCRIPTIVE_METADATA_VERSIONS)) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
                 descId);
@@ -583,7 +583,7 @@ public class BrowseRepresentation extends Composite {
 
             // Edit link
             if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
-              RodaConstants.PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE)) {
+              RodaConstants.PERMISSION_METHOD_UPDATE_REPRESENTATION_DESCRIPTIVE_METADATA_FILE)) {
               String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId,
                 descId);
               String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";

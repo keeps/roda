@@ -126,7 +126,7 @@ public class UserPermissionsPluginTest {
       Facets.NONE, user, false, Collections.emptyList());
     Assert.assertFalse(aipsOnIndex.getResults().isEmpty(), "No AIP is indexed");
 
-    IndexedAIP aip = aipsOnIndex.getResults().get(0);
+    IndexedAIP aip = aipsOnIndex.getResults().getFirst();
     Filter eventFilter = new Filter();
     eventFilter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
     IndexResult<IndexedPreservationEvent> eventsOnIndex = index.find(IndexedPreservationEvent.class, eventFilter,
