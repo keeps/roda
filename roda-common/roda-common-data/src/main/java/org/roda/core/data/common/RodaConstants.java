@@ -357,6 +357,8 @@ public final class RodaConstants {
 
   // files
   public static final String API_REST_V2_FILES = "api/v2/files/";
+  public static final String API_REST_V2_FILES_TECHNICAL_METADATA_HTML = "metadata/preservation/html";
+  public static final String API_REST_V2_FILES_TECHNICAL_METADATA_DOWNLOAD = "metadata/preservation/download";
 
   // transferred resource
   public static final String API_REST_V2_TRANSFERRED_RESOURCES = "api/v2/transfers/";
