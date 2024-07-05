@@ -1,5 +1,6 @@
 package org.roda.wui.api.v2.services;
 
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -12,13 +13,16 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.DownloadUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
 import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.DefaultConsumesOutputStream;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.file.CreateFolderRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
@@ -50,6 +54,8 @@ import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
+import org.roda.wui.common.HTMLUtils;
+import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -57,6 +63,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class FilesService {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilesService.class);
+  private static final String HTML_EXT = ".html";
 
   public IndexedFile renameFolder(User user, IndexedFile indexedFolder, String newName, String details)
     throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
@@ -267,4 +274,49 @@ public class FilesService {
       return Collections.emptyList();
     }
   }
+
+  public StreamResponse retrieveFilePreservationHTML(IndexedFile file, String language) throws GenericException,
+    RequestNotValidException, NotFoundException, AuthorizationDeniedException, TechnicalMetadataNotFoundException {
+
+    final String filename;
+    final ConsumesOutputStream stream;
+    StreamResponse ret;
+    ModelService model = RodaCoreFactory.getModelService();
+    Binary preservationMetadataBinary = model.retrievePreservationFile(file.getAipId(), file.getRepresentationId(),
+      file.getAncestorsPath(), file.getId());
+    filename = preservationMetadataBinary.getStoragePath().getName() + HTML_EXT;
+    List<String> parameters = PremisV3Utils.getApplicationTechnicalMetadataParameters(model, file.getAipId(),
+      file.getRepresentationId(), file.getAncestorsPath(), file.getId());
+    // PremisV3Utils
+    StringBuilder htmlTechnical = new StringBuilder();
+    for (int i = 0; i < parameters.size(); i += 2) {
+      htmlTechnical.append(HTMLUtils.technicalMetadataToHtml(preservationMetadataBinary, parameters.get(i),
+        parameters.get(i + 1), ServerTools.parseLocale(language)));
+    }
+    stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_TEXT_HTML, out -> {
+      PrintStream printStream = new PrintStream(out);
+      printStream.print(htmlTechnical);
+      printStream.close();
+    });
+
+    ret = new StreamResponse(stream);
+
+    return ret;
+  }
+
+  public StreamResponse retrieveFilePreservationFile(IndexedFile file) throws GenericException,
+    RequestNotValidException, NotFoundException, AuthorizationDeniedException, TechnicalMetadataNotFoundException {
+
+    final ConsumesOutputStream stream;
+    StreamResponse ret;
+    ModelService model = RodaCoreFactory.getModelService();
+    Binary preservationMetadataBinary = model.retrievePreservationFile(file.getAipId(), file.getRepresentationId(),
+      file.getAncestorsPath(), file.getId());
+    stream = new BinaryConsumesOutputStream(preservationMetadataBinary, RodaConstants.MEDIA_TYPE_TEXT_XML);
+
+    ret = new StreamResponse(stream);
+
+    return ret;
+  }
+
 }

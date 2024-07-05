@@ -460,7 +460,7 @@ public class InfoSliderHelper {
         values.put(messages.preservationEvents(), eventsLink);
       }
 
-      SafeUri uri = RestUtils.createTechnicalMetadataHTMLUri(file.getAipId(), file.getUUID(), "html", null);
+      SafeUri uri = RestUtils.createTechnicalMetadataHTMLUri(file.getUUID());
       RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
 
       Anchor technicalInformationAnchor = new Anchor();

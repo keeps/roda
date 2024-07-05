@@ -171,30 +171,26 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-  public static SafeUri createTechnicalMetadataHTMLUri(String aipId, String fileId, String acceptFormat,
-    String versionId) {
-    // api/v1/aips/{aip_id}/preservation_metadata/{file_id}?acceptFormat={acceptFormat}&version_id={versionId}
+  public static SafeUri createTechnicalMetadataHTMLUri(String fileId) {
+    // /api/v2/files/{fileId}/metadata/preservation/html?lang={lang}
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_PRESERVATION_METADATA);
-
-    if (fileId != null) {
-      b.append(RodaConstants.API_SEP).append(fileId);
-    }
-
-    // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(acceptFormat);
-
-    if (versionId != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION_ID)
-        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
-    }
+    b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileId)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.API_REST_V2_FILES_TECHNICAL_METADATA_HTML);
 
     // locale
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
+  public static SafeUri createTechnicalMetadataDownloadUri(String fileId) {
+    // /api/v2/files/{fileId}/metadata/preservation/download
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileId)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.API_REST_V2_FILES_TECHNICAL_METADATA_DOWNLOAD);
 
     return UriUtils.fromSafeConstant(b.toString());
   }

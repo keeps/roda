@@ -177,7 +177,7 @@ public class Dialogs {
     });
 
     downloadButton.addClickHandler(event -> {
-      SafeUri downloadUri = RestUtils.createTechnicalMetadataHTMLUri(file.getAipId(), file.getUUID(), "bin", null);
+      SafeUri downloadUri = RestUtils.createTechnicalMetadataDownloadUri(file.getUUID());
       Window.Location.assign(downloadUri.asString());
     });
 

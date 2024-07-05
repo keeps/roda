@@ -15,6 +15,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.file.CreateFolderRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
@@ -54,6 +55,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -154,6 +156,79 @@ public class FilesController implements FileRestService, Exportable {
       // register action
       controllerAssistant.registerAction(requestContext, fileUUID, state, RodaConstants.CONTROLLER_FILE_UUID_PARAM,
         fileUUID);
+    }
+  }
+
+  @GetMapping(path = "/{id}/metadata/preservation/html", produces = MediaType.TEXT_HTML_VALUE)
+  @Operation(summary = "Retrieves file technical metadata", description = "Retrieves the techinal metadata with the visualization template applied and internationalized", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns an object ", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),})
+  ResponseEntity<StreamingResponseBody> retrievePreservationMetadataHTML(
+    @Parameter(description = "The File identifier", required = true) @PathVariable(name = "id") String fileId,
+    @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedFile indexedFile = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileId,
+        RodaConstants.FILE_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedFile);
+
+      // delegate
+      StreamResponse streamResponse = filesService.retrieveFilePreservationHTML(indexedFile, localeString);
+      return ApiUtils.okResponse(streamResponse);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (RequestNotValidException | GenericException | NotFoundException | TechnicalMetadataNotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId);
+    }
+  }
+
+  @GetMapping(path = "/{id}/metadata/preservation/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @Operation(summary = "Download technical metadata file", description = "Download the techinal metadata file", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns an object ", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),})
+  ResponseEntity<StreamingResponseBody> retrievePreservationMetadataFile(
+    @Parameter(description = "The File identifier", required = true) @PathVariable(name = "id") String fileId) {
+
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedFile indexedFile = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileId,
+        RodaConstants.FILE_FIELDS_TO_RETURN);
+
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedFile);
+
+      // delegate
+      StreamResponse streamResponse = filesService.retrieveFilePreservationFile(indexedFile);
+      return ApiUtils.okResponse(streamResponse);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (RequestNotValidException | GenericException | NotFoundException | TechnicalMetadataNotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId);
     }
   }
 
