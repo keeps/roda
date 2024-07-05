@@ -3747,16 +3747,17 @@ public class ModelService extends ModelObservable {
   public DisposalHold updateDisposalHoldFirstUseDate(DisposalHold disposalHold, String updatedBy)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, IllegalOperationException,
     GenericException {
-    return updateDisposalHold(disposalHold, updatedBy, true);
+    return updateDisposalHold(disposalHold, updatedBy, true, null);
   }
 
-  public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy)
+  public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy, String details)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, IllegalOperationException,
     GenericException {
-    return updateDisposalHold(disposalHold, updatedBy, false);
+    return updateDisposalHold(disposalHold, updatedBy, false, details);
   }
 
-  public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy, boolean updateFirstUseDate)
+  public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy, boolean updateFirstUseDate,
+    String details)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
     IllegalOperationException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
@@ -3786,6 +3787,9 @@ public class ModelService extends ModelObservable {
     StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(currentDisposalHold.getId());
 
     storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
+
+    createRepositoryEvent(PreservationEventType.UPDATE, "Update disposal hold", PluginState.SUCCESS, "", details, "",
+      true);
 
     return currentDisposalHold;
   }

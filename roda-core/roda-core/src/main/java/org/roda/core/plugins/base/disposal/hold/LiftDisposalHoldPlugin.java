@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.ip.AIP;
@@ -54,6 +55,7 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(LiftDisposalHoldPlugin.class);
 
   private String disposalHoldId;
+  private String details;
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
@@ -62,12 +64,18 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
       PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
         PluginParameter.PluginParameterType.STRING).isMandatory(true).isReadOnly(false)
         .withDescription("Disposal hold identifier").build());
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Details", PluginParameter.PluginParameterType.STRING)
+        .isMandatory(false).withDescription("Details that will be used when creating event").build());
   }
 
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS));
     return parameters;
   }
 
@@ -77,6 +85,10 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID)) {
       disposalHoldId = parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID);
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DETAILS)) {
+      details = parameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS);
     }
   }
 
@@ -148,6 +160,7 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
 
   private void processAIP(IndexService index, ModelService model, Report report, Job cachedJob,
     JobPluginInfo jobPluginInfo, List<AIP> aips) {
+    report.addPluginDetails(details);
 
     if (StringUtils.isNotBlank(disposalHoldId)) {
       try {
@@ -155,7 +168,7 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
         disposalHold.setState(DisposalHoldState.LIFTED);
         disposalHold.setLiftedBy(cachedJob.getUsername());
         disposalHold.setLiftedOn(new Date());
-        model.updateDisposalHold(disposalHold, cachedJob.getUsername());
+        model.updateDisposalHold(disposalHold, cachedJob.getUsername(), details);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
         | IllegalOperationException e) {
         LOGGER.error("Unable to update disposal hold {}: {}", disposalHoldId, e.getMessage(), e);
@@ -170,10 +183,17 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
       LOGGER.debug("Processing AIP {}", aip.getId());
 
       try {
-        outcomeText = DisposalHoldPluginUtils.liftDisposalHoldFromAIP(aip, disposalHoldId, reportItem);
+        Pair<Boolean, String> outcome = DisposalHoldPluginUtils.disassociateDisposalHoldFromAIP(disposalHoldId, aip,
+          reportItem);
+        boolean lifted = outcome.getFirst();
+        outcomeText = outcome.getSecond();
         processTransitiveAIP(model, index, cachedJob, aip, disposalHoldId, jobPluginInfo, report);
         model.updateAIP(aip, cachedJob.getUsername());
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        if (lifted) {
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } else {
+          jobPluginInfo.incrementObjectsProcessedWithSkipped();
+        }
         reportItem.setPluginState(state);
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         outcomeText = "Error lifting disposal hold" + disposalHoldId + " from AIP " + aip.getId();

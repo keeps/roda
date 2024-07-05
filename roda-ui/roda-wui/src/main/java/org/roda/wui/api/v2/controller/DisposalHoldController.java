@@ -20,6 +20,8 @@ import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
+import org.roda.core.data.v2.ip.disposalhold.UpdateDisposalHoldRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
@@ -75,10 +77,11 @@ public class DisposalHoldController implements DisposalHoldRestService {
   }
 
   @Override
-  public DisposalHold updateDisposalHold(@RequestBody DisposalHold hold) {
+  public DisposalHold updateDisposalHold(@RequestBody UpdateDisposalHoldRequest updateDisposalHoldRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
+    DisposalHold hold = updateDisposalHoldRequest.getDisposalHold();
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
@@ -88,7 +91,8 @@ public class DisposalHoldController implements DisposalHoldRestService {
       hold = JsonUtils.getObjectFromJson(sanitize, DisposalHold.class);
 
       // delegate action to service
-      return disposalHoldService.updateDisposalHold(hold, requestContext.getUser());
+      return disposalHoldService.updateDisposalHold(hold, requestContext.getUser(),
+        updateDisposalHoldRequest.getDetails());
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -183,32 +187,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
   }
 
   @Override
-  public Job liftDisposalHoldBySelectedItems(@RequestBody SelectedItemsRequest items, String disposalHoldId) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-      // delegate
-      return disposalHoldService.liftDisposalHold(requestContext.getUser(),
-        CommonServicesUtils.convertSelectedItems(items, IndexedAIP.class), disposalHoldId);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (GenericException | NotFoundException | RequestNotValidException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
-        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId);
-    }
-  }
-
-  @Override
-  public DisposalHold liftDisposalHold(String id) {
+  public DisposalHold liftDisposalHold(String id, String details) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -223,7 +202,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       disposalHold.setLiftedBy(requestContext.getUser().getName());
       disposalHold.setLiftedOn(new Date());
       // delegate
-      return disposalHoldService.updateDisposalHold(disposalHold, requestContext.getUser());
+      return disposalHoldService.updateDisposalHold(disposalHold, requestContext.getUser(), details);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -238,7 +217,8 @@ public class DisposalHoldController implements DisposalHoldRestService {
   }
 
   @Override
-  public Job disassociateDisposalHold(@RequestBody SelectedItemsRequest items, String disposalHoldId, boolean clear) {
+  public Job disassociateDisposalHold(@RequestBody DisassociateDisposalHoldRequest disassociateDisposalHoldRequest,
+    String disposalHoldId) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -247,8 +227,8 @@ public class DisposalHoldController implements DisposalHoldRestService {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
       // delegate
-      return disposalHoldService.disassociateDisposalHold(requestContext.getUser(),
-        CommonServicesUtils.convertSelectedItems(items, IndexedAIP.class), disposalHoldId, clear);
+      return disposalHoldService.disassociateDisposalHold(requestContext.getUser(), disassociateDisposalHoldRequest,
+        disposalHoldId);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -257,9 +237,10 @@ public class DisposalHoldController implements DisposalHoldRestService {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
+        disassociateDisposalHoldRequest.getSelectedItems(),
         RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
-        RodaConstants.CONTROLLER_DISPOSAL_HOLD_DISASSOCIATE_ALL, clear);
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_DISASSOCIATE_ALL, disassociateDisposalHoldRequest.getClear());
     }
   }
 

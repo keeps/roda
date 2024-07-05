@@ -16,9 +16,11 @@ import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.disposal.hold.DisposalHolds;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
@@ -39,6 +41,7 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -178,37 +181,64 @@ public class DisposalHoldsPanel extends Composite {
       messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean result) {
-          if (result) {
-            Services services = new Services("Disassociate disposal holds", "job");
-            services.disposalHoldResource(s -> s.disassociateDisposalHold(SelectedItemsUtils.convertToRESTRequest(aips), null, true))
-              .whenComplete((job, throwable) -> {
-                if (throwable != null) {
-                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                } else {
-                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+            new NoAsyncCallback<String>() {
+              @Override
+              public void onFailure(Throwable caught) {
+                Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                Timer timer = new Timer() {
+                  @Override
+                  public void run() {
+                    refresh();
+                  }
+                };
 
-                      Timer timer = new Timer() {
-                        @Override
-                        public void run() {
-                          refresh();
-                        }
-                      };
+                timer.schedule(RodaConstants.ACTION_TIMEOUT);
+              }
 
-                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                    }
+              @Override
+              public void onSuccess(String details) {
+                if (result) {
+                  SelectedItemsRequest selectedItemsRequest = SelectedItemsUtils.convertToRESTRequest(aips);
+                  DisassociateDisposalHoldRequest request = new DisassociateDisposalHoldRequest();
+                  request.setClear(true);
+                  request.setSelectedItems(selectedItemsRequest);
+                  request.setDetails(details);
+                  Services services = new Services("Disassociate disposal holds", "job");
+                  services.disposalHoldResource(s -> s.disassociateDisposalHold(request, null))
+                    .whenComplete((job, throwable) -> {
+                      if (throwable != null) {
+                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                      } else {
+                        Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
-                    @Override
-                    public void onSuccess(final Void nothing) {
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                    }
-                  });
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            Toast.showInfo(messages.runningInBackgroundTitle(),
+                              messages.runningInBackgroundDescription());
+
+                            Timer timer = new Timer() {
+                              @Override
+                              public void run() {
+                                refresh();
+                              }
+                            };
+
+                            timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                          }
+
+                          @Override
+                          public void onSuccess(final Void nothing) {
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                          }
+                        });
+                      }
+                    });
                 }
-              });
-          }
+              }
+            });
         }
       });
   }
