@@ -54,6 +54,18 @@ public class PluginParameter implements Serializable {
     this.description = builder.description;
   }
 
+  public PluginParameter(PluginParameter parameter) {
+    this.id = parameter.id;
+    this.name = parameter.name;
+    this.type = parameter.type;
+    this.defaultValue = parameter.defaultValue;
+    this.possibleValues = parameter.possibleValues;
+    this.mandatory = parameter.mandatory;
+    this.readonly = parameter.readonly;
+    this.description = parameter.description;
+    this.renderingHints = parameter.renderingHints;
+  }
+
   /**
    * @see Object#toString()
    */
