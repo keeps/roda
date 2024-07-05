@@ -32,6 +32,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
 import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.EditPermissions;
@@ -967,37 +968,52 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            Services services = new Services("Disassociate disposal holds", "job");
-            services
-              .disposalHoldResource(
-                s -> s.disassociateDisposalHold(SelectedItemsUtils.convertToRESTRequest(aips), null, true))
-              .whenComplete((job, throwable) -> {
-                if (throwable != null) {
-                  callback.onFailure(throwable);
-                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                } else {
-                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+              new ActionNoAsyncCallback<String>(callback) {
+                @Override
+                public void onFailure(Throwable caught) {
+                  // do nothing
+                }
 
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                @Override
+                public void onSuccess(String details) {
+                  DisassociateDisposalHoldRequest request = new DisassociateDisposalHoldRequest();
+                  request.setSelectedItems(SelectedItemsUtils.convertToRESTRequest(aips));
+                  request.setClear(true);
+                  request.setDetails(details);
+                  Services services = new Services("Disassociate disposal holds", "job");
+                  services.disposalHoldResource(s -> s.disassociateDisposalHold(request, null))
+                    .whenComplete((job, throwable) -> {
+                      if (throwable != null) {
+                        callback.onFailure(throwable);
+                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                      } else {
+                        Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
-                      Timer timer = new Timer() {
-                        @Override
-                        public void run() {
-                          doActionCallbackUpdated();
-                        }
-                      };
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            Toast.showInfo(messages.runningInBackgroundTitle(),
+                              messages.runningInBackgroundDescription());
 
-                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                    }
+                            Timer timer = new Timer() {
+                              @Override
+                              public void run() {
+                                doActionCallbackUpdated();
+                              }
+                            };
 
-                    @Override
-                    public void onSuccess(final Void nothing) {
-                      doActionCallbackNone();
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                    }
-                  });
+                            timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                          }
+
+                          @Override
+                          public void onSuccess(final Void nothing) {
+                            doActionCallbackNone();
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                          }
+                        });
+                      }
+                    });
                 }
               });
           } else {

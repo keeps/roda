@@ -6,6 +6,8 @@ import org.roda.core.data.v2.disposal.hold.DisposalHolds;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
+import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
+import org.roda.core.data.v2.ip.disposalhold.UpdateDisposalHoldRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +25,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * @author Miguel Guimaraes <mguimarães@keep.pt>
@@ -40,12 +42,12 @@ public interface DisposalHoldRestService extends DirectRestService {
   DisposalHolds listDisposalHolds();
 
   @RequestMapping(method = RequestMethod.PUT, path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Update disposal hold", description = "Update existing disposal hold", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = DisposalHold.class))), responses = {
+  @Operation(summary = "Update disposal hold", description = "Update existing disposal hold", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UpdateDisposalHoldRequest.class))), responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DisposalHold.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  DisposalHold updateDisposalHold(DisposalHold hold);
+  DisposalHold updateDisposalHold(UpdateDisposalHoldRequest updateDisposalHoldRequest);
 
   @RequestMapping(method = RequestMethod.POST, path = "", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
@@ -72,15 +74,6 @@ public interface DisposalHoldRestService extends DirectRestService {
     @Parameter(description = "Disposal hold id", required = true) @PathVariable(name = "id") String disposalHoldId,
     @Parameter(name = "override", description = "Lift all disposal holds associated and apply the selected disposal hold") @RequestParam(name = "override", required = false, defaultValue = "false") boolean override);
 
-  @RequestMapping(method = RequestMethod.POST, path = "/{id}/lift", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Lift disposal holds from selected AIPs", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItemsRequest.class))), responses = {
-    @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class))),
-    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
-    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),})
-  Job liftDisposalHoldBySelectedItems(
-    @Parameter(description = "Selected AIPs", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selectedItems,
-    @Parameter(description = "disposal hold id", required = true) @PathVariable(name = "id") String disposalHoldId);
-
   @RequestMapping(method = RequestMethod.PUT, path = "/{id}/lift", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Lift specific disposal hold", responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = DisposalHold.class))),
@@ -88,17 +81,16 @@ public interface DisposalHoldRestService extends DirectRestService {
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Disposal hold not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   DisposalHold liftDisposalHold(
-    @Parameter(description = "Disposal hold id", required = true) @PathVariable(name = "id") String id);
+    @Parameter(description = "Disposal hold id", required = true) @PathVariable(name = "id") String id,
+    @Parameter(description = "Outcome details", required = true) @RequestParam(name = "details", required = false, defaultValue = "") String details);
 
-  @RequestMapping(method = RequestMethod.POST, path = "/disassociate", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Disassociate disposal hold from selected AIPs", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SelectedItemsRequest.class))), responses = {
+  @RequestMapping(method = RequestMethod.POST, path = "/{id}/disassociate", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Disassociate disposal hold from selected AIPs", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = DisassociateDisposalHoldRequest.class))), responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Job disassociateDisposalHold(
-    @Parameter(description = "Selected AIPs", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selectedItems,
-    @Parameter(description = "Disposal hold id") @PathVariable(name = "id", required = false) String disposalHoldId,
-    @Parameter(name = "clear", description = "Disassociate all disposal holds associated to AIP") @RequestParam(name = "clear", required = false, defaultValue = "false") boolean clear);
+  Job disassociateDisposalHold(DisassociateDisposalHoldRequest request,
+    @Parameter(description = "Disposal hold id", required = false) @PathVariable(name = "id") String disposalHoldId);
 
   @RequestMapping(method = RequestMethod.GET, path = "/transitive/{aip-id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "List transitive holds", responses = {

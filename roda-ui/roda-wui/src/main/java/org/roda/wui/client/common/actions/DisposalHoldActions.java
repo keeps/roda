@@ -17,6 +17,7 @@ import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -30,6 +31,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -103,36 +105,52 @@ public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
             @Override
             public void onSuccess(Boolean result) {
               if (result) {
-                Services services = new Services("Lift disposal hold", "job");
-                services.disposalHoldResource(s -> s.liftDisposalHoldBySelectedItems(SelectedItemsUtils.convertToRESTRequest(aips), disposalHold.getId()))
-                  .whenComplete((job, throwable) -> {
-                    if (throwable != null) {
-                      callback.onFailure(throwable);
-                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                    } else {
-                      Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  new ActionNoAsyncCallback<String>(callback) {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      // do nothing
+                    }
 
-                        @Override
-                        public void onFailure(Throwable caught) {
-                          Toast.showInfo(messages.runningInBackgroundTitle(),
-                            messages.runningInBackgroundDescription());
+                    @Override
+                    public void onSuccess(String details) {
+                      DisassociateDisposalHoldRequest request = new DisassociateDisposalHoldRequest();
+                      request.setClear(false);
+                      request.setDetails(details);
+                      request.setSelectedItems(SelectedItemsUtils.convertToRESTRequest(aips));
+                      Services services = new Services("Lift disposal hold", "job");
+                      services.disposalHoldResource(s -> s.disassociateDisposalHold(request, disposalHold.getId()))
+                        .whenComplete((job, throwable) -> {
+                          if (throwable != null) {
+                            callback.onFailure(throwable);
+                            HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                          } else {
+                            Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
-                          Timer timer = new Timer() {
-                            @Override
-                            public void run() {
-                              doActionCallbackUpdated();
-                            }
-                          };
+                              @Override
+                              public void onFailure(Throwable caught) {
+                                Toast.showInfo(messages.runningInBackgroundTitle(),
+                                  messages.runningInBackgroundDescription());
 
-                          timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                        }
+                                Timer timer = new Timer() {
+                                  @Override
+                                  public void run() {
+                                    doActionCallbackUpdated();
+                                  }
+                                };
 
-                        @Override
-                        public void onSuccess(final Void nothing) {
-                          doActionCallbackNone();
-                          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                        }
-                      });
+                                timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                              }
+
+                              @Override
+                              public void onSuccess(final Void nothing) {
+                                doActionCallbackNone();
+                                HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                              }
+                            });
+                          }
+                        });
                     }
                   });
               } else {

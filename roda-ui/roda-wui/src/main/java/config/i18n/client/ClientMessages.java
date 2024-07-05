@@ -2149,6 +2149,10 @@ public interface ClientMessages extends Messages {
 
   String clearDisposalHoldDialogMessage(@PluralCount int size);
 
+  String liftDisposalHoldDialogTitle();
+
+  String liftDisposalHoldDialogMessage(@PluralCount int size);
+
   String disassociateDisposalHoldDialogTitle();
 
   String disassociateDisposalHoldDialogMessage(@PluralCount int size);
