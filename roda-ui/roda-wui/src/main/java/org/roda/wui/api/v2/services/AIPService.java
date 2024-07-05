@@ -149,6 +149,52 @@ public class AIPService {
     return new StreamResponse(stream);
   }
 
+  public StreamResponse downloadRepresentationDescriptiveMetadata(String aipId, String representationId,
+    String metadataId, String versionId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    ModelService modelService = RodaCoreFactory.getModelService();
+    Binary descriptiveMetadataBinary;
+    if (versionId == null) {
+      descriptiveMetadataBinary = modelService.retrieveDescriptiveMetadataBinary(aipId, representationId, metadataId);
+
+    } else {
+      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, metadataId);
+      BinaryVersion binaryVersion = modelService.getStorage().getBinaryVersion(storagePath, versionId);
+      descriptiveMetadataBinary = binaryVersion.getBinary();
+    }
+
+    return new StreamResponse(
+      new BinaryConsumesOutputStream(descriptiveMetadataBinary, RodaConstants.MEDIA_TYPE_APPLICATION_XML));
+  }
+
+  public StreamResponse retrieveRepresentationDescriptiveMetadata(String aipId, String representationId,
+    String metadataId, String versionId, String localeString)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    ModelService model = RodaCoreFactory.getModelService();
+    Binary descriptiveMetadataBinary;
+    if (versionId != null) {
+      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, metadataId);
+      BinaryVersion binaryVersion = model.getStorage().getBinaryVersion(storagePath, versionId);
+      descriptiveMetadataBinary = binaryVersion.getBinary();
+    } else {
+      descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, representationId, metadataId);
+    }
+
+    String filename = descriptiveMetadataBinary.getStoragePath().getName() + HTML_EXT;
+    DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, representationId, metadataId);
+    String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
+      descriptiveMetadata.getType(), descriptiveMetadata.getVersion(), ServerTools.parseLocale(localeString));
+
+    ConsumesOutputStream stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_APPLICATION_XML,
+      out -> {
+        PrintStream printStream = new PrintStream(out);
+        printStream.print(htmlDescriptive);
+        printStream.close();
+      });
+
+    return new StreamResponse(stream);
+  }
+
   public List<IndexedAIP> getAncestors(IndexedAIP indexedAIP, User user) throws GenericException {
     return RodaCoreFactory.getIndexService().retrieveAncestors(indexedAIP, user, new ArrayList<>());
   }
