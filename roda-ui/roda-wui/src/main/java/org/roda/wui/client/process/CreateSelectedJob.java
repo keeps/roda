@@ -20,6 +20,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Certificate;
 import org.roda.core.data.v2.jobs.CertificateInfo;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
@@ -544,7 +545,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
       } else if (CertificateInfo.CertificateStatus.VERIFIED.equals(certificateStatus)) {
         badgePanel.setIcon("fas fa-shield-alt");
         badgePanel.addStyleName("badge-panel-success");
-        CertificateInfo.Certificate certificate = certificateInfo.getCertificates().iterator().next();
+        Certificate certificate = certificateInfo.getCertificates().iterator().next();
         String issuer = certificate.getOrganizationName(certificate.getIssuerDN());
         String subject = certificate.getOrganizationName(certificate.getSubjectDN());
         statusMessage.setHTML(messages.pluginTrustedMessage(issuer, subject));
