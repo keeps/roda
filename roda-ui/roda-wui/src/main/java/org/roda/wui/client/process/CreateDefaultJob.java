@@ -197,6 +197,7 @@ public class CreateDefaultJob extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     Services services = new Services("Retrieve plugin information", "get");
+    pluginTypes.remove(PluginType.INTERNAL);
     services.configurationsResource(s -> s.retrievePluginsInfo(pluginTypes))
       .whenComplete((pluginInfoList, throwable) -> {
         if (throwable == null) {
