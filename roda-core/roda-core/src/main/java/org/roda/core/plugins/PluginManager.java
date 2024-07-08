@@ -412,7 +412,9 @@ public class PluginManager {
     PluginInfoList pluginsInfo = new PluginInfoList();
 
     for (PluginType pluginType : pluginTypes) {
-      pluginsInfo.addObjects(pluginInfoPerType.getOrDefault(pluginType, Collections.emptyList()));
+      List<PluginInfo> orDefault = pluginInfoPerType.getOrDefault(pluginType, Collections.emptyList());
+      orDefault.removeIf(p -> p.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE));
+      pluginsInfo.addObjects(orDefault);
     }
 
     return pluginsInfo;
@@ -767,7 +769,7 @@ public class PluginManager {
         boolean optIn = configurationManager.getProperty(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
         CertificateInfo certificateInfo = PluginCertificateUtils.loadAndCheckCertificates(jarPath);
         if (!certificateInfo.isNotVerified() || optIn) {
-          LOGGER.info("Adding startup jars from auth plugin " + authPluginClassNamesString);
+          LOGGER.info("Adding startup jars from auth plugin {}", authPluginClassNamesString);
           URLClassLoader classLoader = new URLClassLoader(jarClasspath.toArray(new URL[] {}),
             getClass().getClassLoader());
           jarStartupPluginsClassloaderCache.put(authPluginClassNamesString, classLoader);

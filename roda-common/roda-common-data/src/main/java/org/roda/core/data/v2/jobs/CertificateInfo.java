@@ -13,18 +13,21 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class CertificateInfo implements Serializable {
   @Serial
   private static final long serialVersionUID = 5755199988566186742L;
+
   public enum CertificateStatus {
     INTERNAL, VERIFIED, NOT_VERIFIED
   }
+
   private CertificateStatus certificateStatus = CertificateStatus.INTERNAL;
   private Set<Certificate> certificates = new HashSet<>();
-  private boolean notVerified = false;
 
   public CertificateStatus getCertificateStatus() {
     return certificateStatus;
@@ -42,6 +45,7 @@ public class CertificateInfo implements Serializable {
     this.certificates = certificates;
   }
 
+  @JsonIgnore
   public void addCertificates(String issuer, String subject, Date notBefore, Date notAfter) {
     Certificate certificate = new Certificate();
     certificate.setIssuerDN(issuer);
@@ -51,12 +55,8 @@ public class CertificateInfo implements Serializable {
     this.certificates.add(certificate);
   }
 
-  public boolean isNotVerified(){
+  @JsonIgnore
+  public boolean isNotVerified() {
     return getCertificateStatus().equals(CertificateStatus.NOT_VERIFIED);
   }
-
-  public void setNotVerified(boolean notVerified) {
-    this.notVerified = notVerified;
-  }
-
 }
