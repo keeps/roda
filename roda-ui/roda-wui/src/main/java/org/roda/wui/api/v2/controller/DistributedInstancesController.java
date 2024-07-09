@@ -418,7 +418,7 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state,
+      controllerAssistant.registerAction(requestContext, state,
         RodaConstants.CONTROLLER_LOCAL_INSTANCE_ID_PARAM, localInstance.getId());
     }
   }
@@ -451,7 +451,7 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state,
+      controllerAssistant.registerAction(requestContext, state,
         RodaConstants.CONTROLLER_LOCAL_INSTANCE_ID_PARAM, id);
     }
   }
@@ -605,7 +605,7 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
         id);
     }
   }
@@ -635,7 +635,7 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
         id);
     }
   }
@@ -665,7 +665,7 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state,
+      controllerAssistant.registerAction(requestContext, state,
         RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
     }
   }

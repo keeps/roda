@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 
-@Tag(name = "v2 disposal confirmations")
+@Tag(name = "Disposal confirmations")
 @RequestMapping(path = "../api/v2/disposal/confirmations")
 public interface DisposalConfirmationRestService extends RODAEntityRestService<DisposalConfirmation> {
 

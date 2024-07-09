@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@Tag(name = "v2 representation information")
+@Tag(name = "Representation information")
 @RequestMapping(path = "../api/v2/representation-information")
 public interface RepresentationInformationRestService extends RODAEntityRestService<RepresentationInformation> {
 

@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@Tag(name = "v2 dips")
+@Tag(name = "DIPs")
 @RequestMapping(path = "../api/v2/dips")
 public interface DIPRestService extends RODAEntityRestService<IndexedDIP> {
 

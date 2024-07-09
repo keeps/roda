@@ -40,7 +40,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * @author António Lindo <alindo@keep.pt>
  */
-@Tag(name = "v2 members")
+@Tag(name = "Members")
 @RequestMapping(path = "../api/v2/members")
 public interface MembersRestService extends RODAEntityRestService<RODAMember> {
 

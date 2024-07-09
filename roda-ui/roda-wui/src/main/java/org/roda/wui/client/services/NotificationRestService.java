@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "v2 notifications")
+@Tag(name = "Notifications")
 @RequestMapping(path = "../api/v2/notifications")
 public interface NotificationRestService extends RODAEntityRestService<Notification> {
 

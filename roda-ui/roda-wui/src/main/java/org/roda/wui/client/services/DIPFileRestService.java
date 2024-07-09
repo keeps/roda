@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@Tag(name = "v2 dip files")
+@Tag(name = "DIP files")
 @RequestMapping(path = "../api/v2/dip-files")
 public interface DIPFileRestService extends RODAEntityRestService<DIPFile> {
 }

@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@Tag(name = "v2 preservation events")
+@Tag(name = "Preservation events")
 @RequestMapping(path = "../api/v2/preservation/events")
 public interface PreservationEventRestService extends RODAEntityRestService<IndexedPreservationEvent> {
 

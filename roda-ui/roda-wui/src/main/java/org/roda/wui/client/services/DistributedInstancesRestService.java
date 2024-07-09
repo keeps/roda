@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * @author António Lindo <alindo@keep.pt>
  */
-@Tag(name = "v2 distributed instances")
+@Tag(name = "Distributed instances")
 @RequestMapping(path = "../api/v2/distributed-instances")
 public interface DistributedInstancesRestService extends DirectRestService {
 

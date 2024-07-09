@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author António Lindo <alindo@keep.pt>
  */
 
-@Tag(name = "v2 jobs")
+@Tag(name = "Jobs")
 @RequestMapping(path = "../api/v2/jobs")
 public interface JobsRestService extends RODAEntityRestService<Job> {
 

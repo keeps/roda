@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@Tag(name = "v2 disposal rules")
+@Tag(name = "Disposal rules")
 @RequestMapping(path = "../api/v2/disposal/rules")
 public interface DisposalRuleRestService extends DirectRestService {
   @RequestMapping(method = RequestMethod.GET, path = "", produces = MediaType.APPLICATION_JSON_VALUE)
