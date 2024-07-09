@@ -285,20 +285,22 @@ public class OrderDisposalRules extends Composite {
     Dialogs.showConfirmDialog(messages.saveButton(), messages.confirmChangeRulesOrder(), messages.dialogNo(),
       messages.dialogYes(), new NoAsyncCallback<Boolean>() {
         @Override
-        public void onSuccess(Boolean aBoolean) {
-          Services services = new Services("Update multiple disposal rules", "update");
-          List<CompletableFuture<DisposalRule>> futures = new ArrayList<>();
-          for (DisposalRule rule : disposalRules.getObjects()) {
-            futures.add(services.disposalRuleResource(s -> s.updateDisposalRule(rule)).toCompletableFuture());
-          }
-          CompletableFuture<?>[] futuresArray = futures.toArray(new CompletableFuture<?>[0]);
-          CompletableFuture<List<DisposalRule>> listFuture = CompletableFuture.allOf(futuresArray)
-            .thenApply(v -> futures.stream().map(CompletableFuture::join).collect(Collectors.toList()));
-          listFuture.join();
+        public void onSuccess(Boolean confirm) {
+          if (confirm) {
+            Services services = new Services("Update multiple disposal rules", "update");
+            List<CompletableFuture<DisposalRule>> futures = new ArrayList<>();
+            for (DisposalRule rule : disposalRules.getObjects()) {
+              futures.add(services.disposalRuleResource(s -> s.updateDisposalRule(rule)).toCompletableFuture());
+            }
+            CompletableFuture<?>[] futuresArray = futures.toArray(new CompletableFuture<?>[0]);
+            CompletableFuture<List<DisposalRule>> listFuture = CompletableFuture.allOf(futuresArray)
+              .thenApply(v -> futures.stream().map(CompletableFuture::join).collect(Collectors.toList()));
+            listFuture.join();
 
-          Toast.showInfo(messages.updateDisposalRulesOrderSuccessTitle(),
-            messages.updateDisposalRulesOrderSuccessMessage());
-          DisposalRuleActions.applyDisposalRulesAction();
+            Toast.showInfo(messages.updateDisposalRulesOrderSuccessTitle(),
+              messages.updateDisposalRulesOrderSuccessMessage());
+            DisposalRuleActions.applyDisposalRulesAction();
+          }
         }
       });
   }
