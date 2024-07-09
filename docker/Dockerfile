@@ -1,11 +1,11 @@
-FROM tomcat:10-jre21
+FROM eclipse-temurin:21-jre-jammy
 LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 
 # Install dependencies
 RUN set -ex; \
     apt-get -qq update && \
     apt-get -qq -y install software-properties-common; \
-    apt-get -qq -y --no-install-recommends install clamdscan zip rsync jq && \
+    apt-get -qq -y --no-install-recommends install clamdscan rsync jq && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Remove python dependency
@@ -16,27 +16,27 @@ RUN \
 COPY ./docker-files/clamd.conf /etc/clamav/clamd.conf
 
 # setup remove old ROOT folder from tomcat
-RUN set -ex; \
-    rm -rf /usr/local/tomcat/webapps/ROOT
+#RUN set -ex; \
+#    rm -rf /usr/local/tomcat/webapps/ROOT
 
 # Install web application
-COPY ./target/roda-wui-*.war  .
+COPY ./target/roda-wui-*.war  /KEEPS/bin/
 
 # Fix configuration & do some final cleanup
-RUN mkdir -p /usr/local/tomcat/conf/Catalina/localhost
-RUN chmod -R a+rwx /usr/local/tomcat/conf/Catalina
+#RUN mkdir -p /usr/local/tomcat/conf/Catalina/localhost
+#RUN chmod -R a+rwx /usr/local/tomcat/conf/Catalina
 
-RUN set -ex; \
-    unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
-    sed -i -e 's/^core.plugins.internal.virus_check.clamav/#&/' -e 's/^core.tools.siegfried.mode/#&/' config/roda-core.properties && \
-    echo "\n" >> config/roda-core.properties && \
-    echo "core.plugins.internal.virus_check.clamav.bin = /usr/bin/clamdscan" >> config/roda-core.properties && \
-    echo "core.plugins.internal.virus_check.clamav.params = -m --fdpass" >> config/roda-core.properties && \
-    echo "core.plugins.internal.virus_check.clamav.get_version = clamdscan --version" >> config/roda-core.properties && \
-    echo "core.tools.siegfried.mode = server" >> config/roda-core.properties && \
-    zip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties ; \
-    apt-get remove -y curl zip && apt-get clean && apt-get autoremove ; \
-    rm -rf /var/lib/apt/lists/*
+#RUN set -ex; \
+#    unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
+#    sed -i -e 's/^core.plugins.internal.virus_check.clamav/#&/' -e 's/^core.tools.siegfried.mode/#&/' config/roda-core.properties && \
+#    echo "\n" >> config/roda-core.properties && \
+#    echo "core.plugins.internal.virus_check.clamav.bin = /usr/bin/clamdscan" >> config/roda-core.properties && \
+#    echo "core.plugins.internal.virus_check.clamav.params = -m --fdpass" >> config/roda-core.properties && \
+#    echo "core.plugins.internal.virus_check.clamav.get_version = clamdscan --version" >> config/roda-core.properties && \
+#    echo "core.tools.siegfried.mode = server" >> config/roda-core.properties && \
+#    zip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties ; \
+#    apt-get remove -y curl zip && apt-get clean && apt-get autoremove ; \
+#    rm -rf /var/lib/apt/lists/*
 
 ENV RODA_HOME=/roda \
     LDAP_SERVER_URL=ldap://openldap \
@@ -61,5 +61,7 @@ RUN set -ex; \
 VOLUME "$RODA_HOME/data"
 
 USER "$RODA_UID"
+
+WORKDIR "$RODA_HOME"
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
