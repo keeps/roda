@@ -134,8 +134,9 @@ jobs:
             To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
       - name: Trigger KEEPS GitLab CI/CD
         run: |
-          curl --progress-bar -o /dev/null -L --request POST \
-               --form ref=master \
-               --form token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
-               --form "variables[DOCKER_TAG]=${{ github.ref_name }}" \
-               ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
+          curl -X POST \
+            --fail \
+            -F token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
+            -F variables[DOCKER_TAG]=${{ github.ref_name }} \
+            -F ref=main \
+            ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}

@@ -1,6 +1,6 @@
 services:
   zoo:
-    image: docker.io/zookeeper:3.9.2-jre-17
+    image: docker.io/zookeeper:3.9-jre-17
     restart: unless-stopped
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
@@ -8,7 +8,7 @@ services:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
   solr:
-    image: docker.io/solr:9.5.0
+    image: docker.io/solr:9.6.1
     restart: unless-stopped
     ports:
       - "8983:8983"

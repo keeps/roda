@@ -113,8 +113,9 @@ jobs:
           provenance: mode=max
       - name: Trigger KEEPS GitLab CI/CD
         run: |
-          curl --progress-bar -o /dev/null -L --request POST \
-               --form ref=development \
-               --form token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
-               --form "variables[DOCKER_TAG]=development" \
-               ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
+          curl -X POST \
+              --fail \
+              -F token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
+              -F variables[DOCKER_TAG]=development \
+              -F ref=development \
+              ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
