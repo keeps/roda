@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * @author António Lindo <alindo@keep.pt>
  */
-@Tag(name = "v2 transfers")
+@Tag(name = "Transfers")
 @RequestMapping(path = "../api/v2/transfers")
 public interface TransferredResourceRestService extends RODAEntityRestService<TransferredResource> {
 

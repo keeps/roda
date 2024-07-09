@@ -31,7 +31,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(path = "/api/v2/classification-plans")
 @Tag(name = ClassificationPlanController.SWAGGER_ENDPOINT)
 public class ClassificationPlanController {
-  public static final String SWAGGER_ENDPOINT = "v2 classification plans";
+  public static final String SWAGGER_ENDPOINT = "Classification plan";
 
   @Autowired
   HttpServletRequest request;

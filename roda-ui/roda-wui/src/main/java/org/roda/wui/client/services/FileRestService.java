@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@Tag(name = "v2 files")
+@Tag(name = "Files")
 @RequestMapping(path = "../api/v2/files")
 public interface FileRestService extends RODAEntityRestService<IndexedFile> {
 

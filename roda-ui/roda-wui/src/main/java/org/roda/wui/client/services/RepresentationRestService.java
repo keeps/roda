@@ -32,7 +32,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * @author António Lindo <alindo@keep.pt>
  */
-@Tag(name = "v2 representations")
+@Tag(name = "Representations")
 @RequestMapping(path = "../api/v2/representations")
 public interface RepresentationRestService extends RODAEntityRestService<IndexedRepresentation> {
 

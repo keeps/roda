@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v2/themes")
 @Tag(name = ThemesController.SWAGGER_ENDPOINT)
 public class ThemesController {
-  public static final String SWAGGER_ENDPOINT = "v2 themes";
+  public static final String SWAGGER_ENDPOINT = "Themes";
 
   @Autowired
   ThemeService themeService;

@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author Miguel Guimaraes <mguimarães@keep.pt>
  */
 
-@Tag(name = "v2 disposal holds")
+@Tag(name = "Disposal holds")
 @RequestMapping(path = "../api/v2/disposal/holds")
 public interface DisposalHoldRestService extends DirectRestService {
 

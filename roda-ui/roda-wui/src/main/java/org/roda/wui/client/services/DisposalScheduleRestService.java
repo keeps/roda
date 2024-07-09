@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@Tag(name = "v2 disposal schedules")
+@Tag(name = "Disposal schedules")
 @RequestMapping(path = "../api/v2/disposal/schedules")
 public interface DisposalScheduleRestService extends DirectRestService {
 

@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author Carlos Afonso <cafonso@keep.pt>
  */
 
-@Tag(name = "v2 incidences")
+@Tag(name = "Incidences")
 @RequestMapping(path = "../api/v2/incidences")
 public interface RiskIncidenceRestService extends RODAEntityRestService<RiskIncidence> {
 

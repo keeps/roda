@@ -59,9 +59,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "/api/v2/transfers")
-@Tag(name = TransferredResourceController.SWAGGER_ENDPOINT)
 public class TransferredResourceController implements TransferredResourceRestService, Exportable {
-  public static final String SWAGGER_ENDPOINT = "v2 transfers";
 
   @Autowired
   private HttpServletRequest request;

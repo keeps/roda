@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author Carlos Afonso <cafonso@keep.pt>
  */
 
-@Tag(name = "v2 risks")
+@Tag(name = "Risks")
 @RequestMapping(path = "../api/v2/risks")
 public interface RiskRestService extends RODAEntityRestService<IndexedRisk> {
   @RequestMapping(path = "/delete", method = RequestMethod.POST)

@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@Tag(name = "v2 audit logs")
+@Tag(name = "Audit logs")
 @RequestMapping(path = "../api/v2/audit-logs")
 public interface AuditLogRestService extends RODAEntityRestService<LogEntry> {
 

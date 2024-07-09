@@ -332,7 +332,7 @@ public class MembersController implements MembersRestService, Exportable {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext.getUser(), state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
     }
   }
 

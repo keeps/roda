@@ -29,7 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(path = "/api/v2/metrics")
 @Tag(name = MetricsController.SWAGGER_ENDPOINT)
 public class MetricsController {
-  public static final String SWAGGER_ENDPOINT = "v2 metrics";
+  public static final String SWAGGER_ENDPOINT = "Metrics";
 
   @Autowired
   MetricsService metricsService;

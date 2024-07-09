@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@Tag(name = "v2 configurations")
+@Tag(name = "Configurations")
 @RequestMapping(path = "../api/v2/configurations")
 public interface ConfigurationRestService extends DirectRestService {
 
