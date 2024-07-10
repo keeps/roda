@@ -1341,6 +1341,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_EVENT_DESCRIPTION = "parameter.event_description";
   public static final String PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS = "parameter.delete_older_than_x_days";
   public static final String PLUGIN_PARAMS_SIP_UPDATE_INFORMATION = "parameter.sip_update_information";
+  public static final String PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL = "parameter.siegfried_overwrite_manual";
   public static final String PLUGIN_PARAMS_REPRESENTATION_TYPE = "parameter.representation_type";
   public static final String PLUGIN_PARAMS_OUTCOMEOBJECTID_TO_SOURCEOBJECTID_MAP = "parameter.outcomeobjectid_to_sourceobjectid_map";
   public static final String PLUGIN_PARAMS_NEW_TYPE = "parameter.new_type";
@@ -1413,6 +1414,15 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN = "parameter.do_build_sync_manifest";
   public static final String PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN = "parameter.do_send_sync_bundle";
   public static final String PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN = "parameter.do_request_sync_bundle";
+
+  // Edit File Format Plugin Parameters
+
+  public static final String PLUGIN_PARAMS_EXTENSION = "parameter.extension";
+  public static final String PLUGIN_PARAMS_MIMETYPE = "parameter.mime_type";
+  public static final String PLUGIN_PARAMS_FORMAT = "parameter.format";
+  public static final String PLUGIN_PARAMS_FORMAT_VERSION = "parameter.format_version";
+  public static final String PLUGIN_PARAMS_PRONOM = "parameter.pronom";
+
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
   public static final String PLUGIN_CATEGORY_RISK_MANAGEMENT = "risk_management";
@@ -1690,6 +1700,19 @@ public final class RodaConstants {
   /* Disposal Confirmation */
   public static final String DISPOSAL_CONFIRMATION_ID = "id";
 
+  /* Siegfriend payload fields */
+  public static final String SIEGFRIED_PAYLOAD_MATCHES = "matches";
+  public static final String SIEGFRIED_PAYLOAD_MATCH_NS = "ns";
+  public static final String SIEGFRIED_PAYLOAD_MATCH_NS_PRONOM = "pronom";
+  public static final String SIEGFRIED_PAYLOAD_MATCH_MIMETYPE = "mime";
+  public static final String SIEGFRIED_PAYLOAD_MATCH_ID = "id";
+  public static final String SIEGFRIED_PAYLOAD_MATCH_FORMAT_DESIGNATION = "format";
+  public static final String SIEGFRIED_PAYLOAD_MATCH_FORMAT_VERSION = "version";
+
+  /* Preservation agents fields regex */
+  public static final String REGEX_PUID = "(?:x-)?[a-z0-9]+\\/[a-z0-9]+";
+  public static final String REGEX_MIME = "\\w+\\/[-+.\\w]+";
+
   /* Preservation agents fields */
   public static final String PRESERVATION_AGENT_ID = "id";
   public static final String PRESERVATION_AGENT_NAME = "name";
@@ -1719,6 +1742,8 @@ public final class RodaConstants {
   public static final String PRESERVATION_LEVEL_BITLEVEL = "bitlevel";
   public static final String PRESERVATION_REGISTRY_PRONOM = "pronom";
   public static final String PRESERVATION_REGISTRY_MIME = "mime";
+
+  public static final String PRESERVATION_FORMAT_NOTE_MANUAL = "manual";
 
   public static final String PREMIS_RELATIONSHIP_TYPE_STRUCTURAL = "structural";
   public static final String PREMIS_RELATIONSHIP_SUBTYPE_HASPART = "hasPart";
