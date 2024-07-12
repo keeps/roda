@@ -20,13 +20,11 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.user.requests.ChangeUserStatusRequest;
-import org.roda.core.data.v2.user.requests.CreateUserRequest;
+import org.roda.core.data.v2.user.requests.UpdateUserRequest;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.management.access.AccessKeyTablePanel;
-import org.roda.wui.client.management.access.CreateAccessKey;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -41,7 +39,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -161,7 +158,7 @@ public class EditUser extends Composite {
         final User updatedUser = userDataPanel.getUser();
         try (SecureString password = getPassword()) {
           Services services = new Services("Update User", "update");
-          CreateUserRequest userOperations = new CreateUserRequest(updatedUser, password, userDataPanel.getUserExtra());
+          UpdateUserRequest userOperations = new UpdateUserRequest(updatedUser, password, userDataPanel.getUserExtra());
           services.membersResource(s -> s.updateUser(userOperations)).whenComplete((res, error) -> {
             if (error == null) {
               HistoryUtils.newHistory(ShowUser.RESOLVER, res.getId());

@@ -721,6 +721,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_NOTIFICATION_ID_PARAM = "notificationId";
   public static final String CONTROLLER_NOTIFICATION_TOKEN_PARAM = "token";
   public static final String CONTROLLER_JOB_PARAM = "job";
+  public static final String CONTROLLER_JOB_CREATE_REQUEST = "createJobRequest";
   public static final String CONTROLLER_JOB_ID_PARAM = "jobId";
   public static final String CONTROLLER_JOB_JUST_FAILED_PARAM = "justFailed";
   public static final String CONTROLLER_JOB_REPORT_ID_PARAM = "jobReportId";

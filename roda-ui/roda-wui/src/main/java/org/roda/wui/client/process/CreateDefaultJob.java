@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -32,6 +34,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Certificate;
 import org.roda.core.data.v2.jobs.CertificateInfo;
+import org.roda.core.data.v2.jobs.CreateJobRequest;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
@@ -677,15 +680,23 @@ public class CreateDefaultJob extends Composite {
     String jobName = getName().getText();
     SelectedItems<? extends IsIndexed> selected = search.getSelectedItemsInCurrentList();
     if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
-      selected = new SelectedItemsNone();
+      selected = new SelectedItemsNone<>();
     } else if (isListEmpty) {
       selected = SelectedItemsAll.create(targetList.getSelectedValue());
     }
 
-    Job job = JobUtils.createJob(jobName, priority, parallelism, selected, getSelectedPlugin().getId(),
-      getWorkflowOptions().getValue(), selected.getSelectedClass());
+    CreateJobRequest jobRequest = new CreateJobRequest();
+    jobRequest.setName(jobName);
+    jobRequest.setPlugin(getSelectedPlugin().getId());
+    jobRequest.setPluginParameters(getWorkflowOptions().getValue());
+    SelectedItemsRequest selectedItemsRequest = SelectedItemsUtils.convertToRESTRequest(selected);
+    jobRequest.setSourceObjects(selectedItemsRequest);
+    jobRequest.setPriority(priority.name());
+    jobRequest.setParallelism(parallelism.name());
+    jobRequest.setSourceObjectsClass(selected.getSelectedClass());
+
     Services services = new Services("Create job", "create");
-    services.jobsResource(s -> s.createJob(job)).whenComplete((job1, throwable) -> {
+    services.jobsResource(s -> s.createJob(jobRequest)).whenComplete((job1, throwable) -> {
       if (throwable != null) {
         // Toast.showError(messages.dialogFailure(), caught.getMessage());
         buttonCreate.setEnabled(true);

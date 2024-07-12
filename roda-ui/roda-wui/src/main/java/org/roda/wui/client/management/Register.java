@@ -10,24 +10,17 @@
  */
 package org.roda.wui.client.management;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
-import config.i18n.client.ClientMessages;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.user.requests.CreateUserRequest;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.user.requests.RegisterUserRequest;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -43,9 +36,18 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -167,7 +169,8 @@ public class Register extends Composite {
         final String recaptcha = recaptchaResponse;
 
         Services services = new Services("Register RODA user", "register");
-        CreateUserRequest userRequest = new CreateUserRequest(user, password, userDataPanel.getUserExtra());
+        RegisterUserRequest userRequest = new RegisterUserRequest(user.getEmail(), user.getName(), user.getFullName(),
+          password, userDataPanel.getUserExtra());
         services.membersResource(s -> s.registerUser(userRequest, LocaleInfo.getCurrentLocale().getLocaleName(), recaptcha)).whenComplete((registedUser, error) -> {
           if (registedUser != null) {
             if (registedUser.isActive()) {
