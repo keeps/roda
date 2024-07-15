@@ -153,26 +153,31 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
     for (File file : files) {
       Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class);
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-      List<LinkingIdentifier> sources = new ArrayList<>();
-      try {
-        sources.add(setFileFormatMetadata(model, file, cachedJob.getId(), cachedJob.getUsername(), payload));
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
-      } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException | GenericException
-        | PluginException e) {
-        LOGGER.error("Error setting format metadata on file {}: {}", file.getId(), e.getMessage(), e);
-
+      if (file.isDirectory()) {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Error setting format metadata on file " + file.getId() + ": " + e.getMessage());
-      }
+        reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Skipping folder");
+      } else {
+        List<LinkingIdentifier> sources = new ArrayList<>();
+        try {
+          sources.add(setFileFormatMetadata(model, file, cachedJob.getId(), cachedJob.getUsername(), payload));
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          reportItem.setPluginState(PluginState.SUCCESS);
+        } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException | GenericException
+          | PluginException e) {
+          LOGGER.error("Error setting format metadata on file {}: {}", file.getId(), e.getMessage(), e);
 
-      try {
-        PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          model, index, sources, null, reportItem.getPluginState(), "", true, cachedJob);
-      } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
-        | ValidationException | AlreadyExistsException e) {
-        LOGGER.error("Error creating event: {}", e.getMessage(), e);
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          reportItem.setPluginState(PluginState.FAILURE)
+            .setPluginDetails("Error setting format metadata on file " + file.getId() + ": " + e.getMessage());
+        }
+
+        try {
+          PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(),
+            file.getId(), model, index, sources, null, reportItem.getPluginState(), "", true, cachedJob);
+        } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
+          | ValidationException | AlreadyExistsException e) {
+          LOGGER.error("Error creating event: {}", e.getMessage(), e);
+        }
       }
 
       report.addReport(reportItem);
@@ -271,12 +276,12 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public PluginType getType() {
-    return PluginType.INTERNAL;
+    return PluginType.MISC;
   }
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MISC);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT, RodaConstants.PLUGIN_CATEGORY_MAINTENANCE);
   }
 
   @Override

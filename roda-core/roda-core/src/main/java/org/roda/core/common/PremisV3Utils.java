@@ -174,11 +174,7 @@ public final class PremisV3Utils {
   public static void updateFileFormat(gov.loc.premis.v3.File file, String formatDesignationName,
     String formatDesignationVersion, String pronom, String mimeType, List<String> notes) {
 
-    if (notes != null) {
-      List<String> fn = getFormatNote(file);
-      fn.clear();
-      fn.addAll(notes);
-    }
+    setAllFormatNotes(file, notes);
 
     if (StringUtils.isNotBlank(formatDesignationName)) {
       FormatDesignationComplexType fdct = getFormatDesignation(file);
@@ -315,42 +311,21 @@ public final class PremisV3Utils {
         LOGGER.debug("PREMIS object skeleton created");
       }
       gov.loc.premis.v3.File premisFile = binaryToFile(premisBin.getContent(), false);
-      return getFormatNote(premisFile).contains(RodaConstants.PRESERVATION_FORMAT_NOTE_MANUAL);
+      ObjectCharacteristicsComplexType objectCharacteristics;
+      if (premisFile.getObjectIdentifier() != null && !premisFile.getObjectIdentifier().isEmpty()) {
+        objectCharacteristics = premisFile.getObjectCharacteristics().get(0);
+        if (objectCharacteristics.getFormat() != null && !objectCharacteristics.getFormat().isEmpty()) {
+          for (FormatComplexType format : objectCharacteristics.getFormat()) {
+            if (format.getFormatNote() != null) {
+              return format.getFormatNote().contains(RodaConstants.PRESERVATION_FORMAT_NOTE_MANUAL);
+            }
+          }
+        }
+      }
     } catch (RODAException | IOException e) {
       LOGGER.error("PREMIS could not be checked due to an error", e);
     }
     return false;
-  }
-
-  public static List<String> getFormatNote(gov.loc.premis.v3.File file) {
-    ObjectCharacteristicsComplexType objectCharacteristics;
-    List<String> formatNote = null;
-    if (file.getObjectIdentifier() != null && !file.getObjectIdentifier().isEmpty()) {
-      objectCharacteristics = file.getObjectCharacteristics().get(0);
-    } else {
-      objectCharacteristics = FACTORY.createObjectCharacteristicsComplexType();
-      file.getObjectCharacteristics().add(objectCharacteristics);
-    }
-
-    if (objectCharacteristics.getFormat() != null && !objectCharacteristics.getFormat().isEmpty()) {
-      for (FormatComplexType format : objectCharacteristics.getFormat()) {
-        if (format.getFormatNote() != null) {
-          formatNote = format.getFormatNote();
-          break;
-        }
-      }
-
-      if (formatNote == null) {
-        FormatComplexType formatComplexType = FACTORY.createFormatComplexType();
-        formatNote = formatComplexType.getFormatNote();
-        objectCharacteristics.getFormat().add(formatComplexType);
-      }
-    } else {
-      FormatComplexType formatComplexType = FACTORY.createFormatComplexType();
-      formatNote = formatComplexType.getFormatNote();
-      objectCharacteristics.getFormat().add(formatComplexType);
-    }
-    return formatNote;
   }
 
   public static FormatRegistryComplexType getFormatRegistry(gov.loc.premis.v3.File file, String registryName) {
@@ -412,6 +387,25 @@ public final class PremisV3Utils {
       formatDesignation = FACTORY.createFormatDesignationComplexType();
     }
     return formatDesignation;
+  }
+
+  public static void setAllFormatNotes(gov.loc.premis.v3.File file, List<String> notes) {
+    ObjectCharacteristicsComplexType objectCharacteristics;
+    if (file.getObjectCharacteristics() != null && !file.getObjectCharacteristics().isEmpty()) {
+      objectCharacteristics = file.getObjectCharacteristics().get(0);
+    } else {
+      objectCharacteristics = FACTORY.createObjectCharacteristicsComplexType();
+      file.getObjectCharacteristics().add(objectCharacteristics);
+    }
+
+    if (objectCharacteristics.getFormat() != null && !objectCharacteristics.getFormat().isEmpty()) {
+      for (FormatComplexType format : objectCharacteristics.getFormat()) {
+        format.getFormatNote().clear();
+        format.getFormatNote().addAll(notes);
+      }
+    } else {
+      FACTORY.createFormatComplexType().getFormatNote().addAll(notes);
+    }
   }
 
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
