@@ -37,19 +37,11 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
-import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Alexandre Flores <aflores@keep.pt>
@@ -149,35 +141,43 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
 
   private void processFiles(IndexService index, ModelService model, StorageService storage, Report report,
     JobPluginInfo jobPluginInfo, Job cachedJob, List<File> files) {
-    JsonNode payload = createPayload();
+    Report parametersReport = validateParameters();
+
     for (File file : files) {
       Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class);
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-      if (file.isDirectory()) {
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Skipping folder");
-      } else {
-        List<LinkingIdentifier> sources = new ArrayList<>();
-        try {
-          sources.add(setFileFormatMetadata(model, file, cachedJob.getId(), cachedJob.getUsername(), payload));
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          reportItem.setPluginState(PluginState.SUCCESS);
-        } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException | GenericException
-          | PluginException e) {
-          LOGGER.error("Error setting format metadata on file {}: {}", file.getId(), e.getMessage(), e);
-
+      if (parametersReport.getPluginState().equals(PluginState.SUCCESS)) {
+        if (file.isDirectory()) {
           jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(PluginState.FAILURE)
-            .setPluginDetails("Error setting format metadata on file " + file.getId() + ": " + e.getMessage());
-        }
+          reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Skipping folder");
+        } else {
+          List<LinkingIdentifier> sources = new ArrayList<>();
+          try {
+            sources.add(setFileFormatMetadata(model, file, cachedJob.getId(), cachedJob.getUsername()));
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+            reportItem.setPluginState(PluginState.SUCCESS);
+          } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException | GenericException
+            | PluginException e) {
+            LOGGER.error("Error setting format metadata on file {}: {}", file.getId(), e.getMessage(), e);
 
-        try {
-          PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(),
-            file.getId(), model, index, sources, null, reportItem.getPluginState(), "", true, cachedJob);
-        } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
-          | ValidationException | AlreadyExistsException e) {
-          LOGGER.error("Error creating event: {}", e.getMessage(), e);
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            reportItem.setPluginState(PluginState.FAILURE)
+              .setPluginDetails("Error setting format metadata on file " + file.getId() + ": " + e.getMessage());
+          }
+
+          try {
+            PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(),
+              file.getId(), model, index, sources, null, reportItem.getPluginState(), "", true, cachedJob);
+          } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
+            | ValidationException | AlreadyExistsException e) {
+            LOGGER.error("Error creating event: {}", e.getMessage(), e);
+          }
         }
+      }
+      else {
+        reportItem.setPluginState(PluginState.FAILURE);
+        reportItem.setPluginDetails(parametersReport.getPluginDetails());
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
       }
 
       report.addReport(reportItem);
@@ -185,31 +185,20 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
     }
   }
 
-  private JsonNode createPayload() {
-    JsonMapper mapper = new JsonMapper();
-    ObjectNode payloadJson = mapper.createObjectNode();
-    ArrayNode matchesArray = payloadJson.putArray(RodaConstants.SIEGFRIED_PAYLOAD_MATCHES);
-    ObjectNode matchesNode = matchesArray.addObject();
-
-    matchesNode.put(RodaConstants.SIEGFRIED_PAYLOAD_MATCH_NS, RodaConstants.SIEGFRIED_PAYLOAD_MATCH_NS_PRONOM);
-    if (mimetype != null) {
-      matchesNode.put(RodaConstants.SIEGFRIED_PAYLOAD_MATCH_MIMETYPE, mimetype);
+  private Report validateParameters() {
+    Report reportItem = PluginHelper.initPluginReportItem(this, null, File.class);
+    if (mimetype != null && !mimetype.isEmpty() && !mimetype.matches(RodaConstants.REGEX_MIME)) {
+      reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(
+        "Invalid mimetype (expecting a string that conforms to \"" + RodaConstants.REGEX_MIME + "\".");
     }
-    if (format != null) {
-      matchesNode.put(RodaConstants.SIEGFRIED_PAYLOAD_MATCH_FORMAT_DESIGNATION, format);
+    if (pronom != null && !pronom.isEmpty() && !pronom.matches(RodaConstants.REGEX_PUID)) {
+      reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(
+        "Invalid pronom identifier (expecting a string that conforms to \"" + RodaConstants.REGEX_PUID + "\".");
     }
-    if (formatVersion != null) {
-      matchesNode.put(RodaConstants.SIEGFRIED_PAYLOAD_MATCH_FORMAT_VERSION, formatVersion);
-    }
-    if (pronom != null) {
-      matchesNode.put(RodaConstants.SIEGFRIED_PAYLOAD_MATCH_ID, pronom);
-    }
-
-    return payloadJson;
+    return reportItem;
   }
 
-  private LinkingIdentifier setFileFormatMetadata(ModelService model, File file, String jobId, String username,
-    JsonNode payloadJson)
+  private LinkingIdentifier setFileFormatMetadata(ModelService model, File file, String jobId, String username)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
     PluginException {
     StoragePath fileDataPath = ModelUtils.getFileStoragePath(file);
@@ -231,10 +220,6 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
 
       jsonFilePath.remove(jsonFilePath.size() - 1);
       String jsonFileId = fullFsPath.getFileName().toString();
-
-      ContentPayload payload = new StringContentPayload(payloadJson.toString());
-      model.createOrUpdateOtherMetadata(file.getAipId(), file.getRepresentationId(), jsonFilePath, jsonFileId,
-        SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, username, false);
 
       String updatedFormat = format;
       String updatedFormatVersion = formatVersion;
@@ -293,12 +278,6 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public boolean areParameterValuesValid() {
-    if (mimetype != null && !mimetype.matches(RodaConstants.REGEX_MIME)) {
-      return false;
-    }
-    if (pronom != null && !pronom.matches(RodaConstants.REGEX_PUID)) {
-      return false;
-    }
     return true;
   }
 
