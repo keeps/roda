@@ -1,8 +1,11 @@
 package org.roda.wui.api.v2.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.roda.core.common.ProvidesInputStream;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
+import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.ThemeService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,20 +19,24 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
 @RequestMapping(path = "/api/v2/themes")
-@Tag(name = ThemesController.SWAGGER_ENDPOINT)
+@Tag(name = "Themes")
 public class ThemesController {
-  public static final String SWAGGER_ENDPOINT = "Themes";
 
   @Autowired
   ThemeService themeService;
 
-  @GetMapping()
+  @GetMapping(path = "")
+  @Operation(summary = "Get theme resources", responses = {
+      @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SelectedItemsRequest.class))),
+      @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   public ResponseEntity<StreamingResponseBody> getResource(
     @Parameter(description = "The resource id", required = true) @RequestParam("resource-id") String resourceId,
     @Parameter(description = "The default resource id") @RequestParam(value = "default-resource-id", required = false) String fallbackResourceId,
