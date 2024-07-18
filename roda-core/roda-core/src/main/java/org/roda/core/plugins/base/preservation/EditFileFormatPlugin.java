@@ -187,6 +187,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
 
   private Report validateParameters() {
     Report reportItem = PluginHelper.initPluginReportItem(this, null, File.class);
+    reportItem.setPluginState(PluginState.SUCCESS);
     if (mimetype != null && !mimetype.isEmpty() && !mimetype.matches(RodaConstants.REGEX_MIME)) {
       reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(
         "Invalid mimetype (expecting a string that conforms to \"" + RodaConstants.REGEX_MIME + "\".");

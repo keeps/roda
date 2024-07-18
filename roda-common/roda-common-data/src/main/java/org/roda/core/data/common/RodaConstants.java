@@ -1710,7 +1710,7 @@ public final class RodaConstants {
   public static final String SIEGFRIED_PAYLOAD_MATCH_FORMAT_VERSION = "version";
 
   /* Preservation agents fields regex */
-  public static final String REGEX_PUID = "(?:x-)?[a-z0-9]+\\/[a-z0-9]+";
+  public static final String REGEX_PUID = "(?:fmt|x-fmt)\\/[a-z0-9]+";
   public static final String REGEX_MIME = "\\w+\\/[-+.\\w]+";
 
   /* Preservation agents fields */
