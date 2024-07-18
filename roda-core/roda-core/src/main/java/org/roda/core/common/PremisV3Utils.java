@@ -172,7 +172,9 @@ public final class PremisV3Utils {
   }
 
   public static void updateFileFormat(gov.loc.premis.v3.File file, String formatDesignationName,
-                                      String formatDesignationVersion, String pronom, String mimeType) {
+    String formatDesignationVersion, String pronom, String mimeType, List<String> notes) {
+
+    setAllFormatNotes(file, notes);
 
     if (StringUtils.isNotBlank(formatDesignationName)) {
       FormatDesignationComplexType fdct = getFormatDesignation(file);
@@ -193,6 +195,11 @@ public final class PremisV3Utils {
       frct.setFormatRegistryKey(getStringPlusAuthority(mimeType));
     }
 
+  }
+
+  public static void updateFileFormat(gov.loc.premis.v3.File file, String formatDesignationName,
+    String formatDesignationVersion, String pronom, String mimeType) {
+    updateFileFormat(file, formatDesignationName, formatDesignationVersion, pronom, mimeType, null);
   }
 
   public static void updateTechnicalMetadata(gov.loc.premis.v3.File file, TechnicalMetadata technicalMetadata)
@@ -273,6 +280,46 @@ public final class PremisV3Utils {
     return extensionComplexType;
   }
 
+  public static boolean formatWasManuallyModified(ModelService model, String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId, String username) {
+    Binary premisBin = null;
+
+    try {
+      try {
+        premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+      } catch (NotFoundException e) {
+        LOGGER.debug("PREMIS object skeleton does not exist yet. Creating PREMIS object!");
+        List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+
+        if (fileId == null) {
+          PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms,
+            username);
+        } else {
+          File file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
+          PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms, username);
+        }
+
+        premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+        LOGGER.debug("PREMIS object skeleton created");
+      }
+      gov.loc.premis.v3.File premisFile = binaryToFile(premisBin.getContent(), false);
+      ObjectCharacteristicsComplexType objectCharacteristics;
+      if (premisFile.getObjectIdentifier() != null && !premisFile.getObjectIdentifier().isEmpty()) {
+        objectCharacteristics = premisFile.getObjectCharacteristics().get(0);
+        if (objectCharacteristics.getFormat() != null && !objectCharacteristics.getFormat().isEmpty()) {
+          for (FormatComplexType format : objectCharacteristics.getFormat()) {
+            if (format.getFormatNote() != null) {
+              return format.getFormatNote().contains(RodaConstants.PRESERVATION_FORMAT_NOTE_MANUAL);
+            }
+          }
+        }
+      }
+    } catch (RODAException | IOException e) {
+      LOGGER.error("PREMIS could not be checked due to an error", e);
+    }
+    return false;
+  }
+
   public static FormatRegistryComplexType getFormatRegistry(gov.loc.premis.v3.File file, String registryName) {
     ObjectCharacteristicsComplexType objectCharacteristics;
     FormatRegistryComplexType formatRegistry = null;
@@ -332,6 +379,25 @@ public final class PremisV3Utils {
       formatDesignation = FACTORY.createFormatDesignationComplexType();
     }
     return formatDesignation;
+  }
+
+  public static void setAllFormatNotes(gov.loc.premis.v3.File file, List<String> notes) {
+    ObjectCharacteristicsComplexType objectCharacteristics;
+    if (file.getObjectCharacteristics() != null && !file.getObjectCharacteristics().isEmpty()) {
+      objectCharacteristics = file.getObjectCharacteristics().get(0);
+    } else {
+      objectCharacteristics = FACTORY.createObjectCharacteristicsComplexType();
+      file.getObjectCharacteristics().add(objectCharacteristics);
+    }
+
+    if (objectCharacteristics.getFormat() != null && !objectCharacteristics.getFormat().isEmpty()) {
+      for (FormatComplexType format : objectCharacteristics.getFormat()) {
+        format.getFormatNote().clear();
+        format.getFormatNote().addAll(notes);
+      }
+    } else {
+      FACTORY.createFormatComplexType().getFormatNote().addAll(notes);
+    }
   }
 
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
@@ -978,8 +1044,8 @@ public final class PremisV3Utils {
   }
 
   public static void updateFormatPreservationMetadata(ModelService model, String aipId, String representationId,
-                                                      List<String> fileDirectoryPath, String fileId, String format, String version, String pronom, String mime,
-                                                      String username, boolean notify) {
+    List<String> fileDirectoryPath, String fileId, String format, String version, String pronom, String mime,
+    List<String> notes, String username, boolean notify) {
     Binary premisBin;
 
     try {
@@ -991,7 +1057,7 @@ public final class PremisV3Utils {
 
         if (fileId == null) {
           PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms,
-              username);
+            username);
         } else {
           // File file;
           // if (shallow) {
@@ -1010,14 +1076,14 @@ public final class PremisV3Utils {
       }
 
       gov.loc.premis.v3.File premisFile = binaryToFile(premisBin.getContent(), false);
-      PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
+      PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime, notes);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
       String id = IdUtils.getPreservationFileId(fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
-          username, notify);
+        username, notify);
     } catch (RODAException | IOException e) {
       LOGGER.error("PREMIS will not be updated due to an error", e);
     }
