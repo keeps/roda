@@ -168,18 +168,6 @@ public class RodaConfig {
     return registrationBean;
   }
 
-  /*******************************************
-   * REST related servlets/servlet-mappings
-   *******************************************/
-  @Bean
-  public ServletRegistrationBean<HttpServlet> clientLogger() {
-    ServletRegistrationBean<HttpServlet> bean;
-    bean = new ServletRegistrationBean<>(new org.roda.wui.common.server.ClientLoggerImpl());
-    bean.setLoadOnStartup(2);
-    bean.addUrlMappings("/gwtrpc/wuilogger");
-    return bean;
-  }
-
   @Configuration
   public static class DefaultView implements WebMvcConfigurer {
 
