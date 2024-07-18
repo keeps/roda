@@ -54,7 +54,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_MIMETYPE,
       PluginParameter
         .getBuilder(RodaConstants.PLUGIN_PARAMS_MIMETYPE, "Mimetype", PluginParameter.PluginParameterType.STRING)
-        .withDescription("The Mimetype to set for all selected files.").build());
+        .withDescription("The MIME type to set for all selected files.").build());
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_FORMAT,
       PluginParameter
         .getBuilder(RodaConstants.PLUGIN_PARAMS_FORMAT, "Format", PluginParameter.PluginParameterType.STRING)
@@ -80,7 +80,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   }
 
   public static String getStaticDescription() {
-    return "Overwrites the selected files' extension, mimetype, format and PRONOM identifier with provided values.";
+    return "Overwrites the selected files' extension, MIME type, format and PRONOM identifier with provided values.";
   }
 
   @Override
@@ -188,13 +188,13 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   private Report validateParameters() {
     Report reportItem = PluginHelper.initPluginReportItem(this, null, File.class);
     reportItem.setPluginState(PluginState.SUCCESS);
-    if (mimetype != null && !mimetype.isEmpty() && !mimetype.matches(RodaConstants.REGEX_MIME)) {
+    if (StringUtils.isNotBlank(mimetype) && !mimetype.matches(RodaConstants.REGEX_MIME)) {
       reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(
-        "Invalid mimetype (expecting a string that conforms to \"" + RodaConstants.REGEX_MIME + "\".");
+        "Invalid MIME type (expecting a string that conforms to \"" + RodaConstants.REGEX_MIME + "\".");
     }
-    if (pronom != null && !pronom.isEmpty() && !pronom.matches(RodaConstants.REGEX_PUID)) {
+    if (StringUtils.isNotBlank(pronom) && !pronom.matches(RodaConstants.REGEX_PUID)) {
       reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(
-        "Invalid pronom identifier (expecting a string that conforms to \"" + RodaConstants.REGEX_PUID + "\".");
+        "Invalid PRONOM identifier (expecting a string that conforms to \"" + RodaConstants.REGEX_PUID + "\".");
     }
     return reportItem;
   }

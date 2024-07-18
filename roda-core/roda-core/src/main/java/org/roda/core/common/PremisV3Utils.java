@@ -295,14 +295,6 @@ public final class PremisV3Utils {
           PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms,
             username);
         } else {
-          // File file;
-          // if (shallow) {
-          // file = model.retrieveFileInsideManifest(aipId, representationId,
-          // fileDirectoryPath, fileId);
-          // } else {
-          // file = model.retrieveFile(aipId, representationId, fileDirectoryPath,
-          // fileId);
-          // }
           File file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
           PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms, username);
         }
