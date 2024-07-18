@@ -142,7 +142,8 @@ public class SiegfriedPluginUtils {
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(ModelService model,
-    Representation representation, String jobId, String username) throws GenericException, RequestNotValidException,
+    Representation representation, String jobId, String username, boolean overwriteManual) throws GenericException,
+    RequestNotValidException,
     NotFoundException, AuthorizationDeniedException, PluginException {
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(representation.getAipId(),
       representation.getId());
@@ -154,7 +155,7 @@ public class SiegfriedPluginUtils {
       try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
-          new ArrayList<>(), null, representationFsPath, username);
+          new ArrayList<>(), null, representationFsPath, username, overwriteManual);
       } catch (IOException e) {
         throw new GenericException(e);
       } finally {
@@ -171,7 +172,7 @@ public class SiegfriedPluginUtils {
       try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
-          new ArrayList<>(), null, representationFsPath, username);
+          new ArrayList<>(), null, representationFsPath, username, overwriteManual);
       } catch (IOException e) {
         throw new GenericException(e);
       }
@@ -179,14 +180,15 @@ public class SiegfriedPluginUtils {
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnFile(ModelService model, File file,
-    String username) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+    String username, boolean overwriteManual) throws GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException,
     PluginException {
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
 
     try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath)) {
       Path filePath = directAccess.getPath();
       List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, file.getAipId(),
-        file.getRepresentationId(), file.getPath(), file.getId(), filePath, username);
+        file.getRepresentationId(), file.getPath(), file.getId(), filePath, username, overwriteManual);
       model.notifyFileUpdated(file).failOnError();
       return sources;
     } catch (IOException e) {
@@ -195,7 +197,8 @@ public class SiegfriedPluginUtils {
   }
 
   private static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentationOrFile(ModelService model,
-    String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path, String username)
+    String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path, String username,
+    Boolean overwriteManual)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     PluginException {
     List<LinkingIdentifier> sources = new ArrayList<>();
@@ -222,30 +225,33 @@ public class SiegfriedPluginUtils {
 
         jsonFilePath.remove(jsonFilePath.size() - 1);
 
-        ContentPayload payload = new StringContentPayload(file.toString());
-        model.createOrUpdateOtherMetadata(aipId, representationId, jsonFilePath, jsonFileId,
-          SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, username, false);
+        if (!PremisV3Utils.formatWasManuallyModified(model, aipId, representationId, jsonFilePath, jsonFileId, username)
+          || overwriteManual) {
+          ContentPayload payload = new StringContentPayload(file.toString());
+          model.createOrUpdateOtherMetadata(aipId, representationId, jsonFilePath, jsonFileId,
+            SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, username, false);
 
-        sources.add(PluginHelper.getLinkingIdentifier(aipId, representationId, jsonFilePath, jsonFileId,
-          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+          sources.add(PluginHelper.getLinkingIdentifier(aipId, representationId, jsonFilePath, jsonFileId,
+            RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-        // Update PREMIS files
-        final JsonNode matches = file.get("matches");
-        for (JsonNode match : matches) {
-          String format = null;
-          String version = null;
-          String pronom = null;
-          String mime = null;
+          // Update PREMIS files
+          final JsonNode matches = file.get("matches");
+          for (JsonNode match : matches) {
+            String format = null;
+            String version = null;
+            String pronom = null;
+            String mime = null;
 
-          if ("pronom".equalsIgnoreCase(match.get("ns").textValue())) {
-            format = match.get("format").textValue();
-            version = match.get("version").textValue();
-            pronom = match.get("id").textValue();
-            mime = match.get("mime").textValue();
+            if ("pronom".equalsIgnoreCase(match.get("ns").textValue())) {
+              format = match.get("format").textValue();
+              version = match.get("version").textValue();
+              pronom = match.get("id").textValue();
+              mime = match.get("mime").textValue();
+            }
+
+            PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, jsonFilePath, jsonFileId,
+              format, version, pronom, mime, new ArrayList<>(), username, true);
           }
-
-          PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, jsonFilePath, jsonFileId,
-            format, version, pronom, mime, username, true);
         }
       }
     }

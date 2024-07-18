@@ -9,6 +9,7 @@ package org.roda.core.plugins.base.characterization;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.SIPInformation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -50,6 +52,16 @@ import org.slf4j.LoggerFactory;
 public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
   public static final String FILE_SUFFIX = ".json";
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
+  private boolean overwriteManual;
+
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL, PluginParameter
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL, "Overwrite manually assigned fields",
+        PluginParameter.PluginParameterType.BOOLEAN)
+      .withDescription("Force the plugin to overwrite file format metadata that has been manually assigned.").build());
+  }
 
   /*
    * private SIPUpdateInformation sipUpdateInformation = new
@@ -92,6 +104,13 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   }
 
   @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL));
+    return parameters;
+  }
+
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
@@ -102,6 +121,12 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       } catch (GenericException e) {
         LOGGER.debug("Could not serializable SIP information from JSON", e);
       }
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL)) {
+      this.overwriteManual = parameters.get(RodaConstants.PLUGIN_PARAMS_SIEGFRIED_OVERWRITE_MANUAL).equals("true");
+    } else {
+      this.overwriteManual = false;
     }
   }
 
@@ -125,13 +150,22 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
                 if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
                   for (Representation representation : aip.getRepresentations()) {
                     LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                    sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation,
-                      cachedJob.getId(), cachedJob.getUsername()));
-                    model.notifyRepresentationUpdated(representation).failOnError();
+                    List<LinkingIdentifier> newSources = SiegfriedPluginUtils.runSiegfriedOnRepresentation(model,
+                      representation, cachedJob.getId(), cachedJob.getUsername(), overwriteManual);
+                    if (!newSources.isEmpty()) {
+                      sources.addAll(newSources);
+                      model.notifyRepresentationUpdated(representation).failOnError();
+                    }
                   }
 
-                  jobPluginInfo.incrementObjectsProcessedWithSuccess();
-                  reportItem.setPluginState(PluginState.SUCCESS);
+                  if (sources.isEmpty()) {
+                    jobPluginInfo.incrementObjectsProcessedWithSkipped();
+                    reportItem.setPluginState(PluginState.SKIPPED)
+                      .setPluginDetails("Skipped to prevent overwriting manual values.");
+                  } else {
+                    jobPluginInfo.incrementObjectsProcessedWithSuccess();
+                    reportItem.setPluginState(PluginState.SUCCESS);
+                  }
                 } else {
                   reportItem.setPluginState(PluginState.SKIPPED)
                     .setPluginDetails("Skipped because no representation was found for this AIP.");
@@ -146,13 +180,22 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
                 for (Representation representation : aip.getRepresentations()) {
                   LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                  sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation,
-                    cachedJob.getId(), cachedJob.getUsername()));
-                  model.notifyRepresentationUpdated(representation).failOnError();
+                  List<LinkingIdentifier> newSources = SiegfriedPluginUtils.runSiegfriedOnRepresentation(model,
+                    representation, cachedJob.getId(), cachedJob.getUsername(), overwriteManual);
+                  if (!newSources.isEmpty()) {
+                    sources.addAll(newSources);
+                    model.notifyRepresentationUpdated(representation).failOnError();
+                  }
                 }
 
-                jobPluginInfo.incrementObjectsProcessedWithSuccess();
-                reportItem.setPluginState(PluginState.SUCCESS);
+                if (sources.isEmpty()) {
+                  jobPluginInfo.incrementObjectsProcessedWithSkipped();
+                  reportItem.setPluginState(PluginState.SKIPPED)
+                    .setPluginDetails("Skipped to prevent overwriting manual values.");
+                } else {
+                  jobPluginInfo.incrementObjectsProcessedWithSuccess();
+                  reportItem.setPluginState(PluginState.SUCCESS);
+                }
               } else {
                 jobPluginInfo.incrementObjectsProcessedWithSkipped();
                 reportItem.setPluginState(PluginState.SKIPPED)
@@ -183,9 +226,13 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
                 try {
                   LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
                   sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation,
-                    cachedJob.getId(), cachedJob.getUsername()));
-                  model.notifyRepresentationUpdated(representation).failOnError();
-                  state = PluginState.SUCCESS;
+                    cachedJob.getId(), cachedJob.getUsername(), overwriteManual));
+                  if (sources.isEmpty()) {
+                    state = PluginState.SKIPPED;
+                  } else {
+                    model.notifyRepresentationUpdated(representation).failOnError();
+                    state = PluginState.SUCCESS;
+                  }
                 } catch (RODAException e) {
                   state = PluginState.FAILURE;
                   LOGGER.error("Error running Siegfried " + aip.getId(), e);
@@ -196,7 +243,11 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
                 .setPluginDetails("Skipped because no representation was found for this AIP");
               jobPluginInfo.incrementObjectsProcessed(state);
             }
-            reportItem.setPluginState(state).setPluginDetails("Executed on a SIP update context.");
+            if (state.equals(PluginState.SUCCESS)) {
+              reportItem.setPluginState(state).setPluginDetails("Executed on a SIP update context.");
+            } else if (state.equals(PluginState.SKIPPED)) {
+              reportItem.setPluginState(state).setPluginDetails("Skipped to prevent overwriting manual values.");
+            }
             jobPluginInfo.incrementObjectsProcessed(state);
           }
         }
@@ -233,10 +284,16 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
       try {
         sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId(),
-          cachedJob.getUsername()));
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
-        model.notifyRepresentationUpdated(representation).failOnError();
+          cachedJob.getUsername(), overwriteManual));
+        if (sources.isEmpty()) {
+          jobPluginInfo.incrementObjectsProcessedWithSkipped();
+          reportItem.setPluginState(PluginState.SKIPPED)
+            .setPluginDetails("Skipped representation to prevent overwriting manually assigned values.");
+        } else {
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          reportItem.setPluginState(PluginState.SUCCESS);
+          model.notifyRepresentationUpdated(representation).failOnError();
+        }
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
         | AuthorizationDeniedException e) {
         LOGGER.error("Error running Siegfried {}: {}", representation.getAipId(), e.getMessage(), e);
@@ -274,9 +331,15 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         file.getAipId());
 
       try {
-        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnFile(model, file, cachedJob.getUsername()));
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
+        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnFile(model, file, cachedJob.getUsername(), overwriteManual));
+        if (sources.isEmpty()) {
+          jobPluginInfo.incrementObjectsProcessedWithSkipped();
+          reportItem.setPluginState(PluginState.SKIPPED)
+            .setPluginDetails("Skipped file to prevent overwriting manually assigned values.");
+        } else {
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          reportItem.setPluginState(PluginState.SUCCESS);
+        }
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
         | AuthorizationDeniedException e) {
         LOGGER.error("Error running Siegfried on file {}: {}", file.getId(), e.getMessage(), e);
