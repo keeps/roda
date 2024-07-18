@@ -11,14 +11,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.v2.log.ClientLogCreateRequest;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
 import com.google.gwt.logging.client.DevelopmentModeLogHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -60,11 +60,9 @@ public class ClientLogger implements IsSerializable {
   private static final int CURRENT_LOG_LEVEL = TRACE;
   private static final boolean SHOW_ERROR_MESSAGES = false;
   private static final String LOGGING_ERROR = "Error while logging another error";
-  private static final String DISABLE_CLIENT_LOGGER = "ui.sharedProperties.clientLogger.disabled";
 
-  private String classname;
-  private Logger logger;
-  private boolean wuilogger_disabled = false;
+  private final Logger logger;
+  private String className;
 
   /**
    * Create a new client logger
@@ -77,11 +75,11 @@ public class ClientLogger implements IsSerializable {
   /**
    * Create a new client logger
    *
-   * @param classname
+   * @param className
    */
-  public ClientLogger(String classname) {
-    this.classname = classname;
-    logger = Logger.getLogger(classname);
+  public ClientLogger(String className) {
+    this.className = className;
+    logger = Logger.getLogger(className);
     logger.addHandler(new DevelopmentModeLogHandler());
   }
 
@@ -90,7 +88,7 @@ public class ClientLogger implements IsSerializable {
    */
   public static void setUncaughtExceptionHandler() {
     GWT.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-      ClientLogger clientlogger = new ClientLogger("Uncaught");
+      final ClientLogger clientlogger = new ClientLogger("Uncaught");
 
       @Override
       public void onUncaughtException(Throwable e) {
@@ -106,50 +104,15 @@ public class ClientLogger implements IsSerializable {
    * @param message
    */
   public void trace(final String message) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-    if (CURRENT_LOG_LEVEL <= TRACE && !this.wuilogger_disabled) {
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          responseOnFailure(message, null, caught);
+    if (CURRENT_LOG_LEVEL <= TRACE) {
+      Services services = new Services("Log client message", "log");
+      ClientLogCreateRequest request = new ClientLogCreateRequest(ClientLogCreateRequest.Level.TRACE, className,
+        message);
+      services.clientLoggerResource(s -> s.log(request)).whenComplete((object, throwable) -> {
+        if (throwable != null) {
+          responseOnFailure(message, null, throwable);
         }
-
-        @Override
-        public void onSuccess(Void result) {
-          // do nothing
-        }
-      };
-      ClientLoggerService.Util.getInstance().trace(classname, message, this.wuilogger_disabled, errorcallback);
-    }
-  }
-
-  /**
-   * Log a trace message and error
-   *
-   * @param message
-   * @param error
-   */
-  public void trace(final String message, final Throwable error) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-
-    if (CURRENT_LOG_LEVEL <= TRACE && !this.wuilogger_disabled) {
-
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          responseOnFailure(message, error, caught);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-          GWT.log(message, error);
-        }
-      };
-      ClientLoggerService.Util.getInstance().trace(classname, message, this.wuilogger_disabled, errorcallback);
+      });
     }
   }
 
@@ -159,51 +122,15 @@ public class ClientLogger implements IsSerializable {
    * @param message
    */
   public void debug(final String message) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-    GWT.log(message);
-    if (CURRENT_LOG_LEVEL <= DEBUG && !this.wuilogger_disabled) {
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          responseOnFailure(message, null, caught);
+    if (CURRENT_LOG_LEVEL <= DEBUG) {
+      Services services = new Services("Log client message", "log");
+      ClientLogCreateRequest request = new ClientLogCreateRequest(ClientLogCreateRequest.Level.DEBUG, className,
+        message);
+      services.clientLoggerResource(s -> s.log(request)).whenComplete((object, throwable) -> {
+        if (throwable != null) {
+          responseOnFailure(message, null, throwable);
         }
-
-        @Override
-        public void onSuccess(Void result) {
-          // do nothing
-        }
-      };
-      ClientLoggerService.Util.getInstance().debug(classname, message, this.wuilogger_disabled, errorcallback);
-    }
-
-  }
-
-  /**
-   * Log a debug message and error
-   *
-   * @param object
-   * @param error
-   */
-  public void debug(final String object, final Throwable error) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-    if (CURRENT_LOG_LEVEL <= DEBUG && !this.wuilogger_disabled) {
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          responseOnFailure(object, error, caught);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-          // do nothing
-          GWT.log(object, error);
-        }
-      };
-      ClientLoggerService.Util.getInstance().debug(classname, object, this.wuilogger_disabled, errorcallback);
+      });
     }
   }
 
@@ -213,49 +140,15 @@ public class ClientLogger implements IsSerializable {
    * @param message
    */
   public void info(final String message) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-    if (CURRENT_LOG_LEVEL <= INFO && !this.wuilogger_disabled) {
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          responseOnFailure(message, null, caught);
+    if (CURRENT_LOG_LEVEL <= INFO) {
+      Services services = new Services("Log client message", "log");
+      ClientLogCreateRequest request = new ClientLogCreateRequest(ClientLogCreateRequest.Level.INFO, className,
+        message);
+      services.clientLoggerResource(s -> s.log(request)).whenComplete((object, throwable) -> {
+        if (throwable != null) {
+          responseOnFailure(message, null, throwable);
         }
-
-        @Override
-        public void onSuccess(Void result) {
-          // do nothing
-        }
-      };
-      ClientLoggerService.Util.getInstance().info(classname, message, this.wuilogger_disabled, errorcallback);
-    }
-  }
-
-  /**
-   * Log an information message and error
-   *
-   * @param message
-   * @param error
-   */
-  public void info(final String message, final Throwable error) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-    if (CURRENT_LOG_LEVEL <= INFO && !this.wuilogger_disabled) {
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          responseOnFailure(message, error, caught);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-          // do nothing
-          GWT.log(message, error);
-        }
-      };
-      ClientLoggerService.Util.getInstance().info(classname, message, this.wuilogger_disabled, errorcallback);
+      });
     }
   }
 
@@ -265,48 +158,15 @@ public class ClientLogger implements IsSerializable {
    * @param message
    */
   public void warn(final String message) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-    if (CURRENT_LOG_LEVEL <= WARN && !this.wuilogger_disabled) {
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          responseOnFailure(message, null, caught);
+    if (CURRENT_LOG_LEVEL <= WARN) {
+      Services services = new Services("Log client message", "log");
+      ClientLogCreateRequest request = new ClientLogCreateRequest(ClientLogCreateRequest.Level.WARN, className,
+        message);
+      services.clientLoggerResource(s -> s.log(request)).whenComplete((object, throwable) -> {
+        if (throwable != null) {
+          responseOnFailure(message, null, throwable);
         }
-
-        @Override
-        public void onSuccess(Void result) {
-          // do nothing
-        }
-      };
-      ClientLoggerService.Util.getInstance().warn(classname, message, this.wuilogger_disabled, errorcallback);
-    }
-  }
-
-  /**
-   * Log a warning message and error
-   *
-   * @param message
-   * @param error
-   */
-  public void warn(final String message, final Throwable error) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-    if (CURRENT_LOG_LEVEL <= WARN && !this.wuilogger_disabled) {
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          responseOnFailure(message, error, caught);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-          GWT.log(message, error);
-        }
-      };
-      ClientLoggerService.Util.getInstance().warn(classname, message, this.wuilogger_disabled, errorcallback);
+      });
     }
   }
 
@@ -316,23 +176,15 @@ public class ClientLogger implements IsSerializable {
    * @param message
    */
   public void error(final String message) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-    if (CURRENT_LOG_LEVEL <= ERROR && !this.wuilogger_disabled) {
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          responseOnFailure(message, null, caught);
+    if (CURRENT_LOG_LEVEL <= ERROR) {
+      Services services = new Services("Log client message", "log");
+      ClientLogCreateRequest request = new ClientLogCreateRequest(ClientLogCreateRequest.Level.ERROR, className,
+        message);
+      services.clientLoggerResource(s -> s.log(request)).whenComplete((object, throwable) -> {
+        if (throwable != null) {
+          responseOnFailure(message, null, throwable);
         }
-
-        @Override
-        public void onSuccess(Void result) {
-          // do nothing
-        }
-      };
-      GWT.log(message, null);
-      ClientLoggerService.Util.getInstance().error(classname, message, this.wuilogger_disabled, errorcallback);
+      });
 
       if (SHOW_ERROR_MESSAGES) {
         Toast.showError(message);
@@ -347,32 +199,24 @@ public class ClientLogger implements IsSerializable {
    * @param error
    */
   public void error(final String message, final Throwable error) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-
-    // FIXME should this be done if internal authentication is being used? I
-    // don't think so
     if (error instanceof AuthorizationDeniedException) {
       UserLogin.getInstance().showSuggestLoginDialog();
-    } else if (CURRENT_LOG_LEVEL <= ERROR && error != null && !this.wuilogger_disabled) {
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          logger.log(Level.SEVERE, message, error);
-          logger.log(Level.SEVERE, LOGGING_ERROR, caught);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-          logger.log(Level.SEVERE, message, error);
-        }
-      };
-
+    } else if (CURRENT_LOG_LEVEL <= ERROR && error != null) {
       String errorDetails = extractErrorDetails(error);
 
-      ClientLoggerService.Util.getInstance().error(classname, message + ", error: " + errorDetails,
-        this.wuilogger_disabled, errorcallback);
+      Services services = new Services("Log client message", "log");
+      ClientLogCreateRequest request = new ClientLogCreateRequest(ClientLogCreateRequest.Level.ERROR, className,
+        message + ", error: " + errorDetails, error);
+      services.clientLoggerResource(s -> s.log(request)).whenComplete((object, throwable) -> {
+
+        if (throwable != null) {
+          logger.log(Level.SEVERE, message, error);
+          logger.log(Level.SEVERE, LOGGING_ERROR, throwable);
+        } else {
+          logger.log(Level.SEVERE, message, error);
+        }
+      });
+
       if (SHOW_ERROR_MESSAGES) {
         Toast.showError(message,
           error.getMessage() + (error.getCause() != null ? "\nCause: " + error.getCause().getMessage() : ""));
@@ -406,24 +250,17 @@ public class ClientLogger implements IsSerializable {
    * @param message
    */
   public void fatal(final String message) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-    if (CURRENT_LOG_LEVEL <= FATAL && !this.wuilogger_disabled) {
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          responseOnFailure(message, null, caught);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-          // do nothing
-        }
-      };
-      GWT.log(message);
+    if (CURRENT_LOG_LEVEL <= FATAL) {
+      Services services = new Services("Log client message", "log");
+      ClientLogCreateRequest request = new ClientLogCreateRequest(ClientLogCreateRequest.Level.FATAL, className,
+        message);
       logger.log(Level.SEVERE, message);
-      ClientLoggerService.Util.getInstance().fatal(classname, message, this.wuilogger_disabled, errorcallback);
+      services.clientLoggerResource(s -> s.log(request)).whenComplete((object, throwable) -> {
+        if (throwable != null) {
+          responseOnFailure(message, null, throwable);
+        }
+      });
+
       if (SHOW_ERROR_MESSAGES) {
         Toast.showError(message);
       }
@@ -437,35 +274,23 @@ public class ClientLogger implements IsSerializable {
    * @param error
    */
   public void fatal(final String message, final Throwable error) {
-    if (ConfigurationManager.isInitialized()) {
-      this.wuilogger_disabled = ConfigurationManager.getBoolean(false, DISABLE_CLIENT_LOGGER);
-    }
-    if (CURRENT_LOG_LEVEL <= FATAL && !this.wuilogger_disabled) {
-      AsyncCallback<Void> errorcallback = new AsyncCallback<Void>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          GWT.log(message, error);
-          GWT.log(LOGGING_ERROR, caught);
-          logger.log(Level.SEVERE, message, error);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-          GWT.log(message, error);
-          logger.log(Level.SEVERE, message, error);
-        }
-      };
-
+    if (CURRENT_LOG_LEVEL <= FATAL) {
       String errorDetails = extractErrorDetails(error);
-      ClientLoggerService.Util.getInstance().fatal(classname, message + ", error: " + errorDetails,
-        this.wuilogger_disabled, errorcallback);
+      Services services = new Services("Log client message", "log");
+      ClientLogCreateRequest request = new ClientLogCreateRequest(ClientLogCreateRequest.Level.FATAL, className,
+        message + ", error: " + errorDetails, error);
+      logger.log(Level.SEVERE, message);
+      services.clientLoggerResource(s -> s.log(request)).whenComplete((object, throwable) -> {
+        if (throwable != null) {
+          responseOnFailure(message, null, throwable);
+        }
+      });
 
       if (SHOW_ERROR_MESSAGES) {
         Toast.showError(message,
           error.getMessage() + (error.getCause() != null ? "\nCause: " + error.getCause().getMessage() : ""));
       }
     }
-
   }
 
   /**
@@ -473,27 +298,22 @@ public class ClientLogger implements IsSerializable {
    *
    * @return the name of the class being logged
    */
-  public String getClassname() {
-    return classname;
+  public String getClassName() {
+    return className;
   }
 
   /**
    * Set class name
    *
-   * @param classname
+   * @param className
    *          the name of class being logged
    */
-  public void setClassname(String classname) {
-    this.classname = classname;
+  public void setClassName(String className) {
+    this.className = className;
   }
 
   public void responseOnFailure(String message, Throwable error, Throwable caught) {
     GWT.log(message, error);
     GWT.log(LOGGING_ERROR, caught);
   }
-
-  public void responseOnSuccess(String message, Throwable error, Throwable caught) {
-    GWT.log(message, error);
-  }
-
 }
