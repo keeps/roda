@@ -1,0 +1,24 @@
+{
+  "categories": [
+    "Content characterization"
+  ],
+  "id": "urn:siegfried:r1",
+  "name": "File format identification issue",
+  "description": "File format identification process has identified possible issues while identifying file formats.",
+  "notes": "The file format identification process may have reported warnings during the matching process of the file format identifier signatures. These are not strictly errors but may still warrant further investigation. Common warnings include being unable to detect the file format or a mismatch between the identified file format via identifier signatures and the file name extension.",
+  "preMitigationNotes": "\n- The repository cannot reliably confirm the technical metadata of the affected files",
+  "mitigationOwner": "Preservation",
+  "mitigationStrategy": "Manually review and/or edit the technical metadata of affected files in order to verify the relevance of the produced warnings.",
+  "preMitigationProbability": 4,
+  "preMitigationImpact": 3,
+  "preMitigationSeverity": 12,
+  "preMitigationSeverityLevel": "MODERATE",
+  "identifiedBy": "Risk automatically detected by the File Format Identification plugin \"roda.core.plugins.plugins.base.characterization.SiegfriedPlugin\".",
+  "mitigationOwnerType": "",
+  "createdBy": "admin",
+  "createdOn": 1721257200000,
+  "updatedBy": "admin",
+  "updatedOn": 1721257200000,
+  "identifiedOn": "1721257200000"
+}
+        

@@ -28,6 +28,8 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.risks.IncidenceStatus;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -37,6 +39,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
+import org.roda.core.plugins.base.characterization.SiegfriedPluginUtils;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
@@ -68,12 +71,20 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
       PluginParameter
         .getBuilder(RodaConstants.PLUGIN_PARAMS_PRONOM, "PRONOM", PluginParameter.PluginParameterType.STRING)
         .withDescription("The PRONOM identifier to set for all selected files.").build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INCIDENCES,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INCIDENCES, "Clear Siegfried risk incidences",
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDescription(
+          "Have this plugin clear risk incidences caused by Siegfried file format identification warnings.")
+        .build());
   }
 
   private String mimetype;
   private String format;
   private String formatVersion;
   private String pronom;
+  private boolean clearIncidences;
 
   public static String getStaticName() {
     return "Edit File Format";
@@ -115,6 +126,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_FORMAT));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_FORMAT_VERSION));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_PRONOM));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INCIDENCES));
     return parameters;
   }
 
@@ -125,6 +137,11 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
     format = parameters.get(RodaConstants.PLUGIN_PARAMS_FORMAT);
     formatVersion = parameters.get(RodaConstants.PLUGIN_PARAMS_FORMAT_VERSION);
     pronom = parameters.get(RodaConstants.PLUGIN_PARAMS_PRONOM);
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CLEAR_INCIDENCES)) {
+      clearIncidences = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INCIDENCES));
+    } else {
+      clearIncidences = false;
+    }
   }
 
   @Override
@@ -153,7 +170,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
         } else {
           List<LinkingIdentifier> sources = new ArrayList<>();
           try {
-            sources.add(setFileFormatMetadata(model, file, cachedJob.getId(), cachedJob.getUsername()));
+            sources.add(setFileFormatMetadata(model, index, file, cachedJob.getId(), cachedJob.getUsername()));
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
             reportItem.setPluginState(PluginState.SUCCESS);
           } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException | GenericException
@@ -199,7 +216,8 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
     return reportItem;
   }
 
-  private LinkingIdentifier setFileFormatMetadata(ModelService model, File file, String jobId, String username)
+  private LinkingIdentifier setFileFormatMetadata(ModelService model, IndexService index, File file, String jobId,
+    String username)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
     PluginException {
     StoragePath fileDataPath = ModelUtils.getFileStoragePath(file);
@@ -227,9 +245,11 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
       String updatedPronomIdentifier = pronom;
       String updatedMimetype = mimetype;
 
+      List<String> notes = mitigatePreviousIncidencesAndCreateNotes(model, index, file.getAipId(),
+        file.getRepresentationId(), file.getId(), jsonFilePath, username);
       PremisV3Utils.updateFormatPreservationMetadata(model, file.getAipId(), file.getRepresentationId(), jsonFilePath,
         jsonFileId, updatedFormat, updatedFormatVersion, updatedPronomIdentifier, updatedMimetype,
-        Arrays.asList(RodaConstants.PRESERVATION_FORMAT_NOTE_MANUAL), username, true);
+        notes, username, true);
 
       source = PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(), jsonFilePath, jsonFileId,
         RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
@@ -238,6 +258,30 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
       throw new PluginException("Could not create direct access StorageService for file " + file.getId(), e);
     }
     return source;
+  }
+
+  private List<String> mitigatePreviousIncidencesAndCreateNotes(ModelService model, IndexService index, String aipId,
+    String representationId, String fileId, List<String> filePath, String username)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    List<String> notes = new ArrayList<>();
+    notes.add(RodaConstants.PRESERVATION_FORMAT_NOTE_MANUAL);
+    List<RiskIncidence> siegfriedRiskIncidences = SiegfriedPluginUtils.getPreviousSiegfriedIncidences(model, index,
+      fileId);
+    if (!siegfriedRiskIncidences.isEmpty()) {
+      if (clearIncidences) {
+        for (RiskIncidence incidence : siegfriedRiskIncidences) {
+          incidence.setStatus(IncidenceStatus.MITIGATED);
+          model.updateRiskIncidence(incidence, true);
+        }
+      } else {
+        for (String note : PremisV3Utils.getFormatNotes(model, aipId, representationId, filePath, fileId, username)) {
+          if (note.contains(RodaConstants.PRESERVATION_FORMAT_NOTE_SIEGFRIED_WARNING)) {
+            notes.add(note);
+          }
+        }
+      }
+    }
+    return notes;
   }
 
   @Override

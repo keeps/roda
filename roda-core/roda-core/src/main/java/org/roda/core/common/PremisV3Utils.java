@@ -280,6 +280,46 @@ public final class PremisV3Utils {
     return extensionComplexType;
   }
 
+  public static List<String> getFormatNotes(ModelService model, String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId, String username) {
+    Binary premisBin = null;
+
+    try {
+      try {
+        premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+      } catch (NotFoundException e) {
+        LOGGER.debug("PREMIS object skeleton does not exist yet. Creating PREMIS object!");
+        List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+
+        if (fileId == null) {
+          PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms,
+            username);
+        } else {
+          File file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
+          PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms, username);
+        }
+
+        premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+        LOGGER.debug("PREMIS object skeleton created");
+      }
+      gov.loc.premis.v3.File premisFile = binaryToFile(premisBin.getContent(), false);
+      ObjectCharacteristicsComplexType objectCharacteristics;
+      if (premisFile.getObjectIdentifier() != null && !premisFile.getObjectIdentifier().isEmpty()) {
+        objectCharacteristics = premisFile.getObjectCharacteristics().get(0);
+        if (objectCharacteristics.getFormat() != null && !objectCharacteristics.getFormat().isEmpty()) {
+          for (FormatComplexType format : objectCharacteristics.getFormat()) {
+            if (format.getFormatNote() != null) {
+              return format.getFormatNote();
+            }
+          }
+        }
+      }
+    } catch (RODAException | IOException e) {
+      LOGGER.error("PREMIS could not be checked due to an error", e);
+    }
+    return new ArrayList<>();
+  }
+
   public static boolean formatWasManuallyModified(ModelService model, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, String username) {
     Binary premisBin = null;
@@ -1059,14 +1099,6 @@ public final class PremisV3Utils {
           PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms,
             username);
         } else {
-          // File file;
-          // if (shallow) {
-          // file = model.retrieveFileInsideManifest(aipId, representationId,
-          // fileDirectoryPath, fileId);
-          // } else {
-          // file = model.retrieveFile(aipId, representationId, fileDirectoryPath,
-          // fileId);
-          // }
           File file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
           PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms, username);
         }
