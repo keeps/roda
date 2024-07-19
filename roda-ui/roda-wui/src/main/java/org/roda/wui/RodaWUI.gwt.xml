@@ -12,6 +12,7 @@
 	<!-- I18N -->
 	<extend-property name="locale" values="en" />
 	<extend-property name="locale" values="pt_PT" />
+	<extend-property name="locale" values="es" />
 	<extend-property name="locale" values="es_CL" />
 	<extend-property name="locale" values="hr" />
 	<extend-property name="locale" values="hu" />
