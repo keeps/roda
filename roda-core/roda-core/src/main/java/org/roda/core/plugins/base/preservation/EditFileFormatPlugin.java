@@ -40,6 +40,7 @@ import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,7 +145,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
     Report parametersReport = validateParameters();
 
     for (File file : files) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class);
+      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       if (parametersReport.getPluginState().equals(PluginState.SUCCESS)) {
         if (file.isDirectory()) {
