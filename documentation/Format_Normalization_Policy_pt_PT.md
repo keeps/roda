@@ -1,4 +1,3 @@
-
 ***NOTA: A informação desta página está desatualizada. Para mais informação contacte dos administradores do projeto.***
 
 # Política de normalização de formatos
@@ -54,7 +53,7 @@ Nesta página, poderá encontrar o mapeamento predefinido entre formatos e class
 
 ## Formatos de preservação recomendados para cada classe de objeto
 
-| *Class* | *Format* | *MIME Type* | *Extensions* | *Description* |
+| *Class* | *Format* | *MIME Type* | *Extensions* | *Descrição* |
 |---------|----------|-------------|--------------|---------------|
 | Text    | PDF/A | application/pdf or text/plain<sup>2</sup> | .pdf | PDF for archiving|
 | Presentation | PDF/A | application/pdf | .pdf | PDF for archiving|
