@@ -19,27 +19,23 @@ Esta documentação cobre os seguintes tópicos:
     - [Tratamento de riscos](Risk_Assessment.md)
     - [Politica de normalização de formatos](Format_Normalization_Policy.md)
     - [Política de avaliação e seleção](Disposal_Policies.md)
-- Suporte
-    - [Suporte pela comunidade](Community_Support.md)
-    - [Suporte profissional](Professional_Support.md)
-- [Instalação](https://github.com/keeps/roda/blob/master/deploys/README.md)
-- Instalação
-    - [Demonstração](Installation_Testing_Environments.md)
-    - [Produção](Installation_Production_Environments.md)
-- Configuração
+- [Suporte](https://www.roda-community.org/#bellhop_bell-support)
+- [Instalação](https://www.roda-community.org/deploys/)
+- Formatos de metadados
     - [Estatísticas](Statistics_pt_PT.md)
-    - [Formatos de metainformação](Metadata_Formats.md)
-    - [Central Authentication Service (CAS)](Central_Authentication_Service.md)
+    - [Formatos de metadados](Metadata_Formats.md)
+    - [Autenticação Externa com o protocolo CAS](Central_Authentication_Service.md)
     - [Avaliação e seleção](Disposal.md)
+    - [Permissões predefinidas de AIP](Permissions_pt_PT.md)
 - Contribuir para o projeto
     - [Guia para desenvolvimento](Developers_Guide.md)
     - [Guia de tradução](Translation_Guide.md)
     - [Guia de documentação](Documentation_Guide_pt_PT.md)
-    - [Publicação de plugins](Publishing_plugins_pt_PT.md)
+    - [Publicar plugins](Publishing_plugins.md)
 - [Resolução de problemas](Troubleshooting.md)
 - [FAQ](FAQ_pt_PT.md)
-- [agradecimentos](Acknowledgements.md)
-- [Licença](LICENSE.md)
+- [História](History_pt_PT.md)
+- [Licença](LICENSE_pt_PT.md)
 
 ## Normas e especificações
 
@@ -52,7 +48,7 @@ Esta documentação cobre os seguintes tópicos:
 
 ### Normas
 
-* [ISO 14721:2012 - Space data and information transfer systems - Open archival information system (OAIS) - Reference model](http://www.iso.org/iso/catalogue_detail.htm?csnumber=57284) ([Magenta book](http://public.ccsds.org/publications/archive/650x0m2.pdf))
+* [ISO 14721:2012 - Space data and information transfer systems - Open archival information system (OAIS) - Reference model](http://www.iso.org/iso/catalogue_detail.htm?csnumber=57284) ([Magenta book](https://public.ccsds.org/pubs/650x0m2.pdf))
 * [ISO 16363:2012 - Space data and information transfer systems - Audit and certification of trustworthy digital repositories](http://www.iso.org/iso/catalogue_detail.htm?csnumber=56510) ([TRAC version](https://www.crl.edu/sites/default/files/d6/attachments/pages/trac_0.pdf))
 * [eCH-0165 SIARD Format Specification 2.0](https://www.ech.ch/vechweb/page?p=dossier&documentNumber=eCH-0165&documentVersion=2.0)
 

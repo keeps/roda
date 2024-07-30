@@ -20,11 +20,11 @@
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
 			<h4>Número de entidades intelectuais</h4>
-			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedAIP" data-source-only-active="true" data-view="text" data-view-field="totalCount"></span></div>
+			<div class="textfill"><span class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.IndexedAIP" data-source-only-active="true" data-view="text" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_8 chart_col_card">
 			<h4>Distribuição de níveis de descrição (top 10)</h4>
-			<canvas id="stat-desc-levels" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedAIP" data-source-facets="level" data-view="chart" data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="stat-desc-levels" data-view="download" data-view-filename="description-levels.csv">
+			<canvas id="stat-desc-levels" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.IndexedAIP" data-source-facets="level" data-view="chart" data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="stat-desc-levels" data-view="download" data-view-filename="description-levels.csv">
 				<i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>
@@ -54,7 +54,7 @@
 		</div>
 		<div class="col_6 chart_col_card">
 			<h4>Eliminação de metainformação descritiva (top 10)</h4>
-			<canvas id="user-desc-deletes" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.log.LogEntry" data-source-facets="username" data-view="chart" data-source-filters="actionMethod=deleteAIPDescriptiveMetadataFile" data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="user-desc-deletes" data-view="download" data-view-filename="user-desc-deletes.csv">
+			<canvas id="user-desc-deletes" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.log.LogEntry" data-source-facets="username" data-view="chart" data-source-filters="actionMethod=deleteDescriptiveMetadataFile" data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="user-desc-deletes" data-view="download" data-view-filename="user-desc-deletes.csv">
 				<i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>
@@ -66,11 +66,11 @@
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
 			<h4>Número de representações</h4>
-			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation" data-view="text" data-view-field="totalCount"></span></div>
+			<div class="textfill"><span class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation" data-view="text" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_8 chart_col_card">
 			<h4>Distribuição dos tipos de representação</h4>
-			<canvas id="representation-types" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation" data-source-facets="type" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar"></canvas><span class="statistic toolbarLink" data-ref="representation-types" data-view="download" data-view-filename="representation-types.csv">
+			<canvas id="representation-types" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation" data-source-facets="type" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar"></canvas><span class="statistic toolbarLink" data-ref="representation-types" data-view="download" data-view-filename="representation-types.csv">
 				<i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>
@@ -79,11 +79,11 @@
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
 			<h4>Número de ficheiros</h4>
-			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-view="text" data-view-field="totalCount"></span></div>
+			<div class="textfill"><span class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-view="text" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_8 chart_col_card">
 			<h4>Distribuição de PRONOMs (top 10)</h4>
-			<canvas id="file-formats-pronom" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-facets="formatPronom" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="file-formats-pronom" data-view="download" data-view-filename="file-formats-pronom.csv">
+			<canvas id="file-formats-pronom" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-facets="formatPronom" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="file-formats-pronom" data-view="download" data-view-filename="file-formats-pronom.csv">
 				<i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>
@@ -91,13 +91,13 @@
 	<div class="row full_width">
 		<div class="col_12 chart_col_card">
 			<h4>Distribuição de formatos (top 10)</h4>
-			<canvas id="file-formats-description" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-facets="fileFormat" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="file-formats-description" data-view="download" data-view-filename="file-formats-description.csv"> <i class="fa fa-download" aria-hidden="true"></i></span>
+			<canvas id="file-formats-description" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-facets="fileFormat" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="file-formats-description" data-view="download" data-view-filename="file-formats-description.csv"> <i class="fa fa-download" aria-hidden="true"></i></span>
 		</div>
 	</div>
 	<div class="row full_width">
 		<div class="col_12 chart_col_card">
 			<h4>Distribuição de tipos MIME (top 10)</h4>
-			<canvas id="file-formats-mimetypes" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-facets="formatMimetype" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="file-formats-mimetypes" data-view="download" data-view-filename="file-formats-mimetypes.csv">
+			<canvas id="file-formats-mimetypes" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-facets="formatMimetype" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="file-formats-mimetypes" data-view="download" data-view-filename="file-formats-mimetypes.csv">
 				<i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>
@@ -146,7 +146,7 @@
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
 			<h4>Número de relatórios</h4>
-			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.jobs.IndexedReport" data-view="text" data-view-field="totalCount"></span></div>
+			<div class="textfill"><span class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.jobs.IndexedReport" data-view="text" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_8 chart_col_card">
 			<h4>Distribuição de plugins (top 5)</h4>
@@ -159,7 +159,7 @@
 	<div class="row full_width">
 		<div class="col_4 chart_col_card">
 			<h4>Distribuição do estado de execução</h4>
-			<canvas id="process-reports-plugin-state" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.jobs.IndexedReport" data-source-facets="pluginState" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="process-reports-plugin-state" data-view="download" data-view-filename="process-reports-plugin-state.csv"> <i class="fa fa-download" aria-hidden="true"></i>
+			<canvas id="process-reports-plugin-state" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.jobs.IndexedReport" data-source-facets="pluginState" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="process-reports-plugin-state" data-view="download" data-view-filename="process-reports-plugin-state.csv"> <i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>
 
@@ -194,7 +194,7 @@
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
 			<h4>Número de transferências</h4>
-			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.TransferredResource" data-view="text" data-view-field="totalCount"></span></div>
+			<div class="textfill"><span class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.TransferredResource" data-view="text" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_4 stat_col_card">
 			<h4>Ingestões bem sucedidas</h4>
@@ -211,36 +211,14 @@
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
 			<h4>Número de eventos de preservação</h4>
-			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent" data-view="text" data-view-field="totalCount"></span></div>
+			<div class="textfill"><span class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent" data-view="text" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_8 chart_col_card">
 			<h4>Agentes de preservação por tipo (top 5)</h4>
-			<canvas id="preservation-agents-type" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent" data-source-facets="eventType" data-view="chart" data-view-field="facetResults" data-view-type="pie" data-view-limit="5"></canvas><span class="statistic toolbarLink" data-ref="preservation-agents-type" data-view="download" data-view-filename="preservation-agents-type.csv"> <i class="fa fa-download" aria-hidden="true"></i>
+			<canvas id="preservation-agents-type" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent" data-source-facets="eventType" data-view="chart" data-view-field="facetResults" data-view-type="pie" data-view-limit="5"></canvas><span class="statistic toolbarLink" data-ref="preservation-agents-type" data-view="download" data-view-filename="preservation-agents-type.csv"> <i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>
 
-	</div>
-	<div class="row full_width">
-		<div class="col_12 chart_col_card">
-			<h4>Eventos de preservação por agente (top 5)</h4>
-			<canvas id="preservation-event-agents" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent" data-source-facets="linkingAgentIdentifier" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar" data-label-function="agentLabel" data-view-limit="5"></canvas><script type="text/javascript">
-				function agentLabel(label) {
-					var agent = JSON.parse(label);
-					var valueArray = agent.value.split('@');
-					var updatedValue = valueArray[0].substring(valueArray[0]
-							.lastIndexOf(".") + 1);
-					updatedValue = updatedValue.substring(updatedValue
-							.lastIndexOf(":") + 1);
-
-					if (valueArray.length != 1) {
-						updatedValue += "@" + valueArray[1];
-					}
-
-					return updatedValue;
-				}
-			</script><span class="statistic toolbarLink" data-ref="preservation-event-agents" data-view="download" data-view-filename="preservation-event-agents.csv"> <i class="fa fa-download" aria-hidden="true"></i>
-			</span>
-		</div>
 	</div>
 
 	<h2>Riscos</h2>
@@ -248,11 +226,11 @@
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
 			<h4>Número de riscos</h4>
-			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.risks.IndexedRisk" data-view="text" data-view-field="totalCount"></span></div>
+			<div class="textfill"><span class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.risks.IndexedRisk" data-view="text" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_8 chart_col_card">
 			<h4>Riscos por severidade de mitigação</h4>
-			<canvas id="risk-severity" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.risks.IndexedRisk" data-source-facets="currentSeverityLevel" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="risk-severity" data-view="download" data-view-filename="risk-severity.csv">
+			<canvas id="risk-severity" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.risks.IndexedRisk" data-source-facets="currentSeverityLevel" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="risk-severity" data-view="download" data-view-filename="risk-severity.csv">
 				<i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>
@@ -263,16 +241,16 @@
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
 			<h4>Número de incidências</h4>
-			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.risks.RiskIncidence" data-view="text" data-view-field="totalCount"></span></div>
+			<div class="textfill"><span class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.risks.RiskIncidence" data-view="text" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_4 chart_col_card">
 			<h4>Incidências por severidade</h4>
-			<canvas id="risk-incidence-severity" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.risks.RiskIncidence" data-source-facets="severity" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="risk-incidence-severity" data-view="download" data-view-filename="risk-incidence-severity.csv"> <i class="fa fa-download" aria-hidden="true"></i>
+			<canvas id="risk-incidence-severity" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.risks.RiskIncidence" data-source-facets="severity" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="risk-incidence-severity" data-view="download" data-view-filename="risk-incidence-severity.csv"> <i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>
 		<div class="col_4 chart_col_card">
 			<h4>Incidências por estado</h4>
-			<canvas id="risk-incidence-status" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.risks.RiskIncidence" data-source-facets="status" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="risk-incidence-status" data-view="download" data-view-filename="risk-incidence-status.csv">
+			<canvas id="risk-incidence-status" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.risks.RiskIncidence" data-source-facets="status" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="risk-incidence-status" data-view="download" data-view-filename="risk-incidence-status.csv">
 				<i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>
@@ -283,11 +261,11 @@
 	<div class="row full_width">
 		<div class="col_4 stat_col_card">
 			<h4>Número de notificações</h4>
-			<div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.notifications.Notification" data-view="text" data-view-field="totalCount"></span></div>
+			<div class="textfill"><span class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.notifications.Notification" data-view="text" data-view-field="totalCount"></span></div>
 		</div>
 		<div class="col_8 chart_col_card">
 			<h4>Notificações com recepção confirmada</h4>
-			<canvas id="notification-acknowledge" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.notifications.Notification" data-source-facets="isAcknowledged" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="notification-acknowledge" data-view="download" data-view-filename="notification-acknowledge.csv"> <i class="fa fa-download" aria-hidden="true"></i>
+			<canvas id="notification-acknowledge" class="statistic" data-source="index" data-source-filters="any" data-source-class="org.roda.core.data.v2.notifications.Notification" data-source-facets="isAcknowledged" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="notification-acknowledge" data-view="download" data-view-filename="notification-acknowledge.csv"> <i class="fa fa-download" aria-hidden="true"></i>
 			</span>
 		</div>
 	</div>
