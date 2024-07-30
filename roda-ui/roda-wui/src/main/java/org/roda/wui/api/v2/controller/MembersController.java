@@ -3,6 +3,7 @@ package org.roda.wui.api.v2.controller;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +50,9 @@ import org.roda.core.data.v2.user.requests.CreateGroupRequest;
 import org.roda.core.data.v2.user.requests.CreateUserExtraFormFields;
 import org.roda.core.data.v2.user.requests.CreateUserRequest;
 import org.roda.core.data.v2.user.requests.LoginRequest;
+import org.roda.core.data.v2.user.requests.RegisterUserRequest;
 import org.roda.core.data.v2.user.requests.ResetPasswordRequest;
+import org.roda.core.data.v2.user.requests.UpdateUserRequest;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.model.GenericOkResponse;
@@ -546,7 +549,8 @@ public class MembersController implements MembersRestService, Exportable {
   }
 
   @Override
-  public User updateUser(@RequestBody CreateUserRequest userRequest) {
+  public User updateUser(@RequestBody UpdateUserRequest userRequest) {
+    // TODO: Change request usage
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
@@ -568,7 +572,7 @@ public class MembersController implements MembersRestService, Exportable {
   }
 
   @Override
-  public User updateMyUser(@RequestBody CreateUserRequest userOperations) {
+  public User updateMyUser(@RequestBody UpdateUserRequest userOperations) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -705,19 +709,22 @@ public class MembersController implements MembersRestService, Exportable {
   }
 
   @Override
-  public User createUser(@RequestBody CreateUserRequest userOperations, String localeString) {
+  public User createUser(@RequestBody CreateUserRequest createUserRequest, String localeString) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
-    User user = userOperations.getUser();
+    User user = new User(createUserRequest.getName(), createUserRequest.getName(), createUserRequest.getFullName(),
+      true, new HashSet<>(), new HashSet<>(), createUserRequest.getGroups(), createUserRequest.getEmail(),
+      createUserRequest.getGuest(), null, createUserRequest.getValues(), null, null, null, null);
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
 
-      User createdUser = membersService.createUser(user, userOperations.getPassword(), userOperations.getValues());
+      User createdUser = membersService.createUser(user, createUserRequest.getPassword(),
+        createUserRequest.getValues());
       membersService.requestPasswordReset(request.getRequestURL().toString().split("/api")[0], user.getEmail(),
         localeString, request.getRemoteAddr(), false);
-      createdUser.setExtra(userOperations.getValues());
+      createdUser.setExtra(createUserRequest.getValues());
       return createdUser;
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
@@ -729,25 +736,26 @@ public class MembersController implements MembersRestService, Exportable {
   }
 
   @Override
-  public User registerUser(@RequestBody CreateUserRequest createUserRequest, String localeString, String captcha) {
+  public User registerUser(@RequestBody RegisterUserRequest registerUserRequest, String localeString, String captcha) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
-
+    User user = new User(registerUserRequest.getName(), registerUserRequest.getName(),
+      registerUserRequest.getFullName(), true, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+      registerUserRequest.getEmail(), false, null, registerUserRequest.getValues(), null, null, null, null);
     try {
       // delegate
-      return membersService.registerUser(request, createUserRequest.getUser(), createUserRequest.getPassword(), captcha,
-        createUserRequest.getValues(), localeString, request.getRequestURL().toString().split("/api")[0]);
+      return membersService.registerUser(request, user, registerUserRequest.getPassword(), captcha,
+        registerUserRequest.getValues(), localeString, request.getRequestURL().toString().split("/api")[0]);
     } catch (EmailAlreadyExistsException | UserAlreadyExistsException e) {
       state = LogEntryState.FAILURE;
-      return new User(createUserRequest.getUser());
+      return new User(user);
     } catch (RODAException | RecaptchaException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USER_PARAM,
-        createUserRequest.getUser());
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USER_PARAM, user);
     }
   }
 
