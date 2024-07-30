@@ -18,7 +18,9 @@ import org.roda.core.data.v2.user.requests.CreateGroupRequest;
 import org.roda.core.data.v2.user.requests.CreateUserExtraFormFields;
 import org.roda.core.data.v2.user.requests.CreateUserRequest;
 import org.roda.core.data.v2.user.requests.LoginRequest;
+import org.roda.core.data.v2.user.requests.RegisterUserRequest;
 import org.roda.core.data.v2.user.requests.ResetPasswordRequest;
+import org.roda.core.data.v2.user.requests.UpdateUserRequest;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.model.GenericOkResponse;
 import org.springframework.http.HttpStatus;
@@ -95,7 +97,7 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
 
   @RequestMapping(path = "/users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
-  @Operation(summary = "Create user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class))), description = "Creates a new user", responses = {
+  @Operation(summary = "Create user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CreateUserRequest.class))), description = "Creates a new user", responses = {
     @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = User.class))),
     @ApiResponse(responseCode = "409", description = "Conflict", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
@@ -105,10 +107,10 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
 
   @RequestMapping(path = "/users/register", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
-  @Operation(summary = "Register user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class))), description = "Registers a new user", responses = {
+  @Operation(summary = "Register user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RegisterUserRequest.class))), description = "Registers a new user", responses = {
     @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = User.class)))})
   User registerUser(
-    @Parameter(name = "user", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) CreateUserRequest userOperations,
+    @Parameter(name = "user", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) RegisterUserRequest userOperations,
     @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
     @Parameter(description = "captcha") @RequestParam(required = false, name = "captcha") String captcha);
 
@@ -128,18 +130,18 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @Parameter(name = "group", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Group modifiedGroup);
 
   @RequestMapping(path = "/users", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Update user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CreateUserRequest.class))), description = "Updates a user", responses = {
+  @Operation(summary = "Update user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UpdateUserRequest.class))), description = "Updates a user", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   User updateUser(
-    @Parameter(name = "user", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) CreateUserRequest userOperations);
+    @Parameter(name = "user", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) UpdateUserRequest userOperations);
 
   @RequestMapping(path = "/users/update-my-user", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Update my user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CreateUserRequest.class))), description = "Updates my user", responses = {
+  @Operation(summary = "Update my user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UpdateUserRequest.class))), description = "Updates my user", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   User updateMyUser(
-    @Parameter(name = "user", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) CreateUserRequest userOperations);
+    @Parameter(name = "user", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) UpdateUserRequest userOperations);
 
   @RequestMapping(path = "/users/{id}/reset-password", method = RequestMethod.PATCH)
   @ResponseStatus(HttpStatus.NO_CONTENT)

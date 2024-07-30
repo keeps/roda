@@ -15,10 +15,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonSubTypes({@JsonSubTypes.Type(value = SelectedItemsListRequest.class, name = "SelectedItemsListRequest"),
-  @JsonSubTypes.Type(value = SelectedItemsFilterRequest.class, name = "SelectedItemsFilterRequest")})
+  @JsonSubTypes.Type(value = SelectedItemsFilterRequest.class, name = "SelectedItemsFilterRequest"),
+  @JsonSubTypes.Type(value = SelectedItemsNoneRequest.class, name = "SelectedItemsNoneRequest"),
+  @JsonSubTypes.Type(value = SelectedItemsAllRequest.class, name = "SelectedItemsAllRequest")})
 @Schema(type = "object", subTypes = {SelectedItemsListRequest.class,
-  SelectedItemsFilterRequest.class}, discriminatorMapping = {
+  SelectedItemsFilterRequest.class, SelectedItemsNoneRequest.class,
+  SelectedItemsAllRequest.class}, discriminatorMapping = {
     @DiscriminatorMapping(value = "SelectedItemsListRequest", schema = SelectedItemsListRequest.class),
-    @DiscriminatorMapping(value = "SelectedItemsFilterRequest", schema = SelectedItemsFilterRequest.class)}, discriminatorProperty = "@type")
+    @DiscriminatorMapping(value = "SelectedItemsFilterRequest", schema = SelectedItemsFilterRequest.class),
+    @DiscriminatorMapping(value = "SelectedItemsNoneRequest", schema = SelectedItemsNoneRequest.class),
+    @DiscriminatorMapping(value = "SelectedItemsAllRequest", schema = SelectedItemsAllRequest.class)}, discriminatorProperty = "@type")
 public interface SelectedItemsRequest extends Serializable {
 }

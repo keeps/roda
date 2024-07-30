@@ -13,6 +13,7 @@ package org.roda.wui.client.process;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -20,6 +21,7 @@ import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.jobs.CreateJobRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -95,10 +97,17 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
     getButtonCreate().setEnabled(false);
     String jobName = getName().getText();
 
-    Job job = JobUtils.createJob(jobName, getJobPriority(), getJobParallelism(), getSelected(),
-      getSelectedPlugin().getId(), getWorkflowOptions().getValue());
+    CreateJobRequest jobRequest = new CreateJobRequest();
+    jobRequest.setName(jobName);
+    jobRequest.setPlugin(getSelectedPlugin().getId());
+    jobRequest.setPluginParameters(getWorkflowOptions().getValue());
+    jobRequest.setSourceObjects(SelectedItemsUtils.convertToRESTRequest(getSelected()));
+    jobRequest.setPriority(getJobPriority().name());
+    jobRequest.setParallelism(getJobParallelism().name());
+    jobRequest.setSourceObjectsClass(getSelected().getSelectedClass());
+
     Services services = new Services("Create job", "create");
-    services.jobsResource(s -> s.createJob(job)).whenComplete((job1, throwable) -> {
+    services.jobsResource(s -> s.createJob(jobRequest)).whenComplete((job1, throwable) -> {
       if (throwable != null) {
         getButtonCreate().setEnabled(true);
         AsyncCallbackUtils.defaultFailureTreatment(throwable);

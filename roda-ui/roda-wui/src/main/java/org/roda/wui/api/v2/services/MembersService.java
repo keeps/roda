@@ -46,7 +46,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaPrincipal;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.data.v2.user.requests.CreateUserRequest;
+import org.roda.core.data.v2.user.requests.UpdateUserRequest;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -55,11 +55,11 @@ import org.roda.core.plugins.base.maintenance.ChangeRodaMemberStatusPlugin;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
+import org.roda.wui.api.v2.utils.RecaptchaUtils;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.server.ServerTools;
-import org.roda.wui.api.v2.utils.RecaptchaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -291,7 +291,7 @@ public class MembersService {
     return RodaCoreFactory.getModelService().confirmUserEmail(username, email, emailConfirmationToken, true, true);
   }
 
-  public User updateUser(CreateUserRequest request) throws GenericException, AlreadyExistsException, NotFoundException,
+  public User updateUser(UpdateUserRequest request) throws GenericException, AlreadyExistsException, NotFoundException,
     AuthorizationDeniedException, ValidationException, RequestNotValidException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
@@ -395,7 +395,7 @@ public class MembersService {
         user.setEmailConfirmationTokenExpirationDate(DateTime.now().plusDays(1).toDateTimeISO().toInstant().toString());
 
         try {
-          user = updateUser(new CreateUserRequest(user, null, null));
+          user = updateUser(new UpdateUserRequest(user, null, null));
           // 20170523 hsilva: need to set ip address for registering the action
           // as the above method returns a new instante of the modified user
           user.setIpAddress(ipAddress);

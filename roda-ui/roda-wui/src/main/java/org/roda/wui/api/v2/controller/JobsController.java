@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.SelectedItemsUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -20,7 +21,11 @@ import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SuggestRequest;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.jobs.CreateJobRequest;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.Jobs;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -29,12 +34,14 @@ import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.UserUtility;
-import org.roda.wui.api.v2.utils.ExtraMediaType;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.JobService;
 import org.roda.wui.api.v2.utils.ApiUtils;
+import org.roda.wui.api.v2.utils.CommonServicesUtils;
+import org.roda.wui.api.v2.utils.ExtraMediaType;
+import org.roda.wui.client.common.utils.JobUtils;
 import org.roda.wui.client.services.JobsRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
@@ -80,12 +87,17 @@ public class JobsController implements JobsRestService, Exportable {
   }
 
   @Override
-  public Job createJob(@RequestBody Job job) {
+  public Job createJob(@RequestBody CreateJobRequest jobRequest) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
+      SelectedItems<?> sourceObjects = CommonServicesUtils.convertSelectedItems(jobRequest.getSourceObjects(),
+        SelectedItemsUtils.parseClass(jobRequest.getSourceObjectsClass()));
+      Job job = JobUtils.createJob(jobRequest.getName(), JobPriority.valueOf(jobRequest.getPriority()),
+        JobParallelism.valueOf(jobRequest.getParallelism()), sourceObjects, jobRequest.getPlugin(),
+        jobRequest.getPluginParameters());
       // validate input and set missing information when possible
       jobService.validateAndSetJobInformation(requestContext.getUser(), job);
       // check user permissions
@@ -100,7 +112,8 @@ public class JobsController implements JobsRestService, Exportable {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_PARAM, job);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_CREATE_REQUEST,
+        jobRequest);
     }
   }
 

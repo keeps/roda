@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -19,22 +17,23 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.generics.MetadataValue;
+import org.roda.core.data.v2.generics.select.SelectedItemsAllRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsFilterRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsNoneRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.util.IdUtils;
-import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +113,10 @@ public class CommonServicesUtils {
       return SelectedItemsList.create(tClass, itemsListRequest.getIds());
     } else if (request instanceof SelectedItemsFilterRequest filterRequest) {
       return new SelectedItemsFilter<>(filterRequest.getFilter(), tClass.getName(), filterRequest.getJustActive());
+    } else if (request instanceof SelectedItemsNoneRequest) {
+      return new SelectedItemsNone<>();
+    } else if (request instanceof SelectedItemsAllRequest) {
+      return new SelectedItemsAll<>(tClass.getName());
     }
 
     throw new RequestNotValidException("Selected items must be either a list or a filter");

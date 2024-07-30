@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author António Lindo <alindo@keep.pt>
  */
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class CreateUserRequest implements Serializable {
+public class RegisterUserRequest implements Serializable {
 
   @Serial
   private static final long serialVersionUID = 2288990827132952813L;
@@ -22,24 +22,19 @@ public class CreateUserRequest implements Serializable {
   private String email;
   private String name;
   private String fullName;
-  private Set<String> groups;
-  private boolean guest;
   private SecureString password;
   private Set<MetadataValue> values;
 
-  public CreateUserRequest(String email, String name, String fullName, Set<String> groups, boolean guest,
-    SecureString password, Set<MetadataValue> values) {
+  public RegisterUserRequest(String email, String name, String fullName, SecureString password,
+    Set<MetadataValue> values) {
     this.email = email;
     this.name = name;
     this.fullName = fullName;
-    this.groups = groups;
-    this.guest = guest;
     this.password = password;
     this.values = values;
   }
 
-  public CreateUserRequest() {
-    this.groups = new HashSet<>();
+  public RegisterUserRequest() {
     this.password = new SecureString();
     this.values = new HashSet<>();
   }
@@ -66,22 +61,6 @@ public class CreateUserRequest implements Serializable {
 
   public void setFullName(String fullName) {
     this.fullName = fullName;
-  }
-
-  public Set<String> getGroups() {
-    return groups;
-  }
-
-  public void setGroups(Set<String> groups) {
-    this.groups = groups;
-  }
-
-  public boolean getGuest() {
-    return guest;
-  }
-
-  public void setGuest(boolean guest) {
-    this.guest = guest;
   }
 
   public Set<MetadataValue> getValues() {
