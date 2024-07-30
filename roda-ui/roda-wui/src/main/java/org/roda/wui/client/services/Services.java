@@ -10,7 +10,9 @@ import org.fusesource.restygwt.client.REST;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -124,7 +126,7 @@ public class Services implements DirectRestService {
       service = GWT.create(TransferredResourceRestService.class);
     } else if (Notification.class.getName().equals(objectClassString)) {
       service = GWT.create(NotificationRestService.class);
-    } else if (IndexedAIP.class.getName().equals(objectClassString)) {
+    } else if (IndexedAIP.class.getName().equals(objectClassString) || AIP.class.getName().equals(objectClassString)) {
       service = GWT.create(AIPRestService.class);
     } else if (DisposalConfirmation.class.getName().equals(objectClassString)) {
       service = GWT.create(DisposalConfirmationRestService.class);
@@ -148,7 +150,8 @@ public class Services implements DirectRestService {
       service = GWT.create(DIPRestService.class);
     } else if (IndexedRepresentation.class.getName().equals(objectClassString)) {
       service = GWT.create(RepresentationRestService.class);
-    } else if (IndexedFile.class.getName().equals(objectClassString)) {
+    } else if (IndexedFile.class.getName().equals(objectClassString)
+      || File.class.getName().equals(objectClassString)) {
       service = GWT.create(FileRestService.class);
     } else if (LogEntry.class.getName().equals(objectClassString)) {
       service = GWT.create(AuditLogRestService.class);
