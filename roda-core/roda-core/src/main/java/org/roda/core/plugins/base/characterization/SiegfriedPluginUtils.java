@@ -264,7 +264,7 @@ public class SiegfriedPluginUtils {
               List<String> notes = new ArrayList<>();
               if (StringUtils.isNotBlank(warning.textValue())) {
                 notes.add(RodaConstants.PRESERVATION_FORMAT_NOTE_SIEGFRIED_WARNING + ": " + warning.textValue());
-                updateFileRiskIncidences(model, index, aipId, representationId, fileId, jsonFilePath,
+                updateFileRiskIncidences(model, index, aipId, representationId, jsonFileId, jsonFilePath,
                   warning.textValue());
               }
               PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, jsonFilePath, jsonFileId,
