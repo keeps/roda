@@ -49,7 +49,15 @@ public class CountRequest implements Serializable {
     return filter;
   }
 
+  public void setFilter(Filter filter) {
+    this.filter = filter;
+  }
+
   public boolean isOnlyActive() {
     return onlyActive;
+  }
+
+  public void setOnlyActive(boolean onlyActive) {
+    this.onlyActive = onlyActive;
   }
 }

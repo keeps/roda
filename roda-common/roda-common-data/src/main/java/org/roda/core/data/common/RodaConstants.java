@@ -1423,6 +1423,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_FORMAT = "parameter.format";
   public static final String PLUGIN_PARAMS_FORMAT_VERSION = "parameter.format_version";
   public static final String PLUGIN_PARAMS_PRONOM = "parameter.pronom";
+  public static final String PLUGIN_PARAMS_CLEAR_INCIDENCES = "parameter.clear_incidences";
 
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
@@ -1573,6 +1574,9 @@ public final class RodaConstants {
   public static final String RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR = "/";
   public static final String RISK_INCIDENCE_FILE_EXTENSION = ".json";
 
+  /* Risk Ids */
+  public static final String RISK_ID_SIEGFRIED_IDENTIFICATION_WARNING = "urn:siegfried:r1";
+
   /* Representation information */
   public static final String REPRESENTATION_INFORMATION_ID = "id";
   public static final String REPRESENTATION_INFORMATION_NAME = "name";
@@ -1703,6 +1707,7 @@ public final class RodaConstants {
 
   /* Siegfriend payload fields */
   public static final String SIEGFRIED_PAYLOAD_MATCHES = "matches";
+  public static final String SIEGFRIED_PAYLOAD_MATCH_WARNING = "warning";
   public static final String SIEGFRIED_PAYLOAD_MATCH_NS = "ns";
   public static final String SIEGFRIED_PAYLOAD_MATCH_NS_PRONOM = "pronom";
   public static final String SIEGFRIED_PAYLOAD_MATCH_MIMETYPE = "mime";
@@ -1745,6 +1750,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_REGISTRY_MIME = "mime";
 
   public static final String PRESERVATION_FORMAT_NOTE_MANUAL = "manual";
+  public static final String PRESERVATION_FORMAT_NOTE_SIEGFRIED_WARNING = "SIEGFRIED WARNING";
 
   public static final String PREMIS_RELATIONSHIP_TYPE_STRUCTURAL = "structural";
   public static final String PREMIS_RELATIONSHIP_SUBTYPE_HASPART = "hasPart";
