@@ -20,7 +20,7 @@ import com.google.gwt.user.client.ui.Label;
  */
 public class DisposalPolicySummaryPanel extends FlowPanel {
   private HTML iconHTML;
-  private Label textLabel;
+  private HTML textLabel;
 
   public DisposalPolicySummaryPanel() {
     super();
@@ -31,7 +31,7 @@ public class DisposalPolicySummaryPanel extends FlowPanel {
     add(iconHTML);
     iconHTML.setVisible(false);
 
-    textLabel = new Label();
+    textLabel = new HTML();
     textLabel.addStyleName("h5 disposal-policy-summary-text");
     add(textLabel);
   }
@@ -51,11 +51,11 @@ public class DisposalPolicySummaryPanel extends FlowPanel {
   }
 
   public void setText(String text) {
-    textLabel.setText(text);
+    textLabel.setHTML(SafeHtmlUtils.fromSafeConstant("<h5>" + text + "</h5>"));
   }
 
   public void reset() {
     iconHTML.setHTML("");
-    textLabel.setText("");
+    textLabel.setHTML(SafeHtmlUtils.fromSafeConstant("<h5></h5>"));
   }
 }

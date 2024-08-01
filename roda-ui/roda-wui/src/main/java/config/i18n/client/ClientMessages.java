@@ -249,6 +249,8 @@ public interface ClientMessages extends Messages {
 
   String couldNotFindPreservationAgent();
 
+  String couldNotFindAIP();
+
   String intellectualEntity();
 
   String inspectIntellectualEntity();

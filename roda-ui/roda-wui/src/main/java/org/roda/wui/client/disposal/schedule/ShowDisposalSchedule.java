@@ -216,9 +216,9 @@ public class ShowDisposalSchedule extends Composite {
 
     if (disposalSchedule.getState().equals(DisposalScheduleState.ACTIVE)
       && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
-      Label aipTitle = new Label();
+      HTML aipTitle = new HTML();
+      aipTitle.setHTML(SafeHtmlUtils.fromSafeConstant("<h5>" + messages.disposalScheduleListAips() + "</h5>"));
       aipTitle.addStyleName("h5");
-      aipTitle.setText(messages.disposalScheduleListAips());
       aipListTitle.add(aipTitle);
 
       ListBuilder<IndexedAIP> aipsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),

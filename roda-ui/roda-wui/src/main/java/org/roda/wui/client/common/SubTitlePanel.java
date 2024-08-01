@@ -21,7 +21,7 @@ import org.roda.wui.common.client.tools.StringUtils;
  */
 public class SubTitlePanel extends FlowPanel {
   private HTML iconHTML;
-  private Label textLabel;
+  private HTML textLabel;
 
   public Label getLabel() {
     return textLabel;
@@ -36,7 +36,7 @@ public class SubTitlePanel extends FlowPanel {
     add(iconHTML);
     iconHTML.setVisible(false);
 
-    textLabel = new Label();
+    textLabel = new HTML();
     textLabel.addStyleName("h4 browseItemText");
     add(textLabel);
   }
@@ -60,11 +60,11 @@ public class SubTitlePanel extends FlowPanel {
   }
 
   public void setText(String text) {
-    textLabel.setText(text);
+    textLabel.setHTML(SafeHtmlUtils.fromSafeConstant("<h4>" + text + "</h4>"));
   }
 
   public void reset() {
     iconHTML.setHTML("");
-    textLabel.setText("");
+    textLabel.setHTML("<h4></h4>");
   }
 }

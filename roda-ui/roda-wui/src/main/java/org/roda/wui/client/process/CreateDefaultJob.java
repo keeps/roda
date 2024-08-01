@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
@@ -489,7 +490,8 @@ public class CreateDefaultJob extends Composite {
     // PLUGIN NAME
     String pluginName = messages.pluginLabel(selectedPlugin.getName());
     name.setText(pluginName);
-    Label pluginNameLabel = new Label(pluginName);
+    HTML pluginNameLabel = new HTML();
+    pluginNameLabel.setHTML(SafeHtmlUtils.fromSafeConstant("<h5>" + pluginName + "</h5>"));
     pluginNameLabel.addStyleName("form-label h5");
     leftPanel.add(pluginNameLabel);
 

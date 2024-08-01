@@ -12,6 +12,8 @@ import static org.roda.wui.client.common.actions.Actionable.ActionImpact;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.HTML;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -125,7 +127,8 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
         if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
           && actionable.canAct(actionButton.getAction(), objects)) {
           ActionableTitle actionableTitle = actionGroup.getTitle();
-          Label groupTitle = new Label(actionableTitle.getTitle());
+          HTML groupTitle = new HTML();
+          groupTitle.setHTML(SafeHtmlUtils.fromSafeConstant("<h4>" + actionableTitle.getTitle() + "</h4>"));
           groupTitle.addStyleName("h4 actionable-title");
           if (!actionableTitle.hasTitle()) {
             groupTitle.addStyleName("actionable-title-empty");

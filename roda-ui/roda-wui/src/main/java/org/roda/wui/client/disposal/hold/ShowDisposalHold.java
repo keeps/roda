@@ -194,9 +194,9 @@ public class ShowDisposalHold extends Composite {
 
     if (disposalHold.getState().equals(DisposalHoldState.ACTIVE)
       && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
-      Label aipTitle = new Label();
+      HTML aipTitle = new HTML();
       aipTitle.addStyleName("h5");
-      aipTitle.setText(messages.disposalHoldListAips());
+      aipTitle.setHTML(SafeHtmlUtils.fromSafeConstant("<h5>" + messages.disposalHoldListAips() + "</h5>"));
       aipListTitle.clear();
       aipListTitle.add(aipTitle);
 

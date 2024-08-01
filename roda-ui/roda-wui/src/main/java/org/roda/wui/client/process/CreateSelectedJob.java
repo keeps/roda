@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -469,7 +470,8 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
     // PLUGIN NAME
     String pluginName = messages.pluginLabel(selectedPlugin.getName());
     name.setText(pluginName);
-    Label pluginNameLabel = new Label(pluginName);
+    HTML pluginNameLabel = new HTML();
+    pluginNameLabel.setHTML(SafeHtmlUtils.fromSafeConstant("<h5>" + pluginName + "</h5>"));
     pluginNameLabel.addStyleName("form-label h5");
     leftPanel.add(pluginNameLabel);
 

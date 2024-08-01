@@ -9,6 +9,7 @@ package org.roda.wui.client.disposal.policy;
 
 import java.util.List;
 
+import com.google.gwt.user.cellview.client.Header;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHolds;
@@ -70,7 +71,8 @@ public class DisposalPolicyHoldsPanel extends Composite {
   }
 
   private void createDisposalHoldsDescription(FlowPanel disposalHoldsDescription) {
-    Label header = new Label(messages.disposalHoldsTitle());
+    HTML header = new HTML();
+    header.setHTML(SafeHtmlUtils.fromSafeConstant("<h5>" + messages.disposalHoldsTitle() + "</h5>"));
     header.addStyleName("h5");
 
     HTMLPanel info = new HTMLPanel("");

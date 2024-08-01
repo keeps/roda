@@ -206,9 +206,9 @@ public class ShowLogEntry extends Composite {
     expandedAuditLogsList.setVisible(false);
 
     if (logEntry.getAuditLogRequestHeaders() != null) {
-      Label relatedAuditLogs = new Label();
+      HTML relatedAuditLogs = new HTML();
       relatedAuditLogs.addStyleName("h5");
-      relatedAuditLogs.setText(messages.relatedAuditLogs());
+      relatedAuditLogs.setHTML("<h5>" + messages.relatedAuditLogs() + "</h5>");
       expandedAuditLogs.add(relatedAuditLogs);
 
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.LOG_REQUEST_HEADER_UUID,

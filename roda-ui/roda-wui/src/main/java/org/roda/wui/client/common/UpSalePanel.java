@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 
 import com.google.gwt.user.client.Window;
@@ -23,7 +24,7 @@ public class UpSalePanel extends FlowPanel {
 
   private HTML icon;
 
-  private final Label title;
+  private final HTML title;
 
   private Label description;
 
@@ -36,7 +37,8 @@ public class UpSalePanel extends FlowPanel {
     super();
 
     this.setStyleName("ingest-tab-panel");
-    this.title = new Label(title);
+    this.title = new HTML();
+    this.title.setHTML(SafeHtmlUtils.fromSafeConstant("<h5>" + title + "</h5>"));
     this.title.addStyleName("ingest-tab-panel-label");
 
     this.icon = new HTML();
@@ -64,7 +66,8 @@ public class UpSalePanel extends FlowPanel {
     super();
 
     this.setStyleName("collapsable-card-panel");
-    this.title = new Label(title);
+    this.title = new HTML();
+    this.title.setHTML(SafeHtmlUtils.fromSafeConstant("<h5>" + title + "</h5>"));
     this.title.addStyleName("h5");
 
     this.description = new Label(description);

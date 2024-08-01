@@ -66,7 +66,8 @@ public class DisposalPolicyRulesPanel extends Composite {
   }
 
   private void createDisposalRulesDescription(FlowPanel disposalRulesDescription) {
-    Label header = new Label(messages.disposalRulesTitle());
+    HTML header = new HTML();
+    header.setHTML(SafeHtmlUtils.fromSafeConstant("<h5>" + messages.disposalRulesTitle() + "</h5>"));
     header.addStyleName("h5");
 
     HTMLPanel info = new HTMLPanel("");

@@ -634,7 +634,8 @@ pre code {
     color: black;
 }
 
-.form-label {
+.form-label,
+.form-label h5 {
 	margin-top: 5px;
 	min-width: 200px;
 }
@@ -1213,7 +1214,8 @@ pre code {
     background-color: white;
 }
 
-.panel-title {
+.panel-title,
+.panel-title h5{
     margin-top: 0;
     margin-bottom: 0;
     font-size: 16px;
@@ -1306,7 +1308,8 @@ pre code {
     display:none;
 }
 
-.my-asyncdatagrid-side-panel .h5 {
+.my-asyncdatagrid-side-panel .h5,
+.my-asyncdatagrid-side-panel h5{
     margin-top: 0;
     font-size: 1.4rem;
     font-weight: 500;
@@ -2277,7 +2280,9 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .sidebar .h1, .sidebar .h2, .sidebar .h3, .sidebar .h4, .sidebar .h5,
-.sidebar .h6, .sidebar .actions-layout-title {
+.sidebar .h6, .sidebar .actions-layout-title, .sidebar h1, .sidebar h2,
+.sidebar h3, .sidebar h4, .sidebar h5, .sidebar h6,
+.sidebar .actions-layout-title {
     margin-bottom: 0.6rem;
     margin-top: 0.3rem;
     font-size: 1.8rem;
@@ -2579,7 +2584,9 @@ td.datePickerMonth, td.datePickerYear {
     font-weight: 300;
 }
 
-.browseItemText {
+.browseItemText,
+.browseItemText h2,
+.browseItemText h4{
     display: inline;
     vertical-align: bottom;
 }
@@ -7116,7 +7123,9 @@ span.code {
 }
 
 .sidebar .actionable-title,
-.slider .actionable-title {
+.slider .actionable-title,
+.sidebar .actionable-title h4,
+.slider .actionable-title h4{
     display: block;
 }
 
@@ -7516,7 +7525,8 @@ span.code {
     display: inline-block;
 }
 
-.disposal-policy-summary-text {
+.disposal-policy-summary-text,
+.disposal-policy-summary-text h5{
     display: inline;
     vertical-align: bottom;
 }
@@ -7848,7 +7858,8 @@ span.code {
     color: #664d03;
 }
 
-.ingest-tab-panel-label {
+.ingest-tab-panel-label,
+.ingest-tab-panel-label h5{
     padding: 3px 5px;
 }
 

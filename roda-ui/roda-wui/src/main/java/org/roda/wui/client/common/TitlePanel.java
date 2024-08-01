@@ -15,13 +15,12 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
 
 public class TitlePanel extends FlowPanel {
   private HTML iconHTML;
-  private Label textLabel;
+  private HTML textLabel;
 
-  public Label getLabel() {
+  public HTML getLabel() {
     return textLabel;
   }
 
@@ -34,7 +33,7 @@ public class TitlePanel extends FlowPanel {
     add(iconHTML);
     iconHTML.setVisible(false);
 
-    textLabel = new Label();
+    textLabel = new HTML();
     textLabel.addStyleName("h2 browseItemText");
     add(textLabel);
   }
@@ -58,11 +57,11 @@ public class TitlePanel extends FlowPanel {
   }
 
   public void setText(String text) {
-    textLabel.setText(text);
+    textLabel.setHTML(SafeHtmlUtils.fromSafeConstant("<h2>" + text + "</h2>"));
   }
 
   public void reset() {
     iconHTML.setHTML("");
-    textLabel.setText("");
+    textLabel.setHTML("");
   }
 }

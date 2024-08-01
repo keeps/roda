@@ -1131,7 +1131,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       String title = ConfigurationManager.getTranslationWithDefault(facetParameter.getName(),
         RodaConstants.I18N_UI_FACETS_PREFIX, getClassToReturn().getSimpleName(), facetParameter.getName());
 
-      Label titleLabel = new Label(title);
+      HTML titleLabel = new HTML();
+      titleLabel.setHTML(SafeHtmlUtils.fromSafeConstant("<h5>" + title + "</h5>"));
       titleLabel.addStyleName("h5");
 
       FlowPanel facetPanel = new FlowPanel();

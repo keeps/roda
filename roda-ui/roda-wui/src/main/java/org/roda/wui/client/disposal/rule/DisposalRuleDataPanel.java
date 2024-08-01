@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
@@ -124,9 +125,9 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   }
 
   private void initPreviewAIPList() {
-    Label aipTitle = new Label();
+    HTML aipTitle = new HTML();
+    aipTitle.setHTML(SafeHtmlUtils.fromSafeConstant("<h5>" + messages.disposalRulePreviewAIPListTitle() + "</h5>"));
     aipTitle.addStyleName("h5");
-    aipTitle.setText(messages.disposalRulePreviewAIPListTitle());
     previewHelpText = new Label();
     previewHelpText.addStyleName("no-preview-label");
 

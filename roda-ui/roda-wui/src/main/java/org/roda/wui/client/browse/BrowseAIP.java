@@ -27,6 +27,7 @@ import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.AIPs;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -50,6 +51,7 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
+import org.roda.wui.client.common.search.CatalogueSearch;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -59,6 +61,7 @@ import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.association.DisposalPolicyAssociationPanel;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
+import org.roda.wui.client.portal.BrowseAIPPortal;
 import org.roda.wui.client.services.AIPRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -103,6 +106,7 @@ import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda_project.commons_ip2.model.AIP;
 
 /**
  * @author Luis Faria
@@ -348,8 +352,8 @@ public class BrowseAIP extends Composite {
       .whenComplete((aip, error) -> {
         if (error != null) {
           if (error instanceof NotFoundException) {
-            Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
-            HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
+            Toast.showError(messages.notFoundError(), messages.couldNotFindAIP());
+            HistoryUtils.newHistory(ListUtils.concat(BrowseAIPPortal.RESOLVER.getHistoryPath()));
           } else {
             AsyncCallbackUtils.defaultFailureTreatment(error);
           }

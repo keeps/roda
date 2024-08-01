@@ -157,7 +157,6 @@ public class ShowPreservationEvent extends Composite {
 
     Services services = new Services("Retrieve preservation event", "get");
 
-
     services.rodaEntityRestService(s -> s.findByUuid(eventId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedPreservationEvent.class)
       .thenCompose(event -> services.preservationEventsResource(s -> s.getPreservationAgents(event.getId()))
         .thenCompose(indexedPreservationAgents -> services
@@ -165,8 +164,15 @@ public class ShowPreservationEvent extends Composite {
           .whenComplete((linkingObjects, throwable) -> {
             if (throwable != null) {
               if (throwable instanceof NotFoundException) {
-                Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
-                HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
+                if (event == null) {
+                  Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
+                  HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
+                } else {
+                  this.preservationEvent = event;
+                  this.agents = indexedPreservationAgents;
+                  this.linkingObjects = linkingObjects;
+                  viewAction();
+                }
               } else {
                 AsyncCallbackUtils.defaultFailureTreatment(throwable);
               }
@@ -206,32 +212,34 @@ public class ShowPreservationEvent extends Composite {
 
     agentsHeader.setVisible(hasAgents);
 
-    // Source objects
     boolean showSourceObjects = false;
-    for (LinkingIdentifier sourceObjectId : linkingObjects.getSourceObjectIds()) {
-      if (sourceObjectId.getRoles() != null
-        && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)
-        && (RodaConstants.URN_TYPE.equalsIgnoreCase(sourceObjectId.getType())
-          || RodaConstants.URI_TYPE.equalsIgnoreCase(sourceObjectId.getType()))) {
-        addObjectPanel(sourceObjectId, linkingObjects, sourceObjectsPanel);
-        showSourceObjects = true;
+    boolean showOutcomeObjects = false;
+
+    if (linkingObjects != null) {
+      // Source objects
+      for (LinkingIdentifier sourceObjectId : linkingObjects.getSourceObjectIds()) {
+        if (sourceObjectId.getRoles() != null
+          && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)
+          && (RodaConstants.URN_TYPE.equalsIgnoreCase(sourceObjectId.getType())
+            || RodaConstants.URI_TYPE.equalsIgnoreCase(sourceObjectId.getType()))) {
+          addObjectPanel(sourceObjectId, linkingObjects, sourceObjectsPanel);
+          showSourceObjects = true;
+        }
+      }
+      // Outcome objects
+      for (LinkingIdentifier outcomeObjectId : linkingObjects.getOutcomeObjectIds()) {
+        if (outcomeObjectId.getRoles() != null
+          && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)
+          && (RodaConstants.URN_TYPE.equalsIgnoreCase(outcomeObjectId.getType())
+            || RodaConstants.URI_TYPE.equalsIgnoreCase(outcomeObjectId.getType()))) {
+          addObjectPanel(outcomeObjectId, linkingObjects, outcomeObjectsPanel);
+          showOutcomeObjects = true;
+        }
       }
     }
+
     sourceObjectsHeader.setVisible(showSourceObjects);
     sourceObjectsPanel.setVisible(showSourceObjects);
-
-    // Outcome objects
-    boolean showOutcomeObjects = false;
-    for (LinkingIdentifier outcomeObjectId : linkingObjects.getOutcomeObjectIds()) {
-      if (outcomeObjectId.getRoles() != null
-        && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)
-        && (RodaConstants.URN_TYPE.equalsIgnoreCase(outcomeObjectId.getType())
-          || RodaConstants.URI_TYPE.equalsIgnoreCase(outcomeObjectId.getType()))) {
-        addObjectPanel(outcomeObjectId, linkingObjects, outcomeObjectsPanel);
-        showOutcomeObjects = true;
-      }
-    }
-
     outcomeObjectsHeader.setVisible(showOutcomeObjects);
     outcomeObjectsPanel.setVisible(showOutcomeObjects);
 
@@ -299,7 +307,7 @@ public class ShowPreservationEvent extends Composite {
     body.addStyleName("panel-body");
     layout.add(body);
 
-    Label header = new Label(messages.uriLinkingIdentifierTitle());
+    HTML header = new HTML(SafeHtmlUtils.fromSafeConstant("<h5>" + messages.uriLinkingIdentifierTitle() + "</h5>"));
     header.addStyleName("panel-title");
     header.addStyleName("h5");
     heading.add(header);
@@ -325,12 +333,12 @@ public class ShowPreservationEvent extends Composite {
     layout.add(body);
 
     if (StringUtils.isNotBlank(agent.getName())) {
-      Label nameValue = new Label(agent.getName());
-      nameValue.addStyleName("panel-title");
+      HTML nameValue = new HTML(SafeHtmlUtils.fromSafeConstant("<h5>" + agent.getName() + "</h5>"));
+      nameValue.addStyleName("panel-title h5");
       heading.add(nameValue);
     } else {
-      Label idValue = new Label(agent.getId());
-      idValue.addStyleName("panel-title");
+      HTML idValue = new HTML(SafeHtmlUtils.fromSafeConstant("<h5>" + agent.getId() + "</h5>"));
+      idValue.addStyleName("panel-title h5");
       heading.add(idValue);
     }
 
@@ -409,7 +417,7 @@ public class ShowPreservationEvent extends Composite {
     body.addStyleName("panel-body");
     layout.add(body);
 
-    Label header = new Label(messages.intellectualEntity());
+    HTML header = new HTML(SafeHtmlUtils.fromSafeConstant("<h5>" + messages.intellectualEntity() + "</h5>"));
     header.addStyleName("panel-title");
     header.addStyleName("h5");
     heading.add(header);
@@ -455,7 +463,7 @@ public class ShowPreservationEvent extends Composite {
     body.addStyleName("panel-body");
     layout.add(body);
 
-    Label header = new Label(messages.showRepresentationExtended());
+    HTML header = new HTML(SafeHtmlUtils.fromSafeConstant("<h5>" + messages.showRepresentationExtended() + "</h5>"));
     header.addStyleName("panel-title");
     header.addStyleName("h5");
     heading.add(header);
@@ -506,7 +514,7 @@ public class ShowPreservationEvent extends Composite {
     body.addStyleName("panel-body");
     layout.add(body);
 
-    Label header = new Label(messages.showFileExtended());
+    HTML header = new HTML(SafeHtmlUtils.fromSafeConstant("<h5>" + messages.showFileExtended() + "</h5>"));
     header.addStyleName("panel-title");
     header.addStyleName("h5");
     heading.add(header);
@@ -609,7 +617,7 @@ public class ShowPreservationEvent extends Composite {
     body.addStyleName("panel-body");
     layout.add(body);
 
-    Label header = new Label(messages.showTransferredResourceExtended());
+    HTML header = new HTML(SafeHtmlUtils.fromSafeConstant("<h5>" + messages.showTransferredResourceExtended() + "</h5>"));
     header.addStyleName("panel-title");
     header.addStyleName("h5");
     heading.add(header);
