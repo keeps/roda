@@ -150,7 +150,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
                 if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
                   for (Representation representation : aip.getRepresentations()) {
                     LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                    List<LinkingIdentifier> newSources = SiegfriedPluginUtils.runSiegfriedOnRepresentation(model,
+                    List<LinkingIdentifier> newSources = SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, index,
                       representation, cachedJob.getId(), cachedJob.getUsername(), overwriteManual);
                     if (!newSources.isEmpty()) {
                       sources.addAll(newSources);
@@ -180,7 +180,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
                 for (Representation representation : aip.getRepresentations()) {
                   LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                  List<LinkingIdentifier> newSources = SiegfriedPluginUtils.runSiegfriedOnRepresentation(model,
+                  List<LinkingIdentifier> newSources = SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, index,
                     representation, cachedJob.getId(), cachedJob.getUsername(), overwriteManual);
                   if (!newSources.isEmpty()) {
                     sources.addAll(newSources);
@@ -203,7 +203,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               }
             }
           } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
-            | AuthorizationDeniedException e) {
+            | AuthorizationDeniedException | AlreadyExistsException e) {
             LOGGER.error("Error running Siegfried {}: {}", aip.getId(), e.getMessage(), e);
 
             jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -225,7 +225,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               for (Representation representation : filteredList) {
                 try {
                   LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                  sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation,
+                  sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, index, representation,
                     cachedJob.getId(), cachedJob.getUsername(), overwriteManual));
                   if (sources.isEmpty()) {
                     state = PluginState.SKIPPED;
@@ -283,7 +283,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
       try {
-        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId(),
+        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, index, representation,
+          cachedJob.getId(),
           cachedJob.getUsername(), overwriteManual));
         if (sources.isEmpty()) {
           jobPluginInfo.incrementObjectsProcessedWithSkipped();
@@ -295,7 +296,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
           model.notifyRepresentationUpdated(representation).failOnError();
         }
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
-        | AuthorizationDeniedException e) {
+        | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error running Siegfried {}: {}", representation.getAipId(), e.getMessage(), e);
 
         jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -331,7 +332,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         file.getAipId());
 
       try {
-        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnFile(model, file, cachedJob.getUsername(), overwriteManual));
+        sources.addAll(
+          SiegfriedPluginUtils.runSiegfriedOnFile(model, index, file, cachedJob.getUsername(), overwriteManual));
         if (sources.isEmpty()) {
           jobPluginInfo.incrementObjectsProcessedWithSkipped();
           reportItem.setPluginState(PluginState.SKIPPED)
@@ -341,7 +343,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
           reportItem.setPluginState(PluginState.SUCCESS);
         }
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
-        | AuthorizationDeniedException e) {
+        | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error running Siegfried on file {}: {}", file.getId(), e.getMessage(), e);
 
         jobPluginInfo.incrementObjectsProcessedWithFailure();

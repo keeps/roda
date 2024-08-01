@@ -21,18 +21,27 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.risks.IncidenceStatus;
+import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.risks.SeverityLevel;
+import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.PluginException;
@@ -142,9 +151,9 @@ public class SiegfriedPluginUtils {
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(ModelService model,
+    IndexService index,
     Representation representation, String jobId, String username, boolean overwriteManual) throws GenericException,
-    RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException, PluginException {
+    RequestNotValidException, NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException {
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(representation.getAipId(),
       representation.getId());
     StorageService storageService;
@@ -154,7 +163,7 @@ public class SiegfriedPluginUtils {
         ModelUtils.getAIPStoragePath(representation.getAipId()));
       try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
-        return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
+        return runSiegfriedOnRepresentationOrFile(model, index, representation.getAipId(), representation.getId(),
           new ArrayList<>(), null, representationFsPath, username, overwriteManual);
       } catch (IOException e) {
         throw new GenericException(e);
@@ -171,7 +180,7 @@ public class SiegfriedPluginUtils {
     } else {
       try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
-        return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
+        return runSiegfriedOnRepresentationOrFile(model, index, representation.getAipId(), representation.getId(),
           new ArrayList<>(), null, representationFsPath, username, overwriteManual);
       } catch (IOException e) {
         throw new GenericException(e);
@@ -179,15 +188,15 @@ public class SiegfriedPluginUtils {
     }
   }
 
-  public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnFile(ModelService model, File file,
+  public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnFile(ModelService model,
+    IndexService index, File file,
     String username, boolean overwriteManual) throws GenericException, RequestNotValidException, NotFoundException,
-    AuthorizationDeniedException,
-    PluginException {
+    AuthorizationDeniedException, PluginException, AlreadyExistsException {
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
 
     try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath)) {
       Path filePath = directAccess.getPath();
-      List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, file.getAipId(),
+      List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, index, file.getAipId(),
         file.getRepresentationId(), file.getPath(), file.getId(), filePath, username, overwriteManual);
       model.notifyFileUpdated(file).failOnError();
       return sources;
@@ -197,10 +206,11 @@ public class SiegfriedPluginUtils {
   }
 
   private static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentationOrFile(ModelService model,
-    String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path, String username,
+    IndexService index, String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path,
+    String username,
     Boolean overwriteManual)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-    PluginException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, PluginException,
+    AlreadyExistsException {
     List<LinkingIdentifier> sources = new ArrayList<>();
 
     if (FSUtils.exists(path)) {
@@ -225,37 +235,95 @@ public class SiegfriedPluginUtils {
 
         jsonFilePath.remove(jsonFilePath.size() - 1);
 
-        if (!PremisV3Utils.formatWasManuallyModified(model, aipId, representationId, jsonFilePath, jsonFileId, username)
-          || overwriteManual) {
-          ContentPayload payload = new StringContentPayload(file.toString());
-          model.createOrUpdateOtherMetadata(aipId, representationId, jsonFilePath, jsonFileId,
-            SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, username, false);
+        JsonNode matches = file.get(RodaConstants.SIEGFRIED_PAYLOAD_MATCHES);
+        if (matches != null) {
+          if (!PremisV3Utils.formatWasManuallyModified(model, aipId, representationId, jsonFilePath, jsonFileId,
+            username) || overwriteManual) {
+            ContentPayload payload = new StringContentPayload(file.toString());
+            model.createOrUpdateOtherMetadata(aipId, representationId, jsonFilePath, jsonFileId,
+              SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, username, false);
 
-          sources.add(PluginHelper.getLinkingIdentifier(aipId, representationId, jsonFilePath, jsonFileId,
-            RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+            sources.add(PluginHelper.getLinkingIdentifier(aipId, representationId, jsonFilePath, jsonFileId,
+              RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-          // Update PREMIS files
-          final JsonNode matches = file.get("matches");
-          for (JsonNode match : matches) {
-            String format = null;
-            String version = null;
-            String pronom = null;
-            String mime = null;
+            // Update PREMIS files
+            for (JsonNode match : matches) {
+              String format = null;
+              String version = null;
+              String pronom = null;
+              String mime = null;
 
-            if ("pronom".equalsIgnoreCase(match.get("ns").textValue())) {
-              format = match.get("format").textValue();
-              version = match.get("version").textValue();
-              pronom = match.get("id").textValue();
-              mime = match.get("mime").textValue();
+              if ("pronom".equalsIgnoreCase(match.get("ns").textValue())) {
+                format = match.get("format").textValue();
+                version = match.get("version").textValue();
+                pronom = match.get("id").textValue();
+                mime = match.get("mime").textValue();
+              }
+
+              JsonNode warning = match.get(RodaConstants.SIEGFRIED_PAYLOAD_MATCH_WARNING);
+              List<String> notes = new ArrayList<>();
+              if (StringUtils.isNotBlank(warning.textValue())) {
+                notes.add(RodaConstants.PRESERVATION_FORMAT_NOTE_SIEGFRIED_WARNING + ": " + warning.textValue());
+                updateFileRiskIncidences(model, index, aipId, representationId, jsonFileId, jsonFilePath,
+                  warning.textValue());
+              }
+              PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, jsonFilePath, jsonFileId,
+                format, version, pronom, mime, notes, username, true);
             }
-
-            PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, jsonFilePath, jsonFileId,
-              format, version, pronom, mime, new ArrayList<>(), username, true);
           }
         }
       }
     }
-
     return sources;
+  }
+
+  private static void updateFileRiskIncidences(ModelService model, IndexService index, String aipId,
+    String representationId, String fileId, List<String> filePath, String warning) throws RequestNotValidException,
+    GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    // Mitigate previous incidences
+    for (RiskIncidence incidence : getPreviousSiegfriedIncidences(model, index, fileId)) {
+      incidence.setStatus(IncidenceStatus.MITIGATED);
+      model.updateRiskIncidence(incidence, true);
+    }
+    // Create a new incidence
+    RiskIncidence riskIncidence = new RiskIncidence();
+    if (fileId != null) {
+      riskIncidence.setFileId(fileId);
+      riskIncidence.setFilePath(filePath);
+      riskIncidence.setObjectClass(File.class.getName());
+    } else {
+      riskIncidence.setObjectClass(Representation.class.getName());
+    }
+    riskIncidence.setRiskId(RodaConstants.RISK_ID_SIEGFRIED_IDENTIFICATION_WARNING);
+    riskIncidence.setDetectedBy(SiegfriedPlugin.getStaticName());
+    riskIncidence.setByPlugin(true);
+    riskIncidence.setStatus(IncidenceStatus.UNMITIGATED);
+    riskIncidence.setRepresentationId(representationId);
+    riskIncidence.setAipId(aipId);
+    riskIncidence.setDescription(warning);
+    riskIncidence.setFileId(fileId);
+    riskIncidence.setSeverity(SeverityLevel.LOW);
+    model.createRiskIncidence(riskIncidence, true);
+  }
+
+  public static List<RiskIncidence> getPreviousSiegfriedIncidences(ModelService model, IndexService index,
+    String fileId) throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
+    List<RiskIncidence> riskIncidences = new ArrayList<>();
+    Filter filter = new Filter();
+    List<FilterParameter> filterParameters = new ArrayList<>();
+    filterParameters.add(new SimpleFilterParameter("riskId", RodaConstants.RISK_ID_SIEGFRIED_IDENTIFICATION_WARNING));
+    filterParameters.add(new SimpleFilterParameter("fileId", fileId));
+    filterParameters.add(new SimpleFilterParameter("status", IncidenceStatus.UNMITIGATED.name()));
+    filter.add(filterParameters);
+    try (IterableIndexResult<RiskIncidence> results = index.findAll(RiskIncidence.class, filter, true,
+      Arrays.asList("id", "status"))) {
+      for (RiskIncidence incidence : results) {
+        RiskIncidence modelIncidence = model.retrieveRiskIncidence(incidence.getId());
+        riskIncidences.add(modelIncidence);
+      }
+    } catch (IOException e) {
+      LOGGER.error("Error finding file id {}'s associated risk incidences", fileId, e);
+    }
+    return riskIncidences;
   }
 }

@@ -73,7 +73,7 @@ public class RiskIncidenceController implements RiskIncidenceRestService, Export
   }
 
   @Override
-  public LongResponse count(CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_RISK_INCIDENCE)) {
       return new LongResponse(indexService.count(RiskIncidence.class, countRequest, requestContext));
