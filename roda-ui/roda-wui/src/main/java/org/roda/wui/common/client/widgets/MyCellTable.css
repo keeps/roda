@@ -57,10 +57,10 @@
     border-color: #f8f8f8
 }
 .cellTableSelectedRow {
-    background: #5bbeff
+    background: #257cb6
 }
 .cellTableSelectedRowCell {
-    border-color: #5bbeff
+    border-color: #257cb6
 }
 .cellTableHoveredRow {
     background: #eeeeee;
@@ -70,12 +70,12 @@
     border-color: #eeeeee
 }
 .cellTableSelectedRow.cellTableHoveredRow {
-    background: #5bbeff;
+    background: #257cb6;
     color: white
 }
 .cellTableSelectedRowCell.cellTableHoveredRowCell {
-    border-color: #5bbeff;
-    background: #5bbeff
+    border-color: #257cb6;
+    background: #257cb6
 }
 .cellTableFadeOut {
     white-space: nowrap;

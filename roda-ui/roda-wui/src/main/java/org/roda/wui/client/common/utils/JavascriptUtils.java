@@ -154,7 +154,7 @@ public class JavascriptUtils {
                           .hide();
                       var tpl = $wnd
                           .jQuery('<li class="working"><input type="text" value="0" data-width="30" data-height="30"'
-                              + ' data-fgColor="#089de3" data-readOnly="1" data-bgColor="#3e4043" /><p></p><span class="icon"></span></li>');
+                              + ' data-fgColor="#156193" data-readOnly="1" data-bgColor="#3e4043" /><p></p><span class="icon"></span></li>');
 
                       // Append the file name and file size
                       tpl

@@ -3,10 +3,13 @@
 @def COLOR_PRIMARY				eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.primary")');
 @def COLOR_PRIMARY_HOVER		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.primary.hover")');
 
+@def COLOR_BODY_FOREGROUND      eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.body.foreground")');
+
 @def COLOR_MENU_PRIMARY			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.menu.primary")');
 @def COLOR_MENU_PRIMARY_TEXT	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.menu.primary.text")');
 @def COLOR_MENU_SECONDARY		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.menu.secondary")');
 @def COLOR_MENU_SECONDARY_TEXT	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.menu.secondary.text")');
+@def COLOR_MENU_DISABLED        eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.menu.disabled")');
 
 @def COLOR_BUTTON_DANGER		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.button.danger")');
 @def COLOR_BUTTON_DANGER_HOVER	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.button.danger.hover")');
@@ -19,6 +22,10 @@
 @def COLOR_LABEL_DANGER			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.danger")');
 @def COLOR_LABEL_WARNING		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.warning")');
 @def COLOR_LABEL_INFO			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.info")');
+@def COLOR_LABEL_TRANSPARENT    eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.transparent")');
+@def COLOR_LABEL_LIGHTGRAY      eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.lightgray")');
+@def COLOR_LABEL_GRAY           eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.gray")');
+@def COLOR_LABEL_DARKGRAY       eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.darkgray")');
 
 @def COLOR_ACTIONS_PRIMARY			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.actions.primary")');
 @def COLOR_ACTIONS_PRIMARY_HOVER	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.actions.primary.hover")');
@@ -55,7 +62,7 @@
     line-height: 1.6;
     font-weight: 400;
     font-family: FONT_PRIMARY;
-    color: #222;
+    color: COLOR_BODY_FOREGROUND;
 }
 
 .roda {
@@ -72,7 +79,7 @@ a:HOVER {
 }
 
 select {
-    color: #444;
+    color: COLOR_LABEL_DARKGRAY;
     padding: 5px;
     line-height: 1.6;
     font-weight: 400;
@@ -148,7 +155,7 @@ ol {
 .label {
     font-size: 1.5rem;
     font-weight: 300;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .col_card {
@@ -199,7 +206,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     /*     font-size: 75%; */
     /*     font-weight: 700; */
     line-height: 1;
-    color: #fff;
+    color: COLOR_LABEL_DARKGRAY;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
@@ -213,7 +220,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     /*     font-size: 75%; */
     /*     font-weight: 700; */
     line-height: 1;
-    color: #fff;
+    color: white;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
@@ -227,7 +234,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     /*font-size: 75%;
     font-weight: 700;*/
     line-height: 1;
-    color: #fff;
+    color: COLOR_LABEL_DARKGRAY;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
@@ -241,7 +248,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     /*     font-size: 75%; */
     /*     font-weight: 700; */
     line-height: 1;
-    color: #fff;
+    color: white;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
@@ -255,7 +262,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     /*     font-size: 75%; */
     /*     font-weight: 700; */
     line-height: 1;
-    color: #fff;
+    color: white;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
@@ -269,7 +276,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     /*     font-size: 75%; */
     /*     font-weight: 700; */
     line-height: 1;
-    color: #fff;
+    color: white;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
@@ -306,7 +313,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
 }
 
 .gray {
-    color: #a7a9ac;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .inline {
@@ -343,8 +350,8 @@ div.inline {
     right: 0;
     width: 2em;
     height: 100%;
-    /* @alternate */ background: -webkit-linear-gradient(right, #fff 30%, rgba(255, 255, 255, 0) 100%);
-    background: linear-gradient(-90deg, #fff 30%, rgba(255, 255, 255, 0) 100%);
+    /* @alternate */ background: -webkit-linear-gradient(right, white 30%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(-90deg, white 30%, rgba(255, 255, 255, 0) 100%);
 }
 
 .my-asyncdatagrid-side-panel .fade-out:after {
@@ -378,7 +385,7 @@ div.inline {
 .card .actionable-header,
 .representationInformationSubtitle{
     margin-top: 0;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
     font-weight: 300;
     margin-bottom: 1rem;
 }
@@ -408,7 +415,7 @@ div.inline {
     @mixin fontawesome();
     padding-right: 10px;
     color: COLOR_PRIMARY;
-    
+
 }
 
 .browse_top .aipChildrenCard {
@@ -613,7 +620,7 @@ pre code {
 .error:before {
     content: '\f071';
     @mixin fontawesome();
-    
+
     padding-left: 5px;
     margin-right: 5px;
 }
@@ -625,7 +632,7 @@ pre code {
 .success:before {
     content: '\f00c';
     @mixin fontawesome();
-    
+
     padding-left: 5px;
     margin-right: 5px;
 }
@@ -708,7 +715,7 @@ pre code {
 
 .searchAdvancedPanel .fieldTextBox, .searchAdvancedPanel .form-textbox, .loginPanel .fieldTextBox, .dialog-right-side .form-textbox, .relation-form-panel .form-textbox {
     border: 1px solid #ccc;
-    background-color: #fff;
+    background-color: white;
 }
 
 .content .fieldTextBox, .content .form-textbox {
@@ -757,7 +764,7 @@ pre code {
 .form-help {
     font-size: 1rem;
     font-weight: 400;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
     position: relative;
     top: -5px;
 }
@@ -823,7 +830,7 @@ pre code {
 
 .itemPanel .itemText {
     font-size: 1.2rem;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .itemButtonsPanel {
@@ -921,7 +928,7 @@ pre code {
 }
 
 .btn:disabled {
-    background-color: #ddd;
+    background-color: COLOR_MENU_DISABLED;
 }
 
 .btn:active {
@@ -942,9 +949,9 @@ pre code {
 
 .btn:after {
     display: inline-block;
-    
+
     @mixin fontawesome();
-    
+
     line-height: 1;
     float: right;
 
@@ -1164,9 +1171,9 @@ pre code {
     cursor: pointer;
     cursor: hand;
     color: white;
-    background-color: #999;
+    background-color: COLOR_LABEL_LIGHTGRAY;
     text-align: center;
-    /*border-left: 1px SOLID WHITE;*/
+    /*border-left: 1px SOLID white;*/
 }
 
 .toolbarLink.toolbarLinkSmall {
@@ -1185,7 +1192,7 @@ pre code {
 }
 
 .toolbarLink.disabled, .toolbarLink.disabled:hover {
-	background-color: #ddd;
+	background-color: COLOR_MENU_DISABLED;
 	cursor: auto;
 }
 
@@ -1203,7 +1210,7 @@ pre code {
 
 .panel {
     margin-bottom: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid COLOR_MENU_DISABLED;
     background-color: COLOR_PRIMARY;
     padding-left: 2px;
 }
@@ -1314,7 +1321,7 @@ pre code {
     font-size: 1.4rem;
     font-weight: 500;
     margin-bottom: 0.2rem;
-    color: #4b4a4a;
+    color: COLOR_LABEL_DARKGRAY;
 }
 
 .my-asyncdatagrid-pager-results {
@@ -1446,21 +1453,21 @@ pre code {
 }
 
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-    color:    #ddd;
+    color:    COLOR_MENU_DISABLED;
 }
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-   color:    #ddd;
+   color:    COLOR_MENU_DISABLED;
    opacity:  1;
 }
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
-   color:    #ddd;
+   color:    COLOR_MENU_DISABLED;
    opacity:  1;
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
-   color:    #ddd;
+   color:    COLOR_MENU_DISABLED;
 }
 ::-ms-input-placeholder { /* Microsoft Edge */
-   color:    #ddd;
+   color:    COLOR_MENU_DISABLED;
 }
 
 /**********************************************
@@ -1527,7 +1534,7 @@ pre code {
 }
 
 .gwt-SuggestBoxPopup .item-selected {
-    background-color: #999;
+    background-color: COLOR_LABEL_LIGHTGRAY;
 }
 
 /**********************************************
@@ -1572,12 +1579,12 @@ pre code {
 
 .dropdown-label:after {
     display: inline-block;
-    
+
     content: "\f107";
     @mixin fontawesome();
-    
+
     font-size: inherit;
-    
+
     float: right;
     line-height: 2.5rem;
     padding-left: 5px;
@@ -1615,7 +1622,7 @@ pre code {
 }
 
 .gwt-DatePicker {
-    border: 1px solid #888;
+    border: 1px solid COLOR_LABEL_LIGHTGRAY;
     cursor: default;
 }
 
@@ -1657,7 +1664,7 @@ pre code {
 }
 
 .datePickerDayIsFiller {
-    color: #888888;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .datePickerDayIsValue {
@@ -1741,7 +1748,7 @@ td.datePickerMonth, td.datePickerYear {
     padding: 5px 15px;
     font-size: 1.1rem;
     font-weight: 300;
-    color: #fff;
+    color: white;
     z-index: 10;
 }
 
@@ -1773,13 +1780,13 @@ td.datePickerMonth, td.datePickerYear {
     padding: 40px;
     font-size: 12px;
     line-height: 18px;
-    color: #222;
+    color: COLOR_BODY_FOREGROUND;
 }
 
 .static-page-distributed-instance {
     font-size: 12px;
     line-height: 18px;
-    color: #222;
+    color: COLOR_BODY_FOREGROUND;
 }
 
 .static-page .license ul li {
@@ -2125,11 +2132,11 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .main .menu-item-on {
-    color: #FFFFFF;
+    color: white;
 }
 
 .main .menu-item-on:hover {
-    color: #FFFFFF;
+    color: white;
 }
 
 .main .menu_separator {
@@ -2210,7 +2217,7 @@ td.datePickerMonth, td.datePickerYear {
 .main .wui-breadcrumbPanel .breadcrumb {
     display: inline-block;
     vertical-align: bottom;
-    color: #a7a9ac;
+    color: COLOR_LABEL_GRAY;
     cursor: pointer;
     cursor: hand;
     font-size: 1.2rem;
@@ -2222,12 +2229,12 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .main .wui-breadcrumbPanel .breadcrumb * {
-    color: #a7a9ac;
+    color: COLOR_LABEL_GRAY;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb .fa {
     margin: 0 3px;
-    color: #a7a9ac;
+    color: COLOR_LABEL_GRAY;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-last {
@@ -2240,14 +2247,14 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-last .fa, .main .wui-breadcrumbPanel .breadcrumb-last .description-level {
-    color: #404142;
+    color: COLOR_LABEL_DARKGRAY;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-separator {
     display: inline-block;
     vertical-align: bottom;
     font-size: 1.2rem;
-    color: #a7a9ac;
+    color: COLOR_LABEL_GRAY;
     cursor: text;
 }
 
@@ -2324,7 +2331,7 @@ td.datePickerMonth, td.datePickerYear {
     display: inline-block;
     margin-left: 2px;
     margin-right: 2px;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .facet-empty {
@@ -2572,7 +2579,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseItemHeader {
-	color: #999;
+	color: COLOR_LABEL_LIGHTGRAY;
 	font-size: 1.8rem;
 	font-weight: 300;
 }
@@ -2638,7 +2645,7 @@ td.datePickerMonth, td.datePickerYear {
 .browseIngestJobId,
 .browseItemDates,
 .browseRepresentationId {
-    color: #a7a9ac;
+    color: COLOR_LABEL_LIGHTGRAY;
     font-size: 1rem;
     line-height: 1.2rem;
 }
@@ -2674,7 +2681,7 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 15px;
     padding: 0;
     position: relative;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .browseItemMetadata .gwt-TabBarItem > div {
@@ -2778,7 +2785,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .descriptiveMetadata .title, .preservationMetadata .title {
     display: none;
-    color: #a7a9ac;
+    color: COLOR_LABEL_LIGHTGRAY;
     border-bottom: 1px solid rgba(167, 169, 172, 0.5);
     padding-bottom: 5px;
     margin-bottom: 10px;
@@ -2978,7 +2985,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .representation .preservationLevel, .derivation {
-    color: #888;
+    color: COLOR_LABEL_LIGHTGRAY;
     display: block;
     margin-left: 3.2rem;
     font-size: 1.1rem;
@@ -3022,7 +3029,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .file .subheader {
     display: block;
-    color: #888;
+    color: COLOR_LABEL_LIGHTGRAY;
     font-size: 1.2rem;
     margin-left: 7px;
     border-left: 1px solid #ccc;
@@ -3120,7 +3127,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .event .subheader {
     display: block;
-    color: #888;
+    color: COLOR_LABEL_LIGHTGRAY;
     font-size: 1.2rem;
     margin-left: 2rem;
 }
@@ -3149,7 +3156,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .agent .subheader {
     display: block;
-    color: #888;
+    color: COLOR_LABEL_LIGHTGRAY;
     font-size: 1.2rem;
     margin-left: 2rem;
 }
@@ -3295,7 +3302,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-view-window .viewPanel-tabs .gwt-TabBar {
-    background-color: #999;
+    background-color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .wui-view-window .viewPanel-tabs .gwt-TabPanelBottom {
@@ -3561,7 +3568,7 @@ td.datePickerMonth, td.datePickerYear {
     display: none;
 }
 
-/* @end */ /* @end */ 
+/* @end */ /* @end */
 
 /** Arrangement table **/
 .wui-browse-arrangementTable { /*	background-color: white;*/
@@ -3805,7 +3812,7 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 15px;
     float: right;
     width: 40px;
-    background-color: #999;
+    background-color: COLOR_LABEL_LIGHTGRAY;
     color: white;
 }
 
@@ -3865,7 +3872,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchBox::-webkit-input-placeholder,
 .searchBox:placeholder-shown {
-    color: rgba(0, 0, 0, 0.5);
+    color: COLOR_LABEL_TRANSPARENT;
 }
 
 .searchButton,
@@ -3875,7 +3882,7 @@ td.datePickerMonth, td.datePickerYear {
     position: relative;
     float: left;
     width: 40px;
-    background-color: #999;
+    background-color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .advancedSearchButton {
@@ -3889,7 +3896,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchAdvancedDisclosureButton {
     background-color: #eee;
-    color: rgba(0, 0, 0, 0.5);
+    color: COLOR_LABEL_TRANSPARENT;
 }
 
 .searchButton:hover {
@@ -3994,7 +4001,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .search-field-warning-label {
     font-size: 1.1rem;
-    color: #999;
+    color: COLOR_LABEL_GRAY;
     position: absolute;
 	width: 100%;
 }
@@ -4044,7 +4051,7 @@ td.datePickerMonth, td.datePickerYear {
     background: transparent;
     cursor: pointer;
     cursor: hand;
-    color: rgba(0, 0, 0, 0.5);
+    color: COLOR_LABEL_TRANSPARENT;
 }
 
 .search-field-dialog {
@@ -4057,7 +4064,7 @@ td.datePickerMonth, td.datePickerYear {
     background: transparent;
     cursor: pointer;
     cursor: hand;
-    color: rgba(0, 0, 0, 0.5);
+    color: COLOR_LABEL_TRANSPARENT;
 }
 
 .search-field-left-panel .form-textbox-small {
@@ -4097,7 +4104,7 @@ td.datePickerMonth, td.datePickerYear {
     margin-top: 1rem;
     margin-bottom: 1rem;
     font-weight: 600;
-    color: #9a9a9a;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .table-empty-inner .table-empty-inner-link {
@@ -4182,7 +4189,7 @@ td.datePickerMonth, td.datePickerYear {
     border-left: 5px solid COLOR_PRIMARY;
     margin-top: 15px;
     padding: 5px 10px;
-    box-shadow: 2px 2px 5px 1px #ddd;
+    box-shadow: 2px 2px 5px 1px COLOR_MENU_DISABLED;
 }
 
 .list-panel:first-of-type {
@@ -4203,7 +4210,7 @@ td.datePickerMonth, td.datePickerYear {
     position: absolute;
     top: 5px;
     left: 40px;
-    color: #ffffff;
+    color: white;
 }
 
 .wui-login .wui-login-layout-guest {
@@ -4262,7 +4269,7 @@ td.datePickerMonth, td.datePickerYear {
     width: 150px;
     font-family: FONT_PRIMARY;
     font-size: 9pt;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
     margin-bottom: 5px;
 }
 
@@ -4275,9 +4282,9 @@ td.datePickerMonth, td.datePickerYear {
     position: absolute;
     top: 65px;
     left: 40px;
-    color: #ffffff;
+    color: white;
     padding-bottom: 3px;
-    border-bottom: 1px dashed #ffffff;
+    border-bottom: 1px dashed white;
     cursor: pointer;
     cursor: hand;
 }
@@ -4295,7 +4302,7 @@ td.datePickerMonth, td.datePickerYear {
 .wui-login .wui-loginLinks .loginLink a {
     font-family: FONT_PRIMARY;
     font-size: 9pt;
-    color: #ffffff;
+    color: white;
     text-decoration: none;
     white-space: nowrap;
 }
@@ -4307,7 +4314,7 @@ td.datePickerMonth, td.datePickerYear {
 .wui-login .wui-loginLinks .separator {
     font-family: FONT_PRIMARY;
     font-size: 9pt;
-    color: #ffffff;
+    color: white;
 }
 
 .wui-login .wui-loginLinks {
@@ -4404,8 +4411,8 @@ td.datePickerMonth, td.datePickerYear {
     padding-right:10px;
     margin-top: 15px;
     background: none;
-    color: #089de3;
-    border: 1px solid #089de3;
+    color: #156193;
+    border: 1px solid #156193;
     min-width: 80px;
     text-align: center;
 }
@@ -4573,7 +4580,7 @@ td.datePickerMonth, td.datePickerYear {
 .viewRepresentationFile .filePreviewToolbar {
     min-height: 35px;
     line-height: 35px;
-    background-color: #ddd;
+    background-color: COLOR_MENU_DISABLED;
     position: relative;
 }
 
@@ -4584,7 +4591,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .filePreviewToolbar-alt .toolbarLink {
 	background: none;
-	color: #999;
+	color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .filePreviewToolbar-alt .toolbarLink:hover {
@@ -4593,12 +4600,12 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .filePreviewToolbar-alt .toolbarLink.disabled {
-	color: #ddd;
+	color: COLOR_MENU_DISABLED;
 	background: none;
 }
 
 .filePreviewToolbar-alt .toolbarLink.disabled:hover {
-	color: #ddd;
+	color: COLOR_MENU_DISABLED;
 	background: none;
 }
 
@@ -4606,7 +4613,7 @@ td.datePickerMonth, td.datePickerYear {
 	display: inline-block;
 	vertical-align: bottom;
     margin-right: 2px;
-    color: #222;
+    color: COLOR_BODY_FOREGROUND;
 }
 
 .viewRepresentationFile .filePreviewToolbar .viewRepresentationBreadcrumb {
@@ -4697,7 +4704,7 @@ td.datePickerMonth, td.datePickerYear {
 .viewRepresentationNotSupportedPreview,
 .viewRepresentationAudioFilePreviewHTML {
     padding-top: 120px;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
     text-align: center;
 }
 
@@ -4732,7 +4739,7 @@ td.datePickerMonth, td.datePickerYear {
 .viewRepresentation .searchPanel {
     height: 35px;
     margin-right: 0px;
-    background-color: #999;
+    background-color: COLOR_LABEL_LIGHTGRAY;
     color: #eee;
 }
 
@@ -4752,7 +4759,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .viewRepresentation .searchBox::-webkit-input-placeholder,
 .viewRepresentation .searchBox:placeholder-shown {
-    color: #ddd;
+    color: COLOR_MENU_DISABLED;
 }
 
 .viewRepresentation .searchPanelLeft {
@@ -4861,7 +4868,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .table-file-path {
-    color: #a7a9ac;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 /**********************************************
@@ -4877,7 +4884,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .ingest-transfer-lastscanned {
     font-size: 1.1rem;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 #upload {
@@ -4886,7 +4893,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .dragover #drop {
-    border: 5px solid #ddd;
+    border: 5px solid COLOR_MENU_DISABLED;
 }
 
 #drop {
@@ -4904,7 +4911,7 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 2.4rem;
     line-height: 1.35;
     letter-spacing: -.08rem;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
     text-transform: none;
     margin-top: 0px;
     margin-bottom: 1rem;
@@ -4914,7 +4921,7 @@ td.datePickerMonth, td.datePickerYear {
 #drop a {
     background-color: COLOR_PRIMARY;
     padding: 10px 20px;
-    color: #fff;
+    color: white;
     font-size: 1.2rem;
     border-radius: 2px;
     cursor: pointer;
@@ -4973,20 +4980,20 @@ td.datePickerMonth, td.datePickerYear {
 
 #upload-list li span.icon:after {
     display: inline-block;
-    
+
     font-size: 2rem;
     line-height: 2rem;
     width: 2rem;
     height: 2rem;
-    
+
     content: "\f00c";
     @mixin fontawesome();
-    
+
     position: absolute;
     top: 20px;
     right: 20px;
     cursor: pointer;
-    
+
     color: #24c279;
     -webkit-animation: none;
     -moz-animation: none;
@@ -5081,7 +5088,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .ingest-process-counter-0 {
-    color: #999;
+    color: COLOR_LABEL_GRAY;
 }
 
 /**********************************************
@@ -5093,7 +5100,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .job-report-object-output .job-report-object-output-icon {
     line-height: 1.1rem;
-    color: #222;
+    color: COLOR_BODY_FOREGROUND;
     padding-right: 5px;
 }
 
@@ -5104,7 +5111,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .report .entry, .report .valid {
-    /* 	border-bottom: 1px solid #ddd; */
+    /* 	border-bottom: 1px solid COLOR_MENU_DISABLED; */
 }
 
 .report .entry {
@@ -5178,8 +5185,8 @@ td.datePickerMonth, td.datePickerYear {
 
 /** User Disclosure Panel **/
 .wui-UserDisclosurePanel {
-    border-top: 1px solid #fff;
-    border-bottom: 1px solid #fff;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
     width: 100%;
     background-color: #e6e7e8;
 }
@@ -5187,7 +5194,7 @@ td.datePickerMonth, td.datePickerYear {
 .wui-UserDisclosurePanel .gwt-DisclosurePanel {
     width: 100%;
     border-spacing: 0;
-    /*	border-right: 1px solid #fff;*/
+    /*	border-right: 1px solid white;*/
 }
 
 .wui-UserDisclosurePanel .gwt-DisclosurePanel .header {
@@ -5271,7 +5278,7 @@ td.datePickerMonth, td.datePickerYear {
 
 /** Group Disclosure Panel **/
 .wui-GroupDisclosurePanel {
-    border: 1px solid #fff;
+    border: 1px solid white;
     width: 100%;
     background-color: #e6e7e8;
 }
@@ -5279,7 +5286,7 @@ td.datePickerMonth, td.datePickerYear {
 .wui-GroupDisclosurePanel .gwt-DisclosurePanel {
     width: 100%;
     border-spacing: 0;
-    /*	border-right: 1px solid #fff;*/
+    /*	border-right: 1px solid white;*/
 }
 
 .wui-GroupDisclosurePanel .gwt-DisclosurePanel .header {
@@ -5385,7 +5392,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .groupselect .group-label {
     font-weight: bold;
-    color: #fff;
+    color: white;
     background-color: #58595b;
     padding: 2px 4px;
     width: 300px;
@@ -5440,7 +5447,7 @@ td.datePickerMonth, td.datePickerYear {
     vertical-align: middle;
     cursor: default;
     margin-left: 3px;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 /** Permissions Panel **/
@@ -5470,7 +5477,7 @@ td.datePickerMonth, td.datePickerYear {
     vertical-align: middle;
     cursor: default;
     margin-left: 3px;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .permission {
@@ -5566,7 +5573,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .wui-user-data .password-note {
     font-size: 8pt;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
     margin-top: 2px;
 }
 
@@ -5587,7 +5594,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .wui-user-data .wui-user-data-note {
     font-size: 8pt;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
     margin-top: 2px;
 }
 
@@ -5783,7 +5790,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-report .report-item .header * {
-    color: #ffffff;
+    color: white;
 }
 
 .wui-report .report-item-attributes {
@@ -5858,7 +5865,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .controlPanel-whitebox {
     min-width: 130px;
-    border: 1px solid #999;
+    border: 1px solid COLOR_LABEL_LIGHTGRAY;
     background-color: #e6e7e8;
 }
 
@@ -5933,7 +5940,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .wui-search-compact .search-box {
     width: 120px;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
     font-size: 10pt;
 }
 
@@ -6119,8 +6126,8 @@ td.datePickerMonth, td.datePickerYear {
     left: 0;
     right: 0;
 
-    background: #222;
-    color: #fff;
+    background: COLOR_BODY_FOREGROUND;
+    color: white;
     font-size: 17px;
     font-family: FONT_PRIMARY;
     font-weight: 300;
@@ -6136,7 +6143,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .cc_container ::-moz-selection {
     background: #ff5e99;
-    color: #fff;
+    color: white;
     text-shadow: none;
 }
 
@@ -6200,7 +6207,7 @@ td.datePickerMonth, td.datePickerYear {
 .representation {
 	background-color: transparent;
 	padding-left: 0px;
-/* 	border: 1px solid #ddd; */
+/* 	border: 1px solid COLOR_MENU_DISABLED; */
 	margin-bottom: 10px;
 }
 .representation .panel-body {
@@ -6244,11 +6251,11 @@ td.datePickerMonth, td.datePickerYear {
 }
 .representationInformation {
     /*font-size: 90%;*/
-    color: #a7a9ac;
+    color: COLOR_LABEL_LIGHTGRAY;
     font-size: 1rem;
 }
 .representationId {
-	color: #a7a9ac;
+	color: COLOR_LABEL_LIGHTGRAY;
     font-size: 1rem;
     display: none;
 }
@@ -6325,7 +6332,7 @@ td.datePickerMonth, td.datePickerYear {
     margin: 0;
     float: left;
     text-align: center;
-    color: #222;
+    color: COLOR_BODY_FOREGROUND;
 }
 
 .plugin-list-item-icon-experimental:before {
@@ -6672,9 +6679,9 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .ri-entity-relation-section {
-	color: #999;
+	color: COLOR_LABEL_LIGHTGRAY;
     font-size: 90%;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid COLOR_MENU_DISABLED;
     margin-top: 20px;
     padding-top: 7px;
     padding-left: 1.5%;
@@ -6872,17 +6879,17 @@ span.code {
 
 .fa.gwt-ToggleButton-down,.fa.gwt-ToggleButton-down-hovering,
 .fa.gwt-PushButton-down,.fa.gwt-PushButton-down-hovering {
-    color: #222;
+    color: COLOR_BODY_FOREGROUND;
 }
 
 .fa.gwt-ToggleButton-up,.fa.gwt-ToggleButton-up-hovering,
 .fa.gwt-PushButton-up,.fa.gwt-PushButton-up-hovering {
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .fa.gwt-ToggleButton-down-hovering,.fa.gwt-ToggleButton-up-hovering,
 .fa.gwt-PushButton-down-hovering,.fa.gwt-PushButton-up-hovering {
-	/*background-color: #ddd;*/
+	/*background-color: COLOR_MENU_DISABLED;*/
     /*border-radius: 1px;*/
 	cursor: pointer;
 	cursor: hand;
@@ -6913,7 +6920,7 @@ span.code {
 
 .search-prefilter-field, .search-prefilter-value {
     font-family: FONT_MONOSPACED;
-    color: #888;
+    color: COLOR_LABEL_LIGHTGRAY;
     font-weight: 800;
 }
 
@@ -6990,7 +6997,7 @@ span.code {
 }
 
 .actions-empty-help {
-    color: #222;
+    color: COLOR_BODY_FOREGROUND;
 }
 
 
@@ -7138,7 +7145,7 @@ span.code {
 .sidebar .actionable-button-disabled,
 .slider .actionable-button-disabled,
 .ActionableStyleButtons .actionable-button-disabled{
-    background-color: #ddd;
+    background-color: COLOR_MENU_DISABLED;
 }
 
 .slider .actionable-button + .actionable-button,
@@ -7252,12 +7259,12 @@ span.code {
     margin-left: 1rem;
     line-height: 1.6;
     vertical-align: middle;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .actionable-header.actionable-header-with-actions:hover .actionable-header-caret,
 .actionable-header.actionable-header-with-actions-clicked .actionable-header-caret {
-    color: #222;
+    color: COLOR_BODY_FOREGROUND;
 }
 
 /******************************
@@ -7266,7 +7273,7 @@ span.code {
 .navigationToolbar {
     min-height: 35px;
     line-height: 35px;
-    background-color: #ddd;
+    background-color: COLOR_MENU_DISABLED;
     position: relative;
 }
 
@@ -7279,7 +7286,7 @@ span.code {
     display: inline-block;
     vertical-align: bottom;
     font-size: 1.6rem;
-    color: #222;
+    color: COLOR_BODY_FOREGROUND;
 }
 
 .navigationToolbar .navigationToolbarHeader {
@@ -7317,9 +7324,9 @@ span.code {
     cursor: pointer;
     cursor: hand;
     color: white;
-    background-color: #999;
+    background-color: COLOR_LABEL_LIGHTGRAY;
     text-align: center;
-    /*border-left: 1px SOLID WHITE;*/
+    /*border-left: 1px SOLID white;*/
 }
 
 .navigationToolbarLink.navigationToolbarLinkSmall {
@@ -7341,18 +7348,18 @@ span.code {
 
 .navigationToolbarLink.disabled,
 .navigationToolbarLink.disabled:hover {
-    background-color: #ddd;
+    background-color: COLOR_MENU_DISABLED;
     cursor: auto;
 }
 
 .navigationToolbar-alt .navigationToolbarLink {
     background-color: #eee;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .navigationToolbar-alt .navigationToolbarLink.disabled,
 .navigationToolbar-alt .navigationToolbarLink.disabled:hover {
-    color: #ddd;
+    color: COLOR_MENU_DISABLED;
     background-color: #eee;
 }
 
@@ -7361,7 +7368,7 @@ span.code {
     line-height: 35px;
     height: 35px;
     color: white;
-    background-color: #999;
+    background-color: COLOR_LABEL_LIGHTGRAY;
     text-align: center;
     width: auto;
     font-size: 14px;
@@ -7375,7 +7382,7 @@ span.code {
     margin-top: 1rem;
     margin-bottom: 1rem;
     font-weight: 600;
-    color: #9a9a9a;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .basicTable{
@@ -7407,7 +7414,7 @@ span.code {
     display:inline-block;
     padding: 4px 12px;
     background-color: #e7e7e7;
-    border-color: #ddd;
+    border-color: COLOR_MENU_DISABLED;
     cursor: pointer;
     margin-right: 10px
 }
@@ -7463,18 +7470,18 @@ span.code {
     margin-top: 1rem;
     margin-bottom: 1rem;
     font-weight: 600;
-    color: #9a9a9a;
+    color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .wui-create-disposal-confirmation-data .wui-disposal-confirmation-data-note {
     font-size: 8pt;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
     margin-top: 2px;
 }
 
 .wui-required-fields-note {
     font-size: 8pt;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
     margin-top: 2px;
 }
 
@@ -7548,7 +7555,7 @@ span.code {
 }
 
 .disposal-policy-summary-hold {
-    background-color: #888;
+    background-color: COLOR_LABEL_LIGHTGRAY;
 }
 
 .disposal-policy-summary-retain {
@@ -7659,7 +7666,7 @@ span.code {
 }
 
 .pluginWorkFlowListTitleButtons:hover {
-    color: #fff;
+    color: white;
 }
 
 .plugin-status-btn {
@@ -7707,7 +7714,7 @@ span.code {
     font-size: 15px;
     padding: 0;
     position: relative;
-    color: #999;
+    color: COLOR_LABEL_LIGHTGRAY;
     border-bottom: solid 2px transparent;
 }
 
@@ -7758,17 +7765,17 @@ span.code {
 
 .badge-panel-dark {
     background-color: #2b303a;
-    color: #fff;
+    color: white;
 }
 
 .badge-panel-success {
     background-color: COLOR_LABEL_SUCCESS;
-    color: #fff;
+    color: white;
 }
 
 .badge-panel-danger {
     background-color: COLOR_LABEL_DANGER;
-    color: #fff;
+    color: white;
 }
 
 .badge-icon {
@@ -7840,7 +7847,7 @@ span.code {
   border: none;
   right: 20px;
   position: absolute;
-  color: #555;
+  color: COLOR_LABEL_DARKGRAY;
   cursor: pointer;
   top: 20px;
 }
@@ -7854,20 +7861,26 @@ span.code {
     border-radius: 2px;
     font-weight: 200;
     font-size: 1.3rem;
-    background-color: #FFF3CD;
+    background-color: #fff3CD;
     color: #664d03;
 }
 
-.ingest-tab-panel-label,
-.ingest-tab-panel-label h5{
+.ingest-tab-panel-label{
     padding: 3px 5px;
+}
+
+.ingest-tab-panel-label h5{
+    padding: 0px;
+    font-size: 1.3rem;
+    font-weight: 200;
+    margin: 0px;
 }
 
 .ingestTabPanelclose{
     background-color: transparent;
     border: none;
     right: 20px;
-    color: #555;
+    color: COLOR_LABEL_DARKGRAY;
     cursor: pointer;
     top: 20px;
     float:right;
