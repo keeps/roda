@@ -84,6 +84,8 @@ public class ContentPanel extends SimplePanel {
   }
 
   public void init() {
+    // Set ID
+    getElement().setId("content");
     // Login
     resolvers.add(Login.RESOLVER);
     // Home
