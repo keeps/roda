@@ -13,8 +13,8 @@
   // Change cookie consent options on the fly.
   var OPTIONS_UPDATER = 'update_cookieconsent_options';
 
-  // Name of cookie to be set when dismissed
-  var DISMISSED_COOKIE = 'cookieconsent_dismissed';
+  // Key used to store consent status in localStorage
+  var DISMISSED_KEY = 'cookieconsent_dismissed';
 
   // The path to built in themes
   // Note: Directly linking to a version on the CDN like this is horrible, but it's less horrible than people downloading the code
@@ -22,7 +22,7 @@
   var THEME_BUCKET_PATH = '//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.10/';
 
   // No point going further if they've already dismissed.
-  if (document.cookie.indexOf(DISMISSED_COOKIE) > -1 || (window.navigator && window.navigator.CookiesOK)) {
+  if (localStorage.getItem(DISMISSED_KEY) || (window.navigator && window.navigator.CookiesOK)) {
     return;
   }
 
@@ -93,25 +93,8 @@
       return null;
     },
 
-    setCookie: function (name, value, expiryDays, domain, path) {
-      expiryDays = expiryDays || 365;
-
-      var exdate = new Date();
-      exdate.setDate(exdate.getDate() + expiryDays);
-
-      var cookie = [
-        name + '=' + value,
-        'expires=' + exdate.toUTCString(),
-        'path=' + path || '/'
-      ];
-
-      if (domain) {
-        cookie.push(
-          'domain=' + domain
-        );
-      }
-
-      document.cookie = cookie.join(';');
+    setLocalStorage: function (key, value) {
+          localStorage.setItem(key, value);
     },
 
     addEventListener: function (el, event, eventListener) {
@@ -332,12 +315,12 @@
     dismiss: function (evt) {
       evt.preventDefault && evt.preventDefault();
       evt.returnValue = false;
-      this.setDismissedCookie();
+      this.setDismissed();
       this.container.removeChild(this.element);
     },
 
-    setDismissedCookie: function () {
-      Util.setCookie(DISMISSED_COOKIE, 'yes', this.options.expiryDays, this.options.domain, this.options.path);
+    setDismissed: function () {
+          Util.setLocalStorage(DISMISSED_KEY, 'yes');
     }
   };
 

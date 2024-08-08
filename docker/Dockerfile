@@ -50,8 +50,9 @@ COPY ./docker-files/docker-entrypoint.sh /
 COPY ./docker-files/docker-entrypoint.d/* /docker-entrypoint.d/
 
 RUN set -ex; \
-  groupadd -r --gid "$RODA_GID" "$RODA_GROUP"; \
-  useradd -r --uid "$RODA_UID" --gid "$RODA_GID" "$RODA_USER"; \
+  usermod -l roda ubuntu; \
+  usermod -d /home/roda -m roda; \
+  groupmod  -n roda ubuntu; \
   mkdir -p -m0770 "$RODA_HOME/data"; \
   mkdir -p -m0770 "$RODA_HOME/config"; \
   chown -R "$RODA_USER:0" "$RODA_HOME"
