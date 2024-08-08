@@ -31,7 +31,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.orchestrate.akka.AkkaJobsManager;
+import org.roda.core.plugins.orchestrate.pekko.PekkoJobsManager;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +145,7 @@ public class PluginThatTestsLocking extends AbstractPlugin<AIP> {
           Report reportItem = PluginHelper.initPluginReportItem(plugin, aip.getId(), AIP.class);
           addDetails(reportItem, new Date().toString());
           for (Entry<String, Counter> entry : RodaCoreFactory.getMetrics().getCounters().entrySet()) {
-            if (entry.getKey().endsWith(AkkaJobsManager.LOCK_REQUESTS_WAITING_TO_ACQUIRE_LOCK)
+            if (entry.getKey().endsWith(PekkoJobsManager.LOCK_REQUESTS_WAITING_TO_ACQUIRE_LOCK)
               && entry.getValue().getCount() > 0) {
               addDetails(reportItem, PLUGIN_DETAILS_AT_LEAST_ONE_LOCK_REQUEST_WAITING);
             }

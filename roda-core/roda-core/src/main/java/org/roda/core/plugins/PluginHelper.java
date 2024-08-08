@@ -31,7 +31,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
-import org.roda.core.common.akka.Messages;
+import org.roda.core.common.pekko.Messages;
+import org.roda.core.common.pekko.messages.jobs.JobPartialUpdate;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -1375,7 +1376,7 @@ public final class PluginHelper {
       Job job = getJob(plugin, index);
       SelectedItems<?> sourceObjects = job.getSourceObjects();
       if (sourceObjects instanceof SelectedItemsList) {
-        RodaCoreFactory.getPluginOrchestrator().updateJobAsync(plugin, (Messages.JobPartialUpdate) Messages
+        RodaCoreFactory.getPluginOrchestrator().updateJobAsync(plugin, (JobPartialUpdate) Messages
           .newJobSourceObjectsUpdated(oldToNewTransferredResourceIds).withJobPriority(job.getPriority()));
       }
     } catch (NotFoundException | GenericException | RequestNotValidException e) {

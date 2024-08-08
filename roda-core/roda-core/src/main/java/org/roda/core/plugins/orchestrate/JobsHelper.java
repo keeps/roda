@@ -21,7 +21,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.akka.Messages;
+import org.roda.core.common.pekko.Messages;
+import org.roda.core.common.pekko.messages.jobs.JobPartialUpdate;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -254,7 +255,7 @@ public final class JobsHelper {
   public static <T extends IsRODAObject> void updateJobStateAsync(Plugin<T> plugin, JobPriority priority,
     JOB_STATE state, Optional<String> stateDetails) {
     RodaCoreFactory.getPluginOrchestrator().updateJobAsync(plugin,
-      (Messages.JobPartialUpdate) Messages.newJobStateUpdated(plugin, state, stateDetails).withJobPriority(priority));
+      (JobPartialUpdate) Messages.newJobStateUpdated(plugin, state, stateDetails).withJobPriority(priority));
   }
 
   public static <T extends IsRODAObject> void updateJobStateAsync(Plugin<T> plugin, JobPriority priority,

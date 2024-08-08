@@ -145,7 +145,7 @@ import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginManagerException;
 import org.roda.core.plugins.PluginOrchestrator;
-import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
+import org.roda.core.plugins.orchestrate.PekkoEmbeddedPluginOrchestrator;
 import org.roda.core.protocols.Protocol;
 import org.roda.core.protocols.ProtocolManager;
 import org.roda.core.protocols.ProtocolManagerException;
@@ -1568,8 +1568,8 @@ public class RodaCoreFactory {
 
   private static void instantiateOrchestrator() {
     OrchestratorType orchestratorType = getOrchestratorType();
-    if (orchestratorType == OrchestratorType.AKKA) {
-      pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
+    if (orchestratorType == OrchestratorType.PEKKO) {
+      pluginOrchestrator = new PekkoEmbeddedPluginOrchestrator();
     } else {
       LOGGER.error("Orchestrator type '{}' is invalid or not supported. No plugin orchestrator will be started!",
         orchestratorType);

@@ -12,7 +12,10 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 
+import java.io.Serial;
+
 public class EventsManager implements EventsNotifier {
+  @Serial
   private static final long serialVersionUID = 3733394744862836327L;
 
   private EventsNotifier eventsNotifier;

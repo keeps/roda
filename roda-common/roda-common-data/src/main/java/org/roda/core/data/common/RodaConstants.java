@@ -765,10 +765,10 @@ public final class RodaConstants {
   public static final String DEFAULT_ENVIRONMENT_COLLECT_VERSION = "true";
 
   public enum OrchestratorType {
-    AKKA, AKKA_DISTRIBUTED
+    PEKKO, PEKKO_DISTRIBUTED
   }
 
-  public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.AKKA;
+  public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.PEKKO;
   public static final String ORCHESTRATOR_TYPE_PROPERTY = "core.orchestrator.type";
   public static final String CORE_ORCHESTRATOR_PREFIX = "core.orchestrator";
   public static final String CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PRIORITY = "internal_jobs_priority";
@@ -830,7 +830,7 @@ public final class RodaConstants {
       "org.roda.core.data.v2.ip.TransferredResource", "org.roda.core.data.v2.user.User",
       "org.roda.core.data.v2.user.Group", "org.roda.core.data.v2.user.RODAMember",
       "org.roda.core.data.v2.ip.disposal.DisposalConfirmation", "org.roda.core.data.v2.user.RodaPrincipal",
-      "org.roda.core.data.v2.ip.AIP", "org.roda.core.data.v2.risks.Risk", "org.roda.core.events.akka.CRDTWrapper",
+      "org.roda.core.data.v2.ip.AIP", "org.roda.core.data.v2.risks.Risk", "org.roda.core.events.pekko.CRDTWrapper",
       "org.roda.core.data.v2.ip.DIP", "org.roda.core.data.v2.ip.metadata.DescriptiveMetadata",
       "org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry",
       "org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalConfirmationAIPMetadata",
