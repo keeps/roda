@@ -13,7 +13,7 @@ public class RequestUtils {
     RequestContext requestContext = new RequestContext();
 
     // get user
-    User user = UserUtility.getApiUser(request);
+    User user = UserUtility.getUser(request, true);
 
     // get headers
     RequestHeaders headers = new RequestHeaders();

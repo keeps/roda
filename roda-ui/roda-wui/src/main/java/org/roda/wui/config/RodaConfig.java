@@ -1,14 +1,19 @@
 package org.roda.wui.config;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import org.apereo.cas.client.session.SingleSignOutHttpSessionListener;
 import org.roda.wui.filter.OnOffFilter;
+import org.roda.wui.filter.SecurityHeadersFilter;
 import org.roda.wui.servlets.ContextListener;
 import org.roda.wui.servlets.RodaWuiServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -166,6 +171,34 @@ public class RodaConfig {
     registrationBean.addUrlPatterns("/login", "/logout");
 
     return registrationBean;
+  }
+
+  @Bean
+  public FilterRegistrationBean<SecurityHeadersFilter> securityHeadersFilter() {
+    FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
+    registrationBean.setFilter(new SecurityHeadersFilter());
+    registrationBean.addUrlPatterns("/*"); // Apply the filter to all requests
+    return registrationBean;
+  }
+
+  @Bean
+  public ServletContextInitializer servletContextInitializer() {
+    return new ServletContextInitializer() {
+
+      @Override
+      public void onStartup(ServletContext servletContext) throws ServletException {
+        servletContext.getSessionCookieConfig().setSecure(true);
+        servletContext.getSessionCookieConfig().setHttpOnly(true);
+      }
+    };
+  }
+
+  @Configuration(proxyBeanMethods = false)
+  public class SameSiteConfiguration {
+    @Bean
+    public CookieSameSiteSupplier applicationCookieSameSiteSupplier() {
+      return CookieSameSiteSupplier.ofStrict();
+    }
   }
 
   @Configuration

@@ -94,7 +94,7 @@
     },
 
     setLocalStorage: function (key, value) {
-          localStorage.setItem(key, value);
+      localStorage.setItem(key, value);
     },
 
     addEventListener: function (el, event, eventListener) {
@@ -320,7 +320,7 @@
     },
 
     setDismissed: function () {
-          Util.setLocalStorage(DISMISSED_KEY, 'yes');
+      Util.setLocalStorage(DISMISSED_KEY, 'yes');
     }
   };
 
