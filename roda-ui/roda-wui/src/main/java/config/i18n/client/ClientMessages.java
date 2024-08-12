@@ -2484,4 +2484,7 @@ public interface ClientMessages extends Messages {
 
   /* Audit logs */
   String relatedAuditLogs();
+
+  /* Accessibility labels */
+  String ariaLabelClose();
 }

@@ -190,7 +190,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputPanel.addStyleName("search-field-input-panel");
     inputPanel.addStyleName("full_width");
     remove.addStyleName("search-field-remove");
-    remove.getElement().setAttribute("aria-label", "close");
+    remove.getElement().setAttribute("aria-label", messages.ariaLabelClose());
     fieldLabel.addStyleName("search-field-label");
     fieldBox.addStyleName("form-listbox");
     searchAdvancedFields.addStyleName("form-listbox");
