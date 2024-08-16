@@ -9,6 +9,7 @@ package org.roda.wui.client.disposal.rule;
 
 import java.util.List;
 
+import com.google.gwt.aria.client.Roles;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -95,6 +96,8 @@ public class EditDisposalRule extends Composite {
   public EditDisposalRule(DisposalRule disposalRule, DisposalSchedules disposalSchedules) {
     this.disposalRule = disposalRule;
     this.disposalRuleDataPanel = new DisposalRuleDataPanel(disposalRule, disposalSchedules, true);
+    Roles.getButtonRole().setAriaLabelProperty(buttonApply.getElement(), messages.ariaLabelSubmit());
+    Roles.getButtonRole().setAriaLabelProperty(buttonCancel.getElement(), messages.ariaLabelCancel());
 
     initWidget(uiBinder.createAndBindUi(this));
   }

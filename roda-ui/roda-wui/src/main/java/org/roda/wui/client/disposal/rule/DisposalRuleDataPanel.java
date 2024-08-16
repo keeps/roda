@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.aria.client.Roles;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
@@ -134,6 +135,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     previewHelpText.setText(messages.disposalRulePreviewHelpText());
     btnPreview = new Button(messages.disposalRulePreviewButtonText());
     btnPreview.addStyleName("btn btn-preview");
+    Roles.getButtonRole().setAriaLabelProperty(btnPreview.getElement(), messages.ariaLabelPreview());
     btnPreview.setEnabled(isEditMode());
 
     btnPreview.addClickHandler(e -> {

@@ -2487,4 +2487,10 @@ public interface ClientMessages extends Messages {
 
   /* Accessibility labels */
   String ariaLabelClose();
+  String ariaLabelUsername();
+  String ariaLabelPassword();
+  String ariaLabelSubmit();
+  String ariaLabelActions();
+  String ariaLabelCancel();
+  String ariaLabelPreview();
 }

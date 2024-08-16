@@ -13,6 +13,7 @@ package org.roda.wui.client.main;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.aria.client.Roles;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
@@ -176,6 +177,10 @@ public class Login extends Composite {
         }
       }
     });
+
+    // Accessibility roles
+    Roles.getTextboxRole().setAriaLabelProperty(username.getElement(), messages.ariaLabelUsername());
+    Roles.getTextboxRole().setAriaLabelProperty(password.getElement(), messages.ariaLabelPassword());
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

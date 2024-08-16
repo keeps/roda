@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import com.google.gwt.aria.client.ExpandedValue;
+import com.google.gwt.aria.client.Roles;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
@@ -190,7 +192,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputPanel.addStyleName("search-field-input-panel");
     inputPanel.addStyleName("full_width");
     remove.addStyleName("search-field-remove");
-    remove.getElement().setAttribute("aria-label", messages.ariaLabelClose());
+    Roles.getButtonRole().setAriaLabelProperty(remove.getElement(), messages.ariaLabelClose());
     fieldLabel.addStyleName("search-field-label");
     fieldBox.addStyleName("form-listbox");
     searchAdvancedFields.addStyleName("form-listbox");
@@ -345,38 +347,50 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE)) {
       inputPanel.add(inputDateBox);
       inputDateBox.getElement().setAttribute("title", label);
+      Roles.getTextboxRole().setAriaLabelProperty(inputDateBox.getElement(), label);
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)) {
       inputPanel.add(inputDateBoxFrom);
       inputPanel.add(inputDateBoxTo);
       inputDateBoxFrom.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldFrom() + ")");
+      Roles.getTextboxRole().setAriaLabelProperty(inputDateBoxFrom.getElement(), label);
       inputDateBoxTo.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldTo() + ")");
+      Roles.getTextboxRole().setAriaLabelProperty(inputDateBoxTo.getElement(), label);
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC)) {
       inputPanel.add(inputNumeric);
-      inputPanel.getElement().setAttribute("title", label);
+      inputNumeric.getElement().setAttribute("title", label);
+      Roles.getTextboxRole().setAriaLabelProperty(inputNumeric.getElement(), label);
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)) {
       inputPanel.add(inputNumericFrom);
       inputPanel.add(inputNumericTo);
       inputDateBoxFrom.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldFrom() + ")");
+      Roles.getTextboxRole().setAriaLabelProperty(inputNumericFrom.getElement(), label + " (" + messages.dateRangeFieldFrom() + ")");
       inputDateBoxTo.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldTo() + ")");
+      Roles.getTextboxRole().setAriaLabelProperty(inputNumericTo.getElement(), label + " (" + messages.dateRangeFieldTo() + ")");
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)) {
       inputPanel.add(inputStorageSizeFrom);
       inputPanel.add(inputStorageSizeTo);
       inputPanel.add(inputStorageSizeList);
       inputStorageSizeFrom.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldFrom() + ")");
+      Roles.getTextboxRole().setAriaLabelProperty(inputStorageSizeFrom.getElement(), label + " (" + messages.dateRangeFieldFrom() + ")");
       inputStorageSizeTo.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldTo() + ")");
+      Roles.getTextboxRole().setAriaLabelProperty(inputStorageSizeTo.getElement(), label + " (" + messages.dateRangeFieldTo() + ")");
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN)) {
       inputPanel.add(inputCheckBox);
       inputCheckBox.getElement().setAttribute("title", label);
+      Roles.getTextboxRole().setAriaLabelProperty(inputCheckBox.getElement(), label);
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST)) {
 
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_CONTROLLED)) {
       inputPanel.add(inputControlled);
       inputControlled.getElement().setAttribute("title", label);
+      Roles.getTextboxRole().setAriaLabelProperty(inputControlled.getElement(), label);
     } else {
       inputPanel.add(inputText);
       inputText.getElement().setAttribute("title", label);
+      Roles.getTextboxRole().setAriaLabelProperty(inputText.getElement(), label);
       inputPanel.addStyleName("full_width");
     }
+    Roles.getButtonRole().setAriaLabelProperty(remove.getElement(), messages.ariaLabelClose() + " (" + label + ")");
   }
 
   public void addInputSearchSuggestBox(SearchSuggestBox<?> searchSuggestBox) {

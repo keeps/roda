@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.aria.client.ExpandedValue;
+import com.google.gwt.aria.client.Roles;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
@@ -155,6 +157,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
     // setup search input textfield and search button
     searchInputButton.addClickHandler(event -> doSearch());
+    Roles.getButtonRole().setAriaLabelProperty(searchInputButton.getElement(), messages.ariaLabelSubmit());
     searchInputBox.getElement().setPropertyString("placeholder",
       placeholder == null ? messages.searchPlaceHolder() : placeholder);
     searchInputBox.addKeyDownHandler(event -> {
@@ -171,6 +174,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
     actionableBuilder = actionable != null ? new ActionableWidgetBuilder<>(actionable) : null;
     actionsButton.setVisible(actionableBuilder != null && actionable.hasAnyRoles() && list.isSelectable());
+    Roles.getButtonRole().setAriaLabelProperty(actionsButton.getElement(), messages.ariaLabelActions());
     actionsButton.addClickHandler(event -> {
       if (!list.isVisible()) {
         doSearch();
@@ -262,6 +266,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     }
 
     searchAdvancedDisclosureButton.setVisible(advancedSearchEnabled);
+    Roles.getButtonRole().setAriaExpandedState(searchAdvancedDisclosureButton.getElement(), ExpandedValue.FALSE);
     searchAdvancedPanel.setVisible(makeAdvancedPanelVisible);
     if (advancedSearchEnabled) {
       searchAdvancedDisclosureButton.addClickHandler(event -> toggleAdvancedSearchPanel());
@@ -352,8 +357,10 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   private void toggleAdvancedSearchPanel() {
     searchAdvancedPanel.setVisible(!searchAdvancedPanel.isVisible());
     if (searchAdvancedPanel.isVisible()) {
+      Roles.getButtonRole().setAriaExpandedState(searchAdvancedDisclosureButton.getElement(), ExpandedValue.TRUE);
       searchAdvancedDisclosureButton.addStyleName("open");
     } else {
+      Roles.getButtonRole().setAriaExpandedState(searchAdvancedDisclosureButton.getElement(), ExpandedValue.FALSE);
       searchAdvancedDisclosureButton.removeStyleName("open");
     }
   }

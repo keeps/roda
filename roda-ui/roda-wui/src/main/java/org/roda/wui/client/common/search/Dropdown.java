@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.gwt.aria.client.ExpandedValue;
+import com.google.gwt.aria.client.Roles;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
@@ -79,8 +81,10 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
 
     focusPanel.addStyleName("dropdown");
     panel.addStyleName("dropdown-panel");
+    Roles.getButtonRole().setAriaExpandedState(panel.getElement(), ExpandedValue.FALSE);
     iconAndLabelPanel.addStyleName("dropdown-label");
     popup.addStyleName("dropdown-popup");
+
   }
 
   public void addItem(final String label, final String value, final String icon) {
@@ -122,12 +126,14 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
   public void popup() {
     if (popupShowing) {
       popup.hide();
+      Roles.getButtonRole().setAriaExpandedState(panel.getElement(), ExpandedValue.FALSE);
       popupShowing = popup.isShowing();
     } else {
       // popup.showRelativeTo(panel);
       popup.setWidth(panel.getOffsetWidth() + "px");
       popup.setPopupPosition(panel.getAbsoluteLeft(), panel.getAbsoluteTop() + panel.getOffsetHeight());
       popup.show();
+      Roles.getButtonRole().setAriaExpandedState(panel.getElement(), ExpandedValue.TRUE);
       popupShowing = popup.isShowing();
       panel.addStyleName("open");
     }

@@ -319,6 +319,7 @@ public class JavascriptUtils {
     var locArray = noHistoryCurrLoc.split("?");
     $wnd.location.href = locArray[0] + "?locale=" + newLocale + "#"
         + noHistoryCurrLocArray[1];
+    document.documentElement.setAttribute('lang', newLocale);
   }-*/;
 
   public static native void setCookieOptions(String message, String dismiss, String learnMore, String link) /*-{
