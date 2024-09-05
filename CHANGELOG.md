@@ -1,5 +1,25 @@
 # Changelog
 
+## v5.7.0 (05/09/2024)
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+- Improve HTTP headers security
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.0-beta1 (21/06/2024)
+#### New features 
+
+- Replace Akka with Apache Pekko
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.6.5 (07/06/2024)
 #### Bug fixes
 
@@ -429,52 +449,4 @@ docker pull keeps/roda:v4.5.2
 Install for demonstration:
 ```
 docker pull keeps/roda:v4.5.1
-```
-
----
-
-## v4.5.0 (06/01/2023)
-### :warning: Breaking Changes
-Due to a dependency upgrade from Apache DS a migration procedure should be executed:
-
-1. Perform a LDAP backup
-2. Remove the ldap folder inside config directory
-3. Start RODA
-4. Restore the LDAP backup.
-
-#### New features:
-
-- Solr retry #1216
-- Add saved search functionality #2283
-
-#### Enhancements:
-
-- Dialogs.prompt() lack of feedback when input is invalid #908
-
-#### Bug Fixes:
-
-- Fixity information computation does not create an event when skipped #2291
-- File leak when listing disposal resources #2250
-- Ingest Assessment search filter does not clear up #2263
-
-#### Security:
-
-- Several dependency upgrades to fix security vulnerabilities
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.5.0
-```
-
----
-
-## v3.7.1 (01/08/2022)
-#### Bug Fixes:
-
-- Processes with different types of parallelism are sharing the same pool of workers #2211
-- Deleting a Representation is also deleting PREMIS file #2033
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.7.1
 ```
