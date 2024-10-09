@@ -96,7 +96,7 @@ public class DeleteRodaObjectPluginUtils {
     } else if (object instanceof RiskIncidence) {
       processRiskIncidence(model, report, jobPluginInfo, cachedJob, plugin, (RiskIncidence) object, doReport);
     } else if (object instanceof DIP) {
-      processDIP(model, report, jobPluginInfo, cachedJob, plugin, (DIP) object, doReport);
+      processDIP(model, report, jobPluginInfo, cachedJob, plugin, (DIP) object, doReport, true);
     } else if (object instanceof DIPFile) {
       processDIPFile(model, report, jobPluginInfo, cachedJob, plugin, (DIPFile) object, doReport);
     }
@@ -513,7 +513,7 @@ public class DeleteRodaObjectPluginUtils {
         }
 
         if (aipIds.isEmpty() && representationIds.isEmpty() && fileIds.isEmpty()) {
-          processDIP(model, report, jobPluginInfo, job, plugin, dip, false);
+          processDIP(model, report, jobPluginInfo, job, plugin, dip, false, false);
         } else {
           model.updateDIP(dip);
         }
@@ -524,7 +524,7 @@ public class DeleteRodaObjectPluginUtils {
   }
 
   private static void processDIP(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
-    final Plugin<? extends IsRODAObject> plugin, DIP dip, final boolean doReport) {
+    final Plugin<? extends IsRODAObject> plugin, DIP dip, final boolean doReport, final boolean incrementObjects) {
     Optional<String> deletePlugin = DIPUtils.getDeletePlugin(dip);
 
     if (deletePlugin.isPresent()) {
@@ -543,7 +543,9 @@ public class DeleteRodaObjectPluginUtils {
         report.addReport(reportItem.setPluginState(state));
         PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
       }
-      jobPluginInfo.incrementObjectsProcessed(state);
+      if (incrementObjects) {
+        jobPluginInfo.incrementObjectsProcessed(state);
+      }
     }
   }
 
