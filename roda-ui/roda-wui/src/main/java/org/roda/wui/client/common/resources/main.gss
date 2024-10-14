@@ -859,6 +859,7 @@ pre code {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: auto !important;
 }
 
 .btn-block {
@@ -871,9 +872,6 @@ pre code {
 
 .btn:hover {
     background-color: COLOR_PRIMARY_HOVER;
-    cursor: pointer;
-    cursor: hand;
-    cursor: pointer;
 }
 
 .btn-default {
@@ -933,8 +931,6 @@ pre code {
 
 .btn:active {
     opacity: 0.9;
-    cursor: pointer;
-    cursor: hand;
 }
 
 .btn:focus {
@@ -1140,8 +1136,7 @@ pre code {
 }
 
 .lightbtn {
-	cursor: pointer;
-	cursor: hand;
+	;
 	display: inline-block;
 	opacity: 0.5;
 	width: 2rem;
@@ -1701,8 +1696,7 @@ td.datePickerMonth, td.datePickerYear {
 .datePickerPreviousYearButton, .datePickerNextYearButton {
     font-size: 120%;
     line-height: 1em;
-    cursor: hand;
-    cursor: pointer;
+    ;
     padding: 0px 4px;
 }
 
@@ -3806,8 +3800,6 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchPanelRight .actions-button {
-    cursor: pointer;
-    cursor: hand;
     position: relative;
     font-size: 15px;
     float: right;
@@ -3877,8 +3869,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchButton,
 .searchAdvancedDisclosureButton {
-    cursor: pointer;
-    cursor: hand;
+    ;
     position: relative;
     float: left;
     width: 40px;
@@ -4049,8 +4040,7 @@ td.datePickerMonth, td.datePickerYear {
     margin-top: 7px;
     border: none;
     background: transparent;
-    cursor: pointer;
-    cursor: hand;
+    ;
     color: COLOR_LABEL_TRANSPARENT;
 }
 
@@ -4261,8 +4251,7 @@ td.datePickerMonth, td.datePickerYear {
     position: absolute;
     left: 207px;
     top: 66px;
-    cursor: pointer;
-    cursor: hand;
+    ;
 }
 
 .wui-login .wui-login-box-pass-dummy {
@@ -4285,8 +4274,7 @@ td.datePickerMonth, td.datePickerYear {
     color: white;
     padding-bottom: 3px;
     border-bottom: 1px dashed white;
-    cursor: pointer;
-    cursor: hand;
+    ;
 }
 
 .wui-login .wui-logout-button-hover {
@@ -4768,8 +4756,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .viewRepresentation .searchButton {
-    cursor: pointer;
-    cursor: hand;
+    ;
     position: relative;
     top: -2px;
     left: 2px;
@@ -5409,14 +5396,12 @@ td.datePickerMonth, td.datePickerYear {
 
 .groupselect .group-button-add {
     margin: 10px 13px;
-    cursor: pointer;
-    cursor: hand;
+    ;
 }
 
 .groupselect .group-button-remove {
     margin: 10px 13px;
-    cursor: pointer;
-    cursor: hand;
+    ;
 }
 
 /** Groups Panel **/
@@ -5948,8 +5933,7 @@ td.datePickerMonth, td.datePickerYear {
     position: absolute;
     right: 10px;
     top: 10px;
-    cursor: pointer;
-    cursor: hand;
+    ;
 }
 
 /**********************************************
@@ -6891,7 +6875,7 @@ span.code {
 .fa.gwt-PushButton-down-hovering,.fa.gwt-PushButton-up-hovering {
 	/*background-color: COLOR_MENU_DISABLED;*/
     /*border-radius: 1px;*/
-	cursor: pointer;
+	;
 	cursor: hand;
 	box-shadow: 0px 0px 10px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     transition: all 0.2s cubic-bezier(.25,.8,.25,1);
@@ -7031,7 +7015,7 @@ span.code {
 }
 
 .actionable-button:hover {
-    cursor: pointer;
+    ;
 }
 
 .actionable-button-disabled:hover {
