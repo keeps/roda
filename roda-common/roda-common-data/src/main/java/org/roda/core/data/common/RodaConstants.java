@@ -1425,6 +1425,10 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_PRONOM = "parameter.pronom";
   public static final String PLUGIN_PARAMS_CLEAR_INCIDENCES = "parameter.clear_incidences";
 
+  // Generate Backfill Plugin Parameters
+
+  public static final String PLUGIN_PARAMS_BLOCK_SIZE = "parameter.block_size";
+
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
   public static final String PLUGIN_CATEGORY_RISK_MANAGEMENT = "risk_management";
