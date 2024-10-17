@@ -1321,6 +1321,11 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN = "parameter.do_build_sync_manifest";
   public static final String PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN = "parameter.do_send_sync_bundle";
   public static final String PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN = "parameter.do_request_sync_bundle";
+
+  // Generate Backfill Plugin Parameters
+
+  public static final String PLUGIN_PARAMS_BLOCK_SIZE = "parameter.block_size";
+
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
   public static final String PLUGIN_CATEGORY_RISK_MANAGEMENT = "risk_management";

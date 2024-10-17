@@ -71,7 +71,6 @@
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.jvnet.jaxb</groupId>
         <artifactId>jaxb-maven-plugin</artifactId>
@@ -95,8 +94,24 @@
               </bindingIncludes>
             </configuration>
           </execution>
+          <execution>
+            <id>generate-backfill-JAXB</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <schemaDirectory>src/main/resources/backfill</schemaDirectory>
+              <schemaIncludes>
+                <include>add_documents.xsd</include>
+              </schemaIncludes>
+              <cleanPackageDirectories>true</cleanPackageDirectories>
+              <generatePackage>org.roda.core.plugins.base.maintenance.backfill.beans</generatePackage>
+            </configuration>
+          </execution>
         </executions>
         <configuration>
+          <forceRegenerate>true</forceRegenerate>
           <extension>true</extension>
           <args>
             <arg>-Xsimplify</arg>
