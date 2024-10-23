@@ -7,9 +7,12 @@
  */
 package org.roda.core.plugins.base.maintenance.backfill;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -37,17 +40,22 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.base.maintenance.backfill.beans.Add;
+import org.roda.core.plugins.base.maintenance.backfill.beans.Delete;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class GenerateBackfillPlugin<T extends IsRODAObject & IsModelObject> extends AbstractPlugin<T> {
+public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & IsModelObject>
+  extends AbstractPlugin<T> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GenerateBackfillPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GenerateRODAEntityBackfillPlugin.class);
   private int blockSize = 100000;
+  private String validateAgainst = "None";
 
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  private final HashSet<String> processedObjectIds = new HashSet<>();
+
+  private final static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE,
@@ -55,9 +63,21 @@ public abstract class GenerateBackfillPlugin<T extends IsRODAObject & IsModelObj
         .getBuilder(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE, "Block size", PluginParameter.PluginParameterType.INTEGER)
         .withDefaultValue("100000").isMandatory(false)
         .withDescription("Number of documents in each index documents block.").build());
+    pluginParameters
+      .put(RodaConstants.PLUGIN_PARAMS_VALIDATE_AGAINST,
+        PluginParameter
+          .getBuilder(RodaConstants.PLUGIN_PARAMS_VALIDATE_AGAINST, "Check parity against",
+            PluginParameter.PluginParameterType.DROPDOWN)
+          .withPossibleValues(Arrays.asList(GenerateBackfillPluginUtils.VALIDATE_AGAINST_NONE,
+            GenerateBackfillPluginUtils.VALIDATE_AGAINST_INDEX, GenerateBackfillPluginUtils.VALIDATE_AGAINST_STORAGE))
+          .withDefaultValue(GenerateBackfillPluginUtils.VALIDATE_AGAINST_NONE).isMandatory(true)
+          .withDescription(
+            "Which collection the final result will be validated against to adjust for mid-execution changes.")
+          .build());
+
   }
 
-  protected GenerateBackfillPlugin() {
+  protected GenerateRODAEntityBackfillPlugin() {
     super();
   }
 
@@ -92,6 +112,7 @@ public abstract class GenerateBackfillPlugin<T extends IsRODAObject & IsModelObj
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_VALIDATE_AGAINST));
     return parameters;
   }
 
@@ -100,6 +121,9 @@ public abstract class GenerateBackfillPlugin<T extends IsRODAObject & IsModelObj
     super.setParameterValues(parameters);
     if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE)) {
       blockSize = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE));
+    }
+    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_VALIDATE_AGAINST)) {
+      validateAgainst = parameters.get(RodaConstants.PLUGIN_PARAMS_VALIDATE_AGAINST);
     }
   }
 
@@ -121,11 +145,12 @@ public abstract class GenerateBackfillPlugin<T extends IsRODAObject & IsModelObj
     for (T object : objects) {
       // TODO Handle exceptions
       try {
+        processedObjectIds.add(object.getId());
         if (count == blockSize) {
           count = 0;
           totalBeans += 1;
-          GenerateBackfillPluginUtils.writeAddBean(storage, object.getClass().getName() + "_" + totalBeans + ".xml",
-            addType);
+          GenerateBackfillPluginUtils.writeAddBean(storage, pluginParameters.get(RodaConstants.PLUGIN_PARAMS_JOB_ID)
+            + "/" + object.getClass().getName() + "_" + totalBeans + ".xml", addType);
         }
         addType.getDoc().add(GenerateBackfillPluginUtils.toDocBean(object, getIndexClass()));
         count += 1;
@@ -155,6 +180,18 @@ public abstract class GenerateBackfillPlugin<T extends IsRODAObject & IsModelObj
   }
 
   protected abstract <I extends IsIndexed> Class<I> getIndexClass();
+
+  protected List<T> retrieveModelObjects(ModelService model, List<String> ids)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    List<T> result = new ArrayList<>();
+    for (String id : ids) {
+      result.add(retrieveModelObject(model, id));
+    }
+    return result;
+  }
+
+  protected abstract T retrieveModelObject(ModelService model, String id)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   @Override
   public PluginType getType() {
@@ -194,7 +231,69 @@ public abstract class GenerateBackfillPlugin<T extends IsRODAObject & IsModelObj
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) {
-    // do nothing
+    if (validateAgainst.equals(GenerateBackfillPluginUtils.VALIDATE_AGAINST_INDEX)) {
+      validateAgainstIndex(index, model, storage);
+    }
+    return null;
+
+  }
+
+  protected Report validateAgainstIndex(IndexService index, ModelService model, StorageService storage) {
+    // TODO Handle exceptions
+    try {
+      List<Add> originalAddBeans = GenerateBackfillPluginUtils.readAddBeans(storage, "test");
+      List<String> deletedObjectIds = GenerateBackfillPluginUtils.checkIndexForDeletedObjects(index, getIndexClass(),
+        processedObjectIds.stream().toList());
+      List<String> addedObjects = GenerateBackfillPluginUtils.checkIndexForAddedObjects(index, getIndexClass(),
+        processedObjectIds);
+      Add addBean = new Add();
+      int addBeanCount = 0;
+      Delete deleteBean = new Delete();
+      int deleteBeanCount = 0;
+      while (!deletedObjectIds.isEmpty() || !addedObjects.isEmpty()) {
+        for (String id : deletedObjectIds) {
+          // Write delete query and remove from the processed ids
+          deleteBean.getId().add(id);
+          processedObjectIds.remove(id);
+          if (deleteBean.getId().size() > blockSize) {
+            GenerateBackfillPluginUtils.writeDeleteBean(storage,
+              pluginParameters.get(RodaConstants.PLUGIN_PARAMS_JOB_ID) + "/index_deleted/"
+                + getIndexClass().getSimpleName() + "_" + deleteBeanCount + ".xml",
+              deleteBean);
+            deleteBean = new Delete();
+          }
+        }
+        for (String id : addedObjects) {
+          // Write add query and add to the processed ids
+          addBean.getDoc().add(GenerateBackfillPluginUtils.toDocBean(retrieveModelObject(model, id), getIndexClass()));
+          processedObjectIds.add(id);
+          if (addBean.getDoc().size() > blockSize) {
+            GenerateBackfillPluginUtils.writeAddBean(storage,
+              "index_added/" + getIndexClass().getSimpleName() + "_" + addBeanCount + ".xml", addBean);
+            addBean = new Add();
+          }
+        }
+        deletedObjectIds = GenerateBackfillPluginUtils.checkIndexForDeletedObjects(index, getIndexClass(),
+          processedObjectIds.stream().toList());
+        addedObjects = GenerateBackfillPluginUtils.checkIndexForAddedObjects(index, getIndexClass(),
+          processedObjectIds);
+      }
+    } catch (GenericException e) {
+      throw new RuntimeException(e);
+    } catch (RequestNotValidException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (AuthorizationDeniedException e) {
+      throw new RuntimeException(e);
+    } catch (NotFoundException e) {
+      throw new RuntimeException(e);
+    } catch (NotSupportedException e) {
+      throw new RuntimeException(e);
+    } catch (AlreadyExistsException e) {
+      throw new RuntimeException(e);
+    }
+    // TODO return report
     return null;
   }
 
