@@ -7,11 +7,13 @@
  */
 package org.roda.core.plugins.base.maintenance.backfill;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -23,17 +25,16 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
-import org.roda.core.data.v2.index.select.SelectedItemsNone;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -50,18 +51,33 @@ import org.slf4j.LoggerFactory;
 public class GenerateAllRODAEntitiesBackfillPlugin extends AbstractPlugin<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GenerateAllRODAEntitiesBackfillPlugin.class);
-  private int blockSize = 100000;
-  private HashMap<String, HashSet<String>> initialIdsManifest = new HashMap<>();
-  private HashMap<String, HashSet<String>> processedIdsManifest = new HashMap<>();
+  private String outputDirectory = ".";
+  private boolean onlyGenerateInventory = false;
+  private Date startDate = null;
 
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE,
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE, "Block size", PluginParameter.PluginParameterType.INTEGER)
-        .withDefaultValue("100000").isMandatory(false)
-        .withDescription("Number of documents in each index documents block.").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY, "Output directory",
+          PluginParameter.PluginParameterType.STRING)
+        .withDefaultValue(".").isMandatory(true).withDescription("This job's output directory path").build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY, "Only generate inventory",
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").isMandatory(true)
+        .withDescription(
+          "Whether this job should only generate the inventory of RODA objects and not the index backfill files")
+        .build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_START_DATE,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_START_DATE, "Object starting date",
+          PluginParameter.PluginParameterType.STRING)
+        .isMandatory(false).withDescription(
+          "The last modified data for source objects to process. If not set, all objects will be processed.")
+        .build());
   }
 
   @Override
@@ -98,15 +114,28 @@ public class GenerateAllRODAEntitiesBackfillPlugin extends AbstractPlugin<Void> 
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_START_DATE));
     return parameters;
   }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE)) {
-      blockSize = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE));
+    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY)) {
+      outputDirectory = parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY);
+    }
+    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY)) {
+      onlyGenerateInventory = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY));
+    }
+    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_START_DATE)) {
+      SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+      try {
+        startDate = formatter.parse(parameters.get(RodaConstants.PLUGIN_PARAMS_START_DATE));
+      } catch (ParseException e) {
+        throw new InvalidParameterException(e);
+      }
     }
   }
 
@@ -141,7 +170,6 @@ public class GenerateAllRODAEntitiesBackfillPlugin extends AbstractPlugin<Void> 
       String jobId = IdUtils.createUUID();
       String jobName = "Generate index backfill for RODA entity (" + clazz.getSimpleName() + ")";
       report = PluginHelper.initPluginReportItem(this, jobId, Job.class);
-
       try {
         String username = PluginHelper.getJobUsername(this, model);
         Job job = initGenerateBackfillJob(clazz, jobId, jobName, username);
@@ -165,14 +193,28 @@ public class GenerateAllRODAEntitiesBackfillPlugin extends AbstractPlugin<Void> 
     job.setId(jobId);
     job.setName(jobName);
 
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE, String.valueOf(blockSize));
-    job.setPluginParameters(pluginParameters);
+    Map<String, String> localPluginParameters = new HashMap<>();
+    localPluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY, outputDirectory);
+    localPluginParameters.put(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY,
+      String.valueOf(onlyGenerateInventory));
+    job.setPluginParameters(localPluginParameters);
     job.setPluginType(PluginType.MISC);
     job.setUsername(username);
 
     job.setPlugin(GenerateBackfillPluginUtils.getGeneratedBackfillPluginName(clazz));
-    job.setSourceObjects(SelectedItemsAll.create(clazz));
+    SelectedItems<?> selectedItems;
+    if (startDate != null) {
+      SelectedItemsFilter<?> selectedItemsFilter = new SelectedItemsFilter<>();
+      Filter filter = new Filter();
+      DateIntervalFilterParameter dateIntervalFilterParameter = new DateIntervalFilterParameter();
+      dateIntervalFilterParameter.setFromValue(startDate);
+      filter.add(dateIntervalFilterParameter);
+      selectedItemsFilter.setFilter(filter);
+      selectedItems = selectedItemsFilter;
+    } else {
+      selectedItems = SelectedItemsAll.create(clazz);
+    }
+    job.setSourceObjects(selectedItems);
 
     return job;
   }
@@ -209,28 +251,13 @@ public class GenerateAllRODAEntitiesBackfillPlugin extends AbstractPlugin<Void> 
 
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) {
-    // Get all currently indexed IDs
-    /*
-     * List<Class<? extends IsRODAObject>> classes =
-     * PluginHelper.getReindexObjectClasses(); for (Class<? extends IsRODAObject>
-     * clazz : classes) { // TODO handle exceptions try { Class<? extends IsIndexed>
-     * indexClass = GenerateBackfillPluginUtils.getIndexClass(clazz);
-     * CloseableIterable<? extends OptionalWithCause<? extends IsIndexed>>
-     * indexedObjects = index.list(indexClass, List.of("id")); HashSet<String>
-     * objectIds = new HashSet<>(); indexedObjects.forEach(o ->
-     * objectIds.add(o.get().getId())); indexedObjects.close();
-     * initialIdsManifest.put(clazz.getSimpleName(), objectIds); } catch
-     * (NotFoundException e) { throw new RuntimeException(e); } catch
-     * (RequestNotValidException e) { throw new RuntimeException(e); } catch
-     * (GenericException e) { throw new RuntimeException(e); } catch (IOException e)
-     * { throw new RuntimeException(e); } }
-     */
+    // do nothing
     return null;
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) {
-
+    // do nothing
     return null;
   }
 

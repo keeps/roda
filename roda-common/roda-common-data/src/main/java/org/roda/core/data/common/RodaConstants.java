@@ -1324,8 +1324,9 @@ public final class RodaConstants {
 
   // Generate Backfill Plugin Parameters
 
-  public static final String PLUGIN_PARAMS_BLOCK_SIZE = "parameter.block_size";
-  public static final String PLUGIN_PARAMS_VALIDATE_AGAINST = "parameter.validate_against";
+  public static final String PLUGIN_PARAMS_OUTPUT_DIRECTORY = "parameter.output_directory";
+  public static final String PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY = "parameter.only_generate_inventory";
+  public static final String PLUGIN_PARAMS_START_DATE = "parameter.start_date";
 
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";

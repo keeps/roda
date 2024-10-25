@@ -1,16 +1,11 @@
 package org.roda.core.plugins.base.maintenance.backfill;
 
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import java.util.List;
+
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
-
-import java.util.List;
 
 /**
  * @author Alexandre Flores <aflores@keep.pt>
@@ -20,11 +15,6 @@ public class GenerateAIPBackfillPlugin extends GenerateRODAEntityBackfillPlugin<
     @Override
     protected <I extends IsIndexed> Class<I> getIndexClass() {
         return (Class<I>) IndexedAIP.class;
-    }
-
-    @Override
-    protected AIP retrieveModelObject(ModelService model, String id) throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-        return model.retrieveAIP(id);
     }
 
     @Override

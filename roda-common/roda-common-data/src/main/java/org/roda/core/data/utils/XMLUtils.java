@@ -16,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -40,6 +41,23 @@ public class XMLUtils {
     try {
       jaxbContext = JAXBContext.newInstance(object.getClass());
       Marshaller marshaller = jaxbContext.createMarshaller();
+      StringWriter writer = new StringWriter();
+      marshaller.marshal(object, writer);
+      ret = writer.toString();
+    } catch (JAXBException e) {
+      throw new GenericException(e);
+    }
+
+    return ret;
+  }
+
+  public static String getXMLFragFromObject(JAXBElement<?> object) throws GenericException {
+    String ret = null;
+    JAXBContext jaxbContext;
+    try {
+      jaxbContext = JAXBContext.newInstance(object.getValue().getClass());
+      Marshaller marshaller = jaxbContext.createMarshaller();
+      marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
       StringWriter writer = new StringWriter();
       marshaller.marshal(object, writer);
       ret = writer.toString();

@@ -8,14 +8,18 @@
 package org.roda.core.plugins.base.maintenance.backfill;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -25,10 +29,12 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotSupportedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -39,42 +45,41 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
-import org.roda.core.plugins.base.maintenance.backfill.beans.Add;
-import org.roda.core.plugins.base.maintenance.backfill.beans.Delete;
+import org.roda.core.plugins.base.maintenance.backfill.beans.DocType;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.storage.DefaultBinary;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.xml.bind.JAXBElement;
 
 public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & IsModelObject>
   extends AbstractPlugin<T> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GenerateRODAEntityBackfillPlugin.class);
-  private int blockSize = 100000;
-  private String validateAgainst = "None";
+  private String outputDirectory = ".";
+  private boolean onlyGenerateInventory = false;
 
-  private final HashSet<String> processedObjectIds = new HashSet<>();
-
-  private final static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE,
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE, "Block size", PluginParameter.PluginParameterType.INTEGER)
-        .withDefaultValue("100000").isMandatory(false)
-        .withDescription("Number of documents in each index documents block.").build());
-    pluginParameters
-      .put(RodaConstants.PLUGIN_PARAMS_VALIDATE_AGAINST,
-        PluginParameter
-          .getBuilder(RodaConstants.PLUGIN_PARAMS_VALIDATE_AGAINST, "Check parity against",
-            PluginParameter.PluginParameterType.DROPDOWN)
-          .withPossibleValues(Arrays.asList(GenerateBackfillPluginUtils.VALIDATE_AGAINST_NONE,
-            GenerateBackfillPluginUtils.VALIDATE_AGAINST_INDEX, GenerateBackfillPluginUtils.VALIDATE_AGAINST_STORAGE))
-          .withDefaultValue(GenerateBackfillPluginUtils.VALIDATE_AGAINST_NONE).isMandatory(true)
-          .withDescription(
-            "Which collection the final result will be validated against to adjust for mid-execution changes.")
-          .build());
-
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY, "Output directory",
+          PluginParameter.PluginParameterType.STRING)
+        .withDefaultValue(".").isMandatory(true).withDescription("This job's output directory path").build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY, "Only generate inventory",
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").isMandatory(true)
+        .withDescription(
+          "Whether this job should only generate the inventory of RODA objects and not the index backfill files")
+        .build());
   }
 
   protected GenerateRODAEntityBackfillPlugin() {
@@ -93,8 +98,7 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
 
   @Override
   public String getName() {
-    // Get from pom.xml <name>
-    return getClass().getPackage().getImplementationTitle();
+    return "Generate " + getObjectClasses().getFirst().getSimpleName() + " index backfill";
   }
 
   @Override
@@ -104,26 +108,25 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
 
   @Override
   public String getVersionImpl() {
-    // Get from pom.xml <version>
-    return getClass().getPackage().getImplementationVersion();
+    return "1.0";
   }
 
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_VALIDATE_AGAINST));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY));
     return parameters;
   }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE)) {
-      blockSize = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_BLOCK_SIZE));
+    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY)) {
+      outputDirectory = parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY);
     }
-    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_VALIDATE_AGAINST)) {
-      validateAgainst = parameters.get(RodaConstants.PLUGIN_PARAMS_VALIDATE_AGAINST);
+    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY)) {
+      onlyGenerateInventory = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY));
     }
   }
 
@@ -138,22 +141,17 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
 
   protected void generateBackfill(ModelService model, IndexService index, StorageService storage, Report report,
     JobPluginInfo jobPluginInfo, Job job, List<T> objects) {
-    int totalBeans = 0;
-    int count = 0;
-    Add addType = new Add();
+    StringBuilder docXMLs = new StringBuilder();
+    List<String> processedIds = new LinkedList<>();
+    String batchId = IdUtils.createUUID();
 
     for (T object : objects) {
       // TODO Handle exceptions
       try {
-        processedObjectIds.add(object.getId());
-        if (count == blockSize) {
-          count = 0;
-          totalBeans += 1;
-          GenerateBackfillPluginUtils.writeAddBean(storage, pluginParameters.get(RodaConstants.PLUGIN_PARAMS_JOB_ID)
-            + "/" + object.getClass().getName() + "_" + totalBeans + ".xml", addType);
-        }
-        addType.getDoc().add(GenerateBackfillPluginUtils.toDocBean(object, getIndexClass()));
-        count += 1;
+        DocType docBean = GenerateBackfillPluginUtils.toDocBean(object, getIndexClass());
+        JAXBElement<DocType> rootElement = new JAXBElement<>(new QName("doc"), DocType.class, docBean);
+        docXMLs.append(XMLUtils.getXMLFragFromObject(rootElement));
+        processedIds.addLast(object.getId());
       } catch (AuthorizationDeniedException e) {
         throw new RuntimeException(e);
       } catch (RequestNotValidException e) {
@@ -164,15 +162,16 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
         throw new RuntimeException(e);
       } catch (GenericException e) {
         throw new RuntimeException(e);
-      } catch (AlreadyExistsException e) {
-        throw new RuntimeException(e);
       }
     }
     // TODO Handle exceptions
     try {
-      totalBeans += 1;
-      GenerateBackfillPluginUtils.writeAddBean(storage,
-        objects.getFirst().getClass().getSimpleName() + "_" + totalBeans + ".xml", addType);
+      StoragePath addPartialPath = GenerateBackfillPluginUtils.constructAddPartialOutputPath(outputDirectory,
+        objects.getFirst().getClass(), batchId);
+      GenerateBackfillPluginUtils.writeAddPartial(storage, addPartialPath, docXMLs.toString());
+      StoragePath inventoryPartialPath = GenerateBackfillPluginUtils
+        .constructInventoryPartialOutputPath(outputDirectory, objects.getFirst().getClass(), batchId);
+      GenerateBackfillPluginUtils.writeInventoryPartial(storage, inventoryPartialPath, processedIds);
     } catch (AlreadyExistsException | RequestNotValidException | GenericException | AuthorizationDeniedException
       | NotFoundException e) {
       throw new RuntimeException(e);
@@ -180,18 +179,6 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
   }
 
   protected abstract <I extends IsIndexed> Class<I> getIndexClass();
-
-  protected List<T> retrieveModelObjects(ModelService model, List<String> ids)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    List<T> result = new ArrayList<>();
-    for (String id : ids) {
-      result.add(retrieveModelObject(model, id));
-    }
-    return result;
-  }
-
-  protected abstract T retrieveModelObject(ModelService model, String id)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   @Override
   public PluginType getType() {
@@ -231,64 +218,95 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) {
-    if (validateAgainst.equals(GenerateBackfillPluginUtils.VALIDATE_AGAINST_INDEX)) {
-      validateAgainstIndex(index, model, storage);
-    }
-    return null;
-
+    concatenateAndWriteAdds(storage);
+    concatenateAndWriteInventory(storage);
+    // TODO return report
+    return new Report();
   }
 
-  protected Report validateAgainstIndex(IndexService index, ModelService model, StorageService storage) {
+  protected Report concatenateAndWriteAdds(StorageService storage) {
+    // TODO Get this from plugin config
+    int blockSize = 10;
     // TODO Handle exceptions
     try {
-      List<Add> originalAddBeans = GenerateBackfillPluginUtils.readAddBeans(storage, "test");
-      List<String> deletedObjectIds = GenerateBackfillPluginUtils.checkIndexForDeletedObjects(index, getIndexClass(),
-        processedObjectIds.stream().toList());
-      List<String> addedObjects = GenerateBackfillPluginUtils.checkIndexForAddedObjects(index, getIndexClass(),
-        processedObjectIds);
-      Add addBean = new Add();
-      int addBeanCount = 0;
-      Delete deleteBean = new Delete();
-      int deleteBeanCount = 0;
-      while (!deletedObjectIds.isEmpty() || !addedObjects.isEmpty()) {
-        for (String id : deletedObjectIds) {
-          // Write delete query and remove from the processed ids
-          deleteBean.getId().add(id);
-          processedObjectIds.remove(id);
-          if (deleteBean.getId().size() > blockSize) {
-            GenerateBackfillPluginUtils.writeDeleteBean(storage,
-              pluginParameters.get(RodaConstants.PLUGIN_PARAMS_JOB_ID) + "/index_deleted/"
-                + getIndexClass().getSimpleName() + "_" + deleteBeanCount + ".xml",
-              deleteBean);
-            deleteBean = new Delete();
-          }
+      StoragePath addPartialsDirectory = GenerateBackfillPluginUtils.constructAddPartialsDirectoryPath(outputDirectory,
+        getObjectClasses().getFirst());
+      CloseableIterable<Resource> addPartials = storage.listResourcesUnderDirectory(addPartialsDirectory, false);
+      StringBuilder addStringBuilder = new StringBuilder();
+      addStringBuilder.append("<add>");
+      int addedBatches = 0;
+      int writtenBlocks = 0;
+      for (Resource addPartialResource : addPartials) {
+        InputStream addPartialStream = ((DefaultBinary) addPartialResource).getContent().createInputStream();
+        addStringBuilder.append(new String(addPartialStream.readAllBytes(), StandardCharsets.UTF_8));
+        addPartialStream.close();
+        addedBatches++;
+        if (addedBatches > blockSize) {
+          addStringBuilder.append("</add>");
+          StoragePath addPath = GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory,
+            getObjectClasses().getFirst(), Integer.toString(writtenBlocks));
+          storage.createBinary(addPath, new StringContentPayload(addStringBuilder.toString()), false);
+
+          addStringBuilder = new StringBuilder();
+          addStringBuilder.append("<add>");
+          addedBatches = 0;
+          writtenBlocks++;
         }
-        for (String id : addedObjects) {
-          // Write add query and add to the processed ids
-          addBean.getDoc().add(GenerateBackfillPluginUtils.toDocBean(retrieveModelObject(model, id), getIndexClass()));
-          processedObjectIds.add(id);
-          if (addBean.getDoc().size() > blockSize) {
-            GenerateBackfillPluginUtils.writeAddBean(storage,
-              "index_added/" + getIndexClass().getSimpleName() + "_" + addBeanCount + ".xml", addBean);
-            addBean = new Add();
-          }
-        }
-        deletedObjectIds = GenerateBackfillPluginUtils.checkIndexForDeletedObjects(index, getIndexClass(),
-          processedObjectIds.stream().toList());
-        addedObjects = GenerateBackfillPluginUtils.checkIndexForAddedObjects(index, getIndexClass(),
-          processedObjectIds);
+        storage.deleteResource(addPartialResource.getStoragePath());
       }
-    } catch (GenericException e) {
-      throw new RuntimeException(e);
+      addPartials.close();
+      if (addedBatches > 0) {
+        addStringBuilder.append("</add>");
+        StoragePath addPath = GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory,
+          getObjectClasses().getFirst(), Integer.toString(writtenBlocks));
+        storage.createBinary(addPath, new StringContentPayload(addStringBuilder.toString()), false);
+      }
     } catch (RequestNotValidException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
       throw new RuntimeException(e);
     } catch (AuthorizationDeniedException e) {
       throw new RuntimeException(e);
     } catch (NotFoundException e) {
       throw new RuntimeException(e);
-    } catch (NotSupportedException e) {
+    } catch (GenericException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (AlreadyExistsException e) {
+      throw new RuntimeException(e);
+    }
+    // TODO return report
+    return null;
+  }
+
+  protected Report concatenateAndWriteInventory(StorageService storage) {
+    // TODO Handle exceptions
+    try {
+      StoragePath inventoryPartialsDirectory = GenerateBackfillPluginUtils
+        .constructInventoryPartialsDirectoryPath(outputDirectory, getObjectClasses().getFirst());
+      CloseableIterable<Resource> inventoryPartials = storage.listResourcesUnderDirectory(inventoryPartialsDirectory,
+        false);
+      StringBuilder inventoryStringBuilder = new StringBuilder();
+      for (Resource inventoryPartialResource : inventoryPartials) {
+        InputStream inventoryPartialStream = ((DefaultBinary) inventoryPartialResource).getContent()
+          .createInputStream();
+        inventoryStringBuilder.append(new String(inventoryPartialStream.readAllBytes(), StandardCharsets.UTF_8));
+        inventoryPartialStream.close();
+        inventoryStringBuilder.append("\n");
+        storage.deleteResource(inventoryPartialResource.getStoragePath());
+      }
+      inventoryPartials.close();
+      StoragePath inventoryPath = GenerateBackfillPluginUtils.constructInventoryOutputPath(outputDirectory,
+        getObjectClasses().getFirst());
+      storage.createBinary(inventoryPath, new StringContentPayload(inventoryStringBuilder.toString()), false);
+    } catch (RequestNotValidException e) {
+      throw new RuntimeException(e);
+    } catch (AuthorizationDeniedException e) {
+      throw new RuntimeException(e);
+    } catch (NotFoundException e) {
+      throw new RuntimeException(e);
+    } catch (GenericException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
       throw new RuntimeException(e);
     } catch (AlreadyExistsException e) {
       throw new RuntimeException(e);

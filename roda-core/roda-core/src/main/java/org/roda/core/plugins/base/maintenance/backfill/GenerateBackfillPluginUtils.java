@@ -2,13 +2,16 @@ package org.roda.core.plugins.base.maintenance.backfill;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -51,6 +54,7 @@ import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.XMLContentPayload;
 
 /**
@@ -64,6 +68,49 @@ public class GenerateBackfillPluginUtils {
   public static final String VALIDATE_AGAINST_NONE = "None";
   public static final String VALIDATE_AGAINST_INDEX = "Index";
   public static final String VALIDATE_AGAINST_STORAGE = "Storage";
+
+  public static final String BACKFILL_ROOT_DIRECTORY = "backfill";
+
+  public static StoragePath constructAddOutputPath(String outputDirectory, Class<?> clazz, String addId)
+    throws RequestNotValidException {
+    return DefaultStoragePath
+      .parse(List.of(BACKFILL_ROOT_DIRECTORY, outputDirectory, clazz.getSimpleName(), "add", "add_" + addId + ".xml"));
+  }
+
+  public static StoragePath constructAddPartialOutputPath(String outputDirectory, Class<?> clazz, String batchId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(
+      List.of(BACKFILL_ROOT_DIRECTORY, outputDirectory, clazz.getSimpleName(), "add", "add_" + batchId + ".xmlfrag"));
+  }
+
+  public static StoragePath constructAddPartialsDirectoryPath(String outputDirectory, Class<?> clazz)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(List.of(BACKFILL_ROOT_DIRECTORY, outputDirectory, clazz.getSimpleName(), "add"));
+  }
+
+  public static StoragePath constructInventoryOutputPath(String outputDirectory, Class<?> clazz)
+    throws RequestNotValidException {
+    return DefaultStoragePath
+      .parse(List.of(BACKFILL_ROOT_DIRECTORY, outputDirectory, clazz.getSimpleName(), "inventory", "inventory.lst"));
+  }
+
+  public static StoragePath constructInventoryPartialOutputPath(String outputDirectory, Class<?> clazz, String batchId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(
+      List.of(BACKFILL_ROOT_DIRECTORY, outputDirectory, clazz.getSimpleName(), "inventory", "inv_" + batchId + ".lst"));
+  }
+
+  public static StoragePath constructInventoryPartialsDirectoryPath(String outputDirectory, Class<?> clazz)
+    throws RequestNotValidException {
+    return DefaultStoragePath
+      .parse(List.of(BACKFILL_ROOT_DIRECTORY, outputDirectory, clazz.getSimpleName(), "inventory"));
+  }
+
+  public static StoragePath constructBeanOutputPath(String outputDirectory, Class<?> clazz, int beanIndex)
+    throws RequestNotValidException {
+    return DefaultStoragePath
+      .parse(List.of(BACKFILL_ROOT_DIRECTORY, outputDirectory, clazz.getSimpleName() + "_" + beanIndex + ".xml"));
+  }
 
   public static <I extends IsIndexed, M extends IsModelObject> DocType toDocBean(M object, Class<I> indexClass)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, NotSupportedException,
@@ -91,42 +138,79 @@ public class GenerateBackfillPluginUtils {
     return docBean;
   }
 
-  public static void writeAddBean(StorageService storage, String filename, Add addBean) throws RequestNotValidException,
-    GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
-    StoragePath storagePath = DefaultStoragePath.parse(List.of(".", filename));
-    String xml = XMLUtils.getXMLFromObject(addBean);
-    ContentPayload payload = new XMLContentPayload(xml);
-    storage.createBinary(storagePath, payload, false);
+  public static <I extends IsIndexed> DocType toDocBean(I object) {
+    DocType docBean = new DocType();
+
+    for (Map.Entry<String, Object> field : object.getFields().entrySet()) {
+      Object value = field.getValue();
+      if (value instanceof String string && !string.isEmpty()) {
+        FieldType fieldBean = new FieldType();
+        fieldBean.setName(field.getKey());
+        fieldBean.setValue(string);
+        docBean.getField().add(fieldBean);
+      } else if (value instanceof List<?> multiValueField) {
+        for (Object multiValue : multiValueField) {
+          FieldType fieldBean = new FieldType();
+          fieldBean.setName(field.getKey());
+          fieldBean.setValue(multiValue.toString());
+          docBean.getField().add(fieldBean);
+        }
+      }
+    }
+
+    return docBean;
   }
 
-  public static List<Add> readAddBeans(StorageService storage, String directoryPath)
+  public static void writeAddBean(StorageService storage, StoragePath path, Add addBean)
+    throws RequestNotValidException,
+    GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    String xml = XMLUtils.getXMLFromObject(addBean);
+    ContentPayload payload = new XMLContentPayload(xml);
+    storage.createBinary(path, payload, false);
+  }
+
+  public static void writeAddPartial(StorageService storage, StoragePath path, String addPartialXML)
+    throws AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    GenericException {
+    ContentPayload payload = new StringContentPayload(addPartialXML);
+    storage.createBinary(path, payload, false);
+  }
+
+  public static void writeInventoryPartial(StorageService storage, StoragePath path, Collection<String> processedIds)
+    throws AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    GenericException {
+    ContentPayload payload = new StringContentPayload(String.join("\n", processedIds));
+    storage.createBinary(path, payload, false);
+  }
+
+  public static Set<String> readOriginalProcessedIds(StorageService storage, String directoryPath)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException, IOException {
-    StoragePath storagePath = DefaultStoragePath.parse(List.of(".", directoryPath));
+    StoragePath storagePath = DefaultStoragePath.parse(List.of(BACKFILL_ROOT_DIRECTORY, directoryPath));
     CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, false);
-    List<Add> addBeans = new ArrayList<>();
+    Set<String> processedIds = new HashSet<>();
     for (Resource resource : resources) {
-      addBeans.add(readAddBean(resource));
+      Add addBean = readAddBean(resource);
+      for (DocType docBean : addBean.getDoc()) {
+        processedIds.add(docBean.getField().stream().filter(field -> field.getName().equals(RodaConstants.INDEX_ID))
+          .findFirst().get().getValue());
+      }
     }
-    return addBeans;
+    resources.close();
+    return processedIds;
   }
 
   public static Add readAddBean(Resource addXMLResource)
-    throws RequestNotValidException, GenericException, IOException {
+    throws GenericException, IOException {
     ContentPayload payload = ((DefaultBinary) addXMLResource).getContent();
     return XMLUtils.getObjectFromXML(payload.createInputStream(), Add.class);
   }
 
-  public static void writeDeleteBean(StorageService storage, String filename, Delete deleteBean)
+  public static void writeDeleteBean(StorageService storage, StoragePath path, Delete deleteBean)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
     NotFoundException {
-    StoragePath storagePath = DefaultStoragePath.parse(List.of(".", filename));
     String xml = XMLUtils.getXMLFromObject(deleteBean);
     ContentPayload payload = new XMLContentPayload(xml);
-    storage.createBinary(storagePath, payload, false);
-  }
-
-  public static void createAndWriteDeletionBeans(StorageService storage, List<String> deletedIds) {
-
+    storage.createBinary(path, payload, false);
   }
 
   public static String getGeneratedBackfillPluginName(Class<? extends IsRODAObject> clazz) throws NotFoundException {
@@ -194,10 +278,11 @@ public class GenerateBackfillPluginUtils {
   }
 
   public static <T extends IsRODAObject & IsModelObject, I extends IsIndexed> HashSet<String> generateBackfillForRODAObjects(
-    StorageService storage, List<T> objects, int blockSize, Class<I> indexClass, Report report) {
+    StorageService storage, List<T> objects, int blockSize, Class<I> indexClass, Report report,
+    String outputDirectory) {
     int totalBeans = 0;
     int count = 0;
-    Add addType = new Add();
+    Add addBean = new Add();
     HashSet<String> processedIds = new HashSet<>();
 
     for (T object : objects) {
@@ -205,12 +290,12 @@ public class GenerateBackfillPluginUtils {
       try {
         processedIds.add(object.getId());
         if (count == blockSize) {
+          StoragePath path = constructBeanOutputPath(outputDirectory, object.getClass(), totalBeans);
+          writeAddBean(storage, path, addBean);
           count = 0;
           totalBeans += 1;
-          GenerateBackfillPluginUtils.writeAddBean(storage, object.getClass().getName() + "_" + totalBeans + ".xml",
-            addType);
         }
-        addType.getDoc().add(GenerateBackfillPluginUtils.toDocBean(object, getIndexClass(indexClass)));
+        addBean.getDoc().add(GenerateBackfillPluginUtils.toDocBean(object, getIndexClass(indexClass)));
         count += 1;
       } catch (AuthorizationDeniedException e) {
         throw new RuntimeException(e);
@@ -229,8 +314,8 @@ public class GenerateBackfillPluginUtils {
     // TODO Handle exceptions
     try {
       totalBeans += 1;
-      GenerateBackfillPluginUtils.writeAddBean(storage,
-        objects.getFirst().getClass().getSimpleName() + "_" + totalBeans + ".xml", addType);
+      StoragePath path = constructBeanOutputPath(BACKFILL_ROOT_DIRECTORY, objects.getFirst().getClass(), totalBeans);
+      writeAddBean(storage, path, addBean);
     } catch (AlreadyExistsException | RequestNotValidException | GenericException | AuthorizationDeniedException
       | NotFoundException e) {
       throw new RuntimeException(e);
@@ -241,8 +326,8 @@ public class GenerateBackfillPluginUtils {
   public static <I extends IsIndexed> List<String> checkIndexForDeletedObjects(IndexService index, Class<I> indexClass,
     List<String> objectIds) throws RequestNotValidException, GenericException, IOException {
     Filter filter = new Filter();
-    filter.add(new OneOfManyFilterParameter("id", objectIds));
-    IterableIndexResult<I> indexResult = index.findAll(indexClass, filter, List.of("id"));
+    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_ID, objectIds));
+    IterableIndexResult<I> indexResult = index.findAll(indexClass, filter, List.of(RodaConstants.INDEX_ID));
     List<String> existingIndexIdsList = new ArrayList<>();
     for (I indexedObject : indexResult) {
       existingIndexIdsList.add(indexedObject.getId());
@@ -251,19 +336,9 @@ public class GenerateBackfillPluginUtils {
     return objectIds.stream().filter(id -> !existingIndexIdsList.contains(id)).toList();
   }
 
-  /*
-   * public static <I extends IsIndexed> List<String>
-   * checkIndexForModifiedObjects(IndexService index, Class<I> indexClass,
-   * List<String> objectIds) throws RequestNotValidException, GenericException {
-   * Filter filter = new Filter(); filter.add(new OneOfManyFilterParameter("id",
-   * objectIds)); IndexResult<I> result = index.find(indexClass, filter,
-   * Sorter.NONE, Sublist.NONE, List.of("id")); return
-   * result.getResults().stream().map(I::getId).toList(); }
-   */
-
   public static <I extends IsIndexed> List<String> checkIndexForAddedObjects(IndexService index, Class<I> indexClass,
     Set<String> objectIds) throws RequestNotValidException, GenericException, IOException {
-    IterableIndexResult<I> indexResult = index.findAll(indexClass, Filter.ALL, List.of("id"));
+    IterableIndexResult<I> indexResult = index.findAll(indexClass, Filter.ALL, List.of(RodaConstants.INDEX_ID));
     List<String> unprocessedIndexIds = new ArrayList<>();
     for (I indexObject : indexResult) {
       if (!objectIds.contains(indexObject.getId())) {
