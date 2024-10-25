@@ -2,14 +2,15 @@ package org.roda.core.plugins.base.maintenance.backfill;
 
 import java.util.List;
 
-import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.plugins.Plugin;
 
 /**
  * @author Alexandre Flores <aflores@keep.pt>
  */
-public class GenerateDisposalConfirmationBackfillPlugin extends GenerateRODAEntityBackfillPlugin<DisposalConfirmation> {
+public class GenerateDisposalConfirmationBackfillPlugin
+  extends GenerateRODAEntityBackfillPlugin<org.roda.core.data.v2.ip.disposal.DisposalConfirmation> {
 
   @Override
   protected <I extends IsIndexed> Class<I> getIndexClass() {

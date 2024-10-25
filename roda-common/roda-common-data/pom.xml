@@ -104,6 +104,7 @@
               <schemaDirectory>src/main/resources/backfill</schemaDirectory>
               <schemaIncludes>
                 <include>add_documents.xsd</include>
+                <include>delete_document_ids.xsd</include>
               </schemaIncludes>
               <cleanPackageDirectories>true</cleanPackageDirectories>
               <generatePackage>org.roda.core.plugins.base.maintenance.backfill.beans</generatePackage>
