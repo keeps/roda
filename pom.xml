@@ -109,7 +109,7 @@
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
-        <springboot.version>3.3.0</springboot.version>
+        <springboot.version>3.3.5</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
         <logback.version>1.5.6</logback.version>
     </properties>
