@@ -16,10 +16,12 @@ import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsNoneRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.CreateJobRequest;
@@ -93,8 +95,11 @@ public class JobsController implements JobsRestService, Exportable {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      SelectedItems<?> sourceObjects = CommonServicesUtils.convertSelectedItems(jobRequest.getSourceObjects(),
-        SelectedItemsUtils.parseClass(jobRequest.getSourceObjectsClass()));
+      Class<? extends IsIndexed> sourceObjectsClass = null;
+      if (!(jobRequest.getSourceObjects() instanceof SelectedItemsNoneRequest)) {
+        sourceObjectsClass = SelectedItemsUtils.parseClass(jobRequest.getSourceObjectsClass());
+      }
+      SelectedItems<?> sourceObjects = CommonServicesUtils.convertSelectedItems(jobRequest.getSourceObjects(), sourceObjectsClass);
       Job job = JobUtils.createJob(jobRequest.getName(), JobPriority.valueOf(jobRequest.getPriority()),
         JobParallelism.valueOf(jobRequest.getParallelism()), sourceObjects, jobRequest.getPlugin(),
         jobRequest.getPluginParameters());
