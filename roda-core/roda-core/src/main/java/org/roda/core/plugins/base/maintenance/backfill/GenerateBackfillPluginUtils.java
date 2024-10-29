@@ -22,29 +22,24 @@ import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.index.IndexService;
 import org.roda.core.index.schema.SolrCollectionRegistry;
-import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.plugins.base.maintenance.backfill.beans.Add;
 import org.roda.core.plugins.base.maintenance.backfill.beans.Delete;
 import org.roda.core.plugins.base.maintenance.backfill.beans.DocType;
@@ -218,6 +213,8 @@ public class GenerateBackfillPluginUtils {
       return GenerateAIPBackfillPlugin.class.getName();
     } else if (clazz.equals(RepresentationInformation.class)) {
       return GenerateRepresentationInformationBackfillPlugin.class.getName();
+    } else if (clazz.equals(Representation.class)) {
+      return GenerateRepresentationBackfillPlugin.class.getName();
     } else if (clazz.equals(Risk.class)) {
       return GenerateRiskBackfillPlugin.class.getName();
     } else if (clazz.equals(RiskIncidence.class)) {
@@ -232,12 +229,16 @@ public class GenerateBackfillPluginUtils {
       return GenerateRODAMemberBackfillPlugin.class.getName();
     } else if (clazz.equals(LogEntry.class)) {
       return GenerateActionLogBackfillPlugin.class.getName();
-    } else if (clazz.equals(IndexedPreservationAgent.class)) {
-      return GeneratePreservationAgentBackfillPlugin.class.getName();
-    } else if (clazz.equals(IndexedPreservationEvent.class)) {
-      return GeneratePreservationRepositoryEventBackfillPlugin.class.getName();
+    } else if (clazz.equals(PreservationMetadata.class)) {
+      return GeneratePreservationMetadataBackfillPlugin.class.getName();
     } else if (clazz.equals(DIP.class)) {
       return GenerateDIPBackfillPlugin.class.getName();
+    } else if (clazz.equals(DIPFile.class)) {
+      return GenerateDIPFileBackfillPlugin.class.getName();
+    } else if (clazz.equals(File.class)) {
+      return GenerateFileBackfillPlugin.class.getName();
+    } else if (clazz.equals(Report.class)) {
+      return GenerateJobReportBackfillPlugin.class.getName();
     } else if (clazz.equals(DisposalConfirmation.class)) {
       return GenerateDisposalConfirmationBackfillPlugin.class.getName();
     } else {
@@ -245,107 +246,139 @@ public class GenerateBackfillPluginUtils {
     }
   }
 
-  public static Class<? extends IsIndexed> getIndexClass(Class<? extends IsRODAObject> clazz) throws NotFoundException {
-    if (clazz.equals(AIP.class)) {
-      return IndexedAIP.class;
-    } else if (clazz.equals(RepresentationInformation.class)) {
-      return RepresentationInformation.class;
-    } else if (clazz.equals(Risk.class)) {
-      return IndexedRisk.class;
-    } else if (clazz.equals(RiskIncidence.class)) {
-      return RiskIncidence.class;
-    } else if (clazz.equals(Job.class)) {
-      return Job.class;
-    } else if (clazz.equals(Notification.class)) {
-      return Notification.class;
-    } else if (clazz.equals(TransferredResource.class)) {
-      return TransferredResource.class;
-    } else if (clazz.equals(RODAMember.class)) {
-      return RODAMember.class;
-    } else if (clazz.equals(LogEntry.class)) {
-      return LogEntry.class;
-    } else if (clazz.equals(IndexedPreservationAgent.class)) {
-      return IndexedPreservationAgent.class;
-    } else if (clazz.equals(IndexedPreservationEvent.class)) {
-      return IndexedPreservationEvent.class;
-    } else if (clazz.equals(DIP.class)) {
-      return IndexedDIP.class;
-    } else if (clazz.equals(DisposalConfirmation.class)) {
-      return DisposalConfirmation.class;
-    } else {
-      throw new NotFoundException("Index class not found for class " + clazz.getName());
-    }
+  /*
+   * public static Class<? extends IsIndexed> getIndexClass(Class<? extends
+   * IsRODAObject> clazz) throws NotFoundException { if (clazz.equals(AIP.class))
+   * { return IndexedAIP.class; } else if
+   * (clazz.equals(RepresentationInformation.class)) { return
+   * RepresentationInformation.class; } else if
+   * (clazz.equals(Representation.class)) { return IndexedRepresentation.class; }
+   * else if (clazz.equals(Risk.class)) { return IndexedRisk.class; } else if
+   * (clazz.equals(RiskIncidence.class)) { return RiskIncidence.class; } else if
+   * (clazz.equals(Job.class)) { return Job.class; } else if
+   * (clazz.equals(Notification.class)) { return Notification.class; } else if
+   * (clazz.equals(TransferredResource.class)) { return TransferredResource.class;
+   * } else if (clazz.equals(RODAMember.class)) { return RODAMember.class; } else
+   * if (clazz.equals(LogEntry.class)) { return LogEntry.class; } else if
+   * (clazz.equals(IndexedPreservationAgent.class)) { return
+   * IndexedPreservationAgent.class; } else if
+   * (clazz.equals(IndexedPreservationEvent.class)) { return
+   * IndexedPreservationEvent.class; } else if (clazz.equals(DIP.class)) { return
+   * IndexedDIP.class; } else if (clazz.equals(DIPFile.class)) { return
+   * DIPFile.class; } else if (clazz.equals(File.class)) { return
+   * IndexedFile.class; } else if (clazz.equals(Report.class)) { return
+   * IndexedReport.class; } else if (clazz.equals(DisposalConfirmation.class)) {
+   * return DisposalConfirmation.class; } else { throw new
+   * NotFoundException("Index class not found for class " + clazz.getName()); } }
+   */
+
+  public static List<Class<? extends IsRODAObject>> getBackfillObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(TransferredResource.class);
+    list.add(AIP.class);
+    list.add(RODAMember.class);
+    list.add(RepresentationInformation.class);
+    list.add(Notification.class);
+    list.add(Risk.class);
+    list.add(LogEntry.class);
+    list.add(RiskIncidence.class);
+    list.add(PreservationMetadata.class);
+    list.add(DIP.class);
+    list.add(DIPFile.class);
+    list.add(File.class);
+    list.add(Report.class);
+    list.add(DisposalConfirmation.class);
+    list.add(Representation.class);
+    return list;
   }
 
-  public static <T extends IsRODAObject & IsModelObject, I extends IsIndexed> HashSet<String> generateBackfillForRODAObjects(
-    StorageService storage, List<T> objects, int blockSize, Class<I> indexClass, Report report,
-    String outputDirectory) {
-    int totalBeans = 0;
-    int count = 0;
-    Add addBean = new Add();
-    HashSet<String> processedIds = new HashSet<>();
+  /*
+   * public static <T extends IsRODAObject & IsModelObject, I extends IsIndexed>
+   * HashSet<String> generateBackfillForRODAObjects( StorageService storage,
+   * List<T> objects, int blockSize, Class<I> indexClass, Report report, String
+   * outputDirectory) { int totalBeans = 0; int count = 0; Add addBean = new
+   * Add(); HashSet<String> processedIds = new HashSet<>();
+   * 
+   * for (T object : objects) { // TODO Handle exceptions try {
+   * processedIds.add(object.getId()); if (count == blockSize) { StoragePath path
+   * = constructBeanOutputPath(outputDirectory, object.getClass(), totalBeans);
+   * writeAddBean(storage, path, addBean); count = 0; totalBeans += 1; }
+   * addBean.getDoc().add(GenerateBackfillPluginUtils.toDocBean(object,
+   * getIndexClass(indexClass))); count += 1; } catch
+   * (AuthorizationDeniedException e) { throw new RuntimeException(e); } catch
+   * (RequestNotValidException e) { throw new RuntimeException(e); } catch
+   * (NotFoundException e) { throw new RuntimeException(e); } catch
+   * (NotSupportedException e) { throw new RuntimeException(e); } catch
+   * (GenericException e) { throw new RuntimeException(e); } catch
+   * (AlreadyExistsException e) { throw new RuntimeException(e); } } // TODO
+   * Handle exceptions try { totalBeans += 1; StoragePath path =
+   * constructBeanOutputPath(BACKFILL_ROOT_DIRECTORY,
+   * objects.getFirst().getClass(), totalBeans); writeAddBean(storage, path,
+   * addBean); } catch (AlreadyExistsException | RequestNotValidException |
+   * GenericException | AuthorizationDeniedException | NotFoundException e) {
+   * throw new RuntimeException(e); } return processedIds; }
+   */
 
-    for (T object : objects) {
-      // TODO Handle exceptions
-      try {
-        processedIds.add(object.getId());
-        if (count == blockSize) {
-          StoragePath path = constructBeanOutputPath(outputDirectory, object.getClass(), totalBeans);
-          writeAddBean(storage, path, addBean);
-          count = 0;
-          totalBeans += 1;
-        }
-        addBean.getDoc().add(GenerateBackfillPluginUtils.toDocBean(object, getIndexClass(indexClass)));
-        count += 1;
-      } catch (AuthorizationDeniedException e) {
-        throw new RuntimeException(e);
-      } catch (RequestNotValidException e) {
-        throw new RuntimeException(e);
-      } catch (NotFoundException e) {
-        throw new RuntimeException(e);
-      } catch (NotSupportedException e) {
-        throw new RuntimeException(e);
-      } catch (GenericException e) {
-        throw new RuntimeException(e);
-      } catch (AlreadyExistsException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    // TODO Handle exceptions
-    try {
-      totalBeans += 1;
-      StoragePath path = constructBeanOutputPath(BACKFILL_ROOT_DIRECTORY, objects.getFirst().getClass(), totalBeans);
-      writeAddBean(storage, path, addBean);
-    } catch (AlreadyExistsException | RequestNotValidException | GenericException | AuthorizationDeniedException
-      | NotFoundException e) {
-      throw new RuntimeException(e);
-    }
-    return processedIds;
-  }
+  /*
+   * public static <I extends IsIndexed> List<String>
+   * checkIndexForDeletedObjects(IndexService index, Class<I> indexClass,
+   * List<String> objectIds) throws RequestNotValidException, GenericException,
+   * IOException { Filter filter = new Filter(); filter.add(new
+   * OneOfManyFilterParameter(RodaConstants.INDEX_ID, objectIds));
+   * IterableIndexResult<I> indexResult = index.findAll(indexClass, filter,
+   * List.of(RodaConstants.INDEX_ID)); List<String> existingIndexIdsList = new
+   * ArrayList<>(); for (I indexedObject : indexResult) {
+   * existingIndexIdsList.add(indexedObject.getId()); } indexResult.close();
+   * return objectIds.stream().filter(id ->
+   * !existingIndexIdsList.contains(id)).toList(); }
+   * 
+   * public static <I extends IsIndexed> List<String>
+   * checkIndexForAddedObjects(IndexService index, Class<I> indexClass,
+   * Set<String> objectIds) throws RequestNotValidException, GenericException,
+   * IOException { IterableIndexResult<I> indexResult = index.findAll(indexClass,
+   * Filter.ALL, List.of(RodaConstants.INDEX_ID)); List<String>
+   * unprocessedIndexIds = new ArrayList<>(); for (I indexObject : indexResult) {
+   * if (!objectIds.contains(indexObject.getId())) {
+   * unprocessedIndexIds.add(indexObject.getId()); } } indexResult.close(); return
+   * unprocessedIndexIds; }
+   */
 
-  public static <I extends IsIndexed> List<String> checkIndexForDeletedObjects(IndexService index, Class<I> indexClass,
-    List<String> objectIds) throws RequestNotValidException, GenericException, IOException {
-    Filter filter = new Filter();
-    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_ID, objectIds));
-    IterableIndexResult<I> indexResult = index.findAll(indexClass, filter, List.of(RodaConstants.INDEX_ID));
-    List<String> existingIndexIdsList = new ArrayList<>();
-    for (I indexedObject : indexResult) {
-      existingIndexIdsList.add(indexedObject.getId());
-    }
-    indexResult.close();
-    return objectIds.stream().filter(id -> !existingIndexIdsList.contains(id)).toList();
-  }
-
-  public static <I extends IsIndexed> List<String> checkIndexForAddedObjects(IndexService index, Class<I> indexClass,
-    Set<String> objectIds) throws RequestNotValidException, GenericException, IOException {
-    IterableIndexResult<I> indexResult = index.findAll(indexClass, Filter.ALL, List.of(RodaConstants.INDEX_ID));
-    List<String> unprocessedIndexIds = new ArrayList<>();
-    for (I indexObject : indexResult) {
-      if (!objectIds.contains(indexObject.getId())) {
-        unprocessedIndexIds.add(indexObject.getId());
-      }
-    }
-    indexResult.close();
-    return unprocessedIndexIds;
-  }
+  /*
+   * public static <T extends IsModelObject, I extends IsIndexed> Report
+   * generateBackfillForFullEntityCollection( StorageService storage,
+   * JobPluginInfo jobPluginInfo, Job cachedJob, String outputDirectory,
+   * Iterable<? extends OptionalWithCause<T>> objects, Class<I> indexClass) {
+   * List<String> processedIds = new LinkedList<>();
+   * 
+   * // TODO: Get this from config int batchSize = 100; int blockSize = 10; Add
+   * addBean = new Add(); int docCount = 0; int addCount = 0; for
+   * (OptionalWithCause<T> object : objects) { if (object.isPresent()) { // TODO
+   * Handle exceptions try { DocType docBean =
+   * GenerateBackfillPluginUtils.toDocBean(object.get(), indexClass);
+   * addBean.getDoc().add(docBean); processedIds.addLast(object.get().getId());
+   * 
+   * docCount++; if (docCount >= blockSize * batchSize) { StoragePath addPath =
+   * GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory,
+   * LogEntry.class, Integer.toString(addCount));
+   * GenerateBackfillPluginUtils.writeAddBean(storage, addPath, addBean); addBean
+   * = new Add(); addCount++; docCount = 0; } } catch
+   * (AuthorizationDeniedException e) { throw new RuntimeException(e); } catch
+   * (RequestNotValidException e) { throw new RuntimeException(e); } catch
+   * (NotFoundException e) { throw new RuntimeException(e); } catch
+   * (NotSupportedException e) { throw new RuntimeException(e); } catch
+   * (GenericException e) { throw new RuntimeException(e); } catch
+   * (AlreadyExistsException e) { throw new RuntimeException(e); } } } // TODO
+   * Handle exceptions try { if (docCount > 0) { StoragePath addPath =
+   * GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory,
+   * LogEntry.class, Integer.toString(addCount));
+   * GenerateBackfillPluginUtils.writeAddBean(storage, addPath, addBean); }
+   * StoragePath inventoryPath =
+   * GenerateBackfillPluginUtils.constructInventoryOutputPath(outputDirectory,
+   * LogEntry.class); GenerateBackfillPluginUtils.writeInventoryPartial(storage,
+   * inventoryPath, processedIds); } catch (AlreadyExistsException |
+   * RequestNotValidException | GenericException | AuthorizationDeniedException |
+   * NotFoundException e) { throw new RuntimeException(e); }
+   * 
+   * // TODO: Report execution return null; }
+   */
 }

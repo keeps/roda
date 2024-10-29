@@ -16,6 +16,10 @@ public class GenerateJobBackfillPlugin extends GenerateRODAEntityBackfillPlugin<
         return (Class<I>) Job.class;
     }
 
+    @Override
+    protected String getObjectId(Job object) {
+      return object.getId();
+    }
 
     @Override
     public Plugin<Job> cloneMe() {

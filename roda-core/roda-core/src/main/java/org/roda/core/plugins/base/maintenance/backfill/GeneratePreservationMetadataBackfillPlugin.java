@@ -33,11 +33,13 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -52,9 +54,9 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GenerateActionLogBackfillPlugin extends AbstractPlugin<Void> {
+public class GeneratePreservationMetadataBackfillPlugin extends AbstractPlugin<Void> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GenerateActionLogBackfillPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GeneratePreservationMetadataBackfillPlugin.class);
   private String outputDirectory = ".";
   private boolean onlyGenerateInventory = false;
   private Date startDate = null;
@@ -101,7 +103,7 @@ public class GenerateActionLogBackfillPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Generate complete log entry index backfill";
+    return "Generate Preservation Agents index backfill";
   }
 
   @Override
@@ -158,27 +160,45 @@ public class GenerateActionLogBackfillPlugin extends AbstractPlugin<Void> {
 
   protected void generateBackfill(ModelService model, IndexService index, StorageService storage, Report report,
     JobPluginInfo jobPluginInfo, Job cachedJob) {
+    generateAgentsBackfill(model, index, storage, report, jobPluginInfo, cachedJob);
+    generateEventsBackfill(model, index, storage, report, jobPluginInfo, cachedJob);
+  }
+
+  protected void generateAgentsBackfill(ModelService model, IndexService index, StorageService storage, Report report,
+    JobPluginInfo jobPluginInfo, Job cachedJob) {
+    // TODO: Report
     List<String> processedIds = new LinkedList<>();
 
-    CloseableIterable<OptionalWithCause<LogEntry>> objects = model.listLogEntries();
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationObjects;
+    // TODO: Handle exceptions
+    try {
+      preservationObjects = model.listPreservationAgents();
+    } catch (GenericException e) {
+      throw new RuntimeException(e);
+    } catch (AuthorizationDeniedException e) {
+      throw new RuntimeException(e);
+    } catch (RequestNotValidException e) {
+      throw new RuntimeException(e);
+    }
     // TODO: Get this from config
     int batchSize = 100;
     int blockSize = 10;
     Add addBean = new Add();
     int docCount = 0;
     int addCount = 0;
-    for (OptionalWithCause<LogEntry> object : objects) {
-      if (object.isPresent() && (startDate == null || object.get().getDatetime().after(startDate))) {
+    for (OptionalWithCause<PreservationMetadata> preservationObject : preservationObjects) {
+      if (preservationObject.isPresent()) {
         // TODO Handle exceptions
         try {
-          DocType docBean = GenerateBackfillPluginUtils.toDocBean(object.get(), LogEntry.class);
+          DocType docBean = GenerateBackfillPluginUtils.toDocBean(preservationObject.get(),
+            IndexedPreservationAgent.class);
           addBean.getDoc().add(docBean);
-          processedIds.addLast(object.get().getId());
+          processedIds.addLast(preservationObject.get().getId());
 
           docCount++;
           if (docCount >= blockSize * batchSize) {
-            StoragePath addPath = GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory, LogEntry.class,
-              Integer.toString(addCount));
+            StoragePath addPath = GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory,
+              IndexedPreservationAgent.class, Integer.toString(addCount));
             GenerateBackfillPluginUtils.writeAddBean(storage, addPath, addBean);
             addBean = new Add();
             addCount++;
@@ -201,14 +221,88 @@ public class GenerateActionLogBackfillPlugin extends AbstractPlugin<Void> {
     }
     // TODO Handle exceptions
     try {
-      objects.close();
+      preservationObjects.close();
       if (docCount > 0) {
-        StoragePath addPath = GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory, LogEntry.class,
-          Integer.toString(addCount));
+        StoragePath addPath = GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory,
+          IndexedPreservationAgent.class, Integer.toString(addCount));
         GenerateBackfillPluginUtils.writeAddBean(storage, addPath, addBean);
       }
       StoragePath inventoryPath = GenerateBackfillPluginUtils.constructInventoryOutputPath(outputDirectory,
-        LogEntry.class);
+        IndexedPreservationAgent.class);
+      GenerateBackfillPluginUtils.writeInventoryPartial(storage, inventoryPath, processedIds);
+    } catch (AlreadyExistsException | RequestNotValidException | GenericException | AuthorizationDeniedException
+      | NotFoundException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected void generateEventsBackfill(ModelService model, IndexService index, StorageService storage, Report report,
+    JobPluginInfo jobPluginInfo, Job cachedJob) {
+    // TODO: Report
+    List<String> processedIds = new LinkedList<>();
+
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationObjects;
+    // TODO: Handle exceptions
+    try {
+      preservationObjects = model.listPreservationRepositoryEvents();
+    } catch (GenericException e) {
+      throw new RuntimeException(e);
+    } catch (AuthorizationDeniedException e) {
+      throw new RuntimeException(e);
+    } catch (RequestNotValidException e) {
+      throw new RuntimeException(e);
+    }
+    // TODO: Get this from config
+    int batchSize = 100;
+    int blockSize = 10;
+    Add addBean = new Add();
+    int docCount = 0;
+    int addCount = 0;
+    for (OptionalWithCause<PreservationMetadata> preservationObject : preservationObjects) {
+      if (preservationObject.isPresent()) {
+        // TODO Handle exceptions
+        try {
+          DocType docBean = GenerateBackfillPluginUtils.toDocBean(preservationObject.get(),
+            IndexedPreservationEvent.class);
+          addBean.getDoc().add(docBean);
+          processedIds.addLast(preservationObject.get().getId());
+
+          docCount++;
+          if (docCount >= blockSize * batchSize) {
+            StoragePath addPath = GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory,
+              IndexedPreservationEvent.class, Integer.toString(addCount));
+            GenerateBackfillPluginUtils.writeAddBean(storage, addPath, addBean);
+            addBean = new Add();
+            addCount++;
+            docCount = 0;
+          }
+        } catch (AuthorizationDeniedException e) {
+          throw new RuntimeException(e);
+        } catch (RequestNotValidException e) {
+          throw new RuntimeException(e);
+        } catch (NotFoundException e) {
+          throw new RuntimeException(e);
+        } catch (NotSupportedException e) {
+          throw new RuntimeException(e);
+        } catch (GenericException e) {
+          throw new RuntimeException(e);
+        } catch (AlreadyExistsException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+    // TODO Handle exceptions
+    try {
+      preservationObjects.close();
+      if (docCount > 0) {
+        StoragePath addPath = GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory,
+          IndexedPreservationEvent.class, Integer.toString(addCount));
+        GenerateBackfillPluginUtils.writeAddBean(storage, addPath, addBean);
+      }
+      StoragePath inventoryPath = GenerateBackfillPluginUtils.constructInventoryOutputPath(outputDirectory,
+        IndexedPreservationEvent.class);
       GenerateBackfillPluginUtils.writeInventoryPartial(storage, inventoryPath, processedIds);
     } catch (AlreadyExistsException | RequestNotValidException | GenericException | AuthorizationDeniedException
       | NotFoundException e) {
@@ -267,6 +361,6 @@ public class GenerateActionLogBackfillPlugin extends AbstractPlugin<Void> {
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new GenerateActionLogBackfillPlugin();
-    }
+    return new GeneratePreservationMetadataBackfillPlugin();
+  }
 }

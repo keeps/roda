@@ -18,6 +18,11 @@ public class GenerateRiskBackfillPlugin extends GenerateRODAEntityBackfillPlugin
     }
 
     @Override
+    protected String getObjectId(Risk object) {
+      return object.getId();
+    }
+
+    @Override
     public Plugin<Risk> cloneMe() {
         return new GenerateRiskBackfillPlugin();
     }

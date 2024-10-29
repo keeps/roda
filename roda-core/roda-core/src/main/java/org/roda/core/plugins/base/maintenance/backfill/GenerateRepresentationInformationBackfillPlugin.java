@@ -18,6 +18,11 @@ public class GenerateRepresentationInformationBackfillPlugin
   }
 
   @Override
+  protected String getObjectId(RepresentationInformation object) {
+    return object.getId();
+  }
+
+  @Override
   public Plugin<RepresentationInformation> cloneMe() {
     return new GenerateRepresentationInformationBackfillPlugin();
   }

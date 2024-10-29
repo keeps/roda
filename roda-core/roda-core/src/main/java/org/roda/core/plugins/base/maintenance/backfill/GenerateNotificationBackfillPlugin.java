@@ -16,6 +16,10 @@ public class GenerateNotificationBackfillPlugin extends GenerateRODAEntityBackfi
     return (Class<I>) Notification.class;
   }
 
+  @Override
+  protected String getObjectId(Notification object) {
+    return object.getId();
+  }
 
   @Override
   public Plugin<Notification> cloneMe() {

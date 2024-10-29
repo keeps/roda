@@ -17,6 +17,11 @@ public class GenerateIncidenceBackfillPlugin extends GenerateRODAEntityBackfillP
   }
 
   @Override
+  protected String getObjectId(RiskIncidence object) {
+    return object.getId();
+  }
+
+  @Override
   public Plugin<RiskIncidence> cloneMe() {
     return new GenerateIncidenceBackfillPlugin();
   }

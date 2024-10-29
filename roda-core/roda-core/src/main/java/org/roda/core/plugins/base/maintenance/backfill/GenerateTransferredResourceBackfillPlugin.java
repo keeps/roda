@@ -5,6 +5,7 @@ import java.util.List;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.util.IdUtils;
 
 /**
  * @author Alexandre Flores <aflores@keep.pt>
@@ -16,6 +17,10 @@ public class GenerateTransferredResourceBackfillPlugin extends GenerateRODAEntit
       return (Class<I>) TransferredResource.class;
     }
 
+    @Override
+    protected String getObjectId(TransferredResource object) {
+      return IdUtils.getTransferredResourceUUID(String.join("/", object.getAncestorsPaths()));
+    }
 
     @Override
     public Plugin<TransferredResource> cloneMe() {

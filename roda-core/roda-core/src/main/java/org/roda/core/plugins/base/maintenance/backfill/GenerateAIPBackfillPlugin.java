@@ -18,6 +18,11 @@ public class GenerateAIPBackfillPlugin extends GenerateRODAEntityBackfillPlugin<
     }
 
     @Override
+    protected String getObjectId(AIP object) {
+      return object.getId();
+    }
+
+    @Override
     public Plugin<AIP> cloneMe() {
         return new GenerateAIPBackfillPlugin();
     }

@@ -18,6 +18,11 @@ public class GenerateDIPBackfillPlugin extends GenerateRODAEntityBackfillPlugin<
   }
 
   @Override
+  protected String getObjectId(DIP object) {
+    return object.getId();
+  }
+
+  @Override
   public Plugin<DIP> cloneMe() {
     return new GenerateDIPBackfillPlugin();
   }

@@ -151,7 +151,7 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
         DocType docBean = GenerateBackfillPluginUtils.toDocBean(object, getIndexClass());
         JAXBElement<DocType> rootElement = new JAXBElement<>(new QName("doc"), DocType.class, docBean);
         docXMLs.append(XMLUtils.getXMLFragFromObject(rootElement));
-        processedIds.addLast(object.getId());
+        processedIds.addLast(getObjectId(object));
       } catch (AuthorizationDeniedException e) {
         throw new RuntimeException(e);
       } catch (RequestNotValidException e) {
@@ -179,6 +179,8 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
   }
 
   protected abstract <I extends IsIndexed> Class<I> getIndexClass();
+
+  protected abstract String getObjectId(T object);
 
   @Override
   public PluginType getType() {

@@ -30,6 +30,10 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -130,11 +134,14 @@ public class GenerateAllRODAEntitiesBackfillPlugin extends AbstractPlugin<Void> 
       onlyGenerateInventory = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY));
     }
     if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_START_DATE)) {
-      SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-      try {
-        startDate = formatter.parse(parameters.get(RodaConstants.PLUGIN_PARAMS_START_DATE));
-      } catch (ParseException e) {
-        throw new InvalidParameterException(e);
+      String dateString = parameters.get(RodaConstants.PLUGIN_PARAMS_START_DATE);
+      if (!dateString.isEmpty()) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+          startDate = formatter.parse(parameters.get(RodaConstants.PLUGIN_PARAMS_START_DATE));
+        } catch (ParseException e) {
+          throw new InvalidParameterException(e);
+        }
       }
     }
   }
@@ -142,7 +149,7 @@ public class GenerateAllRODAEntitiesBackfillPlugin extends AbstractPlugin<Void> 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
+    List<Class<? extends IsRODAObject>> classes = GenerateBackfillPluginUtils.getBackfillObjectClasses();
     return PluginHelper.processVoids(this,
       (RODAProcessingLogic<Void>) (index1, model1, storage1, report, cachedJob, jobPluginInfo,
         plugin) -> generateBackfill(model1, index1, storage1, report, jobPluginInfo, cachedJob, classes),
@@ -166,7 +173,8 @@ public class GenerateAllRODAEntitiesBackfillPlugin extends AbstractPlugin<Void> 
     JobPluginInfo jobPluginInfo) {
     Report report = null;
 
-    if (model.hasObjects(clazz)) {
+    if (model.hasObjects(clazz) || (clazz.equals(DIPFile.class) || clazz.equals(Representation.class)
+      || clazz.equals(File.class) || clazz.equals(PreservationMetadata.class))) {
       String jobId = IdUtils.createUUID();
       String jobName = "Generate index backfill for RODA entity (" + clazz.getSimpleName() + ")";
       report = PluginHelper.initPluginReportItem(this, jobId, Job.class);
@@ -197,6 +205,10 @@ public class GenerateAllRODAEntitiesBackfillPlugin extends AbstractPlugin<Void> 
     localPluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_DIRECTORY, outputDirectory);
     localPluginParameters.put(RodaConstants.PLUGIN_PARAMS_ONLY_GENERATE_INVENTORY,
       String.valueOf(onlyGenerateInventory));
+    if (startDate != null) {
+      SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+      localPluginParameters.put(RodaConstants.PLUGIN_PARAMS_START_DATE, dateFormat.format(startDate));
+    }
     job.setPluginParameters(localPluginParameters);
     job.setPluginType(PluginType.MISC);
     job.setUsername(username);
