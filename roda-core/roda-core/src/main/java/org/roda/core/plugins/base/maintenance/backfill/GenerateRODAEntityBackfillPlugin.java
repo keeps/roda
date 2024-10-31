@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -37,6 +38,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -133,48 +135,58 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
+    Exception thrown = null;
     return PluginHelper.processObjects(this,
       (RODAObjectsProcessingLogic<T>) (index1, model1, storage1, report, cachedJob, jobPluginInfo, plugin,
-        objects) -> generateBackfill(model1, index1, storage1, report, jobPluginInfo, cachedJob, objects),
+        objects) -> {
+          try {
+              generateBackfill(model1, index1, storage1, report, jobPluginInfo, cachedJob, objects);
+          } catch (PluginException e) {
+              throw new RuntimeException(e);
+          }
+      },
       index, model, storage, liteList);
   }
 
   protected void generateBackfill(ModelService model, IndexService index, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, Job job, List<T> objects) {
+    JobPluginInfo jobPluginInfo, Job job, List<T> objects) throws PluginException {
     StringBuilder docXMLs = new StringBuilder();
     List<String> processedIds = new LinkedList<>();
     String batchId = IdUtils.createUUID();
+    report.setPluginState(PluginState.SUCCESS);
 
     for (T object : objects) {
-      // TODO Handle exceptions
       try {
-        DocType docBean = GenerateBackfillPluginUtils.toDocBean(object, getIndexClass());
-        JAXBElement<DocType> rootElement = new JAXBElement<>(new QName("doc"), DocType.class, docBean);
-        docXMLs.append(XMLUtils.getXMLFragFromObject(rootElement));
+        if (!onlyGenerateInventory) {
+          DocType docBean = GenerateBackfillPluginUtils.toDocBean(object, getIndexClass());
+          JAXBElement<DocType> rootElement = new JAXBElement<>(new QName("doc"), DocType.class, docBean);
+          docXMLs.append(XMLUtils.getXMLFragFromObject(rootElement));
+        }
         processedIds.addLast(getObjectId(object));
-      } catch (AuthorizationDeniedException e) {
-        throw new RuntimeException(e);
-      } catch (RequestNotValidException e) {
-        throw new RuntimeException(e);
-      } catch (NotFoundException e) {
-        throw new RuntimeException(e);
-      } catch (NotSupportedException e) {
-        throw new RuntimeException(e);
-      } catch (GenericException e) {
-        throw new RuntimeException(e);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      } catch (NotSupportedException | GenericException | RequestNotValidException | NotFoundException
+        | AuthorizationDeniedException e) {
+        report.setPluginState(PluginState.FAILURE);
+        report.addPluginDetails("Exception occurred while processing object: " + e.getMessage());
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        throw new PluginException(e);
       }
     }
-    // TODO Handle exceptions
+
     try {
-      StoragePath addPartialPath = GenerateBackfillPluginUtils.constructAddPartialOutputPath(outputDirectory,
-        objects.getFirst().getClass(), batchId);
-      GenerateBackfillPluginUtils.writeAddPartial(storage, addPartialPath, docXMLs.toString());
+      if (!onlyGenerateInventory) {
+        StoragePath addPartialPath = GenerateBackfillPluginUtils.constructAddPartialOutputPath(outputDirectory,
+          objects.getFirst().getClass(), batchId);
+        GenerateBackfillPluginUtils.writeAddPartial(storage, addPartialPath, docXMLs.toString());
+      }
       StoragePath inventoryPartialPath = GenerateBackfillPluginUtils
         .constructInventoryPartialOutputPath(outputDirectory, objects.getFirst().getClass(), batchId);
       GenerateBackfillPluginUtils.writeInventoryPartial(storage, inventoryPartialPath, processedIds);
     } catch (AlreadyExistsException | RequestNotValidException | GenericException | AuthorizationDeniedException
       | NotFoundException e) {
-      throw new RuntimeException(e);
+      report.setPluginState(PluginState.FAILURE);
+      report.addPluginDetails("Exception occurred while writing generated XML: " + e.getMessage());
+      throw new PluginException(e);
     }
   }
 
@@ -220,16 +232,25 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) {
-    concatenateAndWriteAdds(storage);
-    concatenateAndWriteInventory(storage);
-    // TODO return report
+    Report report = new Report();
+    if (!onlyGenerateInventory) {
+      report.addReport(concatenateAndWriteAdds(storage));
+    }
+    report.addReport(concatenateAndWriteInventory(storage));
+    report.setPluginState(
+      report.getReports().stream().allMatch(r -> r.getPluginState().equals(PluginState.SUCCESS)) ? PluginState.SUCCESS
+        : PluginState.FAILURE);
     return new Report();
   }
 
   protected Report concatenateAndWriteAdds(StorageService storage) {
-    // TODO Get this from plugin config
-    int blockSize = 10;
-    // TODO Handle exceptions
+    Report report = new Report();
+    report.setPluginState(PluginState.SUCCESS);
+    int blockSize = RodaCoreFactory.getRodaConfigurationAsInt("core", "plugins", "internal", "backfill",
+      "blockBatches");
+    if (blockSize == 0) {
+      blockSize = 10;
+    }
     try {
       StoragePath addPartialsDirectory = GenerateBackfillPluginUtils.constructAddPartialsDirectoryPath(outputDirectory,
         getObjectClasses().getFirst());
@@ -239,9 +260,9 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
       int addedBatches = 0;
       int writtenBlocks = 0;
       for (Resource addPartialResource : addPartials) {
-        InputStream addPartialStream = ((DefaultBinary) addPartialResource).getContent().createInputStream();
-        addStringBuilder.append(new String(addPartialStream.readAllBytes(), StandardCharsets.UTF_8));
-        addPartialStream.close();
+        try (InputStream addPartialStream = ((DefaultBinary) addPartialResource).getContent().createInputStream()) {
+          addStringBuilder.append(new String(addPartialStream.readAllBytes(), StandardCharsets.UTF_8));
+        }
         addedBatches++;
         if (addedBatches > blockSize) {
           addStringBuilder.append("</add>");
@@ -263,25 +284,16 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
           getObjectClasses().getFirst(), Integer.toString(writtenBlocks));
         storage.createBinary(addPath, new StringContentPayload(addStringBuilder.toString()), false);
       }
-    } catch (RequestNotValidException e) {
-      throw new RuntimeException(e);
-    } catch (AuthorizationDeniedException e) {
-      throw new RuntimeException(e);
-    } catch (NotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (GenericException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    } catch (AlreadyExistsException e) {
-      throw new RuntimeException(e);
+    } catch (RequestNotValidException | IOException | NotFoundException | GenericException
+      | AuthorizationDeniedException | AlreadyExistsException e) {
+      report.setPluginState(PluginState.FAILURE);
+      report.addPluginDetails("Exception during document concatenation: " + e.getMessage());
     }
-    // TODO return report
-    return null;
+    return report;
   }
 
   protected Report concatenateAndWriteInventory(StorageService storage) {
-    // TODO Handle exceptions
+    Report report = new Report();
     try {
       StoragePath inventoryPartialsDirectory = GenerateBackfillPluginUtils
         .constructInventoryPartialsDirectoryPath(outputDirectory, getObjectClasses().getFirst());
@@ -289,10 +301,10 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
         false);
       StringBuilder inventoryStringBuilder = new StringBuilder();
       for (Resource inventoryPartialResource : inventoryPartials) {
-        InputStream inventoryPartialStream = ((DefaultBinary) inventoryPartialResource).getContent()
-          .createInputStream();
-        inventoryStringBuilder.append(new String(inventoryPartialStream.readAllBytes(), StandardCharsets.UTF_8));
-        inventoryPartialStream.close();
+        try (InputStream inventoryPartialStream = ((DefaultBinary) inventoryPartialResource).getContent()
+          .createInputStream()) {
+          inventoryStringBuilder.append(new String(inventoryPartialStream.readAllBytes(), StandardCharsets.UTF_8));
+        }
         inventoryStringBuilder.append("\n");
         storage.deleteResource(inventoryPartialResource.getStoragePath());
       }
@@ -300,21 +312,12 @@ public abstract class GenerateRODAEntityBackfillPlugin<T extends IsRODAObject & 
       StoragePath inventoryPath = GenerateBackfillPluginUtils.constructInventoryOutputPath(outputDirectory,
         getObjectClasses().getFirst());
       storage.createBinary(inventoryPath, new StringContentPayload(inventoryStringBuilder.toString()), false);
-    } catch (RequestNotValidException e) {
-      throw new RuntimeException(e);
-    } catch (AuthorizationDeniedException e) {
-      throw new RuntimeException(e);
-    } catch (NotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (GenericException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    } catch (AlreadyExistsException e) {
-      throw new RuntimeException(e);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+      | IOException | AlreadyExistsException e) {
+      report.setPluginState(PluginState.FAILURE);
+      report.addPluginDetails("Exception during inventory concatenation: " + e.getMessage());
     }
-    // TODO return report
-    return null;
+    return report;
   }
 
   @Override

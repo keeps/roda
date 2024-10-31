@@ -20,6 +20,7 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.LogEntryJsonParseException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -30,6 +31,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -39,6 +41,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -159,7 +162,6 @@ public class GenerateAllRODAEntitiesBackfillPlugin extends AbstractPlugin<Void> 
   protected void generateBackfill(ModelService model, IndexService index, StorageService storage, Report report,
     JobPluginInfo jobPluginInfo, Job cachedJob, List<Class<? extends IsRODAObject>> classes) {
     for (Class<? extends IsRODAObject> clazz : classes) {
-      // TODO handle exceptions
       Report reportItem = generateRODAObjectBackfill(model, clazz, jobPluginInfo);
       if (reportItem != null) {
         report.addReport(reportItem);
@@ -215,7 +217,10 @@ public class GenerateAllRODAEntitiesBackfillPlugin extends AbstractPlugin<Void> 
 
     job.setPlugin(GenerateBackfillPluginUtils.getGeneratedBackfillPluginName(clazz));
     SelectedItems<?> selectedItems;
-    if (startDate != null) {
+    if (clazz.equals(LogEntry.class)) {
+      selectedItems = new SelectedItemsNone<>();
+    }
+    else if (startDate != null) {
       SelectedItemsFilter<?> selectedItemsFilter = new SelectedItemsFilter<>();
       Filter filter = new Filter();
       DateIntervalFilterParameter dateIntervalFilterParameter = new DateIntervalFilterParameter();

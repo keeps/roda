@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -38,6 +38,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -46,7 +47,6 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
-import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.base.maintenance.backfill.beans.Add;
 import org.roda.core.plugins.base.maintenance.backfill.beans.DocType;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
@@ -159,67 +159,67 @@ public class GeneratePreservationMetadataBackfillPlugin extends AbstractPlugin<V
   }
 
   protected void generateBackfill(ModelService model, IndexService index, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, Job cachedJob) {
+    JobPluginInfo jobPluginInfo, Job cachedJob) throws PluginException {
     generateAgentsBackfill(model, index, storage, report, jobPluginInfo, cachedJob);
     generateEventsBackfill(model, index, storage, report, jobPluginInfo, cachedJob);
   }
 
   protected void generateAgentsBackfill(ModelService model, IndexService index, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, Job cachedJob) {
-    // TODO: Report
+    JobPluginInfo jobPluginInfo, Job cachedJob) throws PluginException {
     List<String> processedIds = new LinkedList<>();
-
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationObjects;
-    // TODO: Handle exceptions
     try {
       preservationObjects = model.listPreservationAgents();
-    } catch (GenericException e) {
-      throw new RuntimeException(e);
-    } catch (AuthorizationDeniedException e) {
-      throw new RuntimeException(e);
-    } catch (RequestNotValidException e) {
-      throw new RuntimeException(e);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      report.setPluginState(PluginState.FAILURE);
+      report.setPluginDetails("Could not list preservation agents: " + e.getMessage());
+      throw new PluginException(e);
     }
-    // TODO: Get this from config
-    int batchSize = 100;
-    int blockSize = 10;
+    int blockSize = RodaCoreFactory.getRodaConfigurationAsInt("core", "plugins", "internal", "backfill", "blockSize");
+    if (blockSize == 0) {
+      blockSize = 1000;
+    }
     Add addBean = new Add();
     int docCount = 0;
     int addCount = 0;
+
     for (OptionalWithCause<PreservationMetadata> preservationObject : preservationObjects) {
       if (preservationObject.isPresent()) {
-        // TODO Handle exceptions
         try {
-          DocType docBean = GenerateBackfillPluginUtils.toDocBean(preservationObject.get(),
-            IndexedPreservationAgent.class);
-          addBean.getDoc().add(docBean);
-          processedIds.addLast(preservationObject.get().getId());
+          if (!onlyGenerateInventory) {
+            DocType docBean = GenerateBackfillPluginUtils.toDocBean(preservationObject.get(),
+              IndexedPreservationAgent.class);
+            addBean.getDoc().add(docBean);
+          }
+        } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | NotSupportedException
+          | GenericException e) {
+          report.setPluginState(PluginState.FAILURE);
+          report.setPluginDetails("Exception while processing object: " + e.getMessage());
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          throw new PluginException(e);
+        }
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        processedIds.addLast(preservationObject.get().getId());
+        docCount++;
 
-          docCount++;
-          if (docCount >= blockSize * batchSize) {
+        if (docCount >= blockSize && !onlyGenerateInventory) {
+          try {
             StoragePath addPath = GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory,
               IndexedPreservationAgent.class, Integer.toString(addCount));
             GenerateBackfillPluginUtils.writeAddBean(storage, addPath, addBean);
             addBean = new Add();
             addCount++;
             docCount = 0;
+          } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | AlreadyExistsException
+            | NotFoundException e) {
+            report.setPluginState(PluginState.FAILURE);
+            report.setPluginDetails("Exception while creating XML: " + e.getMessage());
+            throw new PluginException(e);
           }
-        } catch (AuthorizationDeniedException e) {
-          throw new RuntimeException(e);
-        } catch (RequestNotValidException e) {
-          throw new RuntimeException(e);
-        } catch (NotFoundException e) {
-          throw new RuntimeException(e);
-        } catch (NotSupportedException e) {
-          throw new RuntimeException(e);
-        } catch (GenericException e) {
-          throw new RuntimeException(e);
-        } catch (AlreadyExistsException e) {
-          throw new RuntimeException(e);
         }
       }
     }
-    // TODO Handle exceptions
+
     try {
       preservationObjects.close();
       if (docCount > 0) {
@@ -227,73 +227,75 @@ public class GeneratePreservationMetadataBackfillPlugin extends AbstractPlugin<V
           IndexedPreservationAgent.class, Integer.toString(addCount));
         GenerateBackfillPluginUtils.writeAddBean(storage, addPath, addBean);
       }
+
       StoragePath inventoryPath = GenerateBackfillPluginUtils.constructInventoryOutputPath(outputDirectory,
         IndexedPreservationAgent.class);
       GenerateBackfillPluginUtils.writeInventoryPartial(storage, inventoryPath, processedIds);
     } catch (AlreadyExistsException | RequestNotValidException | GenericException | AuthorizationDeniedException
-      | NotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+      | NotFoundException | IOException e) {
+      report.setPluginState(PluginState.FAILURE);
+      report.setPluginDetails("Exception while creating XML: " + e.getMessage());
+      throw new PluginException(e);
     }
+    report.setPluginState(PluginState.SUCCESS);
   }
 
   protected void generateEventsBackfill(ModelService model, IndexService index, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, Job cachedJob) {
-    // TODO: Report
+    JobPluginInfo jobPluginInfo, Job cachedJob) throws PluginException {
     List<String> processedIds = new LinkedList<>();
-
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationObjects;
-    // TODO: Handle exceptions
     try {
       preservationObjects = model.listPreservationRepositoryEvents();
-    } catch (GenericException e) {
-      throw new RuntimeException(e);
-    } catch (AuthorizationDeniedException e) {
-      throw new RuntimeException(e);
-    } catch (RequestNotValidException e) {
-      throw new RuntimeException(e);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      report.setPluginState(PluginState.FAILURE);
+      report.setPluginDetails("Could not list preservation repository events: " + e.getMessage());
+      throw new PluginException(e);
     }
-    // TODO: Get this from config
-    int batchSize = 100;
-    int blockSize = 10;
+    int blockSize = RodaCoreFactory.getRodaConfigurationAsInt("core", "plugins", "internal", "backfill", "blockSize");
+    if (blockSize == 0) {
+      blockSize = 1000;
+    }
     Add addBean = new Add();
     int docCount = 0;
     int addCount = 0;
+
     for (OptionalWithCause<PreservationMetadata> preservationObject : preservationObjects) {
       if (preservationObject.isPresent()) {
-        // TODO Handle exceptions
         try {
-          DocType docBean = GenerateBackfillPluginUtils.toDocBean(preservationObject.get(),
-            IndexedPreservationEvent.class);
-          addBean.getDoc().add(docBean);
-          processedIds.addLast(preservationObject.get().getId());
+          if (!onlyGenerateInventory) {
+            DocType docBean = GenerateBackfillPluginUtils.toDocBean(preservationObject.get(),
+              IndexedPreservationEvent.class);
+            addBean.getDoc().add(docBean);
+          }
+        } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | NotSupportedException
+          | GenericException e) {
+          report.setPluginState(PluginState.FAILURE);
+          report.setPluginDetails("Exception while processing object: " + e.getMessage());
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          throw new PluginException(e);
+        }
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        processedIds.addLast(preservationObject.get().getId());
+        docCount++;
 
-          docCount++;
-          if (docCount >= blockSize * batchSize) {
+        if (docCount >= blockSize && !onlyGenerateInventory) {
+          try {
             StoragePath addPath = GenerateBackfillPluginUtils.constructAddOutputPath(outputDirectory,
               IndexedPreservationEvent.class, Integer.toString(addCount));
             GenerateBackfillPluginUtils.writeAddBean(storage, addPath, addBean);
             addBean = new Add();
             addCount++;
             docCount = 0;
+          } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | AlreadyExistsException
+            | NotFoundException e) {
+            report.setPluginState(PluginState.FAILURE);
+            report.setPluginDetails("Exception while creating XML: " + e.getMessage());
+            throw new PluginException(e);
           }
-        } catch (AuthorizationDeniedException e) {
-          throw new RuntimeException(e);
-        } catch (RequestNotValidException e) {
-          throw new RuntimeException(e);
-        } catch (NotFoundException e) {
-          throw new RuntimeException(e);
-        } catch (NotSupportedException e) {
-          throw new RuntimeException(e);
-        } catch (GenericException e) {
-          throw new RuntimeException(e);
-        } catch (AlreadyExistsException e) {
-          throw new RuntimeException(e);
         }
       }
     }
-    // TODO Handle exceptions
+
     try {
       preservationObjects.close();
       if (docCount > 0) {
@@ -301,15 +303,17 @@ public class GeneratePreservationMetadataBackfillPlugin extends AbstractPlugin<V
           IndexedPreservationEvent.class, Integer.toString(addCount));
         GenerateBackfillPluginUtils.writeAddBean(storage, addPath, addBean);
       }
+
       StoragePath inventoryPath = GenerateBackfillPluginUtils.constructInventoryOutputPath(outputDirectory,
         IndexedPreservationEvent.class);
       GenerateBackfillPluginUtils.writeInventoryPartial(storage, inventoryPath, processedIds);
     } catch (AlreadyExistsException | RequestNotValidException | GenericException | AuthorizationDeniedException
-      | NotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+      | NotFoundException | IOException e) {
+      report.setPluginState(PluginState.FAILURE);
+      report.setPluginDetails("Exception while creating XML: " + e.getMessage());
+      throw new PluginException(e);
     }
+    report.setPluginState(PluginState.SUCCESS);
   }
 
   @Override

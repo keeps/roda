@@ -178,7 +178,7 @@ public class GenerateBackfillPluginUtils {
     storage.createBinary(path, payload, false);
   }
 
-  public static Set<String> readOriginalProcessedIds(StorageService storage, String directoryPath)
+  /*public static Set<String> readOriginalProcessedIds(StorageService storage, String directoryPath)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException, IOException {
     StoragePath storagePath = DefaultStoragePath.parse(List.of(BACKFILL_ROOT_DIRECTORY, directoryPath));
     CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, false);
@@ -192,13 +192,13 @@ public class GenerateBackfillPluginUtils {
     }
     resources.close();
     return processedIds;
-  }
+  }*/
 
-  public static Add readAddBean(Resource addXMLResource)
+  /*public static Add readAddBean(Resource addXMLResource)
     throws GenericException, IOException {
     ContentPayload payload = ((DefaultBinary) addXMLResource).getContent();
     return XMLUtils.getObjectFromXML(payload.createInputStream(), Add.class);
-  }
+  }*/
 
   public static void writeDeleteBean(StorageService storage, StoragePath path, Delete deleteBean)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
@@ -286,6 +286,7 @@ public class GenerateBackfillPluginUtils {
     list.add(DIP.class);
     list.add(DIPFile.class);
     list.add(File.class);
+    list.add(Job.class);
     list.add(Report.class);
     list.add(DisposalConfirmation.class);
     list.add(Representation.class);
