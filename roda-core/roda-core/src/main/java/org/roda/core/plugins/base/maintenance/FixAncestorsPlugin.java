@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -45,17 +46,18 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// FIXME 20161202 hsilva: expose params PLUGIN_PARAMS_PARENT_ID
 public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FixAncestorsPlugin.class);
 
   private String originalJobId;
 
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "Ingest job identifier", PluginParameterType.STRING,
-        "", true, false, "The identifier of the job responsible to ingest the information package to fix."));
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "Ingest job identifier", PluginParameterType.STRING)
+        .isMandatory(false).isReadOnly(false)
+        .withDescription("The identifier of the job responsible to ingest the information package to fix.").build());
   }
 
   @Override
@@ -104,9 +106,11 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID)) {
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID)
+      && StringUtils.isNotBlank(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID))) {
       originalJobId = getParameterValues().get(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID);
     }
+
   }
 
   @Override
