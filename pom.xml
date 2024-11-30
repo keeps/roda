@@ -103,7 +103,7 @@
         <jackson.version>2.17.1</jackson.version>
         <spring.version>6.1.14</spring.version>
         <solr.version>9.6.1</solr.version>
-        <pekko.version>1.0.2</pekko.version>
+        <pekko.version>1.1.2</pekko.version>
         <httpcomponents.version>4.5.14</httpcomponents.version>
         <commons_ip2.version>2.6.1</commons_ip2.version>
         <metrics.version>3.2.6</metrics.version>
