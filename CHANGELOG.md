@@ -1,5 +1,19 @@
 # Changelog
 
+## v5.7.1 (08/01/2025)
+#### Bug fixes
+
+- Fix built-in plugin "AIP ancestor hierarchy fix"
+- Deleting linked DIPs now longer increments objects processed (#3285)
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.0 (05/09/2024)
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities
@@ -436,17 +450,4 @@ docker pull keeps/roda:v4.5.3
 Install for demonstration:
 ```
 docker pull keeps/roda:v4.5.2
-```
----
-
-## v4.5.1 (16/01/2023)
-#### Enhancements:
-
-- Refactor RetryPolicyBuilder #2296
-- Improve log information during initialization process #2297
-- Add metrics about retries (related to RetryPolicyBuilder) #2298
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.5.1
 ```
