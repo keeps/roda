@@ -129,6 +129,7 @@
         <testng.groups>all</testng.groups>
         <springboot.version>3.4.0</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
+        <jetty.version>12.0.12</jetty.version>
     </properties>
     <profiles>
         <profile>
