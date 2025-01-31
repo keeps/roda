@@ -21,6 +21,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
@@ -79,7 +80,7 @@ public class ListFactory {
       options = new AsyncTableCellOptions<>(RiskIncidence.class, listIdPrefix + "_riskIncidence");
       listConstructor = () -> new RiskIncidenceList();
     } else if (Job.class.getName().equals(actualClass)) {
-      options = new AsyncTableCellOptions<>(Job.class, listIdPrefix + "_job");
+      options = new AsyncTableCellOptions<>(IndexedJob.class, listIdPrefix + "_job");
       listConstructor = () -> new JobList();
     } else if (Report.class.getName().equals(actualClass) || IndexedReport.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(IndexedReport.class, listIdPrefix + "_simpleJob");

@@ -43,7 +43,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
@@ -87,8 +87,8 @@ public class SyncUtils {
     final Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, instanceIdentifier));
     filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, "CREATED"));
-    final IterableIndexResult<Job> jobs = RodaCoreFactory.getIndexService().findAll(Job.class, filter, true,
-      new ArrayList<>());
+    final IterableIndexResult<IndexedJob> jobs = RodaCoreFactory.getIndexService().findAll(IndexedJob.class, filter,
+      true, new ArrayList<>());
 
     final Path destinationPath = workingDir.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_JOB);

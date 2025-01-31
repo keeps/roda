@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -191,10 +192,10 @@ public class InstanceIdentifierJobPlugin extends AbstractPlugin<Void> {
     int countFail = 0;
     int countSuccess = 0;
     // Get Jobs from index
-    IterableIndexResult<Job> indexedJobs = retrieveList(index);
+    IterableIndexResult<IndexedJob> indexedJobs = retrieveList(index);
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-    for (Job indexedJob : indexedJobs) {
+    for (IndexedJob indexedJob : indexedJobs) {
       try {
         model.updateJobInstanceId(model.retrieveJob(indexedJob.getId()));
         countSuccess++;
@@ -227,10 +228,10 @@ public class InstanceIdentifierJobPlugin extends AbstractPlugin<Void> {
     return new Report();
   }
 
-  private IterableIndexResult<Job> retrieveList(final IndexService index)
+  private IterableIndexResult<IndexedJob> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     final Filter filter = new Filter();
     RODAInstanceUtils.addLocalInstanceFilter(filter);
-    return index.findAll(Job.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
+    return index.findAll(IndexedJob.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }

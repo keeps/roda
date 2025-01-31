@@ -8,14 +8,14 @@
 package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.wui.client.common.lists.JobList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 
-public class SelectJobDialog extends DefaultSelectDialog<Job> {
+public class SelectJobDialog extends DefaultSelectDialog<IndexedJob> {
   public SelectJobDialog(String title, Filter filter) {
     super(title, new ListBuilder<>(() -> new JobList(),
-      new AsyncTableCellOptions<>(Job.class, "SelectJobDialog_jobs").withFilter(filter).withSummary(title)));
+      new AsyncTableCellOptions<>(IndexedJob.class, "SelectJobDialog_jobs").withFilter(filter).withSummary(title)));
   }
 }

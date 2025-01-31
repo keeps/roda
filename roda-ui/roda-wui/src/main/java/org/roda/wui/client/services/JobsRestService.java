@@ -6,9 +6,11 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.jobs.CreateJobRequest;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Jobs;
 import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginInfoRequest;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
@@ -34,7 +36,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Jobs")
 @RequestMapping(path = "../api/v2/jobs")
-public interface JobsRestService extends RODAEntityRestService<Job> {
+public interface JobsRestService extends RODAEntityRestService<IndexedJob> {
+
+  @RequestMapping(method = RequestMethod.GET, path = "/{" + RodaConstants.API_PATH_PARAM_JOB_ID
+    + "}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get job", description = "Gets a job from the model", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Job.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Job getJobFromModel(@PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_ID) String jobId);
 
   @RequestMapping(method = RequestMethod.POST, path = "/obtain-command", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Obtains the cURL command for a job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {
@@ -90,9 +99,8 @@ public interface JobsRestService extends RODAEntityRestService<Job> {
     @PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_REPORT_ID) String reportId);
 
   @RequestMapping(method = RequestMethod.POST, path = "/plugin-info", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Get job plugin info", description = "Gets the information about the plugins executed on the job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Job.class))), responses = {
+  @Operation(summary = "Get job plugin info", description = "Gets the information about the plugins executed on the job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = PluginInfoRequest.class))), responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PluginInfo.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  List<PluginInfo> getJobPluginInfo(
-    @Parameter(name = "job", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Job job);
+  List<PluginInfo> getJobPluginInfo(PluginInfoRequest pluginInfoRequest);
 }
