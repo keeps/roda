@@ -13,14 +13,13 @@ import java.util.List;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobParallelism;
@@ -32,18 +31,17 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
-import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JobCollection extends AbstractSolrCollection<Job, Job> {
+public class JobCollection extends AbstractSolrCollection<IndexedJob, Job> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JobCollection.class);
 
   @Override
-  public Class<Job> getIndexClass() {
-    return Job.class;
+  public Class<IndexedJob> getIndexClass() {
+    return IndexedJob.class;
   }
 
   @Override
@@ -82,7 +80,6 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     fields.add(new Field(RodaConstants.JOB_PLUGIN, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_PLUGIN_TYPE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_PLUGIN_PARAMETERS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
-    fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
     fields.add(new Field(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_COUNT, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_WAITING_TO_BE_PROCESSED, Field.TYPE_INT));
@@ -139,7 +136,6 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     doc.addField(RodaConstants.JOB_PLUGIN_TYPE, job.getPluginType().toString());
     doc.addField(RodaConstants.JOB_PLUGIN, job.getPlugin());
     doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, JsonUtils.getJsonFromObject(job.getPluginParameters()));
-    doc.addField(RodaConstants.JOB_SOURCE_OBJECTS, JsonUtils.getJsonFromObject(job.getSourceObjects()));
     doc.addField(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS, job.getOutcomeObjectsClass());
     doc.addField(RodaConstants.JOB_HAS_FAILURES,
       jobStats.getSourceObjectsProcessedWithFailure() > 0
@@ -154,9 +150,9 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
   }
 
   @Override
-  public Job fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn) throws GenericException {
+  public IndexedJob fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn) throws GenericException {
 
-    final Job job = super.fromSolrDocument(doc, fieldsToReturn);
+    final IndexedJob job = super.fromSolrDocument(doc, fieldsToReturn);
 
     job.setName(SolrUtils.objectToString(doc.get(RodaConstants.JOB_NAME), null));
     job.setUsername(SolrUtils.objectToString(doc.get(RodaConstants.JOB_USERNAME), null));
@@ -196,14 +192,6 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
         JsonUtils.getMapFromJson(SolrUtils.objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS), "")));
     }
 
-    try {
-      if (fieldsToReturn.isEmpty() || fieldsToReturn.contains(RodaConstants.JOB_SOURCE_OBJECTS)) {
-        job.setSourceObjects(JsonUtils.getObjectFromJson(
-          SolrUtils.objectToString(doc.get(RodaConstants.JOB_SOURCE_OBJECTS), ""), SelectedItems.class));
-      }
-    } catch (GenericException e) {
-      LOGGER.error("Error parsing report in job objects", e);
-    }
     job.setOutcomeObjectsClass(SolrUtils.objectToString(doc.get(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS), null));
 
     try {

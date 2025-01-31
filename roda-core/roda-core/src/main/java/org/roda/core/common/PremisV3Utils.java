@@ -63,7 +63,6 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -1033,7 +1032,7 @@ public final class PremisV3Utils {
   }
 
   public static PreservationMetadata createOrUpdatePremisUserAgentBinary(String username, ModelService model,
-                                                                         IndexService index, boolean notify, Job job) throws GenericException, ValidationException, NotFoundException,
+                                                                         IndexService index, boolean notify, List<JobUserDetails> jobUserDetails) throws GenericException, ValidationException, NotFoundException,
       RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     PreservationMetadata pm = null;
 
@@ -1044,11 +1043,11 @@ public final class PremisV3Utils {
       String note = "";
       String version = "";
 
-      if (job != null) {
-        for (JobUserDetails jobUserDetails : job.getJobUsersDetails()) {
-          if (jobUserDetails.getUsername().equals(username)) {
-            fullName = jobUserDetails.getFullname();
-            note = jobUserDetails.getEmail();
+      if (jobUserDetails != null) {
+        for (JobUserDetails jobUserDetail : jobUserDetails) {
+          if (jobUserDetail.getUsername().equals(username)) {
+            fullName = jobUserDetail.getFullname();
+            note = jobUserDetail.getEmail();
           }
         }
       } else {

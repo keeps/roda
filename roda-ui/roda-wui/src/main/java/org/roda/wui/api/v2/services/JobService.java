@@ -32,6 +32,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobMixIn;
@@ -39,6 +40,7 @@ import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginInfoRequest;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -57,6 +59,11 @@ import org.springframework.stereotype.Service;
 public class JobService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JobService.class);
+
+  public Job getJobFromModel(String jobId)
+    throws NotFoundException, AuthorizationDeniedException, RequestNotValidException, GenericException {
+    return RodaCoreFactory.getModelService().retrieveJob(jobId);
+  }
 
   public String buildCurlCommand(String path, Job job) {
     String command = RodaCoreFactory.getRodaConfiguration().getString("ui.createJob.curl");
@@ -78,7 +85,7 @@ public class JobService {
     RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(updatedJob, async);
 
     // force commit
-    RodaCoreFactory.getIndexService().commit(Job.class);
+    RodaCoreFactory.getIndexService().commit(IndexedJob.class);
 
     return updatedJob;
   }
@@ -301,15 +308,15 @@ public class JobService {
     }
   }
 
-  public List<PluginInfo> getJobPluginInfo(Job job, List<PluginInfo> pluginsInfo) {
-    PluginInfo basePlugin = RodaCoreFactory.getPluginManager().getPluginInfo(job.getPlugin());
+  public List<PluginInfo> getJobPluginInfo(PluginInfoRequest pluginInfoRequest, List<PluginInfo> pluginsInfo) {
+    PluginInfo basePlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginInfoRequest.getPlugin());
 
     if (basePlugin != null) {
       pluginsInfo.add(basePlugin);
 
       for (PluginParameter parameter : basePlugin.getParameters()) {
         if (PluginParameter.PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
-          String pluginId = job.getPluginParameters().get(parameter.getId());
+          String pluginId = pluginInfoRequest.getPluginParameters().get(parameter.getId());
           if (pluginId == null) {
             pluginId = parameter.getDefaultValue();
           }

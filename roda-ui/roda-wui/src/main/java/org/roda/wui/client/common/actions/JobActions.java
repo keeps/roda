@@ -18,6 +18,7 @@ import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
@@ -41,7 +42,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
-public class JobActions extends AbstractActionable<Job> {
+public class JobActions extends AbstractActionable<IndexedJob> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final Set<HistoryResolver> NEW_PROCESS_RESOLVERS = new HashSet<>(
     Arrays.asList(IngestTransfer.RESOLVER, CreateDefaultJob.RESOLVER));
@@ -61,18 +62,18 @@ public class JobActions extends AbstractActionable<Job> {
   }
 
   @Override
-  public Action<Job> actionForName(String name) {
+  public Action<IndexedJob> actionForName(String name) {
     return JobAction.valueOf(name);
   }
 
   @Override
-  public boolean canAct(Action<Job> action) {
+  public boolean canAct(Action<IndexedJob> action) {
     return hasPermissions(action) && JobAction.NEW_PROCESS.equals(action)
       && NEW_PROCESS_RESOLVERS.contains(newProcessResolver);
   }
 
   @Override
-  public boolean canAct(Action<Job> action, Job object) {
+  public boolean canAct(Action<IndexedJob> action, IndexedJob object) {
     if (hasPermissions(action) && object != null) {
       if (JobAction.STOP.equals(action)) {
         return !object.isInFinalState() && !object.isStopping();
@@ -90,7 +91,7 @@ public class JobActions extends AbstractActionable<Job> {
   }
 
   @Override
-  public boolean canAct(Action<Job> action, SelectedItems<Job> objects) {
+  public boolean canAct(Action<IndexedJob> action, SelectedItems<IndexedJob> objects) {
     if (hasPermissions(action) && objects != null) {
       if (JobAction.APPROVE.equals(action) || JobAction.REJECT.equals(action)) {
         return true;
@@ -100,7 +101,7 @@ public class JobActions extends AbstractActionable<Job> {
   }
 
   @Override
-  public void act(Action<Job> action, AsyncCallback<ActionImpact> callback) {
+  public void act(Action<IndexedJob> action, AsyncCallback<ActionImpact> callback) {
     if (JobAction.NEW_PROCESS.equals(action)) {
       newProcess(callback);
     } else {
@@ -109,7 +110,7 @@ public class JobActions extends AbstractActionable<Job> {
   }
 
   @Override
-  public void act(Action<Job> action, Job object, AsyncCallback<ActionImpact> callback) {
+  public void act(Action<IndexedJob> action, IndexedJob object, AsyncCallback<ActionImpact> callback) {
     if (JobAction.STOP.equals(action)) {
       stop(object, callback);
     } else if (JobAction.INGEST_APPRAISAL.equals(action)) {
@@ -125,7 +126,7 @@ public class JobActions extends AbstractActionable<Job> {
     }
   }
 
-  public void act(Action<Job> action, SelectedItems<Job> jobs, AsyncCallback<ActionImpact> callback) {
+  public void act(Action<IndexedJob> action, SelectedItems<IndexedJob> jobs, AsyncCallback<ActionImpact> callback) {
 
     if (JobAction.APPROVE.equals(action)) {
       approve(jobs, callback);
@@ -136,19 +137,19 @@ public class JobActions extends AbstractActionable<Job> {
     }
   }
 
-  private void ingestProcess(Job object, AsyncCallback<ActionImpact> callback) {
+  private void ingestProcess(IndexedJob object, AsyncCallback<ActionImpact> callback) {
     callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_WITH_PREFILTER_HANDLER, "title",
       messages.searchPrefilterCreatedByJob(object.getName()), SearchFilters.classesToHistoryTokens(IndexedAIP.class),
       RodaConstants.ALL_INGEST_JOB_IDS, object.getId());
   }
 
-  private void ingestAppraisal(Job object, AsyncCallback<ActionImpact> callback) {
+  private void ingestAppraisal(IndexedJob object, AsyncCallback<ActionImpact> callback) {
     callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(IngestAppraisal.RESOLVER, RodaConstants.INGEST_JOB_ID, object.getId());
   }
 
-  private void stop(Job object, AsyncCallback<ActionImpact> callback) {
+  private void stop(IndexedJob object, AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.jobStopConfirmDialogTitle(), messages.jobStopConfirmDialogMessage(),
       messages.dialogCancel(), messages.dialogYes(), new ActionAsyncCallback<Boolean>(callback) {
 
@@ -171,7 +172,7 @@ public class JobActions extends AbstractActionable<Job> {
       });
   }
 
-  private void approve(Job object, AsyncCallback<ActionImpact> callback) {
+  private void approve(IndexedJob object, AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.jobApproveConfirmDialogTitle(), messages.jobApproveConfirmDialogMessage(),
       messages.dialogCancel(), messages.dialogYes(), new ActionAsyncCallback<Boolean>(callback) {
 
@@ -199,8 +200,8 @@ public class JobActions extends AbstractActionable<Job> {
       });
   }
 
-  private void approve(SelectedItems<Job> objects, AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(Job.class, objects, new ActionNoAsyncCallback<Long>(callback) {
+  private void approve(SelectedItems<IndexedJob> objects, AsyncCallback<ActionImpact> callback) {
+    ClientSelectedItemsUtils.size(IndexedJob.class, objects, new ActionNoAsyncCallback<Long>(callback) {
       @Override
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.jobApproveConfirmDialogTitle(),
@@ -237,7 +238,7 @@ public class JobActions extends AbstractActionable<Job> {
     });
   }
 
-  private void reject(Job object, AsyncCallback<ActionImpact> callback) {
+  private void reject(IndexedJob object, AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.jobRejectConfirmDialogTitle(), messages.jobRejectConfirmDialogMessage(),
       messages.dialogCancel(), messages.dialogYes(), new ActionAsyncCallback<Boolean>(callback) {
 
@@ -271,8 +272,8 @@ public class JobActions extends AbstractActionable<Job> {
       });
   }
 
-  private void reject(SelectedItems<Job> objects, AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(Job.class, objects, new ActionNoAsyncCallback<Long>(callback) {
+  private void reject(SelectedItems<IndexedJob> objects, AsyncCallback<ActionImpact> callback) {
+    ClientSelectedItemsUtils.size(IndexedJob.class, objects, new ActionNoAsyncCallback<Long>(callback) {
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.jobRejectConfirmDialogTitle(),
           messages.jobSelectedRejectConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
@@ -315,11 +316,11 @@ public class JobActions extends AbstractActionable<Job> {
   }
 
   @Override
-  public ActionableBundle<Job> createActionsBundle() {
-    ActionableBundle<Job> jobActionableBundle = new ActionableBundle<>();
+  public ActionableBundle<IndexedJob> createActionsBundle() {
+    ActionableBundle<IndexedJob> jobActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionableGroup<Job> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
+    ActionableGroup<IndexedJob> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
     managementGroup.addButton(messages.newProcessPreservation(), JobAction.NEW_PROCESS, ActionImpact.UPDATED,
       "btn-plus-circle");
     managementGroup.addButton(messages.stopButton(), JobAction.STOP, ActionImpact.DESTROYED, "btn-stop");
@@ -340,7 +341,7 @@ public class JobActions extends AbstractActionable<Job> {
     return jobActionableBundle;
   }
 
-  public enum JobAction implements Action<Job> {
+  public enum JobAction implements Action<IndexedJob> {
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), STOP(RodaConstants.PERMISSION_METHOD_STOP_JOB),
     INGEST_APPRAISAL(RodaConstants.PERMISSION_METHOD_APPRAISAL),
     INGEST_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), APPROVE(RodaConstants.PERMISSION_METHOD_APPROVE_JOB),

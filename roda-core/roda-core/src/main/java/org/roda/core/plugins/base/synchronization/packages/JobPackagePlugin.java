@@ -23,6 +23,7 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -88,7 +89,7 @@ public class JobPackagePlugin extends RodaEntityPackagesPlugin<Job> {
       filter.add(
         new DateIntervalFilterParameter(RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE, fromDate, toDate));
     }
-    return Arrays.asList(index.findAll(Job.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID)));
+    return Arrays.asList(index.findAll(IndexedJob.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID)));
   }
 
   @Override

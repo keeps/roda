@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
@@ -45,21 +45,21 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class JobList extends AsyncTableCell<Job> {
+public class JobList extends AsyncTableCell<IndexedJob> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private TooltipTextColumn<Job> nameColumn;
-  private TextColumn<Job> usernameColumn;
-  private Column<Job, Date> startDateColumn;
-  private TextColumn<Job> durationColumn;
-  private Column<Job, SafeHtml> statusColumn;
-  private TextColumn<Job> progressColumn;
-  private TextColumn<Job> objectsTotalCountColumn;
-  private Column<Job, SafeHtml> objectsSuccessCountColumn;
-  private Column<Job, SafeHtml> objectsPartialSuccessCountColumn;
-  private Column<Job, SafeHtml> objectsFailureCountColumn;
-  private Column<Job, SafeHtml> objectsSkippedCountColumn;
+  private TooltipTextColumn<IndexedJob> nameColumn;
+  private TextColumn<IndexedJob> usernameColumn;
+  private Column<IndexedJob, Date> startDateColumn;
+  private TextColumn<IndexedJob> durationColumn;
+  private Column<IndexedJob, SafeHtml> statusColumn;
+  private TextColumn<IndexedJob> progressColumn;
+  private TextColumn<IndexedJob> objectsTotalCountColumn;
+  private Column<IndexedJob, SafeHtml> objectsSuccessCountColumn;
+  private Column<IndexedJob, SafeHtml> objectsPartialSuccessCountColumn;
+  private Column<IndexedJob, SafeHtml> objectsFailureCountColumn;
+  private Column<IndexedJob, SafeHtml> objectsSkippedCountColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.JOB_NAME,
     RodaConstants.JOB_USERNAME, RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE, RodaConstants.JOB_STATE,
@@ -67,42 +67,42 @@ public class JobList extends AsyncTableCell<Job> {
     RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS,
     RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS,
     RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE, RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED,
-    RodaConstants.JOB_COMPLETION_PERCENTAGE, RodaConstants.JOB_PLUGIN, RodaConstants.JOB_SOURCE_OBJECTS);
+    RodaConstants.JOB_COMPLETION_PERCENTAGE, RodaConstants.JOB_PLUGIN);
 
   @Override
-  protected void adjustOptions(AsyncTableCellOptions<Job> options) {
+  protected void adjustOptions(AsyncTableCellOptions<IndexedJob> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 
   @Override
-  protected void configureDisplay(CellTable<Job> display) {
-    nameColumn = new TooltipTextColumn<Job>() {
+  protected void configureDisplay(CellTable<IndexedJob> display) {
+    nameColumn = new TooltipTextColumn<IndexedJob>() {
 
       @Override
-      public String getValue(Job job) {
+      public String getValue(IndexedJob job) {
         return job != null ? job.getName() : null;
       }
     };
-    usernameColumn = new TextColumn<Job>() {
+    usernameColumn = new TextColumn<IndexedJob>() {
 
       @Override
-      public String getValue(Job job) {
+      public String getValue(IndexedJob job) {
         return job != null ? job.getUsername() : null;
       }
     };
 
-    startDateColumn = new Column<Job, Date>(
+    startDateColumn = new Column<IndexedJob, Date>(
       new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
-      public Date getValue(Job job) {
+      public Date getValue(IndexedJob job) {
         return job != null ? job.getStartDate() : null;
       }
     };
 
-    durationColumn = new TextColumn<Job>() {
+    durationColumn = new TextColumn<IndexedJob>() {
 
       @Override
-      public String getValue(Job job) {
+      public String getValue(IndexedJob job) {
         if (job == null) {
           return null;
         }
@@ -111,17 +111,17 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    statusColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
+    statusColumn = new Column<IndexedJob, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public SafeHtml getValue(Job job) {
-        return HtmlSnippetUtils.getJobStateHtml(job);
+      public SafeHtml getValue(IndexedJob job) {
+        return HtmlSnippetUtils.getJobStateHtml(job.getState(), job.getJobStats());
       }
     };
 
-    objectsTotalCountColumn = new TextColumn<Job>() {
+    objectsTotalCountColumn = new TextColumn<IndexedJob>() {
 
       @Override
-      public String getValue(Job job) {
+      public String getValue(IndexedJob job) {
         String ret = "";
         if (job != null && job.getJobStats().getSourceObjectsCount() > 0) {
           ret = Integer.toString(job.getJobStats().getSourceObjectsCount());
@@ -130,10 +130,10 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    objectsSuccessCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
+    objectsSuccessCountColumn = new Column<IndexedJob, SafeHtml>(new SafeHtmlCell()) {
 
       @Override
-      public SafeHtml getValue(Job job) {
+      public SafeHtml getValue(IndexedJob job) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
           b.append(
@@ -146,10 +146,10 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    objectsPartialSuccessCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
+    objectsPartialSuccessCountColumn = new Column<IndexedJob, SafeHtml>(new SafeHtmlCell()) {
 
       @Override
-      public SafeHtml getValue(Job job) {
+      public SafeHtml getValue(IndexedJob job) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
           b.append(job.getJobStats().getSourceObjectsProcessedWithPartialSuccess() > 0
@@ -162,9 +162,9 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    objectsFailureCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
+    objectsFailureCountColumn = new Column<IndexedJob, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public SafeHtml getValue(Job job) {
+      public SafeHtml getValue(IndexedJob job) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
           b.append(SafeHtmlUtils.fromSafeConstant("<span"));
@@ -181,10 +181,10 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    objectsSkippedCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
+    objectsSkippedCountColumn = new Column<IndexedJob, SafeHtml>(new SafeHtmlCell()) {
 
       @Override
-      public SafeHtml getValue(Job job) {
+      public SafeHtml getValue(IndexedJob job) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
           b.append(
@@ -197,9 +197,9 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    progressColumn = new TextColumn<Job>() {
+    progressColumn = new TextColumn<IndexedJob>() {
       @Override
-      public String getValue(Job job) {
+      public String getValue(IndexedJob job) {
         return job != null ? job.getJobStats().getCompletionPercentage() + "%" : null;
       }
     };
@@ -238,7 +238,7 @@ public class JobList extends AsyncTableCell<Job> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<Job, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
+    Map<Column<IndexedJob, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(nameColumn, Collections.singletonList(RodaConstants.JOB_NAME));
     columnSortingKeyMap.put(startDateColumn, Collections.singletonList(RodaConstants.JOB_START_DATE));
     columnSortingKeyMap.put(statusColumn, Collections.singletonList(RodaConstants.JOB_STATE));
