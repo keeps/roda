@@ -50,6 +50,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobPriority;
@@ -587,19 +588,19 @@ public final class JobsHelper {
     throw new GenericException("Error while getting class from string");
   }
 
-  public static IterableIndexResult<Job> findUnfinishedJobs(IndexService index)
+  public static IterableIndexResult<IndexedJob> findUnfinishedJobs(IndexService index)
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.JOB_STATE, Job.nonFinalStateList()));
-    return index.findAll(Job.class, filter, Collections.emptyList());
+    return index.findAll(IndexedJob.class, filter, Collections.emptyList());
   }
 
-  public static void cleanJobObjects(Job job, ModelService model, IndexService index) {
+  public static void cleanJobObjects(String jobId, ModelService model, IndexService index) {
     if (RodaCoreFactory.getNodeType() == NodeType.PRIMARY) {
       // find all AIPs that should be removed
       Filter filter = new Filter();
       // FIXME 20161128 hsilva: perhaps we should avoid ghosts???
       // FIXME 20170308 nvieira: it should rollback if job is update
-      filter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId()));
+      filter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, jobId));
       filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
         Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));
 
@@ -609,10 +610,10 @@ public final class JobsHelper {
         for (IndexedAIP aip : result) {
           String aipId = aip.getUUID();
           try {
-            LOGGER.info("Deleting AIP {} during job {} cleanup", aipId, job.getId());
+            LOGGER.info("Deleting AIP {} during job {} cleanup", aipId, jobId);
             model.deleteAIP(aipId);
           } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-            LOGGER.error("Error deleting AIP {} during job {} cleanup", aipId, job.getId(), e);
+            LOGGER.error("Error deleting AIP {} during job {} cleanup", aipId, jobId, e);
           }
         }
       } catch (IOException | GenericException | RequestNotValidException e) {

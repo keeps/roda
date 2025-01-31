@@ -109,6 +109,7 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
@@ -2648,6 +2649,35 @@ public class ModelService extends ModelObservable {
 
       // index it
       notifyJobReportCreatedOrUpdated(jobReport, cachedJob).failOnError();
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error creating/updating job report in storage", e);
+    }
+  }
+
+  public void createOrUpdateJobReport(Report jobReport, IndexedJob indexJob)
+    throws GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    jobReport.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
+
+    // create job report in storage
+    try {
+      // if job report changed id, set it and remove old report
+      String newId = IdUtils.getJobReportId(jobReport.getJobId(), jobReport.getSourceObjectId(),
+        jobReport.getOutcomeObjectId());
+      if (!newId.equals(jobReport.getId())) {
+        String oldId = jobReport.getId();
+        jobReport.setId(newId);
+        storage.deleteResource(ModelUtils.getJobReportStoragePath(jobReport.getJobId(), oldId));
+        notifyJobReportDeleted(oldId);
+      }
+
+      String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);
+      StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReport.getJobId(), jobReport.getId());
+      storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true);
+
+      // index it
+      notifyJobReportCreatedOrUpdated(jobReport, indexJob).failOnError();
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Error creating/updating job report in storage", e);
     }

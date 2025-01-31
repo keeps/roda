@@ -119,7 +119,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
-        fixAncestors(index, model, report, jobPluginInfo, jobPluginInfo.getSourceObjectsCount());
+        fixAncestors(index, model, report, cachedJob, jobPluginInfo, jobPluginInfo.getSourceObjectsCount());
       }
     }, index, model, storage, counter);
   }
@@ -142,8 +142,8 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
     return count;
   }
 
-  private void fixAncestors(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
-    int counter) {
+  private void fixAncestors(IndexService index, ModelService model, Report report, Job cachedJob,
+    JobPluginInfo jobPluginInfo, int counter) {
     try {
       Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
       Job originalJob = PluginHelper.getJob(originalJobId, model);
@@ -160,11 +160,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
       reportItem.setPluginDetails("Ancestors fix failed: " + e.getMessage());
       reportItem.setPluginState(PluginState.FAILURE);
       report.addReport(reportItem);
-      try {
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, PluginHelper.getJob(this, index));
-      } catch (NotFoundException | GenericException | RequestNotValidException e1) {
-        LOGGER.error("Error when updating job when ancestors fix failed", e1);
-      }
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
   }
 

@@ -25,12 +25,14 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.CreateJobRequest;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.Jobs;
 import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginInfoRequest;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -81,6 +83,30 @@ public class JobsController implements JobsRestService, Exportable {
 
   @Autowired
   private IndexService indexService;
+
+  @Override
+  public Job getJobFromModel(String jobId) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // delegate
+      return jobService.getJobFromModel(jobId);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (NotFoundException | RequestNotValidException | GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+    }
+  }
 
   @Override
   public StringResponse obtainJobCommand(@RequestBody Job job) {
@@ -314,29 +340,29 @@ public class JobsController implements JobsRestService, Exportable {
   }
 
   @Override
-  public List<PluginInfo> getJobPluginInfo(@RequestBody Job job) {
+  public List<PluginInfo> getJobPluginInfo(@RequestBody PluginInfoRequest pluginInfoRequest) {
     List<PluginInfo> pluginsInfo = new ArrayList<>();
 
-    return jobService.getJobPluginInfo(job, pluginsInfo);
+    return jobService.getJobPluginInfo(pluginInfoRequest, pluginsInfo);
   }
 
   @Override
-  public Job findByUuid(String uuid, String localeString) {
+  public IndexedJob findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, Job.class, uuid, new ArrayList<>());
+    return indexService.retrieve(requestContext, IndexedJob.class, uuid, new ArrayList<>());
   }
 
   @Override
-  public IndexResult<Job> find(@RequestBody FindRequest findRequest, String localeString) {
+  public IndexResult<IndexedJob> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(Job.class, findRequest, localeString, requestContext);
+    return indexService.find(IndexedJob.class, findRequest, localeString, requestContext);
   }
 
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_JOB)) {
-      return new LongResponse(indexService.count(Job.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(IndexedJob.class, countRequest, requestContext));
     } else {
       return new LongResponse(-1L);
     }
@@ -345,14 +371,14 @@ public class JobsController implements JobsRestService, Exportable {
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, Job.class, requestContext);
+    return indexService.suggest(suggestRequest, IndexedJob.class, requestContext);
   }
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils
-      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, Job.class, requestContext));
+    return ApiUtils.okResponse(
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedJob.class, requestContext));
   }
 }

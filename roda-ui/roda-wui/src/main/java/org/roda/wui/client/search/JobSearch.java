@@ -8,8 +8,8 @@
 package org.roda.wui.client.search;
 
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.common.actions.JobActions;
 import org.roda.wui.client.common.lists.IngestJobReportList;
 import org.roda.wui.client.common.lists.JobList;
@@ -29,9 +29,9 @@ public class JobSearch extends SimplePanel {
       jobActions = JobActions.get(jobResolver);
     }
 
-    ListBuilder<Job> jobListBuilder = new ListBuilder<>(() -> new JobList(),
-      new AsyncTableCellOptions<>(Job.class, jobsListId).withFilter(new Filter(defaultJobFilter)).withAutoUpdate(5000)
-        .withActionable(jobActions).bindOpener());
+    ListBuilder<IndexedJob> jobListBuilder = new ListBuilder<>(() -> new JobList(),
+      new AsyncTableCellOptions<>(IndexedJob.class, jobsListId).withFilter(new Filter(defaultJobFilter))
+        .withAutoUpdate(5000).withActionable(jobActions).bindOpener());
 
     ListBuilder<IndexedReport> jobReportListBuilder = new ListBuilder<>(
       isIngest ? () -> new IngestJobReportList() : () -> new SimpleJobReportList(),

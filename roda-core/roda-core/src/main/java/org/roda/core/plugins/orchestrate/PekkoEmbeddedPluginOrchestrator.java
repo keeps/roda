@@ -54,6 +54,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobParallelism;
@@ -513,11 +514,11 @@ public class PekkoEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void cleanUnfinishedJobsAsync() {
     List<String> unfinishedJobsIdsList = new ArrayList<>();
-    try (IterableIndexResult<Job> result = JobsHelper.findUnfinishedJobs(index)) {
+    try (IterableIndexResult<IndexedJob> result = JobsHelper.findUnfinishedJobs(index)) {
       // set all jobs state to TO_BE_CLEANED
-      for (Job job : result) {
-        unfinishedJobsIdsList.add(job.getId());
-        Job jobToUpdate = model.retrieveJob(job.getId());
+      for (IndexedJob indexedJob : result) {
+        unfinishedJobsIdsList.add(indexedJob.getId());
+        Job jobToUpdate = model.retrieveJob(indexedJob.getId());
         jobToUpdate.setState(JOB_STATE.TO_BE_CLEANED);
         model.createOrUpdateJob(jobToUpdate);
       }

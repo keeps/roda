@@ -33,6 +33,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
+import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -48,7 +49,6 @@ import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
-import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -253,22 +253,22 @@ public class HtmlSnippetUtils {
     return getJobPriorityHtml(priority, false);
   }
 
-  public static SafeHtml getJobStateHtml(Job job) {
+  public static SafeHtml getJobStateHtml(JOB_STATE jobState, JobStats jobStats) {
     SafeHtml ret = null;
-    if (job != null) {
-      JOB_STATE state = job.getState();
+    if (jobState != null && jobStats != null) {
+      JOB_STATE state = jobState;
       if (JOB_STATE.COMPLETED.equals(state)) {
-        if (job.getJobStats().getSourceObjectsCount() == job.getJobStats().getSourceObjectsProcessedWithSuccess()) {
+        if (jobStats.getSourceObjectsCount() == jobStats.getSourceObjectsProcessedWithSuccess()) {
           ret = SafeHtmlUtils
             .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.showJobStatusCompleted() + CLOSE_SPAN);
-        } else if (job.getJobStats().getSourceObjectsProcessedWithPartialSuccess() > 0) {
+        } else if (jobStats.getSourceObjectsProcessedWithPartialSuccess() > 0) {
           ret = SafeHtmlUtils
             .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
-        } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0) {
+        } else if (jobStats.getSourceObjectsProcessedWithSuccess() > 0) {
           ret = SafeHtmlUtils
             .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
-        } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() == 0
-          && job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0) {
+        } else if (jobStats.getSourceObjectsProcessedWithSuccess() == 0
+          && jobStats.getSourceObjectsProcessedWithSkipped() > 0) {
           ret = SafeHtmlUtils
             .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else {

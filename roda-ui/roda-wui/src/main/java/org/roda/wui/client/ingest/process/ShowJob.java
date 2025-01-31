@@ -35,9 +35,11 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginInfoRequest;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -118,8 +120,8 @@ public class ShowJob extends Composite {
       } else if (!historyTokens.isEmpty()) {
         String jobId = historyTokens.get(0);
         Services services = new Services("Get job plugin info", "get");
-        services.jobsResource(s -> s.findByUuid(jobId, LocaleInfo.getCurrentLocale().getLocaleName()))
-          .thenCompose(retrievedJob -> services.jobsResource(s -> s.getJobPluginInfo(retrievedJob))
+        services.jobsResource(s -> s.findByUuid(jobId, LocaleInfo.getCurrentLocale().getLocaleName())).thenCompose(
+          retrievedJob -> services.jobsResource(s -> s.getJobPluginInfo(new PluginInfoRequest(retrievedJob)))
             .whenComplete((pluginInfoList, error) -> {
               if (error != null) {
                 if (error.getCause() instanceof NotFoundException) {
@@ -226,12 +228,13 @@ public class ShowJob extends Composite {
   FlowPanel content;
 
   // SIDEBAR
-  private Job job;
+  private IndexedJob job;
   private Map<String, PluginInfo> pluginsInfo;
   private Timer autoUpdateTimer = null;
   private int autoUpdateTimerPeriod = 0;
 
-  public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo, List<FilterParameter> extraReportFilterParameters) {
+  public ShowJob(IndexedJob job, Map<String, PluginInfo> pluginsInfo,
+    List<FilterParameter> extraReportFilterParameters) {
     this.job = job;
     this.pluginsInfo = pluginsInfo;
     boolean isIngest = job.getPluginType().equals(PluginType.INGEST);
@@ -306,14 +309,20 @@ public class ShowJob extends Composite {
     dateStarted.setText(Humanize.formatDateTime(job.getStartDate()));
     update();
 
-    SelectedItems<?> selected = job.getSourceObjects();
-    selectedListPanel.setVisible(true);
-
-    if (isIngest) {
-      showIngestSourceObjects(selected);
-    } else {
-      showActionSourceObjects(selected);
-    }
+    Services services = new Services("get job from model", "get");
+    services.jobsResource(s -> s.getJobFromModel(job.getId())).whenComplete((modelJob, error) -> {
+      if (modelJob != null) {
+        SelectedItems<?> selected = modelJob.getSourceObjects();
+        if (isIngest) {
+          showIngestSourceObjects(selected);
+        } else {
+          showActionSourceObjects(selected);
+        }
+      } else if (error != null) {
+        selectedListPanel.setVisible(false);
+        AsyncCallbackUtils.defaultFailureTreatment(error);
+      }
+    });
 
     showAttachments(job.getAttachmentsList());
 
@@ -450,7 +459,7 @@ public class ShowJob extends Composite {
                 } else {
                   Toast.showInfo(messages.exportListTitle(),
                     messages.exportListMessage(longResponse.getResult().intValue()));
-                  RestUtils.requestCSVExport(Job.class, filter, Sorter.NONE,
+                  RestUtils.requestCSVExport(IndexedJob.class, filter, Sorter.NONE,
                     new Sublist(0, longResponse.getResult().intValue()), Facets.NONE, true, false, "job.csv");
                 }
               });
@@ -500,7 +509,7 @@ public class ShowJob extends Composite {
                 } else {
                   Toast.showInfo(messages.exportListTitle(),
                     messages.exportListMessage(longResponse.getResult().intValue()));
-                  RestUtils.requestCSVExport(Job.class, filter, Sorter.NONE,
+                  RestUtils.requestCSVExport(IndexedJob.class, filter, Sorter.NONE,
                     new Sublist(0, longResponse.getResult().intValue()), Facets.NONE, true, false, "job.csv");
                 }
               });
@@ -581,7 +590,7 @@ public class ShowJob extends Composite {
     duration.setText(Humanize.durationInDHMS(job.getStartDate(), job.getEndDate(), DHMSFormat.LONG));
 
     // set state
-    status.setHTML(HtmlSnippetUtils.getJobStateHtml(job));
+    status.setHTML(HtmlSnippetUtils.getJobStateHtml(job.getState(), job.getJobStats()));
 
     scheduleInfoLabel.setVisible(false);
     scheduleInfo.setVisible(false);
@@ -669,7 +678,7 @@ public class ShowJob extends Composite {
   private void refreshJobPluginInfo() {
     Services services = new Services("Refresh job plugin info", "update");
     services.jobsResource(s -> s.findByUuid(job.getId(), LocaleInfo.getCurrentLocale().getLocaleName()))
-      .thenCompose(updateJob -> services.jobsResource(s -> s.getJobPluginInfo(updateJob)))
+      .thenCompose(updateJob -> services.jobsResource(s -> s.getJobPluginInfo(new PluginInfoRequest(updateJob))))
       .whenComplete((pluginsInfoList, error) -> {
         if (pluginsInfoList != null) {
           pluginsInfo = new HashMap<>();

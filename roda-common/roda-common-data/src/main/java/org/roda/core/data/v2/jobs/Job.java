@@ -9,8 +9,6 @@ package org.roda.core.data.v2.jobs;
 
 import java.io.Serial;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +17,6 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.HasId;
@@ -36,7 +33,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_JOB)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Job implements IsModelObject, IsIndexed, HasId, HasInstanceID, HasInstanceName {
+public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName {
   @Serial
   private static final long serialVersionUID = 615993757726175203L;
 
@@ -322,30 +319,6 @@ public class Job implements IsModelObject, IsIndexed, HasId, HasInstanceID, HasI
       + parallelism + ", jobStats=" + jobStats + ", plugin=" + plugin + ", pluginType=" + pluginType
       + ", pluginParameters=" + pluginParameters + ", sourceObjects=" + sourceObjects + ", outcomeObjectsClass="
       + outcomeObjectsClass + ", instanceId=" + instanceId + ", attachmentsList=" + attachmentsList + "]";
-  }
-
-  @Override
-  public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "name", "username", "startDate", "endDate", "state", "stateDetails", "priority", "type",
-      "jobStats", "plugin", "pluginType", "pluginParameters", "sourceObjects", "outcomeObjectsClass", "instanceId",
-      "attachmentsList");
-  }
-
-  @Override
-  public List<Object> toCsvValues() {
-    return Arrays.asList(id, name, username, startDate, endDate, state, stateDetails, priority, parallelism, jobStats,
-      plugin, pluginType, pluginParameters, sourceObjects, outcomeObjectsClass, instanceId, attachmentsList);
-  }
-
-  @JsonIgnore
-  @Override
-  public String getUUID() {
-    return getId();
-  }
-
-  @Override
-  public List<String> liteFields() {
-    return Collections.singletonList(RodaConstants.INDEX_UUID);
   }
 
   /**

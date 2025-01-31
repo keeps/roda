@@ -30,6 +30,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -262,7 +263,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
 
   private static boolean checkIfJobExist(final IndexService index, final String jobId) {
     try {
-      index.retrieve(Job.class, jobId, Collections.singletonList(RodaConstants.INDEX_UUID));
+      index.retrieve(IndexedJob.class, jobId, Collections.singletonList(RodaConstants.INDEX_UUID));
     } catch (NotFoundException e) {
       return true;
     } catch (GenericException e) {
