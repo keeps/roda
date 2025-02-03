@@ -100,8 +100,7 @@ public class IndexedJob implements IsIndexed, HasId, HasInstanceID, HasInstanceN
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "name", "username", "startDate", "endDate", "state", "stateDetails", "priority", "type",
-      "jobStats", "plugin", "pluginType", "pluginParameters", "sourceObjects", "outcomeObjectsClass", "instanceId",
-      "attachmentsList");
+      "jobStats", "plugin", "pluginType", "pluginParameters", "outcomeObjectsClass", "instanceId", "attachmentsList");
   }
 
   @Override
