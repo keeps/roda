@@ -123,14 +123,14 @@ public class ConfigurationController implements ConfigurationRestService {
   }
 
   @Override
-  public PluginInfoList retrievePluginsInfo(List<PluginType> types) {
+  public PluginInfoList retrievePluginsInfo(List<PluginType> types, boolean removeNotListable) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       controllerAssistant.checkRoles(requestContext.getUser());
 
-      return RodaCoreFactory.getPluginManager().getPluginsInfo(types);
+      return RodaCoreFactory.getPluginManager().getPluginsInfo(types, removeNotListable);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);

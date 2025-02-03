@@ -182,7 +182,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
     }
 
     Services services = new Services("Retrieve plugin information", "get");
-    services.configurationsResource(s -> s.retrievePluginsInfo(pluginType))
+    services.configurationsResource(s -> s.retrievePluginsInfo(pluginType, true))
       .whenComplete((pluginInfoList, throwable) -> {
         if (throwable == null) {
           init(pluginInfoList.getPluginInfoList());

@@ -202,7 +202,7 @@ public class CreateDefaultJob extends Composite {
 
     Services services = new Services("Retrieve plugin information", "get");
     pluginTypes.remove(PluginType.INTERNAL);
-    services.configurationsResource(s -> s.retrievePluginsInfo(pluginTypes))
+    services.configurationsResource(s -> s.retrievePluginsInfo(pluginTypes, true))
       .whenComplete((pluginInfoList, throwable) -> {
         if (throwable == null) {
           init(pluginInfoList.getPluginInfoList());
