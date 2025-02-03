@@ -64,6 +64,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
@@ -1129,7 +1130,7 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> jobCreatedOrUpdated(Job job, boolean reindexJobReports) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    SolrUtils.create2(index, (ModelObserver) this, Job.class, job).addTo(ret);
+    SolrUtils.create2(index, (ModelObserver) this, IndexedJob.class, job).addTo(ret);
 
     if (ret.isEmpty() && reindexJobReports) {
       indexJobReports(job).addTo(ret);
@@ -1170,7 +1171,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> jobDeleted(String jobId) {
-    return deleteDocumentFromIndex(Job.class, jobId);
+    return deleteDocumentFromIndex(IndexedJob.class, jobId);
   }
 
   private <T extends IsIndexed, M extends IsModelObject> ReturnWithExceptions<Void, ModelObserver> addDocumentToIndex(
@@ -1208,6 +1209,12 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, Job cachedJob) {
     return SolrUtils.create2(index, this, IndexedReport.class, jobReport,
       new JobReportCollection.Info(jobReport, cachedJob));
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, IndexedJob indexedJob) {
+    return SolrUtils.create2(index, this, IndexedReport.class, jobReport,
+      new JobReportCollection.Info(jobReport, indexedJob));
   }
 
   @Override

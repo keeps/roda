@@ -26,8 +26,8 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -403,8 +403,8 @@ public class HistoryUtils {
     } else if (object instanceof RiskIncidence) {
       RiskIncidence incidence = (RiskIncidence) object;
       path = HistoryUtils.getHistory(ShowRiskIncidence.RESOLVER.getHistoryPath(), incidence.getUUID());
-    } else if (object instanceof Job) {
-      Job job = (Job) object;
+    } else if (object instanceof IndexedJob) {
+      IndexedJob job = (IndexedJob) object;
       path = HistoryUtils.getHistory(ShowJob.RESOLVER.getHistoryPath(), job.getUUID());
     } else if (object instanceof IndexedReport) {
       IndexedReport report = (IndexedReport) object;

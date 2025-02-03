@@ -39,7 +39,7 @@ public class AutoAcceptIngestStep extends IngestStep {
 
       if (RodaCoreFactory.getRodaConfiguration()
         .getBoolean(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false)) {
-        PluginHelper.moveSIPs(bundle.getIngestPlugin(), bundle.getModel(), bundle.getIndex(), bundle.getResources(),
+        PluginHelper.moveSIPs(bundle.getIngestPlugin(), bundle.getModel(), bundle.getResources(),
           bundle.getJobPluginInfo());
       }
     } else {

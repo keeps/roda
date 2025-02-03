@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -30,10 +31,10 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +92,7 @@ public class CleanUnfinishedJobsPlugin extends AbstractPlugin<Job> {
 
       try {
         // cleanup job related objects (aips, sips, etc.)
-        JobsHelper.cleanJobObjects(job, model, index);
+        JobsHelper.cleanJobObjects(job.getId(), model, index);
 
         // only after deleting all the objects, delete the job
         model.createOrUpdateJob(JobsHelper.updateJobInTheStateStartedOrCreated(job));
@@ -116,7 +117,7 @@ public class CleanUnfinishedJobsPlugin extends AbstractPlugin<Job> {
     }
 
     if (!jobsToBeDeletedFromIndex.isEmpty()) {
-      index.deleteSilently(Job.class, jobsToBeDeletedFromIndex);
+      index.deleteSilently(IndexedJob.class, jobsToBeDeletedFromIndex);
     }
   }
 

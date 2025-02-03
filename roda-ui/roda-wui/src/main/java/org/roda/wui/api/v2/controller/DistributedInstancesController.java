@@ -23,6 +23,7 @@ import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -480,7 +481,7 @@ public class DistributedInstancesController implements DistributedInstancesRestS
       jobFilter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.CREATED.name()));
       jobFilter.add(new DateIntervalFilterParameter(RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE,
         lastSynchronizationDate, toDate));
-      total += index.count(Job.class, jobFilter);
+      total += index.count(IndexedJob.class, jobFilter);
 
       // get Risks
       final Filter riskFilter = new Filter();

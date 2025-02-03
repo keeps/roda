@@ -27,6 +27,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -37,9 +38,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,7 +139,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
     }
 
     List<String> activeJobsIds = new ArrayList<>();
-    try (IterableIndexResult<Job> result = index.findAll(Job.class, activeJobsViaStateFilter,
+    try (IterableIndexResult<IndexedJob> result = index.findAll(IndexedJob.class, activeJobsViaStateFilter,
       Arrays.asList(RodaConstants.INDEX_UUID))) {
       result.forEach(e -> activeJobsIds.add(e.getId()));
     } catch (IOException | GenericException | RequestNotValidException e) {
