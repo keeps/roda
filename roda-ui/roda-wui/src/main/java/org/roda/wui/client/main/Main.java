@@ -22,8 +22,6 @@ import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -35,7 +33,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -47,7 +44,7 @@ import config.i18n.client.ClientMessages;
  */
 public class Main extends Composite implements EntryPoint {
 
-  private ClientLogger logger = new ClientLogger(getClass().getName());
+  private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @Override
@@ -74,14 +71,11 @@ public class Main extends Composite implements EntryPoint {
   interface Binder extends UiBinder<Widget, Main> {
   }
 
-  @UiField
-  AccessibleFocusPanel homeLinkArea;
-
-  @UiField
-  FlowPanel bannerLogo;
+  @UiField(provided = true)
+  UserMenu userMenu;
 
   @UiField(provided = true)
-  Menu menu;
+  Header header;
 
   @UiField(provided = true)
   ContentPanel contentPanel;
@@ -92,7 +86,8 @@ public class Main extends Composite implements EntryPoint {
    * Create a new main
    */
   public Main() {
-    menu = new Menu();
+    userMenu = new UserMenu();
+    header = new Header();
     contentPanel = ContentPanel.getInstance();
     footer = new Footer();
 
@@ -124,16 +119,11 @@ public class Main extends Composite implements EntryPoint {
     RootPanel.get().addStyleName("roda");
 
     // Initialize
-    menu.init();
+    userMenu.init();
+    header.init();
     contentPanel.init();
     onHistoryChanged(History.getToken());
     History.addValueChangeHandler(event -> onHistoryChanged(event.getValue()));
-
-    bannerLogo.add(new HTMLWidgetWrapper("Banner.html"));
-
-    homeLinkArea.addClickHandler(event -> HistoryUtils.newHistory(Welcome.RESOLVER));
-
-    homeLinkArea.setTitle(messages.homeTitle());
 
     if (ConfigurationManager.getBoolean(false, RodaConstants.UI_COOKIES_ACTIVE_PROPERTY)) {
       JavascriptUtils.setCookieOptions(messages.cookiesMessage(), messages.cookiesDismisse(),

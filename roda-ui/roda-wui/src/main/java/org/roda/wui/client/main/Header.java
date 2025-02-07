@@ -11,26 +11,14 @@
  */
 package org.roda.wui.client.main;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.Widget;
-import config.i18n.client.ClientMessages;
+import java.util.List;
+
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.Disposal;
 import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.disposal.DisposalDestroyedRecords;
@@ -43,8 +31,6 @@ import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.NotificationRegister;
-import org.roda.wui.client.management.Profile;
-import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.Statistics;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.management.distributed.DistributedInstancesManagement;
@@ -63,31 +49,46 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import org.roda.wui.common.client.widgets.wcag.AcessibleMenuBar;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.ClientMessages;
 
 /**
- * @author Luis Faria
+ * @author Alexandre Flores
  *
  */
-public class Menu extends Composite {
+public class Header extends Composite {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  interface MyUiBinder extends UiBinder<Widget, Menu> {
+  interface MyUiBinder extends UiBinder<Widget, Header> {
   }
 
   @UiField
-  AcessibleMenuBar leftMenu;
+  AccessibleFocusPanel homeLinkArea;
 
   @UiField
-  AcessibleMenuBar rightMenu;
+  FlowPanel bannerLogo;
+
+  @UiField
+  AcessibleMenuBar navigationMenu;
 
   private MenuItem about;
 
@@ -110,7 +111,6 @@ public class Menu extends Composite {
   private MenuItem administrationDistributedInstances;
   private MenuItem administrationMonitoring;
   private MenuItem administrationMarketplace;
-  // private MenuItem administrationPreferences;
 
   private AcessibleMenuBar disposalMenu;
   private MenuItem disposalPolicy;
@@ -119,31 +119,29 @@ public class Menu extends Composite {
   private MenuItem disposalDestroyedRecords;
 
   private AcessibleMenuBar planningMenu;
-  // private MenuItem planningMonitoring;
   private MenuItem planningRepresentationInformation;
   private MenuItem planningRisk;
   private MenuItem planningEvent;
   private MenuItem planningAgent;
 
   private MenuItem help;
-  private AcessibleMenuBar userMenu;
-  private AcessibleMenuBar languagesMenu;
 
-  // private final MenuBar settingsMenu;
-
-  private String selectedLanguage;
-  private int leftMenuItemCount = 0;
+  private int navigationMenuItemCount = 0;
 
   /**
-   * Main menu constructor
+   * Main navigationMenu constructor
    *
    */
-  public Menu() {
+  public Header() {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
   public void init() {
-    about = customMenuItem("fa fa-home", messages.title("about"), "menu-item-label", null,
+    bannerLogo.add(new HTMLWidgetWrapper("Banner.html"));
+    homeLinkArea.addClickHandler(event -> HistoryUtils.newHistory(Welcome.RESOLVER));
+    homeLinkArea.setTitle(messages.homeTitle());
+
+    about = customMenuItem("fa fa-home", messages.title("about"), "navigationMenu-item-label", null,
       createCommand(Welcome.RESOLVER.getHistoryPath()));
 
     disseminationBrowse = new MenuItem(messages.title("browse"), createCommand(BrowseTop.RESOLVER.getHistoryPath()));
@@ -152,6 +150,7 @@ public class Menu extends Composite {
     disseminationSearchBasic.addStyleName("search_menu_item");
 
     ingestMenu = new AcessibleMenuBar(true);
+    ingestMenu.addStyleName("bannerHeaderColors");
     ingestPre = ingestMenu.addItem(messages.title("ingest_preIngest"),
       createCommand(PreIngest.RESOLVER.getHistoryPath()));
     ingestPre.addStyleName("ingest_pre_item");
@@ -166,6 +165,7 @@ public class Menu extends Composite {
     ingestAppraisal.addStyleName("ingest_appraisal_item");
 
     administrationMenu = new AcessibleMenuBar(true);
+    administrationMenu.addStyleName("bannerHeaderColors");
     administrationActions = administrationMenu.addItem(messages.title("administration_actions"),
       createCommand(ActionProcess.RESOLVER.getHistoryPath()));
     administrationActions.addStyleName("administration_actions_item");
@@ -219,6 +219,7 @@ public class Menu extends Composite {
     administrationMarketplace.addStyleName("administration_marketplace_item");
 
     disposalMenu = new AcessibleMenuBar(true);
+    disposalMenu.addStyleName("bannerHeaderColors");
     disposalPolicy = disposalMenu.addItem(messages.title("disposal_policies"),
       createCommand(DisposalPolicy.RESOLVER.getHistoryPath()));
     disposalPolicy.addStyleName("disposal_policy_item");
@@ -233,6 +234,7 @@ public class Menu extends Composite {
     disposalDestroyedRecords.addStyleName("disposal_destroyed_records_item");
 
     planningMenu = new AcessibleMenuBar(true);
+    planningMenu.addStyleName("bannerHeaderColors");
     planningRepresentationInformation = planningMenu.addItem(messages.title("planning_representation_information"),
       createCommand(RepresentationInformationNetwork.RESOLVER.getHistoryPath()));
     planningRepresentationInformation.addStyleName("planning_representation_information_item");
@@ -249,17 +251,6 @@ public class Menu extends Composite {
     help = new MenuItem(messages.title("help"), createCommand(Help.RESOLVER.getHistoryPath()));
     help.addStyleName("help_menu_item");
 
-    userMenu = new AcessibleMenuBar(true);
-    MenuItem profile = userMenu.addItem(messages.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));
-    profile.addStyleName("profile_user_item");
-    MenuItem login = userMenu.addItem(messages.loginLogout(), () -> UserLogin.getInstance().logout());
-    login.addStyleName("login_user_item");
-
-    languagesMenu = new AcessibleMenuBar(true);
-    setLanguageMenu();
-
-    // settingsMenu = new MenuBar(true);
-
     UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
       @Override
@@ -269,29 +260,24 @@ public class Menu extends Composite {
 
       @Override
       public void onSuccess(User user) {
-        updateVisibles(user);
+        updateVisibleItems(user);
       }
     });
 
-    UserLogin.getInstance().addLoginStatusListener(this::updateVisibles);
+    UserLogin.getInstance().addLoginStatusListener(this::updateVisibleItems);
   }
 
   private ScheduledCommand createCommand(final List<String> path) {
     return () -> HistoryUtils.newHistory(path);
   }
 
-  private ScheduledCommand createLoginCommand() {
-    return () -> UserLogin.getInstance().login();
-  }
-
   private ScheduledCommand createURLCommand(String url) {
     return () -> Window.open(url, "_blank", "");
   }
 
-  private void updateVisibles(User user) {
-    leftMenu.clearItems();
-    leftMenuItemCount = 0;
-    rightMenu.clearItems();
+  private void updateVisibleItems(User user) {
+    navigationMenu.clearItems();
+    navigationMenuItemCount = 0;
 
     // TODO make creating sync (not async)
 
@@ -319,8 +305,6 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(UserLog.RESOLVER, administrationLog);
     updateResolverSubItemVisibility(NotificationRegister.RESOLVER, administrationNotifications);
     updateResolverSubItemVisibility(Statistics.RESOLVER, administrationStatistics);
-    // updateResolverSubItemVisibility(Management.RESOLVER,
-    // administrationPreferences);
     MenuItem adminItem = new MenuItem(messages.title("administration"), administrationMenu);
     adminItem.addStyleName("administration_menu_item");
     updateResolverTopItemVisibility(Management.RESOLVER, adminItem, 4);
@@ -335,7 +319,6 @@ public class Menu extends Composite {
     updateResolverTopItemVisibility(Disposal.RESOLVER, disposalItem, 5);
 
     // Planning
-    // updateResolverSubItemVisibility(Planning.RESOLVER, planningMonitoring);
     updateResolverSubItemVisibility(RiskRegister.RESOLVER, planningRisk);
     updateResolverSubItemVisibility(RepresentationInformationNetwork.RESOLVER, planningRepresentationInformation);
     updateResolverSubItemVisibility(PreservationEvents.PLANNING_RESOLVER, planningEvent);
@@ -346,29 +329,6 @@ public class Menu extends Composite {
 
     // Help
     updateResolverTopItemVisibility(Help.RESOLVER, help, 7);
-
-    // User
-    if (user.isGuest()) {
-      MenuItem loginItem = customMenuItem("fa fa-user", messages.loginLogin(), "menu-item-label", null,
-        createLoginCommand());
-      loginItem.addStyleName("user_menu_item");
-      rightMenu.addItem(loginItem);
-
-      MenuItem registerItem = customMenuItem("fa fa-user-plus", messages.loginRegister(),
-        "menu-item-label menu-register", null, createCommand(Register.RESOLVER.getHistoryPath()));
-      registerItem.addStyleName("user_menu_item_register");
-      rightMenu.addItem(registerItem);
-    } else {
-      // rightMenu.addItem(customMenuItem("fa fa-cog",
-      // messages.title("settings"), "menu-item-label", settingsMenu, null));
-      MenuItem userItem = customMenuItem("fa fa-user", user.getName(), "menu-item-label", userMenu, null);
-      userItem.addStyleName("user_menu_item");
-      rightMenu.addItem(userItem);
-    }
-
-    MenuItem languageMenuItem = customMenuItem("fa fa-globe", selectedLanguage, "menu-item-label", languagesMenu, null);
-    languageMenuItem.addStyleName("menu-item-language");
-    rightMenu.addItem(languageMenuItem);
   }
 
   private MenuItem customMenuItem(String icon, String label, String styleNames, MenuBar subMenu,
@@ -389,7 +349,7 @@ public class Menu extends Composite {
     } else {
       menuItem = new MenuItem(b.toSafeHtml());
     }
-    menuItem.addStyleName("menu-item");
+    menuItem.addStyleName("navigationMenu-item");
     menuItem.addStyleName(styleNames);
 
     return menuItem;
@@ -406,7 +366,7 @@ public class Menu extends Composite {
       @Override
       public void onSuccess(Boolean asRole) {
         if (asRole) {
-          insertIntoLeftMenu(item, index);
+          insertIntoNavigationMenu(item, index);
         }
       }
     });
@@ -427,48 +387,9 @@ public class Menu extends Composite {
     });
   }
 
-  private void insertIntoLeftMenu(MenuItem item, int index) {
-    int indexToInsert = index <= leftMenuItemCount ? index : leftMenuItemCount;
-    leftMenu.insertItem(item, indexToInsert);
-    leftMenuItemCount++;
-  }
-
-  private void setLanguageMenu() {
-    String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-
-    // Getting supported languages and their display name
-    Map<String, String> supportedLanguages = new HashMap<>();
-
-    for (String localeName : LocaleInfo.getAvailableLocaleNames()) {
-      if (!"default".equals(localeName)) {
-        supportedLanguages.put(localeName, LocaleInfo.getLocaleNativeDisplayName(localeName));
-      }
-    }
-
-    languagesMenu.clearItems();
-
-    for (final Entry<String, String> entry : supportedLanguages.entrySet()) {
-      final String key = entry.getKey();
-      final String value = entry.getValue();
-
-      if (key.equals(locale)) {
-        SafeHtmlBuilder b = new SafeHtmlBuilder();
-        String iconHTML = "<i class='fa fa-check'></i>";
-
-        b.append(SafeHtmlUtils.fromSafeConstant(value));
-        b.append(SafeHtmlUtils.fromSafeConstant(iconHTML));
-
-        MenuItem languageMenuItem = new MenuItem(b.toSafeHtml());
-        languageMenuItem.addStyleName("menu-item-language-selected");
-        languageMenuItem.addStyleName("menu-item-language");
-        languagesMenu.addItem(languageMenuItem);
-        selectedLanguage = value;
-      } else {
-        MenuItem languageMenuItem = new MenuItem(SafeHtmlUtils.fromSafeConstant(value),
-          () -> JavascriptUtils.changeLocale(key));
-        languagesMenu.addItem(languageMenuItem);
-        languageMenuItem.addStyleName("menu-item-language");
-      }
-    }
+  private void insertIntoNavigationMenu(MenuItem item, int index) {
+    int indexToInsert = index <= navigationMenuItemCount ? index : navigationMenuItemCount;
+    navigationMenu.insertItem(item, indexToInsert);
+    navigationMenuItemCount++;
   }
 }
