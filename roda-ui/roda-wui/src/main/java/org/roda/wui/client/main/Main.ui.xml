@@ -7,16 +7,11 @@
 	</ui:style>
 
 	<g:FlowPanel styleName="main">
-		<!-- Header -->
-		<g:FlowPanel styleName="banner">
-			<wcag:AccessibleFocusPanel styleName="homeLink" ui:field="homeLinkArea">
-				<g:FlowPanel ui:field="bannerLogo">
-				</g:FlowPanel>
-			</wcag:AccessibleFocusPanel>
-		</g:FlowPanel>
+		<!-- UserMenu -->
+		<m:UserMenu ui:field="userMenu" addStyleNames="header" />
 
-		<!-- Menu -->
-		<m:Menu ui:field="menu" addStyleNames="menu" />
+		<!-- Navigation Menu -->
+		<m:Header ui:field="header" addStyleNames="header"/>
 
 		<!-- Content -->
 		<m:ContentPanel ui:field="contentPanel" />

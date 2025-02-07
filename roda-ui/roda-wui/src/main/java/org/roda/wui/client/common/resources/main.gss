@@ -28,6 +28,12 @@
 @def COLOR_SIDEBAR_BACKGROUND		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.sidebar.background")');
 @def COLOR_TABLE_SIDEBAR_BACKGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.table.sidebar.background")');
 
+@def COLOR_HEADER_USER_BACKGROUND eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.header.user.background")');
+@def COLOR_HEADER_USER_FOREGROUND eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.header.user.foreground")');
+
+@def COLOR_HEADER_NAVIGATION_BACKGROUND eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.header.navigation.background")');
+@def COLOR_HEADER_NAVIGATION_FOREGROUND eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.header.navigation.foreground")');
+
 @def COLOR_FOOTER_BACKGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.footer.background")');
 @def COLOR_FOOTER_FOREGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.footer.foreground")');
 
@@ -1999,23 +2005,26 @@ td.datePickerMonth, td.datePickerYear {
 				BANNER
 ************************************************/
 .banner {
-    background-color: COLOR_PRIMARY;
-    position: relative;
-    height: 110px;
+    display: flex;
+    flex: 1;
 }
 
 .homeLink {
-    padding-left: 30px;
-    height: 110px;
+    display: flex;
+    flex: 0;
     cursor: pointer;
     cursor: hand;
+    height: 100%;
+}
+
+.bannerLogoContainer {
+    display: flex;
+    flex: 1;
+    padding: 20px 0px 20px 0px;
 }
 
 .homeLogo {
-    height: 100px;
-    float: left;
-    margin-right: 20px;
-    margin-top: 4px;
+    height: 100%;
 }
 
 .homeText {
@@ -2037,9 +2046,48 @@ td.datePickerMonth, td.datePickerYear {
     right: 40px;
 }
 
-.menu {
+.header {
     padding: 0 30px;
-    background-color: COLOR_MENU_PRIMARY;
+}
+
+.header table {
+    height: 100%;
+}
+
+.header table td {
+    vertical-align: middle;
+}
+
+.userMenu {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.userMenuColors {
+    background-color: COLOR_HEADER_USER_BACKGROUND;
+    color: COLOR_HEADER_USER_FOREGROUND;
+}
+
+.userMenuColors .gwt-MenuItem-selected {
+    background-color: COLOR_HEADER_USER_FOREGROUND;
+    color: COLOR_HEADER_USER_BACKGROUND;
+}
+
+.bannerHeader {
+    height: 64px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.bannerHeaderColors {
+    background-color: COLOR_HEADER_NAVIGATION_BACKGROUND;
+    color: COLOR_HEADER_NAVIGATION_FOREGROUND;
+}
+
+.bannerHeaderColors .gwt-MenuItem-selected {
+    background-color: COLOR_HEADER_NAVIGATION_FOREGROUND;
+    color: COLOR_HEADER_NAVIGATION_BACKGROUND;
 }
 
 /**********************************************
@@ -2059,7 +2107,6 @@ td.datePickerMonth, td.datePickerYear {
 				MENU
 ************************************************/
 .gwt-MenuBar {
-    background-color: COLOR_MENU_PRIMARY;
 }
 
 .gwt-MenuBar table {
@@ -2067,14 +2114,10 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .gwt-MenuBar.gwt-MenuBar-vertical {
-    background-color: COLOR_MENU_SECONDARY;
-    color: COLOR_MENU_SECONDARY_TEXT;
 }
 
 .gwt-MenuBar.gwt-MenuBar-vertical .gwt-MenuItem {
     min-width: 130px;
-    background-color: COLOR_MENU_SECONDARY;
-    color: COLOR_MENU_SECONDARY_TEXT;
 }
 
 .gwt-MenuBar .gwt-MenuItem {
@@ -2083,19 +2126,15 @@ td.datePickerMonth, td.datePickerYear {
     font-weight: 500;
     font-size: 1.4rem;
     font-variant: normal;
-    color: COLOR_MENU_PRIMARY_TEXT;
     padding: 5px 10px;
     text-align: left;
 }
 
 .gwt-MenuBar .gwt-MenuItem-selected {
-    background-color: COLOR_MENU_SECONDARY;
-    color: COLOR_MENU_SECONDARY_TEXT;
+
 }
 
 .gwt-MenuBar.gwt-MenuBar-vertical .gwt-MenuItem-selected {
-    background-color: COLOR_MENU_PRIMARY;
-    color: COLOR_MENU_PRIMARY_TEXT;
 }
 
 .gwt-MenuBarPopup {

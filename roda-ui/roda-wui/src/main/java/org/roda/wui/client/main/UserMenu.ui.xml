@@ -3,14 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag">
 
-	<ui:style>
-	.menubar-right {
-		float: right;
-	}
-	</ui:style>
-
-	<g:FlowPanel>
-		<wcag:AcessibleMenuBar ui:field="rightMenu" addStyleNames="{style.menubar-right}" />
-		<wcag:AcessibleMenuBar ui:field="leftMenu" />
+	<g:FlowPanel styleName="userMenu userMenuColors">
+		<wcag:AcessibleMenuBar ui:field="menu" />
 	</g:FlowPanel>
 </ui:UiBinder>
