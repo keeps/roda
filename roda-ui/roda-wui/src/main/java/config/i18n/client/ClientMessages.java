@@ -745,9 +745,15 @@ public interface ClientMessages extends Messages {
 
   String representationFiles();
 
+  String representationFolders();
+
   String objectCreatedDate();
 
+  String objectCreatedDateShort();
+
   String objectLastModified();
+
+  String objectLastModifiedShort();
 
   /************* Preservation Event List ****************/
 
