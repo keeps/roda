@@ -45,6 +45,7 @@ import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.cards.AIPRepresentationCardList;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
@@ -113,7 +114,7 @@ public class BrowseAIP extends Composite {
   private static final List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static SimplePanel container;
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   static {
     fieldsToReturn.addAll(
@@ -162,6 +163,13 @@ public class BrowseAIP extends Composite {
   FlowPanel center;
   @UiField
   Label dateCreatedAndModified;
+  @UiField
+  FlowPanel representationCards;
+  @UiField
+  SimplePanel representationActions;
+  @UiField
+  FlowPanel disseminationCards;
+
   private String aipId;
   private IndexedAIP aip;
   private SimplePanel descriptiveMetadataButtons;
@@ -259,7 +267,7 @@ public class BrowseAIP extends Composite {
 
     // CSS
     newDescriptiveMetadata.getElement().setId("aipNewDescriptiveMetadata");
-    addStyleName("browse browse_aip");
+    keyboardFocus.addStyleName("browse browse_aip");
 
     // make FocusPanel comply with WCAG
     Element firstElement = this.getElement().getFirstChildElement();
@@ -268,7 +276,7 @@ public class BrowseAIP extends Composite {
     }
 
     // STATE
-    this.addStyleName(aip.getState().toString().toLowerCase());
+    keyboardFocus.addStyleName(aip.getState().toString().toLowerCase());
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(aip.getState()));
     aipState.setVisible(!justActive);
 
@@ -322,7 +330,15 @@ public class BrowseAIP extends Composite {
       addChildAip.setVisible(response.getRepresentationCount().getResult() == 0);
     }
 
+    // Side panel representations
+    this.representationCards.add(new AIPRepresentationCardList(aipId));
+    // this.disseminationCards.add(new AIPDisseminationCardList(aipId));
+    this.representationActions.setWidget(new ActionableWidgetBuilder<>(representationActions).buildListWithObjects(
+      new ActionableObject<>(IndexedRepresentation.class),
+      Collections.singletonList(RepresentationActions.RepresentationAction.NEW)));
+
     keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("here");
   }
 
   public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {

@@ -37,8 +37,14 @@
 @def COLOR_FOOTER_BACKGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.footer.background")');
 @def COLOR_FOOTER_FOREGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.footer.foreground")');
 
-@def FONT_PRIMARY "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-@def FONT_MONOSPACED "UbuntuMono", "Lucida Console", Monaco, monospace;
+@def COLOR_GREY_DARK	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.dark")');
+@def COLOR_GREY_BGDARKER eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.bgdarker")');
+@def COLOR_GREY_BGLIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.bglight")');
+
+@def COLOR_GREEN eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.green")');
+
+@def FONT_PRIMARY "Inter", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@def FONT_MONOSPACED "Roboto_Mono", "UbuntuMono", "Lucida Console", Monaco, monospace;
 
 @defmixin fontawesome() {
 	font-family: 'Font Awesome 5 Free';
@@ -127,13 +133,21 @@ h4, .h4 {
 h5, .h5 {
     font-size: 1.8rem;
     line-height: 1.5;
-    letter-spacing: -.05rem;
+    font-weight: 600;
 }
 
 h6, .h6 {
     font-size: 1.5rem;
     line-height: 1.6;
     letter-spacing: 0;
+}
+
+.noMargin {
+    margin: 0px;
+}
+
+.rodaTitleHeader i {
+    margin-right: 8px;
 }
 
 ul {
@@ -504,6 +518,7 @@ div.inline {
 .footer {
     background-color: COLOR_FOOTER_BACKGROUND;
     margin-top: 0;
+    max-width: none!important;
 }
 
 .footer .row {
@@ -528,6 +543,11 @@ div.inline {
 .footer ul li:hover,
 .footer ul li a:hover {
     color: white;
+}
+
+.footer .last {
+    display: flex;
+    flex-direction: row-reverse;
 }
 
 #keeps-logo {
@@ -1735,6 +1755,10 @@ td.datePickerMonth, td.datePickerYear {
 /**********************************************
 				TOAST
 ************************************************/
+.gwt-PopupPanel {
+    z-index: 10;
+}
+
 .wui-toast {
     width: auto;
     max-width: 300px;
@@ -2002,95 +2026,6 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 /**********************************************
-				BANNER
-************************************************/
-.banner {
-    display: flex;
-    flex: 1;
-}
-
-.homeLink {
-    display: flex;
-    flex: 0;
-    cursor: pointer;
-    cursor: hand;
-    height: 100%;
-}
-
-.bannerLogoContainer {
-    display: flex;
-    flex: 1;
-    padding: 20px 0px 20px 0px;
-}
-
-.homeLogo {
-    height: 100%;
-}
-
-.homeText {
-    color: white;
-    font-weight: 400;
-    font-size: 6rem;
-    line-height: 110px;
-    text-align: left;
-}
-
-.homeSubText {
-    font-size: 3.5rem;
-    font-weight: 200;
-}
-
-.languageSwitcher {
-    position: absolute;
-    top: 10px;
-    right: 40px;
-}
-
-.header {
-    padding: 0 30px;
-}
-
-.header table {
-    height: 100%;
-}
-
-.header table td {
-    vertical-align: middle;
-}
-
-.userMenu {
-    display: flex;
-    flex-direction: row-reverse;
-}
-
-.userMenuColors {
-    background-color: COLOR_HEADER_USER_BACKGROUND;
-    color: COLOR_HEADER_USER_FOREGROUND;
-}
-
-.userMenuColors .gwt-MenuItem-selected {
-    background-color: COLOR_HEADER_USER_FOREGROUND;
-    color: COLOR_HEADER_USER_BACKGROUND;
-}
-
-.bannerHeader {
-    height: 64px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.bannerHeaderColors {
-    background-color: COLOR_HEADER_NAVIGATION_BACKGROUND;
-    color: COLOR_HEADER_NAVIGATION_FOREGROUND;
-}
-
-.bannerHeaderColors .gwt-MenuItem-selected {
-    background-color: COLOR_HEADER_NAVIGATION_FOREGROUND;
-    color: COLOR_HEADER_NAVIGATION_BACKGROUND;
-}
-
-/**********************************************
 				LANGUAGE SWITCH
 ************************************************/
 .wui-languageSwitcher {
@@ -2139,6 +2074,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .gwt-MenuBarPopup {
     box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 10px -2px, rgba(0, 0, 0, 0.22) 0px 4px 10px -2px;
+    z-index: 10;
 }
 
 .main .menus {
@@ -2233,6 +2169,119 @@ td.datePickerMonth, td.datePickerYear {
     right: 10px;
     position: absolute;
     margin-top: 3px;
+}
+
+/**********************************************
+				BANNER
+************************************************/
+.banner {
+    display: flex;
+    flex: 1;
+}
+
+.homeLink {
+    display: flex;
+    flex: 0;
+    cursor: pointer;
+    cursor: hand;
+    height: 100%;
+}
+
+.bannerLogoContainer {
+    display: flex;
+    flex: 1;
+    padding: 20px 0px 20px 0px;
+}
+
+.homeLogo {
+    height: 100%;
+}
+
+.homeText {
+    color: white;
+    font-weight: 400;
+    font-size: 6rem;
+    line-height: 110px;
+    text-align: left;
+}
+
+.homeSubText {
+    font-size: 3.5rem;
+    font-weight: 200;
+}
+
+.languageSwitcher {
+    position: absolute;
+    top: 10px;
+    right: 40px;
+}
+
+.header {
+    padding: 0 30px;
+}
+
+.header table {
+    height: 100%;
+}
+
+.header table td {
+    vertical-align: middle;
+}
+
+.userMenu {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.userMenu .gwt-MenuItem {
+    font-size: 10px !important;
+    font-weight: 300;
+}
+
+.userMenuColors {
+    background-color: COLOR_HEADER_USER_BACKGROUND;
+    color: COLOR_HEADER_USER_FOREGROUND;
+}
+
+.userMenuColors .gwt-MenuItem {
+    font-weight: 300;
+}
+
+.userMenuColors .gwt-MenuItem-selected {
+    background-color: COLOR_HEADER_USER_FOREGROUND;
+    color: COLOR_HEADER_USER_BACKGROUND;
+    font-weight: 300;
+}
+
+.bannerHeader {
+    height: 64px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.bannerHeader .gwt-MenuItem {
+    font-size: 12px !important;
+    font-weight: 300;
+}
+
+.bannerHeaderColors {
+    background-color: COLOR_HEADER_NAVIGATION_BACKGROUND;
+    color: COLOR_HEADER_NAVIGATION_FOREGROUND;
+    font-weight: 300;
+}
+
+.bannerHeaderColors .gwt-MenuItem {
+    font-weight: 300;
+}
+
+.bannerHeaderColors .gwt-MenuItem-selected {
+    background-color: COLOR_HEADER_NAVIGATION_FOREGROUND;
+    color: COLOR_HEADER_NAVIGATION_BACKGROUND;
+    font-weight: 300;
 }
 
 /**********************************************
@@ -2560,6 +2609,10 @@ td.datePickerMonth, td.datePickerYear {
 
 .browse, .wui-browse-representation {
 	margin-top: 0;
+}
+
+.browse_aip {
+    flex: 1;
 }
 
 .browse-file .aipState {
@@ -2957,6 +3010,149 @@ td.datePickerMonth, td.datePickerYear {
     padding: 5px;
     border: 1px solid darkgrey;
     float: left;
+}
+
+/* --------------------------------------------------
+
+  ************** RODA 6 SIDE PANELS *****************
+
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+.contentWithSidePanel {
+    display: flex;
+}
+
+.browseSidePanel {
+    width: 235px;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 32px;
+    background: COLOR_GREY_DARK;
+}
+
+.browseSidePanel .actionable-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.browseSidePanel .actionable-title {
+    display: none;
+}
+
+.browseSidePanel .actionable-button {
+    color: white;
+    background-color: COLOR_PRIMARY;
+    border-radius: 4px;
+    padding: 4px 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.thumbnailCardList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.thumbnailCardListTitle {
+    color: #CCCCCC;
+    text-transform: capitalize;
+}
+
+.thumbnailCardListCards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.thumbnailCardContainer {
+    display: flex;
+    flex: 0;
+    flex-direction: column;
+}
+
+.thumbnailCard {
+    display: flex;
+    flex-direction: column;
+    flex: 0;
+    border-radius: 4px;
+    background-color: COLOR_GREY_BGDARKER;
+    font-size: 10px;
+}
+
+.thumbnailCardTitle {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 8px 16px 8px 16px;
+    cursor: pointer;
+}
+
+.thumbnailCardExpandable .thumbnailCardTitle:after {
+    @mixin fontawesome();
+    content: "\f078";
+}
+
+.thumbnailCardCollapsible .thumbnailCardTitle:after {
+    @mixin fontawesome();
+    content: "\f077";
+}
+
+.thumbnailCardDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-radius: 4px;
+    background-color: COLOR_GREY_BGLIGHT;
+    padding: 16px 16px 8px 16px;
+}
+
+.thumbnailCardExpandable .thumbnailCardDetails {
+    display: none;
+}
+
+.thumbnailCardIconThumbnail {
+    display: flex;
+    justify-content: center;
+    height: 204px;
+    background-color: white;
+    align-items: center;
+    font-size: 16px;
+}
+
+.thumbnailCardTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    padding: 2px 8px;
+    border-radius: 4px;
+    flex: 1;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.tagGreen {
+    background-color: COLOR_GREEN;
+}
+
+.thumbnailCardAttributes {
+    display: flex;
+    flex-direction: column;
+}
+
+.thumbnailCardAttributes > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.thumbnailCardAttributes > div > div:first-child {
+    text-transform: uppercase;
 }
 
 /* --------------------------------------------------
@@ -7143,7 +7339,6 @@ span.code {
     word-spacing: normal;
     text-indent: 0;
     text-shadow: none;
-    display: inline-block;
     margin: 0em;
     font-family: FONT_PRIMARY;
     line-height: normal;
@@ -7188,7 +7383,7 @@ span.code {
 }
 
 .ActionableStyleButtons .actionable-button-label {
-    margin-right: 2em;
+    margin-right: 0.5em;
 }
 
 .browseNewDescriptiveMetadataButton,
@@ -7203,6 +7398,8 @@ span.code {
 }
 
 .my-asyncdatagrid-main-panel .ActionableStyleButtons .actionable-menu {
+    display: flex;
+    flex-direction: row;
     margin: 1rem;
 }
 
@@ -7228,6 +7425,12 @@ span.code {
 
 .sidebar .actionable-button-destroyed:hover {
     background-color: COLOR_ACTIONS_DANGER_HOVER;
+}
+
+.actionable-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
 }
 
 .card + .ActionableStyleButtons, .ActionableStyleButtons + .ActionableStyleButtons {
@@ -7296,7 +7499,6 @@ span.code {
 .navigationToolbar {
     min-height: 35px;
     line-height: 35px;
-    background-color: #ddd;
     position: relative;
 }
 

@@ -41,6 +41,10 @@ public class ActionButton<T extends IsIndexed> extends Composite implements HasE
     addStyleDependentName(actionButton.getImpact().toString().toLowerCase());
     setEnabled(true);
 
+    label = new Label(actionButton.getText());
+    label.addStyleName("actionable-button-label");
+    button.add(label);
+
     String iconClass = "fa fa-question-circle";
     for (String possibleIcon : actionButton.getExtraCssClasses()) {
       if (possibleIcon.startsWith("btn-")) {
@@ -53,10 +57,6 @@ public class ActionButton<T extends IsIndexed> extends Composite implements HasE
     HTMLPanel icon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<i class='" + iconClass + "'></i>"));
     icon.addStyleName("actionable-button-icon");
     button.add(icon);
-
-    label = new Label(actionButton.getText());
-    label.addStyleName("actionable-button-label");
-    button.add(label);
   }
 
   @Override
