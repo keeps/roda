@@ -97,3 +97,31 @@
   font-weight: 300;
   src: url(../../api/v2/themes?resource-id=fonts/RODA_logo/RODA_logo.ttf) format("truetype");
 }
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 1 1000;
+  src: local('Inter'), url(../../api/v2/themes?resource-id=fonts/Inter/Inter-VariableFont_opsz,wght.ttf) format("truetype-variations");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: italic;
+  font-weight: 1 1000;
+  src: local('Inter'), url(../../api/v2/themes?resource-id=fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf) format("truetype-variations");
+}
+
+@font-face {
+  font-family: "RobotoMono";
+  font-style: normal;
+  font-weight: 1 1000;
+  src: local('RobotoMono'), url(../../api/v2/themes?resource-id=fonts/Roboto_Mono/RobotoMono-VariableFont_wght.ttf) format("truetype-variations");
+}
+
+@font-face {
+  font-family: "UbuntuMono";
+  font-style: italic;
+  font-weight: 1 1000;
+  src: local('UbuntuMono'), url(../../api/v2/themes?resource-id=fonts/Roboto_Mono/RobotoMono-Italic-VariableFont_wght.ttf) format("truetype-variations");
+}
