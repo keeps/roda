@@ -1028,7 +1028,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     ActionableBundle<IndexedAIP> aipActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.intellectualEntity());
+    ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.intellectualEntity(), "fa fa-search",
+      false);
     managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP_TOP, ActionImpact.UPDATED,
       "btn-plus-circle");
     managementGroup.addButton(messages.newSublevel(), AipAction.NEW_CHILD_AIP_BELOW, ActionImpact.UPDATED,
@@ -1041,7 +1042,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     managementGroup.addButton(messages.removeArchivalPackage(), AipAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
     // PRESERVATION
-    ActionableGroup<IndexedAIP> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
+    ActionableGroup<IndexedAIP> preservationGroup = new ActionableGroup<>(messages.preservationTitle(),
+      "fa fa-play-circle", true);
     preservationGroup.addButton(messages.newProcessPreservation(), AipAction.NEW_PROCESS, ActionImpact.UPDATED,
       "btn-play");
 

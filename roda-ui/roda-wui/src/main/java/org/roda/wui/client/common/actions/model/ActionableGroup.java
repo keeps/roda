@@ -24,14 +24,26 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class ActionableGroup<T extends IsIndexed> {
   private final ActionableTitle title;
+  private final String icon;
+  private final boolean replaceWithChild;
   private List<ActionableButton<T>> buttons = new ArrayList<>();
+
+  public ActionableGroup(String title, String icon, boolean replaceWithChild) {
+    this.title = new ActionableTitle(title);
+    this.icon = icon;
+    this.replaceWithChild = replaceWithChild;
+  }
 
   public ActionableGroup(String title) {
     this.title = new ActionableTitle(title);
+    this.icon = null;
+    this.replaceWithChild = false;
   }
 
   public ActionableGroup() {
     this.title = new ActionableTitle(null);
+    this.icon = null;
+    this.replaceWithChild = false;
   }
 
   // TODO: remove extraCssClasses and generate them based on other info
@@ -44,6 +56,14 @@ public class ActionableGroup<T extends IsIndexed> {
 
   public ActionableTitle getTitle() {
     return title;
+  }
+
+  public String getIcon() {
+    return icon;
+  }
+
+  public boolean shouldReplaceWithChild() {
+    return this.replaceWithChild;
   }
 
   public List<ActionableButton<T>> getButtons() {
