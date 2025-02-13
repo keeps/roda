@@ -9,6 +9,7 @@
 		<g:FocusPanel ui:field="keyboardFocus">
 			<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
 				<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.catalogueItemTitle}" />
+				<common:ObjectToolbar ui:field="objectToolbar" label="{messages.catalogueItemTitle}"/>
 				<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
 					<g:FlowPanel addStyleNames="col_12 content">
 						<!-- STATUS -->

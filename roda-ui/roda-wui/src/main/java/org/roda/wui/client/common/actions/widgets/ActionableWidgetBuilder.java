@@ -22,6 +22,7 @@ import org.roda.wui.client.common.actions.model.ActionableButton;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.model.ActionableTitle;
+import org.roda.wui.client.common.labels.LabelWithIcon;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 
 import com.google.gwt.core.shared.GWT;
@@ -29,8 +30,10 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -109,6 +112,25 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return createActionsMenu(actionableBundle, objects);
   }
 
+  public Widget buildGroupedListWithObjects(ActionableObject<T> objects) {
+    ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
+    return createGroupedActionsMenu(actionableBundle, objects);
+  }
+
+  public Widget buildGroupedListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist) {
+    ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
+
+    if (!actionWhitelist.isEmpty()) {
+      // remove unwanted buttons, and the whole group if it is empty
+      actionableBundle.getGroups().removeIf(group -> {
+        group.getButtons().removeIf(button -> !actionWhitelist.contains(button.getAction()));
+        return group.getButtons().isEmpty();
+      });
+    }
+
+    return createGroupedActionsMenu(actionableBundle, objects);
+  }
+
   // Internal (GUI elements creation)
 
   private FlowPanel createActionsMenu(ActionableBundle<T> actionableBundle, ActionableObject<T> objects) {
@@ -182,6 +204,100 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     if (addedButtonCount == 0) {
       Label emptyHelpText = new Label(messages.actionableEmptyHelp(objects.getType()));
       emptyHelpText.addStyleName("actions-empty-help");
+      panel.add(emptyHelpText);
+    }
+
+    widgetCreatedHandler.accept(addedButtonCount);
+
+    return panel;
+  }
+
+  private FlowPanel createGroupedActionsMenu(ActionableBundle<T> actionableBundle, ActionableObject<T> objects) {
+    FlowPanel panel = new FlowPanel();
+    panel.addStyleName("groupedActionableMenu");
+
+    boolean isReadonly = NodeType.valueOf(ConfigurationManager.getString(RodaConstants.RODA_NODE_TYPE_KEY))
+      .equals(NodeType.REPLICA);
+    int addedButtonCount = 0;
+
+    for (ActionableGroup<T> actionGroup : actionableBundle.getGroups()) {
+      FlowPanel groupPanel = null;
+      for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
+        if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
+          && actionable.canAct(actionButton.getAction(), objects)) {
+          ActionableTitle actionableTitle = actionGroup.getTitle();
+          groupPanel = new FlowPanel();
+          if (!actionGroup.shouldReplaceWithChild()) {
+            Button groupButton = new Button(actionableTitle.getTitle());
+            groupButton.addStyleName("groupedActionableDropdownButton");
+            if (!actionableTitle.hasTitle()) {
+              groupButton.addStyleName("groupedActionableDropdownButtonEmpty");
+            }
+            groupPanel.add(groupButton);
+          }
+          break;
+        }
+      }
+
+      if (groupPanel != null) {
+        panel.add(groupPanel);
+        SimplePanel anchorPanel = new SimplePanel();
+        anchorPanel.addStyleName("popupAnchor");
+        groupPanel.add(anchorPanel);
+        FlowPanel buttonsPanel = new FlowPanel();
+        buttonsPanel.addStyleName("groupedActionableDropdown");
+        anchorPanel.add(buttonsPanel);
+        for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
+          if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
+            && actionable.canAct(actionButton.getAction(), objects)) {
+
+            ActionButton<T> button = new ActionButton<>(actionButton);
+
+            button.addClickHandler(new ClickHandler() {
+              @Override
+              public void onClick(ClickEvent event) {
+                button.setEnabled(false);
+                actionable.act(actionButton.getAction(), objects, new AsyncCallback<Actionable.ActionImpact>() {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    actionImpactCallback.onFailure(caught);
+                    button.setEnabled(true);
+                  }
+
+                  @Override
+                  public void onSuccess(Actionable.ActionImpact result) {
+                    actionImpactCallback.onSuccess(result);
+                    button.setEnabled(true);
+                  }
+                });
+              }
+            });
+
+            addedButtonCount++;
+            if (actionGroup.shouldReplaceWithChild()) {
+              groupPanel.add(button);
+              break;
+            }
+            else {
+              buttonsPanel.add(button);
+            }
+          }
+        }
+      }
+    }
+
+    if (includeBackButton) {
+      ActionButton<T> backButton = new ActionButton<>(
+        new ActionableButton<>(messages.backButton(), null, ActionImpact.NONE, "fas fa-arrow-circle-left"));
+      backButton.addClickHandler(event -> History.back());
+      backButton.addStyleName("groupedActionableButtonBack");
+      panel.add(backButton);
+      addedButtonCount++;
+    }
+
+    if (addedButtonCount == 0) {
+      Label emptyHelpText = new Label(messages.actionableEmptyHelp(objects.getType()));
+      emptyHelpText.addStyleName("groupedActionableEmptyHelp");
       panel.add(emptyHelpText);
     }
 

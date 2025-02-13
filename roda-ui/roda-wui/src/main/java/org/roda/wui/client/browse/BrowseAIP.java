@@ -38,6 +38,7 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.ObjectToolbar;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
@@ -127,6 +128,8 @@ public class BrowseAIP extends Composite {
   FocusPanel keyboardFocus;
   @UiField
   NavigationToolbar<IndexedAIP> navigationToolbar;
+  @UiField
+  ObjectToolbar<IndexedAIP> objectToolbar;
   @UiField
   HTML aipState;
   // IDENTIFICATION
@@ -294,6 +297,11 @@ public class BrowseAIP extends Composite {
       navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.UPDATED,
         () -> refresh(aipId, new NoAsyncCallback<>()));
       navigationToolbar.build();
+    }
+
+    // OBJECT TOOLBAR
+    if (justActive) {
+      objectToolbar.setObjectAndBuild(aip);
     }
 
     // IDENTIFICATION
