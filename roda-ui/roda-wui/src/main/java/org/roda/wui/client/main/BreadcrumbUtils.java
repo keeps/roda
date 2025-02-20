@@ -77,8 +77,8 @@ public class BreadcrumbUtils {
 
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip, boolean events) {
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
-    breadcrumb
-      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", BrowseTop.RESOLVER.getHistoryPath()));
+    breadcrumb.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.allCollectionsTitle()),
+      messages.allCollectionsTitle(), BrowseTop.RESOLVER.getHistoryPath()));
 
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {

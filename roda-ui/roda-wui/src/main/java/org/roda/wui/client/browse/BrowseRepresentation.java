@@ -37,7 +37,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NavigationToolbarLegacy;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
@@ -154,7 +154,7 @@ public class BrowseRepresentation extends Composite {
   @UiField
   FlowPanel center;
   @UiField
-  NavigationToolbar<IndexedRepresentation> navigationToolbar;
+  NavigationToolbarLegacy<IndexedRepresentation> navigationToolbar;
 
   // STATUS
   @UiField

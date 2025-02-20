@@ -58,6 +58,7 @@ public class SearchWrapper extends Composite {
     this.components = new Components();
 
     rootPanel = new FlowPanel();
+    rootPanel.setStyleName("searchWrapper");
     initWidget(rootPanel);
   }
 
@@ -92,7 +93,8 @@ public class SearchWrapper extends Composite {
     String defaultLabelText = ConfigurationManager.resolveTranslation(RodaConstants.UI_LISTS_PROPERTY, list.getListId(),
       RodaConstants.UI_LISTS_SEARCH_SELECTEDINFO_LABEL_DEFAULT_I18N_PROPERTY);
     if (defaultLabelText == null) {
-      defaultLabelText = messages.someOfAObject(list.getClassToReturn().getName());
+      defaultLabelText = messages.searchButton() + " "
+        + messages.searchDropdownLabels(list.getClassToReturn().getName());
     }
 
     String dropdownValue = list.getClassToReturn().getSimpleName();
@@ -100,11 +102,11 @@ public class SearchWrapper extends Composite {
     // create
     searchPanel = new SearchPanel<>(list, filter, allFilter, incremental,
       listBuilder.getOptions().getSearchPlaceholder(), hasMultipleSearchPanels,
-      listBuilder.getOptions().getActionable(), listBuilder.getOptions().getActionableCallback(), showSaveButton, hideListAfterClear);
+      listBuilder.getOptions().getActionable(), listBuilder.getOptions().getActionableCallback(), showSaveButton,
+      hideListAfterClear);
     if (hasMultipleSearchPanels) {
       initSearchPanelSelectionDropdown();
-      searchPanelSelectionDropdown.addItem(defaultLabelText, dropdownValue,
-        SelectedPanel.getIconForList(list.getListId(), list.getClassToReturn().getSimpleName()));
+      searchPanelSelectionDropdown.addItem(defaultLabelText, dropdownValue, null);
     } else {
       listClassForSingleSearchPanel = listBuilder.getOptions().getClassToReturn().getSimpleName();
     }

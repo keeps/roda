@@ -670,6 +670,21 @@ public interface ClientMessages extends Messages {
 
   String aipType();
 
+  String descriptiveMetadataTab();
+
+  String preservationEventsTab();
+
+  String auditLogsTab();
+
+  String risksTab();
+
+  String disposalTab();
+
+  String permissionsTab();
+
+  String detailsTab();
+
+
   /************* Search ****************/
   String searchDropdownLabels(@Select String objectClass);
 
@@ -1263,6 +1278,14 @@ public interface ClientMessages extends Messages {
   String metadataFilename();
 
   /*** Browse ****/
+  String searchWithin();
+
+  String searchDescendants();
+
+  String searchPackage();
+
+  String manage();
+
   String appraisalTitle();
 
   String appraisalAccept();
@@ -1288,6 +1311,8 @@ public interface ClientMessages extends Messages {
   String preservationTitle();
 
   String newProcessPreservation();
+
+  String runAction();
 
   String preservationEvents();
 
@@ -1359,6 +1384,8 @@ public interface ClientMessages extends Messages {
 
   /***** Dissemination ****/
   String dissemination();
+
+  String disseminationFiles();
 
   /***** Dissemination File ****/
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:m="urn:import:org.roda.wui.client.main"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+             xmlns:i="urn:import:config.i18n.client" xmlns:commonlabels="urn:import:org.roda.wui.client.common.labels"
+             xmlns:search="urn:import:org.roda.wui.client.search" xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
+             xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
+
+    <ui:style>
+    </ui:style>
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+    <wcag:AccessibleFocusPanel ui:field="keyboardFocus">
+        <g:FlowPanel ui:field="toolbar" styleName="objectToolbar">
+            <commonlabels:LabelWithIcon ui:field="label" styleName="objectToolbarLabel"/>
+            <g:FlowPanel ui:field="tags" styleName="objectToolbarTags"/>
+            <g:FlowPanel ui:field="actions" styleName="objectToolbarActions"/>
+        </g:FlowPanel>
+    </wcag:AccessibleFocusPanel>
+</ui:UiBinder>

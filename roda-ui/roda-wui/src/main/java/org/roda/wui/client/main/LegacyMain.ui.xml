@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:m="urn:import:org.roda.wui.client.main" xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag">
+
+	<ui:style>
+	</ui:style>
+
+	<g:FlowPanel styleName="main">
+		<!-- Header -->
+		<g:FlowPanel styleName="banner">
+			<wcag:AccessibleFocusPanel styleName="homeLink" ui:field="homeLinkArea">
+				<g:FlowPanel ui:field="bannerLogo">
+				</g:FlowPanel>
+			</wcag:AccessibleFocusPanel>
+		</g:FlowPanel>
+
+		<!-- NavigationMenu -->
+		<m:Menu ui:field="menu" addStyleNames="menu" />
+
+		<!-- Content -->
+		<m:ContentPanel ui:field="contentPanel" />
+	</g:FlowPanel>
+
+</ui:UiBinder>

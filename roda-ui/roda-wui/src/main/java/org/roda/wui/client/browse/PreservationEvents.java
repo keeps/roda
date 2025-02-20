@@ -29,7 +29,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NavigationToolbarLegacy;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -121,7 +121,7 @@ public class PreservationEvents extends Composite {
   @UiField
   FlowPanel pageDescription;
   @UiField
-  NavigationToolbar navigationToolbar;
+  NavigationToolbarLegacy navigationToolbar;
   private String aipId;
   private String representationUUID;
   private String fileUUID;
