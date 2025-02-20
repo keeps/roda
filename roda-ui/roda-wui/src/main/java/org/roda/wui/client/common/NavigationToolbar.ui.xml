@@ -13,31 +13,12 @@
 
 	<wcag:AccessibleFocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel stylePrimaryName="navigationToolbar" ui:field="toolbarPanel">
-			<g:Label addStyleNames="navigationToolbarHeader" ui:field="navigationToolbarHeader" />
-			<g:Label addStyleNames="navigationToolbarHeaderArrow">&rsaquo;</g:Label>
 			<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="navigationToolbarBreadcrumb" />
-
-			<!-- STATUS -->
-			<g:HTML ui:field="aipState" styleName="aipState small" />
-
 			<g:FlowPanel addStyleNames="navigationToolbarIcons">
-
-				<wcag:AccessibleFocusPanel ui:field="disseminationsButton" addStyleNames="navigationToolbarLink">
-					<g:HTML>
-						<i class="fa fa-play-circle-o">
-						</i>
-					</g:HTML>
-				</wcag:AccessibleFocusPanel>
 				<wcag:AccessibleFocusPanel ui:field="infoSidebarButton" addStyleNames="navigationToolbarLink"
 					title="{messages.details}">
 					<g:HTML>
 						<i class="fa fa-list-alt">
-						</i>
-					</g:HTML>
-				</wcag:AccessibleFocusPanel>
-				<wcag:AccessibleFocusPanel ui:field="searchButton" addStyleNames="navigationToolbarLink">
-					<g:HTML>
-						<i class="fa fa-search">
 						</i>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>
@@ -51,12 +32,6 @@
 				<wcag:AccessibleFocusPanel ui:field="nextButton" addStyleNames="navigationToolbarLink">
 					<g:HTML>
 						<i class="fa fa-chevron-right">
-						</i>
-					</g:HTML>
-				</wcag:AccessibleFocusPanel>
-				<wcag:AccessibleFocusPanel ui:field="actionsButton" addStyleNames="navigationToolbarLink">
-					<g:HTML>
-						<i class="fa fa-ellipsis-v">
 						</i>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>

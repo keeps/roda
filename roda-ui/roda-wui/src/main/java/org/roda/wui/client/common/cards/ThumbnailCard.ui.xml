@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+    <g:FlowPanel styleName="thumbnailCard">
+        <g:Label ui:field="title" styleName="thumbnailCardTitle"/>
+        <g:FlowPanel styleName="thumbnailCardDetails">
+            <g:SimplePanel ui:field="thumbnail" />
+            <g:FlowPanel ui:field="tags" styleName="thumbnailCardTags"/>
+            <g:FlowPanel ui:field="attributes" styleName="thumbnailCardAttributes"/>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>

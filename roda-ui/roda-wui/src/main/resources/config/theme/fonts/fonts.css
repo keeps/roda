@@ -125,3 +125,10 @@
   font-weight: 1 1000;
   src: local('UbuntuMono'), url(../../api/v2/themes?resource-id=fonts/Roboto_Mono/RobotoMono-Italic-VariableFont_wght.ttf) format("truetype-variations");
 }
+
+@font-face {
+    font-family: "CustomMaterialIcons";
+    font-style: normal;
+    font-weight: 1 1000;
+    src: url(../../api/v2/themes?resource-id=fonts/Custom_Material_Icons/material-icons.ttf) format("truetype");
+}

@@ -28,7 +28,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.DisposalPolicySummaryPanel;
-import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NavigationToolbarLegacy;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalAssociationActions;
@@ -165,7 +165,7 @@ public class DisposalPolicyAssociationPanel extends Composite {
   private static DisposalPolicyAssociationPanel.MyUiBinder uiBinder = GWT
     .create(DisposalPolicyAssociationPanel.MyUiBinder.class);
   @UiField
-  NavigationToolbar<IndexedAIP> navigationToolbar;
+  NavigationToolbarLegacy<IndexedAIP> navigationToolbar;
   @UiField
   TitlePanel titlePanel;
   @UiField

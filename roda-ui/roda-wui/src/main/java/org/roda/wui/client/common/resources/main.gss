@@ -37,9 +37,21 @@
 @def COLOR_FOOTER_BACKGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.footer.background")');
 @def COLOR_FOOTER_FOREGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.footer.foreground")');
 
+@def COLOR_SHADOW eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.shadow")');
+
 @def COLOR_GREY_DARK	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.dark")');
+@def COLOR_GREY_MEDIUM eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.medium")');
+@def COLOR_GREY_LIGHT	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.light")');
+@def COLOR_GREY_VERYLIGHT	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.verylight")');
+@def COLOR_GREY_VERYLIGHTEST	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.lightest")');
 @def COLOR_GREY_BGDARKER eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.bgdarker")');
 @def COLOR_GREY_BGLIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.bglight")');
+
+@def COLOR_RED_LIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.red.light")');
+
+@def COLOR_YELLOW_LIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.yellow.light")');
+
+@def COLOR_BLUE_LIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.blue.light")');
 
 @def COLOR_GREEN eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.green")');
 
@@ -166,9 +178,10 @@ ol {
 }
 
 .label {
-    font-size: 1.5rem;
+    font-size: px;
     font-weight: 300;
-    color: #999;
+    color: COLOR_GREY_MEDIUM;
+    flex: 0.3;
 }
 
 .col_card {
@@ -183,8 +196,9 @@ ol {
 }
 
 .value {
-    font-size: 1.6rem;
-    color: rgb(88, 89, 91);
+    font-size: 14px;
+    color: black;
+    flex: 1;
 }
 
 .value a {
@@ -193,6 +207,8 @@ ol {
 
 .field {
     margin-bottom: 1rem;
+    display: flex;
+    flex-direction: row;
 }
 
 .field ul {
@@ -428,7 +444,16 @@ div.inline {
     @mixin fontawesome();
     padding-right: 10px;
     color: COLOR_PRIMARY;
-    
+
+}
+
+.verticalDivider {
+    width: 1px;
+    background-color: COLOR_GREY_LIGHT;
+}
+
+.browse {
+    background-color: COLOR_GREY_VERYLIGHT;
 }
 
 .browse_top .aipChildrenCard {
@@ -512,7 +537,7 @@ div.inline {
 }
 
 .main {
-    background-color: white;
+    background-color: COLOR_GREY_VERYLIGHT;
 }
 
 .footer {
@@ -639,7 +664,7 @@ pre code {
 .error:before {
     content: '\f071';
     @mixin fontawesome();
-    
+
     padding-left: 5px;
     margin-right: 5px;
 }
@@ -651,7 +676,7 @@ pre code {
 .success:before {
     content: '\f00c';
     @mixin fontawesome();
-    
+
     padding-left: 5px;
     margin-right: 5px;
 }
@@ -671,11 +696,13 @@ pre code {
 	color:red;
 	font-size: 0.8em;
 }
+
+
 .form-separator {
 	color: COLOR_PRIMARY;
-	font-size: 1.6rem;
-	font-weight: 300;
-	margin: 1em -15px 0 -15px !important;
+	font-size: 14px;
+	font-weight: bold;
+	margin: 3em -15px 0 -15px !important;
 	padding: 5px 15px !important;
 }
 
@@ -967,14 +994,18 @@ pre code {
 
 .btn:after {
     display: inline-block;
-    
+
     @mixin fontawesome();
-    
+
     line-height: 1;
     float: right;
 
     position: absolute;
     right: 10px;
+}
+
+button:after {
+    @mixin fontawesome();
 }
 
 .btn-link:after {
@@ -1155,6 +1186,10 @@ pre code {
 
 .btn-clear:after {
      content: "\f12d";
+}
+
+.appendIconAttribute:after {
+    content: attr(icon);
 }
 
 .lightbtn {
@@ -1595,12 +1630,12 @@ pre code {
 
 .dropdown-label:after {
     display: inline-block;
-    
+
     content: "\f107";
     @mixin fontawesome();
-    
+
     font-size: inherit;
-    
+
     float: right;
     line-height: 2.5rem;
     padding-left: 5px;
@@ -1755,13 +1790,10 @@ td.datePickerMonth, td.datePickerYear {
 /**********************************************
 				TOAST
 ************************************************/
-.gwt-PopupPanel {
-    z-index: 10;
-}
-
 .wui-toast {
-    width: auto;
-    max-width: 300px;
+    position: absolute;
+    right: 2rem;
+    width: 17.5rem;
     clear: both;
     border-radius: 2px;
     background-color: rgba(50, 50, 50, 0.9);
@@ -2260,7 +2292,7 @@ td.datePickerMonth, td.datePickerYear {
     justify-content: space-between;
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 3;
 }
 
 .bannerHeader .gwt-MenuItem {
@@ -2298,7 +2330,7 @@ td.datePickerMonth, td.datePickerYear {
     color: #a7a9ac;
     cursor: pointer;
     cursor: hand;
-    font-size: 1.2rem;
+    font-size: 12px;
 
     max-width: 150px;
     white-space: nowrap;
@@ -2315,9 +2347,14 @@ td.datePickerMonth, td.datePickerYear {
     color: #a7a9ac;
 }
 
+.main .wui-breadcrumbPanel .breadcrumb-root {
+    color: COLOR_PRIMARY;
+    font-weight: bold;
+}
+
 .main .wui-breadcrumbPanel .breadcrumb-last {
-    color: #404142;
-    text-decoration: none;
+    font-weight: bold;
+    color: black
 }
 
 .viewRepresentationBreadcrumb .breadcrumb-last {
@@ -2325,20 +2362,19 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-last .fa, .main .wui-breadcrumbPanel .breadcrumb-last .description-level {
-    color: #404142;
+    color: black;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-separator {
     display: inline-block;
     vertical-align: bottom;
-    font-size: 1.2rem;
-    color: #a7a9ac;
+    font-size: 12px;
     cursor: text;
 }
 
 .main .navigationToolbarBreadcrumb .breadcrumb,
 .main .navigationToolbarBreadcrumb .breadcrumb-separator {
-    font-size: 1.4rem;
+    font-size: 12px;
 }
 
 /**********************************************
@@ -2850,15 +2886,12 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .descriptiveMetadataHTML {
-    padding-top: 5px;
 }
 
 .descriptiveMetadata {
-	padding-top: 25px;
 }
 
 .descriptiveMetadataHTML .descriptiveMetadata {
-	padding-top: 0px;
 }
 
 .descriptiveMetadata .title, .preservationMetadata .title {
@@ -3028,6 +3061,7 @@ td.datePickerMonth, td.datePickerYear {
     flex-direction: column;
     padding: 24px 32px;
     background: COLOR_GREY_DARK;
+    gap: 32px;
 }
 
 .browseSidePanel .actionable-menu {
@@ -3043,11 +3077,19 @@ td.datePickerMonth, td.datePickerYear {
 .browseSidePanel .actionable-button {
     color: white;
     background-color: COLOR_PRIMARY;
+    border:none;
     border-radius: 4px;
+    height: 30px;
+    align-items: center;
+    gap: 8px;
     padding: 4px 8px;
     text-transform: uppercase;
     font-weight: 600;
     font-size: 13px;
+}
+
+.browseSidePanel .actionable-button:hover {
+    background-color: COLOR_PRIMARY_HOVER;
 }
 
 .thumbnailCardList {
@@ -3138,6 +3180,22 @@ td.datePickerMonth, td.datePickerYear {
 
 .tagGreen {
     background-color: COLOR_GREEN;
+}
+
+.tagLightRed {
+    background-color: COLOR_RED_LIGHT;
+}
+
+.tagLightYellow {
+    background-color: COLOR_YELLOW_LIGHT;
+}
+
+.tagMono {
+    font-family: FONT_MONOSPACED;
+}
+
+.labelWithIconReversed {
+    flex-direction: row-reverse;
 }
 
 .thumbnailCardAttributes {
@@ -3789,7 +3847,7 @@ td.datePickerMonth, td.datePickerYear {
     display: none;
 }
 
-/* @end */ /* @end */ 
+/* @end */ /* @end */
 
 /** Arrangement table **/
 .wui-browse-arrangementTable { /*	background-color: white;*/
@@ -3926,6 +3984,13 @@ td.datePickerMonth, td.datePickerYear {
 /**********************************************
 				DEFAULT SEARCH + ADV SEARCH
 ************************************************/
+.searchWrapper {
+    background-color: white;
+    padding: 16px;
+    border-radius: 4px;
+    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
+}
+
 .searchPanelContainer {
     margin-bottom: 30px;
 }
@@ -3954,9 +4019,8 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchPanel {
-    margin-right: 80px;
     height: 4rem;
-    background-color: #eee;
+    display: flex;
 }
 
 .searchPanelLeft {
@@ -3979,8 +4043,7 @@ td.datePickerMonth, td.datePickerYear {
 .searchInputListBox .dropdown-label,
 .searchInputListBoxPopup .dropdown-item {
     line-height: 4rem;
-    background-color: COLOR_PRIMARY;
-    color: white;
+    color: black;
     border: none;
     padding: 0 0 0 0;
     padding-left: 20px;
@@ -3989,6 +4052,7 @@ td.datePickerMonth, td.datePickerYear {
     position: relative;
     white-space: nowrap;
     overflow: hidden;
+    font-size: 14px;
 }
 
 .searchPanelLeft .selected-count-panel {
@@ -4002,7 +4066,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchInputListBox .dropdown-label:after {
     line-height: 40px;
-    font-size: 20px;
+    font-size: 16px;
     position: absolute;
     right: 0px;
     width: 40px;
@@ -4015,9 +4079,8 @@ td.datePickerMonth, td.datePickerYear {
     color: white;
 }
 
-.searchPanelLeft .searchPanelLeftInput {
-    display: table-cell;
-    width: 100%;
+.searchPanel .searchPanelLeftInput {
+    flex: 1;
     vertical-align: top;
 }
 
@@ -4088,7 +4151,8 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 2rem;
     border: none;
     padding: 0 1rem;
-    background-color: #eee;
+    background-color: COLOR_GREY_VERYLIGHTEST;
+    border-bottom: 2px solid COLOR_GREY_LIGHT;
 }
 
 .searchBox::-webkit-input-placeholder,
@@ -5201,20 +5265,20 @@ td.datePickerMonth, td.datePickerYear {
 
 #upload-list li span.icon:after {
     display: inline-block;
-    
+
     font-size: 2rem;
     line-height: 2rem;
     width: 2rem;
     height: 2rem;
-    
+
     content: "\f00c";
     @mixin fontawesome();
-    
+
     position: absolute;
     top: 20px;
     right: 20px;
     cursor: pointer;
-    
+
     color: #24c279;
     -webkit-animation: none;
     -moz-animation: none;
@@ -6178,7 +6242,6 @@ td.datePickerMonth, td.datePickerYear {
 ************************************************/
 .gwt-PopupPanelGlass {
     background-color: rgba(0, 0, 0, 0.25);
-    z-index: 5;
 }
 
 .office-window-dock {
@@ -7497,9 +7560,13 @@ span.code {
   Navigation Toolbar
  */
 .navigationToolbar {
-    min-height: 35px;
-    line-height: 35px;
+    display: flex;
     position: relative;
+    background-color: white;
+    flex-direction: row;
+    align-items: center;
+    padding: 16px 32px;
+    font-size: 12px;
 }
 
 .navigationToolbar-alt {
@@ -7510,7 +7577,6 @@ span.code {
 .navigationToolbar .navigationToolbarHeaderArrow {
     display: inline-block;
     vertical-align: bottom;
-    font-size: 1.6rem;
     color: #222;
 }
 
@@ -7527,13 +7593,16 @@ span.code {
 .navigationToolbar .navigationToolbarBreadcrumb {
     margin: 0;
     padding: 0;
-    display: inline-block;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    flex: 1;
 }
 
 .navigationToolbar .navigationToolbarIcons {
-    position: absolute;
-    top: 0;
-    right: 0;
+    display: flex;
+    flex-directoin: row;
+    align-items: center;
 }
 
 .navigationToolbar .navigationToolbarIcons .navigationToolbarLink {
@@ -7542,14 +7611,8 @@ span.code {
 
 .navigationToolbarLink {
     display: inline-block;
-    font-size: 20px;
-    line-height: 35px;
-    width: 35px;
-    height: 35px;
     cursor: pointer;
     cursor: hand;
-    color: white;
-    background-color: #999;
     text-align: center;
     /*border-left: 1px SOLID WHITE;*/
 }
@@ -7561,42 +7624,59 @@ span.code {
     height: 25px;
 }
 
+.navigationToolbarLink {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    height: 32px;
+    width: 32px;
+}
+
+.navigationToolbarLink.disabled {
+    color: COLOR_GREY_LIGHT;
+}
+
 .navigationToolbarLink:hover,
 .navigationToolbarLink-selected,
 .navigationToolbarLink.active,
 .navigationToolbar-alt .navigationToolbarLink:hover,
 .navigationToolbar-alt .navigationToolbarLink-selected,
 .navigationToolbar-alt .navigationToolbarLink.active {
-    color: white;
-    background-color: COLOR_PRIMARY;
+    color: COLOR_PRIMARY;
+    background-color: COLOR_BLUE_LIGHT;
+    border-radius: 128px;
+}
+
+.navigationToolbarLink.disabled:hover,
+.navigationToolbarLink-selected.disabled,
+.navigationToolbarLink.disabled.active,
+.navigationToolbar-alt.disabled .navigationToolbarLink.disabled:hover,
+.navigationToolbar-alt.disabled .navigationToolbarLink-selected.disabled,
+.navigationToolbar-alt.disabled .navigationToolbarLink.disabled.active {
+    color: COLOR_GREY_LIGHT;
+    background-color: transparent;
 }
 
 .navigationToolbarLink.disabled,
 .navigationToolbarLink.disabled:hover {
-    background-color: #ddd;
     cursor: auto;
 }
 
 .navigationToolbar-alt .navigationToolbarLink {
-    background-color: #eee;
     color: #999;
 }
 
 .navigationToolbar-alt .navigationToolbarLink.disabled,
 .navigationToolbar-alt .navigationToolbarLink.disabled:hover {
-    color: #ddd;
+    color: COLOR_GREY_LIGHT;
     background-color: #eee;
 }
 
 .navigationToolbarPagination {
     display: inline-block;
-    line-height: 35px;
-    height: 35px;
-    color: white;
-    background-color: #999;
     text-align: center;
     width: auto;
-    font-size: 14px;
     vertical-align: top;
     padding: 0 5px 0 5px;
 }
@@ -7844,6 +7924,268 @@ span.code {
       content: '\f071';
         @mixin fontawesome();
 }
+
+/******************************
+  Object toolbar
+ ******************************/
+
+.objectToolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    background-color: COLOR_GREY_VERYLIGHTEST;
+}
+
+.objectToolbarLabel {
+    background-color: COLOR_PRIMARY;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 32px;
+    font-size: 11px;
+    text-transform: uppercase;
+    gap: 8px;
+}
+
+.objectToolbarTags {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.objectToolbarTags .tag {
+    font-size: 10px;
+}
+
+.objectToolbarActions {
+    display: flex;
+    flex-direction: row;
+    white-space: nowrap;
+    gap: 16px;
+}
+
+.objectToolbarActions .verticalDivider {
+    align-self: stretch;
+}
+
+.groupedActionableMenu {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+}
+
+.groupedActionableMenu > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.objectToolbar button,
+.groupedActionableMenu button, .groupedActionableMenu .actionable-button,
+.groupedActionableDropdown button, .groupedActionableDropdown .actionable-button
+ {
+    display: flex;
+    flex-direction: row-reverse;
+    flex: 1;
+    gap:4px;
+    align-items: center;
+    font-family: 'Inter';
+    font-size: 12px;
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.objectToolbar button:hover, .groupedActionableMenu button:hover,
+.groupedActionableMenu .actionable-button:hover{
+    background-color: COLOR_BLUE_LIGHT;
+    color: COLOR_PRIMARY;
+}
+
+.popupAnchor {
+    position: relative;
+}
+
+.groupedActionableDropdown {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    background-color: white;
+    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
+    border-radius: 4px;
+}
+
+.groupedActionableDropdown button:not(:first-child) {
+    border-top: 1px solid COLOR_GREY_LIGHT;
+}
+
+.groupedActionableDropdown button:first-child {
+    border-radius: 4px 0px 0px 0px;
+}
+
+.groupedActionableDropdown button:last-child {
+    border-radius: 0px 0px 4px 0px;
+}
+
+.groupedActionableDropdown .actionable-button {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 8px;
+    white-space: nowrap;
+}
+
+.groupedActionableDropdown .actionable-button:hover {
+    background-color: COLOR_GREY_VERYLIGHT;
+}
+
+.groupedActionableDropdown .actionable-button:after {
+    display:none
+
+}
+
+
+/******************************
+  RODA 6 Tabs
+ ******************************/
+
+.tabsContainer {
+
+}
+
+.tabsHeader {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid COLOR_BLUE_LIGHT;
+    margin-bottom: 16px;
+}
+
+.tabButtonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 16px 5px 16px;
+    border-bottom: 2px solid transparent;
+}
+
+.tabSelected {
+    color: COLOR_PRIMARY;
+    border-bottom: 2px solid COLOR_PRIMARY;
+}
+
+.tabSelected .tabButton {
+    color: COLOR_PRIMARY;
+    background-color: transparent;
+}
+
+.tabButton {
+    padding: 8px;
+    border: none;
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 14px;
+    background-color: transparent;
+}
+
+.tabButton:hover {
+    color: COLOR_PRIMARY;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+
+/******************************
+  Descriptive metadata tabs
+ ******************************/
+
+.descriptiveMetadataTabs {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 16px;
+}
+
+.descriptiveMetadataTabs .tabsHeader {
+    width: 250px;
+    flex-direction: column;
+}
+
+.descriptiveMetadataTabs .tabContent {
+    flex: 1;
+    background-color: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
+}
+
+.descriptiveMetadataTabs .objectToolbar {
+    background-color: transparent;
+}
+
+.descriptiveMetadataTabs .tabsHeader {
+    border: none;
+}
+
+.descriptiveMetadataTabs .tabButtonContainer {
+    text-transform: none;
+    border-bottom: 1px solid COLOR_GREY_LIGHT;
+    padding: 8px 2px 5px;
+    justify-content: start;
+}
+
+.descriptiveMetadataTabs .tabButtonContainer .tabButton {
+    font-size: 12px;
+    padding: 8px 2px;
+    text-transform: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.descriptiveMetadataTabs .tabButtonContainer.tabSelected {
+    font-weight: bold;
+    border-bottom: 2px solid COLOR_PRIMARY;
+}
+
+.descriptiveMetadataTabs .tabButtonContainer.tabSelected  button{
+    font-weight: bold;
+}
+
+.descriptiveMetadataTabs .descriptiveMetadata {
+    padding: 24px 32px;
+}
+
+.descriptiveMetadataTabs .tabButtonContainer:last-child {
+    border: none;
+}
+
+.descriptiveMetadataTabs .tabButtonContainer .linkButton {
+    padding: 8px 2px;
+}
+
+
+/******************************
+  RODA 6 buttons
+ ******************************/
+
+ .linkButton {
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    background-color: transparent;
+    color: COLOR_PRIMARY;
+    text-transform: uppercase;
+    display: flex;
+    gap: 8px;
+ }
+
+ .linkButton:hover {
+    cursor: pointer;
+    border-bottom: 1px solid COLOR_PRIMARY;
+ }
+
+
 
 /******************************
   Plugin info

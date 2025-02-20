@@ -100,6 +100,7 @@ public class BreadcrumbPanel extends FlowPanel {
         add(createSeparator());
       }
       Breadcrumb breadcrumb = breadcrumbs.get(i);
+      breadcrumb.setRoot(i == 0);
       breadcrumb.setLast(i == breadcrumbs.size() - 1);
       add(breadcrumb);
     }
@@ -111,6 +112,8 @@ public class BreadcrumbPanel extends FlowPanel {
     private BreadcrumbItem item;
 
     private boolean enabled;
+
+    private boolean root;
 
     private boolean last;
 
@@ -127,6 +130,7 @@ public class BreadcrumbPanel extends FlowPanel {
 
       this.item = item;
       enabled = true;
+      root = false;
       last = true;
 
       addStyleName("breadcrumb");
@@ -168,6 +172,20 @@ public class BreadcrumbPanel extends FlowPanel {
      */
     public BreadcrumbItem getItem() {
       return item;
+    }
+
+    /**
+     * Set if this breadcrumb a root one. The root breadcrumb has a different style.
+     * 
+     * @param root
+     */
+    public void setRoot(boolean root) {
+      this.root = root;
+      if (root) {
+        this.addStyleName("breadcrumb-root");
+      } else {
+        this.removeStyleName("breadcrumb-root");
+      }
     }
 
     /**
