@@ -18,7 +18,7 @@ import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NavigationToolbarLegacy;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UpSalePanel;
@@ -166,7 +166,7 @@ public class IngestTransfer extends Composite {
   Label itemDates;
 
   @UiField
-  NavigationToolbar<TransferredResource> navigationToolbar;
+  NavigationToolbarLegacy<TransferredResource> navigationToolbar;
 
   private NoAsyncCallback<Actionable.ActionImpact> actionCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
     @Override

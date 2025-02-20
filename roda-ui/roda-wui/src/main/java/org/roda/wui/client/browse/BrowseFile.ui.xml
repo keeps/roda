@@ -8,7 +8,7 @@
 
 	<wcag:AccessibleFocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="viewRepresentationFile">
-			<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.catalogueFileTitle}" />
+			<common:NavigationToolbarLegacy ui:field="navigationToolbar" header="{messages.catalogueFileTitle}" />
 			<g:FlowPanel addStyleNames="viewRepresentationFile-center" ui:field="center">
 				<b:IndexedFilePreview addStyleNames="viewRepresentationFilePreview" ui:field="filePreview" />
 			</g:FlowPanel>

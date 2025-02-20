@@ -6,7 +6,7 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 	<g:FlowPanel styleName="wui-disposal-policy-association-data" addStyleNames="wrapper skip_padding">
-		<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.catalogueItemTitle}" />
+		<common:NavigationToolbarLegacy ui:field="navigationToolbar" header="{messages.catalogueItemTitle}" />
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content" ui:field="content">
 				<common:TitlePanel ui:field="titlePanel" />

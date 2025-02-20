@@ -398,7 +398,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     // MANAGEMENT
     ActionableGroup<IndexedRepresentation> managementGroup = new ActionableGroup<>(messages.representation());
     managementGroup.addButton(messages.newRepresentationButton(), RepresentationAction.NEW, ActionImpact.UPDATED,
-      "btn-plus-circle");
+      "btn-plus");
     managementGroup.addButton(messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, ActionImpact.UPDATED,
       "btn-edit");
     managementGroup.addButton(messages.changeStatusButton(), RepresentationAction.CHANGE_STATE, ActionImpact.UPDATED,

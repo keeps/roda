@@ -7,7 +7,7 @@
 
 	<g:FocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="wui-browse-representation" addStyleNames="wrapper skip_padding">
-			<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.catalogueRepresentationTitle}" />
+			<common:NavigationToolbarLegacy ui:field="navigationToolbar" header="{messages.catalogueRepresentationTitle}" />
 			<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
 				<g:FlowPanel addStyleNames="col_12 content">
 					<!-- STATUS -->

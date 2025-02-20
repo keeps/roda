@@ -40,7 +40,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NavigationToolbarLegacy;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.DisseminationFileActions;
@@ -377,7 +377,7 @@ public class BrowseDIP extends Composite {
       layout.addStyleName("browseDip-topList");
     }
 
-    NavigationToolbar<IsIndexed> bottomNavigationToolbar = new NavigationToolbar<>();
+    NavigationToolbarLegacy<IsIndexed> bottomNavigationToolbar = new NavigationToolbarLegacy<>();
     bottomNavigationToolbar.withObject(dipFile != null ? dipFile : dip);
 
     bottomNavigationToolbar.withActionImpactHandler(Actionable.ActionImpact.DESTROYED, () -> {
@@ -406,7 +406,7 @@ public class BrowseDIP extends Composite {
       bottomNavigationToolbar.withAlternativeStyle(true);
 
       Runnable deleteActionImpactHandler;
-      NavigationToolbar<IsIndexed> topNavigationToolbar = new NavigationToolbar<>();
+      NavigationToolbarLegacy<IsIndexed> topNavigationToolbar = new NavigationToolbarLegacy<>();
       ListSelectionUtils.ProcessRelativeItem<IsIndexed> processor;
       String title;
 
