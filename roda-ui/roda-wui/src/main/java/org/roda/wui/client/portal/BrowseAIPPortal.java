@@ -25,7 +25,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.DipFilePreview;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NavigationToolbarLegacy;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.actions.Actionable;
@@ -120,7 +120,7 @@ public class BrowseAIPPortal extends Composite {
     }
   };
   @UiField
-  NavigationToolbar<IndexedAIP> navigationToolbar;
+  NavigationToolbarLegacy<IndexedAIP> navigationToolbar;
   @UiField
   HTML aipState;
   // IDENTIFICATION

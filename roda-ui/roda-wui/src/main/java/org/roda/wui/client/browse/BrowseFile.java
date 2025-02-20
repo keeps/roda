@@ -27,7 +27,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NavigationToolbarLegacy;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.model.BrowseFileResponse;
@@ -214,7 +214,7 @@ public class BrowseFile extends Composite {
   FlowPanel center;
 
   @UiField
-  NavigationToolbar<IndexedFile> navigationToolbar;
+  NavigationToolbarLegacy<IndexedFile> navigationToolbar;
 
   public BrowseFile(Viewers viewers, final BrowseFileResponse response, IndexedFile indexedFile, Services services) {
     final boolean justActive = AIPState.ACTIVE.equals(response.getIndexedAIP().getState());

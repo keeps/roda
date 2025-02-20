@@ -7,7 +7,7 @@
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="wui-ingest-transfer" addStyleNames="wrapper skip_padding">
-		<common:NavigationToolbar ui:field="navigationToolbar" visible="false" />
+		<common:NavigationToolbarLegacy ui:field="navigationToolbar" visible="false" />
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
 				<common:TitlePanel text="{messages.ingestTransferTitle}" iconClass="TransferredResource"

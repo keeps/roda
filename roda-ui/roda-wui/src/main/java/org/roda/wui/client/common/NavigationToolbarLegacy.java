@@ -41,7 +41,7 @@ import com.google.gwt.user.client.ui.*;
 
 import config.i18n.client.ClientMessages;
 
-public class NavigationToolbar<T extends IsIndexed> extends Composite implements HasHandlers {
+public class NavigationToolbarLegacy<T extends IsIndexed> extends Composite implements HasHandlers {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
@@ -90,33 +90,33 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     }
   };
 
-  public NavigationToolbar() {
+  public NavigationToolbarLegacy() {
     initWidget(uiBinder.createAndBindUi(this));
     withModifierKeys(true, false, false);
     hideButtons();
   }
 
-  public NavigationToolbar<T> withObject(T object) {
+  public NavigationToolbarLegacy<T> withObject(T object) {
     this.currentObject = object;
     return this;
   }
 
-  public NavigationToolbar<T> withoutButtons() {
+  public NavigationToolbarLegacy<T> withoutButtons() {
     this.skipButtonSetup = true;
     return this;
   }
 
-  public NavigationToolbar<T> withProcessor(ProcessRelativeItem<T> processor) {
+  public NavigationToolbarLegacy<T> withProcessor(ProcessRelativeItem<T> processor) {
     this.processor = processor;
     return this;
   }
 
-  public NavigationToolbar<T> withPermissions(Permissions permissions) {
+  public NavigationToolbarLegacy<T> withPermissions(Permissions permissions) {
     this.permissions = permissions;
     return this;
   }
 
-  public NavigationToolbar<T> withAlternativeStyle(boolean useAltStyle) {
+  public NavigationToolbarLegacy<T> withAlternativeStyle(boolean useAltStyle) {
     toolbarPanel.setStyleDependentName("alt", useAltStyle);
     return this;
   }
@@ -131,8 +131,8 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     return disseminationsButton;
   }
 
-  public NavigationToolbar<T> withModifierKeys(boolean requireControlKeyModifier, boolean requireShiftKeyModifier,
-    boolean requireAltKeyModifier) {
+  public NavigationToolbarLegacy<T> withModifierKeys(boolean requireControlKeyModifier, boolean requireShiftKeyModifier,
+                                                     boolean requireAltKeyModifier) {
     this.requireControlKeyModifier = requireControlKeyModifier;
     this.requireShiftKeyModifier = requireShiftKeyModifier;
     this.requireAltKeyModifier = requireAltKeyModifier;
@@ -221,7 +221,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     actionsButton.setVisible(visible);
   }
 
-  public NavigationToolbar<T> withActionImpactHandler(Actionable.ActionImpact actionImpact, Runnable handler) {
+  public NavigationToolbarLegacy<T> withActionImpactHandler(Actionable.ActionImpact actionImpact, Runnable handler) {
     this.handlers.put(actionImpact, handler);
     return this;
   }
@@ -363,7 +363,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     searchPopupClickHandler = null;
   }
 
-  interface MyUiBinder extends UiBinder<Widget, NavigationToolbar> {
+  interface MyUiBinder extends UiBinder<Widget, NavigationToolbarLegacy> {
   }
 
   private static class SearchPopup extends CalloutPopup {
