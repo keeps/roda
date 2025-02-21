@@ -1953,6 +1953,10 @@ public interface ClientMessages extends Messages {
 
   String dateRangeFieldTo();
 
+  String genericRangeFieldFrom();
+
+  String genericRangeFieldTo();
+
   String inputStorageSizeList();
 
   String removableTextBox();

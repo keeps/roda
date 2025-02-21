@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
@@ -57,7 +58,8 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
   private FlowPanel leftPanel;
   private FlowPanel inputPanel;
   private Button remove = new Button("<i class=\"fa fa-close\"></i>");
-  private Label duplicateWarning;
+  private SimplePanel duplicateWarningPanel;
+  private Label duplicateWarningLabel;
 
   private SearchField searchField;
 
@@ -74,15 +76,21 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
   // Date
   private DateBox inputDateBox;
   // Date interval
+  private Label inputDateBoxFromLabel;
   private DateBox inputDateBoxFrom;
+  private Label inputDateBoxToLabel;
   private DateBox inputDateBoxTo;
   // Numeric
   private TextBox inputNumeric;
   // Numeric interval
+  private Label inputNumericFromLabel;
   private TextBox inputNumericFrom;
+  private Label inputNumericToLabel;
   private TextBox inputNumericTo;
   // Storage
+  private Label inputStorageSizeFromLabel;
   private TextBox inputStorageSizeFrom;
+  private Label inputStorageSizeToLabel;
   private TextBox inputStorageSizeTo;
   private ListBox inputStorageSizeList;
   // Boolean
@@ -100,7 +108,8 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     fieldLabel = new Label();
     fieldBox = new ListBox();
     searchAdvancedFields = new ListBox();
-    duplicateWarning = new Label();
+    duplicateWarningPanel = new SimplePanel();
+    duplicateWarningLabel = new Label();
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
 
@@ -119,44 +128,50 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputDateBox.getDatePicker().setYearAndMonthDropdownVisible(true);
     inputDateBox.getDatePicker().setYearArrowsVisible(true);
     inputDateBox.setFireNullValues(true);
-    inputDateBox.getElement().setPropertyString("placeholder", messages.searchFieldDatePlaceHolder());
+    // inputDateBox.getElement().setPropertyString("placeholder", messages.searchFieldDatePlaceHolder());
     inputDateBox.getTextBox().addKeyDownHandler(keyDownHandler);
 
+    inputDateBoxFromLabel = new Label(messages.genericRangeFieldFrom());
     inputDateBoxFrom = new DateBox();
     inputDateBoxFrom.setFormat(dateFormat);
     inputDateBoxFrom.getDatePicker().setYearAndMonthDropdownVisible(true);
     inputDateBoxFrom.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxFrom.setFireNullValues(true);
-    inputDateBoxFrom.getElement().setPropertyString("placeholder", messages.searchFieldDateFromPlaceHolder());
+    // inputDateBoxFrom.getElement().setPropertyString("placeholder", messages.searchFieldDateFromPlaceHolder());
     inputDateBoxFrom.getTextBox().addKeyDownHandler(keyDownHandler);
 
+    inputDateBoxToLabel = new Label(messages.genericRangeFieldTo());
     inputDateBoxTo = new DateBox();
     inputDateBoxTo.setFormat(dateFormat);
     inputDateBoxTo.getDatePicker().setYearAndMonthDropdownVisible(true);
     inputDateBoxTo.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxTo.setFireNullValues(true);
-    inputDateBoxTo.getElement().setPropertyString("placeholder", messages.searchFieldDateToPlaceHolder());
+    // inputDateBoxTo.getElement().setPropertyString("placeholder", messages.searchFieldDateToPlaceHolder());
     inputDateBoxTo.getTextBox().addKeyDownHandler(keyDownHandler);
 
     inputNumeric = new TextBox();
-    inputNumeric.getElement().setPropertyString("placeholder", messages.searchFieldNumericPlaceHolder());
+    // inputNumeric.getElement().setPropertyString("placeholder", messages.searchFieldNumericPlaceHolder());
     inputNumeric.getElement().setAttribute("type", "number");
     inputNumeric.addKeyDownHandler(keyDownHandler);
+    inputNumericFromLabel = new Label(messages.genericRangeFieldFrom());
     inputNumericFrom = new TextBox();
-    inputNumericFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
+    // inputNumericFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
     inputNumericFrom.getElement().setAttribute("type", "number");
     inputNumericFrom.addKeyDownHandler(keyDownHandler);
+    inputNumericToLabel = new Label(messages.genericRangeFieldTo());
     inputNumericTo = new TextBox();
-    inputNumericTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
+    // inputNumericTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
     inputNumericTo.getElement().setAttribute("type", "number");
     inputNumericTo.addKeyDownHandler(keyDownHandler);
 
+    inputStorageSizeFromLabel = new Label(messages.genericRangeFieldFrom());
     inputStorageSizeFrom = new TextBox();
-    inputStorageSizeFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
+    // inputStorageSizeFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
     inputStorageSizeFrom.getElement().setAttribute("type", "number");
     inputStorageSizeFrom.addKeyDownHandler(keyDownHandler);
+    inputStorageSizeToLabel = new Label(messages.genericRangeFieldTo());
     inputStorageSizeTo = new TextBox();
-    inputStorageSizeTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
+    // inputStorageSizeTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
     inputStorageSizeTo.getElement().setAttribute("type", "number");
     inputStorageSizeTo.addKeyDownHandler(keyDownHandler);
     inputStorageSizeList = new ListBox();
@@ -193,18 +208,19 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     fieldLabel.addStyleName("search-field-label");
     fieldBox.addStyleName("form-listbox");
     searchAdvancedFields.addStyleName("form-listbox");
-    duplicateWarning.addStyleName("search-field-warning-label");
-    duplicateWarning.setVisible(false);
+    duplicateWarningPanel.addStyleName("search-field-warning-panel");
+    duplicateWarningLabel.addStyleName("search-field-warning-label");
+    duplicateWarningPanel.setVisible(false);
 
     inputText.addStyleName("form-textbox");
     inputDateBox.addStyleName("form-textbox form-textbox-small");
-    inputDateBoxFrom.addStyleName("form-textbox form-textbox-small");
-    inputDateBoxTo.addStyleName("form-textbox form-textbox-small");
+    inputDateBoxFrom.addStyleName("form-textbox");
+    inputDateBoxTo.addStyleName("form-textbox");
     inputNumeric.addStyleName("form-textbox form-textbox-small");
-    inputNumericFrom.addStyleName("form-textbox form-textbox-small");
-    inputNumericTo.addStyleName("form-textbox form-textbox-small");
-    inputStorageSizeFrom.addStyleName("form-textbox form-textbox-small");
-    inputStorageSizeTo.addStyleName("form-textbox form-textbox-small");
+    inputNumericFrom.addStyleName("form-textbox");
+    inputNumericTo.addStyleName("form-textbox");
+    inputStorageSizeFrom.addStyleName("form-textbox");
+    inputStorageSizeTo.addStyleName("form-textbox");
     inputStorageSizeList.addStyleName("form-listbox");
     inputCheckBox.addStyleName("form-checkbox");
     inputControlled.addStyleName("form-controlled");
@@ -319,7 +335,8 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     leftPanel.add(inputPanel);
     setInputPanel(searchField.getType(), searchField.getLabel());
     panel.add(remove);
-    panel.add(duplicateWarning);
+    panel.add(duplicateWarningPanel);
+    duplicateWarningPanel.setWidget(duplicateWarningLabel);
     panel.removeStyleName("full_width");
   }
 
@@ -345,7 +362,9 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
       inputPanel.add(inputDateBox);
       inputDateBox.getElement().setAttribute("title", label);
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)) {
+      inputPanel.add(inputDateBoxFromLabel);
       inputPanel.add(inputDateBoxFrom);
+      inputPanel.add(inputDateBoxToLabel);
       inputPanel.add(inputDateBoxTo);
       inputDateBoxFrom.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldFrom() + ")");
       inputDateBoxTo.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldTo() + ")");
@@ -353,12 +372,16 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
       inputPanel.add(inputNumeric);
       inputPanel.getElement().setAttribute("title", label);
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)) {
+      inputPanel.add(inputNumericFromLabel);
       inputPanel.add(inputNumericFrom);
+      inputPanel.add(inputNumericToLabel);
       inputPanel.add(inputNumericTo);
       inputDateBoxFrom.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldFrom() + ")");
       inputDateBoxTo.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldTo() + ")");
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)) {
+      inputPanel.add(inputStorageSizeFromLabel);
       inputPanel.add(inputStorageSizeFrom);
+      inputPanel.add(inputStorageSizeToLabel);
       inputPanel.add(inputStorageSizeTo);
       inputPanel.add(inputStorageSizeList);
       inputStorageSizeFrom.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldFrom() + ")");
@@ -447,11 +470,10 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
   }
 
   public void setWarningVisible(boolean visible, String field) {
-    duplicateWarning.setVisible(visible);
+    duplicateWarningPanel.setVisible(visible);
 
     if (visible) {
-      duplicateWarning.setText(messages.searchDuplicateWarningMessage(field));
-      duplicateWarning.getElement().getStyle().setMarginLeft(searchAdvancedFields.getOffsetWidth() + 2, Unit.PX);
+      duplicateWarningLabel.setText(messages.searchDuplicateWarningMessage(field));
       panel.removeStyleName("search-field");
       panel.addStyleName("search-field-warning");
     } else {

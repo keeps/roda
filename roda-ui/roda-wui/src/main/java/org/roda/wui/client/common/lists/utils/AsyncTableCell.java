@@ -238,7 +238,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
     dataProvider.addDataDisplay(display);
 
-    resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.LEFT,
+    resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.CENTER,
       GWT.create(SimplePager.Resources.class), false, initialPageSize, false, false,
       GWT.create(SimplePager.ImageButtonsConstants.class));
     resultsPager.setDisplay(display);
@@ -247,7 +247,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     pageSizePager.setDisplay(display);
 
     Button csvDownloadButton = new Button(messages.tableDownloadCSV());
-    csvDownloadButton.addStyleName("btn btn-link csvDownloadButton");
+    csvDownloadButton.addStyleName("btn btn-link btn-download csvDownloadButton");
     csvDownloadButton.setVisible(options.isCsvDownloadButtonVisibility());
 
     sidePanel = new FlowPanel();
@@ -1082,19 +1082,24 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
             boolean facetIsSelected = facetResult.getSelectedValues().contains(value);
             StringBuilder checkboxLabel = new StringBuilder();
             checkboxLabel.append(label);
-            if (count > 0 || facetResult.getSelectedValues().isEmpty() || facetIsSelected) {
-              checkboxLabel.append(" (").append(count).append(")");
-            }
 
             CheckBox facetValuePanel = new CheckBox(checkboxLabel.toString());
             facetValuePanel.setTitle(checkboxLabel.toString());
-            facetValuePanel.addStyleName("sidebar-facet-label");
-            facetValuePanel.addStyleName("fade-out");
+            facetValuePanel.addStyleName("sidebar-facet-label fade-out");
+
+            FlowPanel facetValueRow = new FlowPanel();
+            facetValueRow.addStyleName("sidebar-facet-row");
+            facetValueRow.add(facetValuePanel);
+            if (count > 0 || facetResult.getSelectedValues().isEmpty() || facetIsSelected) {
+              Label countLabel = new Label(String.valueOf(count));
+              countLabel.addStyleName("sidebar-facet-count");
+              facetValueRow.add(countLabel);
+            }
 
             boolean enabled = count > 0 || !facetResult.getSelectedValues().isEmpty();
             facetValuePanel.setEnabled(enabled);
 
-            facetPanel.add(facetValuePanel);
+            facetPanel.add(facetValueRow);
             facetValuePanel.setValue(facetIsSelected);
 
             facetValuePanel.addValueChangeHandler(facetValueChangedEvent -> {
@@ -1244,6 +1249,10 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       originalFilter = this.getFilter();
       refresh();
     }
+  }
+
+  public FlowPanel getSidePanel() {
+    return this.sidePanel;
   }
 
   enum AutoUpdateState {
