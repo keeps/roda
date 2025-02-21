@@ -8,46 +8,42 @@
 
     <g:FlowPanel styleName="searchPanelContainer">
         <g:FlowPanel styleName="searchPanel" ui:field="searchPanel">
-            <g:FlowPanel styleName="searchPanelLeft">
-                <g:SimplePanel ui:field="searchPanelSelectionDropdownWrapper"/>
-                <commonsearch:SelectedPanel ui:field="searchSelectedPanel"/>
-                <g:FlowPanel styleName="searchPanelLeftInput">
-                    <g:TextBox title="{messages.searchButton}" ui:field="searchInputBox" addStyleNames="searchBox"/>
-                </g:FlowPanel>
+            <g:SimplePanel ui:field="searchPanelSelectionDropdownWrapper"/>
+            <commonsearch:SelectedPanel ui:field="searchSelectedPanel"/>
+            <g:FlowPanel styleName="searchPanelLeftInput">
+                <g:TextBox title="{messages.searchButton}" ui:field="searchInputBox" addStyleNames="searchBox"/>
             </g:FlowPanel>
-            <g:FlowPanel styleName="searchPanelRight" ui:field="searchPanelRight">
-                <wcag:AccessibleFocusPanel styleName="searchAdvancedDisclosureButton"
-                                           ui:field="searchAdvancedDisclosureButton">
-                    <g:HTML addStyleNames="searchButton-html" ui:field="searchButton">
-                        <span class="searchButton-html-label">
-                            <ui:text from='{messages.searchButtonAdvancedSearch}'/>
-                        </span>
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-angle-down fa-stack-1x">
-                            </i>
-                            <i class="fa fa-angle-up fa-stack-1x">
-                            </i>
-                        </span>
-                    </g:HTML>
-                </wcag:AccessibleFocusPanel>
-                <wcag:AccessibleFocusPanel styleName="searchButton" ui:field="searchInputButton">
-                    <g:HTML addStyleNames="searchButton-html">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-search fa-stack-1x">
-                            </i>
-                        </span>
-                    </g:HTML>
-                </wcag:AccessibleFocusPanel>
-                <wcag:AccessibleFocusPanel styleName="actions-button searchPanelButtonsSeparator"
-                                           ui:field="actionsButton">
-                    <g:HTML>
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-ellipsis-v fa-stack-1x">
-                            </i>
-                        </span>
-                    </g:HTML>
-                </wcag:AccessibleFocusPanel>
-            </g:FlowPanel>
+            <wcag:AccessibleFocusPanel styleName="searchAdvancedDisclosureButton"
+                                       ui:field="searchAdvancedDisclosureButton">
+                <g:HTML addStyleNames="searchButton-html" ui:field="searchButton">
+                    <span class="searchButton-html-label">
+                        <ui:text from='{messages.searchButtonAdvancedSearch}'/>
+                    </span>
+                    <span class="fa-stack fa-lg">
+                        <i class="fa fa-angle-down fa-stack-1x">
+                        </i>
+                        <i class="fa fa-angle-up fa-stack-1x">
+                        </i>
+                    </span>
+                </g:HTML>
+            </wcag:AccessibleFocusPanel>
+            <wcag:AccessibleFocusPanel styleName="searchButton" ui:field="searchInputButton">
+                <g:HTML addStyleNames="searchButton-html">
+                    <span class="fa-stack fa-lg">
+                        <i class="fa fa-search fa-stack-1x">
+                        </i>
+                    </span>
+                </g:HTML>
+            </wcag:AccessibleFocusPanel>
+            <wcag:AccessibleFocusPanel styleName="actions-button searchPanelButtonsSeparator"
+                                       ui:field="actionsButton">
+                <g:HTML>
+                    <span class="fa-stack fa-lg">
+                        <i class="fa fa-ellipsis-v fa-stack-1x">
+                        </i>
+                    </span>
+                </g:HTML>
+            </wcag:AccessibleFocusPanel>
         </g:FlowPanel>
         <g:FlowPanel addStyleNames="searchAdvancedPanel" ui:field="searchAdvancedPanel">
             <g:FlowPanel styleName="searchAdvancedPanelButtons" ui:field="searchAdvancedPanelButtons">

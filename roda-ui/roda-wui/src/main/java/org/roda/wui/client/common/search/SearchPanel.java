@@ -113,9 +113,6 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   @UiField
   SimplePanel searchPanelSelectionDropdownWrapper;
 
-  @UiField
-  FlowPanel searchPanelRight;
-
   private Filter defaultFilter;
   private String allFilter;
   private boolean defaultFilterIncremental = false;
@@ -156,7 +153,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     // setup search input textfield and search button
     searchInputButton.addClickHandler(event -> doSearch());
     searchInputBox.getElement().setPropertyString("placeholder",
-      placeholder == null ? messages.searchPlaceHolder() : placeholder);
+      placeholder == null ? "" : placeholder);
     searchInputBox.addKeyDownHandler(event -> {
       if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
         doSearch();
@@ -245,8 +242,6 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     searchSelectedPanel.setVisible(selectedPanelVisible);
 
     drawSearchPreFilters();
-
-    updateRightButtonsCss();
 
     if (!showSaveButton) {
       searchAdvancedSave.setVisible(false);
@@ -428,10 +423,8 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
           Collections.singletonList(action));
 
         // add single action CSS
-
         // insert this button before actionsbutton
-        searchPanelRight.insert(widget, searchPanelRight.getWidgetIndex(actionsButton));
-        updateRightButtonsCss();
+        searchPanel.insert(widget, searchPanel.getWidgetIndex(actionsButton));
       } else {
         GWT.log("Could not resolve. Action '" + actionName + "' for class '" + list.getClassToReturn().getSimpleName()
           + "' was not found.");
@@ -503,20 +496,5 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     }
     drawSearchPreFilters();
     return filter;
-  }
-
-  private void updateRightButtonsCss() {
-    // supports 0-9 buttons
-    int count = 0;
-    count += searchAdvancedDisclosureButton.isVisible() ? 1 : 0;
-    count += searchInputButton.isVisible() ? 1 : 0;
-    count += actionsButton.isVisible() ? 1 : 0;
-
-    int maximum = searchPanelRight.getWidgetCount();
-    for (int i = 1; i <= maximum; i++) {
-      searchPanel.removeStyleName("searchPanelButtons-" + i);
-    }
-
-    searchPanel.addStyleName("searchPanelButtons-" + count);
   }
 }
