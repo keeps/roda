@@ -1,0 +1,51 @@
+package org.roda.wui.client.common.labels;
+
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.HTML;
+
+/**
+ *
+ * @author Alexandre Flores <aflores@keep.pt>
+ */
+public class Header extends HTML {
+  private int level = 1;
+  private String styleName = "";
+  private String text = "";
+  private String icon = "";
+
+  public Header() {
+    super();
+  }
+
+  public void setLevel(int level) {
+    this.level = level;
+    rebuildHTML();
+  }
+
+  public void setHeaderStyleName(String styleName) {
+    this.styleName = styleName;
+    rebuildHTML();
+  }
+
+  public void setTitleText(String text) {
+    this.text = text;
+    rebuildHTML();
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
+    rebuildHTML();
+  }
+
+  private void rebuildHTML() {
+    SafeHtmlBuilder builder = new SafeHtmlBuilder();
+    builder.append(SafeHtmlUtils.fromSafeConstant("<h" + level + " class=\"" + styleName + " rodaTitleHeader\">"));
+    if (icon != null && !icon.isEmpty()) {
+      builder.append(SafeHtmlUtils.fromSafeConstant("<i class=\"" + icon + "\"></i>"));
+    }
+    builder.append(SafeHtmlUtils.fromSafeConstant(text));
+    builder.append(SafeHtmlUtils.fromSafeConstant("</h" + level + ">"));
+    setHTML(builder.toSafeHtml());
+  }
+}
