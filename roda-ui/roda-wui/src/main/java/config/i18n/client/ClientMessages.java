@@ -670,6 +670,21 @@ public interface ClientMessages extends Messages {
 
   String aipType();
 
+  String descriptiveMetadataTab();
+
+  String preservationEventsTab();
+
+  String auditLogsTab();
+
+  String risksTab();
+
+  String disposalTab();
+
+  String permissionsTab();
+
+  String detailsTab();
+
+
   /************* Search ****************/
   String searchDropdownLabels(@Select String objectClass);
 

@@ -89,9 +89,11 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
 
     FlowPanel item = new FlowPanel();
 
-    InlineHTML iconPanel = new InlineHTML();
-    iconPanel.setHTML(createHtmlForIcon(icon));
-    item.add(iconPanel);
+    if (icon != null) {
+      InlineHTML iconPanel = new InlineHTML();
+      iconPanel.setHTML(createHtmlForIcon(icon));
+      item.add(iconPanel);
+    }
 
     Label labelWidget = new Label(label);
     item.addStyleName("dropdown-item");
