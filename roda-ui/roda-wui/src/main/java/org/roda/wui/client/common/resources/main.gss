@@ -59,7 +59,7 @@
 @def FONT_MONOSPACED "Roboto_Mono", "UbuntuMono", "Lucida Console", Monaco, monospace;
 
 @defmixin fontawesome() {
-	font-family: 'Font Awesome 5 Free';
+	font-family: 'CustomMaterialIcons', 'Font Awesome 5 Free';
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -758,7 +758,7 @@ pre code {
     font-weight: 300;
 }
 
-.searchAdvancedPanel .fieldTextBox, .searchAdvancedPanel .form-textbox, .loginPanel .fieldTextBox, .dialog-right-side .form-textbox, .relation-form-panel .form-textbox {
+.loginPanel .fieldTextBox, .dialog-right-side .form-textbox, .relation-form-panel .form-textbox {
     border: 1px solid #ccc;
     background-color: #fff;
 }
@@ -1188,6 +1188,15 @@ button:after {
      content: "\f12d";
 }
 
+.ma {
+    font-family: 'CustomMaterialIcons';
+    font-style: normal;
+}
+
+.ma-tune:after {
+    content: "\e91e";
+}
+
 .appendIconAttribute:after {
     content: attr(icon);
 }
@@ -1351,6 +1360,16 @@ button:after {
     padding: 1rem 1.5rem 0 1.5rem;
 }
 
+.searchWrapperSidePanel .my-asyncdatagrid-side-panel {
+    margin-left: 16px;
+    padding: 16px;
+    background-color: transparent;
+}
+
+.searchWrapperSidePanel .my-asyncdatagrid-side-panel {
+    width: 250px;
+}
+
 .col_12 .my-asyncdatagrid-side-panel {
     margin-left: 30px;
 }
@@ -1373,6 +1392,67 @@ button:after {
     font-weight: 500;
     margin-bottom: 0.2rem;
     color: #4b4a4a;
+}
+
+.searchWrapperSidePanel .my-asyncdatagrid-side-panel .h5 {
+    margin-top: 0;
+    font-size: 10px;
+    font-weight: 300;
+    margin-bottom: 0;
+    color: COLOR_GREY_DARK;
+    text-transform: uppercase;
+}
+
+.searchWrapperSidePanel .sidebar-facet-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.searchWrapperSidePanel .sidebar-facet-panel.facet-empty {
+    display: none;
+}
+
+.searchWrapper .btn-link {
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+    padding: 0;
+    box-sizing: border-box;
+    gap: 8px;
+    margin-left: 16px;
+}
+
+.searchWrapper .btn-link:hover {
+    border-bottom: 1px solid COLOR_PRIMARY;
+    text-decoration: none;
+}
+
+.searchWrapper .btn-link:after {
+    display: inline-block;
+    position: static;
+}
+
+.searchWrapper a.gwt-Anchor {
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+    padding: 0;
+    box-sizing: border-box;
+    gap: 8px;
+    background-color: transparent;
+    color: COLOR_PRIMARY;
+    text-transform: uppercase;
+    align-items: center;
+    font-weight: 600;
+    margin-right: 16px;
+}
+
+.searchWrapper a.gwt-Anchor:hover {
+    background-color: transparent;
+    color: COLOR_PRIMARY;
+    border-bottom: 1px solid COLOR_PRIMARY;
+    text-decoration: none;
 }
 
 .my-asyncdatagrid-pager-results {
@@ -1420,6 +1500,7 @@ button:after {
     width: 100%;
     table-layout: fixed;
     margin-top: 0.6rem;
+    margin-bottom: 32px;
 }
 
 .my-asyncdatagrid .panel {
@@ -1610,12 +1691,21 @@ button:after {
     border: 1px solid #eee;
     position: absolute;
     z-index: 9;
-    box-shadow: 0 0px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    box-shadow: 0 2px 4px 0 COLOR_SHADOW;
+    border-radius: 4px;
+}
+
+.dropdown-popup .dropdown-item {
+    padding: 4px;
+}
+
+.dropdown-popup tr:last-child .dropdown-item {
+    border-radius: 0 0 4px 4px;
 }
 
 .dropdown-label,
 .dropdown-item {
-    padding: 5px;
+    padding: 0;
     background-color: white;
     min-width: 150px;
     cursor: pointer;
@@ -2420,10 +2510,34 @@ td.datePickerMonth, td.datePickerYear {
     white-space: nowrap;
     margin-bottom: 5px;
     font-size: 1.2rem;
+    text-transform: capitalize;
 }
 
 .sidebar-facet-label label {
     vertical-align: top;
+}
+
+.sidebar-facet-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.sidebar-facet-row .sidebar-facet-label {
+    flex: 1;
+}
+
+.searchWrapper .sidebar-facet-label.fade-out:after {
+    background: linear-gradient(-90deg, COLOR_GREY_VERYLIGHT 30%, rgba(255, 255, 255, 0) 100%);
+}
+
+.sidebar-facet-count {
+    background-color: COLOR_BLUE_LIGHT;
+    color: COLOR_PRIMARY;
+    font-size: 1.2rem;
+    border-radius: 64px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
 }
 
 .facet-input-panel {
@@ -3985,10 +4099,16 @@ td.datePickerMonth, td.datePickerYear {
 				DEFAULT SEARCH + ADV SEARCH
 ************************************************/
 .searchWrapper {
+    display: flex;
+    align-items: start;
+}
+
+.searchWrapperMainPanel {
     background-color: white;
     padding: 16px;
     border-radius: 4px;
     box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
+    flex: 1;
 }
 
 .searchPanelContainer {
@@ -4019,14 +4139,37 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchPanel {
-    height: 4rem;
+    height: 100%;
     display: flex;
+    gap: 16px;
+    align-items: center;
 }
 
 .searchPanelLeft {
     float: left;
     width: 100%;
     display: table;
+}
+
+.searchPanel .dropdown {
+    height: 100%;
+}
+
+.searchPanel .dropdown .dropdown-panel {
+    height: 100%;
+}
+
+.searchPanel .dropdown .dropdown-panel .dropdown-label {
+    height: 100%;
+}
+
+.searchPanel .selected-count-panel {
+    display: flex;
+    align-items: center;
+}
+
+.searchPanel .selected-count-panel i {
+    display: none;
 }
 
 .searchInputListBox,
@@ -4036,25 +4179,29 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchInputListBoxPopup {
+ border-radius: 4px;
     border-top: 2px solid white;
 }
 
 .searchPanelLeft .selected-count-panel,
 .searchInputListBox .dropdown-label,
 .searchInputListBoxPopup .dropdown-item {
-    line-height: 4rem;
     color: black;
     border: none;
-    padding: 0 0 0 0;
-    padding-left: 20px;
-    padding-right: 35px;
-    min-width: 165px;
+    min-width: 220px;
     position: relative;
     white-space: nowrap;
     overflow: hidden;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
 }
 
+.searchInputListBoxPopup tr:not(:first-child) {
+    border-top: 1px solid COLOR_GREY_LIGHT;
+}
 .searchPanelLeft .selected-count-panel {
     min-width: 0;
     padding-right: 20px;
@@ -4065,11 +4212,8 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchInputListBox .dropdown-label:after {
-    line-height: 40px;
     font-size: 16px;
-    position: absolute;
-    right: 0px;
-    width: 40px;
+    width: 16px;
     text-align: center;
     padding: 0;
 }
@@ -4152,7 +4296,7 @@ td.datePickerMonth, td.datePickerYear {
     border: none;
     padding: 0 1rem;
     background-color: COLOR_GREY_VERYLIGHTEST;
-    border-bottom: 2px solid COLOR_GREY_LIGHT;
+    border-bottom: 1px solid COLOR_GREY_LIGHT;
 }
 
 .searchBox::-webkit-input-placeholder,
@@ -4166,8 +4310,6 @@ td.datePickerMonth, td.datePickerYear {
     cursor: hand;
     position: relative;
     float: left;
-    width: 40px;
-    background-color: #999;
 }
 
 .advancedSearchButton {
@@ -4179,17 +4321,52 @@ td.datePickerMonth, td.datePickerYear {
     float: right;
 }
 
-.searchAdvancedDisclosureButton {
-    background-color: #eee;
-    color: rgba(0, 0, 0, 0.5);
+.searchWrapper .searchAdvancedDisclosureButton {
+    color: COLOR_PRIMARY;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    height: 32px;
+    width: 32px;
+}
+
+.searchWrapper .searchAdvancedDisclosureButton:hover {
+   background-color: COLOR_BLUE_LIGHT;
+   border-radius: 64px;
+}
+
+.searchWrapper .searchAdvancedDisclosureButton i {
+    font-size: 18px;
+}
+
+.searchButton {
+    background-color: COLOR_PRIMARY;
+    color: white;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 6px 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 4px
 }
 
 .searchButton:hover {
-    background-color: COLOR_PRIMARY;
+    background-color: COLOR_PRIMARY_HOVER;
 }
 
 .searchButton-html {
-    font-size: 15px;
+    display:flex;
+    gap: 8px;
+}
+
+.searchButton-html i {
+    font-size: 17px;
+
 }
 
 .searchButton-html-label {
@@ -4213,7 +4390,7 @@ td.datePickerMonth, td.datePickerYear {
     display: block;
 }
 
-.searchAdvancedDisclosureButton.open .fa-angle-down {
+.searchAdvancedDisclosureButton.open .ma-tune {
     display: none;
 }
 
@@ -4263,16 +4440,46 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchAdvancedPanel {
-    padding: 20px !important;
+    padding: 20px 0 !important;
     min-height: auto;
-    background-color: #eee;
-    border-top: 2px solid COLOR_PRIMARY;
+}
+
+.searchAdvancedPanel .form-textbox {
+    background-color: COLOR_GREY_VERYLIGHTEST;
+    border-bottom: 1px solid COLOR_GREY_LIGHT;
+    border-left: none;
+    flex: 1;
+}
+
+.searchAdvancedPanel .form-listbox {
+    border:none;
+    padding: 0;
+    margin: 0;
+    margin-left: -4px;
+    font-size: 14px;
+    color: black;
+    min-width: 224px;
 }
 
 .searchAdvancedFieldsPanel {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     margin-bottom: 15px;
 }
+
+.searchAdvancedPanel .search-field,
+.searchAdvancedPanel .search-field-warning {
+    max-width: 750px;
+    display: flex;
+}
+
+.searchAdvancedPanel .search-field-left-panel {
+    flex: 1;
+    display: flex;
+    gap: 16px;
+}
+
 
 .search-field {
     margin-right: 20px;
@@ -4284,11 +4491,17 @@ td.datePickerMonth, td.datePickerYear {
     height: 50px;
 }
 
+.search-field-warning-panel {
+    position: absolute;
+}
+
 .search-field-warning-label {
     font-size: 1.1rem;
-    color: #999;
+    color: COLOR_GREY_MEDIUM;
     position: absolute;
-	width: 100%;
+    top: 35px;
+    left: 236px;
+	width: 750px;
 }
 
 .search-field.full_width {
@@ -4312,8 +4525,13 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .search-field-left-panel .search-field-input-panel {
-    display: table-cell;
-    vertical-align: top;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.search-field-left-panel .search-field-input-panel .gwt-Label {
+    text-transform: capitalize;
 }
 
 .search-field-left-panel .search-field-input-panel.full_width {
@@ -4336,7 +4554,7 @@ td.datePickerMonth, td.datePickerYear {
     background: transparent;
     cursor: pointer;
     cursor: hand;
-    color: rgba(0, 0, 0, 0.5);
+    color: black;
 }
 
 .search-field-dialog {
@@ -7326,6 +7544,27 @@ span.code {
     display: block;
 }
 
+.ActionableStyleMenu .popupContent .actionable-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.ActionableStyleMenu .popupContent .actionable-menu .actionable-button {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: start;
+    align-items: center;
+    border: none;
+    margin: 0;
+    padding: 8px;
+    gap: 8px;
+    background-color: transparent;
+}
+
+.ActionableStyleMenu .popupContent .actionable-menu .actionable-button:hover {
+    background-color: COLOR_GREY_LIGHT;
+}
+
 .ActionableStyleButtons .actionable-title,
 .ActionableStyleMenu .actionable-title {
     display:none;
@@ -7345,7 +7584,7 @@ span.code {
 }
 
 .ActionableStyleMenu .actionable-button-destroyed:hover {
-    background-color: rgba(217, 83, 79, 0.4);
+    background-color: rgba(217, 83, 79, 0.4)!important;
 }
 
 .ActionableStyleMenu .actionable-button-update:hover {
