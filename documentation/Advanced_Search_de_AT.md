@@ -4,7 +4,7 @@ Auf der Suchseite können Sie nach intellektuellen Entitäten, Repräsentationen
 
 Die Suchmaschine findet nur ganze Wörter. Wenn Sie nach Teilbegriffen suchen möchten, verwenden Sie bitte "*".
 
-## Suchoperatoren
+## Suchfunktionen
 
 Folgende Suchoperatoren stehen zur Verfügung:
 
