@@ -30,7 +30,7 @@ Optional:
 
 
 ### 1. SIPs mit dem neuen beschreibenden Metadatentyp und der neuen beschreibenden Metadatenversion erstellen
-Auf dem SIP müssen der beschreibende Metadatentyp und die beschreibende Metadatenversion festgelegt werden. Da Sie Ihre eigenen Metadaten verwenden, sollten Sie den Metadatentyp ANDERE, anderen Metadatentyp (z.B. "GolikSwe") und Metadatenversion (z.B. "1") definieren. Dies kann direkt in METS oder mit Hilfe der [RODA-in-Anwendung] (http://rodain.roda-community.org/) oder der [commons-ip-Bibliothek] (https://github.com/keeps/commons-ip) geschehen.
+Auf dem SIP müssen der beschreibende Metadatentyp und die beschreibende Metadatenversion festgelegt werden. Da Sie Ihre eigenen Metadaten verwenden, sollten Sie den Metadatentyp ANDERE, anderen Metadatentyp, wie etwa "GolikSwe", und Metadatenversion, wie z.B. "1", definieren. Dies kann direkt in METS oder mit Hilfe der [RODA-in-Anwendung] (http://rodain.roda-community.org/) oder der [commons-ip-Bibliothek] (https://github.com/keeps/commons-ip) geschehen.
 
 ### 2. RODA für Indexierung eines neuen beschreibenden Metadatenformats konfigurieren
 Bei RODA muss konfiguriert werden, wie diese Datei indexiert werden kann. Dazu muss das XSLT unter `$RODA_HOME/config/crosswalks/ingest/` mit einem Namen hinterlegt werden, der sich aus dem Metadatentyp und der Metadatenversion ergibt.
