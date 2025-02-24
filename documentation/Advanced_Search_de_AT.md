@@ -6,7 +6,7 @@ Die Suchmaschine findet nur ganze Wörter. Wenn Sie nach Teilbegriffen suchen m�
 
 ## Suchfunktionen
 
-Folgende Suchoperatoren stehen zur Verfügung:
+Folgende Suchfunktionen stehen zur Verfügung:
 
 - Genaue Angabe (z.B. "Max Mustermann")
 - Angabe beginnt mit (z.B. "Max M*")
