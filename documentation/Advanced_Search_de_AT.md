@@ -8,7 +8,7 @@ Die Suchmaschine findet nur ganze Wörter. Wenn Sie nach Teilbegriffen suchen m�
 
 Folgende Suchfunktionen stehen zur Verfügung:
 
-- Volltext (z.B. "Max Mustermann")
+- Exakter Wortlaut (z.B. "Max Mustermann")
 - Angabe beginnt mit (z.B. "Max M*")
 - Zeichen ignorieren (z.B. Max Mustermann?)
 - Begriff ausschließen (z.B. -Max Mustermann)
