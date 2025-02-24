@@ -13,7 +13,7 @@ Folgende Suchfunktionen stehen zur Verfügung:
 - Zeichen ignorieren (z.B. Max Mustermann?)
 - Begriff ausschließen (z.B. -Max Mustermann)
 - Ähnlicher Begriff (z.B. Mustermann~)
-- Nummernkreis (z.B. 1900..2000)
+- Zahlenbereich (z.B. 1900..2000)
 - Auswahl (z.B. Max oder Mustermann)
 
 ## In benutzerdefinierten Metadatenfeldern suchen
