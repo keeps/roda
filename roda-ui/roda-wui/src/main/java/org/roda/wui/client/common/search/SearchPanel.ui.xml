@@ -16,21 +16,17 @@
             <wcag:AccessibleFocusPanel styleName="searchAdvancedDisclosureButton"
                                        ui:field="searchAdvancedDisclosureButton">
                 <g:HTML addStyleNames="searchButton-html" ui:field="searchButton">
-                    <span class="searchButton-html-label">
-                        <ui:text from='{messages.searchButtonAdvancedSearch}'/>
-                    </span>
-                    <span class="fa-stack fa-lg">
-                        <i class="fa fa-angle-down fa-stack-1x">
-                        </i>
-                        <i class="fa fa-angle-up fa-stack-1x">
-                        </i>
-                    </span>
+                    <i class="ma ma-tune">
+                    </i>
+                    <i class="fa fa-angle-up">
+                    </i>
                 </g:HTML>
             </wcag:AccessibleFocusPanel>
             <wcag:AccessibleFocusPanel styleName="searchButton" ui:field="searchInputButton">
                 <g:HTML addStyleNames="searchButton-html">
-                    <span class="fa-stack fa-lg">
-                        <i class="fa fa-search fa-stack-1x">
+                    Search
+                    <span>
+                        <i class="fa fa-search">
                         </i>
                     </span>
                 </g:HTML>
