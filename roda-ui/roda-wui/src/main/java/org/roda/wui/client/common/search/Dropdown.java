@@ -55,6 +55,7 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
     popupIcons = new HashMap<>();
 
     iconAndLabelPanel.add(selectedIcon);
+    selectedIcon.setVisible(false);
     iconAndLabelPanel.add(selectedLabel);
     panel.add(iconAndLabelPanel);
     focusPanel.add(panel);
@@ -103,7 +104,12 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
       @Override
       public void onClick(ClickEvent event) {
         selectedLabel.setText(label);
-        selectedIcon.setHTML(createHtmlForIcon(icon));
+        if (icon != null) {
+          selectedIcon.setVisible(true);
+          selectedIcon.setHTML(createHtmlForIcon(icon));
+        } else {
+          selectedIcon.setVisible(false);
+        }
         onChange();
         popup();
       }

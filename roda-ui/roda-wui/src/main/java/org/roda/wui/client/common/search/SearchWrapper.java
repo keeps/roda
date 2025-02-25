@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -40,6 +41,8 @@ public class SearchWrapper extends Composite {
   private final String preselectedDropdownValue;
 
   private final FlowPanel rootPanel;
+  private final FlowPanel mainPanel;
+  private final FlowPanel sidePanel;
 
   // this being not null means that lists should be created inside a ScrollPanel
   // and that the ScrollPanel should be using the specified CSS classes
@@ -59,6 +62,12 @@ public class SearchWrapper extends Composite {
 
     rootPanel = new FlowPanel();
     rootPanel.setStyleName("searchWrapper");
+    mainPanel = new FlowPanel();
+    mainPanel.setStyleName("searchWrapperMainPanel");
+    sidePanel = new FlowPanel();
+    sidePanel.setStyleName("searchWrapperSidePanel");
+    rootPanel.add(mainPanel);
+    rootPanel.add(sidePanel);
     initWidget(rootPanel);
   }
 
@@ -117,7 +126,7 @@ public class SearchWrapper extends Composite {
     // add search panel if none has been added yet, note that if there is a
     // preselectedDropdownValue then only the corresponding search panel should be
     // used as the default search panel
-    if (rootPanel.getWidgetCount() == 0) {
+    if (mainPanel.getWidgetCount() == 0) {
       if (preselectedDropdownValue != null) {
         if (preselectedDropdownValue.equals(dropdownValue)) {
           attachComponents(dropdownValue);
@@ -255,14 +264,16 @@ public class SearchWrapper extends Composite {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClassSimpleName);
     AsyncTableCell<T> list = components.getList(objectClassSimpleName);
 
-    rootPanel.clear();
-    rootPanel.add(searchPanel);
+    mainPanel.clear();
+    mainPanel.add(searchPanel);
+    sidePanel.clear();
+    sidePanel.add(list.getSidePanel());
     if (scrollPanelCssClasses != null) {
       ScrollPanel scrollPanel = new ScrollPanel(list);
       scrollPanel.addStyleName(scrollPanelCssClasses);
-      rootPanel.add(scrollPanel);
+      mainPanel.add(scrollPanel);
     } else {
-      rootPanel.add(list);
+      mainPanel.add(list);
     }
 
     if (hasMultipleSearchPanels) {

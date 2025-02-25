@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -19,14 +20,15 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.ConfigurationManager.ColumnOptionsFactory;
+import org.roda.wui.common.client.tools.ConfigurationManager.FacetFactory;
 
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.cellview.client.AbstractHasData.RedrawEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.view.client.SelectionChangeEvent;
-import org.roda.wui.common.client.tools.ConfigurationManager.ColumnOptionsFactory;
-import org.roda.wui.common.client.tools.ConfigurationManager.FacetFactory;
 
 public class AsyncTableCellOptions<T extends IsIndexed> {
   private final Class<T> classToReturn;
