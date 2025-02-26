@@ -113,10 +113,9 @@ public class SearchWrapper extends Composite {
       listBuilder.getOptions().getSearchPlaceholder(), hasMultipleSearchPanels,
       listBuilder.getOptions().getActionable(), listBuilder.getOptions().getActionableCallback(), showSaveButton,
       hideListAfterClear);
-    if (hasMultipleSearchPanels) {
-      initSearchPanelSelectionDropdown();
-      searchPanelSelectionDropdown.addItem(defaultLabelText, dropdownValue, null);
-    } else {
+    initSearchPanelSelectionDropdown();
+    searchPanelSelectionDropdown.addItem(defaultLabelText, dropdownValue, null);
+    if (!hasMultipleSearchPanels) {
       listClassForSingleSearchPanel = listBuilder.getOptions().getClassToReturn().getSimpleName();
     }
     searchPanel.setVisible(searchEnabled);
@@ -276,10 +275,8 @@ public class SearchWrapper extends Composite {
       mainPanel.add(list);
     }
 
-    if (hasMultipleSearchPanels) {
       searchPanelSelectionDropdown.setSelectedValue(objectClassSimpleName, false);
       searchPanel.attachSearchPanelSelectionDropdown(searchPanelSelectionDropdown);
-    }
   }
 
   /**
