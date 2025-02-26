@@ -2,7 +2,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-             xmlns:commonsearch="urn:import:org.roda.wui.client.common.search">
+             xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+             xmlns:common="urn:import:org.roda.wui.client.common">
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
@@ -31,15 +32,6 @@
                     </span>
                 </g:HTML>
             </wcag:AccessibleFocusPanel>
-            <wcag:AccessibleFocusPanel styleName="actions-button searchPanelButtonsSeparator"
-                                       ui:field="actionsButton">
-                <g:HTML>
-                    <span class="fa-stack fa-lg">
-                        <i class="fa fa-ellipsis-v fa-stack-1x">
-                        </i>
-                    </span>
-                </g:HTML>
-            </wcag:AccessibleFocusPanel>
         </g:FlowPanel>
         <g:FlowPanel addStyleNames="searchAdvancedPanel" ui:field="searchAdvancedPanel">
             <g:FlowPanel styleName="searchAdvancedPanelButtons" ui:field="searchAdvancedPanelButtons">
@@ -58,5 +50,6 @@
             </g:FlowPanel>
         </g:FlowPanel>
         <g:FlowPanel addStyleNames="searchPreFilters" ui:field="searchPreFilters"/>
+        <common:ActionsToolbar ui:field="actionsToolbar"></common:ActionsToolbar>
     </g:FlowPanel>
 </ui:UiBinder>
