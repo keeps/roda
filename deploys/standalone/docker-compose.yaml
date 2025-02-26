@@ -69,7 +69,7 @@ services:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 
   roda:
-    image: ghcr.io/keeps/roda:latest
+    image: ghcr.io/keeps/roda:staging
     restart: unless-stopped
     ports:
       - "8080:8080"
