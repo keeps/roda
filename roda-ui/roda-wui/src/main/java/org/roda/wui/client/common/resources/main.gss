@@ -178,10 +178,9 @@ ol {
 }
 
 .label {
-    font-size: px;
+    font-size: 1.5rem;
     font-weight: 300;
-    color: COLOR_GREY_MEDIUM;
-    flex: 0.3;
+    color: #999;
 }
 
 .col_card {
@@ -196,9 +195,8 @@ ol {
 }
 
 .value {
-    font-size: 14px;
-    color: black;
-    flex: 1;
+    font-size: 1.6rem;
+    color: rgb(88, 89, 91);
 }
 
 .value a {
@@ -207,8 +205,6 @@ ol {
 
 .field {
     margin-bottom: 1rem;
-    display: flex;
-    flex-direction: row;
 }
 
 .field ul {
@@ -697,12 +693,11 @@ pre code {
 	font-size: 0.8em;
 }
 
-
 .form-separator {
 	color: COLOR_PRIMARY;
-	font-size: 14px;
-	font-weight: bold;
-	margin: 3em -15px 0 -15px !important;
+	font-size: 1.6rem;
+	font-weight: 300;
+	margin: 1em -15px 0 -15px !important;
 	padding: 5px 15px !important;
 }
 
@@ -1014,6 +1009,10 @@ button:after {
 
 .btn-plus:after {
     content: "\f055";
+}
+
+.btn-calendar:after {
+    content: "\e908";
 }
 
 
@@ -1722,6 +1721,20 @@ button:after {
     display: inline-block;
 
     content: "\f107";
+    @mixin fontawesome();
+
+    font-size: inherit;
+
+    float: right;
+    line-height: 2.5rem;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.selected-count-panel:after {
+    display: inline-block;
+
+    content: "\e910";
     @mixin fontawesome();
 
     font-size: inherit;
@@ -4106,13 +4119,24 @@ td.datePickerMonth, td.datePickerYear {
 .searchWrapperMainPanel {
     background-color: white;
     padding: 16px;
-    border-radius: 4px;
+    border-radius: 8px;
     box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
     flex: 1;
 }
 
+.searchWrapper .objectToolbar {
+    background-color: white;
+    gap: 0;
+    min-height: 32px;
+    margin-top: 16px;
+}
+
+.searchWrapper .objectToolbar .groupedActionableEmptyHelp {
+    display: none;
+}
+
 .searchPanelContainer {
-    margin-bottom: 30px;
+    margin-bottom: 16px;
 }
 
 .searchPanelContainer.with-prefilters{
@@ -4185,7 +4209,8 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchPanelLeft .selected-count-panel,
 .searchInputListBox .dropdown-label,
-.searchInputListBoxPopup .dropdown-item {
+.searchInputListBoxPopup .dropdown-item,
+.searchWrapper .selected-count-panel {
     color: black;
     border: none;
     min-width: 220px;
@@ -8236,6 +8261,7 @@ span.code {
     border-radius: 4px;
     cursor: pointer;
     padding: 8px;
+    margin: 0;
 }
 
 .objectToolbar button:hover, .groupedActionableMenu button:hover,
@@ -8401,6 +8427,31 @@ span.code {
 
 .descriptiveMetadataTabs .tabButtonContainer .linkButton {
     padding: 8px 2px;
+}
+
+.descriptiveMetadata .label {
+    font-size: 14px;
+    font-weight: 300;
+    color: COLOR_GREY_MEDIUM;
+    flex: 0.3;
+}
+
+.descriptiveMetadata .field {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: row;
+}
+
+.descriptiveMetadata .value {
+    font-size: 14px;
+    color: black;
+    flex: 1;
+}
+
+.descriptiveMetadata .form-separator {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 3em -15px 0 -15px !important;
 }
 
 

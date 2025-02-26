@@ -1,9 +1,6 @@
 package org.roda.wui.client.common;
 
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.labels.LabelWithIcon;
-import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
@@ -68,6 +65,11 @@ public class ActionsToolbar extends Composite {
     actionButton.addClickHandler(onClick);
     actionButton.addStyleName(buttonStyle);
     actions.add(actionButton);
+  }
+
+  public void setActionableMenu(Widget actionableMenu) {
+    actions.clear();
+    actions.add(actionableMenu);
   }
 
   interface MyUiBinder extends UiBinder<Widget, ActionsToolbar> {

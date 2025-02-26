@@ -1028,7 +1028,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     ActionableBundle<IndexedAIP> aipActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.intellectualEntity(), "fa fa-search",
+    ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.intellectualEntity(), "btn-search",
       false);
     managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP_TOP, ActionImpact.UPDATED,
       "btn-plus-circle");
@@ -1043,7 +1043,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     // PRESERVATION
     ActionableGroup<IndexedAIP> preservationGroup = new ActionableGroup<>(messages.preservationTitle(),
-      "fa fa-play-circle", true);
+      "btn-play-circle", true);
     preservationGroup.addButton(messages.newProcessPreservation(), AipAction.NEW_PROCESS, ActionImpact.UPDATED,
       "btn-play");
 
@@ -1064,11 +1064,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       "btn-download");
 
     // Disposal
-    ActionableGroup<IndexedAIP> disposalGroup = new ActionableGroup<>(messages.disposalTitle());
+    ActionableGroup<IndexedAIP> disposalGroup = new ActionableGroup<>(messages.disposalTitle(), "btn-calendar", false);
     disposalGroup.addButton(messages.associateDisposalScheduleButton(), AipAction.ASSOCIATE_DISPOSAL_SCHEDULE,
-      ActionImpact.NONE, "fas fa-calendar");
+      ActionImpact.NONE, "btn-calendar");
     disposalGroup.addButton(messages.associateDisposalHoldButton(), AipAction.ASSOCIATE_DISPOSAL_HOLD,
-      ActionImpact.NONE, "fas fa-lock");
+      ActionImpact.NONE, "btn-lock");
 
     aipActionableBundle.addGroup(managementGroup).addGroup(disposalGroup).addGroup(preservationGroup)
       .addGroup(appraisalGroup).addGroup(downloadGroup);
