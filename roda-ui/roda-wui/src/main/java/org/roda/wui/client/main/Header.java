@@ -141,7 +141,7 @@ public class Header extends Composite {
     homeLinkArea.addClickHandler(event -> HistoryUtils.newHistory(Welcome.RESOLVER));
     homeLinkArea.setTitle(messages.homeTitle());
 
-    about = customMenuItem("fa fa-home", messages.title("about"), "navigationMenu-item-label", null,
+    about = customMenuItem("cmi cmi-home largeIcon", "", "navigationMenu-item-label", null,
       createCommand(Welcome.RESOLVER.getHistoryPath()));
 
     disseminationBrowse = new MenuItem(messages.title("browse"), createCommand(BrowseTop.RESOLVER.getHistoryPath()));

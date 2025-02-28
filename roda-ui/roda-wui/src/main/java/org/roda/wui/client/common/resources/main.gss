@@ -402,6 +402,18 @@ div.inline {
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
+.cardInvisible {
+    background-color: transparent;
+    box-shadow: none;
+    transition: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.cardInvisible:hover {
+    box-shadow: none;
+}
+
 .card + .card {
     margin-top: 30px;
 }
@@ -464,6 +476,38 @@ div.inline {
 
 .browse_top .aipChildrenCard:hover {
 	box-shadow: none;
+}
+
+.browse_aip .aipChildrenCard {
+    box-shadow: none;
+    padding: 0;
+    transition: none;
+}
+
+.browse_aip .aipChildrenCard:hover {
+    box-shadow: none;
+}
+
+.browse_aip .row .content {
+    padding: 0!important;
+    width:100%;
+}
+
+.browse_aip .row .content .upperContent {
+    padding: 30px;
+}
+
+.browse_aip .row .content .lowerContent {
+    padding: 30px;
+    background-color: COLOR_GREY_BGDARKER;
+}
+
+.browse_aip .row .content .lowerContent .card {
+    background-color: transparent;
+}creature
+
+.browse_aip .row .content .lowerContent .card .searchWrapper .sidebar-facet-label.fade-out:after {
+        background: linear-gradient(-90deg, COLOR_GREY_BGDARKER 30%, rgba(255, 255, 255, 0) 100%);
 }
 
 .descriptiveMetadataCard {
@@ -1015,6 +1059,9 @@ button:after {
     content: "\e908";
 }
 
+.btn-lock:after {
+    content: "\f023";
+}
 
 .btn-top:after {
     content: "\f102";
@@ -1360,13 +1407,9 @@ button:after {
 }
 
 .searchWrapperSidePanel .my-asyncdatagrid-side-panel {
-    margin-left: 16px;
     padding: 16px;
     background-color: transparent;
-}
-
-.searchWrapperSidePanel .my-asyncdatagrid-side-panel {
-    width: 250px;
+    margin: 0;
 }
 
 .col_12 .my-asyncdatagrid-side-panel {
@@ -2288,7 +2331,7 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 1.5rem;
 }
 
-.menu-register {
+.user_menu_item_register {
     display: none;
 }
 
@@ -2370,22 +2413,25 @@ td.datePickerMonth, td.datePickerYear {
 
 .userMenu .gwt-MenuItem {
     font-size: 10px !important;
-    font-weight: 300;
+    font-weight: 500;
 }
 
+.userMenu .gwt-MenuItem i {
+    margin-right: 4px;
+}
 .userMenuColors {
     background-color: COLOR_HEADER_USER_BACKGROUND;
     color: COLOR_HEADER_USER_FOREGROUND;
 }
 
 .userMenuColors .gwt-MenuItem {
-    font-weight: 300;
+    font-weight: 500;
 }
 
 .userMenuColors .gwt-MenuItem-selected {
     background-color: COLOR_HEADER_USER_FOREGROUND;
     color: COLOR_HEADER_USER_BACKGROUND;
-    font-weight: 300;
+    font-weight: 500;
 }
 
 .bannerHeader {
@@ -2398,25 +2444,60 @@ td.datePickerMonth, td.datePickerYear {
     z-index: 3;
 }
 
+.bannerHeader .gwt-MenuBar {
+    display: flex;
+    align-items: center;
+}
+
+.bannerHeader table {
+    height: auto
+}
+
+.bannerHeader table tr {
+    line-height: normal;
+}
+
+.bannerHeader  table tr .gwt-MenuItem.navigationMenu-item {
+    padding: 6px;
+}
+
+.bannerHeader  table tr .gwt-MenuItem.navigationMenu-item .largeIcon {
+    font-size: 30px;
+}
+
 .bannerHeader .gwt-MenuItem {
     font-size: 12px !important;
-    font-weight: 300;
+    font-weight: 500;
 }
 
 .bannerHeaderColors {
     background-color: COLOR_HEADER_NAVIGATION_BACKGROUND;
     color: COLOR_HEADER_NAVIGATION_FOREGROUND;
-    font-weight: 300;
+    font-weight: 500;
 }
 
 .bannerHeaderColors .gwt-MenuItem {
-    font-weight: 300;
+    font-weight: 500;
+    border-radius: 4px;
+    padding: 8px 16px;
 }
 
 .bannerHeaderColors .gwt-MenuItem-selected {
-    background-color: COLOR_HEADER_NAVIGATION_FOREGROUND;
-    color: COLOR_HEADER_NAVIGATION_BACKGROUND;
-    font-weight: 300;
+    transition: background-color 0.1s;
+    background-color: COLOR_PRIMARY;
+    font-weight: 500;
+}
+
+.gwt-MenuBarPopup .bannerHeaderColors  tr .gwt-MenuItem {
+    border-radius: 0;
+}
+
+.gwt-MenuBarPopup .bannerHeaderColors tr:last-child .gwt-MenuItem{
+    border-radius: 0 0 4px 4px;
+}
+
+.gwt-MenuBarPopup .gwt-MenuBar {
+    border-radius: 0px 0px 4px 4px;
 }
 
 /**********************************************
@@ -3288,13 +3369,23 @@ td.datePickerMonth, td.datePickerYear {
     height: 204px;
     background-color: white;
     align-items: center;
-    font-size: 16px;
+    font-size: 100px;
+    color: COLOR_GREY_LIGHT;
+    border-radius: 4px;
+}
+
+.thumbnailCardIconThumbnail:hover {
+    cursor: pointer;
 }
 
 .thumbnailCardTags {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.thumbnailCardTags .tag .gwt-Label {
+    justify-content: center;
 }
 
 .tag {
@@ -3305,11 +3396,16 @@ td.datePickerMonth, td.datePickerYear {
     text-align: center;
 }
 
+.tagGrey {
+    background-color: COLOR_GREY_MEDIUM;
+    color: white;
+}
+
 .tagGreen {
     background-color: COLOR_GREEN;
 }
 
-.tagLightRed {
+.tagLightRed .tagRed {
     background-color: COLOR_RED_LIGHT;
 }
 
@@ -3319,6 +3415,41 @@ td.datePickerMonth, td.datePickerYear {
 
 .tagMono {
     font-family: FONT_MONOSPACED;
+}
+
+.tagBorderBlack {
+    border: 1px solid black;
+    color: black;
+}
+
+.tagBorderRed  {
+    border: 1px solid COLOR_RED_LIGHT;
+    color: COLOR_RED_LIGHT;
+}
+
+.tag .gwt-Label {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.tagIconCalendar .gwt-Label:before {
+    @mixin fontawesome();
+    content: "\e908";
+}
+
+.tagIconLock .gwt-Label:before {
+    @mixin fontawesome();
+    content: "\f023";
+}
+
+.tagIconClock .gwt-Label:before {
+    @mixin fontawesome();
+    content: "\e900";
+}
+
+.clickable {
+    cursor: pointer;
 }
 
 .labelWithIconReversed {
@@ -4114,21 +4245,25 @@ td.datePickerMonth, td.datePickerYear {
 .searchWrapper {
     display: flex;
     align-items: start;
+    gap: 16px;
 }
 
 .searchWrapperMainPanel {
     background-color: white;
-    padding: 16px;
     border-radius: 8px;
     box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
     flex: 1;
 }
 
+.searchWrapperSidePanel {
+    max-width: 250px;
+}
+
 .searchWrapper .objectToolbar {
-    background-color: white;
     gap: 0;
     min-height: 32px;
     margin-top: 16px;
+    padding: 8px 16px;
 }
 
 .searchWrapper .objectToolbar .groupedActionableEmptyHelp {
@@ -4148,10 +4283,6 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .card .searchPanelContainer {
-    margin-bottom: 15px;
-    margin-top: -15px;
-    margin-left: -15px;
-    margin-right: -15px;
 }
 
 .browse_top .card .searchPanelContainer {
@@ -4167,6 +4298,7 @@ td.datePickerMonth, td.datePickerYear {
     display: flex;
     gap: 16px;
     align-items: center;
+    padding: 16px 16px 0 16px;
 }
 
 .searchPanelLeft {
@@ -4465,7 +4597,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchAdvancedPanel {
-    padding: 20px 0 !important;
+    padding: 20px 16px !important;
     min-height: auto;
 }
 
@@ -4655,6 +4787,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchPreFilters {
+    padding: 0 16px 16px 16px;
     font-size: 60%;
 }
 
@@ -8266,8 +8399,8 @@ span.code {
 
 .objectToolbar button:hover, .groupedActionableMenu button:hover,
 .groupedActionableMenu .actionable-button:hover{
-    background-color: COLOR_BLUE_LIGHT;
-    color: COLOR_PRIMARY;
+    transition: background-color 0.1s;
+    background-color: COLOR_GREY_LIGHT;
 }
 
 .popupAnchor {
@@ -8379,14 +8512,6 @@ span.code {
 
 .descriptiveMetadataTabs .tabContent {
     flex: 1;
-    background-color: white;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
-}
-
-.descriptiveMetadataTabs .objectToolbar {
-    background-color: transparent;
 }
 
 .descriptiveMetadataTabs .tabsHeader {
@@ -8418,7 +8543,7 @@ span.code {
 }
 
 .descriptiveMetadataTabs .descriptiveMetadata {
-    padding: 24px 32px;
+    padding: 24px 0px;
 }
 
 .descriptiveMetadataTabs .tabButtonContainer:last-child {
@@ -8433,7 +8558,7 @@ span.code {
     font-size: 14px;
     font-weight: 300;
     color: COLOR_GREY_MEDIUM;
-    flex: 0.3;
+    width: 250px;
 }
 
 .descriptiveMetadata .field {
@@ -8454,6 +8579,167 @@ span.code {
     margin: 3em -15px 0 -15px !important;
 }
 
+/******************************
+  Disposal Tabs
+ ******************************/
+
+.disposalAssociationTab {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.disposalAssociationTab .row {
+    margin: 0px;
+}
+
+.disposalAssociationTab .row .content {
+    margin: 0px;
+    min-height: initial;
+}
+
+.disposalAssociationTab .row .content .panel{
+    border: none;
+    background-color: transparent;
+}
+
+.disposalAssociationTab .row .content .wui-disposal-holds-panel button {
+    display: none;
+}
+
+.disposalAssociationTab .panel-body {
+    padding: 0;
+}
+
+.disposalAssociationTab .disposal-policy-summary {
+    margin: 0;
+}
+
+.disposalAssociationTab .label {
+    font-size: 14px;
+    font-weight: 300;
+    color: COLOR_GREY_MEDIUM;
+    width: 250px;
+}
+
+.disposalAssociationTab .field {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: row;
+}
+
+.disposalAssociationTab .value {
+    font-size: 14px;
+    color: black;
+    flex: 1;
+}
+
+.disposalAssociationTab .panel-heading {
+    padding: 0;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.disposalAssociationTab .panel-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.disposalAssociationTab .content > .wui-disposal-holds-panel {
+    margin-top: 32px;
+}
+
+
+
+/******************************
+  Permissions Tab
+ ******************************/
+
+.permissionsTab .row {
+    margin: 0;
+    padding: 0;
+}
+
+.permissionsTab .row .content {
+    min-height: 0;
+}
+
+.permissionsTab .panel.permission {
+    padding: 8px;
+    border: none;
+    background-color: transparent;
+}
+
+.permissionsTab .panel.permission .panel-body {
+    padding: 0;
+}
+
+.permissionsTab .panel.permission .panel-body i {
+    font-size: 12px;
+}
+
+.permissionsTab .permission-tags {
+    display: flex;
+    gap: 8px;
+}
+
+.permissionsTab .permission-tags .permission-tag {
+    font-size: 12px;
+    text-transform: none;
+}
+
+.permissionsTab .panel.permission:nth-child(odd) {
+    background-color: COLOR_GREY_VERYLIGHT;
+}
+
+.permissionsTab .permission .panel-body {
+    background-color: transparent;
+}
+
+
+
+.wui-disposal-schedule-data .form-textbox {
+    background-color: white;
+}
+
+wui-disposal-hold-data .form-textbox {
+    background-color: white;
+}
+
+
+/******************************
+  RODA 6 cards
+ ******************************/
+
+.roda6Card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+}
+
+.roda6CardWithHeader {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
+    display: flex;
+    flex-direction: column;
+}
+
+.roda6CardWithHeader .cardHeader {
+    background-color: COLOR_GREY_VERYLIGHTEST;
+    padding: 8px 16px;
+    border-radius: 8px 8px 0px 0px;
+}
+
+.roda6CardWithHeader .cardBody {
+  padding: 8px 16px;
+}
 
 /******************************
   RODA 6 buttons
@@ -8768,3 +9054,24 @@ span.code {
      margin-top: 10px;
      margin-bottom: 5px;
  }
+
+ /******************************
+   Custom Material Icons
+  ******************************/
+
+.cmi {
+    @mixin fontawesome();
+    font-style: normal;
+}
+
+.cmi-accountTree:after {
+    content: "\e901";
+}
+
+.cmi-home:after {
+    content: "\e920";
+}
+
+.largeIcon {
+    font-size: 20px;
+}

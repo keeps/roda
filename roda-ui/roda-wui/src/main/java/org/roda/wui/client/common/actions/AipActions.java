@@ -1028,8 +1028,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     ActionableBundle<IndexedAIP> aipActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.intellectualEntity(), "btn-search",
-      false);
+    ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.intellectualEntity(), "btn-search");
     managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP_TOP, ActionImpact.UPDATED,
       "btn-plus-circle");
     managementGroup.addButton(messages.newSublevel(), AipAction.NEW_CHILD_AIP_BELOW, ActionImpact.UPDATED,
@@ -1043,7 +1042,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     // PRESERVATION
     ActionableGroup<IndexedAIP> preservationGroup = new ActionableGroup<>(messages.preservationTitle(),
-      "btn-play-circle", true);
+      "btn-play-circle");
     preservationGroup.addButton(messages.newProcessPreservation(), AipAction.NEW_PROCESS, ActionImpact.UPDATED,
       "btn-play");
 
@@ -1064,7 +1063,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       "btn-download");
 
     // Disposal
-    ActionableGroup<IndexedAIP> disposalGroup = new ActionableGroup<>(messages.disposalTitle(), "btn-calendar", false);
+    ActionableGroup<IndexedAIP> disposalGroup = new ActionableGroup<>(messages.disposalTitle(), "btn-calendar");
     disposalGroup.addButton(messages.associateDisposalScheduleButton(), AipAction.ASSOCIATE_DISPOSAL_SCHEDULE,
       ActionImpact.NONE, "btn-calendar");
     disposalGroup.addButton(messages.associateDisposalHoldButton(), AipAction.ASSOCIATE_DISPOSAL_HOLD,

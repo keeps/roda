@@ -1,22 +1,23 @@
 package org.roda.wui.client.common.cards;
 
+import java.util.List;
+import java.util.Map;
+
 import org.roda.wui.client.common.labels.Tag;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -29,7 +30,7 @@ public class ThumbnailCard extends Composite {
   @UiField
   Label title;
   @UiField
-  SimplePanel thumbnail;
+  FocusPanel thumbnail;
   @UiField
   FlowPanel tags;
   @UiField
@@ -37,7 +38,8 @@ public class ThumbnailCard extends Composite {
 
   private boolean collapsed = false;
 
-  public ThumbnailCard(String title, Widget iconThumbnail, List<Tag> tags, Map<String, String> attributes) {
+  public ThumbnailCard(String title, Widget iconThumbnail, List<Tag> tags, Map<String, String> attributes,
+    ClickHandler thumbnailClickHandler) {
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -50,6 +52,7 @@ public class ThumbnailCard extends Composite {
     // Thumbnail
     iconThumbnail.addStyleName("thumbnailCardIconThumbnail");
     this.thumbnail.setWidget(iconThumbnail);
+    this.thumbnail.addClickHandler(thumbnailClickHandler);
 
     // Tags
     for (Tag tag : tags) {

@@ -1,0 +1,25 @@
+<svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="75" cy="75" r="67.5" fill="#25A6D6"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="54.75" cy="73.5" r="24.75" fill="#BBBBBB" fill-opacity="0.3"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<ellipse cx="117.5" cy="114" rx="17.5" ry="17" fill="#BBBBBB" fill-opacity="0.4"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="49.875" cy="102.375" r="13.875" fill="#BABABA" fill-opacity="0.6"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="34" cy="34" r="34" fill="#D9D9D9" fill-opacity="0.5"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="127.5" cy="87.5" r="22.5" fill="#D9D9D9"/>
+</g>
+<path d="M104.529 49.8691H101.387V62.4345H88.8218V65.5759H104.529V49.8691Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M45 75C45 58.339 58.339 45 75 45C87.4769 45 98.6683 52.604 102.994 63.5195L99.7812 64.7925C95.9956 55.239 86.1085 48.4555 75 48.4555C60.2474 48.4555 48.4555 60.2474 48.4555 75C48.4555 89.7526 60.2474 101.545 75 101.545C89.7526 101.545 101.545 89.7526 101.545 75H105C105 91.661 91.661 105 75 105C58.339 105 45 91.661 45 75Z" fill="white"/>
+<path d="M76.2564 56.1519H73.115V78.1414H76.2564V56.1519Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M75.7346 75.7415L86.9587 86.9625L84.5156 89.4062L73.2915 78.1853L75.7346 75.7415Z" fill="white"/>
+<g style="mix-blend-mode:multiply">
+<ellipse cx="50" cy="7.5" rx="50" ry="7.5" transform="matrix(1 0 0 -1 25 142.5)" fill="#D9D9D9"/>
+</g>
+</svg>

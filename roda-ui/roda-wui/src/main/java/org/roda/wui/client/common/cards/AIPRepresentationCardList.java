@@ -9,12 +9,15 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.common.labels.Tag;
+import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.common.cards.utils.CardBuilder;
+import org.roda.wui.client.common.labels.Tag;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HTML;
 
 import config.i18n.client.ClientMessages;
@@ -56,7 +59,11 @@ public class AIPRepresentationCardList extends ThumbnailCardList<IndexedRepresen
             attributes.put(messages.objectLastModifiedShort(), Humanize.formatDate(representation.getUpdatedOn()));
           }
 
-          return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes);
+          ClickHandler thumbnailClickHandler = event -> {
+            HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representation.getId());
+          };
+
+          return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler);
         }
       });
   }

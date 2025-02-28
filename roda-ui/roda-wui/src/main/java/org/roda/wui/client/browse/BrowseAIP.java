@@ -35,7 +35,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.tabs.BrowseTabs;
+import org.roda.wui.client.browse.tabs.BrowseAIPTabs;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -49,6 +49,7 @@ import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.cards.AIPDisseminationCardList;
 import org.roda.wui.client.common.cards.AIPRepresentationCardList;
+import org.roda.wui.client.common.labels.Header;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -56,18 +57,13 @@ import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.DisposalPolicyUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
-import org.roda.wui.client.disposal.association.DisposalPolicyAssociationPanel;
-import org.roda.wui.client.management.UserLog;
-import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.services.AIPRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -91,7 +87,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -135,26 +130,23 @@ public class BrowseAIP extends Composite {
   @UiField
   TitlePanel title;
   @UiField
-  BrowseTabs browseTab;
+  BrowseAIPTabs browseTab;
 
-  // DESCRIPTIVE METADATA
   // AIP CHILDREN
+  @UiField
+  FlowPanel lowerContent;
+  @UiField
+  Header aipChildrenTitle;
   @UiField
   SimplePanel aipChildrenCard;
   @UiField
-  SimplePanel addChildAip;
-  @UiField
-  FlowPanel risksEventsLogs;
-  @UiField
-  FlowPanel disposalPolicy;
-  @UiField
   FlowPanel center;
+
+  // SIDEBAR
   @UiField
-  Label dateCreatedAndModified;
+  FlowPanel sidePanel;
   @UiField
   FlowPanel representationCards;
-  @UiField
-  SimplePanel representationActions;
   @UiField
   FlowPanel disseminationCards;
 
@@ -200,10 +192,13 @@ public class BrowseAIP extends Composite {
       newDescriptiveMetadataRedirect();
     });
     descriptiveMetadataTab.add(newDescriptiveMetadata);
-    browseTab.init(aip, response.getDescriptiveMetadataInfos());
+    browseTab.init(aip, response, response.getDescriptiveMetadataInfos());
     updateSectionDescriptiveMetadata(response.getDescriptiveMetadataInfos());
 
     // AIP CHILDREN
+    aipChildrenTitle.setHeaderText(messages.sublevels());
+    aipChildrenTitle.setIcon("cmi cmi-accountTree");
+    aipChildrenTitle.setLevel(5);
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
       ListBuilder<IndexedAIP> aipChildrenListBuilder;
       if (aip.getState().equals(AIPState.DESTROYED) || aip.isOnHold() || aip.getDisposalConfirmationId() != null) {
@@ -269,33 +264,30 @@ public class BrowseAIP extends Composite {
 
     // IDENTIFICATION
     updateSectionIdentification(response);
-    // DISPOSAL
-    updateDisposalInformation();
 
     // AIP CHILDREN
     if (aip.getState().equals(AIPState.ACTIVE)) {
       if (response.getChildAipsCount().getResult() > 0) {
         LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
-      } else {
-        if (!aip.isOnHold() && aip.getDisposalConfirmationId() == null) {
-          addChildAip.setWidget(
-            new ActionableWidgetBuilder<>(aipActions).buildListWithObjects(new ActionableObject<>(IndexedAIP.class),
-              Collections.singletonList(AipActions.AipAction.NEW_CHILD_AIP_BELOW)));
-        }
       }
 
-      addChildAip.setVisible(response.getRepresentationCount().getResult() == 0);
+      lowerContent.setVisible(response.getChildAipsCount().getResult() > 0);
     }
 
     // Side panel representations
-    this.representationCards.add(new AIPRepresentationCardList(aipId));
-    this.disseminationCards.add(new AIPDisseminationCardList(aipId));
-    this.representationActions.setWidget(new ActionableWidgetBuilder<>(representationActions).buildListWithObjects(
-      new ActionableObject<>(IndexedRepresentation.class),
-      Collections.singletonList(RepresentationActions.RepresentationAction.NEW)));
+    if (response.getRepresentationCount().getResult() > 0 || response.getDipCount().getResult() > 0) {
+      if (response.getRepresentationCount().getResult() > 0) {
+        this.representationCards.add(new AIPRepresentationCardList(aipId));
+      }
+      if (response.getDipCount().getResult() > 0) {
+        this.disseminationCards.add(new AIPDisseminationCardList(aipId));
+      }
+    }
+    else {
+      this.sidePanel.setVisible(false);
+    }
 
     keyboardFocus.setFocus(true);
-    keyboardFocus.addStyleName("here");
   }
 
   public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
@@ -499,65 +491,7 @@ public class BrowseAIP extends Composite {
     title.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
     Sliders.createAipInfoSlider(center, navigationToolbar.getInfoSidebarButton(), response);
 
-    risksEventsLogs.clear();
-
-    if (response.getIncidenceCount().getResult() >= 0) {
-      Anchor risksLink = new Anchor(messages.aipRiskIncidences(response.getIncidenceCount().getResult()),
-        HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, aip.getId()));
-      risksEventsLogs.add(risksLink);
-    }
-
-    if (response.getEventCount().getResult() >= 0) {
-      Anchor eventsLink = new Anchor(messages.aipEvents(response.getEventCount().getResult()),
-        HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, aip.getId()));
-
-      if (response.getIncidenceCount().getResult() >= 0) {
-        if (response.getLogCount().getResult() >= 0) {
-          risksEventsLogs.add(new Label(", "));
-        } else {
-          risksEventsLogs.add(new Label(" " + messages.and() + " "));
-        }
-      }
-
-      risksEventsLogs.add(eventsLink);
-    }
-
-    if (response.getLogCount().getResult() >= 0) {
-      Anchor logsLink = new Anchor(messages.aipLogs(response.getLogCount().getResult()),
-        HistoryUtils.createHistoryHashLink(UserLog.RESOLVER, aip.getId()));
-
-      if (response.getIncidenceCount().getResult() >= 0 || response.getEventCount().getResult() >= 0) {
-        risksEventsLogs.add(new Label(" " + messages.and() + " "));
-      }
-
-      risksEventsLogs.add(logsLink);
-    }
-
     navigationToolbar.updateBreadcrumb(aip, response.getAncestors());
-
-    if (aip.getCreatedOn() != null && StringUtils.isNotBlank(aip.getCreatedBy()) && aip.getUpdatedOn() != null
-      && StringUtils.isNotBlank(aip.getUpdatedBy())) {
-      dateCreatedAndModified.setText(messages.dateCreatedAndUpdated(Humanize.formatDate(aip.getCreatedOn()),
-        aip.getCreatedBy(), Humanize.formatDate(aip.getUpdatedOn()), aip.getUpdatedBy()));
-    } else if (aip.getCreatedOn() != null && StringUtils.isNotBlank(aip.getCreatedBy())) {
-      dateCreatedAndModified
-        .setText(messages.dateCreated(Humanize.formatDateTime(aip.getCreatedOn()), aip.getCreatedBy()));
-    } else if (aip.getUpdatedOn() != null && StringUtils.isNotBlank(aip.getUpdatedBy())) {
-      dateCreatedAndModified
-        .setText(messages.dateUpdated(Humanize.formatDateTime(aip.getUpdatedOn()), aip.getUpdatedBy()));
-    } else {
-      dateCreatedAndModified.setText("");
-    }
-  }
-
-  private void updateDisposalInformation() {
-    if (DisposalPolicyUtils.showDisposalPolicySummary(aip)) {
-      Anchor disposalPolicyLink = new Anchor(DisposalPolicyUtils.getDisposalPolicySummarySafeHTML(aip),
-        HistoryUtils.createHistoryHashLink(DisposalPolicyAssociationPanel.RESOLVER, aip.getId()));
-      disposalPolicy.add(disposalPolicyLink);
-    } else {
-      disposalPolicy.setVisible(false);
-    }
   }
 
   private void getDescriptiveMetadataHTML(final String aipId, final String descId, final DescriptiveMetadataInfo bundle,

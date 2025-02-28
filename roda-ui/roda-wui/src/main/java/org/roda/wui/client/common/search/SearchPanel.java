@@ -167,6 +167,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     actionableBuilder = actionable != null ? new ActionableWidgetBuilder<>(actionable) : null;
     actionsToolbar.setVisible(actionableBuilder != null && actionable.hasAnyRoles() && list.isSelectable());
     actionsToolbar.setLabelVisible(false);
+    actionsToolbar.setTagsVisible(false);
     list.addCheckboxSelectionListener(selectedItems -> {
       if (!list.isVisible()) {
         doSearch();

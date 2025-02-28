@@ -8,11 +8,13 @@
 package org.roda.wui.client.common.utils;
 
 import java.util.Date;
+import java.util.List;
 
 import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
 import org.roda.core.data.v2.disposal.schedule.RetentionPeriodCalculation;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.wui.client.common.labels.Tag;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
@@ -47,6 +49,33 @@ public class DisposalPolicyUtils {
     }
 
     return SafeHtmlUtils.EMPTY_SAFE_HTML;
+  }
+
+  public static Tag getDisposalPolicySummaryTag(IndexedAIP aip) {
+    if (AIPState.ACTIVE.equals(aip.getState())) {
+      DisposalPolicySummary summary = getDisposalPolicySummaryForActiveAIP(aip);
+      switch (summary.getPolicyStatus()) {
+        case DESTROY:
+        case CONFIRMATION:
+        case OVERDUE:
+        case ERROR:
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.DANGER_LIGHT));
+        case REVIEW:
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.WARNING_LIGHT));
+        case HOLD:
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.NEUTRAL));
+        case RETAIN:
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.SUCCESS));
+        case NONE:
+        default:
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.NEUTRAL));
+      }
+    } else if (AIPState.DESTROYED.equals(aip.getState())) {
+      String message = messages.disposalPolicyDestroyedAIPSummary(Humanize.formatDate(aip.getDestroyedOn()));
+      return Tag.fromText(message, List.of(Tag.TagStyle.NEUTRAL, Tag.TagStyle.ICON_CLOCK));
+    }
+
+    return null;
   }
 
   public static String getDisposalPolicySummaryText(IndexedAIP aip) {

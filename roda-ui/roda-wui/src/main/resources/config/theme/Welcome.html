@@ -1,178 +1,306 @@
-<div class="static-page max-width">
-  <h1>Welcome to RODA!</h1>
+<div class="padding-lg hero">
+  <h1 class="title">
+    An open-source digital repository designed for preservation
+  </h1>
+  <hr class="hero-separator" />
+  <div class="hero-details">
+    <p>
+      RODA (Repository of Authentic Digital Records) is a long-term digital
+      repository solution that delivers functionalities for all the main
+      functional units of the OAIS reference model. RODA is capable of
+      ingesting, managing, and providing access to various types of digital
+      content produced by large corporations and public bodies. RODA was
+      developed using open-source technologies and it is supported by standards
+      such as the Open Archival Information System (OAIS), Metadata Encoding and
+      Transmission Standard (METS), Encoded Archival Description (EAD), Dublin
+      Core (DC), E-ARK Information Package specifications and PREMIS
+      (Preservation Metadata).
+    </p>
+  </div>
+  <div class="btn-row">
+    <a
+            class="btn-hero more-info-btn"
+            role="button"
+            href="https://roda-community.org"
+    >More info</a
+    >
+  </div>
+</div>
+<div class="row padding-lg full_width tutorial-roda-community">
+  <div>
+    <h2>Local instance of RODA</h2>
 
-  <h2>An open-source digital repository designed for preservation</h2>
+    <p>Welcome to your local instance of the RODA Community Edition. Please be aware that this edition
+      is devoid of any commercial components or plugins. If you are interested in experiencing these
+      additional features, we invite you to explore the <a
+              href="https://demo.roda-enterprise.com/"
+              title="RODA Enterprise demo"
+              target="_blank"
+      >RODA Enterprise demo</a> or to browse the <a
+              href="https://marketplace.roda-community.com/"
+              title="RODA Marketplace"
+              target="_blank"
+      >RODA Marketplace</a>.
+    </p>
 
-  <p>RODA (Repository of Authentic Digital Records) is a long-term digital
-    repository solution that delivers functionalities for all the main
-    functional units of the OAIS reference model. RODA is capable of ingesting,
-    managing, and providing access to various types of digital content produced
-    by large corporations and public bodies.</p>
+    <p>
+      By default you have an administrative user account. This will allow you full access to all
+      functionalities of the software. Please ensure that you <b>change the administrator user account
+      password</b> before publishing this instance.
+    </p>
 
-  <div class="features">
-    <div class="row full_width skip_padding">
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-trophy"></i>
+    <p>
+      <img alt="RODA default credentials"
+           src="api/v2/themes?resource-id=credentials-access.svg"
+           style="width: 150px"
+      />
+    </p>
+
+    <p>
+      Should you have any questions or require further information, please do not hesitate to <a
+            href="https://github.com/keeps/roda/discussions" target="_blank" title="RODA Discussions">contact
+      us</a>. Enjoy exploring the RODA Community Edition.
+    </p>
+  </div>
+</div>
+
+<div class="row full_width row-highlight padding-lg">
+  <div class="col_6">
+    <h2>Authenticity</h2>
+    <hr class="hero-separator" />
+    <div class="highligth-details">
+      <p>
+        RODA uses PREMIS preservation metadata to create a trust chain between
+        all generations of digital assets.
+      </p>
+      <p>
+        Preservation metadata, together with the establishment of trust of its
+        surrounding environment (ISO 16363 and ISO 14721) ensures that the
+        repository service is reliable, and digital assets remain authentic over
+        time.
+      </p>
+      <p>
+        RODA also supports plugins that assess the validity of digital
+        signatures and re-sign archived PDFs when the lifetime of digital
+        signatures is coming to an end.
+      </p>
+    </div>
+  </div>
+  <div class="col_6">
+    <div class="highlight-image">
+      <img src="api/v2/themes?resource-id=images/authenticity.svg" />
+    </div>
+  </div>
+</div>
+
+<div class="row full_width row-highlight row-highlight-alt padding-lg">
+  <div class="col_6">
+    <div class="highlight-image">
+      <img src="api/v2/themes?resource-id=images/vendor-independent.svg" />
+    </div>
+  </div>
+  <div class="col_6">
+    <h2>Vendor independent</h2>
+    <hr class="hero-separator" />
+    <div class="highligth-details">
+      <p>RODA is built on top of enduring open-source technologies.</p>
+      <p>
+        The entire infrastructure required to support RODA is also vendor
+        independent. This means that you may use the hardware and the Linux
+        distribution that best fit your institutional needs.
+      </p>
+      <p>
+        Because the product itself is open source, you don't have to rely on a
+        single vendor for support. The entire source code of the system is
+        available on GitHub for inspection.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="row-features padding-lg full_width">
+  <div class="row-feature-details">
+    <div class="column-feature-details">
+      <div class="component-row">
+        <div class="component-column">
+          <img
+                  src="api/v2/themes?resource-id=images/conforms-open-standards.svg"
+                  alt="Image 1"
+          />
         </div>
-        <div class="feature-text">
-          Conforms to open standards
-        </div>
-      </div>
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-briefcase"></i>
-        </div>
-        <div class="feature-text">
-          Vendor independent
-        </div>
-      </div>
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-tachometer"></i>
-        </div>
-        <div class="feature-text">
-          Scalable
-        </div>
-      </div>
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-tasks"></i>
-        </div>
-        <div class="feature-text">
-          Embedded preservation actions
+        <div class="component-column">
+          <h6>Conforms to open standards</h6>
+          <hr class="separator-sm" />
+          <p>
+            RODA is compliant with several open descriptive metadata standards
+            such as EAD, and Dublin Core, PREMIS for preservation metadata and
+            METS for structural metadata.
+          </p>
         </div>
       </div>
     </div>
-
-    <div class="row full_width skip_padding">
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-check-square-o"></i>
+    <div class="column-feature-details">
+      <div class="component-row">
+        <div class="component-column">
+          <img
+                  src="api/v2/themes?resource-id=images/embedded-preservation-actions.svg"
+                  alt="Image 2"
+          />
         </div>
-        <div class="feature-text">
-          Authenticity
-        </div>
-      </div>
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-files-o"></i>
-        </div>
-        <div class="feature-text">
-          Support for multiple formats
-        </div>
-      </div>
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-rocket"></i>
-        </div>
-        <div class="feature-text">
-          Copes with the rapid changing nature of technology
-        </div>
-      </div>
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-lock"></i>
-        </div>
-        <div class="feature-text">
-          Advanced access control
+        <div class="component-column">
+          <h6>Embedded preservation actions</h6>
+          <hr class="separator-sm" />
+          <p>
+            Preservation actions can be executed right from the user interface
+            over any selection of digital objects in the repository.
+          </p>
         </div>
       </div>
     </div>
-
-    <div class="row full_width skip_padding">
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-plug"></i>
+    <div class="column-feature-details">
+      <div class="component-row">
+        <div class="component-column">
+          <img
+                  src="api/v2/themes?resource-id=images/retention-and-disposal.svg"
+                  alt="Image 3"
+          />
         </div>
-        <div class="feature-text">
-          Integration with 3rd party systems
-        </div>
-      </div>
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-cogs"></i>
-        </div>
-        <div class="feature-text">
-          Advanced ingest workflow
-        </div>
-      </div>
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-business-time"></i>
-        </div>
-        <div class="feature-text">
-          Retention and disposal policies
-        </div>
-      </div>
-      <div class="col_3 feature">
-        <div class="feature-img">
-          <i class="fa fa-store"></i>
-        </div>
-        <div class="feature-text">
-          Marketplace
+        <div class="component-column">
+          <h6>Retention and disposal policies</h6>
+          <hr class="separator-sm" />
+          <p>
+            RODA incorporates robust and comprehensive functionality for the
+            definition and implementation of retention and disposal policies.
+          </p>
         </div>
       </div>
     </div>
   </div>
-  <p>
-    For more information about RODA and its main features, please visit
+  <div class="row-feature-details">
+    <div class="column-feature-details">
+      <div class="component-row">
+        <div class="component-column">
+          <img
+                  src="api/v2/themes?resource-id=images/scalable.svg"
+                  alt="Image 4"
+          />
+        </div>
+        <div class="component-column">
+          <h6>Scalable</h6>
+          <hr class="separator-sm" />
+          <p>
+            RODA is ideal for large organisations with millions of digital
+            objects. It's service-oriented nature allows it to be highly
+            scalable, enabling the distribution of load between several servers.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="column-feature-details">
+      <div class="component-row">
+        <div class="component-column">
+          <img
+                  src="api/v2/themes?resource-id=images/advanced-ingest-workflows.svg"
+                  alt="Image 5"
+          />
+        </div>
+        <div class="component-column">
+          <h6>Advanced ingest workflows</h6>
+          <hr class="separator-sm" />
+          <p>
+            Ingest workflows can be customised by the user to implement
+            institutional policies and handle special collections of data.
+            Ingest workflows can be enhanced via the use of open source or
+            commercial plugins.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="column-feature-details">
+      <div class="component-row">
+        <div class="component-column">
+          <img
+                  src="api/v2/themes?resource-id=images/rapid-changes.svg"
+                  alt="Image 6"
+          />
+        </div>
+        <div class="component-column">
+          <h6>Copes with the rapid changing nature of technology</h6>
+          <hr class="separator-sm" />
+          <p>
+            The pluggable architecture of RODA makes it easy to add more
+            functionality to the system without affecting its core
+            functionality.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row row-learn-more padding-lg full_width">
+  <div class="col_12">
+    <h1>RODA COMMUNITY</h1>
+    <div class="subtitle">
+      <p>FREE.</p>
+      <p class="alt">CUSTOMIZABLE.</p>
+      <p>COMMUNITY-DRIVEN.</p>
+    </div>
+    <hr class="hero-separator" />
+    <div class="details">
+      <p>
+        RODA Community Edition is designed for mid-sized organizations seeking to implement and
+        customize the product to meet their specific requirements. As its name suggests, this edition is
+        community-driven and provides organizations the necessary tools to manage the product on
+        their own. While this flexibility is a major advantage, organizations may also benefit from enlisting
+        the expertise of IT, software, and digital preservation specialists to tailor the solution to their
+        unique needs by adding specialized features and integrations.
+      </p>
+      <p>
+        As its name suggests, this edition is community-driven and provides organizations the necessary tools to manage the product on their own. However, it should be noted that the RODA Community Edition does not include commercial plugins, integrations, or professional support services. Those products and services must be acquired separately.
+        For more information about how to acquire commercial services from KEEP SOLUTIONS, please visit <a href="https://www.keep.pt">KEEP SOLUTIONS</a>.
+      </p>
+    </div>
     <a
-        href="https://www.roda-community.org"
-        title="RODA Community"
-        target="_blank">www.roda-community.org</a>.
-  </p>
+            class="btn-welcome learn-more-btn"
+            role="button"
+            href="https://roda-community.org"
+            target="_blank"
+    >Learn more</a
+    >
+  </div>
+</div>
 
-  <h2>Local instance of RODA</h2>
-
-  <p>Welcome to your local instance of the RODA Community Edition. Please be aware that this edition
-    is devoid of any commercial components or plugins. If you are interested in experiencing these
-    additional features, we invite you to explore the <a
-        href="https://demo.roda-enterprise.com/"
-        title="RODA Enterprise demo"
-        target="_blank"
-    >RODA Enterprise demo</a> or to browse the <a
-        href="https://marketplace.roda-community.com/"
-        title="RODA Marketplace"
-        target="_blank"
-    >RODA Marketplace</a>.
-  </p>
-
-  <p>
-    By default you have an administrative user account. This will allow you full access to all
-    functionalities of the software. Please ensure that you <b>change the administrator user account
-    password</b> before publishing this instance.
-  </p>
-
-  <p>
-    <img alt="RODA default credentials"
-        src="api/v2/themes?resource-id=credentials-access.svg"
-        style="width: 150px"
-    />
-  </p>
-
-  <p>
-    Should you have any questions or require further information, please do not hesitate to <a
-      href="https://github.com/keeps/roda/discussions" target="_blank" title="RODA Discussions">contact
-    us</a>. Enjoy exploring the RODA Community Edition.
-  </p>
-
-  <h2>Enterprise editions</h2>
-  <p>
-    RODA is an open-source solution, which means that anyone can download its
-    source code, compile it and have it running on their own institution in a
-    matter of hours. While this flexibility is a major advantage, organisations
-    may also benefit from enlisting the expertise of IT, software, and digital
-    preservation specialists to tailor the solution to their unique needs by
-    adding specialised features and integrations.
-  </p>
-
-  <p>
-    KEEP SOLUTIONS, the maintainer of the RODA open-source project, offers four
-    software distributions specially designed to meet the rigorous demands of
-    mid to large-sized institutions with vast collections of digital records,
-    providing the capability to efficiently manage digital assets in large-scale
-    production environments. These software suites are called “Community”,
-    “Enterprise”, “Enterprise HA” and “Enterprise SM”.
-  </p>
+<div class="row-get-quote padding-md full_width">
+  <div class="custom-row">
+    <div class="custom-column align-center">
+      <p>roda enterprise</p>
+      <p class="alt">ha</p>
+    </div>
+    <div class="custom-column">
+      <div class="middle-info-quote">
+        <p class="values">unlimited scalability.</p>
+        <p class="values values-alt">minimal</p>
+        <p class="values values-alt">disruption.</p>
+        <p class="values">seamless access</p>
+      </div>
+    </div>
+    <div class="custom-column">
+      <form class="form" action="https://keep.pt/en/contact-us/" method="get">
+        <input
+                type="email"
+                name="wpf9057_1"
+                placeholder="Enter your email address"
+                id="form_email"
+        />
+        <input
+                type="hidden"
+                name="wpf9057_9"
+                value="RODA Enterprise"
+                id="form_product"
+        />
+        <button type="submit" class="form-button">CONTACT US</button>
+      </form>
+    </div>
+  </div>
 </div>

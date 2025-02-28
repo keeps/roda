@@ -2,6 +2,7 @@ package org.roda.wui.client.common.labels;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 
 /**
@@ -11,11 +12,20 @@ import com.google.gwt.user.client.ui.HTML;
 public class Header extends HTML {
   private int level = 1;
   private String styleName = "";
-  private String text = "";
+  private String headerText = "";
   private String icon = "";
 
   public Header() {
     super();
+  }
+
+  public Header(String headerText, String styleName, String icon, int level) {
+    super();
+    this.headerText = headerText;
+    this.styleName = styleName;
+    this.icon = icon;
+    this.level = level;
+    rebuildHTML();
   }
 
   public void setLevel(int level) {
@@ -28,8 +38,8 @@ public class Header extends HTML {
     rebuildHTML();
   }
 
-  public void setTitleText(String text) {
-    this.text = text;
+  public void setHeaderText(String text) {
+    this.headerText = text;
     rebuildHTML();
   }
 
@@ -44,7 +54,7 @@ public class Header extends HTML {
     if (icon != null && !icon.isEmpty()) {
       builder.append(SafeHtmlUtils.fromSafeConstant("<i class=\"" + icon + "\"></i>"));
     }
-    builder.append(SafeHtmlUtils.fromSafeConstant(text));
+    builder.append(SafeHtmlUtils.fromSafeConstant(headerText));
     builder.append(SafeHtmlUtils.fromSafeConstant("</h" + level + ">"));
     setHTML(builder.toSafeHtml());
   }

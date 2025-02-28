@@ -1,5 +1,6 @@
 package org.roda.wui.client.browse.tabs;
 
+import com.google.gwt.user.client.ui.Widget;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -45,13 +46,20 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
       SafeHtml buttonTitle = SafeHtmlUtils.fromString(metadataInfo.getLabel());
       // Content container
       FlowPanel content = new FlowPanel();
-      content.addStyleName("descriptiveMetadataTabContainer");
+      content.addStyleName("descriptiveMetadataTabContainer roda6CardWithHeader");
       // Create Toolbar
+      FlowPanel cardHeader = new FlowPanel();
+      cardHeader.setStyleName("cardHeader");
       String metadataID = SafeHtmlUtils.htmlEscape(metadataInfo.getId());
       ActionsToolbar descriptiveMetadataToolbar = new ActionsToolbar();
       descriptiveMetadataToolbar.setLabelVisible(false);
-      content.add(descriptiveMetadataToolbar);
+      descriptiveMetadataToolbar.setTagsVisible(false);
+      cardHeader.add(descriptiveMetadataToolbar);
+      content.add(cardHeader);
       // Get metadata and populate widget
+      FlowPanel cardBody = new FlowPanel();
+      content.add(cardBody);
+      cardBody.setStyleName("cardBody");
       HTML metadataHTML = new HTML();
       SafeUri uri = RestUtils.createDescriptiveMetadataHTMLUri(aip.getId(), metadataID);
       RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
@@ -133,9 +141,15 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
           Toast.showError(messages.errorLoadingDescriptiveMetadata(e.getMessage()));
         }
       }
-      content.add(metadataHTML);
+      cardBody.add(metadataHTML);
       // Create and add tab
-      createAndAddTab(buttonTitle, content);
+      // This descriptive metadata content is NOT lazy loading!
+      createAndAddTab(buttonTitle, new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          return content;
+        }
+      });
     }
     // Create button
     Button createButton = new Button(messages.newButton());

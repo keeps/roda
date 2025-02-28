@@ -1,0 +1,14 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="100" cy="100" r="90" fill="#25A6D6"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="60" cy="60" r="60" fill="#D9D9D9" fill-opacity="0.5"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<ellipse cx="67" cy="10" rx="67" ry="10" transform="matrix(1 0 0 -1 33 190)" fill="#D9D9D9"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="150" cy="100" r="50" fill="#BBBBBB" fill-opacity="0.5"/>
+</g>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M61 88.8889H138.778V150H61V88.8889ZM66.5556 94.4445V144.444H133.222V94.4445H66.5556Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M99.889 55.5556C90.7618 55.5556 83.2223 62.7489 83.2223 71.6667V91.6667H77.6667V71.6667C77.6667 59.4733 87.9051 50 99.889 50C111.873 50 122.111 59.4733 122.111 71.6667H116.556C116.556 62.7489 109.016 55.5556 99.889 55.5556Z" fill="white"/>
+</svg>
