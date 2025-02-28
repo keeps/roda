@@ -402,6 +402,18 @@ div.inline {
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
+.cardInvisible {
+    background-color: transparent;
+    box-shadow: none;
+    transition: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.cardInvisible:hover {
+    box-shadow: none;
+}
+
 .card + .card {
     margin-top: 30px;
 }
@@ -464,6 +476,38 @@ div.inline {
 
 .browse_top .aipChildrenCard:hover {
 	box-shadow: none;
+}
+
+.browse_aip .aipChildrenCard {
+    box-shadow: none;
+    padding: 0;
+    transition: none;
+}
+
+.browse_aip .aipChildrenCard:hover {
+    box-shadow: none;
+}
+
+.browse_aip .row .content {
+    padding: 0!important;
+    width:100%;
+}
+
+.browse_aip .row .content .upperContent {
+    padding: 30px;
+}
+
+.browse_aip .row .content .lowerContent {
+    padding: 30px;
+    background-color: COLOR_GREY_BGDARKER;
+}
+
+.browse_aip .row .content .lowerContent .card {
+    background-color: transparent;
+}
+
+.browse_aip .row .content .lowerContent .card .searchWrapper .sidebar-facet-label.fade-out:after {
+        background: linear-gradient(-90deg, COLOR_GREY_BGDARKER 30%, rgba(255, 255, 255, 0) 100%);
 }
 
 .descriptiveMetadataCard {
@@ -3291,6 +3335,10 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 16px;
 }
 
+.thumbnailCardIconThumbnail:hover {
+    cursor: pointer;
+}
+
 .thumbnailCardTags {
     display: flex;
     flex-wrap: wrap;
@@ -4148,10 +4196,6 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .card .searchPanelContainer {
-    margin-bottom: 15px;
-    margin-top: -15px;
-    margin-left: -15px;
-    margin-right: -15px;
 }
 
 .browse_top .card .searchPanelContainer {

@@ -12,25 +12,29 @@
 				<common:NavigationToolbar ui:field="navigationToolbar" />
 				<common:ObjectActionsToolbar ui:field="objectToolbar" label="{messages.catalogueItemTitle}"/>
 				<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
-					<g:FlowPanel addStyleNames="col_12 content">
-						<!-- STATUS -->
-						<g:HTML ui:field="aipState" />
+					<g:FlowPanel addStyleNames="content">
+						<g:FlowPanel addStyleNames="upperContent">
+							<!-- STATUS -->
+							<g:HTML ui:field="aipState" />
 
-						<!-- IDENTIFICATION -->
-						<common:TitlePanel ui:field="title">
-							<g:FlowPanel addStyleNames="browseItemPanelDisposal" ui:field="disposalPolicy" />
-							<g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="risksEventsLogs" />
-							<g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified" />
-						</common:TitlePanel>
+							<!-- IDENTIFICATION -->
+							<common:TitlePanel ui:field="title">
+								<g:FlowPanel addStyleNames="browseItemPanelDisposal" ui:field="disposalPolicy" />
+							</common:TitlePanel>
 
-						<!-- DESCRIPTIVE METADATA -->
-						<tabs:BrowseTabs ui:field="browseTab" />
+							<!-- DESCRIPTIVE METADATA -->
+							<tabs:BrowseAIPTabs ui:field="browseTab" />
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="lowerContent">
+							<g:HTML>
+								<h3 text="{messages.sublevels}"/>
+							</g:HTML>
+							<!-- AIP CHILDREN -->
+							<g:SimplePanel ui:field="aipChildrenCard" addStyleNames="card aipChildrenCard" />
 
-						<!-- AIP CHILDREN -->
-						<g:SimplePanel ui:field="aipChildrenCard" addStyleNames="card aipChildrenCard" />
-
-						<!-- ADD NEW -->
-						<g:SimplePanel ui:field="addChildAip" addStyleNames="ActionableStyleButtons" />
+							<!-- ADD NEW -->
+							<g:SimplePanel ui:field="addChildAip" addStyleNames="ActionableStyleButtons" />
+						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
