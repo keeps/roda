@@ -32,7 +32,7 @@ public class Tabs extends Composite {
   SimplePanel tabContentWrapper;
 
   private Widget selectedTab;
-  private final Map<Widget, Widget> tabs;
+  private final Map<Widget, TabContentBuilder> tabs;
 
   public Tabs() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -41,28 +41,28 @@ public class Tabs extends Composite {
     selectedTab = null;
   }
 
-  public void createAndAddTab(Widget tabButtonInnerWidget, Widget tabContent) {
+  public void createAndAddTab(Widget tabButtonInnerWidget, TabContentBuilder tabContentBuilder) {
     SimplePanel tabButtonContainer = new SimplePanel();
     tabButtonContainer.addStyleName("tabButtonContainer");
     FocusPanel tabButton = new FocusPanel(tabButtonInnerWidget);
     tabButton.addStyleName("tabButton");
     tabButtonContainer.setWidget(tabButton);
     tabButtons.add(tabButtonContainer);
-    tabs.put(tabButtonContainer, tabContent);
+    tabs.put(tabButtonContainer, tabContentBuilder);
     tabButton.addClickHandler(createTabClickHandler(tabButtonContainer));
     if (selectedTab == null) {
       selectTab(tabButtonContainer);
     }
   }
 
-  public void createAndAddTab(SafeHtml tabTitle, Widget tabContent) {
+  public void createAndAddTab(SafeHtml tabTitle, TabContentBuilder tabContentBuilder) {
     SimplePanel tabButtonContainer = new SimplePanel();
     tabButtonContainer.addStyleName("tabButtonContainer");
     Button tabButton = new Button(tabTitle);
     tabButton.addStyleName("tabButton");
     tabButtonContainer.setWidget(tabButton);
     tabButtons.add(tabButtonContainer);
-    tabs.put(tabButtonContainer, tabContent);
+    tabs.put(tabButtonContainer, tabContentBuilder);
     tabButton.addClickHandler(createTabClickHandler(tabButtonContainer));
     if (selectedTab == null) {
       selectTab(tabButtonContainer);
@@ -86,15 +86,19 @@ public class Tabs extends Composite {
   }
 
   private void selectTab(Widget tabButtonContainer) {
-    for (Map.Entry<Widget, Widget> tab : tabs.entrySet()) {
+    for (Map.Entry<Widget, TabContentBuilder> tab : tabs.entrySet()) {
       if (tab.getKey().equals(tabButtonContainer)) {
         selectedTab = tabButtonContainer;
         tab.getKey().addStyleName("tabSelected");
-        tabContentWrapper.setWidget(tab.getValue());
+        tabContentWrapper.setWidget(tab.getValue().buildTabWidget());
       } else {
         tab.getKey().removeStyleName("tabSelected");
       }
     }
+  }
+
+  public interface TabContentBuilder {
+    public Widget buildTabWidget();
   }
 
   interface MyUiBinder extends UiBinder<Widget, Tabs> {

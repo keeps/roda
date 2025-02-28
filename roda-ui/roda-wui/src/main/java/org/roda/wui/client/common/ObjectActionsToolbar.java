@@ -9,7 +9,13 @@ import org.roda.wui.client.common.actions.AIPToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.labels.Tag;
+import org.roda.wui.client.common.utils.DisposalPolicyUtils;
+import org.roda.wui.client.disposal.association.DisposalPolicyAssociationPanel;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
+
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 
 /**
  *
@@ -50,6 +56,19 @@ public class ObjectActionsToolbar<T extends IsIndexed> extends ActionsToolbar {
           tags.add(Tag.fromText(messages.aipState(state), List.of(Tag.TagStyle.DANGER_LIGHT, Tag.TagStyle.MONO)));
           break;
       }
+      // Disposal
+      // if (DisposalPolicyUtils.showDisposalPolicySummary(aip)) {
+      //   Tag disposalTag = DisposalPolicyUtils.getDisposalPolicySummaryTag(aip);
+      //   if (disposalTag != null) {
+      //     disposalTag.addClickHandler(new ClickHandler() {
+      //       @Override
+      //       public void onClick(ClickEvent event) {
+      //         HistoryUtils.newHistory(DisposalPolicyAssociationPanel.RESOLVER, aip.getId());
+      //       }
+      //     });
+      //     tags.add(disposalTag);
+      //   }
+      // }
     }
   }
 
@@ -59,18 +78,16 @@ public class ObjectActionsToolbar<T extends IsIndexed> extends ActionsToolbar {
     if (object instanceof IndexedAIP) {
       IndexedAIP aip = (IndexedAIP) object;
       AIPToolbarActions aipActions;
-      if (aip.getParentID() != null) {
-        aipActions = AIPToolbarActions.get(aip.getParentID(), aip.getState(), aip.getPermissions());
-      } else {
-        aipActions = AIPToolbarActions.get();
-      }
+      aipActions = AIPToolbarActions.get(aip.getId(), aip.getState(), aip.getPermissions());
       this.actions.add(
         new ActionableWidgetBuilder<IndexedAIP>(aipActions).buildGroupedListWithObjects(new ActionableObject<>(aip),
           List.of(AIPToolbarActions.AIPAction.SEARCH_DESCENDANTS, AIPToolbarActions.AIPAction.SEARCH_PACKAGE,
             AIPToolbarActions.AIPAction.DOWNLOAD, AIPToolbarActions.AIPAction.DOWNLOAD_EVENTS,
             AIPToolbarActions.AIPAction.DOWNLOAD_DOCUMENTATION, AIPToolbarActions.AIPAction.DOWNLOAD_SUBMISSIONS,
             AIPToolbarActions.AIPAction.CHANGE_TYPE, AIPToolbarActions.AIPAction.MOVE_IN_HIERARCHY,
-            AIPToolbarActions.AIPAction.REMOVE, AIPToolbarActions.AIPAction.NEW_PROCESS)));
+            AIPToolbarActions.AIPAction.REMOVE, AIPToolbarActions.AIPAction.NEW_PROCESS,
+            AIPToolbarActions.AIPAction.NEW_CHILD_AIP_BELOW, AIPToolbarActions.AIPAction.NEW_REPRESENTATION),
+          List.of(AIPToolbarActions.AIPAction.NEW_PROCESS)));
     }
   }
 }

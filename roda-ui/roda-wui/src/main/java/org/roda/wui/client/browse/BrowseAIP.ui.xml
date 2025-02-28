@@ -2,7 +2,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:commoncards="urn:import:org.roda.wui.client.common.cards"
-	xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs">
+	xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs" xmlns:labels="urn:import:org.roda.wui.client.common.labels">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -12,33 +12,29 @@
 				<common:NavigationToolbar ui:field="navigationToolbar" />
 				<common:ObjectActionsToolbar ui:field="objectToolbar" label="{messages.catalogueItemTitle}"/>
 				<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
-					<g:FlowPanel addStyleNames="col_12 content">
-						<!-- STATUS -->
-						<g:HTML ui:field="aipState" />
+					<g:FlowPanel addStyleNames="content">
+						<g:FlowPanel addStyleNames="upperContent">
+							<!-- STATUS -->
+							<g:HTML ui:field="aipState" />
 
-						<!-- IDENTIFICATION -->
-						<common:TitlePanel ui:field="title">
-							<g:FlowPanel addStyleNames="browseItemPanelDisposal" ui:field="disposalPolicy" />
-							<g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="risksEventsLogs" />
-							<g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified" />
-						</common:TitlePanel>
+							<!-- IDENTIFICATION -->
+							<common:TitlePanel ui:field="title" />
 
-						<!-- DESCRIPTIVE METADATA -->
-						<tabs:BrowseTabs ui:field="browseTab" />
-
-						<!-- AIP CHILDREN -->
-						<g:SimplePanel ui:field="aipChildrenCard" addStyleNames="card aipChildrenCard" />
-
-						<!-- ADD NEW -->
-						<g:SimplePanel ui:field="addChildAip" addStyleNames="ActionableStyleButtons" />
+							<!-- DESCRIPTIVE METADATA -->
+							<tabs:BrowseAIPTabs ui:field="browseTab" />
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="lowerContent" ui:field="lowerContent">
+							<!-- AIP CHILDREN -->
+							<labels:Header ui:field="aipChildrenTitle" />
+							<g:SimplePanel ui:field="aipChildrenCard" addStyleNames="card aipChildrenCard" />
+						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FocusPanel>
-		<g:FlowPanel styleName="browseSidePanel">
+		<g:FlowPanel styleName="browseSidePanel" ui:field="sidePanel">
 			<g:FlowPanel>
 				<g:FlowPanel ui:field="representationCards"  addStyleNames="verticalThumbnailCardContainer"/>
-				<g:SimplePanel ui:field="representationActions" />
 			</g:FlowPanel>
 			<g:FlowPanel>
 				<g:FlowPanel ui:field="disseminationCards" addStyleNames="verticalThumbnailCardContainer"/>

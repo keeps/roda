@@ -1,0 +1,17 @@
+<svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="75" cy="75" r="67.5" fill="#25A6D6"/>
+<g style="mix-blend-mode:multiply">
+<circle cx="112.5" cy="37.5" r="37.5" fill="#BBBBBB" fill-opacity="0.3"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="33.75" cy="26.25" r="18.75" fill="#BABABA" fill-opacity="0.25"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<circle cx="45" cy="75" r="45" fill="#D9D9D9"/>
+</g>
+<g style="mix-blend-mode:multiply">
+<ellipse cx="50.25" cy="7.5" rx="50.25" ry="7.5" transform="matrix(1 0 0 -1 24.75 142.5)" fill="#D9D9D9"/>
+</g>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M109 52.0165L68.1611 101.931L49 77.9792L52.7197 75.0035L68.2027 94.3572L105.313 49L109 52.0165Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M109 52.0165L68.1611 101.931L49 77.9792L52.7197 75.0035L68.2027 94.3572L105.313 49L109 52.0165Z" fill="white"/>
+</svg>

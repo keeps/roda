@@ -2,18 +2,25 @@ package org.roda.wui.client.common.labels;
 
 import java.util.List;
 
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
  * @author Alexandre Flores <aflores@keep.pt>
  */
-public class Tag extends HTML {
+public class Tag extends Composite {
+  private static final Tag.MyUiBinder uiBinder = GWT.create(Tag.MyUiBinder.class);
+
   public enum TagStyle {
-    DEFAULT, SUCCESS, FAILURE, WARNING_LIGHT, DANGER_LIGHT, MONO;
+    DEFAULT, SUCCESS, FAILURE, WARNING_LIGHT, DANGER_LIGHT, NEUTRAL, MONO, ICON_CALENDAR, ICON_LOCK, ICON_CLOCK,
+    BORDER_BLACK, BORDER_DANGER;
 
     private static String toStyleName(TagStyle tagStyle) {
       switch (tagStyle) {
@@ -27,51 +34,63 @@ public class Tag extends HTML {
           return "tagLightRed";
         case MONO:
           return "tagMono";
+        case NEUTRAL:
+          return "tagGrey";
+        case ICON_CALENDAR:
+          return "tagIconCalendar";
+        case ICON_LOCK:
+          return "tagIconLock";
+        case ICON_CLOCK:
+          return "tagIconClock";
+        case BORDER_BLACK:
+          return "tagBorderBlack";
+        case BORDER_DANGER:
+          return "tagBorderRed";
         default:
           return "";
       }
     }
   }
 
-  protected static final SafeHtml OPEN_TAG_SPAN = SafeHtmlUtils.fromSafeConstant("<span>");
-  protected static final SafeHtml CLOSE_TAG_SPAN = SafeHtmlUtils.fromSafeConstant("</span>");
+  @UiField
+  FocusPanel tagPanel;
+  @UiField
+  Label label;
 
-  public Tag(SafeHtml safeHtml) {
-    super(safeHtml);
+  public Tag() {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   public static Tag fromText(String text) {
-    SafeHtmlBuilder tagBuilder = new SafeHtmlBuilder();
-    tagBuilder.append(OPEN_TAG_SPAN);
-    tagBuilder.append(SafeHtmlUtils.fromString(text));
-    tagBuilder.append(CLOSE_TAG_SPAN);
-    Tag tag = new Tag(tagBuilder.toSafeHtml());
-    tag.addStyleName("tag");
+    Tag tag = new Tag();
+    tag.label.setText(text);
     tag.addStyleName(TagStyle.toStyleName(TagStyle.DEFAULT));
     return tag;
   }
 
   public static Tag fromText(String text, TagStyle style) {
-    SafeHtmlBuilder tagBuilder = new SafeHtmlBuilder();
-    tagBuilder.append(OPEN_TAG_SPAN);
-    tagBuilder.append(SafeHtmlUtils.fromString(text));
-    tagBuilder.append(CLOSE_TAG_SPAN);
-    Tag tag = new Tag(tagBuilder.toSafeHtml());
-    tag.addStyleName("tag");
+    Tag tag;
+    tag = new Tag();
+    tag.label.setText(text);
     tag.addStyleName(TagStyle.toStyleName(style));
     return tag;
   }
 
   public static Tag fromText(String text, List<TagStyle> style) {
-    SafeHtmlBuilder tagBuilder = new SafeHtmlBuilder();
-    tagBuilder.append(OPEN_TAG_SPAN);
-    tagBuilder.append(SafeHtmlUtils.fromString(text));
-    tagBuilder.append(CLOSE_TAG_SPAN);
-    Tag tag = new Tag(tagBuilder.toSafeHtml());
-    tag.addStyleName("tag");
+    Tag tag;
+    tag = new Tag();
+    tag.label.setText(text);
     for (TagStyle s : style) {
       tag.addStyleName(TagStyle.toStyleName(s));
     }
     return tag;
+  }
+
+  public void addClickHandler(ClickHandler clickHandler) {
+    tagPanel.addClickHandler(clickHandler);
+    tagPanel.addStyleName("clickable");
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, Tag> {
   }
 }

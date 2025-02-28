@@ -9,13 +9,15 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.common.cards.utils.CardBuilder;
 import org.roda.wui.client.common.labels.Tag;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HTML;
 
 import config.i18n.client.ClientMessages;
@@ -27,9 +29,8 @@ import config.i18n.client.ClientMessages;
 public class AIPDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
   public AIPDisseminationCardList(String aipId) {
     super(messages.someOfAObject(IndexedDIP.class.getName()),
-      ConfigurationManager.getString(RodaConstants.UI_ICONS_CLASS, IndexedDIP.class.getSimpleName()),
-      IndexedDIP.class, new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, aipId)),
-      new CardBuilder<IndexedDIP>() {
+      ConfigurationManager.getString(RodaConstants.UI_ICONS_CLASS, IndexedDIP.class.getSimpleName()), IndexedDIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, aipId)), new CardBuilder<IndexedDIP>() {
         @Override
         public ThumbnailCard constructCard(ClientMessages messages, IndexedDIP dip) {
           // Title
@@ -51,7 +52,11 @@ public class AIPDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
             attributes.put(messages.objectLastModifiedShort(), Humanize.formatDate(dip.getLastModified()));
           }
 
-          return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes);
+          ClickHandler thumbnailClickHandler = event -> {
+            HistoryUtils.newHistory(BrowseDIP.RESOLVER, aipId, dip.getId());
+          };
+
+          return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler);
         }
       });
   }

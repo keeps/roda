@@ -12,8 +12,6 @@ import static org.roda.wui.client.common.actions.Actionable.ActionImpact;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.HTML;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -116,10 +114,11 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
   public Widget buildGroupedListWithObjects(ActionableObject<T> objects) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
-    return createGroupedActionsMenu(actionableBundle, objects);
+    return createGroupedActionsMenu(actionableBundle, objects, List.of());
   }
 
-  public Widget buildGroupedListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist) {
+  public Widget buildGroupedListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist,
+    List<Actionable.Action<T>> ungroupedActions) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
 
     if (!actionWhitelist.isEmpty()) {
@@ -130,7 +129,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
       });
     }
 
-    return createGroupedActionsMenu(actionableBundle, objects);
+    return createGroupedActionsMenu(actionableBundle, objects, ungroupedActions);
   }
 
   // Internal (GUI elements creation)
@@ -214,7 +213,8 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return panel;
   }
 
-  private FlowPanel createGroupedActionsMenu(ActionableBundle<T> actionableBundle, ActionableObject<T> objects) {
+  private FlowPanel createGroupedActionsMenu(ActionableBundle<T> actionableBundle, ActionableObject<T> objects,
+    List<Actionable.Action<T>> ungroupedActions) {
     FlowPanel panel = new FlowPanel();
     panel.addStyleName("groupedActionableMenu");
 
@@ -225,40 +225,31 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     boolean firstGroup = true;
     for (ActionableGroup<T> actionGroup : actionableBundle.getGroups()) {
       FlowPanel groupPanel = null;
+      FlowPanel buttonsPanel = new FlowPanel();
       Button groupButton = null;
       for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
         if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
-          && actionable.canAct(actionButton.getAction(), objects)) {
+          && actionable.canAct(actionButton.getAction(), objects)
+          && !ungroupedActions.contains(actionButton.getAction())) {
           ActionableTitle actionableTitle = actionGroup.getTitle();
-          groupPanel = new FlowPanel();
-          if (!actionGroup.shouldReplaceWithChild()) {
-            groupButton = new Button(actionableTitle.getTitle());
-            if (actionGroup.getIcon() != null) {
-              groupButton.addStyleName(actionGroup.getIcon());
-            }
-            groupButton.addStyleName("groupedActionableDropdownButton");
-            if (!actionableTitle.hasTitle()) {
-              groupButton.addStyleName("groupedActionableDropdownButtonEmpty");
-            }
-            groupPanel.add(groupButton);
-          }
-          break;
-        }
-      }
 
-      if (groupPanel != null) {
-        if (!firstGroup) {
-          SimplePanel verticalDivider = new SimplePanel();
-          verticalDivider.addStyleName("verticalDivider");
-          panel.add(verticalDivider);
-        } else {
-          firstGroup = false;
-        }
-        panel.add(groupPanel);
-        SimplePanel anchorPanel = new SimplePanel();
-        anchorPanel.addStyleName("popupAnchor");
-        PopupPanel popupPanel = new PopupPanel(true);
-        if (groupButton != null) {
+          groupPanel = new FlowPanel();
+
+          SimplePanel anchorPanel = new SimplePanel();
+          anchorPanel.addStyleName("popupAnchor");
+
+          PopupPanel popupPanel = new PopupPanel(true);
+
+          buttonsPanel.addStyleName("groupedActionableDropdown");
+
+          groupButton = new Button(actionableTitle.getTitle());
+          if (actionGroup.getIcon() != null) {
+            groupButton.addStyleName(actionGroup.getIcon());
+          }
+          groupButton.addStyleName("groupedActionableDropdownButton");
+          if (!actionableTitle.hasTitle()) {
+            groupButton.addStyleName("groupedActionableDropdownButtonEmpty");
+          }
           groupButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -269,48 +260,63 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
               }
             }
           });
+
+          if (!firstGroup) {
+            SimplePanel verticalDivider = new SimplePanel();
+            verticalDivider.addStyleName("verticalDivider");
+            panel.add(verticalDivider);
+          } else {
+            firstGroup = false;
+          }
+          panel.add(groupPanel);
+          groupPanel.add(groupButton);
+          groupPanel.add(anchorPanel);
+          popupPanel.add(buttonsPanel);
+          break;
         }
-        FlowPanel buttonsPanel = new FlowPanel();
-        buttonsPanel.addStyleName("groupedActionableDropdown");
-        popupPanel.add(buttonsPanel);
-        for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
-          if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
-            && actionable.canAct(actionButton.getAction(), objects)) {
 
-            ActionButton<T> button = new ActionButton<>(actionButton);
+      }
 
-            button.addClickHandler(new ClickHandler() {
-              @Override
-              public void onClick(ClickEvent event) {
-                button.setEnabled(false);
-                actionable.act(actionButton.getAction(), objects, new AsyncCallback<Actionable.ActionImpact>() {
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    actionImpactCallback.onFailure(caught);
-                    button.setEnabled(true);
-                  }
+      for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
+        if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
+          && actionable.canAct(actionButton.getAction(), objects)) {
 
-                  @Override
-                  public void onSuccess(Actionable.ActionImpact result) {
-                    actionImpactCallback.onSuccess(result);
-                    button.setEnabled(true);
-                  }
-                });
-              }
-            });
+          ActionButton<T> button = new ActionButton<>(actionButton);
 
-            addedButtonCount++;
-            if (actionGroup.shouldReplaceWithChild()) {
-              groupButton = button;
-              break;
-            } else {
-              buttonsPanel.add(button);
+          button.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+              button.setEnabled(false);
+              actionable.act(actionButton.getAction(), objects, new AsyncCallback<Actionable.ActionImpact>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                  actionImpactCallback.onFailure(caught);
+                  button.setEnabled(true);
+                }
+
+                @Override
+                public void onSuccess(Actionable.ActionImpact result) {
+                  actionImpactCallback.onSuccess(result);
+                  button.setEnabled(true);
+                }
+              });
             }
+          });
+
+          addedButtonCount++;
+          if (ungroupedActions.contains(actionButton.getAction())) {
+            if (!firstGroup) {
+              SimplePanel verticalDivider = new SimplePanel();
+              verticalDivider.addStyleName("verticalDivider");
+              panel.add(verticalDivider);
+            } else {
+              firstGroup = false;
+            }
+            panel.add(button);
+          } else {
+            buttonsPanel.add(button);
           }
         }
-
-        groupPanel.add(groupButton);
-        groupPanel.add(anchorPanel);
       }
     }
 
