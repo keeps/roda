@@ -32,12 +32,12 @@
 					</g:FlowPanel>
 
 					<!-- FILES -->
-					<g:FlowPanel addStyleNames="card filesCard">
+					<g:FlowPanel addStyleNames="card filesCard cardInvisible">
 						<commonsearch:SearchWrapper ui:field="filesSearch" />
 					</g:FlowPanel>
 
 					<!-- DIPs -->
-					<g:FlowPanel addStyleNames="card disseminationsCard">
+					<g:FlowPanel addStyleNames="card disseminationsCard cardInvisible">
 						<commonsearch:SearchWrapper ui:field="disseminationsSearch" />
 					</g:FlowPanel>
 				</g:FlowPanel>

@@ -35,7 +35,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.tabs.BrowseTabs;
+import org.roda.wui.client.browse.tabs.BrowseAIPTabs;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -60,14 +60,11 @@ import org.roda.wui.client.common.utils.DisposalPolicyUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.association.DisposalPolicyAssociationPanel;
-import org.roda.wui.client.management.UserLog;
-import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.services.AIPRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -135,7 +132,7 @@ public class BrowseAIP extends Composite {
   @UiField
   TitlePanel title;
   @UiField
-  BrowseTabs browseTab;
+  BrowseAIPTabs browseTab;
 
   // DESCRIPTIVE METADATA
   // AIP CHILDREN
@@ -144,13 +141,9 @@ public class BrowseAIP extends Composite {
   @UiField
   SimplePanel addChildAip;
   @UiField
-  FlowPanel risksEventsLogs;
-  @UiField
   FlowPanel disposalPolicy;
   @UiField
   FlowPanel center;
-  @UiField
-  Label dateCreatedAndModified;
   @UiField
   FlowPanel representationCards;
   @UiField
@@ -200,7 +193,7 @@ public class BrowseAIP extends Composite {
       newDescriptiveMetadataRedirect();
     });
     descriptiveMetadataTab.add(newDescriptiveMetadata);
-    browseTab.init(aip, response.getDescriptiveMetadataInfos());
+    browseTab.init(aip, response, response.getDescriptiveMetadataInfos());
     updateSectionDescriptiveMetadata(response.getDescriptiveMetadataInfos());
 
     // AIP CHILDREN
@@ -499,55 +492,7 @@ public class BrowseAIP extends Composite {
     title.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
     Sliders.createAipInfoSlider(center, navigationToolbar.getInfoSidebarButton(), response);
 
-    risksEventsLogs.clear();
-
-    if (response.getIncidenceCount().getResult() >= 0) {
-      Anchor risksLink = new Anchor(messages.aipRiskIncidences(response.getIncidenceCount().getResult()),
-        HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, aip.getId()));
-      risksEventsLogs.add(risksLink);
-    }
-
-    if (response.getEventCount().getResult() >= 0) {
-      Anchor eventsLink = new Anchor(messages.aipEvents(response.getEventCount().getResult()),
-        HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, aip.getId()));
-
-      if (response.getIncidenceCount().getResult() >= 0) {
-        if (response.getLogCount().getResult() >= 0) {
-          risksEventsLogs.add(new Label(", "));
-        } else {
-          risksEventsLogs.add(new Label(" " + messages.and() + " "));
-        }
-      }
-
-      risksEventsLogs.add(eventsLink);
-    }
-
-    if (response.getLogCount().getResult() >= 0) {
-      Anchor logsLink = new Anchor(messages.aipLogs(response.getLogCount().getResult()),
-        HistoryUtils.createHistoryHashLink(UserLog.RESOLVER, aip.getId()));
-
-      if (response.getIncidenceCount().getResult() >= 0 || response.getEventCount().getResult() >= 0) {
-        risksEventsLogs.add(new Label(" " + messages.and() + " "));
-      }
-
-      risksEventsLogs.add(logsLink);
-    }
-
     navigationToolbar.updateBreadcrumb(aip, response.getAncestors());
-
-    if (aip.getCreatedOn() != null && StringUtils.isNotBlank(aip.getCreatedBy()) && aip.getUpdatedOn() != null
-      && StringUtils.isNotBlank(aip.getUpdatedBy())) {
-      dateCreatedAndModified.setText(messages.dateCreatedAndUpdated(Humanize.formatDate(aip.getCreatedOn()),
-        aip.getCreatedBy(), Humanize.formatDate(aip.getUpdatedOn()), aip.getUpdatedBy()));
-    } else if (aip.getCreatedOn() != null && StringUtils.isNotBlank(aip.getCreatedBy())) {
-      dateCreatedAndModified
-        .setText(messages.dateCreated(Humanize.formatDateTime(aip.getCreatedOn()), aip.getCreatedBy()));
-    } else if (aip.getUpdatedOn() != null && StringUtils.isNotBlank(aip.getUpdatedBy())) {
-      dateCreatedAndModified
-        .setText(messages.dateUpdated(Humanize.formatDateTime(aip.getUpdatedOn()), aip.getUpdatedBy()));
-    } else {
-      dateCreatedAndModified.setText("");
-    }
   }
 
   private void updateDisposalInformation() {

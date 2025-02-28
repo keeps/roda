@@ -7,7 +7,7 @@
     <g:FlowPanel styleName="thumbnailCard">
         <g:Label ui:field="title" styleName="thumbnailCardTitle"/>
         <g:FlowPanel styleName="thumbnailCardDetails">
-            <g:SimplePanel ui:field="thumbnail" />
+            <g:FocusPanel ui:field="thumbnail" />
             <g:FlowPanel ui:field="tags" styleName="thumbnailCardTags"/>
             <g:FlowPanel ui:field="attributes" styleName="thumbnailCardAttributes"/>
         </g:FlowPanel>
