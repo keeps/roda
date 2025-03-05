@@ -30,6 +30,8 @@ public class BrowseAIPTabs extends Tabs {
   public void init(IndexedAIP aip, BrowseAIPResponse browseAIPResponse, DescriptiveMetadataInfos descriptiveMetadataInfos) {
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
+    // TODO: These tabs should be lazy loading
+
     // Descriptive metadata
     AIPDescriptiveMetadataTabs aipDescriptiveMetadataTabs = new AIPDescriptiveMetadataTabs();
     aipDescriptiveMetadataTabs.init(aip, descriptiveMetadataInfos);
@@ -59,6 +61,7 @@ public class BrowseAIPTabs extends Tabs {
 
     // Disposal
     DisposalPolicyAssociationTab disposalPolicyAssociationPanel = new DisposalPolicyAssociationTab(browseAIPResponse);
+    disposalPolicyAssociationPanel.addStyleName("disposalPolicyAssociationTab");
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalTab()), disposalPolicyAssociationPanel);
   }
 }

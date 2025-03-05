@@ -9,7 +9,10 @@ import org.roda.wui.client.common.actions.AIPToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.labels.Tag;
+import org.roda.wui.client.common.utils.DisposalPolicyUtils;
+import org.roda.wui.client.disposal.association.DisposalPolicyAssociationPanel;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 /**
  *
@@ -49,6 +52,14 @@ public class ObjectActionsToolbar<T extends IsIndexed> extends ActionsToolbar {
         default:
           tags.add(Tag.fromText(messages.aipState(state), List.of(Tag.TagStyle.DANGER_LIGHT, Tag.TagStyle.MONO)));
           break;
+      }
+      // Disposal
+      if (DisposalPolicyUtils.showDisposalPolicySummary(aip)) {
+        Tag disposalTag = DisposalPolicyUtils.getDisposalPolicySummaryTag(aip);
+        if (disposalTag != null) {
+          disposalTag.addClickHandler(
+            event -> HistoryUtils.createHistoryHashLink(DisposalPolicyAssociationPanel.RESOLVER, aip.getId()));
+        }
       }
     }
   }

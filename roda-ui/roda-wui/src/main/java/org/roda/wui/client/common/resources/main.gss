@@ -3353,11 +3353,16 @@ td.datePickerMonth, td.datePickerYear {
     text-align: center;
 }
 
+.tagGrey {
+    background-color: COLOR_GREY_MEDIUM;
+    color: white;
+}
+
 .tagGreen {
     background-color: COLOR_GREEN;
 }
 
-.tagLightRed {
+.tagLightRed .tagRed {
     background-color: COLOR_RED_LIGHT;
 }
 
@@ -8496,6 +8501,34 @@ span.code {
     font-size: 14px;
     font-weight: bold;
     margin: 3em -15px 0 -15px !important;
+}
+
+/******************************
+  Disposal Tabs
+ ******************************/
+
+.disposalPolicyAssociationTab .objectToolbar {
+    background-color: transparent;
+}
+
+.disposalPolicyAssociationTab .row .content {
+    padding: 16px !important;
+    margin: 0px;
+}
+
+
+
+
+
+
+
+
+.wui-disposal-schedule-data .form-textbox {
+    background-color: white;
+}
+
+wui-disposal-hold-data .form-textbox {
+    background-color: white;
 }
 
 

@@ -1117,11 +1117,11 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
     appraisalGroup.addButton(messages.appraisalReject(), AIPAction.APPRAISAL_REJECT, ActionImpact.DESTROYED, "btn-ban");
 
     // Disposal
-    ActionableGroup<IndexedAIP> disposalGroup = new ActionableGroup<>(messages.disposalTitle());
+    ActionableGroup<IndexedAIP> disposalGroup = new ActionableGroup<>(messages.disposalTitle(), "btn-calendar", false);
     disposalGroup.addButton(messages.associateDisposalScheduleButton(), AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
-      ActionImpact.NONE, "fas fa-calendar");
+      ActionImpact.NONE, "btn-calendar");
     disposalGroup.addButton(messages.associateDisposalHoldButton(), AIPAction.ASSOCIATE_DISPOSAL_HOLD,
-      ActionImpact.NONE, "fas fa-lock");
+      ActionImpact.NONE, "btn-lock");
 
     aipActionableBundle.addGroup(searchGroup).addGroup(downloadGroup).addGroup(managementGroup).addGroup(disposalGroup)
       .addGroup(appraisalGroup).addGroup(preservationGroup);
