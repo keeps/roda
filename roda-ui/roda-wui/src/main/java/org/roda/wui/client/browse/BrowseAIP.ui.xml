@@ -18,9 +18,7 @@
 							<g:HTML ui:field="aipState" />
 
 							<!-- IDENTIFICATION -->
-							<common:TitlePanel ui:field="title">
-								<g:FlowPanel addStyleNames="browseItemPanelDisposal" ui:field="disposalPolicy" />
-							</common:TitlePanel>
+							<common:TitlePanel ui:field="title" />
 
 							<!-- DESCRIPTIVE METADATA -->
 							<tabs:BrowseAIPTabs ui:field="browseTab" />

@@ -61,7 +61,6 @@ public class BrowseAIPTabs extends Tabs {
 
     // Disposal
     DisposalPolicyAssociationTab disposalPolicyAssociationPanel = new DisposalPolicyAssociationTab(browseAIPResponse);
-    disposalPolicyAssociationPanel.addStyleName("disposalPolicyAssociationTab");
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalTab()), disposalPolicyAssociationPanel);
   }
 }

@@ -26,7 +26,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -41,8 +40,6 @@ public class DisposalPolicyAssociationTab extends Composite {
   @UiField
   ActionsToolbar actionsToolbar;
   @UiField
-  FlowPanel content;
-  @UiField
   DisposalPolicySummaryPanel disposalPolicySummaryPanel;
   @UiField(provided = true)
   DisposalConfirmationPanel disposalConfirmationPanel;
@@ -50,7 +47,6 @@ public class DisposalPolicyAssociationTab extends Composite {
   RetentionPeriodPanel retentionPeriodPanel;
   @UiField(provided = true)
   DisposalHoldsPanel disposalHoldsPanel;
-  ActionableWidgetBuilder<IndexedAIP> actionableWidgetBuilder;
   private IndexedAIP aip;
 
   public DisposalPolicyAssociationTab(BrowseAIPResponse response) {
@@ -62,12 +58,11 @@ public class DisposalPolicyAssociationTab extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(DisposalAssociationActions.get());
-
     aip = response.getIndexedAIP();
 
     // TOOLBAR
     actionsToolbar.setLabelVisible(false);
+    actionsToolbar.setTagsVisible(false);
     actionsToolbar.setActionableMenu(
       new ActionableWidgetBuilder<IndexedAIP>(AIPToolbarActions.get(aip.getId(), aip.getState(), aip.getPermissions()))
         .buildGroupedListWithObjects(new ActionableObject<>(aip),
@@ -76,10 +71,10 @@ public class DisposalPolicyAssociationTab extends Composite {
 
     // DISPOSAL POLICY SUMMARY
     if (DisposalPolicyUtils.showDisposalPolicySummary(aip)) {
-      disposalPolicySummaryPanel.setVisible(false);
-    } else {
       disposalPolicySummaryPanel.setIcon("fas fa-info-circle");
       disposalPolicySummaryPanel.setText(DisposalPolicyUtils.getDisposalPolicySummaryText(aip));
+    } else {
+      disposalPolicySummaryPanel.setVisible(false);
     }
   }
 

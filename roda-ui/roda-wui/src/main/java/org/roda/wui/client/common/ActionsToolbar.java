@@ -47,6 +47,10 @@ public class ActionsToolbar extends Composite {
     label.setVisible(visible);
   }
 
+  public void setTagsVisible(boolean visible) {
+    tags.setVisible(visible);
+  }
+
   public void setLabel(String labelText) {
     label.setText(labelText);
   }

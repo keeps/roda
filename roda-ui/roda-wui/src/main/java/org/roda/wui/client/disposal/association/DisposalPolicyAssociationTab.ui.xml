@@ -5,12 +5,11 @@
 	xmlns:association="urn:import:org.roda.wui.client.disposal.association">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
-	<g:FlowPanel styleName="wui-disposal-policy-association-data" addStyleNames="wrapper skip_padding">
+	<g:FlowPanel styleName="disposalAssociationTab" addStyleNames="wrapper skip_padding">
 		<common:ActionsToolbar ui:field="actionsToolbar" />
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content" ui:field="content">
+			<g:FlowPanel addStyleNames="col_10 content">
 				<common:DisposalPolicySummaryPanel ui:field="disposalPolicySummaryPanel" />
-
 				<association:DisposalConfirmationPanel ui:field="disposalConfirmationPanel" />
 				<association:RetentionPeriodPanel ui:field="retentionPeriodPanel" />
 				<association:DisposalHoldsPanel ui:field="disposalHoldsPanel" />

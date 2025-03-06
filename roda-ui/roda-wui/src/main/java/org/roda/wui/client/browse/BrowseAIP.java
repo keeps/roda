@@ -56,10 +56,8 @@ import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.DisposalPolicyUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
-import org.roda.wui.client.disposal.association.DisposalPolicyAssociationPanel;
 import org.roda.wui.client.services.AIPRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -88,7 +86,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -140,8 +137,6 @@ public class BrowseAIP extends Composite {
   SimplePanel aipChildrenCard;
   @UiField
   SimplePanel addChildAip;
-  @UiField
-  FlowPanel disposalPolicy;
   @UiField
   FlowPanel center;
   @UiField
@@ -262,8 +257,6 @@ public class BrowseAIP extends Composite {
 
     // IDENTIFICATION
     updateSectionIdentification(response);
-    // DISPOSAL
-    updateDisposalInformation();
 
     // AIP CHILDREN
     if (aip.getState().equals(AIPState.ACTIVE)) {
@@ -493,16 +486,6 @@ public class BrowseAIP extends Composite {
     Sliders.createAipInfoSlider(center, navigationToolbar.getInfoSidebarButton(), response);
 
     navigationToolbar.updateBreadcrumb(aip, response.getAncestors());
-  }
-
-  private void updateDisposalInformation() {
-    if (DisposalPolicyUtils.showDisposalPolicySummary(aip)) {
-      Anchor disposalPolicyLink = new Anchor(DisposalPolicyUtils.getDisposalPolicySummarySafeHTML(aip),
-        HistoryUtils.createHistoryHashLink(DisposalPolicyAssociationPanel.RESOLVER, aip.getId()));
-      disposalPolicy.add(disposalPolicyLink);
-    } else {
-      disposalPolicy.setVisible(false);
-    }
   }
 
   private void getDescriptiveMetadataHTML(final String aipId, final String descId, final DescriptiveMetadataInfo bundle,

@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.utils;
 
 import java.util.Date;
+import java.util.List;
 
 import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
 import org.roda.core.data.v2.disposal.schedule.RetentionPeriodCalculation;
@@ -58,20 +59,20 @@ public class DisposalPolicyUtils {
         case CONFIRMATION:
         case OVERDUE:
         case ERROR:
-          return Tag.fromText(summary.getMessage(), Tag.TagStyle.DANGER_LIGHT);
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.DANGER_LIGHT));
         case REVIEW:
-          return Tag.fromText(summary.getMessage(), Tag.TagStyle.WARNING_LIGHT);
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.WARNING_LIGHT));
         case HOLD:
-          return Tag.fromText(summary.getMessage(), Tag.TagStyle.NEUTRAL);
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.NEUTRAL));
         case RETAIN:
-          return Tag.fromText(summary.getMessage(), Tag.TagStyle.SUCCESS);
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.SUCCESS));
         case NONE:
         default:
-          return Tag.fromText(summary.getMessage(), Tag.TagStyle.NEUTRAL);
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.NEUTRAL));
       }
     } else if (AIPState.DESTROYED.equals(aip.getState())) {
       String message = messages.disposalPolicyDestroyedAIPSummary(Humanize.formatDate(aip.getDestroyedOn()));
-      return Tag.fromText(message, Tag.TagStyle.NEUTRAL);
+      return Tag.fromText(message, List.of(Tag.TagStyle.NEUTRAL, Tag.TagStyle.ICON_CLOCK));
     }
 
     return null;

@@ -14,6 +14,9 @@ import org.roda.wui.client.disposal.association.DisposalPolicyAssociationPanel;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+
 /**
  *
  * @author Alexandre Flores <aflores@keep.pt>
@@ -57,8 +60,13 @@ public class ObjectActionsToolbar<T extends IsIndexed> extends ActionsToolbar {
       if (DisposalPolicyUtils.showDisposalPolicySummary(aip)) {
         Tag disposalTag = DisposalPolicyUtils.getDisposalPolicySummaryTag(aip);
         if (disposalTag != null) {
-          disposalTag.addClickHandler(
-            event -> HistoryUtils.createHistoryHashLink(DisposalPolicyAssociationPanel.RESOLVER, aip.getId()));
+          disposalTag.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+              HistoryUtils.newHistory(DisposalPolicyAssociationPanel.RESOLVER, aip.getId());
+            }
+          });
+          tags.add(disposalTag);
         }
       }
     }

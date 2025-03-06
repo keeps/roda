@@ -50,6 +50,7 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
       String metadataID = SafeHtmlUtils.htmlEscape(metadataInfo.getId());
       ActionsToolbar descriptiveMetadataToolbar = new ActionsToolbar();
       descriptiveMetadataToolbar.setLabelVisible(false);
+      descriptiveMetadataToolbar.setTagsVisible(false);
       content.add(descriptiveMetadataToolbar);
       // Get metadata and populate widget
       HTML metadataHTML = new HTML();

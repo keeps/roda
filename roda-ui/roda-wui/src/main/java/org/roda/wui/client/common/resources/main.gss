@@ -504,7 +504,7 @@ div.inline {
 
 .browse_aip .row .content .lowerContent .card {
     background-color: transparent;
-}
+}creature
 
 .browse_aip .row .content .lowerContent .card .searchWrapper .sidebar-facet-label.fade-out:after {
         background: linear-gradient(-90deg, COLOR_GREY_BGDARKER 30%, rgba(255, 255, 255, 0) 100%);
@@ -3345,6 +3345,10 @@ td.datePickerMonth, td.datePickerYear {
     gap: 8px;
 }
 
+.thumbnailCardTags .tag .gwt-Label {
+    justify-content: center;
+}
+
 .tag {
     padding: 2px 8px;
     border-radius: 4px;
@@ -3372,6 +3376,31 @@ td.datePickerMonth, td.datePickerYear {
 
 .tagMono {
     font-family: FONT_MONOSPACED;
+}
+
+.tag .gwt-Label {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.tagIconCalendar .gwt-Label:before {
+    @mixin fontawesome();
+    content: "\e908";
+}
+
+.tagIconLock .gwt-Label:before {
+    @mixin fontawesome();
+    content: "\f023";
+}
+
+.tagIconClock .gwt-Label:before {
+    @mixin fontawesome();
+    content: "\e900";
+}
+
+.clickable {
+    cursor: pointer;
 }
 
 .labelWithIconReversed {
@@ -8507,13 +8536,75 @@ span.code {
   Disposal Tabs
  ******************************/
 
-.disposalPolicyAssociationTab .objectToolbar {
+.disposalAssociationTab {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
+    padding: 16px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.disposalAssociationTab .objectToolbar {
     background-color: transparent;
 }
 
-.disposalPolicyAssociationTab .row .content {
-    padding: 16px !important;
+.disposalAssociationTab .row .content {
     margin: 0px;
+    padding: 24px 32px !important;
+    min-height: initial;
+}
+
+.disposalAssociationTab .row .content .panel{
+    border: none;
+    background-color: transparent;
+}
+
+.disposalAssociationTab .row .content .wui-disposal-holds-panel button {
+    display: none;
+}
+
+.disposalAssociationTab .panel-body {
+    padding: 0;
+}
+
+.disposalAssociationTab .disposal-policy-summary {
+    margin: 0;
+}
+
+.disposalAssociationTab .label {
+    font-size: 14px;
+    font-weight: 300;
+    color: COLOR_GREY_MEDIUM;
+    width: 250px;
+}
+
+.disposalAssociationTab .field {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: row;
+}
+
+.disposalAssociationTab .value {
+    font-size: 14px;
+    color: black;
+    flex: 1;
+}
+
+.disposalAssociationTab .panel-heading {
+    padding: 0;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.disposalAssociationTab .panel-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.disposalAssociationTab .content > .wui-disposal-holds-panel {
+    margin-top: 32px;
 }
 
 
