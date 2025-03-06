@@ -1588,7 +1588,11 @@ public class LdapUtility {
     final Set<String> newgroupDNs = new HashSet<>();
     for (String groupName : newGroups) {
       LdapGroup ldapGroup = ldapGroupRepository.findByCommonName(groupName);
-      newgroupDNs.add(ldapGroup.getId().toString());
+      if (ldapGroup == null) {
+        LOGGER.warn("Group {} doesn't exist", groupName);
+      } else {
+        newgroupDNs.add(ldapGroup.getId().toString());
+      }
     }
 
     // removing all the groups in newgroups, oldgroups becomes the Set

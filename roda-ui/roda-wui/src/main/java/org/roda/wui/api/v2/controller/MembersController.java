@@ -2,6 +2,7 @@ package org.roda.wui.api.v2.controller;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.function.BiConsumer;
 
 import javax.crypto.SecretKey;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
@@ -63,7 +65,6 @@ import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.client.services.MembersRestService;
 import org.roda.wui.common.ControllerAssistant;
-import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.slf4j.Logger;
@@ -137,6 +138,7 @@ public class MembersController implements MembersRestService, Exportable {
     User user = null;
 
     try {
+      // find user with username
       user = RodaCoreFactory.getModelService().retrieveUser(username);
     } catch (GenericException e) {
       if (!(e.getCause() instanceof NamingException)) {
@@ -144,36 +146,59 @@ public class MembersController implements MembersRestService, Exportable {
       }
     }
 
-    if (user == null) {
-      User newUser = new User(username);
-      newUser = UserUtility.resetGroupsAndRoles(newUser);
+    Map<String, Object> attributes = null;
+    if (request.getUserPrincipal() instanceof AttributePrincipal attributesPrincipal) {
+      attributes = attributesPrincipal.getAttributes();
+    }
 
-      // try to set user email from cas principal attributes
-      if (request.getUserPrincipal() instanceof AttributePrincipal attributePrincipal) {
-        Map<String, Object> attributes = attributePrincipal.getAttributes();
-
-        mapCasAttribute(newUser, attributes, "fullname", (u, a) -> u.setFullName(a));
-        mapCasAttribute(newUser, attributes, "email", (u, a) -> u.setEmail(a));
-      }
-
-      // Try to find a user with email
-      User retrievedUserByEmail = null;
-      if (StringUtils.isNotBlank(newUser.getEmail())) {
+    if ((user == null || user.equals(new User())) && attributes != null) {
+      // couldn't find with username, so try to find with email
+      Object emailAttribute = attributes.get("email");
+      if (emailAttribute instanceof String email && StringUtils.isNotBlank(email)) {
         try {
-          retrievedUserByEmail = RodaCoreFactory.getModelService().retrieveUserByEmail(newUser.getEmail());
+          user = RodaCoreFactory.getModelService().retrieveUserByEmail(email);
         } catch (GenericException e) {
           if (!(e.getCause() instanceof NamingException)) {
             throw e;
           }
         }
       }
+    }
 
-      if (retrievedUserByEmail != null) {
-        user = retrievedUserByEmail;
-      } else {
-        // If no user was found with username or e-mail, a new one is created.
-        user = RodaCoreFactory.getModelService().createUser(newUser, true);
+    if ((user == null || user.equals(new User())) && attributes != null) {
+      // couldn't find user with username nor email, so create a new one
+      user = new User(username);
+      user = UserUtility.resetGroupsAndRoles(user);
+
+      // try to set user email, full name and groups from cas principal attributes
+      mapCasStringAttribute(user, attributes, "fullname", (u, a) -> u.setFullName(a));
+      mapCasStringAttribute(user, attributes, "email", (u, a) -> u.setEmail(a));
+      mapCasSetAttribute(user, attributes, "memberOf", (u, a) -> u.setGroups(a));
+
+      user = RodaCoreFactory.getModelService().createUser(user, true);
+    } else {
+      // found user and authentication externally, so update user email, full name and
+      // groups from cas principal
+      // attributes if they have changed
+      if (attributes.get("email") instanceof String email && !user.getEmail().equals(attributes.get("email"))) {
+        user.setEmail(email);
       }
+      if (attributes.get("fullname") instanceof String fullname
+        && !user.getFullName().equals(attributes.get("fullname"))) {
+        user.setFullName(fullname);
+      }
+      if (attributes.get("memberOf") instanceof Collection<?> memberOf) {
+        Set<String> groups = new HashSet<>();
+        for (Object group : memberOf) {
+          if (group instanceof String groupString) {
+            groups.add(groupString);
+          }
+        }
+        if (!user.getGroups().equals(groups)) {
+          user.setGroups(groups);
+        }
+      }
+      RodaCoreFactory.getModelService().updateUser(user, null, true);
     }
 
     if (!user.isActive()) {
@@ -184,12 +209,28 @@ public class MembersController implements MembersRestService, Exportable {
     return user;
   }
 
-  private static void mapCasAttribute(User user, Map<String, Object> attributes, String attributeKey,
+  private static void mapCasStringAttribute(User user, Map<String, Object> attributes, String attributeKey,
     BiConsumer<User, String> mapping) {
     Object attributeValue = attributes.get(attributeKey);
     if (attributeValue instanceof String value) {
       mapping.accept(user, value);
     }
+  }
+
+  private static void mapCasSetAttribute(User user, Map<String, Object> attributes, String attributeKey,
+    BiConsumer<User, Set<String>> mapping) {
+    Object attributeValue = attributes.get(attributeKey);
+    Set<String> newCollection = new HashSet<>();
+    if (attributeValue instanceof Collection<?> valueCollection) {
+      for (Object value : valueCollection) {
+        if (value instanceof String valueString) {
+          newCollection.add(valueString);
+        }
+      }
+    } else if (attributeValue instanceof String group) {
+      newCollection.add(group);
+    }
+    mapping.accept(user, newCollection);
   }
 
   @Override
