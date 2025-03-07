@@ -78,18 +78,16 @@ public class ObjectActionsToolbar<T extends IsIndexed> extends ActionsToolbar {
     if (object instanceof IndexedAIP) {
       IndexedAIP aip = (IndexedAIP) object;
       AIPToolbarActions aipActions;
-      if (aip.getParentID() != null) {
-        aipActions = AIPToolbarActions.get(aip.getParentID(), aip.getState(), aip.getPermissions());
-      } else {
-        aipActions = AIPToolbarActions.get();
-      }
+      aipActions = AIPToolbarActions.get(aip.getId(), aip.getState(), aip.getPermissions());
       this.actions.add(
         new ActionableWidgetBuilder<IndexedAIP>(aipActions).buildGroupedListWithObjects(new ActionableObject<>(aip),
           List.of(AIPToolbarActions.AIPAction.SEARCH_DESCENDANTS, AIPToolbarActions.AIPAction.SEARCH_PACKAGE,
             AIPToolbarActions.AIPAction.DOWNLOAD, AIPToolbarActions.AIPAction.DOWNLOAD_EVENTS,
             AIPToolbarActions.AIPAction.DOWNLOAD_DOCUMENTATION, AIPToolbarActions.AIPAction.DOWNLOAD_SUBMISSIONS,
             AIPToolbarActions.AIPAction.CHANGE_TYPE, AIPToolbarActions.AIPAction.MOVE_IN_HIERARCHY,
-            AIPToolbarActions.AIPAction.REMOVE, AIPToolbarActions.AIPAction.NEW_PROCESS)));
+            AIPToolbarActions.AIPAction.REMOVE, AIPToolbarActions.AIPAction.NEW_PROCESS,
+            AIPToolbarActions.AIPAction.NEW_CHILD_AIP_BELOW),
+          List.of(AIPToolbarActions.AIPAction.NEW_PROCESS)));
     }
   }
 }

@@ -1059,6 +1059,9 @@ button:after {
     content: "\e908";
 }
 
+.btn-lock:after {
+    content: "\f023";
+}
 
 .btn-top:after {
     content: "\f102";
@@ -1404,13 +1407,9 @@ button:after {
 }
 
 .searchWrapperSidePanel .my-asyncdatagrid-side-panel {
-    margin-left: 16px;
     padding: 16px;
     background-color: transparent;
-}
-
-.searchWrapperSidePanel .my-asyncdatagrid-side-panel {
-    width: 250px;
+    margin: 0;
 }
 
 .col_12 .my-asyncdatagrid-side-panel {
@@ -4196,6 +4195,7 @@ td.datePickerMonth, td.datePickerYear {
 .searchWrapper {
     display: flex;
     align-items: start;
+    gap: 16px;
 }
 
 .searchWrapperMainPanel {
@@ -4204,6 +4204,10 @@ td.datePickerMonth, td.datePickerYear {
     border-radius: 8px;
     box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
     flex: 1;
+}
+
+.searchWrapperSidePanel {
+    max-width: 250px;
 }
 
 .searchWrapper .objectToolbar {
@@ -8344,8 +8348,8 @@ span.code {
 
 .objectToolbar button:hover, .groupedActionableMenu button:hover,
 .groupedActionableMenu .actionable-button:hover{
-    background-color: COLOR_BLUE_LIGHT;
-    color: COLOR_PRIMARY;
+    transition: background-color 0.1s;
+    background-color: COLOR_GREY_LIGHT;
 }
 
 .popupAnchor {
@@ -8511,7 +8515,7 @@ span.code {
     font-size: 14px;
     font-weight: 300;
     color: COLOR_GREY_MEDIUM;
-    flex: 0.3;
+    width: 250px;
 }
 
 .descriptiveMetadata .field {
@@ -8548,6 +8552,10 @@ span.code {
 
 .disposalAssociationTab .objectToolbar {
     background-color: transparent;
+}
+
+.disposalAssociationTab .row {
+    margin: 0px;
 }
 
 .disposalAssociationTab .row .content {
@@ -8936,3 +8944,16 @@ wui-disposal-hold-data .form-textbox {
      margin-top: 10px;
      margin-bottom: 5px;
  }
+
+ /******************************
+   Custom Material Icons
+  ******************************/
+
+.cmi {
+    @mixin fontawesome();
+    font-style: normal;
+}
+
+.cmi-accountTree:after {
+    content: "\e901";
+}

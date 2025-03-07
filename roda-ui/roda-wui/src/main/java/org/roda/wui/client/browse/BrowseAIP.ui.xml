@@ -2,7 +2,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:commoncards="urn:import:org.roda.wui.client.common.cards"
-	xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs">
+	xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs" xmlns:labels="urn:import:org.roda.wui.client.common.labels">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -23,15 +23,10 @@
 							<!-- DESCRIPTIVE METADATA -->
 							<tabs:BrowseAIPTabs ui:field="browseTab" />
 						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="lowerContent">
-							<g:HTML>
-								<h3 text="{messages.sublevels}"/>
-							</g:HTML>
+						<g:FlowPanel addStyleNames="lowerContent" ui:field="lowerContent">
 							<!-- AIP CHILDREN -->
+							<labels:Header ui:field="aipChildrenTitle" />
 							<g:SimplePanel ui:field="aipChildrenCard" addStyleNames="card aipChildrenCard" />
-
-							<!-- ADD NEW -->
-							<g:SimplePanel ui:field="addChildAip" addStyleNames="ActionableStyleButtons" />
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>

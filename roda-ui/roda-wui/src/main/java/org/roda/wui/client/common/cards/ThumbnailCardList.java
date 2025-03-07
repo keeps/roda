@@ -57,7 +57,7 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
     // UI Elements
     initWidget(uiBinder.createAndBindUi(this));
     this.title.setHeaderStyleName("noMargin");
-    this.title.setTitleText(title);
+    this.title.setHeaderText(title);
     this.title.setLevel(5);
     this.title.setIcon(icon);
 

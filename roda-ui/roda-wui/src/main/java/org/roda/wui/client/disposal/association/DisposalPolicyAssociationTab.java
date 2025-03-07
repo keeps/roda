@@ -16,7 +16,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.DisposalPolicySummaryPanel;
 import org.roda.wui.client.common.actions.AIPToolbarActions;
-import org.roda.wui.client.common.actions.DisposalAssociationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
@@ -66,6 +65,8 @@ public class DisposalPolicyAssociationTab extends Composite {
     actionsToolbar.setActionableMenu(
       new ActionableWidgetBuilder<IndexedAIP>(AIPToolbarActions.get(aip.getId(), aip.getState(), aip.getPermissions()))
         .buildGroupedListWithObjects(new ActionableObject<>(aip),
+          List.of(AIPToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
+            AIPToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_HOLD),
           List.of(AIPToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
             AIPToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_HOLD)));
 

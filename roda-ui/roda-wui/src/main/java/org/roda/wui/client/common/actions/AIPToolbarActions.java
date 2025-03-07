@@ -87,14 +87,14 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
   private static final AIPToolbarActions GENERAL_INSTANCE = new AIPToolbarActions(NO_AIP_PARENT, NO_AIP_STATE, null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_NO_AIP_TOP = new HashSet<>(
-    Arrays.asList(AIPAction.NEW_CHILD_AIP_TOP));
+    List.of(AIPAction.NEW_CHILD_AIP_TOP));
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
-    Arrays.asList(AIPAction.NEW_CHILD_AIP_BELOW));
-  private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
-    Arrays.asList(AIPAction.DOWNLOAD, AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.REMOVE,
-      AIPAction.NEW_PROCESS, AIPAction.DOWNLOAD_EVENTS, AIPAction.DOWNLOAD_DOCUMENTATION,
-      AIPAction.DOWNLOAD_SUBMISSIONS, AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
-      AIPAction.ASSOCIATE_DISPOSAL_HOLD, AIPAction.SEARCH_DESCENDANTS, AIPAction.SEARCH_PACKAGE));
+    List.of(AIPAction.NEW_CHILD_AIP_BELOW));
+  private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(Arrays.asList(AIPAction.DOWNLOAD,
+    AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.REMOVE, AIPAction.NEW_PROCESS,
+    AIPAction.DOWNLOAD_EVENTS, AIPAction.DOWNLOAD_DOCUMENTATION, AIPAction.DOWNLOAD_SUBMISSIONS, AIPAction.CHANGE_TYPE,
+    AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE, AIPAction.ASSOCIATE_DISPOSAL_HOLD, AIPAction.SEARCH_DESCENDANTS,
+    AIPAction.SEARCH_PACKAGE, AIPAction.NEW_CHILD_AIP_BELOW));
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.REMOVE, AIPAction.NEW_PROCESS,
       AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE, AIPAction.ASSOCIATE_DISPOSAL_HOLD));
@@ -231,6 +231,8 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
       associateDisposalSchedule(aip, callback);
     } else if (AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
       manageDisposalHold(aip, callback);
+    } else if (AIPAction.NEW_CHILD_AIP_TOP.equals(action) || AIPAction.NEW_CHILD_AIP_BELOW.equals(action)) {
+      newChildAip(callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -347,7 +349,7 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
               public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
                 final IndexedAIP parentAIP = event.getValue();
                 final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
-                final SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId),
+                final SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Collections.singletonList(aipId),
                   IndexedAIP.class.getName());
 
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
@@ -410,7 +412,7 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
                 int counter = 0;
-                boolean justActive = parentAipState != null ? AIPState.ACTIVE.equals(parentAipState) : true;
+                boolean justActive = parentAipState == null || AIPState.ACTIVE.equals(parentAipState);
                 Filter filter = new Filter();
 
                 if (selected instanceof SelectedItemsList) {
@@ -1078,12 +1080,12 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
     ActionableBundle<IndexedAIP> aipActionableBundle = new ActionableBundle<>();
 
     // SEARCH
-    ActionableGroup<IndexedAIP> searchGroup = new ActionableGroup<>(messages.searchWithin(), "btn-search", false);
+    ActionableGroup<IndexedAIP> searchGroup = new ActionableGroup<>(messages.searchWithin(), "btn-search");
     searchGroup.addButton(messages.searchDescendants(), AIPAction.SEARCH_DESCENDANTS, ActionImpact.NONE, "btn-sitemap");
     searchGroup.addButton(messages.searchPackage(), AIPAction.SEARCH_PACKAGE, ActionImpact.NONE, "btn-archive");
 
     // DOWNLOAD
-    ActionableGroup<IndexedAIP> downloadGroup = new ActionableGroup<>(messages.downloadButton(), "btn-download", false);
+    ActionableGroup<IndexedAIP> downloadGroup = new ActionableGroup<>(messages.downloadButton(), "btn-download");
     downloadGroup.addButton(messages.downloadButton() + " " + messages.oneOfAObject(AIP.class.getName()),
       AIPAction.DOWNLOAD, ActionImpact.NONE, "btn-download");
     downloadGroup.addButton(messages.preservationEventsDownloadButton(), AIPAction.DOWNLOAD_EVENTS, ActionImpact.NONE,
@@ -1094,7 +1096,7 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
       "btn-download");
 
     // MANAGEMENT
-    ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.manage(), "btn-edit", false);
+    ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.manage(), "btn-edit");
     managementGroup.addButton(messages.newArchivalPackage(), AIPAction.NEW_CHILD_AIP_TOP, ActionImpact.UPDATED,
       "btn-plus-circle");
     managementGroup.addButton(messages.newSublevel(), AIPAction.NEW_CHILD_AIP_BELOW, ActionImpact.UPDATED,
@@ -1108,7 +1110,7 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
 
     // PRESERVATION
     ActionableGroup<IndexedAIP> preservationGroup = new ActionableGroup<>(messages.preservationTitle(),
-      "btn-play-circle", true);
+      "btn-play-circle");
     preservationGroup.addButton(messages.runAction(), AIPAction.NEW_PROCESS, ActionImpact.UPDATED, "btn-play");
 
     // APPRAISAL
@@ -1117,7 +1119,7 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
     appraisalGroup.addButton(messages.appraisalReject(), AIPAction.APPRAISAL_REJECT, ActionImpact.DESTROYED, "btn-ban");
 
     // Disposal
-    ActionableGroup<IndexedAIP> disposalGroup = new ActionableGroup<>(messages.disposalTitle(), "btn-calendar", false);
+    ActionableGroup<IndexedAIP> disposalGroup = new ActionableGroup<>(messages.disposalTitle(), "btn-calendar");
     disposalGroup.addButton(messages.associateDisposalScheduleButton(), AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
       ActionImpact.NONE, "btn-calendar");
     disposalGroup.addButton(messages.associateDisposalHoldButton(), AIPAction.ASSOCIATE_DISPOSAL_HOLD,
@@ -1141,7 +1143,7 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
     ASSOCIATE_DISPOSAL_HOLD(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD), SEARCH_DESCENDANTS(),
     SEARCH_PACKAGE();
 
-    private List<String> methods;
+    private final List<String> methods;
 
     AIPAction(String... methods) {
       this.methods = Arrays.asList(methods);

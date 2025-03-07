@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:common="urn:import:org.roda.wui.client.common">
+
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_10 content">
+				<common:TitlePanel text="{messages.archivalPackagePermissionsTitle}" ui:field="title" />
+
+				<g:FlowPanel addStyleNames="page-description" ui:field="editPermissionsDescription" />
+				<g:Label styleName="h4">
+					<ui:text from='{messages.permissionAssignedGroups}' />
+				</g:Label>
+				<g:Label styleName="info-empty" ui:field="groupPermissionsEmpty">
+					<ui:text from='{messages.permissionAssignedGroupsEmpty}' />
+				</g:Label>
+				<g:FlowPanel ui:field="groupPermissionsPanel" addStyleNames="plugin-category-padding" />
+				<g:Label styleName="h4">
+					<ui:text from='{messages.permissionAssignedUsers}' />
+				</g:Label>
+				<g:Label styleName="info-empty" ui:field="userPermissionsEmpty">
+					<ui:text from='{messages.permissionAssignedUsersEmpty}' />
+				</g:Label>
+				<g:FlowPanel ui:field="userPermissionsPanel" addStyleNames="permission-box-padding" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:FlowPanel>
+							<g:Label addStyleNames="h5">
+								<ui:text from='{messages.sidebarActionsTitle}' />
+							</g:Label>
+							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="buttonAdd" title="{messages.addPermission}">
+								<ui:text from='{messages.addPermission}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApply" title="{messages.saveButton}">
+								<ui:text from='{messages.saveButton}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApplyToAll" title="{messages.applyAllButton}">
+								<ui:text from='{messages.applyAllButton}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-block btn-default btn-times-circle" ui:field="buttonClose" title="{messages.backButton}">
+								<ui:text from='{messages.backButton}' />
+							</g:Button>
+						</g:FlowPanel>
+					</g:FlowPanel>
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

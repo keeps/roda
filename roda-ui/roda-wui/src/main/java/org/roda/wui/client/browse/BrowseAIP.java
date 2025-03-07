@@ -49,6 +49,7 @@ import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.cards.AIPDisseminationCardList;
 import org.roda.wui.client.common.cards.AIPRepresentationCardList;
+import org.roda.wui.client.common.labels.Header;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -131,14 +132,17 @@ public class BrowseAIP extends Composite {
   @UiField
   BrowseAIPTabs browseTab;
 
-  // DESCRIPTIVE METADATA
   // AIP CHILDREN
+  @UiField
+  FlowPanel lowerContent;
+  @UiField
+  Header aipChildrenTitle;
   @UiField
   SimplePanel aipChildrenCard;
   @UiField
-  SimplePanel addChildAip;
-  @UiField
   FlowPanel center;
+
+  // SIDEBAR
   @UiField
   FlowPanel representationCards;
   @UiField
@@ -192,6 +196,9 @@ public class BrowseAIP extends Composite {
     updateSectionDescriptiveMetadata(response.getDescriptiveMetadataInfos());
 
     // AIP CHILDREN
+    aipChildrenTitle.setHeaderText(messages.sublevels());
+    aipChildrenTitle.setIcon("cmi cmi-accountTree");
+    aipChildrenTitle.setLevel(5);
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
       ListBuilder<IndexedAIP> aipChildrenListBuilder;
       if (aip.getState().equals(AIPState.DESTROYED) || aip.isOnHold() || aip.getDisposalConfirmationId() != null) {
@@ -262,15 +269,9 @@ public class BrowseAIP extends Composite {
     if (aip.getState().equals(AIPState.ACTIVE)) {
       if (response.getChildAipsCount().getResult() > 0) {
         LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
-      } else {
-        if (!aip.isOnHold() && aip.getDisposalConfirmationId() == null) {
-          addChildAip.setWidget(
-            new ActionableWidgetBuilder<>(aipActions).buildListWithObjects(new ActionableObject<>(IndexedAIP.class),
-              Collections.singletonList(AipActions.AipAction.NEW_CHILD_AIP_BELOW)));
-        }
       }
 
-      addChildAip.setVisible(response.getRepresentationCount().getResult() == 0);
+      lowerContent.setVisible(response.getChildAipsCount().getResult() > 0);
     }
 
     // Side panel representations
