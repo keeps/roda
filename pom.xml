@@ -48,14 +48,14 @@
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
-        <developer>
+        <!--developer>
             <id>hsilva</id>
             <name>Helder Silva</name>
             <email>hsilva@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
-        </developer>
+        </developer-->
         <developer>
             <id>mguimaraes</id>
             <name>Miguel Guimarães</name>
@@ -72,18 +72,42 @@
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
-        <developer>
+        <!--developer>
             <id>jgomes</id>
             <name>João Gomes</name>
             <email>jgomes@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
-        </developer>
-        <developer>
+        </developer-->
+        <!--developer>
             <id>syusupov</id>
             <name>Shahzod Yusupov</name>
             <email>syusupov@keep.pt</email>
+            <organization>KEEP SOLUTIONS</organization>
+            <organizationUrl>https://www.keep.pt</organizationUrl>
+            <timezone>0</timezone>
+        </developer-->
+        <developer>
+            <id>alindo</id>
+            <name>António Lindo</name>
+            <email>alindo@keep.pt</email>
+            <organization>KEEP SOLUTIONS</organization>
+            <organizationUrl>https://www.keep.pt</organizationUrl>
+            <timezone>0</timezone>
+        </developer>
+        <developer>
+            <id>cafonso</id>
+            <name>Carlos Afonso</name>
+            <email>cafonso@keep.pt</email>
+            <organization>KEEP SOLUTIONS</organization>
+            <organizationUrl>https://www.keep.pt</organizationUrl>
+            <timezone>0</timezone>
+        </developer>
+        <developer>
+            <id>aflores</id>
+            <name>Alexandre Flores</name>
+            <email>aflores@keep.pt</email>
             <organization>KEEP SOLUTIONS</organization>
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
@@ -101,7 +125,7 @@
         <jersey.version>3.1.7</jersey.version>
         <swagger.version>2.2.22</swagger.version>
         <jackson.version>2.17.1</jackson.version>
-        <spring.version>6.1.14</spring.version>
+        <spring.version>6.2.0</spring.version>
         <solr.version>9.6.1</solr.version>
         <pekko.version>1.0.2</pekko.version>
         <httpcomponents.version>4.5.14</httpcomponents.version>
