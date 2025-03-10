@@ -11,9 +11,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.utils.SelectedItemsUtils;
-import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
-import org.roda.core.data.v2.index.select.SelectedItems;
 
 
 public class DeleteRequest implements Serializable {

@@ -6,7 +6,6 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.Permissions;
 

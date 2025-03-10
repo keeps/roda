@@ -1434,7 +1434,7 @@ public class AIPController implements AIPRestService, Exportable {
   }
 
   @Override
-  public Job updatePermissions(UpdatePermissionsRequest updateRequest) {
+  public Job updatePermissions(@RequestBody UpdatePermissionsRequest updateRequest) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
