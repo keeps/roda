@@ -1,5 +1,7 @@
 package org.roda.wui.client.browse.tabs;
 
+import java.util.List;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -11,7 +13,10 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.EditPermissionsTab;
+import org.roda.wui.client.common.actions.AIPToolbarActions;
 import org.roda.wui.client.common.actions.PreservationEventActions;
+import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
@@ -45,8 +50,8 @@ public class BrowseAIPTabs extends Tabs {
     eventFilter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
     SearchWrapper preservationEvents = new SearchWrapper(false)
       .createListAndSearchPanel(new ListBuilder<>(() -> new PreservationEventList(),
-        new AsyncTableCellOptions<>(IndexedPreservationEvent.class, "BrowseAIP_preservationEvents").withFilter(eventFilter)
-          .withSummary(messages.searchResults()).bindOpener()
+        new AsyncTableCellOptions<>(IndexedPreservationEvent.class, "BrowseAIP_preservationEvents")
+          .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()
           .withActionable(PreservationEventActions.get(aip.getId(), null, null))));
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.preservationEventsTab()), preservationEvents);
 
@@ -71,7 +76,11 @@ public class BrowseAIPTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalTab()), disposalPolicyAssociationPanel);
 
     // Permissions
-    EditPermissionsTab permissionsTab = new EditPermissionsTab(IndexedAIP.class.getName(), aip);
+    AIPToolbarActions aipToolbarActions = AIPToolbarActions.get(aip.getId(), aip.getState(), aip.getPermissions());
+    EditPermissionsTab permissionsTab = new EditPermissionsTab(new ActionableWidgetBuilder<>(aipToolbarActions)
+      .buildGroupedListWithObjects(new ActionableObject<>(aip), List.of(AIPToolbarActions.AIPAction.UPDATE_PERMISSIONS),
+        List.of(AIPToolbarActions.AIPAction.UPDATE_PERMISSIONS)),
+      IndexedAIP.class.getName(), aip);
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.permissionsTab()), permissionsTab);
 
   }

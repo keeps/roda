@@ -1104,7 +1104,7 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
     managementGroup.addButton(messages.changeTypeButton(), AIPAction.CHANGE_TYPE, ActionImpact.UPDATED, BTN_EDIT);
     managementGroup.addButton(messages.moveArchivalPackage(), AIPAction.MOVE_IN_HIERARCHY, ActionImpact.UPDATED,
       BTN_EDIT);
-    managementGroup.addButton(messages.archivalPackagePermissions(), AIPAction.UPDATE_PERMISSIONS, ActionImpact.UPDATED,
+    managementGroup.addButton(messages.editArchivalPackagePermissions(), AIPAction.UPDATE_PERMISSIONS, ActionImpact.UPDATED,
       BTN_EDIT);
     managementGroup.addButton(messages.removeArchivalPackage(), AIPAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 

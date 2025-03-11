@@ -19,7 +19,8 @@ public class Tag extends Composite {
   private static final Tag.MyUiBinder uiBinder = GWT.create(Tag.MyUiBinder.class);
 
   public enum TagStyle {
-    DEFAULT, SUCCESS, FAILURE, WARNING_LIGHT, DANGER_LIGHT, NEUTRAL, MONO, ICON_CALENDAR, ICON_LOCK, ICON_CLOCK;
+    DEFAULT, SUCCESS, FAILURE, WARNING_LIGHT, DANGER_LIGHT, NEUTRAL, MONO, ICON_CALENDAR, ICON_LOCK, ICON_CLOCK,
+    BORDER_BLACK, BORDER_DANGER;
 
     private static String toStyleName(TagStyle tagStyle) {
       switch (tagStyle) {
@@ -41,6 +42,10 @@ public class Tag extends Composite {
           return "tagIconLock";
         case ICON_CLOCK:
           return "tagIconClock";
+        case BORDER_BLACK:
+          return "tagBorderBlack";
+        case BORDER_DANGER:
+          return "tagBorderRed";
         default:
           return "";
       }

@@ -1304,6 +1304,8 @@ public interface ClientMessages extends Messages {
 
   String archivalPackagePermissions();
 
+  String editArchivalPackagePermissions();
+
   String archivalPackagePermissionsTitle();
 
   String disseminationPermissions();
