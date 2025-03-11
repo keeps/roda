@@ -638,7 +638,7 @@ public class PluginParameterPanel extends Composite {
   private void createPluginSipToAipLayout() {
     List<PluginType> plugins = Arrays.asList(PluginType.SIP_TO_AIP);
     Services services = new Services("Retrieve plugin information", "get");
-    services.configurationsResource(s -> s.retrievePluginsInfo(plugins)).whenComplete((pluginInfoList, throwable) -> {
+    services.configurationsResource(s -> s.retrievePluginsInfo(plugins, false)).whenComplete((pluginInfoList, throwable) -> {
       if (throwable == null) {
         Label parameterName = new Label(parameter.getName());
         layout.add(parameterName);

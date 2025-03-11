@@ -409,11 +409,17 @@ public class PluginManager {
   }
 
   public PluginInfoList getPluginsInfo(List<PluginType> pluginTypes) {
+    return getPluginsInfo(pluginTypes, true);
+  }
+
+  public PluginInfoList getPluginsInfo(List<PluginType> pluginTypes, boolean removeNotListable) {
     PluginInfoList pluginsInfo = new PluginInfoList();
 
     for (PluginType pluginType : pluginTypes) {
-      List<PluginInfo> orDefault = pluginInfoPerType.getOrDefault(pluginType, Collections.emptyList());
-      orDefault.removeIf(p -> p.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE));
+      List<PluginInfo> orDefault = new ArrayList<>(pluginInfoPerType.getOrDefault(pluginType, Collections.emptyList()));
+      if (removeNotListable) {
+        orDefault.removeIf(p -> p.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE));
+      }
       pluginsInfo.addObjects(orDefault);
     }
 
