@@ -34,6 +34,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
@@ -164,7 +165,7 @@ public final class TestsHelper {
   public static List<Report> getJobReports(IndexService index, Job job, boolean failIfReportNotSucceeded)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException {
 
-    index.commit(Job.class, IndexedReport.class);
+    index.commit(IndexedJob.class, IndexedReport.class);
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId()));
 

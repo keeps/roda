@@ -347,7 +347,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     try {
-      Job job = PluginHelper.getJob(this, index);
+      Job job = PluginHelper.getJob(this, model);
       if (TransferredResource.class.getName().equals(job.getSourceObjects().getSelectedClass())) {
         String relativePath = "";
         if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_ID)) {

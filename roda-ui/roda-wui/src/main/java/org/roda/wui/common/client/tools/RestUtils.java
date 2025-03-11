@@ -478,7 +478,7 @@ public class RestUtils {
         return RodaConstants.API_REST_V2_AIPS;
       case "org.roda.core.data.v2.ip.IndexedRepresentation":
         return RodaConstants.API_REST_V2_REPRESENTATIONS;
-      case "org.roda.core.data.v2.jobs.Job":
+      case "org.roda.core.data.v2.jobs.IndexedJob":
         return RodaConstants.API_REST_V2_JOBS;
       case "org.roda.core.data.v2.ip.TransferredResource":
         return RodaConstants.API_REST_V2_TRANSFERRED_RESOURCES;

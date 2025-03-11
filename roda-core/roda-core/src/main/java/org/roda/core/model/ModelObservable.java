@@ -22,6 +22,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -196,6 +197,10 @@ public abstract class ModelObservable {
 
   public ReturnWithExceptionsWrapper notifyJobReportCreatedOrUpdated(Report jobReport, Job cachedJob) {
     return notifyObserversSafely(observer -> observer.jobReportCreatedOrUpdated(jobReport, cachedJob));
+  }
+
+  public ReturnWithExceptionsWrapper notifyJobReportCreatedOrUpdated(Report jobReport, IndexedJob indexedJob) {
+    return notifyObserversSafely(observer -> observer.jobReportCreatedOrUpdated(jobReport, indexedJob));
   }
 
   public ReturnWithExceptionsWrapper notifyJobReportDeleted(String jobReportId) {

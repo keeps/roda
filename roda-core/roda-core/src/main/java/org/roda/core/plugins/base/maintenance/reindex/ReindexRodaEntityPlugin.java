@@ -179,7 +179,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {
-        Job job = PluginHelper.getJob(this, index);
+        Job job = PluginHelper.getJob(this, model);
         if (job.getSourceObjects() instanceof SelectedItemsAll) {
           Class<? extends IsIndexed> selectedClass = (Class<? extends IsIndexed>) Class
             .forName(job.getSourceObjects().getSelectedClass());
@@ -205,7 +205,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
     LOGGER.debug("Optimizing indexes");
     if (optimizeIndexes) {
       try {
-        Job job = PluginHelper.getJob(this, index);
+        Job job = PluginHelper.getJob(this, model);
         Class<? extends IsIndexed> selectedClass = (Class<? extends IsIndexed>) Class
           .forName(job.getSourceObjects().getSelectedClass());
         index.optimizeIndexes(SolrCollectionRegistry.getCommitIndexNames(selectedClass));
