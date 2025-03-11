@@ -31,6 +31,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -137,7 +138,7 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
       String userAgentId;
       try {
         PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(job.getUsername(), model, index,
-          true, job);
+          true, job.getJobUsersDetails());
         linkingIdentifierAgent.setValue(pm.getId());
       } catch (AlreadyExistsException e) {
         linkingIdentifierAgent
@@ -256,7 +257,7 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
         model.createOrUpdateJob(ingestJob);
       }
 
-      index.commit(IndexedAIP.class, Job.class, IndexedReport.class, IndexedPreservationEvent.class);
+      index.commit(IndexedAIP.class, IndexedJob.class, IndexedReport.class, IndexedPreservationEvent.class);
 
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       report.setPluginState(PluginState.FAILURE).setPluginDetails("Failed to update job counters");

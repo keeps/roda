@@ -22,8 +22,8 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -34,7 +34,6 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
-import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,12 +149,21 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
   public static class Info extends IndexingAdditionalInfo {
 
     private final Report jobReport;
-    private final Job cachedJob;
+    private final String jobName;
+    private final PluginType pluginType;
 
     public Info(Report jobReport, Job cachedJob) {
       super();
       this.jobReport = jobReport;
-      this.cachedJob = cachedJob;
+      this.jobName = cachedJob.getName();
+      this.pluginType = cachedJob.getPluginType();
+    }
+
+    public Info(Report jobReport, IndexedJob indexedJob) {
+      super();
+      this.jobReport = jobReport;
+      this.jobName = indexedJob.getName();
+      this.pluginType = indexedJob.getPluginType();
     }
 
     @Override
@@ -164,18 +172,18 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
 
       SolrClient index = RodaCoreFactory.getIndexService().getSolrClient();
 
-      preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_NAME, cachedJob.getName());
+      preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_NAME, jobName);
       preCalculatedFields.put(RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL,
         SolrUtils.getObjectLabel(index, jobReport.getSourceObjectClass(), jobReport.getSourceObjectId()));
       preCalculatedFields.put(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL,
         SolrUtils.getObjectLabel(index, jobReport.getOutcomeObjectClass(), jobReport.getOutcomeObjectId()));
       preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE,
-        SolrUtils.formatEnum(cachedJob.getPluginType()));
+        SolrUtils.formatEnum(pluginType));
 
       List<String> successfulPlugins = new ArrayList<>();
       List<String> unsuccessfulPlugins = new ArrayList<>();
 
-      if (cachedJob.getPluginType().equals(PluginType.INGEST)) {
+      if (pluginType.equals(PluginType.INGEST)) {
         for (Report item : jobReport.getReports()) {
           if (item.getPluginState().equals(PluginState.SUCCESS)) {
             successfulPlugins.add(item.getPluginName());

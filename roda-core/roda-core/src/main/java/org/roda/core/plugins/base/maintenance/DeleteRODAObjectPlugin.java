@@ -132,7 +132,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     try {
-      Job job = PluginHelper.getJob(this, index);
+      Job job = PluginHelper.getJob(this, model);
       index.commit((Class<? extends IsIndexed>) Class.forName(job.getSourceObjects().getSelectedClass()));
     } catch (NotFoundException | GenericException | ClassNotFoundException | RequestNotValidException
       | AuthorizationDeniedException e) {

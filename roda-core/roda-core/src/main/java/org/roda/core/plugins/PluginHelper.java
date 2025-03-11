@@ -73,6 +73,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.JobUserDetails;
@@ -559,6 +560,47 @@ public final class PluginHelper {
     }
   }
 
+  public static <T extends IsRODAObject> void updatePartialJobReport(Plugin<T> plugin, ModelService model,
+    Report reportItem, boolean replaceLastReportItemIfTheSame, IndexedJob indexJob) {
+    String jobId = getJobId(plugin);
+    for (String sourceObjectId : getSourceObjectIdsToInitPluginReportItem(plugin, reportItem.getOutcomeObjectId(),
+      reportItem.getSourceObjectId())) {
+      // lets ensure that job report id & source object id is correct
+      reportItem.setSourceObjectId(sourceObjectId);
+      reportItem.setId(IdUtils.getJobReportId(jobId, sourceObjectId, reportItem.getOutcomeObjectId()));
+      try {
+        Report jobReport;
+        try {
+          jobReport = model.retrieveJobReport(jobId, sourceObjectId, reportItem.getOutcomeObjectId());
+
+          if (!replaceLastReportItemIfTheSame) {
+            jobReport.addReport(reportItem);
+          } else {
+            List<Report> reportItems = jobReport.getReports();
+            Report report = reportItems.get(reportItems.size() - 1);
+            if (report.getPlugin().equalsIgnoreCase(reportItem.getPlugin())) {
+              reportItems.remove(reportItems.size() - 1);
+              jobReport.setStepsCompleted(jobReport.getStepsCompleted() - 1);
+              jobReport.addReport(reportItem);
+            }
+          }
+        } catch (NotFoundException e) {
+          jobReport = initPluginReportItem(plugin, reportItem.getOutcomeObjectId(), reportItem.getSourceObjectId())
+            .setSourceObjectClass(reportItem.getSourceObjectClass())
+            .setOutcomeObjectClass(reportItem.getOutcomeObjectClass());
+
+          jobReport.setId(reportItem.getId());
+          jobReport.setDateCreated(reportItem.getDateCreated());
+          jobReport.addReport(reportItem);
+        }
+
+        model.createOrUpdateJobReport(jobReport, indexJob);
+      } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        LOGGER.error("Error while updating Job Report", e);
+      }
+    }
+  }
+
   private static void updateJobReport(ModelService model, Report report) {
     try {
       Job job = model.retrieveJob(report.getJobId());
@@ -580,11 +622,11 @@ public final class PluginHelper {
    *
    * @throws RequestNotValidException
    */
-  public static <T extends IsRODAObject> Job getJob(Plugin<T> plugin, IndexService index)
+  public static <T extends IsRODAObject> IndexedJob getIndexedJob(Plugin<T> plugin, IndexService index)
     throws NotFoundException, GenericException, RequestNotValidException {
     String jobId = getJobId(plugin);
     if (jobId != null) {
-      return index.retrieve(Job.class, jobId, new ArrayList<>());
+      return index.retrieve(IndexedJob.class, jobId, new ArrayList<>());
     } else {
       throw new NotFoundException("Job not found");
     }
@@ -608,7 +650,7 @@ public final class PluginHelper {
   public static String getJobUsername(String jobId, IndexService index)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     if (jobId != null) {
-      Job job = index.retrieve(Job.class, jobId, Arrays.asList(RodaConstants.JOB_USERNAME));
+      IndexedJob job = index.retrieve(IndexedJob.class, jobId, Arrays.asList(RodaConstants.JOB_USERNAME));
       return job.getUsername();
     } else {
       throw new NotFoundException("Job not found");
@@ -1137,26 +1179,34 @@ public final class PluginHelper {
       LOGGER.error("Error creating PREMIS agent", e);
     }
 
-    Job job = cachedJob;
+    String jobUsername;
+    List<JobUserDetails> jobUserDetails;
     // INFO 20190509 hsilva: this is just to make easier to be retro-compatible
-    if (job == null) {
+    if (cachedJob == null) {
       try {
-        job = getJob(plugin, index);
+        IndexedJob indexedJob = getIndexedJob(plugin, index);
+        jobUserDetails = indexedJob.getJobUsersDetails();
+        jobUsername = indexedJob.getUsername();
       } catch (NotFoundException e) {
-        job = null;
+        jobUserDetails = null;
+        jobUsername = null;
       }
     }
+    else {
+      jobUserDetails = cachedJob.getJobUsersDetails();
+      jobUsername = cachedJob.getUsername();
+    }
 
-    if (job != null) {
-      for (JobUserDetails jobUserDetails : job.getJobUsersDetails()) {
-        String userId = IdUtils.getUserAgentId(jobUserDetails.getUsername(),
+    if (jobUserDetails != null && jobUsername != null) {
+      for (JobUserDetails jobUserDetail : jobUserDetails) {
+        String userId = IdUtils.getUserAgentId(jobUserDetail.getUsername(),
           RODAInstanceUtils.getLocalInstanceIdentifier());
         LinkingIdentifier linkingIdentifierAgent1 = new LinkingIdentifier();
         linkingIdentifierAgent1.setValue(userId);
         List<String> rolesAgent1 = new ArrayList<>();
-        rolesAgent1.add(jobUserDetails.getRole());
+        rolesAgent1.add(jobUserDetail.getRole());
         linkingIdentifierAgent1.setRoles(rolesAgent1);
-        addAgent(jobUserDetails.getUsername(), model, linkingIdentifierAgent1, index, agentIds, job);
+        addAgent(jobUserDetail.getUsername(), model, linkingIdentifierAgent1, index, agentIds, jobUserDetails);
       }
     }
 
@@ -1182,7 +1232,7 @@ public final class PluginHelper {
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, outcomes,
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, agentIds);
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
-      premisEvent, job.getUsername(), notify);
+      premisEvent, jobUsername, notify);
 
     PreservationMetadata pm = new PreservationMetadata();
     pm.setId(id);
@@ -1195,13 +1245,14 @@ public final class PluginHelper {
   }
 
   public static void addAgent(String agentName, ModelService model, LinkingIdentifier linkingIdentifierAgent,
-    IndexService index, List<LinkingIdentifier> agentIds, Job job) {
+    IndexService index, List<LinkingIdentifier> agentIds, List<JobUserDetails> jobUserDetails) {
 
     try {
       StoragePath userAgentPath = ModelUtils.getPreservationMetadataStoragePath(linkingIdentifierAgent.getValue(),
         PreservationMetadataType.AGENT);
       if (!RodaCoreFactory.getStorageService().exists(userAgentPath)) {
-        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true, job);
+        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true,
+          jobUserDetails);
         if (pm != null) {
           agentIds.add(linkingIdentifierAgent);
         }
@@ -1278,7 +1329,7 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends IsRODAObject> void moveSIPs(Plugin<T> plugin, ModelService model, IndexService index,
+  public static <T extends IsRODAObject> void moveSIPs(Plugin<T> plugin, ModelService model,
     List<TransferredResource> transferredResources, IngestJobPluginInfo jobPluginInfo) {
     List<String> success = new ArrayList<>();
     List<String> unsuccessful = new ArrayList<>();
@@ -1343,7 +1394,7 @@ public final class PluginHelper {
 
     // update Job (with all new ids)
     successOldToNewTransferredResourceIds.putAll(unsuccessfulOldToNewTransferredResourceIds);
-    updateJobAfterMovingSIPsAsync(plugin, index, successOldToNewTransferredResourceIds);
+    updateJobAfterMovingSIPsAsync(plugin, model, successOldToNewTransferredResourceIds);
   }
 
   private static void updateReportsAndIngestInfoAfterMovingSIPs(ModelService model, IngestJobPluginInfo jobPluginInfo,
@@ -1370,16 +1421,16 @@ public final class PluginHelper {
   /**
    * Update Job source object ids (done asynchronously)
    */
-  private static <T extends IsRODAObject> void updateJobAfterMovingSIPsAsync(Plugin<T> plugin, IndexService index,
+  private static <T extends IsRODAObject> void updateJobAfterMovingSIPsAsync(Plugin<T> plugin, ModelService model,
     Map<String, String> oldToNewTransferredResourceIds) {
     try {
-      Job job = getJob(plugin, index);
+      Job job = getJob(plugin, model);
       SelectedItems<?> sourceObjects = job.getSourceObjects();
       if (sourceObjects instanceof SelectedItemsList) {
         RodaCoreFactory.getPluginOrchestrator().updateJobAsync(plugin, (JobPartialUpdate) Messages
           .newJobSourceObjectsUpdated(oldToNewTransferredResourceIds).withJobPriority(job.getPriority()));
       }
-    } catch (NotFoundException | GenericException | RequestNotValidException e) {
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Error retrieving Job", e);
     }
   }
@@ -1499,13 +1550,13 @@ public final class PluginHelper {
   public static void createAndExecuteJob(Job job) throws GenericException, JobAlreadyStartedException,
     RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(job, true);
-    RodaCoreFactory.getIndexService().commit(Job.class);
+    RodaCoreFactory.getIndexService().commit(IndexedJob.class);
   }
 
   public static void createJob(Job job) throws GenericException, JobAlreadyStartedException, RequestNotValidException,
     NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().createJob(job);
-    RodaCoreFactory.getIndexService().commit(Job.class);
+    RodaCoreFactory.getIndexService().commit(IndexedJob.class);
   }
 
   public static String getReindexPluginName(Class<?> reindexClass) throws NotFoundException {
