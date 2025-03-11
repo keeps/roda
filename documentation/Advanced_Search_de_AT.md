@@ -4,16 +4,16 @@ Auf der Suchseite können Sie nach intellektuellen Entitäten, Repräsentationen
 
 Die Suchmaschine findet nur ganze Wörter. Wenn Sie nach Teilbegriffen suchen möchten, verwenden Sie bitte "*".
 
-## Suchoperatoren
+## Suchfunktionen
 
-Folgende Suchoperatoren stehen zur Verfügung:
+Folgende Suchfunktionen stehen zur Verfügung:
 
-- Genaue Angabe (z.B. "Max Mustermann")
+- Exakter Wortlaut (z.B. "Max Mustermann")
 - Angabe beginnt mit (z.B. "Max M*")
 - Zeichen ignorieren (z.B. Max Mustermann?)
 - Begriff ausschließen (z.B. -Max Mustermann)
 - Ähnlicher Begriff (z.B. Mustermann~)
-- Nummernkreis (z.B. 1900..2000)
+- Zahlenbereich (z.B. 1900..2000)
 - Auswahl (z.B. Max oder Mustermann)
 
 ## In benutzerdefinierten Metadatenfeldern suchen
@@ -30,7 +30,7 @@ Optional:
 
 
 ### 1. SIPs mit dem neuen beschreibenden Metadatentyp und der neuen beschreibenden Metadatenversion erstellen
-Auf dem SIP müssen der beschreibende Metadatentyp und die beschreibende Metadatenversion festgelegt werden. Da Sie Ihre eigenen Metadaten verwenden, sollten Sie den Metadatentyp ANDERE, anderen Metadatentyp (z.B. "GolikSwe") und Metadatenversion (z.B. "1") definieren. Dies kann direkt in METS oder mit Hilfe der [RODA-in-Anwendung] (http://rodain.roda-community.org/) oder der [commons-ip-Bibliothek] (https://github.com/keeps/commons-ip) geschehen.
+Auf dem SIP müssen der beschreibende Metadatentyp und die beschreibende Metadatenversion festgelegt werden. Da Sie Ihre eigenen Metadaten verwenden, sollten Sie den Metadatentyp ANDERE, anderen Metadatentyp, wie etwa "GolikSwe", und Metadatenversion, wie z.B. "1", definieren. Dies kann direkt in METS oder mit Hilfe der [RODA-in-Anwendung] (http://rodain.roda-community.org/) oder der [commons-ip-Bibliothek] (https://github.com/keeps/commons-ip) geschehen.
 
 ### 2. RODA für Indexierung eines neuen beschreibenden Metadatenformats konfigurieren
 Bei RODA muss konfiguriert werden, wie diese Datei indexiert werden kann. Dazu muss das XSLT unter `$RODA_HOME/config/crosswalks/ingest/` mit einem Namen hinterlegt werden, der sich aus dem Metadatentyp und der Metadatenversion ergibt.
