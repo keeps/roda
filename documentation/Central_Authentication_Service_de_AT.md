@@ -5,6 +5,6 @@ CAS kann dann für die Verbindung mit vielen Authentifizierungsprotokollen und -
 
 ## Support
 
-Die Einrichtung der Integration mit externer Authentifizierung kann schwierig sein. Professionelle Supportdienste können dabei helfen, eine sichere und reibungslose Integration zu gewährleisten. Diese Dienste stellen sicher, dass Organisationen einen Zugang zu Ressourcen und Support haben, die sie benötigen, um eine RODA-Umgebung auf Produktionsebene effektiv zu verwalten und zu pflegen, um die Investitionen zu maximieren und den Erfolg von Digital Preservation-Operationen zu gewährleisten.
+Die Einrichtung der Integration mit externer Authentifizierung kann schwierig sein. Professionelle Supportdienste können dabei helfen, eine sichere und reibungslose Integration zu gewährleisten. Diese Dienste stellen sicher, dass Organisationen einen Zugang zu Ressourcen und Support haben, die sie benötigen, um eine RODA-Umgebung auf Produktionsebene effektiv zu verwalten und zu pflegen, um die Investitionen zu maximieren und den Erfolg von digitalen Erhaltungsmaßnahmen zu gewährleisten.
 
-Um weitere Informationen zu erhalten, wie Sie Support in Ihrer Region erhalten können, wenden Sie sich bitte an [KEEP SOLUTIONS](https://www.keep.pt/en/contacts-proposals-information-telephone-address).
+Für weitere Informationen, wie Sie Support in Ihrer Region erhalten können, wenden Sie sich bitte an [KEEP SOLUTIONS](https://www.keep.pt/en/contacts-proposals-information-telephone-address).
