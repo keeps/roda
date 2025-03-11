@@ -125,7 +125,7 @@ public class OrderDisposalRules extends Composite {
 
   private void createTopButton() {
     Button buttonTop = new Button();
-    buttonTop.setText("top");
+    buttonTop.setText(messages.editRulesOrderTop());
     buttonTop.addStyleName("btn btn-block btn-default btn-top");
     buttonTop.addClickHandler(clickEvent -> {
       if (selectedRule != null && selectedIndex != 0) {
@@ -141,7 +141,7 @@ public class OrderDisposalRules extends Composite {
 
   private void createUpButton() {
     Button buttonUp = new Button();
-    buttonUp.setText("up");
+    buttonUp.setText(messages.editRulesOrderUp());
     buttonUp.addStyleName("btn btn-block btn-default btn-up");
     buttonUp.addClickHandler(clickEvent -> {
       int previousIndex = selectedIndex - 1;
@@ -159,7 +159,7 @@ public class OrderDisposalRules extends Composite {
 
   private void createDownButton() {
     Button buttonDown = new Button();
-    buttonDown.setText("down");
+    buttonDown.setText(messages.editRulesOrderDown());
     buttonDown.addStyleName("btn btn-block btn-default btn-down");
     buttonDown.addClickHandler(clickEvent -> {
       int nextIndex = selectedIndex + 1;
@@ -177,7 +177,7 @@ public class OrderDisposalRules extends Composite {
 
   private void createBottomButton() {
     Button buttonBottom = new Button();
-    buttonBottom.setText("bottom");
+    buttonBottom.setText(messages.editRulesOrderBottom());
     buttonBottom.addStyleName("btn btn-block btn-default btn-bottom");
     buttonBottom.addClickHandler(clickEvent -> {
       int lastIndex = disposalRules.getObjects().size() - 1;
