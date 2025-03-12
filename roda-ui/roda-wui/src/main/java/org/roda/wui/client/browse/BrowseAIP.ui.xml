@@ -32,10 +32,9 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FocusPanel>
-		<g:FlowPanel styleName="browseSidePanel">
+		<g:FlowPanel styleName="browseSidePanel" ui:field="sidePanel">
 			<g:FlowPanel>
 				<g:FlowPanel ui:field="representationCards"  addStyleNames="verticalThumbnailCardContainer"/>
-				<g:SimplePanel ui:field="representationActions" />
 			</g:FlowPanel>
 			<g:FlowPanel>
 				<g:FlowPanel ui:field="disseminationCards" addStyleNames="verticalThumbnailCardContainer"/>

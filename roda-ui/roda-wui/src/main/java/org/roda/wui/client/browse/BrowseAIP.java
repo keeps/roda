@@ -144,9 +144,9 @@ public class BrowseAIP extends Composite {
 
   // SIDEBAR
   @UiField
-  FlowPanel representationCards;
+  FlowPanel sidePanel;
   @UiField
-  SimplePanel representationActions;
+  FlowPanel representationCards;
   @UiField
   FlowPanel disseminationCards;
 
@@ -275,14 +275,19 @@ public class BrowseAIP extends Composite {
     }
 
     // Side panel representations
-    this.representationCards.add(new AIPRepresentationCardList(aipId));
-    this.disseminationCards.add(new AIPDisseminationCardList(aipId));
-    this.representationActions.setWidget(new ActionableWidgetBuilder<>(representationActions).buildListWithObjects(
-      new ActionableObject<>(IndexedRepresentation.class),
-      Collections.singletonList(RepresentationActions.RepresentationAction.NEW)));
+    if (response.getRepresentationCount().getResult() > 0 || response.getDipCount().getResult() > 0) {
+      if (response.getRepresentationCount().getResult() > 0) {
+        this.representationCards.add(new AIPRepresentationCardList(aipId));
+      }
+      if (response.getDipCount().getResult() > 0) {
+        this.disseminationCards.add(new AIPDisseminationCardList(aipId));
+      }
+    }
+    else {
+      this.sidePanel.setVisible(false);
+    }
 
     keyboardFocus.setFocus(true);
-    keyboardFocus.addStyleName("here");
   }
 
   public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {

@@ -2416,6 +2416,9 @@ td.datePickerMonth, td.datePickerYear {
     font-weight: 300;
 }
 
+.userMenu .gwt-MenuItem i {
+    margin-right: 4px;
+}
 .userMenuColors {
     background-color: COLOR_HEADER_USER_BACKGROUND;
     color: COLOR_HEADER_USER_FOREGROUND;
@@ -2441,6 +2444,15 @@ td.datePickerMonth, td.datePickerYear {
     z-index: 3;
 }
 
+.bannerHeader .gwt-MenuBar {
+    display: flex;
+    align-items: center;
+}
+
+.bannerHeader table {
+    height: auto
+}
+
 .bannerHeader .gwt-MenuItem {
     font-size: 12px !important;
     font-weight: 300;
@@ -2454,12 +2466,26 @@ td.datePickerMonth, td.datePickerYear {
 
 .bannerHeaderColors .gwt-MenuItem {
     font-weight: 300;
+    border-radius: 4px;
+    padding: 8px 16px;
 }
 
 .bannerHeaderColors .gwt-MenuItem-selected {
-    background-color: COLOR_HEADER_NAVIGATION_FOREGROUND;
-    color: COLOR_HEADER_NAVIGATION_BACKGROUND;
+    transition: background-color 0.1s;
+    background-color: COLOR_PRIMARY;
     font-weight: 300;
+}
+
+.gwt-MenuBarPopup .bannerHeaderColors  tr .gwt-MenuItem {
+    border-radius: 0;
+}
+
+.gwt-MenuBarPopup .bannerHeaderColors tr:last-child .gwt-MenuItem{
+    border-radius: 0 0 4px 4px;
+}
+
+.gwt-MenuBarPopup .gwt-MenuBar {
+    border-radius: 0px 0px 4px 4px;
 }
 
 /**********************************************
@@ -3331,7 +3357,9 @@ td.datePickerMonth, td.datePickerYear {
     height: 204px;
     background-color: white;
     align-items: center;
-    font-size: 16px;
+    font-size: 100px;
+    color: COLOR_GREY_LIGHT;
+    border-radius: 4px;
 }
 
 .thumbnailCardIconThumbnail:hover {
@@ -8471,10 +8499,6 @@ span.code {
 
 .descriptiveMetadataTabs .tabContent {
     flex: 1;
-    background-color: white;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
 }
 
 .descriptiveMetadataTabs .objectToolbar {
@@ -8510,7 +8534,7 @@ span.code {
 }
 
 .descriptiveMetadataTabs .descriptiveMetadata {
-    padding: 24px 32px;
+    padding: 24px 0px;
 }
 
 .descriptiveMetadataTabs .tabButtonContainer:last-child {
@@ -8631,22 +8655,13 @@ span.code {
   Permissions Tab
  ******************************/
 
-.permissionsTab {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
-    padding: 16px !important;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
 .permissionsTab .objectToolbar {
     background-color: transparent;
 }
 
 .permissionsTab .row {
     margin: 0;
+    padding: 0;
 }
 
 .permissionsTab .row .content {
@@ -8654,6 +8669,7 @@ span.code {
 }
 
 .permissionsTab .panel.permission {
+    padding: 8px;
     border: none;
     background-color: transparent;
 }
@@ -8662,14 +8678,26 @@ span.code {
     padding: 0;
 }
 
+.permissionsTab .panel.permission .panel-body i {
+    font-size: 12px;
+}
+
 .permissionsTab .permission-tags {
     display: flex;
-    gap: 4px;
+    gap: 8px;
 }
 
 .permissionsTab .permission-tags .permission-tag {
     font-size: 12px;
     text-transform: none;
+}
+
+.permissionsTab .panel.permission:nth-child(odd) {
+    background-color: COLOR_GREY_VERYLIGHT;
+}
+
+.permissionsTab .permission .panel-body {
+    background-color: transparent;
 }
 
 
@@ -8682,6 +8710,37 @@ wui-disposal-hold-data .form-textbox {
     background-color: white;
 }
 
+
+/******************************
+  RODA 6 cards
+ ******************************/
+
+.roda6Card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+}
+
+.roda6CardWithHeader {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
+    display: flex;
+    flex-direction: column;
+}
+
+.roda6CardWithHeader .cardHeader {
+    background-color: COLOR_GREY_VERYLIGHTEST;
+    padding: 8px 16px;
+    border-radius: 8px 8px 0px 0px;
+}
+
+.roda6CardWithHeader .cardBody {
+  padding: 8px 16px;
+}
 
 /******************************
   RODA 6 buttons
@@ -9008,4 +9067,8 @@ wui-disposal-hold-data .form-textbox {
 
 .cmi-accountTree:after {
     content: "\e901";
+}
+
+.largeIcon {
+    font-size: 20px;
 }

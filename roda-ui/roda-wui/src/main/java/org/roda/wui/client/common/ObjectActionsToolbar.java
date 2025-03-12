@@ -57,18 +57,18 @@ public class ObjectActionsToolbar<T extends IsIndexed> extends ActionsToolbar {
           break;
       }
       // Disposal
-      if (DisposalPolicyUtils.showDisposalPolicySummary(aip)) {
-        Tag disposalTag = DisposalPolicyUtils.getDisposalPolicySummaryTag(aip);
-        if (disposalTag != null) {
-          disposalTag.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-              HistoryUtils.newHistory(DisposalPolicyAssociationPanel.RESOLVER, aip.getId());
-            }
-          });
-          tags.add(disposalTag);
-        }
-      }
+      // if (DisposalPolicyUtils.showDisposalPolicySummary(aip)) {
+      //   Tag disposalTag = DisposalPolicyUtils.getDisposalPolicySummaryTag(aip);
+      //   if (disposalTag != null) {
+      //     disposalTag.addClickHandler(new ClickHandler() {
+      //       @Override
+      //       public void onClick(ClickEvent event) {
+      //         HistoryUtils.newHistory(DisposalPolicyAssociationPanel.RESOLVER, aip.getId());
+      //       }
+      //     });
+      //     tags.add(disposalTag);
+      //   }
+      // }
     }
   }
 
@@ -86,7 +86,7 @@ public class ObjectActionsToolbar<T extends IsIndexed> extends ActionsToolbar {
             AIPToolbarActions.AIPAction.DOWNLOAD_DOCUMENTATION, AIPToolbarActions.AIPAction.DOWNLOAD_SUBMISSIONS,
             AIPToolbarActions.AIPAction.CHANGE_TYPE, AIPToolbarActions.AIPAction.MOVE_IN_HIERARCHY,
             AIPToolbarActions.AIPAction.REMOVE, AIPToolbarActions.AIPAction.NEW_PROCESS,
-            AIPToolbarActions.AIPAction.NEW_CHILD_AIP_BELOW),
+            AIPToolbarActions.AIPAction.NEW_CHILD_AIP_BELOW, AIPToolbarActions.AIPAction.NEW_REPRESENTATION),
           List.of(AIPToolbarActions.AIPAction.NEW_PROCESS)));
     }
   }

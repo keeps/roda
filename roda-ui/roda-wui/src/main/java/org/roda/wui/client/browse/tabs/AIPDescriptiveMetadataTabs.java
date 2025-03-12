@@ -45,14 +45,20 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
       SafeHtml buttonTitle = SafeHtmlUtils.fromString(metadataInfo.getLabel());
       // Content container
       FlowPanel content = new FlowPanel();
-      content.addStyleName("descriptiveMetadataTabContainer");
+      content.addStyleName("descriptiveMetadataTabContainer roda6CardWithHeader");
       // Create Toolbar
+      FlowPanel cardHeader = new FlowPanel();
+      cardHeader.setStyleName("cardHeader");
       String metadataID = SafeHtmlUtils.htmlEscape(metadataInfo.getId());
       ActionsToolbar descriptiveMetadataToolbar = new ActionsToolbar();
       descriptiveMetadataToolbar.setLabelVisible(false);
       descriptiveMetadataToolbar.setTagsVisible(false);
-      content.add(descriptiveMetadataToolbar);
+      cardHeader.add(descriptiveMetadataToolbar);
+      content.add(cardHeader);
       // Get metadata and populate widget
+      FlowPanel cardBody = new FlowPanel();
+      content.add(cardBody);
+      cardBody.setStyleName("cardBody");
       HTML metadataHTML = new HTML();
       SafeUri uri = RestUtils.createDescriptiveMetadataHTMLUri(aip.getId(), metadataID);
       RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
@@ -134,7 +140,7 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
           Toast.showError(messages.errorLoadingDescriptiveMetadata(e.getMessage()));
         }
       }
-      content.add(metadataHTML);
+      cardBody.add(metadataHTML);
       // Create and add tab
       createAndAddTab(buttonTitle, content);
     }
