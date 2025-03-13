@@ -1,0 +1,408 @@
+.main .contentPanel {
+  min-height: 767px !important;
+}
+
+.double-bounce1,
+.double-bounce2 {
+  background-color: #127faa;
+}
+
+.padding-lg {
+  padding: 100px 18.75%;
+}
+
+.padding-md {
+  padding: 50px 18.75%;
+}
+
+.padding-sm {
+  padding: 17px 18.75%;
+}
+
+hr.hero-separator {
+  width: 100px;
+  height: 3px;
+  background: #127faa;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: inline-block;
+  border: unset;
+}
+
+hr.separator-sm {
+  width: 50px;
+  height: 3px;
+  background: #127faa;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  display: inline-block;
+  border: unset;
+}
+
+.hero {
+  background-color: #201d1d;
+  color: #ffffff;
+}
+
+h1.title {
+  margin-top: unset !important;
+}
+
+.title {
+  max-width: 515px;
+  font-family: "Inter", "Ubuntu";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 41px;
+}
+
+.hero-details {
+  padding-bottom: 32px;
+}
+
+.hero-details p {
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 150%;
+  text-align: justify;
+}
+
+.more-info-btn {
+  padding: 12px 24px;
+
+  width: 151px;
+  height: 43px;
+
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  border: 1px solid;
+}
+
+a.btn-hero, a.btn-welcome {
+  text-decoration: none;
+  font-family: "Inter", "Ubuntu";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.request-trial-btn, .learn-more-btn {
+  padding: 12px 24px;
+
+  width: 151px;
+  height: 43px;
+
+  background: #127faa;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+}
+
+a.btn-hero + a.btn-hero {
+  margin-left: 10px;
+}
+
+a.btn-hero:hover, a.btn-welcome:hover {
+  text-decoration: none;
+}
+
+a.btn-hero:visited, a.btn-welcome:visited {
+  text-decoration: none;
+}
+
+.row-highlight h2 {
+  color: #000000;
+  font-family: "Inter", "Ubuntu";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 28px;
+  text-transform: capitalize;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.row-highlight p {
+  font-family: "Inter", "Ubuntu";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  padding-bottom: 16px;
+}
+
+.row-highlight-alt {
+  background-color: #eceaea;
+}
+
+.row-get-quote {
+  background-color: #e4142b;
+  color: #ffffff;
+}
+
+.row-get-quote .align-center {
+  display: flex;
+  align-items: center;
+}
+
+.row-get-quote .col_6 {
+  margin-right: unset;
+}
+
+.row-get-quote p {
+  display: inline;
+  font-family: "Inter", "Ubuntu";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 28px;
+  text-transform: uppercase;
+}
+
+.row-get-quote p.alt {
+  color: #363030;
+  font-family: "Inter", "Ubuntu";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 28px;
+  padding-left: 5px;
+}
+
+.row-get-quote p.values {
+  font-family: "Inter", "Ubuntu";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+
+  text-align: center;
+  text-transform: uppercase;
+
+  color: #ffffff;
+}
+
+.row-get-quote p.values-alt {
+  color: #363030;
+}
+
+.highligth-details {
+  width: 75%;
+}
+
+.highlight-image {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form {
+  display: flex;
+}
+
+.form input[type="text"], .form input[type="email"] {
+  flex: 1;
+  margin-right: 5px;
+  background: #ffffff;
+  box-shadow: 0px 5px 10px rgba(54, 48, 48, 0.25);
+  border-radius: 8px;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px 5px;
+  border: unset;
+}
+
+.form .form-button {
+  background: #363030;
+  box-shadow: 0px 5px 10px rgba(54, 48, 48, 0.25);
+  border-radius: 8px;
+  border: unset;
+  color: #ffffff;
+  margin-bottom: 0;
+  cursor: pointer;
+  padding: 12px 24px;
+  width: 134px;
+}
+
+.row-get-quote .middle-info-quote {
+  width: 300px;
+}
+
+.row-get-quote .custom-row {
+  display: flex;
+}
+
+.row-get-quote .custom-column {
+  flex: 1;
+  padding: 10px;
+}
+
+.row-learn-more {
+  color: #ffffff;
+  background: #363030;
+}
+
+.row-learn-more h1 {
+  margin-top: unset !important;
+}
+
+.row-learn-more p {
+  display: inline;
+  font-family: "Inter", "Ubuntu";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.row-learn-more h1 span {
+  color: #127faa;
+  font-weight: 500;
+}
+
+.row-learn-more .subtitle p {
+  text-transform: uppercase;
+}
+
+.row-learn-more .subtitle p.alt {
+  color: #127faa;
+}
+
+.row-learn-more .details {
+  text-align: justify;
+  text-transform: unset;
+  padding-bottom: 32px;
+}
+
+.row-features h6 {
+  margin: 0;
+  font-weight: 500;
+  font-family: "Inter", "Ubuntu";
+  line-height: 18px;
+  font-size: 16px;
+}
+
+/* FOOTER */
+
+.tutorial-roda-community {
+  background-color: #363030;
+  color: #ffffff;
+}
+
+.build_time {
+  display: none;
+}
+
+.custom-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.custom-column {
+  flex-basis: 100%;
+  margin-bottom: 10px;
+}
+
+.feature-details p {
+  font-family: "Inter", "Ubuntu";
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.row-feature-details {
+  display: flex;
+}
+
+.column-feature-details {
+  flex: 1;
+  padding: 10px;
+}
+
+.component-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.component-column {
+  padding: 5px;
+}
+
+.component-column:first-child {
+  width: 100px;
+  padding-right: 30px;
+}
+
+.component-column:last-child {
+  flex: 1;
+}
+
+.component-column img {
+  max-width: 100%;
+  height: auto;
+}
+
+.component-column h6 {
+  margin: 0;
+  font-weight: 500;
+  font-family: "Inter", "Ubuntu";
+  line-height: 18px;
+  font-size: 16px;
+}
+
+.component-column p {
+  font-family: "Inter", "Ubuntu";
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+
+}
+
+.footer-roda-enterprise p {
+  font-family: "Inter", "Ubuntu";
+  font-weight: 300;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: justify;
+}
+
+.footer-roda-enterprise p + p {
+  margin-top: 25px;
+}
+
+.footer-roda-enterprise .footer-info h5 {
+  font-size: 1.6rem;
+  margin-top: unset !important;
+  margin-bottom: unset !important;
+  font-weight: 100;
+}
+
+@media (max-width: 768px) {
+  .column-feature-details {
+    flex-basis: 100%;
+  }
+
+  .image-column {
+    width: 100%;
+  }
+
+  .row-get-quote .custom-row {
+    flex-wrap: wrap;
+  }
+
+  .row-get-quote .custom-column {
+    flex-basis: 100%;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .custom-column {
+    flex-basis: calc(33.33% - 60px);
+    margin: 0px 50px 0px 0px;
+  }
+}

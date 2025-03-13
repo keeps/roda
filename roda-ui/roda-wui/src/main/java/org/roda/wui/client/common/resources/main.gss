@@ -2331,7 +2331,7 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 1.5rem;
 }
 
-.menu-register {
+.user_menu_item_register {
     display: none;
 }
 
@@ -2413,7 +2413,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .userMenu .gwt-MenuItem {
     font-size: 10px !important;
-    font-weight: 300;
+    font-weight: 500;
 }
 
 .userMenu .gwt-MenuItem i {
@@ -2425,13 +2425,13 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .userMenuColors .gwt-MenuItem {
-    font-weight: 300;
+    font-weight: 500;
 }
 
 .userMenuColors .gwt-MenuItem-selected {
     background-color: COLOR_HEADER_USER_FOREGROUND;
     color: COLOR_HEADER_USER_BACKGROUND;
-    font-weight: 300;
+    font-weight: 500;
 }
 
 .bannerHeader {
@@ -2455,17 +2455,17 @@ td.datePickerMonth, td.datePickerYear {
 
 .bannerHeader .gwt-MenuItem {
     font-size: 12px !important;
-    font-weight: 300;
+    font-weight: 500;
 }
 
 .bannerHeaderColors {
     background-color: COLOR_HEADER_NAVIGATION_BACKGROUND;
     color: COLOR_HEADER_NAVIGATION_FOREGROUND;
-    font-weight: 300;
+    font-weight: 500;
 }
 
 .bannerHeaderColors .gwt-MenuItem {
-    font-weight: 300;
+    font-weight: 500;
     border-radius: 4px;
     padding: 8px 16px;
 }
@@ -2473,7 +2473,7 @@ td.datePickerMonth, td.datePickerYear {
 .bannerHeaderColors .gwt-MenuItem-selected {
     transition: background-color 0.1s;
     background-color: COLOR_PRIMARY;
-    font-weight: 300;
+    font-weight: 500;
 }
 
 .gwt-MenuBarPopup .bannerHeaderColors  tr .gwt-MenuItem {
@@ -9067,6 +9067,10 @@ wui-disposal-hold-data .form-textbox {
 
 .cmi-accountTree:after {
     content: "\e901";
+}
+
+.cmi-home:after {
+    content: "\e920";
 }
 
 .largeIcon {
