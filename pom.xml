@@ -135,7 +135,7 @@
         <testng.groups>all</testng.groups>
         <springboot.version>3.4.0</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
-        <logback.version>1.5.6</logback.version>
+        <logback.version>1.5.13</logback.version>
     </properties>
     <profiles>
         <profile>
