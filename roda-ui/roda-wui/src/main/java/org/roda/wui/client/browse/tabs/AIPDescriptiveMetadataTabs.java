@@ -1,5 +1,6 @@
 package org.roda.wui.client.browse.tabs;
 
+import com.google.gwt.user.client.ui.Widget;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -142,7 +143,13 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
       }
       cardBody.add(metadataHTML);
       // Create and add tab
-      createAndAddTab(buttonTitle, content);
+      // This descriptive metadata content is NOT lazy loading!
+      createAndAddTab(buttonTitle, new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          return content;
+        }
+      });
     }
     // Create button
     Button createButton = new Button(messages.newButton());
