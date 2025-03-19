@@ -13,11 +13,8 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import org.glassfish.jaxb.runtime.api.JAXBRIContext;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -41,8 +38,6 @@ import jakarta.xml.bind.util.ValidationEventCollector;
 public final class MetadataUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(MetadataUtils.class);
 
-  private static List<Class<?>> additionalClasses = new ArrayList<>();
-
   /** Private empty constructor */
   private MetadataUtils() {
 
@@ -63,8 +58,7 @@ public final class MetadataUtils {
     try {
       StringWriter writer = new StringWriter();
 
-      final Map<String, String> props = Collections.singletonMap(JAXBRIContext.DEFAULT_NAMESPACE_REMAP, "http://www.loc.gov/premis/v3");
-      final JAXBContext jaxbContext = JAXBContext.newInstance(tClass, props);
+      final JAXBContext jaxbContext = JAXBContext.newInstance(tClass);
       Marshaller marshaller = jaxbContext.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
       marshaller.marshal(object, writer);

@@ -41,8 +41,6 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
-import jersey.repackaged.com.google.common.collect.Iterables;
-
 /**
  *
  * @author Luis Faria <lfaria@keep.pt>
@@ -913,7 +911,9 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // 6) list binary versions
     CloseableIterable<BinaryVersion> binaryVersions = getStorage().listBinaryVersions(binaryStoragePath);
     List<BinaryVersion> reusableBinaryVersions = new ArrayList<>();
-    Iterables.addAll(reusableBinaryVersions, binaryVersions);
+    //Iterables.addAll(reusableBinaryVersions, binaryVersions);
+
+    binaryVersions.forEach(reusableBinaryVersions::add);
 
     assertEquals(3, reusableBinaryVersions.size());
 
