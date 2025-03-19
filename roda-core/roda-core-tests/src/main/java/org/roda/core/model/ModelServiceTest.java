@@ -35,6 +35,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -86,7 +87,6 @@ import gov.loc.premis.v3.AgentComplexType;
 import gov.loc.premis.v3.EventComplexType;
 import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
 import gov.loc.premis.v3.ObjectIdentifierComplexType;
-import jersey.repackaged.com.google.common.collect.Lists;
 
 /**
  * Unit tests for ModelService
