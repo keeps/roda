@@ -25,7 +25,6 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.labels.Header;
 import org.roda.wui.client.common.labels.Tag;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -100,12 +99,6 @@ public class EditPermissionsTab extends Composite {
     initLabels();
     actionsToolbar.setVisible(false);
     createPermissionPanelList();
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   private void initLabels() {

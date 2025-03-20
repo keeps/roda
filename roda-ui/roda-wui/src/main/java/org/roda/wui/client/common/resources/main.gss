@@ -2553,6 +2553,8 @@ td.datePickerMonth, td.datePickerYear {
 
 .sidebar .sticky-flow {
 	min-width: 220px;
+	position: sticky;
+	top: 64px;
 }
 
 .sidebar .sticky-padding {
@@ -4225,15 +4227,15 @@ td.datePickerMonth, td.datePickerYear {
 .searchWrapper {
     display: flex;
     align-items: start;
-    gap: 16px;
 }
 
 .searchWrapperSearchPanel {
     flex: 1;
 }
 
-.searchWrapperSidePanel {
-    max-width: 250px;
+.searchWrapperSidePanel .my-asyncdatagrid-side-panel {
+    padding: 0;
+    width: 266px;
 }
 
 .searchWrapper .objectToolbar {
@@ -4242,7 +4244,8 @@ td.datePickerMonth, td.datePickerYear {
     background-color: transparent;
     flex-direction: column;
     align-items: stretch;
-    padding: 8px 0;
+    padding: 8px 0px 8px 16px;
+    margin-left: 16px;
 }
 
 .searchWrapper .objectToolbar .objectToolbarLabel {
@@ -4280,6 +4283,11 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchWrapper .objectToolbar .groupedActionableEmptyHelp {
     display: none;
+}
+
+.searchWrapper .my-asyncdatagrid-facets-panel {
+    margin-left: 16px;
+    padding: 0px 0px 0px 16px;
 }
 
 .searchPanelContainer {
@@ -7913,6 +7921,7 @@ span.code {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+    gap: 4px;
 }
 
 .card + .ActionableStyleButtons, .ActionableStyleButtons + .ActionableStyleButtons {

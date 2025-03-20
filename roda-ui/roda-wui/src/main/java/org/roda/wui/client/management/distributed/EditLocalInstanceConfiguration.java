@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.services.DistributedInstancesRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -83,12 +82,6 @@ public class EditLocalInstanceConfiguration extends Composite {
     this.localInstanceConfigurationDataPanel.setLocalInstanceConfiguration(this.localInstance);
 
     initWidget(uiBinder.createAndBindUi(this));
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonSave")

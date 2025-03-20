@@ -19,7 +19,6 @@ import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.RODAMemberActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -174,12 +173,6 @@ public class ShowGroup extends Composite {
     panel.add(value);
 
     return panel;
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
 }

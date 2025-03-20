@@ -19,7 +19,6 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.process.InternalProcess;
@@ -53,14 +52,15 @@ public class EditRisk extends Composite {
         Services service = new Services("Retrieve indexed risk", "get");
         String riskId = historyTokens.get(0);
 
-        service.rodaEntityRestService(s -> s.findByUuid(riskId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedRisk.class).whenComplete((value, error) -> {
-          if (error != null) {
-            callback.onFailure(error);
-          } else if (value != null) {
-            EditRisk editRisk = new EditRisk(value);
-            callback.onSuccess(editRisk);
-          }
-        });
+        service.rodaEntityRestService(s -> s.findByUuid(riskId, LocaleInfo.getCurrentLocale().getLocaleName()),
+          IndexedRisk.class).whenComplete((value, error) -> {
+            if (error != null) {
+              callback.onFailure(error);
+            } else if (value != null) {
+              EditRisk editRisk = new EditRisk(value);
+              callback.onSuccess(editRisk);
+            }
+          });
 
       } else {
         HistoryUtils.newHistory(RiskRegister.RESOLVER);
@@ -129,12 +129,6 @@ public class EditRisk extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
-
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     if (riskDataPanel.isChanged() && riskDataPanel.isValid()) {
@@ -158,9 +152,7 @@ public class EditRisk extends Composite {
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
     Services service = new Services("Remove risk", "remove");
-    service
-      .riskResource(s -> s
-        .deleteRisk(new SelectedItemsListRequest(Collections.singletonList(risk.getUUID()))))
+    service.riskResource(s -> s.deleteRisk(new SelectedItemsListRequest(Collections.singletonList(risk.getUUID()))))
       .whenComplete((value, error) -> {
         if (error != null) {
           HistoryUtils.newHistory(InternalProcess.RESOLVER);

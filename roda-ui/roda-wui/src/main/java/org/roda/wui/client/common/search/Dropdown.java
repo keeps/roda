@@ -44,6 +44,10 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
   private Map<String, String> popupIcons;
 
   public Dropdown() {
+    this(false);
+  }
+
+  public Dropdown(boolean disableOnSingleItem) {
     focusPanel = new FocusPanel();
     panel = new SimplePanel();
     iconAndLabelPanel = new FlowPanel();

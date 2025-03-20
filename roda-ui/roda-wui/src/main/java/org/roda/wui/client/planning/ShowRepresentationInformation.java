@@ -38,7 +38,6 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.search.Search;
@@ -409,12 +408,6 @@ public class ShowRepresentationInformation extends Composite {
     }
 
     return widgetToAdd;
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   // Java method

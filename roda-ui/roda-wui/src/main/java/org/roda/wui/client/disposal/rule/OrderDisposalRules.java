@@ -21,7 +21,6 @@ import org.roda.wui.client.common.actions.DisposalRuleActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.services.DisposalRuleRestService;
 import org.roda.wui.client.services.Services;
@@ -272,12 +271,6 @@ public class OrderDisposalRules extends Composite {
           }
         }));
     }
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonSave")

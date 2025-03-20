@@ -21,7 +21,6 @@ import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -100,12 +99,6 @@ public class UserLog extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     userLogDescription.add(new HTMLWidgetWrapper("UserLogDescription.html"));
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

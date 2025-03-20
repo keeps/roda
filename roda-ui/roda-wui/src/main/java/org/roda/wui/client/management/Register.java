@@ -23,7 +23,6 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.user.requests.RegisterUserRequest;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.Login;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.client.management.recaptcha.RecaptchaWidget;
@@ -145,12 +144,6 @@ public class Register extends Composite {
     }
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
-
   void setExtra(Set<MetadataValue> b) {
     this.userDataPanel.setUserExtra(b);
   }
@@ -171,43 +164,45 @@ public class Register extends Composite {
         Services services = new Services("Register RODA user", "register");
         RegisterUserRequest userRequest = new RegisterUserRequest(user.getEmail(), user.getName(), user.getFullName(),
           password, userDataPanel.getUserExtra());
-        services.membersResource(s -> s.registerUser(userRequest, LocaleInfo.getCurrentLocale().getLocaleName(), recaptcha)).whenComplete((registedUser, error) -> {
-          if (registedUser != null) {
-            if (registedUser.isActive()) {
-              Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(), false,
-                new AsyncCallback<Void>() {
+        services
+          .membersResource(s -> s.registerUser(userRequest, LocaleInfo.getCurrentLocale().getLocaleName(), recaptcha))
+          .whenComplete((registedUser, error) -> {
+            if (registedUser != null) {
+              if (registedUser.isActive()) {
+                Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                  messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(), false,
+                  new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onSuccess(Void result) {
-                    HistoryUtils.newHistory(Login.RESOLVER);
-                  }
+                    @Override
+                    public void onSuccess(Void result) {
+                      HistoryUtils.newHistory(Login.RESOLVER);
+                    }
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    HistoryUtils.newHistory(Login.RESOLVER);
-                  }
-                });
-            } else {
-              Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(), false,
-                new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      HistoryUtils.newHistory(Login.RESOLVER);
+                    }
+                  });
+              } else {
+                Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                  messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(), false,
+                  new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onSuccess(Void result) {
-                    HistoryUtils.newHistory(Login.RESOLVER);
-                  }
+                    @Override
+                    public void onSuccess(Void result) {
+                      HistoryUtils.newHistory(Login.RESOLVER);
+                    }
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    HistoryUtils.newHistory(Login.RESOLVER);
-                  }
-                });
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      HistoryUtils.newHistory(Login.RESOLVER);
+                    }
+                  });
+              }
+            } else if (error != null) {
+              errorMessage(error);
             }
-          } else if (error != null) {
-            errorMessage(error);
-          }
-        });
+          });
       }
     }
   }

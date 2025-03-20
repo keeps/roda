@@ -18,7 +18,6 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -141,16 +140,17 @@ public class ShowJobReport extends Composite {
   private static void retrieveJobReport(String jobReportId, AsyncCallback<Widget> callback) {
     Services services = new Services("Get job report items", "get");
 
-    services.jobReportResource(s -> s.findByUuid(jobReportId, LocaleInfo.getCurrentLocale().getLocaleName())).thenCompose(indexedReport -> services
-      .jobsResource(s -> s.getJobReport(indexedReport.getJobId(), jobReportId)).whenComplete((reports, error) -> {
-        if (reports != null) {
-          indexedReport.setReports(reports.getReports());
-          ShowJobReport showJob = new ShowJobReport(indexedReport);
-          callback.onSuccess(showJob);
-        } else if (error != null) {
-          callback.onFailure(error);
-        }
-      }));
+    services.jobReportResource(s -> s.findByUuid(jobReportId, LocaleInfo.getCurrentLocale().getLocaleName()))
+      .thenCompose(indexedReport -> services.jobsResource(s -> s.getJobReport(indexedReport.getJobId(), jobReportId))
+        .whenComplete((reports, error) -> {
+          if (reports != null) {
+            indexedReport.setReports(reports.getReports());
+            ShowJobReport showJob = new ShowJobReport(indexedReport);
+            callback.onSuccess(showJob);
+          } else if (error != null) {
+            callback.onFailure(error);
+          }
+        }));
   }
 
   public ShowJobReport(IndexedReport jobReport) {
@@ -225,9 +225,10 @@ public class ShowJobReport extends Composite {
 
     ListSelectionUtils.bindLayout(jobReport, searchPrevious, searchNext, keyboardFocus, true, false, false);
 
-    //If it is an ingestion, creates a panel to render the type of Ingestion
+    // If it is an ingestion, creates a panel to render the type of Ingestion
     if (jobReport.getIngestType() != null) {
-      ingestType.setText(jobReport.getIngestType().equals("NEW") ? messages.newIngestion() : messages.ingestionUpdate());
+      ingestType
+        .setText(jobReport.getIngestType().equals("NEW") ? messages.newIngestion() : messages.ingestionUpdate());
     } else {
       ingestTypePanel.setVisible(false);
     }
@@ -307,12 +308,6 @@ public class ShowJobReport extends Composite {
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.removeFromParent();
     }
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonBack")

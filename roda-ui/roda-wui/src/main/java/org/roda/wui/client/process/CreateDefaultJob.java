@@ -55,7 +55,6 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.lists.utils.ListFactory;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.JobUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
@@ -208,12 +207,6 @@ public class CreateDefaultJob extends Composite {
           init(pluginInfoList.getPluginInfoList());
         }
       });
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void init(List<PluginInfo> plugins) {

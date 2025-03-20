@@ -14,7 +14,6 @@ import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.services.DisposalRuleRestService;
 import org.roda.wui.client.services.DisposalScheduleRestService;
@@ -92,12 +91,6 @@ public class CreateDisposalRule extends Composite {
     this.disposalRuleDataPanel = new DisposalRuleDataPanel(disposalRule, disposalSchedules, false);
 
     initWidget(uiBinder.createAndBindUi(this));
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonSave")

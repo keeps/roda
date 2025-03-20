@@ -13,7 +13,6 @@ package org.roda.wui.client.management;
 import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.search.NotificationSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -90,12 +89,6 @@ public class NotificationRegister extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     notificationDescription.add(new HTMLWidgetWrapper("NotificationDescription.html"));
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

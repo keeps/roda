@@ -19,7 +19,6 @@ import org.roda.wui.client.common.actions.PreservationAgentActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -106,8 +105,8 @@ public class ShowPreservationAgent extends Composite {
     actionableWidgetBuilder = new ActionableWidgetBuilder<>(PreservationAgentActions.get());
 
     Services services = new Services("Retrieve preservation agent", "get");
-    services.rodaEntityRestService(s -> s.findByUuid(agentId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedPreservationAgent.class)
-      .whenComplete((preservationAgent, throwable) -> {
+    services.rodaEntityRestService(s -> s.findByUuid(agentId, LocaleInfo.getCurrentLocale().getLocaleName()),
+      IndexedPreservationAgent.class).whenComplete((preservationAgent, throwable) -> {
         if (throwable != null) {
           if (throwable instanceof NotFoundException) {
             Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationAgent());
@@ -119,12 +118,6 @@ public class ShowPreservationAgent extends Composite {
           viewAction(preservationAgent);
         }
       });
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void viewAction(IndexedPreservationAgent agent) {

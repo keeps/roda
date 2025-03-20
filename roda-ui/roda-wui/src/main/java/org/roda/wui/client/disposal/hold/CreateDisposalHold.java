@@ -12,7 +12,6 @@ import java.util.List;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -73,12 +72,6 @@ public class CreateDisposalHold extends Composite {
     this.disposalHoldDataPanel = new DisposalHoldDataPanel(disposalHold, false);
 
     initWidget(uiBinder.createAndBindUi(this));
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonApply")
