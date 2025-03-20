@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -63,7 +62,7 @@ public class SearchWrapper extends Composite {
     rootPanel = new FlowPanel();
     rootPanel.setStyleName("searchWrapper");
     mainPanel = new FlowPanel();
-    mainPanel.setStyleName("searchWrapperMainPanel");
+    mainPanel.setStyleName("searchWrapperMainPanel roda6Card");
     sidePanel = new FlowPanel();
     sidePanel.setStyleName("searchWrapperSidePanel");
     rootPanel.add(mainPanel);
@@ -110,9 +109,7 @@ public class SearchWrapper extends Composite {
 
     // create
     searchPanel = new SearchPanel<>(list, filter, allFilter, incremental,
-      listBuilder.getOptions().getSearchPlaceholder(), hasMultipleSearchPanels,
-      listBuilder.getOptions().getActionable(), listBuilder.getOptions().getActionableCallback(), showSaveButton,
-      hideListAfterClear);
+      listBuilder.getOptions().getSearchPlaceholder(), hasMultipleSearchPanels, showSaveButton, hideListAfterClear);
     initSearchPanelSelectionDropdown();
     searchPanelSelectionDropdown.addItem(defaultLabelText, dropdownValue, null);
     if (!hasMultipleSearchPanels) {
@@ -275,8 +272,8 @@ public class SearchWrapper extends Composite {
       mainPanel.add(list);
     }
 
-      searchPanelSelectionDropdown.setSelectedValue(objectClassSimpleName, false);
-      searchPanel.attachSearchPanelSelectionDropdown(searchPanelSelectionDropdown);
+    searchPanelSelectionDropdown.setSelectedValue(objectClassSimpleName, false);
+    searchPanel.attachSearchPanelSelectionDropdown(searchPanelSelectionDropdown);
   }
 
   /**

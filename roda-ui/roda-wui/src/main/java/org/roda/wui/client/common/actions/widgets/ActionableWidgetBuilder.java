@@ -112,6 +112,26 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return createActionsMenu(actionableBundle, objects);
   }
 
+  public Widget buildListWithObjectsAndDefaults(ActionableObject<T> objects) {
+    ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
+    return createActionsMenuWithDefaults(actionableBundle, objects);
+  }
+
+  public Widget buildListWithObjectsAndDefaults(ActionableObject<T> objects,
+    List<Actionable.Action<T>> actionWhitelist) {
+    ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
+
+    if (!actionWhitelist.isEmpty()) {
+      // remove unwanted buttons, and the whole group if it is empty
+      actionableBundle.getGroups().removeIf(group -> {
+        group.getButtons().removeIf(button -> !actionWhitelist.contains(button.getAction()));
+        return group.getButtons().isEmpty();
+      });
+    }
+
+    return createActionsMenuWithDefaults(actionableBundle, objects);
+  }
+
   public Widget buildGroupedListWithObjects(ActionableObject<T> objects) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
     return createGroupedActionsMenu(actionableBundle, objects, List.of());
@@ -191,6 +211,77 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
           }
         }
       }
+    }
+
+    if (includeBackButton) {
+      ActionButton<T> backButton = new ActionButton<>(
+        new ActionableButton<>(messages.backButton(), null, ActionImpact.NONE, "fas fa-arrow-circle-left"));
+      backButton.addClickHandler(event -> History.back());
+      backButton.addStyleName("actionable-button-back");
+      panel.add(backButton);
+      addedButtonCount++;
+    }
+
+    if (addedButtonCount == 0) {
+      Label emptyHelpText = new Label(messages.actionableEmptyHelp(objects.getType()));
+      emptyHelpText.addStyleName("actions-empty-help");
+      panel.add(emptyHelpText);
+    }
+
+    widgetCreatedHandler.accept(addedButtonCount);
+
+    return panel;
+  }
+
+  private FlowPanel createActionsMenuWithDefaults(ActionableBundle<T> actionableBundle, ActionableObject<T> objects) {
+    FlowPanel panel = new FlowPanel();
+    panel.addStyleName("actionable-menu");
+
+    boolean isReadonly = NodeType.valueOf(ConfigurationManager.getString(RodaConstants.RODA_NODE_TYPE_KEY))
+      .equals(NodeType.REPLICA);
+    int addedButtonCount = 0;
+
+    for (ActionableGroup<T> actionGroup : actionableBundle.getGroups()) {
+      boolean hasButtonsOnThisGroup = false;
+      ActionableTitle actionableTitle = actionGroup.getTitle();
+      Label groupTitle = new Label(actionableTitle.getTitle());
+      groupTitle.addStyleName("h4 actionable-title");
+      if (!actionableTitle.hasTitle()) {
+        groupTitle.addStyleName("actionable-title-empty");
+      }
+      panel.add(groupTitle);
+
+      for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
+        ActionButton<T> button = new ActionButton<>(actionButton);
+        panel.add(button);
+        addedButtonCount++;
+        if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
+          && actionable.canAct(actionButton.getAction(), objects)) {
+          button.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+              button.setEnabled(false);
+              actionable.act(actionButton.getAction(), objects, new AsyncCallback<Actionable.ActionImpact>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                  actionImpactCallback.onFailure(caught);
+                  button.setEnabled(true);
+                }
+
+                @Override
+                public void onSuccess(Actionable.ActionImpact result) {
+                  actionImpactCallback.onSuccess(result);
+                  button.setEnabled(true);
+                }
+              });
+            }
+          });
+        }
+        else {
+          button.setEnabled(false);
+        }
+      }
+
     }
 
     if (includeBackButton) {

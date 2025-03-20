@@ -114,6 +114,10 @@ a.btn-hero:visited, a.btn-welcome:visited {
   text-decoration: none;
 }
 
+.row-highlight {
+    background-color: #eceaea;
+}
+
 .row-highlight h2 {
   color: #000000;
   font-family: "Inter", "Ubuntu";
@@ -136,7 +140,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .row-highlight-alt {
-  background-color: #eceaea;
+    background-color: white;
 }
 
 .row-get-quote {
@@ -279,6 +283,10 @@ a.btn-hero:visited, a.btn-welcome:visited {
   padding-bottom: 32px;
 }
 
+.row-features {
+    background-color: #eceaea;
+}
+
 .row-features h6 {
   margin: 0;
   font-weight: 500;
@@ -290,8 +298,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 /* FOOTER */
 
 .tutorial-roda-community {
-  background-color: #363030;
-  color: #ffffff;
+
 }
 
 .build_time {

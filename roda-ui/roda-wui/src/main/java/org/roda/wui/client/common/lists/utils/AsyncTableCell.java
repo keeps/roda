@@ -39,6 +39,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -126,6 +127,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private Actionable<T> actionable;
   private FlowPanel mainPanel;
   private FlowPanel sidePanel;
+  private FlowPanel facetsPanel;
   private MyAsyncDataProvider<T> dataProvider;
   private SingleSelectionModel<T> selectionModel;
   private AccessibleSimplePager resultsPager;
@@ -250,6 +252,55 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     csvDownloadButton.addStyleName("btn btn-link btn-download csvDownloadButton");
     csvDownloadButton.setVisible(options.isCsvDownloadButtonVisibility());
 
+    ActionsToolbar toolbar = new ActionsToolbar();
+    if (options.getActionable() != null && options.getActionable().hasAnyRoles() && isSelectable()) {
+      ActionableWidgetBuilder<T> builder = new ActionableWidgetBuilder<>(options.getActionable());
+      toolbar.setLabel(messages.actions());
+      toolbar.setIcon(null);
+      toolbar.setTagsVisible(false);
+      toolbar.setActionableMenu(builder.buildListWithObjectsAndDefaults(getActionableObject()));
+      addCheckboxSelectionListener(new CheckboxSelectionListener<T>() {
+        @Override
+        public void onSelectionChange(SelectedItems<T> selected) {
+          builder.withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+            @Override
+            public void onSuccess(Actionable.ActionImpact impact) {
+              if (!Actionable.ActionImpact.NONE.equals(impact)) {
+                Timer timer = new Timer() {
+                  @Override
+                  public void run() {
+                    refresh();
+                  }
+                };
+                timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
+              }
+              if (actionableCallback != null) {
+                actionableCallback.onSuccess(impact);
+              }
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+              Timer timer = new Timer() {
+                @Override
+                public void run() {
+                  refresh();
+                }
+              };
+              timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
+              super.onFailure(caught);
+              if (actionableCallback != null) {
+                actionableCallback.onFailure(caught);
+              }
+            }
+          });
+          toolbar.setActionableMenu(builder.buildListWithObjectsAndDefaults(getActionableObject()));
+        }
+      });
+    } else {
+      toolbar.setVisible(false);
+    }
+
     sidePanel = new FlowPanel();
     sidePanel.addStyleName("my-asyncdatagrid-side-panel");
     add(sidePanel);
@@ -261,17 +312,27 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     autoUpdatePanel = new AccessibleFocusPanel();
     autoUpdatePanel.add(autoUpdateSignal);
 
+    facetsPanel = new FlowPanel();
+    facetsPanel.addStyleName("my-asyncdatagrid-facets-panel");
+
+    FlowPanel footer = new FlowPanel();
+    footer.addStyleName("my-asyncdatagrid-footer");
+
     mainPanel.add(display);
-    mainPanel.add(resultsPager);
-    mainPanel.add(pageSizePager);
-    mainPanel.add(autoUpdatePanel);
-    mainPanel.add(csvDownloadButton);
+    mainPanel.add(footer);
+    footer.add(csvDownloadButton);
+    footer.add(pageSizePager);
+    footer.add(resultsPager);
+    footer.add(autoUpdatePanel);
+
+    sidePanel.add(toolbar);
+    sidePanel.add(facetsPanel);
 
     SimplePanel clearfix = new SimplePanel();
     clearfix.addStyleName("clearfix");
     add(clearfix);
 
-    toggleSidePanel(createAndBindFacets(sidePanel));
+    toggleFacetsPanel(createAndBindFacets(facetsPanel));
 
     csvDownloadButton.addClickHandler(event -> {
       Services services = new Services("Retrieve export limit", "get");
@@ -361,13 +422,13 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     return options;
   }
 
-  private void toggleSidePanel(boolean toggle) {
+  private void toggleFacetsPanel(boolean toggle) {
     if (toggle) {
       mainPanel.removeStyleName("my-asyncdatagrid-main-panel-full");
-      sidePanel.removeStyleName("my-asyncdatagrid-side-panel-hidden");
+      facetsPanel.removeStyleName("my-asyncdatagrid-side-panel-hidden");
     } else {
       mainPanel.addStyleName("my-asyncdatagrid-main-panel-full");
-      sidePanel.addStyleName("my-asyncdatagrid-side-panel-hidden");
+      facetsPanel.addStyleName("my-asyncdatagrid-side-panel-hidden");
     }
   }
 
@@ -725,13 +786,13 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   public void setFacets(Facets facets) {
     this.facets = facets;
     refresh();
-    toggleSidePanel(createAndBindFacets(sidePanel));
+    toggleFacetsPanel(createAndBindFacets(facetsPanel));
   }
 
   public void set(Filter filter, boolean justActive, Facets facets) {
     this.facets = facets;
     set(filter, justActive);
-    toggleSidePanel(createAndBindFacets(sidePanel));
+    toggleFacetsPanel(createAndBindFacets(facetsPanel));
   }
 
   public void set(Filter filter, boolean justActive) {
