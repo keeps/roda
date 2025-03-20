@@ -8,7 +8,6 @@
 package org.roda.wui.client.common.search;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +21,7 @@ import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
-import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.popup.CalloutPopup;
@@ -49,8 +44,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -111,9 +104,6 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   @UiField
   SimplePanel searchPanelSelectionDropdownWrapper;
 
-  @UiField
-  ActionsToolbar actionsToolbar;
-
   private Filter defaultFilter;
   private String allFilter;
   private boolean defaultFilterIncremental = false;
@@ -124,23 +114,16 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   private boolean showPreFilters;
   private boolean hideListAfterClear;
 
-  private final ActionableWidgetBuilder<T> actionableBuilder;
-  private final Actionable<T> actionable;
-
   private SearchPanel() {
     // private constructor to forbid its usage
-    actionableBuilder = null;
-    actionable = null;
   }
 
   SearchPanel(AsyncTableCell<T> list, Filter defaultFilter, String allFilter, boolean incremental, String placeholder,
-    boolean showSearchInputListBox, Actionable<T> actionable, AsyncCallback<Actionable.ActionImpact> actionableCallback,
-    boolean showSaveButton, boolean hideListAfterClear) {
+    boolean showSearchInputListBox, boolean showSaveButton, boolean hideListAfterClear) {
     this.defaultFilter = defaultFilter;
     this.allFilter = allFilter;
     this.defaultFilterIncremental = incremental;
     this.list = list;
-    this.actionable = actionable;
     this.hideListAfterClear = hideListAfterClear;
 
     this.showPreFilters = ConfigurationManager.getBoolean(false, RodaConstants.UI_LISTS_PROPERTY, list.getListId(),
@@ -164,49 +147,9 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     popup.addStyleName("actionable-popup");
     popup.addStyleName("ActionableStyleMenu");
 
-    actionableBuilder = actionable != null ? new ActionableWidgetBuilder<>(actionable) : null;
-    actionsToolbar.setVisible(actionableBuilder != null && actionable.hasAnyRoles() && list.isSelectable());
-    actionsToolbar.setLabelVisible(false);
-    actionsToolbar.setTagsVisible(false);
     list.addCheckboxSelectionListener(selectedItems -> {
       if (!list.isVisible()) {
         doSearch();
-      }
-      if (actionableBuilder != null) {
-        actionableBuilder.withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
-          @Override
-          public void onSuccess(Actionable.ActionImpact impact) {
-            if (!Actionable.ActionImpact.NONE.equals(impact)) {
-              Timer timer = new Timer() {
-                @Override
-                public void run() {
-                  list.refresh();
-                }
-              };
-              timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
-            }
-            if (actionableCallback != null) {
-              actionableCallback.onSuccess(impact);
-            }
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            Timer timer = new Timer() {
-              @Override
-              public void run() {
-                list.refresh();
-              }
-            };
-            timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
-            super.onFailure(caught);
-            if (actionableCallback != null) {
-              actionableCallback.onFailure(caught);
-            }
-          }
-        });
-
-        actionsToolbar.setActionableMenu(actionableBuilder.buildGroupedListWithObjects(list.getActionableObject()));
       }
     });
 
@@ -405,23 +348,6 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
   void attachSearchPanelSelectionDropdown(Dropdown dropdown) {
     searchPanelSelectionDropdownWrapper.setWidget(dropdown);
-  }
-
-  void addActionableButton(String actionName) {
-    if (actionable != null) {
-
-      Actionable.Action<T> action = actionable.actionForName(actionName);
-      if (action != null) {
-        Widget widget = actionableBuilder.buildListWithObjects(new ActionableObject<T>(list.getClassToReturn()),
-          Collections.singletonList(action));
-
-        // add single action CSS
-        searchPanel.add(widget);
-      } else {
-        GWT.log("Could not resolve. Action '" + actionName + "' for class '" + list.getClassToReturn().getSimpleName()
-          + "' was not found.");
-      }
-    }
   }
 
   /**

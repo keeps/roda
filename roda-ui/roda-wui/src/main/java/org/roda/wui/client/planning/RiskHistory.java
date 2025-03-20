@@ -21,7 +21,6 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -130,12 +129,6 @@ public class RiskHistory extends Composite {
     list.setSelectedIndex(0);
     // Manually trigger a ValueChangeEvent
     DomEvent.fireNativeEvent(Document.get().createChangeEvent(), list);
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   private void init() {

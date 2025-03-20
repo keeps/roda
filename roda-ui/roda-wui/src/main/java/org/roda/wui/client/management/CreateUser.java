@@ -17,7 +17,6 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.user.requests.CreateUserRequest;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -99,12 +98,6 @@ public class CreateUser extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
-
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isValid()) {
@@ -112,13 +105,14 @@ public class CreateUser extends Composite {
       Services services = new Services("Create RODA user", "create");
       CreateUserRequest userOperations = new CreateUserRequest(user.getEmail(), user.getName(), user.getFullName(),
         user.getGroups(), user.isGuest(), null, userDataPanel.getUserExtra());
-      services.membersResource(s -> s.createUser(userOperations,  LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((createdUser, error) -> {
-        if (createdUser != null) {
-          HistoryUtils.newHistory(MemberManagement.RESOLVER);
-        } else if (error != null) {
-          errorMessage(error);
-        }
-      });
+      services.membersResource(s -> s.createUser(userOperations, LocaleInfo.getCurrentLocale().getLocaleName()))
+        .whenComplete((createdUser, error) -> {
+          if (createdUser != null) {
+            HistoryUtils.newHistory(MemberManagement.RESOLVER);
+          } else if (error != null) {
+            errorMessage(error);
+          }
+        });
     }
   }
 

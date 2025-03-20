@@ -28,7 +28,6 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchWrapper;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
@@ -216,12 +215,6 @@ public class RiskIncidenceRegister extends Composite {
         breadcrumb.setVisible(true);
       });
     });
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   interface MyUiBinder extends UiBinder<Widget, RiskIncidenceRegister> {

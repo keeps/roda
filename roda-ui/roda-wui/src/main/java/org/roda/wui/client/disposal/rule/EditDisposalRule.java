@@ -16,7 +16,6 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalRuleActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.services.DisposalScheduleRestService;
 import org.roda.wui.client.services.Services;
@@ -104,12 +103,6 @@ public class EditDisposalRule extends Composite {
       instance = new EditDisposalRule();
     }
     return instance;
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonApply")

@@ -9,16 +9,15 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
-import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -29,7 +28,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import org.roda.wui.common.client.widgets.Toast;
+
+import config.i18n.client.ClientMessages;
 
 public class CreateRisk extends Composite {
 
@@ -75,12 +75,6 @@ public class CreateRisk extends Composite {
   public CreateRisk() {
     this.riskDataPanel = new RiskDataPanel(null, false);
     initWidget(uiBinder.createAndBindUi(this));
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonApply")

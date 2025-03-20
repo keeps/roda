@@ -50,6 +50,5 @@
             </g:FlowPanel>
         </g:FlowPanel>
         <g:FlowPanel addStyleNames="searchPreFilters" ui:field="searchPreFilters"/>
-        <common:ActionsToolbar ui:field="actionsToolbar"></common:ActionsToolbar>
     </g:FlowPanel>
 </ui:UiBinder>

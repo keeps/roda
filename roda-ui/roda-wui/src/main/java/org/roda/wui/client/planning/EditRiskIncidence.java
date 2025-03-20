@@ -17,7 +17,6 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -54,8 +53,8 @@ public class EditRiskIncidence extends Composite {
       if (historyTokens.size() == 1) {
         Services service = new Services("Retrieve incidence risk", "get");
         String riskIncidenceId = historyTokens.get(0);
-        service.rodaEntityRestService(s -> s.findByUuid(riskIncidenceId, LocaleInfo.getCurrentLocale().getLocaleName()), RiskIncidence.class)
-          .whenComplete((value, error) -> {
+        service.rodaEntityRestService(s -> s.findByUuid(riskIncidenceId, LocaleInfo.getCurrentLocale().getLocaleName()),
+          RiskIncidence.class).whenComplete((value, error) -> {
             if (error != null) {
               callback.onFailure(error);
             } else if (value != null) {
@@ -181,12 +180,6 @@ public class EditRiskIncidence extends Composite {
     }
 
     severity.setSelectedIndex(selectedIndex - 1);
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void getRiskIncidence() {

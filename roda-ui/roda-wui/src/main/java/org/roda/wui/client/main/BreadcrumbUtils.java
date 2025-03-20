@@ -72,7 +72,7 @@ public class BreadcrumbUtils {
   }
 
   public static List<BreadcrumbItem> getAipBreadcrumbs(IndexedAIP aip) {
-    return Arrays.asList(getBreadcrumbItem(aip));
+    return List.of(getBreadcrumbItem(aip));
   }
 
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip, boolean events) {
@@ -118,8 +118,8 @@ public class BreadcrumbUtils {
   public static List<BreadcrumbItem> getRepresentationBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip,
     IndexedRepresentation representation) {
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
-    breadcrumb
-      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", BrowseTop.RESOLVER.getHistoryPath()));
+    breadcrumb.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.allCollectionsTitle()),
+      messages.allCollectionsTitle(), BrowseTop.RESOLVER.getHistoryPath()));
 
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
@@ -201,8 +201,8 @@ public class BreadcrumbUtils {
   public static List<BreadcrumbItem> getTransferredResourceBreadcrumbs(TransferredResource r) {
     List<BreadcrumbItem> ret = new ArrayList<>();
 
-    ret.add(
-      new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", IngestTransfer.RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.allCollectionsTitle()),
+      messages.allCollectionsTitle(), IngestTransfer.RESOLVER.getHistoryPath()));
     if (r != null) {
 
       // add parent

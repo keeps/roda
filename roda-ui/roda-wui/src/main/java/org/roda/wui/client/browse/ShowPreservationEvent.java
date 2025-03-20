@@ -32,7 +32,6 @@ import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.planning.ShowPreservationAgent;
@@ -157,8 +156,9 @@ public class ShowPreservationEvent extends Composite {
 
     Services services = new Services("Retrieve preservation event", "get");
 
-
-    services.rodaEntityRestService(s -> s.findByUuid(eventId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedPreservationEvent.class)
+    services
+      .rodaEntityRestService(s -> s.findByUuid(eventId, LocaleInfo.getCurrentLocale().getLocaleName()),
+        IndexedPreservationEvent.class)
       .thenCompose(event -> services.preservationEventsResource(s -> s.getPreservationAgents(event.getId()))
         .thenCompose(indexedPreservationAgents -> services
           .preservationEventsResource(s -> s.getLinkingIdentifierObjects(event.getId()))
@@ -181,12 +181,6 @@ public class ShowPreservationEvent extends Composite {
 
   public static final List<String> getViewItemHistoryToken(String id) {
     return ListUtils.concat(RESOLVER.getHistoryPath(), id);
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void viewAction() {

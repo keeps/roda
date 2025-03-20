@@ -159,12 +159,6 @@ public class TransferUpload extends Composite {
     return instance;
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
-
   private String getUploadUrl() {
     String ret = null;
 
@@ -219,16 +213,15 @@ public class TransferUpload extends Composite {
       String transferredResourceUUID = historyTokens.get(0);
       if (transferredResourceUUID != null) {
         Services services = new Services("Upload resource", "Upload");
-        services.transferredResource(s -> s.getResource(transferredResourceUUID))
-          .whenComplete((value,error) -> {
-            if (value != null) {
-              resource = value;
-              callback.onSuccess(TransferUpload.this);
-              updateUploadForm();
-            } else if (error != null) {
-              callback.onFailure(error);
-            }
-          });
+        services.transferredResource(s -> s.getResource(transferredResourceUUID)).whenComplete((value, error) -> {
+          if (value != null) {
+            resource = value;
+            callback.onSuccess(TransferUpload.this);
+            updateUploadForm();
+          } else if (error != null) {
+            callback.onFailure(error);
+          }
+        });
       } else {
         HistoryUtils.newHistory(IngestTransfer.RESOLVER);
         callback.onSuccess(null);
@@ -266,8 +259,8 @@ public class TransferUpload extends Composite {
       SafeHtml html = SafeHtmlUtils.fromSafeConstant("<form id='upload' method='post' action='" + uploadUrl
         + "' enctype='multipart/form-data'>" + "<div id='drop'><h4>" + messages.ingestTransferUploadDropHere()
         + "</h4><a>" + messages.ingestTransferUploadBrowseFiles() + "</a>" + "<input title='"
-        + RodaConstants.API_PARAM_UPLOAD + "' type='file' name='" + "resource"
-        + "' multiple='true' />" + " </div>" + "<input title='hiddenSubmit' type='submit' hidden/> </form>");
+        + RodaConstants.API_PARAM_UPLOAD + "' type='file' name='" + "resource" + "' multiple='true' />" + " </div>"
+        + "<input title='hiddenSubmit' type='submit' hidden/> </form>");
 
       uploadForm.setHTML(html);
       uploadList.setHTML(SafeHtmlUtils.fromSafeConstant("<ul id='upload-list'></ul>"));

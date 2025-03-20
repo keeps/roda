@@ -18,7 +18,6 @@ import org.roda.core.data.v2.ri.RepresentationInformationCreateRequest;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.process.InternalProcess;
@@ -106,12 +105,6 @@ public class EditRepresentationInformation extends Composite {
     this.ri = ri;
     this.representationInformationDataPanel = new RepresentationInformationDataPanel(true, true, ri);
     initWidget(uiBinder.createAndBindUi(this));
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonApply")

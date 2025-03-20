@@ -18,7 +18,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -53,14 +52,15 @@ public class ShowNotification extends Composite {
       if (historyTokens.size() == 1) {
         String notificationId = historyTokens.get(0);
         Services services = new Services("Get notification", "get");
-        services.notificationResource(s -> s.getNotification(notificationId)).whenComplete((notification, throwable) -> {
-          if (throwable != null) {
-            callback.onFailure(throwable);
-          } else {
-            ShowNotification notificationPanel = new ShowNotification(notification);
-            callback.onSuccess(notificationPanel);
-          }
-        });
+        services.notificationResource(s -> s.getNotification(notificationId))
+          .whenComplete((notification, throwable) -> {
+            if (throwable != null) {
+              callback.onFailure(throwable);
+            } else {
+              ShowNotification notificationPanel = new ShowNotification(notification);
+              callback.onSuccess(notificationPanel);
+            }
+          });
       } else {
         HistoryUtils.newHistory(NotificationRegister.RESOLVER);
         callback.onSuccess(null);
@@ -170,12 +170,6 @@ public class ShowNotification extends Composite {
     stateValue.setHTML(HtmlSnippetUtils.getNotificationStateHTML(notification.getState()));
     stateLabel.setVisible(notification.getState() != null);
     stateValue.setVisible(notification.getState() != null);
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonCancel")
