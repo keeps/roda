@@ -249,7 +249,7 @@ public class SearchWrapper extends Composite {
 
   private void initSearchPanelSelectionDropdown() {
     if (searchPanelSelectionDropdown == null) {
-      searchPanelSelectionDropdown = new Dropdown();
+      searchPanelSelectionDropdown = new Dropdown(true);
       searchPanelSelectionDropdown.addStyleName("searchInputListBox");
       searchPanelSelectionDropdown.addPopupStyleName("searchInputListBoxPopup");
       searchPanelSelectionDropdown.addValueChangeHandler(event -> attachComponents(event.getValue()));

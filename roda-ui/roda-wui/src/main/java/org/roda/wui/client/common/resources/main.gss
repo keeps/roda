@@ -1731,8 +1731,12 @@ button:after {
     background-color: white;
     min-width: 150px;
     cursor: pointer;
-    cursor: hand;
     text-transform: capitalize;
+}
+
+.dropdown-disabled .dropdown-label,
+.dropdown-disabled .dropdown-item {
+    cursor: default;
 }
 
 .dropdown-item:hover {
@@ -1752,6 +1756,10 @@ button:after {
     line-height: 2.5rem;
     padding-left: 5px;
     padding-right: 5px;
+}
+
+.dropdown-disabled .dropdown-label:after {
+   display: none;
 }
 
 .selected-count-panel:after {
@@ -8009,7 +8017,6 @@ span.code {
 }
 
 .navigationToolbar .navigationToolbarHeader {
-    margin-left: 40px;
     text-transform: capitalize;
 }
 

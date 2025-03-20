@@ -39,6 +39,8 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
   private PopupPanel popup;
   private VerticalPanel popupPanel;
   private boolean popupShowing = false;
+  private boolean disableOnSingleItem;
+  private boolean enabled;
 
   private Map<String, String> popupValues;
   private Map<String, String> popupIcons;
@@ -57,6 +59,7 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
     popupPanel = new VerticalPanel();
     popupValues = new HashMap<>();
     popupIcons = new HashMap<>();
+    this.disableOnSingleItem = disableOnSingleItem;
 
     iconAndLabelPanel.add(selectedIcon);
     selectedIcon.setVisible(false);
@@ -68,7 +71,9 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
 
       @Override
       public void onClick(ClickEvent event) {
-        popup();
+        if (enabled) {
+          popup();
+        }
       }
     });
 
@@ -86,9 +91,20 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
     panel.addStyleName("dropdown-panel");
     iconAndLabelPanel.addStyleName("dropdown-label");
     popup.addStyleName("dropdown-popup");
+
+    if (disableOnSingleItem) {
+      focusPanel.addStyleName("dropdown-disabled");
+      setEnabled(false);
+    } else {
+      setEnabled(true);
+    }
   }
 
   public void addItem(final String label, final String value, final String icon) {
+    if (disableOnSingleItem && popupValues.size() > 1) {
+      setEnabled(true);
+    }
+
     popupValues.put(label, value);
     popupIcons.put(label, icon);
 
@@ -192,5 +208,14 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
 
   private SafeHtml createHtmlForIcon(String icon) {
     return SafeHtmlUtils.fromSafeConstant("<i class=\"" + icon + "\"></i>");
+  }
+
+  private void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+    if (enabled) {
+      focusPanel.removeStyleName("dropdown-disabled");
+    } else {
+      focusPanel.addStyleName("dropdown-disabled");
+    }
   }
 }
