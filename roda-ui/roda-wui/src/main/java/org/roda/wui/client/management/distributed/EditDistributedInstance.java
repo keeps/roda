@@ -14,7 +14,6 @@ import org.roda.core.data.v2.synchronization.central.UpdateDistributedInstanceRe
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -103,7 +102,8 @@ public class EditDistributedInstance extends Composite {
           public void onClick(ClickEvent clickEvent) {
             Services services = new Services("Update distributed instance status", "update");
             services
-              .distributedInstanceResource(s -> s.updateDistributedInstanceSyncStatus(distributedInstance.getId(), false))
+              .distributedInstanceResource(
+                s -> s.updateDistributedInstanceSyncStatus(distributedInstance.getId(), false))
               .whenComplete((updatedDistributedInstance, error) -> {
                 if (updatedDistributedInstance != null) {
                   HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
@@ -120,7 +120,8 @@ public class EditDistributedInstance extends Composite {
           public void onClick(ClickEvent clickEvent) {
             Services services = new Services("Update distributed instance status", "update");
             services
-              .distributedInstanceResource(s -> s.updateDistributedInstanceSyncStatus(distributedInstance.getId(), true))
+              .distributedInstanceResource(
+                s -> s.updateDistributedInstanceSyncStatus(distributedInstance.getId(), true))
               .whenComplete((updatedDistributedInstance, error) -> {
                 if (updatedDistributedInstance != null) {
                   HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
@@ -132,12 +133,6 @@ public class EditDistributedInstance extends Composite {
       default:
         buttonChangeStatus.setVisible(false);
     }
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   @UiHandler("buttonSave")

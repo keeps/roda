@@ -16,7 +16,6 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.AccessKeyDialogs;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.EditUser;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.ShowUser;
@@ -108,12 +107,6 @@ public class CreateAccessKey extends Composite {
     titlePanel.setText(user.getName());
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
-
   @UiHandler("buttonSave")
   void buttonApplyHandler(ClickEvent e) {
     if (accessKeyDataPanel.isValid()) {
@@ -125,15 +118,15 @@ public class CreateAccessKey extends Composite {
         this.accessKey.getExpirationDate());
       services.membersResource(s -> s.createAccessKey(user.getId(), createAccessKeyRequest))
         .whenComplete((response, error) -> {
-        if (response != null) {
-          AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), response, new NoAsyncCallback<Boolean>() {
-            @Override
-            public void onSuccess(Boolean result) {
-              HistoryUtils.newHistory(ShowUser.RESOLVER, response.getUserName());
-            }
-          });
-        }
-      });
+          if (response != null) {
+            AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), response, new NoAsyncCallback<Boolean>() {
+              @Override
+              public void onSuccess(Boolean result) {
+                HistoryUtils.newHistory(ShowUser.RESOLVER, response.getUserName());
+              }
+            });
+          }
+        });
     }
   }
 

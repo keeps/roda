@@ -19,7 +19,6 @@ import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.RiskActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.services.Services;
@@ -118,19 +117,15 @@ public class ShowRisk extends Composite {
     return instance;
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
-
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
 
     if (historyTokens.size() == 1) {
       Services services = new Services("Retrieve indexed risk", "get");
       SidebarUtils.showSidebar(contentFlowPanel, sidebarFlowPanel);
 
-      services.rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0), LocaleInfo.getCurrentLocale().getLocaleName()), IndexedRisk.class)
+      services
+        .rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0), LocaleInfo.getCurrentLocale().getLocaleName()),
+          IndexedRisk.class)
         .whenComplete((indexedRisk, throwable) -> {
           if (throwable == null) {
             instance = new ShowRisk(indexedRisk);

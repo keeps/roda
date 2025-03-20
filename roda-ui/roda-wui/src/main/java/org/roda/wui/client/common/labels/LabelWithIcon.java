@@ -43,7 +43,11 @@ public class LabelWithIcon extends Composite {
 
   public void setIcon(String iconClasses) {
     if (iconClasses != null && !iconClasses.isEmpty()) {
+      icon.setVisible(true);
       icon.setHTML(SafeHtmlUtils.fromSafeConstant("<i class=\"" + iconClasses + "\"></i>"));
+    }
+    else {
+      icon.setVisible(false);
     }
   }
 

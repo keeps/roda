@@ -19,7 +19,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.user.requests.UpdateUserRequest;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
@@ -126,14 +125,8 @@ public class Profile extends Composite {
     userDataPanel.setUsernameReadOnly(true);
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
-
   private SecureString getPassword() {
-    if(userDataPanel.getPassword() != null) {
+    if (userDataPanel.getPassword() != null) {
       return new SecureString(userDataPanel.getPassword().toCharArray());
     } else {
       return null;

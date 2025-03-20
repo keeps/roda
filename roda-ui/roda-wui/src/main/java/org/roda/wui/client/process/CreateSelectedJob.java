@@ -33,7 +33,6 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.client.main.Theme;
@@ -74,7 +73,8 @@ import config.i18n.client.ClientMessages;
  */
 public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
 
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
@@ -188,12 +188,6 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
           init(pluginInfoList.getPluginInfoList());
         }
       });
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void init(List<PluginInfo> plugins) {
@@ -686,7 +680,5 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   @SuppressWarnings("rawtypes")
   public interface MyUiBinder extends UiBinder<Widget, CreateSelectedJob> {
   }
-
-
 
 }

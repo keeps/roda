@@ -12,7 +12,6 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
-import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.PreservationAgentActions;
@@ -20,20 +19,20 @@ import org.roda.wui.client.common.lists.PreservationAgentList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 /**
  * @author Luis Faria
@@ -101,12 +100,6 @@ public class PreservationAgents extends Composite {
       instance = new PreservationAgents();
     }
     return instance;
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   private void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

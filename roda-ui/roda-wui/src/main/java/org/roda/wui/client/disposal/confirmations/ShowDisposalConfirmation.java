@@ -134,11 +134,7 @@ public class ShowDisposalConfirmation extends Composite {
     }
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
+
 
   interface MyUiBinder extends UiBinder<Widget, ShowDisposalConfirmation> {
   }

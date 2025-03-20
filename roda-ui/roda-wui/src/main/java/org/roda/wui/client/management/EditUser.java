@@ -23,7 +23,6 @@ import org.roda.core.data.v2.user.requests.ChangeUserStatusRequest;
 import org.roda.core.data.v2.user.requests.UpdateUserRequest;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -126,7 +125,6 @@ public class EditUser extends Composite {
       this.userDataPanel.setUserExtra(new HashSet<>());
     }
 
-
     initWidget(uiBinder.createAndBindUi(this));
 
     userDataPanel.setUsernameReadOnly(true);
@@ -137,14 +135,8 @@ public class EditUser extends Composite {
     }
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
-
   private SecureString getPassword() {
-    if(userDataPanel.getPassword() != null) {
+    if (userDataPanel.getPassword() != null) {
       return new SecureString(userDataPanel.getPassword().toCharArray());
     } else {
       return null;
@@ -180,26 +172,25 @@ public class EditUser extends Composite {
 
     ChangeUserStatusRequest request = new ChangeUserStatusRequest(
       new SelectedItemsListRequest(Arrays.asList(user.getUUID())), user.isActive());
-    services.membersResource(s -> s.changeActive(request))
-      .whenComplete((res, error) -> {
-        if (error == null) {
-          Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-          Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+    services.membersResource(s -> s.changeActive(request)).whenComplete((res, error) -> {
+      if (error == null) {
+        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+        Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              HistoryUtils.newHistory(MemberManagement.RESOLVER);
-            }
+          @Override
+          public void onFailure(Throwable caught) {
+            HistoryUtils.newHistory(MemberManagement.RESOLVER);
+          }
 
-            @Override
-            public void onSuccess(final Void nothing) {
-              HistoryUtils.newHistory(ShowJob.RESOLVER, res.getId());
-            }
-          });
+          @Override
+          public void onSuccess(final Void nothing) {
+            HistoryUtils.newHistory(ShowJob.RESOLVER, res.getId());
+          }
+        });
 
-          HistoryUtils.newHistory(MemberManagement.RESOLVER);
-        }
-      });
+        HistoryUtils.newHistory(MemberManagement.RESOLVER);
+      }
+    });
   }
 
   @UiHandler("buttonRemove")
@@ -210,13 +201,12 @@ public class EditUser extends Composite {
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Services services = new Services("Delete user", "delete");
-            services.membersResource(s -> s.deleteUser(user.getId()))
-              .whenComplete((res, error) -> {
-                if (error == null) {
-                  HistoryUtils.newHistory(MemberManagement.RESOLVER);
-                } else {
-                  errorMessage(error, null);
-                }
+            services.membersResource(s -> s.deleteUser(user.getId())).whenComplete((res, error) -> {
+              if (error == null) {
+                HistoryUtils.newHistory(MemberManagement.RESOLVER);
+              } else {
+                errorMessage(error, null);
+              }
             });
           }
         }

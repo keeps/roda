@@ -1407,13 +1407,9 @@ button:after {
 }
 
 .searchWrapperSidePanel .my-asyncdatagrid-side-panel {
-    padding: 16px;
+    padding: 0 16px;
     background-color: transparent;
     margin: 0;
-}
-
-.col_12 .my-asyncdatagrid-side-panel {
-    margin-left: 30px;
 }
 
 .card .my-asyncdatagrid-side-panel {
@@ -1498,21 +1494,12 @@ button:after {
 }
 
 .my-asyncdatagrid-pager-results {
-    display: inline-block;
     line-height: 1;
     font-size: 1.3rem;
-    float:right;
 }
 
 .my-asyncdatagrid-pager-results img {
     vertical-align: middle;
-}
-
-.my-asyncdatagrid-pager-pagesize {
-    /*margin-left: auto; */
-    /* margin-top: 5px; */
-    display: inline-block;
-    float: right;
 }
 
 .my-asyncdatagrid-pager-pagesize a {
@@ -1534,8 +1521,6 @@ button:after {
 .my-asyncdatagrid-autoupdate-signal {
     padding-top: 2px;
     padding-right: 2px;
-    display: inline-block;
-    float: right;
 }
 
 .my-asyncdatagrid-display {
@@ -1578,11 +1563,6 @@ button:after {
 
 .selectAipResultsPanel {
     max-height: 60vh;
-}
-
-
-.table-empty {
-    margin-top: -30px;
 }
 
 .wui-dialog-layout .table-empty {
@@ -1751,8 +1731,12 @@ button:after {
     background-color: white;
     min-width: 150px;
     cursor: pointer;
-    cursor: hand;
     text-transform: capitalize;
+}
+
+.dropdown-disabled .dropdown-label,
+.dropdown-disabled .dropdown-item {
+    cursor: default;
 }
 
 .dropdown-item:hover {
@@ -1772,6 +1756,10 @@ button:after {
     line-height: 2.5rem;
     padding-left: 5px;
     padding-right: 5px;
+}
+
+.dropdown-disabled .dropdown-label:after {
+   display: none;
 }
 
 .selected-count-panel:after {
@@ -2573,6 +2561,8 @@ td.datePickerMonth, td.datePickerYear {
 
 .sidebar .sticky-flow {
 	min-width: 220px;
+	position: sticky;
+	top: 64px;
 }
 
 .sidebar .sticky-padding {
@@ -2629,7 +2619,7 @@ td.datePickerMonth, td.datePickerYear {
     color: COLOR_PRIMARY;
     font-size: 1.2rem;
     border-radius: 64px;
-    width: 20px;
+    min-width: 20px;
     height: 20px;
     text-align: center;
 }
@@ -4245,29 +4235,67 @@ td.datePickerMonth, td.datePickerYear {
 .searchWrapper {
     display: flex;
     align-items: start;
-    gap: 16px;
 }
 
-.searchWrapperMainPanel {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0px 2px 4px 0px COLOR_SHADOW;
+.searchWrapperSearchPanel {
     flex: 1;
 }
 
-.searchWrapperSidePanel {
-    max-width: 250px;
+.searchWrapperSidePanel .my-asyncdatagrid-side-panel {
+    padding: 0;
+    width: 266px;
 }
 
 .searchWrapper .objectToolbar {
     gap: 0;
     min-height: 32px;
-    margin-top: 16px;
-    padding: 8px 16px;
+    background-color: transparent;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 0px 8px 16px;
+    margin-left: 16px;
+}
+
+.searchWrapper .objectToolbar .objectToolbarLabel {
+    font-size: 10px;
+    font-weight: 300;
+    color: #343A3F;
+    background-color: transparent;
+    justify-content: start;
+    padding: 0 0 10px 0;
+}
+
+.searchWrapper .objectToolbar .objectToolbarActions .actionable-title {
+    display: none;
+}
+
+
+.searchWrapper .objectToolbar .objectToolbarActions,
+.searchWrapper .objectToolbar .objectToolbarActions .actionable-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: stretch;
+    justify-content: stretch;
+}
+
+.searchWrapper .objectToolbar button,
+.searchWrapper .objectToolbar .groupedActionableMenu button {
+    padding: 12px 4px;
+    justify-content: start;
+}
+
+.searchWrapper .objectToolbar .objectToolbarActions .verticalDivider {
+    display: none;
 }
 
 .searchWrapper .objectToolbar .groupedActionableEmptyHelp {
     display: none;
+}
+
+.searchWrapper .my-asyncdatagrid-facets-panel {
+    margin-left: 16px;
+    padding: 0px 0px 0px 16px;
 }
 
 .searchPanelContainer {
@@ -4452,8 +4480,8 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 2rem;
     border: none;
     padding: 0 1rem;
-    background-color: COLOR_GREY_VERYLIGHTEST;
-    border-bottom: 1px solid COLOR_GREY_LIGHT;
+    background-color: COLOR_GREY_VERYLIGHT;
+    border-radius: 4px;
 }
 
 .searchBox::-webkit-input-placeholder,
@@ -4505,7 +4533,6 @@ td.datePickerMonth, td.datePickerYear {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
     padding: 6px 16px;
     font-weight: bold;
     text-transform: uppercase;
@@ -7226,9 +7253,13 @@ td.datePickerMonth, td.datePickerYear {
  DOWNLOAD CSV
 ****************************************/
 
-.csvDownloadButton, .actionsButton {
+.actionsButton {
 	padding: 7px;
 	float: left;
+}
+
+.csvDownloadButton {
+    padding: 7px;
 }
 
 .object-dialog .searchPreFilters  {
@@ -7863,6 +7894,13 @@ span.code {
     margin: 1rem;
 }
 
+.my-asyncdatagrid-footer {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    gap: 4px;
+}
+
 .ActionableStyleButtons {
     display: inline-block;
 }
@@ -7891,6 +7929,7 @@ span.code {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+    gap: 4px;
 }
 
 .card + .ActionableStyleButtons, .ActionableStyleButtons + .ActionableStyleButtons {
@@ -7978,7 +8017,6 @@ span.code {
 }
 
 .navigationToolbar .navigationToolbarHeader {
-    margin-left: 40px;
     text-transform: capitalize;
 }
 
@@ -8401,6 +8439,11 @@ span.code {
 .groupedActionableMenu .actionable-button:hover{
     transition: background-color 0.1s;
     background-color: COLOR_GREY_LIGHT;
+}
+
+.objectToolbar button.actionable-button-disabled:hover, .groupedActionableMenu button.actionable-button-disabled:hover,
+.groupedActionableMenu .actionable-button.actionable-button-disabled:hover{
+    background-color: inherit;
 }
 
 .popupAnchor {

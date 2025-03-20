@@ -35,7 +35,6 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -236,23 +235,24 @@ public class EditDescriptiveMetadata extends Composite {
           .thenCompose(result -> service
             .aipResource(s -> s.isAIPMetadataSimilar(aipId, metadataId, new SelectedType(value, result.getValue())))
             .whenComplete((similar, error) -> {
-            if (error == null) {
-              isSimilar = similar;
-              values = result.getValue();
-              updateFormOrXML();
-            }
+              if (error == null) {
+                isSimilar = similar;
+                values = result.getValue();
+                updateFormOrXML();
+              }
             }));
       } else {
-        service.aipResource(s -> s.retrieveRepresentationSupportedMetadata(aipId, representationId, value,
-          LocaleInfo.getCurrentLocale().getLocaleName()))
+        service
+          .aipResource(s -> s.retrieveRepresentationSupportedMetadata(aipId, representationId, value,
+            LocaleInfo.getCurrentLocale().getLocaleName()))
           .thenCompose(result -> service.aipResource(s -> s.isRepresentationMetadataSimilar(aipId, representationId,
             metadataId, new SelectedType(value, result.getValue()))).whenComplete((similar, error) -> {
-            if (error == null) {
-              isSimilar = similar;
-              values = result.getValue();
-              updateFormOrXML();
-            }
-          }));
+              if (error == null) {
+                isSimilar = similar;
+                values = result.getValue();
+                updateFormOrXML();
+              }
+            }));
       }
     });
 
@@ -295,12 +295,6 @@ public class EditDescriptiveMetadata extends Composite {
       services.aipResource(s -> s.releaseAIPLock(this.aipId)).whenComplete((s, throwable) -> aipLocked = false);
     }
     super.onDetach();
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   private void createForm() {

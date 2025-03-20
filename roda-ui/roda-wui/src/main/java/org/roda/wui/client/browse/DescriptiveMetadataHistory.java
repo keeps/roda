@@ -226,12 +226,6 @@ public class DescriptiveMetadataHistory extends Composite {
 
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
-
   private void init() {
     // sort
     List<ResourceVersion> versionList = new ArrayList<>(descriptiveMetadataVersions.getVersions());

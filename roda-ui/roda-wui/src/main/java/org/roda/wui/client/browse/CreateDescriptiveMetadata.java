@@ -32,7 +32,6 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -305,12 +304,6 @@ public class CreateDescriptiveMetadata extends Composite {
             }
           }
         }));
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   private void createForm() {
