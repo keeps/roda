@@ -145,7 +145,6 @@ public class Main extends Composite implements EntryPoint {
     } else {
       List<String> currentHistoryPath = HistoryUtils.getCurrentHistoryPath();
       contentPanel.update(currentHistoryPath);
-      GAnalyticsTracker.track(historyToken);
     }
   }
 }

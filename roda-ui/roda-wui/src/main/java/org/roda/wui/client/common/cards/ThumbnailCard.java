@@ -36,14 +36,14 @@ public class ThumbnailCard extends Composite {
   @UiField
   FlowPanel attributes;
 
-  private boolean collapsed = false;
+  private boolean collapsed = true;
 
   public ThumbnailCard(String title, Widget iconThumbnail, List<Tag> tags, Map<String, String> attributes,
     ClickHandler thumbnailClickHandler) {
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
 
-    expand();
+    collapse();
 
     // Title
     this.title.setText(title);

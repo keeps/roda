@@ -86,13 +86,15 @@ public class Tabs extends Composite {
   }
 
   private void selectTab(Widget tabButtonContainer) {
-    for (Map.Entry<Widget, TabContentBuilder> tab : tabs.entrySet()) {
-      if (tab.getKey().equals(tabButtonContainer)) {
-        selectedTab = tabButtonContainer;
-        tab.getKey().addStyleName("tabSelected");
-        tabContentWrapper.setWidget(tab.getValue().buildTabWidget());
-      } else {
-        tab.getKey().removeStyleName("tabSelected");
+    if (selectedTab == null || !selectedTab.equals(tabButtonContainer)) {
+      for (Map.Entry<Widget, TabContentBuilder> tab : tabs.entrySet()) {
+        if (tab.getKey().equals(tabButtonContainer)) {
+          selectedTab = tabButtonContainer;
+          tab.getKey().addStyleName("tabSelected");
+          tabContentWrapper.setWidget(tab.getValue().buildTabWidget());
+        } else {
+          tab.getKey().removeStyleName("tabSelected");
+        }
       }
     }
   }
