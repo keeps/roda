@@ -71,12 +71,9 @@ public class DisposalPolicyAssociationTab extends Composite {
             AIPToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_HOLD)));
 
     // DISPOSAL POLICY SUMMARY
-    if (DisposalPolicyUtils.showDisposalPolicySummary(aip)) {
-      disposalPolicySummaryPanel.setIcon("fas fa-info-circle");
-      disposalPolicySummaryPanel.setText(DisposalPolicyUtils.getDisposalPolicySummaryText(aip));
-    } else {
-      disposalPolicySummaryPanel.setVisible(false);
-    }
+    disposalPolicySummaryPanel.setIcon("fas fa-info-circle");
+    disposalPolicySummaryPanel.setText(DisposalPolicyUtils.getDisposalPolicySummaryText(aip));
+
   }
 
   interface MyUiBinder extends UiBinder<Widget, DisposalPolicyAssociationTab> {

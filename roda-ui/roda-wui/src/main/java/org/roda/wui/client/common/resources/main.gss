@@ -83,6 +83,8 @@
 }
 
 .roda {
+    display: flex;
+    flex-direction: column;
     background-color: COLOR_FOOTER_BACKGROUND;
 }
 
@@ -577,6 +579,7 @@ div.inline {
 }
 
 .main {
+    flex: 1;
     background-color: COLOR_GREY_VERYLIGHT;
 }
 
@@ -1041,10 +1044,14 @@ pre code {
 
     position: absolute;
     right: 10px;
+
+    font-size: 16px;
 }
 
 button:after {
     @mixin fontawesome();
+
+    font-size: 16px;
 }
 
 .btn-link:after {
@@ -1052,7 +1059,11 @@ button:after {
 }
 
 .btn-plus:after {
-    content: "\f055";
+    content: "\e903";
+}
+
+.btn-plus-circle:after {
+    content: "\e902";
 }
 
 .btn-calendar:after {
@@ -1085,7 +1096,7 @@ button:after {
 }
 
 .btn-edit:after {
-    content: "\f14b";
+    content: "\e90c";
 }
 
 .btn-key:after {
@@ -1105,31 +1116,27 @@ button:after {
 }
 
 .btn-play:after {
-    content: "\f144";
+    content: "\e918";
 }
 
 .btn-download:after {
-    content: "\f019";
+    content: "\e90f";
 }
 
 .btn-disposal-schedule:after {
-    content: "\f133";
-}
-
-.btn-view:after {
-    content: "\f01d";
+    content: "\e908";
 }
 
 .btn-clock:after {
-    content: "\f017";
+    content: "\e900";
 }
 
 .btn-history:after {
-    content: "\f1da";
+    content: "\e919";
 }
 
 .btn-info:after {
-    content: "\f05a";
+    content: "\e910";
 }
 
 .btn-upload:after {
@@ -1169,7 +1176,7 @@ button:after {
 }
 
 .btn-search:after {
-    content: "\f002";
+    content: "\e91b";
 }
 
 .btn-chevron-left:after {
@@ -1201,7 +1208,7 @@ button:after {
 }
 
 .btn-archive:after {
-    content: "\f187";
+    content: "\e912";
 }
 
 .btn-sitemap:after {
@@ -1227,7 +1234,7 @@ button:after {
 }
 
 .btn-home:after {
-    content: "\f015";
+    content: "\e920";
 }
 
 .btn-clear:after {
@@ -1410,10 +1417,6 @@ button:after {
     padding: 0 16px;
     background-color: transparent;
     margin: 0;
-}
-
-.card .my-asyncdatagrid-side-panel {
-    margin-left: 15px;
 }
 
 .my-asyncdatagrid-side-panel .sidebar-facet-panel {
@@ -2572,6 +2575,14 @@ td.datePickerMonth, td.datePickerYear {
 
 .sidebar .btn.separator {
 	margin-bottom: 14px;
+}
+
+.sidebar .sidebar-group .actionable-button {
+    justify-content: space-between;
+}
+
+.sidebar .sidebar-group .actionable-button+.actionable-button {
+    margin-top: 10px;
 }
 
 .sidebar .h1, .sidebar .h2, .sidebar .h3, .sidebar .h4, .sidebar .h5,
@@ -4243,7 +4254,6 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchWrapperSidePanel .my-asyncdatagrid-side-panel {
     padding: 0;
-    width: 266px;
 }
 
 .searchWrapper .objectToolbar {
@@ -4252,8 +4262,9 @@ td.datePickerMonth, td.datePickerYear {
     background-color: transparent;
     flex-direction: column;
     align-items: stretch;
-    padding: 8px 0px 8px 16px;
+    padding: 8px 0 8px 0;
     margin-left: 16px;
+    width: 250px;
 }
 
 .searchWrapper .objectToolbar .objectToolbarLabel {
@@ -4295,7 +4306,8 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchWrapper .my-asyncdatagrid-facets-panel {
     margin-left: 16px;
-    padding: 0px 0px 0px 16px;
+    padding: 0;
+    width: 250px;
 }
 
 .searchPanelContainer {
@@ -8424,7 +8436,7 @@ span.code {
     flex-direction: row-reverse;
     flex: 1;
     gap:4px;
-    align-items: center;
+    align-items: self-end;
     font-family: 'Inter';
     font-size: 12px;
     background-color: transparent;
@@ -9113,6 +9125,10 @@ wui-disposal-hold-data .form-textbox {
 
 .cmi-home:after {
     content: "\e920";
+}
+
+.cmi-cubes:after {
+    content: "\e906"
 }
 
 .largeIcon {

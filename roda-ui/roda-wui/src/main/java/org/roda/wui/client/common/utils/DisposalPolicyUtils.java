@@ -108,9 +108,10 @@ public class DisposalPolicyUtils {
       } else if (aip.getDisposalScheduleId() != null) {
         return onSchedule(aip);
       }
+      else {
+        return new DisposalPolicySummary(DisposalPolicySummary.PolicyStatus.NONE, messages.disposalPolicyNoneSummary());
+      }
     }
-
-    return new DisposalPolicySummary();
   }
 
   private static DisposalPolicySummary onSchedule(IndexedAIP aip) {
