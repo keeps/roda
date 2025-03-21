@@ -27,6 +27,7 @@ public class GAnalyticsTracker {
    *
    * @param historyToken
    */
+  @Deprecated
   public static void track(String historyToken) {
 
     if (StringUtils.isBlank(accountId)) {
@@ -41,6 +42,7 @@ public class GAnalyticsTracker {
     }
   }
 
+  @Deprecated
   private static native void setAccount(String accountId)
   /*-{
   	$wnd.ga('create', accountId, 'auto');
@@ -51,6 +53,7 @@ public class GAnalyticsTracker {
    *
    * @param page
    */
+  @Deprecated
   private static native void pageview(String page)
   /*-{
   	$wnd.ga('set', 'page', page);
