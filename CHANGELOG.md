@@ -1,5 +1,22 @@
 # Changelog
 
+## v5.7.2 (24/03/2025)
+#### Bugs
+
+- Disposal confirmation cancel button message #3303
+
+#### Enhancements 
+
+- Missing translations for disposal rules order panel #3312
+
+#### Security
+- Several major dependency upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.1 (08/01/2025)
 #### Bug fixes
 
@@ -439,15 +456,4 @@ docker pull keeps/roda:v4.5.4
 Install for demonstration:
 ```
 docker pull keeps/roda:v4.5.3
-```
----
-
-## v4.5.2 (19/01/2023)
-#### Bug fixes:
-
-- Failsafe fallback policy misconfigured #2303
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.5.2
 ```
