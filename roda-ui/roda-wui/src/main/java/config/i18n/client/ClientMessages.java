@@ -2256,6 +2256,8 @@ public interface ClientMessages extends Messages {
 
   String disposalPolicyConfirmationSummary();
 
+  String disposalPolicyNoneSummary();
+
   String disposalPolicySummaryReady(String action);
 
   String permanentlyRetained();
