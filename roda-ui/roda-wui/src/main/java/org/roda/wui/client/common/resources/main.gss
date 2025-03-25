@@ -4192,6 +4192,12 @@ td.datePickerMonth, td.datePickerYear {
     color: red;
 }
 
+/** General Browse Representation Panel **/
+
+.wui-browse-representation .representation-information-badge {
+    display: none;
+}
+
 .browseDip-topList {
 	width: 96%;
 	padding: 2%;

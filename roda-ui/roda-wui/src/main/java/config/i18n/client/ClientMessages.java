@@ -678,6 +678,10 @@ public interface ClientMessages extends Messages {
 
   String risksTab();
 
+  String filesTab();
+
+  String dipsTab();
+
   String disposalTab();
 
   String permissionsTab();
