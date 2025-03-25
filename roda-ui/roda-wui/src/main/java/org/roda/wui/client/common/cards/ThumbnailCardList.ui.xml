@@ -7,7 +7,7 @@
 
     <g:FlowPanel styleName="thumbnailCardList">
         <commonlabels:Header ui:field="title" styleName="thumbnailCardListTitle"/>
-        <g:FlowPanel ui:field="cards" styleName="thumbnailCardListCards" />
+        <g:FlowPanel ui:field="cardsPanel" styleName="thumbnailCardListCards" />
         <g:FlowPanel ui:field="buttons" styleName="thumbnailCardListButtons"/>
     </g:FlowPanel>
 </ui:UiBinder>

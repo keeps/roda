@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:m="urn:import:org.roda.wui.client.main" xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:b="urn:import:org.roda.wui.client.browse" xmlns:common="urn:import:org.roda.wui.client.common">
+             xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
+             xmlns:b="urn:import:org.roda.wui.client.browse" xmlns:common="urn:import:org.roda.wui.client.common">
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
-	<wcag:AccessibleFocusPanel ui:field="keyboardFocus">
-		<g:FlowPanel styleName="viewRepresentationFile">
-			<common:NavigationToolbarLegacy ui:field="navigationToolbar" header="{messages.catalogueFileTitle}" />
-			<g:FlowPanel addStyleNames="viewRepresentationFile-center" ui:field="center">
-				<b:IndexedFilePreview addStyleNames="viewRepresentationFilePreview" ui:field="filePreview" />
-			</g:FlowPanel>
-		</g:FlowPanel>
-	</wcag:AccessibleFocusPanel>
+    <g:FlowPanel styleName="contentWithSidePanel">
+        <wcag:AccessibleFocusPanel ui:field="keyboardFocus">
+            <g:FlowPanel styleName="viewRepresentationFile">
+                <common:NavigationToolbar ui:field="navigationToolbar"/>
+                <common:BrowseFileActionsToolbar ui:field="objectToolbar" label="{messages.catalogueFileTitle}"/>
+                <g:FlowPanel addStyleNames="viewRepresentationFile-center" ui:field="center">
+                    <b:IndexedFilePreview addStyleNames="viewRepresentationFilePreview" ui:field="filePreview"/>
+                </g:FlowPanel>
+            </g:FlowPanel>
+        </wcag:AccessibleFocusPanel>
+        <g:FocusPanel styleName="browseSidePanel" ui:field="sidePanel">
+            <g:FlowPanel>
+                <g:FlowPanel ui:field="disseminationCards" addStyleNames="verticalThumbnailCardContainer"/>
+            </g:FlowPanel>
+        </g:FocusPanel>
+    </g:FlowPanel>
 </ui:UiBinder>

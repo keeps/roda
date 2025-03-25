@@ -8,7 +8,6 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -34,15 +33,16 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Alexandre Flores <aflores@keep.pt>
  */
 public class BrowseAIPTabs extends Tabs {
-  public void init(IndexedAIP aip, BrowseAIPResponse browseAIPResponse,
-    DescriptiveMetadataInfos descriptiveMetadataInfos) {
+  public void init(BrowseAIPResponse browseAIPResponse) {
+    IndexedAIP aip = browseAIPResponse.getIndexedAIP();
+
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
     // Descriptive metadata
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.descriptiveMetadataTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
         AIPDescriptiveMetadataTabs aipDescriptiveMetadataTabs = new AIPDescriptiveMetadataTabs();
-        aipDescriptiveMetadataTabs.init(aip, descriptiveMetadataInfos);
+        aipDescriptiveMetadataTabs.init(aip, browseAIPResponse.getDescriptiveMetadataInfos());
         aipDescriptiveMetadataTabs.setStyleName("descriptiveMetadataTabs");
         return aipDescriptiveMetadataTabs;
       }
@@ -54,11 +54,10 @@ public class BrowseAIPTabs extends Tabs {
       public Widget buildTabWidget() {
         Filter eventFilter = new Filter(new AllFilterParameter());
         eventFilter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
-        return new SearchWrapper(false)
-          .createListAndSearchPanel(new ListBuilder<>(() -> new PreservationEventList(),
-            new AsyncTableCellOptions<>(IndexedPreservationEvent.class, "BrowseAIP_preservationEvents")
-              .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()
-              .withActionable(PreservationEventActions.get(aip.getId(), null, null))));
+        return new SearchWrapper(false).createListAndSearchPanel(new ListBuilder<>(() -> new PreservationEventList(),
+          new AsyncTableCellOptions<>(IndexedPreservationEvent.class, "BrowseAIP_preservationEvents")
+            .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()
+            .withActionable(PreservationEventActions.get(aip.getId(), null, null))));
       }
     });
 

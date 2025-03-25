@@ -27,11 +27,12 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.common.NavigationToolbarLegacy;
+import org.roda.wui.client.common.BrowseFileActionsToolbar;
+import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.cards.FileDisseminationCardList;
 import org.roda.wui.client.common.model.BrowseFileResponse;
-import org.roda.wui.client.common.slider.SliderPanel;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.services.ConfigurationRestService;
@@ -46,15 +47,14 @@ import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -115,8 +115,7 @@ public class BrowseFile extends Composite {
           } else {
             Filter riskIncidenceFilter = new Filter(
               new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, indexedFile.getId()));
-            CountRequest riskIncidenceCountRequest = new CountRequest(
-              riskIncidenceFilter, true);
+            CountRequest riskIncidenceCountRequest = new CountRequest(riskIncidenceFilter, true);
             CompletableFuture<LongResponse> riskCounterCompletableFuture = services
               .rodaEntityRestService(s -> s.count(riskIncidenceCountRequest), RiskIncidence.class)
               .handle((longResponse, throwable1) -> {
@@ -128,8 +127,7 @@ public class BrowseFile extends Composite {
 
             Filter preservationEventFilter = new Filter(
               new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, indexedFile.getUUID()));
-            CountRequest preservationEventsCountRequest = new CountRequest(
-              preservationEventFilter, true);
+            CountRequest preservationEventsCountRequest = new CountRequest(preservationEventFilter, true);
 
             CompletableFuture<LongResponse> preservationCounterCompletableFuture = services
               .rodaEntityRestService(s -> s.count(preservationEventsCountRequest), IndexedPreservationEvent.class)
@@ -179,8 +177,8 @@ public class BrowseFile extends Composite {
                 instance = new BrowseFile(viewers, response, indexedFile, services);
                 callback.onSuccess(instance);
               });
-            }
-          });
+          }
+        });
       } else {
         errorRedirect(callback);
       }
@@ -200,8 +198,6 @@ public class BrowseFile extends Composite {
 
   private static BrowseFile instance = null;
 
-  private SliderPanel disseminationsSlider;
-
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
@@ -214,26 +210,23 @@ public class BrowseFile extends Composite {
   FlowPanel center;
 
   @UiField
-  NavigationToolbarLegacy<IndexedFile> navigationToolbar;
+  NavigationToolbar<IndexedFile> navigationToolbar;
+
+  @UiField
+  BrowseFileActionsToolbar objectToolbar;
+
+  @UiField
+  FocusPanel sidePanel;
+
+  @UiField
+  FlowPanel disseminationCards;
 
   public BrowseFile(Viewers viewers, final BrowseFileResponse response, IndexedFile indexedFile, Services services) {
     final boolean justActive = AIPState.ACTIVE.equals(response.getIndexedAIP().getState());
     // initialize preview
     filePreview = new IndexedFilePreview(viewers, indexedFile, indexedFile.isAvailable(), justActive,
-      response.getIndexedAIP().getPermissions(), () -> Scheduler.get().scheduleDeferred((Command) () -> {
-        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, indexedFile.getUUID()));
-
-        services.rodaEntityRestService(s -> s.count(new CountRequest(filter, justActive)),
-          IndexedDIP.class).whenComplete((longResponse, caught) -> {
-            if (caught != null) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            } else {
-              if (longResponse.getResult() > 0) {
-                disseminationsSlider.open();
-              }
-            }
-          });
-      }));
+      response.getIndexedAIP().getPermissions(), () -> {
+      });
 
     // initialize widget
     initWidget(uiBinder.createAndBindUi(this));
@@ -245,20 +238,35 @@ public class BrowseFile extends Composite {
     navigationToolbar.updateBreadcrumb(response.getIndexedAIP(), response.getIndexedRepresentation(), indexedFile);
 
     // STATUS
-    this.addStyleName(response.getIndexedAIP().getState().toString().toLowerCase());
+    this.keyboardFocus.addStyleName(response.getIndexedAIP().getState().toString().toLowerCase());
+
+    // TOOLBAR
+    this.objectToolbar.setObjectAndBuild(response.getIndexedAIP(), indexedFile);
+
+    // SIDEBAR
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, indexedFile.getUUID()));
+    services.rodaEntityRestService(s -> s.count(new CountRequest(filter, justActive)), IndexedDIP.class)
+      .whenComplete((longResponse, caught) -> {
+        if (caught != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        } else {
+          if (longResponse.getResult() > 0) {
+            this.disseminationCards.add(new FileDisseminationCardList(response.getIndexedAIP().getId(),
+              response.getIndexedRepresentation().getId(), indexedFile.getId(), indexedFile.getUUID()));
+          } else {
+            this.sidePanel.setVisible(false);
+          }
+        }
+      });
 
     // bind slider buttons
-    disseminationsSlider = Sliders.createDisseminationSlider(center, navigationToolbar.getDisseminationsButton(),
-        indexedFile, services);
     Sliders.createFileInfoSlider(center, navigationToolbar.getInfoSidebarButton(), indexedFile, response);
-    navigationToolbar.getDisseminationsButton().setVisible(response.getDipCounterResponse().getResult() > 0);
 
     keyboardFocus.setFocus(true);
 
-    this.addStyleName("browse");
-    this.addStyleName("browse-file");
+    this.keyboardFocus.addStyleName("browse browse-file browse_main_panel");
 
-    Element firstElement = this.getElement().getFirstChildElement();
+    Element firstElement = this.keyboardFocus.getElement().getFirstChildElement();
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
     }

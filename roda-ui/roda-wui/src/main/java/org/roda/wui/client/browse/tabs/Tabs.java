@@ -33,12 +33,23 @@ public class Tabs extends Composite {
 
   private Widget selectedTab;
   private final Map<Widget, TabContentBuilder> tabs;
+  private TabContentBuilder defaultContent;
 
   public Tabs() {
     initWidget(uiBinder.createAndBindUi(this));
 
     tabs = new HashMap<>();
-    selectedTab = null;
+    defaultContent = new TabContentBuilder() {
+      @Override
+      public Widget buildTabWidget() {
+        return new FlowPanel();
+      }
+    };
+    selectTab(null);
+  }
+
+  public void setDefaultContent(TabContentBuilder tabContentBuilder) {
+    defaultContent = tabContentBuilder;
   }
 
   public void createAndAddTab(Widget tabButtonInnerWidget, TabContentBuilder tabContentBuilder) {
@@ -85,7 +96,7 @@ public class Tabs extends Composite {
     };
   }
 
-  private void selectTab(Widget tabButtonContainer) {
+  protected void selectTab(Widget tabButtonContainer) {
     if (selectedTab == null || !selectedTab.equals(tabButtonContainer)) {
       for (Map.Entry<Widget, TabContentBuilder> tab : tabs.entrySet()) {
         if (tab.getKey().equals(tabButtonContainer)) {
@@ -95,6 +106,9 @@ public class Tabs extends Composite {
         } else {
           tab.getKey().removeStyleName("tabSelected");
         }
+      }
+      if (tabButtonContainer == null) {
+        tabContentWrapper.setWidget(defaultContent.buildTabWidget());
       }
     }
   }
