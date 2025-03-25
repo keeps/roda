@@ -12,7 +12,6 @@ package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,17 +35,15 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.tabs.BrowseAIPTabs;
+import org.roda.wui.client.common.BrowseAIPActionsToolbar;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
-import org.roda.wui.client.common.ObjectActionsToolbar;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.cards.AIPDisseminationCardList;
 import org.roda.wui.client.common.cards.AIPRepresentationCardList;
 import org.roda.wui.client.common.labels.Header;
@@ -123,7 +120,7 @@ public class BrowseAIP extends Composite {
   @UiField
   NavigationToolbar<IndexedAIP> navigationToolbar;
   @UiField
-  ObjectActionsToolbar<IndexedAIP> objectToolbar;
+  BrowseAIPActionsToolbar objectToolbar;
   @UiField
   HTML aipState;
   // IDENTIFICATION
@@ -192,7 +189,7 @@ public class BrowseAIP extends Composite {
       newDescriptiveMetadataRedirect();
     });
     descriptiveMetadataTab.add(newDescriptiveMetadata);
-    browseTab.init(aip, response, response.getDescriptiveMetadataInfos());
+    browseTab.init(response);
     updateSectionDescriptiveMetadata(response.getDescriptiveMetadataInfos());
 
     // AIP CHILDREN
@@ -228,7 +225,7 @@ public class BrowseAIP extends Composite {
 
     // CSS
     newDescriptiveMetadata.getElement().setId("aipNewDescriptiveMetadata");
-    keyboardFocus.addStyleName("browse browse_aip");
+    keyboardFocus.addStyleName("browse browse_aip browse_main_panel");
 
     // make FocusPanel comply with WCAG
     Element firstElement = this.getElement().getFirstChildElement();
@@ -282,8 +279,7 @@ public class BrowseAIP extends Composite {
       if (response.getDipCount().getResult() > 0) {
         this.disseminationCards.add(new AIPDisseminationCardList(aipId));
       }
-    }
-    else {
+    } else {
       this.sidePanel.setVisible(false);
     }
 

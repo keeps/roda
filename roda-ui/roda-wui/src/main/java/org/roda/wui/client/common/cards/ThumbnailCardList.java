@@ -1,5 +1,7 @@
 package org.roda.wui.client.common.cards;
 
+import java.util.ArrayList;
+
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -31,12 +33,14 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
   Header title;
 
   @UiField
-  FlowPanel cards;
+  FlowPanel cardsPanel;
 
   @UiField
   FlowPanel buttons;
 
   private static final ClientLogger LOGGER = new ClientLogger(ThumbnailCardList.class.getName());
+
+  protected final ArrayList<ThumbnailCard> cards;
 
   private final Class<T> objectClass;
 
@@ -51,9 +55,11 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
     this.objectClass = null;
     this.results = null;
     this.resultsFilter = null;
+    this.cards = new ArrayList<>();
   }
 
-  protected ThumbnailCardList(String title, String icon, Class<T> objectClass, Filter resultsFilter, CardBuilder<T> cardBuilder) {
+  public ThumbnailCardList(String title, String icon, Class<T> objectClass, Filter resultsFilter,
+    CardBuilder<T> cardBuilder) {
     // UI Elements
     initWidget(uiBinder.createAndBindUi(this));
     this.title.setHeaderStyleName("noMargin");
@@ -68,6 +74,7 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
       this.resultsFilter = resultsFilter;
     }
     this.cardBuilder = cardBuilder;
+    this.cards = new ArrayList<>();
 
     // Initialize
     refresh();
@@ -79,17 +86,24 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
   }
 
   private void clearCards() {
-    this.cards.clear();
+    this.cardsPanel.clear();
   }
 
   private void updateResultsAndRebuildCards() {
+    this.cards.clear();
+    this.cardsPanel.clear();
     Services services = new Services("Retrieve AIP representations and disseminations", "get");
     services.rodaEntityRestService(s -> s.find(new FindRequest.FindRequestBuilder(this.resultsFilter, true).build(),
       LocaleInfo.getCurrentLocale().getLocaleName()), objectClass).whenComplete((requestResults, error) -> {
         if (error == null) {
           this.results = requestResults;
           for (T object : this.results.getResults()) {
-            this.cards.add(cardBuilder.constructCard(messages, object));
+            ThumbnailCard card = cardBuilder.constructCard(messages, object);
+            if (this.cards.isEmpty()) {
+              card.expand();
+            }
+            this.cards.add(card);
+            this.cardsPanel.add(card);
           }
         } else {
           this.results = new IndexResult<>();
