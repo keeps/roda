@@ -58,7 +58,7 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
     this.cards = new ArrayList<>();
   }
 
-  protected ThumbnailCardList(String title, String icon, Class<T> objectClass, Filter resultsFilter,
+  public ThumbnailCardList(String title, String icon, Class<T> objectClass, Filter resultsFilter,
     CardBuilder<T> cardBuilder) {
     // UI Elements
     initWidget(uiBinder.createAndBindUi(this));
@@ -99,6 +99,9 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
           this.results = requestResults;
           for (T object : this.results.getResults()) {
             ThumbnailCard card = cardBuilder.constructCard(messages, object);
+            if (this.cards.isEmpty()) {
+              card.expand();
+            }
             this.cards.add(card);
             this.cardsPanel.add(card);
           }

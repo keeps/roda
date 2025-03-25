@@ -66,6 +66,5 @@ public class AIPRepresentationCardList extends ThumbnailCardList<IndexedRepresen
           return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler);
         }
       });
-    cards.get(0).expand();
   }
 }
