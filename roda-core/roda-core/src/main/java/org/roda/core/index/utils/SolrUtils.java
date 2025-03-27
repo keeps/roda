@@ -27,10 +27,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.FactoryConfigurationError;
@@ -94,7 +96,8 @@ import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
-import org.roda.core.data.v2.index.filter.BlockJoinParentFilterParameter;
+import org.roda.core.data.v2.index.filter.NestChildOfFilterParameter;
+import org.roda.core.data.v2.index.filter.NestParentFilterParameter;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -175,8 +178,7 @@ public class SolrUtils {
   public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter, User user,
     boolean justActive) throws GenericException, RequestNotValidException {
     FindRequest findRequest = FindRequest.getBuilder(filter, justActive).build();
-    return find(index, classToRetrieve, findRequest, user)
-      .getTotalCount();
+    return find(index, classToRetrieve, findRequest, user).getTotalCount();
   }
 
   public static <T extends IsIndexed> T retrieve(SolrClient index, Class<T> classToRetrieve, String id, User user,
@@ -343,8 +345,7 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve,
-    FindRequest findRequest, User user)
-    throws GenericException, RequestNotValidException {
+    FindRequest findRequest, User user) throws GenericException, RequestNotValidException {
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
     query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
@@ -379,13 +380,27 @@ public class SolrUtils {
    */
   private static String[] parseFieldsToReturn(FindRequest findRequest) {
     if (findRequest.getChildren()) {
-      List<String> fieldsToReturn = new ArrayList<>();
-      fieldsToReturn.add("*");
-      fieldsToReturn.add("[child]");
+      List<String> fieldsToReturn = new ArrayList<>(findRequest.getFieldsToReturn());
+
+      fieldsToReturn.add(parseChildTransformer(findRequest));
       return fieldsToReturn.toArray(new String[0]);
     }
 
     return findRequest.getFieldsToReturn().toArray(new String[0]);
+  }
+
+  private static String parseChildTransformer(FindRequest findRequest) {
+    String childrenLimit = String
+      .valueOf(findRequest.getChildrenLimit() != null ? findRequest.getChildrenLimit() : 100);
+
+    if (findRequest.getChildrenFieldsToReturn() != null && !findRequest.getChildrenFieldsToReturn().isEmpty()) {
+      String childrenFl = findRequest.getChildrenFieldsToReturn().stream().filter(Objects::nonNull)
+        .collect(Collectors.joining(", "));
+
+      return String.format("[child fl=%s limit=%s]", childrenFl, childrenLimit);
+    }
+
+    return String.format("[child limit=%s]", childrenLimit);
   }
 
   private static String parseCollapse(Collapse collapse) {
@@ -941,24 +956,46 @@ public class SolrUtils {
         prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof AllFilterParameter) {
       appendSelectAll(ret, prefixWithANDOperatorIfBuilderNotEmpty);
-    } else if (parameter instanceof BlockJoinParentFilterParameter blockJoinParentFilterParameter) {
-      appendBlockJoinFilterParameter(ret, blockJoinParentFilterParameter, prefixWithANDOperatorIfBuilderNotEmpty);
+    } else if (parameter instanceof NestParentFilterParameter nestParentFilterParameter) {
+      appendBlockJoinFilterParameter(ret, nestParentFilterParameter, prefixWithANDOperatorIfBuilderNotEmpty);
+    } else if (parameter instanceof NestChildOfFilterParameter nestChildOfFilterParameter) {
+      appendBlockJoinChildrenFilterParameter(ret, nestChildOfFilterParameter, prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
       LOGGER.error("Unsupported filter parameter class: {}", parameter.getClass().getName());
       throw new RequestNotValidException("Unsupported filter parameter class: " + parameter.getClass().getName());
     }
   }
 
-  private static void appendBlockJoinFilterParameter(StringBuilder ret, BlockJoinParentFilterParameter parameter,
+  private static void appendBlockJoinChildrenFilterParameter(StringBuilder ret, NestChildOfFilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
     StringBuilder blockMask = new StringBuilder();
-    parseFilterParameter(blockMask, parameter.getBlockMask(), prefixWithANDOperatorIfBuilderNotEmpty);
+    parseFilterParameter(blockMask, parameter.getChildrenFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
     String replace = blockMask.toString().replace(": ", ":");
 
-    StringBuilder someChildren = new StringBuilder();
-    parseFilterParameter(someChildren, parameter.getSomeChildren(), prefixWithANDOperatorIfBuilderNotEmpty);
+    if (parameter.getParentFilter() != null) {
+      StringBuilder someParents = new StringBuilder();
+      parseFilterParameter(someParents, parameter.getParentFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
 
-    ret.append("{!parent which=").append(replace).append("} ").append(someChildren);
+      ret.append("{!child of=").append(replace).append("} ").append(someParents);
+    } else {
+      ret.append("{!child of=").append(replace).append("}");
+    }
+  }
+
+  private static void appendBlockJoinFilterParameter(StringBuilder ret, NestParentFilterParameter parameter,
+    boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
+    StringBuilder blockMask = new StringBuilder();
+    parseFilterParameter(blockMask, parameter.getParentFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
+    String replace = blockMask.toString().replace(": ", ":");
+
+    if (parameter.getChildrenFilter() != null) {
+      StringBuilder someChildren = new StringBuilder();
+      parseFilterParameter(someChildren, parameter.getChildrenFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
+
+      ret.append("{!parent which=").append(replace).append("} ").append(someChildren);
+    } else {
+      ret.append("{!parent which=").append(replace).append("}");
+    }
   }
 
   private static void appendSelectAll(StringBuilder ret, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
@@ -1691,11 +1728,11 @@ public class SolrUtils {
 
     Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy())
       .onFailure(e -> LOGGER.error("Error deleting document from index")).run(() -> {
-      index.deleteById(SolrCollectionRegistry.getIndexName(classToDelete), ids);
-      if (commit) {
-        commit(index, classToDelete);
-      }
-    });
+        index.deleteById(SolrCollectionRegistry.getIndexName(classToDelete), ids);
+        if (commit) {
+          commit(index, classToDelete);
+        }
+      });
 
     return ret;
   }
@@ -1715,11 +1752,11 @@ public class SolrUtils {
 
     Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy())
       .onFailure(e -> LOGGER.error("Error deleting documents from index")).run(() -> {
-      index.deleteByQuery(SolrCollectionRegistry.getIndexName(classToDelete), parseFilter(filter));
-      if (commit) {
-        commit(index, classToDelete);
-      }
-    });
+        index.deleteByQuery(SolrCollectionRegistry.getIndexName(classToDelete), parseFilter(filter));
+        if (commit) {
+          commit(index, classToDelete);
+        }
+      });
 
     return ret;
   }

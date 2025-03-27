@@ -147,7 +147,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
   @Override
   public SolrInputDocument toSolrDocument(AIP aip, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    boolean safemode = info.getFlags().contains(Flags.SAFE_MODE_ON);
+    boolean safeMode = info.getFlags().contains(Flags.SAFE_MODE_ON);
     SolrInputDocument doc = super.toSolrDocument(aip, info);
 
     doc.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
@@ -206,7 +206,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       aip.getHasShallowFiles() != null ? aip.getHasShallowFiles() : false);
 
     ModelService model = RodaCoreFactory.getModelService();
-    if (!safemode) {
+    if (!safeMode) {
       SolrUtils.indexDescriptiveMetadataFields(RodaCoreFactory.getModelService(), aip.getId(), null,
         aip.getDescriptiveMetadata(), doc);
     }
