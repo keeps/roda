@@ -126,39 +126,36 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
     try {
       ret = getIndexClass().getDeclaredConstructor().newInstance();
 
-      if (ret instanceof HasId) {
+      if (ret instanceof HasId hasId) {
         String id = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_ID),
           SolrUtils.objectToString(doc.get(RodaConstants.INDEX_UUID), null));
-        ((HasId) ret).setId(id);
+        hasId.setId(id);
       }
 
-      if (ret instanceof SetsUUID) {
+      if (ret instanceof SetsUUID setsUUID) {
         String uuid = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_UUID), null);
-        ((SetsUUID) ret).setUUID(uuid);
+        setsUUID.setUUID(uuid);
       }
 
-      if (ret instanceof HasState) {
-        if (doc.containsKey(RodaConstants.INDEX_STATE)) {
-
-          AIPState state = SolrUtils.objectToEnum(doc.get(RodaConstants.INDEX_STATE), AIPState.class,
-            AIPState.getDefault());
-          ((HasState) ret).setState(state);
-        }
+      if (ret instanceof HasState hasState && doc.containsKey(RodaConstants.INDEX_STATE)) {
+        AIPState state = SolrUtils.objectToEnum(doc.get(RodaConstants.INDEX_STATE), AIPState.class,
+          AIPState.getDefault());
+        hasState.setState(state);
       }
 
-      if (ret instanceof HasPermissions) {
+      if (ret instanceof HasPermissions hasPermissions) {
         Permissions permissions = SolrUtils.getPermissions(doc);
-        ((HasPermissions) ret).setPermissions(permissions);
+        hasPermissions.setPermissions(permissions);
       }
 
-      if (ret instanceof HasInstanceID) {
+      if (ret instanceof HasInstanceID hasInstanceID) {
         String instanceID = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null);
-        ((HasInstanceID) ret).setInstanceId(instanceID);
+        hasInstanceID.setInstanceId(instanceID);
       }
 
-      if (ret instanceof HasInstanceName) {
+      if (ret instanceof HasInstanceName hasInstanceName) {
         String instanceName = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null);
-        ((HasInstanceName) ret).setInstanceName(instanceName);
+        hasInstanceName.setInstanceName(instanceName);
       }
 
       Map<String, Object> indexedFields = new HashMap<>();

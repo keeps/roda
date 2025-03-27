@@ -27,10 +27,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.FactoryConfigurationError;
@@ -94,7 +96,8 @@ import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
-import org.roda.core.data.v2.index.filter.BlockJoinParentFilterParameter;
+import org.roda.core.data.v2.index.filter.ChildOfFilterParameter;
+import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -115,6 +118,8 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.HasPermissionFilters;
+import org.roda.core.data.v2.ip.HasPermissions;
+import org.roda.core.data.v2.ip.HasState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
@@ -175,8 +180,7 @@ public class SolrUtils {
   public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter, User user,
     boolean justActive) throws GenericException, RequestNotValidException {
     FindRequest findRequest = FindRequest.getBuilder(filter, justActive).build();
-    return find(index, classToRetrieve, findRequest, user)
-      .getTotalCount();
+    return find(index, classToRetrieve, findRequest, user).getTotalCount();
   }
 
   public static <T extends IsIndexed> T retrieve(SolrClient index, Class<T> classToRetrieve, String id, User user,
@@ -343,19 +347,33 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve,
-    FindRequest findRequest, User user)
-    throws GenericException, RequestNotValidException {
+    FindRequest findRequest, User user) throws GenericException, RequestNotValidException {
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
     query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
-    query.setQuery(parseFilter(findRequest.getFilter()));
     query.setSorts(parseSorter(findRequest.getSorter()));
     query.setStart(findRequest.getSublist().getFirstElementIndex());
     query.setRows(findRequest.getSublist().getMaximumElementCount());
     query.setFields(parseFieldsToReturn(findRequest));
     parseAndConfigureFacets(findRequest.getFacets(), query);
-    if (hasPermissionFilters(classToRetrieve)) {
+    if (hasPermissionFilters(classToRetrieve) && !hasNestedDocumentsFilter(findRequest.getFilter(), classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, findRequest.isOnlyActive(), classToRetrieve));
+    }
+
+    if (hasNestedDocumentsFilter(findRequest.getFilter(), classToRetrieve)) {
+      ChildOfFilterParameter childOfFilter = (ChildOfFilterParameter) findRequest.getFilter().getParameters()
+        .getFirst();
+      if (childOfFilter.getParentFilter() != null) {
+        FilterParameter filterParameter = buildQueryPermissions(user);
+        AndFiltersParameters andFiltersParameters = new AndFiltersParameters(
+          List.of(childOfFilter.getParentFilter(), filterParameter));
+        childOfFilter.setParentFilter(andFiltersParameters);
+      } else {
+        childOfFilter.setParentFilter(buildQueryPermissions(user));
+      }
+      query.setQuery(parseFilter(findRequest.getFilter()));
+    } else {
+      query.setQuery(parseFilter(findRequest.getFilter()));
     }
 
     if (findRequest.getCollapse() != null) {
@@ -373,19 +391,54 @@ public class SolrUtils {
     return ret;
   }
 
+  private static FilterParameter buildQueryPermissions(User user) {
+    List<FilterParameter> filters = new ArrayList<>();
+
+    filters
+      .add(new SimpleFilterParameter(RodaConstants.INDEX_PERMISSION_USERS_PREFIX + PermissionType.READ, user.getId()));
+
+    for (String group : user.getGroups()) {
+      filters.add(new SimpleFilterParameter(RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + PermissionType.READ, group));
+    }
+
+    return new OrFiltersParameters(filters);
+  }
+
+  private static <T extends IsIndexed> boolean hasNestedDocumentsFilter(Filter filter, Class<T> classToRetrieve) {
+    if (!IndexedAIP.class.isAssignableFrom(classToRetrieve)) {
+      return false;
+    }
+
+    return filter.getParameters().stream().anyMatch(ChildOfFilterParameter.class::isInstance);
+  }
+
   /*
    * "Internal" helper methods
    * ____________________________________________________________________________________________________________________
    */
   private static String[] parseFieldsToReturn(FindRequest findRequest) {
     if (findRequest.getChildren()) {
-      List<String> fieldsToReturn = new ArrayList<>();
-      fieldsToReturn.add("*");
-      fieldsToReturn.add("[child]");
+      List<String> fieldsToReturn = new ArrayList<>(findRequest.getFieldsToReturn());
+
+      fieldsToReturn.add(parseChildTransformer(findRequest));
       return fieldsToReturn.toArray(new String[0]);
     }
 
     return findRequest.getFieldsToReturn().toArray(new String[0]);
+  }
+
+  private static String parseChildTransformer(FindRequest findRequest) {
+    String childrenLimit = String
+      .valueOf(findRequest.getChildrenLimit() != null ? findRequest.getChildrenLimit() : 100);
+
+    if (findRequest.getChildrenFieldsToReturn() != null && !findRequest.getChildrenFieldsToReturn().isEmpty()) {
+      String childrenFl = findRequest.getChildrenFieldsToReturn().stream().filter(Objects::nonNull)
+        .collect(Collectors.joining(", "));
+
+      return String.format("[child fl=%s limit=%s]", childrenFl, childrenLimit);
+    }
+
+    return String.format("[child limit=%s]", childrenLimit);
   }
 
   private static String parseCollapse(Collapse collapse) {
@@ -941,24 +994,46 @@ public class SolrUtils {
         prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof AllFilterParameter) {
       appendSelectAll(ret, prefixWithANDOperatorIfBuilderNotEmpty);
-    } else if (parameter instanceof BlockJoinParentFilterParameter blockJoinParentFilterParameter) {
-      appendBlockJoinFilterParameter(ret, blockJoinParentFilterParameter, prefixWithANDOperatorIfBuilderNotEmpty);
+    } else if (parameter instanceof ParentWhichFilterParameter nestParentFilterParameter) {
+      appendBlockJoinFilterParameter(ret, nestParentFilterParameter, prefixWithANDOperatorIfBuilderNotEmpty);
+    } else if (parameter instanceof ChildOfFilterParameter nestChildOfFilterParameter) {
+      appendBlockJoinChildrenFilterParameter(ret, nestChildOfFilterParameter, prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
       LOGGER.error("Unsupported filter parameter class: {}", parameter.getClass().getName());
       throw new RequestNotValidException("Unsupported filter parameter class: " + parameter.getClass().getName());
     }
   }
 
-  private static void appendBlockJoinFilterParameter(StringBuilder ret, BlockJoinParentFilterParameter parameter,
+  private static void appendBlockJoinChildrenFilterParameter(StringBuilder ret, ChildOfFilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
     StringBuilder blockMask = new StringBuilder();
-    parseFilterParameter(blockMask, parameter.getBlockMask(), prefixWithANDOperatorIfBuilderNotEmpty);
+    parseFilterParameter(blockMask, parameter.getChildrenOfFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
     String replace = blockMask.toString().replace(": ", ":");
 
-    StringBuilder someChildren = new StringBuilder();
-    parseFilterParameter(someChildren, parameter.getSomeChildren(), prefixWithANDOperatorIfBuilderNotEmpty);
+    if (parameter.getParentFilter() != null) {
+      StringBuilder someParents = new StringBuilder();
+      parseFilterParameter(someParents, parameter.getParentFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
 
-    ret.append("{!parent which=").append(replace).append("} ").append(someChildren);
+      ret.append("{!child of=").append(replace).append("} ").append(someParents);
+    } else {
+      ret.append("{!child of=").append(replace).append("}");
+    }
+  }
+
+  private static void appendBlockJoinFilterParameter(StringBuilder ret, ParentWhichFilterParameter parameter,
+    boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
+    StringBuilder blockMask = new StringBuilder();
+    parseFilterParameter(blockMask, parameter.getParentFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
+    String replace = blockMask.toString().replace(": ", ":");
+
+    if (parameter.getChildrenFilter() != null) {
+      StringBuilder someChildren = new StringBuilder();
+      parseFilterParameter(someChildren, parameter.getChildrenFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
+
+      ret.append("{!parent which=").append(replace).append("} ").append(someChildren);
+    } else {
+      ret.append("{!parent which=").append(replace).append("}");
+    }
   }
 
   private static void appendSelectAll(StringBuilder ret, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
@@ -1236,25 +1311,30 @@ public class SolrUtils {
   private static <T extends IsIndexed> String getFilterQueries(User user, boolean justActive,
     Class<T> classToRetrieve) {
 
-    StringBuilder fq = new StringBuilder();
-
-    // TODO find a better way to define admin super powers
-    if (user != null && !RodaConstants.ADMIN.equals(user.getName())) {
-      fq.append("(");
-      String usersKey = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + PermissionType.READ;
-      appendExactMatch(fq, usersKey, user.getId(), true, false);
-
-      String groupsKey = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + PermissionType.READ;
-      appendValuesUsingOROperatorForQuery(fq, groupsKey, new ArrayList<>(user.getGroups()), true);
-
-      fq.append(")");
-    }
+    StringBuilder fq = getFilterQueryPermissions(user);
 
     if (justActive && SolrCollection.hasStateFilter(classToRetrieve)) {
       appendExactMatch(fq, RodaConstants.INDEX_STATE, SolrUtils.formatEnum(AIPState.ACTIVE), true, true);
     }
 
     return fq.toString();
+  }
+
+  private static StringBuilder getFilterQueryPermissions(User user) {
+    StringBuilder ret = new StringBuilder();
+
+    // TODO find a better way to define admin super powers
+    if (user != null && !RodaConstants.ADMIN.equals(user.getName())) {
+      ret.append("(");
+      String usersKey = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + PermissionType.READ;
+      appendExactMatch(ret, usersKey, user.getId(), true, false);
+
+      String groupsKey = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + PermissionType.READ;
+      appendValuesUsingOROperatorForQuery(ret, groupsKey, new ArrayList<>(user.getGroups()), true);
+
+      ret.append(")");
+    }
+    return ret;
   }
 
   private static void appendValuesUsingOROperatorForQuery(StringBuilder ret, String key, List<String> values,
@@ -1394,7 +1474,7 @@ public class SolrUtils {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.INDEX_UUID, uuid);
-    fields.entrySet().forEach(e -> doc.addField(e.getKey(), set(e.getValue())));
+    fields.forEach((key, value) -> doc.addField(key, set(value)));
     try {
       create(index, SolrCollectionRegistry.getIndexName(classToCreate), doc, source).addTo(ret);
     } catch (NotSupportedException e) {
@@ -1451,10 +1531,9 @@ public class SolrUtils {
   }
 
   public static List<String> getFileAncestorsPath(String aipId, String representationId, List<String> path) {
-    List<String> parentFileDirectoryPath = new ArrayList<>();
     List<String> ancestorsPath = new ArrayList<>();
 
-    parentFileDirectoryPath.addAll(path);
+    List<String> parentFileDirectoryPath = new ArrayList<>(path);
 
     while (!parentFileDirectoryPath.isEmpty()) {
       int lastElementIndex = parentFileDirectoryPath.size() - 1;
@@ -1691,11 +1770,11 @@ public class SolrUtils {
 
     Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy())
       .onFailure(e -> LOGGER.error("Error deleting document from index")).run(() -> {
-      index.deleteById(SolrCollectionRegistry.getIndexName(classToDelete), ids);
-      if (commit) {
-        commit(index, classToDelete);
-      }
-    });
+        index.deleteById(SolrCollectionRegistry.getIndexName(classToDelete), ids);
+        if (commit) {
+          commit(index, classToDelete);
+        }
+      });
 
     return ret;
   }
@@ -1715,11 +1794,11 @@ public class SolrUtils {
 
     Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy())
       .onFailure(e -> LOGGER.error("Error deleting documents from index")).run(() -> {
-      index.deleteByQuery(SolrCollectionRegistry.getIndexName(classToDelete), parseFilter(filter));
-      if (commit) {
-        commit(index, classToDelete);
-      }
-    });
+        index.deleteByQuery(SolrCollectionRegistry.getIndexName(classToDelete), parseFilter(filter));
+        if (commit) {
+          commit(index, classToDelete);
+        }
+      });
 
     return ret;
   }

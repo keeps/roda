@@ -173,10 +173,10 @@ public class IndexModelObserver implements ModelObserver {
     // if there was an error indexing, try in safe mode
     if (!ret.isEmpty()) {
       if (!safemode) {
-        LOGGER.error("Error indexing AIP, trying safe mode", ret.getExceptions().get(0));
+        LOGGER.error("Error indexing AIP, trying safe mode", ret.getExceptions().getFirst());
         indexAIP(aip, ancestors, true).addTo(ret);
       } else {
-        LOGGER.error("Cannot index created AIP", ret.getExceptions().get(0));
+        LOGGER.error("Cannot index created AIP", ret.getExceptions().getFirst());
       }
     }
 

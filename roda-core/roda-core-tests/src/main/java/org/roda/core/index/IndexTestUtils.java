@@ -8,7 +8,6 @@
 package org.roda.core.index;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.Filter;

@@ -1,6 +1,7 @@
 services:
   zoo:
     image: docker.io/zookeeper:3.9-jre-17
+    container_name: zookeeper
     restart: unless-stopped
     ports:
       - "2181:2181"
@@ -9,8 +10,10 @@ services:
     volumes:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
+
   solr:
-    image: docker.io/solr:9.6.1
+    image: docker.io/solr:9
+    container_name: solr
     restart: unless-stopped
     ports:
       - "8983:8983"
@@ -24,8 +27,10 @@ services:
       - -c
     volumes:
       - solr_data:/var/solr
+
   clamd:
-    image: docker.io/clamav/clamav:stable
+    image: docker.io/clamav/clamav:1.4
+    container_name: clamd
     restart: unless-stopped
     ports:
       - "3310:3310"
@@ -38,6 +43,7 @@ services:
 
   siegfried:
     image: ghcr.io/keeps/siegfried:v1.11.0
+    container_name: siegfried
     restart: unless-stopped
     ports:
       - "5138:5138"
@@ -50,8 +56,10 @@ services:
       - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp:ro
+
   swagger:
     image: docker.io/swaggerapi/swagger-ui:latest
+    container_name: swagger
     restart: on-failure
     ports:
       - "8081:8080"
@@ -59,8 +67,10 @@ services:
       - URL=http://localhost:8080/api/openapi.json
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
+
   mailhog:
     image: mailhog/mailhog
+    container_name: mailhog
     restart: unless-stopped
     ports:
       - "1025:1025" # smtp server
@@ -68,6 +78,7 @@ services:
 
   openldap:
     image: docker.io/bitnami/openldap:2.6
+    container_name: openldap
     restart: unless-stopped
     user: 1001:root
     ports:
