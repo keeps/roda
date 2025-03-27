@@ -55,6 +55,10 @@ public class FindRequest extends CountRequest {
   private Collapse collapse;
   @JsonProperty("children")
   private boolean children;
+  @JsonProperty("childrenFieldsToReturn")
+  private List<String> childrenFieldsToReturn;
+  @JsonProperty("childrenLimit")
+  private Long childrenLimit;
 
   // Private constructor for Jackson deserialization
   private FindRequest(FindRequestBuilder builder) {
@@ -67,6 +71,8 @@ public class FindRequest extends CountRequest {
     this.fieldsToReturn = builder.fieldsToReturn;
     this.collapse = builder.collapse;
     this.children = builder.children;
+    this.childrenFieldsToReturn = builder.childrenFieldsToReturn;
+    this.childrenLimit = builder.childrenLimit;
   }
 
   public Sorter getSorter() {
@@ -101,6 +107,14 @@ public class FindRequest extends CountRequest {
     return children;
   }
 
+  public List<String> getChildrenFieldsToReturn() {
+    return childrenFieldsToReturn;
+  }
+
+  public Long getChildrenLimit() {
+    return childrenLimit;
+  }
+
   public static FindRequestBuilder getBuilder(final Filter filter, boolean onlyActive) {
     return new FindRequestBuilder(filter, onlyActive);
   }
@@ -117,8 +131,11 @@ public class FindRequest extends CountRequest {
     private List<String> fieldsToReturn;
     private Collapse collapse;
     private boolean children;
+    private List<String> childrenFieldsToReturn;
+    private Long childrenLimit;
 
-    public FindRequestBuilder(@JsonProperty("filter") final Filter filter, @JsonProperty("onlyActive") boolean onlyActive) {
+    public FindRequestBuilder(@JsonProperty("filter") final Filter filter,
+      @JsonProperty("onlyActive") boolean onlyActive) {
       // mandatory
       this.filter = filter;
       this.onlyActive = onlyActive;
@@ -173,6 +190,16 @@ public class FindRequest extends CountRequest {
 
     public FindRequestBuilder withChildren(boolean children) {
       this.children = children;
+      return this;
+    }
+
+    public FindRequestBuilder withChildrenFieldsToReturn(List<String> childrenFieldsToReturn) {
+      this.childrenFieldsToReturn = childrenFieldsToReturn;
+      return this;
+    }
+
+    public FindRequestBuilder withChildrenLimit(Long childrenLimit) {
+      this.childrenLimit = childrenLimit;
       return this;
     }
   }

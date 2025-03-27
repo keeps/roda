@@ -30,7 +30,7 @@ import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.filter.BlockJoinParentFilterParameter;
+import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -303,7 +303,7 @@ public class RepresentationInformationService {
   public RepresentationInformation enrichRepresentationInformationRelations(RepresentationInformation fetched,
     String localeString, RequestContext requestContext) {
 
-    BlockJoinParentFilterParameter parentFilter = new BlockJoinParentFilterParameter(
+    ParentWhichFilterParameter parentFilter = new ParentWhichFilterParameter(
       new SimpleFilterParameter("content_type", "ri"),
       new SimpleFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_LINK, fetched.getId()));
 

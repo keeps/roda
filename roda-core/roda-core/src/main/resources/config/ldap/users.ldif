@@ -13,7 +13,10 @@ email: demo-admin@roda-community.org
 givenName: RODA Administrator
 shadowInactive: 0
 uid: admin
-userPassword:: cm9kYQ==
+userPassword:: e1BCS0RGMi1TSEE1MTJ9MTAwMDAkTmFOelplam56QWdoaVJrOTZRWGJjZyRZZ1Z
+ HV2Vtd0ZJMHhsdGp3eUwuT0NULnc5dVNkRTB1U09WeDFlLnQuYlk2SkpBZmVHVnF6bWd3UnNXaDJR
+ MWFycC91c29VeXE0QjNsNnouWTd5NnMwUQ==
+
 
 dn: uid=guest,ou=users,dc=roda,dc=org
 objectClass: extensibleObject
@@ -28,5 +31,6 @@ email: demo-guest@roda-community.org
 givenName: RODA Guest
 shadowInactive: 0
 uid: guest
-userPassword:: cm9kYQ==
-
+userPassword:: e1BCS0RGMi1TSEE1MTJ9MTAwMDAkTmFOelplam56QWdoaVJrOTZRWGJjZyRZZ1Z
+ HV2Vtd0ZJMHhsdGp3eUwuT0NULnc5dVNkRTB1U09WeDFlLnQuYlk2SkpBZmVHVnF6bWd3UnNXaDJR
+ MWFycC91c29VeXE0QjNsNnouWTd5NnMwUQ==
