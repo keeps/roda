@@ -37,6 +37,7 @@ import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.cards.RepresentationDisseminationCardList;
 import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -115,6 +116,12 @@ public class BrowseRepresentation extends Composite {
   @UiField
   BrowseRepresentationTabs browseTab;
 
+  // Side panel
+  @UiField
+  FocusPanel sidePanel;
+  @UiField
+  FlowPanel disseminationCards;
+
   // STATUS
   @UiField
   HTML representationIcon;
@@ -154,14 +161,13 @@ public class BrowseRepresentation extends Composite {
     navigationToolbar.withObject(representation);
     navigationToolbar.withPermissions(aip.getPermissions());
     navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.DESTROYED,
-      () -> HistoryUtils.newHistory(BrowseTop.RESOLVER, representation.getAipId()));
+      () -> HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId));
     navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.UPDATED,
       () -> refresh(aipId, repId, new NoAsyncCallback<>()));
     navigationToolbar.build();
 
     Services services = response.getServices();
-    Filter dipsFilter = new Filter(
-      new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, representation.getUUID()));
+    Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, repUUID));
     CountRequest dipCountRequest = new CountRequest(new Filter(dipsFilter), true);
     CompletableFuture<LongResponse> dipCounterCompletableFuture = services
       .rodaEntityRestService(s -> s.count(dipCountRequest), IndexedDIP.class).handle((longResponse, throwable1) -> {
@@ -172,7 +178,7 @@ public class BrowseRepresentation extends Composite {
       });
 
     AndFiltersParameters riskIncidenceFilter = new AndFiltersParameters(
-      Arrays.asList(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()),
+      Arrays.asList(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, repId),
         new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, representation.getAipId())));
     CountRequest riskIncidenceCountRequest = new CountRequest(new Filter(riskIncidenceFilter), true);
     CompletableFuture<LongResponse> riskIncidenceCounterCompletableFuture = services
@@ -185,7 +191,7 @@ public class BrowseRepresentation extends Composite {
       });
 
     Filter preservationEventFilter = new Filter(
-      new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representation.getUUID()));
+      new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, repUUID));
     CountRequest preservationEventsCountRequest = new CountRequest(preservationEventFilter, true);
 
     CompletableFuture<LongResponse> preservationCounterCompletableFuture = services
@@ -207,9 +213,15 @@ public class BrowseRepresentation extends Composite {
         updateLayout(response, riskIncidenceCounterResponse.getResult(), preservationCounterResponse.getResult(), state,
           justActive);
 
+        // CARDS
+        if (dipCounterResponse.getResult() > 0) {
+          this.disseminationCards.add(new RepresentationDisseminationCardList(aipId, repId));
+        } else {
+          this.sidePanel.setVisible(false);
+        }
+
         // CSS
-        this.addStyleName("browse");
-        this.addStyleName("browse-representation");
+        keyboardFocus.addStyleName("browse browse-representation browse_main_panel");
         this.addStyleName(state.toString().toLowerCase());
 
         Element firstElement = this.getElement().getFirstChildElement();

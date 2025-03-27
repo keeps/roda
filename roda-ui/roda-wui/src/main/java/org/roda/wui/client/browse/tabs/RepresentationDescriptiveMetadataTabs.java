@@ -5,11 +5,10 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
-import org.roda.wui.client.browse.BrowseTop;
-import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.DescriptiveMetadataHistory;
 import org.roda.wui.client.browse.EditDescriptiveMetadata;
 import org.roda.wui.client.common.ActionsToolbar;
+import org.roda.wui.client.common.labels.Header;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -30,9 +29,9 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -155,16 +154,20 @@ public class RepresentationDescriptiveMetadataTabs extends Tabs {
         }
       });
     }
-    // Create button
-    Button createButton = new Button(messages.newButton());
-    createButton.setStyleName("linkButton btn-plus");
-    createButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        HistoryUtils.newHistory(BrowseTop.RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(),
-          RodaConstants.RODA_OBJECT_REPRESENTATION, aip.getId(), representation.getId());
-      }
-    });
-    addStaticElement(createButton);
+    if (descriptiveMetadataInfos.getDescriptiveMetadataInfoList().isEmpty()) {
+      Header message = new Header();
+      message.setHeaderText(messages.errorLoadingDescriptiveMetadata("No descriptive metadata found"));
+      message.setIcon("cmi cmi-info");
+      message.setLevel(5);
+      SimplePanel messagePanel = new SimplePanel(message);
+      messagePanel.setStyleName("roda6Card");
+      setDefaultContent(new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          return messagePanel;
+        }
+      });
+      selectTab(null);
+    }
   }
 }

@@ -7,15 +7,12 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.PreservationEventActions;
-import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
@@ -38,16 +35,39 @@ public class BrowseRepresentationTabs extends Tabs {
 
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
-    // Descriptive metadata
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.descriptiveMetadataTab()), new TabContentBuilder() {
+    // Files
+    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.filesTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        RepresentationDescriptiveMetadataTabs descriptiveMetadataTabs = new RepresentationDescriptiveMetadataTabs();
-        descriptiveMetadataTabs.init(aip, representation, browseRepresentationResponse.getDescriptiveMetadataInfos());
-        descriptiveMetadataTabs.setStyleName("descriptiveMetadataTabs");
-        return descriptiveMetadataTabs;
+        Filter filesFilter = new Filter(
+          new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID,
+            browseRepresentationResponse.getIndexedRepresentation().getUUID()),
+          new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
+
+        String summary = messages.representationListOfFiles();
+
+        ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+          new AsyncTableCellOptions<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
+            .withJustActive(justActive).withSummary(summary).bindOpener()
+            .withActionable(FileActions.get(aip.getId(), representation.getId(), aip.getPermissions())));
+
+        return new SearchWrapper(false).createListAndSearchPanel(fileListBuilder);
       }
     });
+
+    // Descriptive metadata
+    if (!browseRepresentationResponse.getDescriptiveMetadataInfos().getDescriptiveMetadataInfoList().isEmpty()) {
+
+      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.descriptiveMetadataTab()), new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          RepresentationDescriptiveMetadataTabs descriptiveMetadataTabs = new RepresentationDescriptiveMetadataTabs();
+          descriptiveMetadataTabs.init(aip, representation, browseRepresentationResponse.getDescriptiveMetadataInfos());
+          descriptiveMetadataTabs.setStyleName("descriptiveMetadataTabs");
+          return descriptiveMetadataTabs;
+        }
+      });
+    }
 
     // Preservation events
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.preservationEventsTab()), new TabContentBuilder() {
@@ -74,42 +94,6 @@ public class BrowseRepresentationTabs extends Tabs {
               new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId())))
             .withJustActive(justActive).bindOpener()));
         return riskIncidences;
-      }
-    });
-
-    // Files
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.filesTab()), new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        Filter filesFilter = new Filter(
-          new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID,
-            browseRepresentationResponse.getIndexedRepresentation().getUUID()),
-          new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
-
-        String summary = messages.representationListOfFiles();
-
-        ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-          new AsyncTableCellOptions<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
-            .withJustActive(justActive).withSummary(summary).bindOpener()
-            .withActionable(FileActions.get(aip.getId(), representation.getId(), aip.getPermissions())));
-
-        return new SearchWrapper(false).createListAndSearchPanel(fileListBuilder);
-      }
-    });
-
-    // DIPs
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.dipsTab()), new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        Filter disseminationsFilter = new Filter(
-          new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, representation.getUUID()));
-
-        ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(() -> new DIPList(),
-          new AsyncTableCellOptions<>(IndexedDIP.class, "BrowseRepresentation_disseminations")
-            .withFilter(disseminationsFilter).withSummary(messages.listOfDisseminations()).bindOpener()
-            .withJustActive(justActive).withActionable(DisseminationActions.get()));
-
-        return new SearchWrapper(false).createListAndSearchPanel(disseminationsListBuilder);
       }
     });
   }

@@ -225,7 +225,7 @@ public class BrowseAIP extends Composite {
 
     // CSS
     newDescriptiveMetadata.getElement().setId("aipNewDescriptiveMetadata");
-    keyboardFocus.addStyleName("browse browse_aip");
+    keyboardFocus.addStyleName("browse browse_aip browse_main_panel");
 
     // make FocusPanel comply with WCAG
     Element firstElement = this.getElement().getFirstChildElement();

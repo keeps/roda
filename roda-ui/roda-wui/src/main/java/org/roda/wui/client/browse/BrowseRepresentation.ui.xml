@@ -7,26 +7,33 @@
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
-    <g:FocusPanel ui:field="keyboardFocus">
-        <g:FlowPanel styleName="wui-browse-representation" addStyleNames="wrapper skip_padding">
-            <common:NavigationToolbar ui:field="navigationToolbar"/>
-            <common:BrowseRepresentationActionsToolbar ui:field="objectToolbar"
-                                                       label="{messages.catalogueRepresentationTitle}"/>
-            <g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
-                <g:FlowPanel addStyleNames="col_12 content">
-                    <!-- STATUS -->
-                    <g:HTML ui:field="aipState"/>
+    <g:FlowPanel styleName="contentWithSidePanel">
+        <g:FocusPanel ui:field="keyboardFocus">
+            <g:FlowPanel styleName="wui-browse-representation" addStyleNames="wrapper skip_padding">
+                <common:NavigationToolbar ui:field="navigationToolbar"/>
+                <common:BrowseRepresentationActionsToolbar ui:field="objectToolbar"
+                                                           label="{messages.catalogueRepresentationTitle}"/>
+                <g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
+                    <g:FlowPanel addStyleNames="col_12 content">
+                        <!-- STATUS -->
+                        <g:HTML ui:field="aipState"/>
 
-                    <!-- IDENTIFICATION -->
-                    <g:FlowPanel styleName="browseItemPanel">
-                        <g:HTML addStyleNames="h2 browseItemIcon" ui:field="representationIcon"/>
-                        <g:FlowPanel addStyleNames="h2 browseItemText" ui:field="representationTitle"/>
+                        <!-- IDENTIFICATION -->
+                        <g:FlowPanel styleName="browseItemPanel">
+                            <g:HTML addStyleNames="h2 browseItemIcon" ui:field="representationIcon"/>
+                            <g:FlowPanel addStyleNames="h2 browseItemText" ui:field="representationTitle"/>
+                        </g:FlowPanel>
+
+                        <!-- TABS -->
+                        <tabs:BrowseRepresentationTabs ui:field="browseTab"/>
                     </g:FlowPanel>
-
-                    <!-- TABS -->
-                    <tabs:BrowseRepresentationTabs ui:field="browseTab"/>
                 </g:FlowPanel>
             </g:FlowPanel>
-        </g:FlowPanel>
-    </g:FocusPanel>
+        </g:FocusPanel>
+        <g:FocusPanel styleName="browseSidePanel" ui:field="sidePanel">
+            <g:FlowPanel>
+                <g:FlowPanel ui:field="disseminationCards" addStyleNames="verticalThumbnailCardContainer"/>
+            </g:FlowPanel>
+        </g:FocusPanel>
+    </g:FlowPanel>
 </ui:UiBinder>

@@ -2513,10 +2513,6 @@ td.datePickerMonth, td.datePickerYear {
     text-overflow: ellipsis;
 }
 
-.main .wui-breadcrumbPanel .breadcrumb * {
-    color: #a7a9ac;
-}
-
 .main .wui-breadcrumbPanel .breadcrumb .fa {
     margin: 0 3px;
     color: #a7a9ac;
@@ -2856,8 +2852,12 @@ td.datePickerMonth, td.datePickerYear {
 	margin-top: 0;
 }
 
-.browse_aip {
+.browse_main_panel {
     flex: 1;
+}
+
+.browse-representation .searchWrapper .searchWrapperMainPanel #list-BrowseRepresentation_files .actionable-menu {
+    display: none;
 }
 
 .browse-file .aipState {
@@ -9135,6 +9135,10 @@ wui-disposal-hold-data .form-textbox {
 
 .cmi-cubes:after {
     content: "\e906"
+}
+
+.cmi-file:after {
+    content: "\e911"
 }
 
 .largeIcon {
