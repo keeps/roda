@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.characterization.model.TechnicalMetadata;
 import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -354,11 +355,12 @@ public class ModelService extends ModelObservable {
     User user = this.retrieveUser(createdBy);
     Permissions inheritedPermissions = new Permissions();
 
-    if (parentId!=null) {
+    if (parentId != null) {
       inheritedPermissions = this.retrieveAIP(parentId).getPermissions();
     }
 
-    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions), Optional.of(permissions));
+    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions),
+      Optional.of(permissions));
 
     AIP aip = new AIP(id, parentId, type, state, finalPermissions, createdBy);
 
@@ -404,11 +406,12 @@ public class ModelService extends ModelObservable {
     User user = this.retrieveUser(createdBy);
     Permissions inheritedPermissions = new Permissions();
 
-    if (parentId!=null) {
+    if (parentId != null) {
       inheritedPermissions = this.retrieveAIP(parentId).getPermissions();
     }
 
-    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions), Optional.of(permissions));
+    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions),
+      Optional.of(permissions));
 
     AIP aip = new AIP(id, parentId, type, state, finalPermissions, createdBy);
     // Instance Id Management
@@ -432,11 +435,12 @@ public class ModelService extends ModelObservable {
 
     User user = this.retrieveUser(createdBy);
     Permissions inheritedPermissions = new Permissions();
-    if (parentId!=null) {
+    if (parentId != null) {
       inheritedPermissions = this.retrieveAIP(parentId).getPermissions();
     }
 
-    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions), Optional.of(permissions));
+    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(inheritedPermissions),
+      Optional.of(permissions));
 
     AIP aip = new AIP(id, parentId, type, state, finalPermissions, createdBy).setIngestSIPIds(ingestSIPIds)
       .setIngestJobId(ingestJobId).setIngestSIPUUID(ingestSIPUUID);
@@ -1625,6 +1629,12 @@ public class ModelService extends ModelObservable {
     String urn = URNUtils.createRodaPreservationURN(type, identifier, RODAInstanceUtils.getLocalInstanceIdentifier());
     return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload, username,
       notify);
+  }
+
+  public void createTechnicalMetadata(String aipId, List<String> fileDirectoryPath, String fileId,
+    ContentPayload payload, String username, boolean notify) throws AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,

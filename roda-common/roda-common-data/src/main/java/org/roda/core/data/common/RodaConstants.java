@@ -1703,6 +1703,10 @@ public final class RodaConstants {
     }
   }
 
+  public static PreservationAgentType getPreservationAgentType(String type) {
+    return PreservationAgentType.valueOf(type);
+  }
+
   public enum PreservationAgentRole {
     AUTHORIZER("authorizer"), EXECUTING_PROGRAM("executing program"), IMPLEMENTER("implementer"),
     VALIDATOR("validator");

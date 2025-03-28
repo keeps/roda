@@ -10,7 +10,7 @@ services:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
   solr:
-    image: docker.io/solr:9.5.0
+    image: docker.io/solr:9
     restart: unless-stopped
     ports:
       - "8983:8983"
