@@ -356,7 +356,7 @@
 			<artifactId>reflections</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.roda-project</groupId>
+			<groupId>org.roda-community</groupId>
 			<artifactId>commons-ip2</artifactId>
 		</dependency>
 		<dependency>

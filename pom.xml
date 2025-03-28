@@ -123,7 +123,7 @@
         <solr.version>9.5.0</solr.version>
         <apacheds.version>2.0.0.AM27</apacheds.version>
         <httpcomponents.version>4.5.14</httpcomponents.version>
-        <commons_ip2.version>2.8.0</commons_ip2.version>
+        <commons_ip2.version>2.10.0</commons_ip2.version>
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
@@ -1043,7 +1043,7 @@
             </dependency>
             <!-- RODA Commons IP -->
             <dependency>
-                <groupId>org.roda-project</groupId>
+                <groupId>org.roda-community</groupId>
                 <artifactId>commons-ip2</artifactId>
                 <version>${commons_ip2.version}</version>
                 <exclusions>

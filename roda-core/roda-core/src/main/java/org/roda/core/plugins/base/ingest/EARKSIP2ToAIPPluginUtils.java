@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.plugins.base.ingest;
@@ -14,7 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import gov.loc.premis.v3.AgentComplexType;
+import gov.loc.premis.v3.EventComplexType;
+import gov.loc.premis.v3.PremisComplexType;
+import jakarta.xml.bind.JAXBElement;
 import org.apache.commons.io.FilenameUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -42,6 +47,7 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.ExternalFileManifestContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
 import org.roda_project.commons_ip2.model.IPDescriptiveMetadata;
@@ -173,8 +179,8 @@ public class EARKSIP2ToAIPPluginUtils {
           Map<String, String> properties = new HashMap<>();
           properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
 
-          model.updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType, metadataVersion,
-            properties, username);
+          model.updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
+            metadataVersion, properties, username);
         } else {
           throw e;
         }
@@ -206,9 +212,49 @@ public class EARKSIP2ToAIPPluginUtils {
         model.createPreservationMetadata(PreservationMetadataType.OTHER, aipId, representationId.get(),
           file.getRelativeFolders(), file.getFileName(), fileContentPayload, username, notify);
       } else {
-        model.createPreservationMetadata(PreservationMetadataType.OTHER, aipId, file.getRelativeFolders(),
-          file.getFileName(), fileContentPayload, username, notify);
+        try {
+          Object object = PremisV3Utils.binaryToGenericPremis(fileContentPayload, false);
+          if (((JAXBElement<?>) object).getValue() instanceof AgentComplexType agentComplexType) {
+            ContentPayload premisAgentBinary = PremisV3Utils.createPremisAgentBinary(
+              agentComplexType.getAgentIdentifier().getFirst().getAgentIdentifierValue(),
+              agentComplexType.getAgentName().getFirst().getValue(),
+              RodaConstants.getPreservationAgentType(agentComplexType.getAgentType().getValue().toUpperCase()), null,
+              !agentComplexType.getAgentNote().isEmpty() ? agentComplexType.getAgentNote().getFirst() : null,
+              agentComplexType.getVersion());
+
+            try {
+              if (model.retrievePreservationAgent(
+                agentComplexType.getAgentIdentifier().getFirst().getAgentIdentifierValue()) != null) {
+                model.updatePreservationMetadata(PreservationMetadataType.AGENT,
+                  agentComplexType.getAgentIdentifier().getFirst().getAgentIdentifierValue(), premisAgentBinary, true);
+              } else {
+                model.createPreservationMetadata(PreservationMetadataType.AGENT,
+                  agentComplexType.getAgentIdentifier().getFirst().getAgentIdentifierValue(), premisAgentBinary, true);
+              }
+            } catch (NotFoundException e) {
+              model.createPreservationMetadata(PreservationMetadataType.AGENT,
+                agentComplexType.getAgentIdentifier().getFirst().getAgentIdentifierValue(), premisAgentBinary, true);
+            }
+          } else if (((JAXBElement<?>) object).getValue() instanceof EventComplexType) {
+            model.createPreservationMetadata(PreservationMetadataType.EVENT, aipId, file.getRelativeFolders(),
+              file.getFileName(), fileContentPayload, username, notify);
+          }
+        } catch (ValidationException e) {
+          throw new GenericException(e);
+        }
       }
+    }
+  }
+
+  private static void processTechnicalMetadata(ModelService model, List<IPMetadata> technicalMetadata, String aipId,
+    Optional<String> representationId, String username, boolean notify) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
+    for (IPMetadata techMd : technicalMetadata) {
+      IPFileInterface file = techMd.getMetadata();
+      ContentPayload payload = new FSPathContentPayload(file.getPath());
+
+      model.createTechnicalMetadata(aipId, representationId.orElse(null), techMd.getMetadataType().asString(),
+        file.getFileName(), payload, username, notify);
     }
   }
 
@@ -280,6 +326,10 @@ public class EARKSIP2ToAIPPluginUtils {
 
     // process representation preservation metadata
     processPreservationMetadata(model, sr.getPreservationMetadata(), aipId, Optional.ofNullable(representation.getId()),
+      username, notify);
+
+    // process representation technical metadata
+    processTechnicalMetadata(model, sr.getTechnicalMetadata(), aipId, Optional.ofNullable(representation.getId()),
       username, notify);
 
     // process representation files
