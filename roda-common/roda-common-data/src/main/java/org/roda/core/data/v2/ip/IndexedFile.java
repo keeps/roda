@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedFile
   implements IsIndexed, HasId, SetsUUID, HasPermissionFilters, HasStateFilter, HasInstanceID, HasInstanceName {
+  @Serial
   private static final long serialVersionUID = 3303019735787641534L;
 
   private String uuid;

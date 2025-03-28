@@ -49,6 +49,29 @@ public final class URNUtils {
     return createRodaPreservationURN(preservationType, Collections.emptyList(), id, instanceId);
   }
 
+  public static String createRodaTechnicalMetadataURN(String id, String instanceId, String technicalMetadataType) {
+    return getTechnicalMetadataPrefix(technicalMetadataType, instanceId) + id;
+  }
+
+  public static String getTechnicalMetadataPrefix(String technicalMetadataType, String instanceId) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(RodaConstants.URN_BASE);
+    sb.append(RodaConstants.URN_SEPARATOR);
+    sb.append(RodaConstants.URN_RODA);
+    sb.append(RodaConstants.URN_SEPARATOR);
+
+    if (instanceId != null) {
+      sb.append(instanceId);
+      sb.append(RodaConstants.URN_SEPARATOR);
+    }
+
+    sb.append(PreservationMetadataType.TECHNICAL);
+    sb.append(RodaConstants.URN_SEPARATOR);
+    sb.append(technicalMetadataType);
+    sb.append(RodaConstants.URN_SEPARATOR);
+    return sb.toString().toLowerCase();
+  }
+
   public static String createRodaPreservationURN(PreservationMetadataType preservationType, String id) {
     return createRodaPreservationURN(preservationType, Collections.emptyList(), id, null);
   }

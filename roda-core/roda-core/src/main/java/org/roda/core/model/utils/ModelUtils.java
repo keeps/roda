@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,9 +93,7 @@ public final class ModelUtils {
 
   private static List<String> build(List<String> basePath, String... path) {
     List<String> ret = new ArrayList<>(basePath);
-    for (String pathItem : path) {
-      ret.add(pathItem);
-    }
+    Collections.addAll(ret, path);
     return ret;
   }
 
@@ -635,6 +634,23 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
+  public static StoragePath getTechnicalMetadataPath(String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
+    List<String> path = build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_METADATA,
+      RodaConstants.STORAGE_DIRECTORY_TECHNICAL);
+    path.addAll(fileDirectoryPath);
+    path.add(fileId);
+
+    return DefaultStoragePath.parse(path);
+  }
+
+  public static StoragePath getRepresentationTechnicalMetadataContainerPath(String aipId, String representationId)
+    throws RequestNotValidException {
+    List<String> path = build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_METADATA,
+      RodaConstants.STORAGE_DIRECTORY_TECHNICAL);
+    return DefaultStoragePath.parse(path);
+  }
+
   public static StoragePath getLogContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG);
   }
@@ -817,15 +833,15 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
-  public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId, String fileName, String type, String fileSuffix) throws RequestNotValidException {
+  public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId, String fileName,
+    String type, String fileSuffix) throws RequestNotValidException {
 
     List<String> path;
     if (aipId != null && representationId != null && fileName != null && fileSuffix != null && type != null) {
       // other metadata pertaining to a file
       path = getRepresentationOtherMetadataPath(aipId, representationId, type);
       path.add(fileName + fileSuffix);
-    }
-    else if (aipId != null && representationId != null) {
+    } else if (aipId != null && representationId != null) {
       path = getRepresentationOtherMetadataPath(aipId, representationId, "");
     } else {
       throw new RequestNotValidException("AIP id cannot be null");
