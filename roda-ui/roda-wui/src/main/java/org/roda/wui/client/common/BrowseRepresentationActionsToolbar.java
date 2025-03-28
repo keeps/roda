@@ -2,7 +2,6 @@ package org.roda.wui.client.common;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.actions.RepresentationToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -19,26 +18,15 @@ import com.google.gwt.event.dom.client.ClickHandler;
  *
  * @author Alexandre Flores <aflores@keep.pt>
  */
-public class BrowseRepresentationActionsToolbar extends ActionsToolbar {
-  // Data
-  private IndexedAIP aip;
-  private IndexedRepresentation representation;
-
-  public void setObjectAndBuild(IndexedAIP aip, IndexedRepresentation representation) {
-    this.aip = aip;
-    this.representation = representation;
-    buildIcon();
-    buildTags();
-    buildActions();
-  }
+public class BrowseRepresentationActionsToolbar extends BrowseObjectActionsToolbar<IndexedRepresentation> {
 
   public void buildIcon() {
-    setIcon(DescriptionLevelUtils.getRepresentationTypeIconCssClass(representation.getType()));
+    setIcon(DescriptionLevelUtils.getRepresentationTypeIconCssClass(object.getType()));
   }
 
   public void buildTags() {
     this.tags.clear();
-    for (String state : representation.getRepresentationStates()) {
+    for (String state : object.getRepresentationStates()) {
       Tag tag = Tag.fromText(state, Tag.TagStyle.SUCCESS);
       final String filter = RepresentationInformationUtils.createRepresentationInformationFilter(
         RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_STATES, state);
@@ -55,10 +43,10 @@ public class BrowseRepresentationActionsToolbar extends ActionsToolbar {
 
   public void buildActions() {
     this.actions.clear();
-    RepresentationToolbarActions representationActions = RepresentationToolbarActions.get(aip.getId(),
-      aip.getPermissions());
+    RepresentationToolbarActions representationActions = RepresentationToolbarActions.get(object.getAipId(),
+      actionPermissions);
     this.actions.add(new ActionableWidgetBuilder<IndexedRepresentation>(representationActions)
-      .buildGroupedListWithObjects(new ActionableObject<>(representation)));
+      .buildGroupedListWithObjects(new ActionableObject<>(object)));
 
   }
 }

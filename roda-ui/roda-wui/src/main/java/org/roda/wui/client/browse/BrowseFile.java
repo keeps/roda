@@ -11,7 +11,9 @@
 package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
@@ -29,6 +31,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.BrowseFileActionsToolbar;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.cards.FileDisseminationCardList;
@@ -221,6 +224,18 @@ public class BrowseFile extends Composite {
   @UiField
   FlowPanel disseminationCards;
 
+  private final Map<Actionable.ActionImpact, Runnable> handlers;
+  private AsyncCallback<Actionable.ActionImpact> handler = new NoAsyncCallback<Actionable.ActionImpact>() {
+    @Override
+    public void onSuccess(Actionable.ActionImpact result) {
+      if (handlers.containsKey(result)) {
+        handlers.get(result).run();
+      }
+    }
+  };
+  private String aipId;
+  private String repId;
+
   public BrowseFile(Viewers viewers, final BrowseFileResponse response, IndexedFile indexedFile, Services services) {
     final boolean justActive = AIPState.ACTIVE.equals(response.getIndexedAIP().getState());
     // initialize preview
@@ -237,11 +252,17 @@ public class BrowseFile extends Composite {
       .build();
     navigationToolbar.updateBreadcrumb(response.getIndexedAIP(), response.getIndexedRepresentation(), indexedFile);
 
+    handlers = new HashMap<>();
+
+    aipId = indexedFile.getAipId();
+    repId = indexedFile.getRepresentationId();
+    initHandlers();
+
     // STATUS
     this.keyboardFocus.addStyleName(response.getIndexedAIP().getState().toString().toLowerCase());
 
     // TOOLBAR
-    this.objectToolbar.setObjectAndBuild(response.getIndexedAIP(), indexedFile);
+    this.objectToolbar.setObjectAndBuild(indexedFile, response.getIndexedAIP().getPermissions(), handler);
 
     // SIDEBAR
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, indexedFile.getUUID()));
@@ -272,5 +293,10 @@ public class BrowseFile extends Composite {
     }
 
     WCAGUtilities.getInstance().makeAccessible(center.getElement());
+  }
+
+  private void initHandlers() {
+    this.handlers.put(Actionable.ActionImpact.DESTROYED,
+      () -> HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, repId));
   }
 }

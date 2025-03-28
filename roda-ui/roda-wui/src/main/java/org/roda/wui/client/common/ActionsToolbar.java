@@ -1,5 +1,6 @@
 package org.roda.wui.client.common;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.roda.wui.client.common.labels.LabelWithIcon;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 

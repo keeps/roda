@@ -38,6 +38,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
 import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.wui.client.browse.BrowseRepresentation;
+import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -79,23 +80,24 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
-public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
+public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
 
   public static final IndexedAIP NO_AIP_OBJECT = null;
   public static final String NO_AIP_PARENT = null;
   public static final AIPState NO_AIP_STATE = null;
   public static final String BTN_EDIT = "btn-edit";
-  private static final AIPToolbarActions GENERAL_INSTANCE = new AIPToolbarActions(NO_AIP_PARENT, NO_AIP_STATE, null);
+  private static final AipToolbarActions GENERAL_INSTANCE = new AipToolbarActions(NO_AIP_PARENT, NO_AIP_STATE, null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_NO_AIP_TOP = new HashSet<>(
     List.of(AIPAction.NEW_CHILD_AIP_TOP));
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
     List.of(AIPAction.NEW_CHILD_AIP_BELOW));
-  private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(Arrays.asList(AIPAction.DOWNLOAD,
-    AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.REMOVE, AIPAction.NEW_PROCESS,
-    AIPAction.DOWNLOAD_EVENTS, AIPAction.DOWNLOAD_DOCUMENTATION, AIPAction.DOWNLOAD_SUBMISSIONS, AIPAction.CHANGE_TYPE,
-    AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE, AIPAction.ASSOCIATE_DISPOSAL_HOLD, AIPAction.SEARCH_DESCENDANTS,
-    AIPAction.SEARCH_PACKAGE, AIPAction.NEW_CHILD_AIP_BELOW, AIPAction.NEW_REPRESENTATION));
+  private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
+    Arrays.asList(AIPAction.DOWNLOAD, AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.REMOVE,
+      AIPAction.NEW_PROCESS, AIPAction.DOWNLOAD_EVENTS, AIPAction.DOWNLOAD_DOCUMENTATION,
+      AIPAction.DOWNLOAD_SUBMISSIONS, AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
+      AIPAction.ASSOCIATE_DISPOSAL_HOLD, AIPAction.SEARCH_DESCENDANTS, AIPAction.SEARCH_PACKAGE,
+      AIPAction.NEW_CHILD_AIP_BELOW, AIPAction.NEW_REPRESENTATION, AIPAction.CREATE_DESCRIPTIVE_METADATA));
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.REMOVE, AIPAction.NEW_PROCESS,
       AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE, AIPAction.ASSOCIATE_DISPOSAL_HOLD));
@@ -105,23 +107,23 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
   private final AIPState parentAipState;
   private final Permissions permissions;
 
-  private AIPToolbarActions(String parentAipId, AIPState parentAipState, Permissions permissions) {
+  private AipToolbarActions(String parentAipId, AIPState parentAipState, Permissions permissions) {
     this.parentAipId = parentAipId;
     this.parentAipState = parentAipState;
     this.permissions = permissions;
   }
 
-  public static AIPToolbarActions get() {
+  public static AipToolbarActions get() {
     return GENERAL_INSTANCE;
   }
 
-  public static AIPToolbarActions get(String parentAipId, AIPState parentAipState, Permissions permissions) {
-    return new AIPToolbarActions(parentAipId, parentAipState, permissions);
+  public static AipToolbarActions get(String parentAipId, AIPState parentAipState, Permissions permissions) {
+    return new AipToolbarActions(parentAipId, parentAipState, permissions);
   }
 
-  public static AIPToolbarActions getWithoutNoAipActions(String parentAipId, AIPState parentAipState,
+  public static AipToolbarActions getWithoutNoAipActions(String parentAipId, AIPState parentAipState,
     Permissions permissions) {
-    return new AIPToolbarActions(parentAipId, parentAipState, permissions) {
+    return new AipToolbarActions(parentAipId, parentAipState, permissions) {
       @Override
       public boolean canAct(Action<IndexedAIP> action) {
         return false;
@@ -236,6 +238,8 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
       newChildAip(callback);
     } else if (AIPAction.NEW_REPRESENTATION.equals(action)) {
       newRepresentation(callback);
+    } else if (AIPAction.CREATE_DESCRIPTIVE_METADATA.equals(action)) {
+      createDescriptiveMetadata(aip, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -338,6 +342,14 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
             });
         }
       });
+  }
+
+  public void createDescriptiveMetadata(IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+    if (aip != null) {
+      HistoryUtils.newHistory(BrowseTop.RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(),
+        RodaConstants.RODA_OBJECT_AIP, aip.getId());
+    }
+    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void download(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
@@ -1118,6 +1130,8 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
 
     // MANAGEMENT
     ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.manage(), "btn-edit");
+    managementGroup.addButton(messages.newDescriptiveMetadataTitle(), AIPAction.CREATE_DESCRIPTIVE_METADATA,
+      ActionImpact.UPDATED, "btn-plus-circle");
     managementGroup.addButton(messages.newArchivalPackage(), AIPAction.NEW_CHILD_AIP_TOP, ActionImpact.UPDATED,
       "btn-plus-circle");
     managementGroup.addButton(messages.newSublevel(), AIPAction.NEW_CHILD_AIP_BELOW, ActionImpact.UPDATED,
@@ -1164,7 +1178,8 @@ public class AIPToolbarActions extends AbstractActionable<IndexedAIP> {
     CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_AIP_TYPE),
     ASSOCIATE_DISPOSAL_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE),
     ASSOCIATE_DISPOSAL_HOLD(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD), SEARCH_DESCENDANTS(),
-    SEARCH_PACKAGE(), NEW_REPRESENTATION(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION);
+    SEARCH_PACKAGE(), NEW_REPRESENTATION(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION),
+    CREATE_DESCRIPTIVE_METADATA(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_DESCRIPTIVE_METADATA_FILE);
 
     private final List<String> methods;
 

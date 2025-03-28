@@ -12,7 +12,9 @@ package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
@@ -51,7 +53,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -129,7 +130,16 @@ public class BrowseRepresentation extends Composite {
   // DESCRIPTIVE METADATA
   @UiField
   FlowPanel representationTitle;
-  private final List<HandlerRegistration> handlers;
+
+  private final Map<Actionable.ActionImpact, Runnable> handlers;
+  private AsyncCallback<Actionable.ActionImpact> handler = new NoAsyncCallback<Actionable.ActionImpact>() {
+    @Override
+    public void onSuccess(Actionable.ActionImpact result) {
+      if (handlers.containsKey(result)) {
+        handlers.get(result).run();
+      }
+    }
+  };
 
   // FILES
   private final IndexedAIP aip;
@@ -147,7 +157,7 @@ public class BrowseRepresentation extends Composite {
     this.repId = representation.getId();
     this.repUUID = representation.getUUID();
 
-    handlers = new ArrayList<>();
+    handlers = new HashMap<>();
 
     final AIPState state = aip.getState();
     final boolean justActive = AIPState.ACTIVE.equals(state);
@@ -156,6 +166,10 @@ public class BrowseRepresentation extends Composite {
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
+
+    if (justActive) {
+      initHandlers();
+    }
 
     // NAVIGATION TOOLBAR
     navigationToolbar.withObject(representation);
@@ -232,11 +246,16 @@ public class BrowseRepresentation extends Composite {
 
     // OBJECT TOOLBAR
     if (justActive) {
-      objectToolbar.setObjectAndBuild(aip, representation);
+      objectToolbar.setObjectAndBuild(representation, aip.getPermissions(), handler);
     }
 
     // TABS
     browseTab.init(response);
+  }
+
+  private void initHandlers() {
+    handlers.put(Actionable.ActionImpact.DESTROYED, () -> HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId));
+    handlers.put(Actionable.ActionImpact.UPDATED, () -> refresh(aipId, repId, new NoAsyncCallback<>()));
   }
 
   private static void getAndRefresh(String aipId, String id, AsyncCallback<Widget> callback) {

@@ -12,7 +12,8 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.EditPermissionsTab;
-import org.roda.wui.client.common.actions.AIPToolbarActions;
+import org.roda.wui.client.common.actions.AipToolbarActions;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
@@ -26,6 +27,7 @@ import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.disposal.association.DisposalPolicyAssociationTab;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -33,7 +35,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Alexandre Flores <aflores@keep.pt>
  */
 public class BrowseAIPTabs extends Tabs {
-  public void init(BrowseAIPResponse browseAIPResponse) {
+  public void init(BrowseAIPResponse browseAIPResponse, AsyncCallback<Actionable.ActionImpact> actionCallback) {
     IndexedAIP aip = browseAIPResponse.getIndexedAIP();
 
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
@@ -91,7 +93,7 @@ public class BrowseAIPTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DisposalPolicyAssociationTab(browseAIPResponse);
+        return new DisposalPolicyAssociationTab(browseAIPResponse, actionCallback);
       }
     });
 
@@ -99,10 +101,10 @@ public class BrowseAIPTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.permissionsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        AIPToolbarActions aipToolbarActions = AIPToolbarActions.get(aip.getId(), aip.getState(), aip.getPermissions());
+        AipToolbarActions aipToolbarActions = AipToolbarActions.get(aip.getId(), aip.getState(), aip.getPermissions());
         return new EditPermissionsTab(new ActionableWidgetBuilder<>(aipToolbarActions).buildGroupedListWithObjects(
-          new ActionableObject<>(aip), List.of(AIPToolbarActions.AIPAction.UPDATE_PERMISSIONS),
-          List.of(AIPToolbarActions.AIPAction.UPDATE_PERMISSIONS)), IndexedAIP.class.getName(), aip);
+          new ActionableObject<>(aip), List.of(AipToolbarActions.AIPAction.UPDATE_PERMISSIONS),
+          List.of(AipToolbarActions.AIPAction.UPDATE_PERMISSIONS)), IndexedAIP.class.getName(), aip);
       }
     });
 

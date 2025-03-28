@@ -149,10 +149,15 @@ public class BrowseAIP extends Composite {
 
   private String aipId;
   private IndexedAIP aip;
-  private SimplePanel descriptiveMetadataButtons;
-  private Map<Integer, HTMLPanel> descriptiveMetadataSavedButtons;
-  private TabPanel descriptiveMetadataTabPanel;
-  private Button newDescriptiveMetadata;
+  private Map<Actionable.ActionImpact, Runnable> handlers = new HashMap<>();
+  private AsyncCallback<Actionable.ActionImpact> handler = new NoAsyncCallback<Actionable.ActionImpact>() {
+    @Override
+    public void onSuccess(Actionable.ActionImpact result) {
+      if (handlers.containsKey(result)) {
+        handlers.get(result).run();
+      }
+    }
+  };
 
   private BrowseAIP(BrowseAIPResponse response) {
     aip = response.getIndexedAIP();
@@ -175,22 +180,12 @@ public class BrowseAIP extends Composite {
       }
     };
 
-    // DESCRIPTIVE METADATA
-    FlowPanel descriptiveMetadataTab = new FlowPanel();
-    FlowPanel descriptiveMetadataTabCard = new FlowPanel();
-    descriptiveMetadataTabCard.addStyleName("card descriptiveMetadataCard");
-    descriptiveMetadataTabPanel = new TabPanel();
-    descriptiveMetadataTab.addStyleName("browseItemMetadata");
-    descriptiveMetadataTabCard.add(descriptiveMetadataTabPanel);
-    descriptiveMetadataTab.add(descriptiveMetadataTabCard);
-    newDescriptiveMetadata = new Button(messages.newDescriptiveMetadataTitle());
-    newDescriptiveMetadata.addStyleName("btn btn-block btn-plus browseNewDescriptiveMetadataButton");
-    newDescriptiveMetadata.addClickHandler(e -> {
-      newDescriptiveMetadataRedirect();
-    });
-    descriptiveMetadataTab.add(newDescriptiveMetadata);
-    browseTab.init(response);
-    updateSectionDescriptiveMetadata(response.getDescriptiveMetadataInfos());
+    if (justActive) {
+      initHandlers();
+    }
+
+    // TABS
+    browseTab.init(response, handler);
 
     // AIP CHILDREN
     aipChildrenTitle.setHeaderText(messages.sublevels());
@@ -220,11 +215,7 @@ public class BrowseAIP extends Composite {
       aipChildrenCard.setVisible(false);
     }
 
-    PermissionClientUtils.bindPermission(newDescriptiveMetadata, aip.getPermissions(),
-      RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE);
-
     // CSS
-    newDescriptiveMetadata.getElement().setId("aipNewDescriptiveMetadata");
     keyboardFocus.addStyleName("browse browse_aip browse_main_panel");
 
     // make FocusPanel comply with WCAG
@@ -256,7 +247,7 @@ public class BrowseAIP extends Composite {
 
     // OBJECT TOOLBAR
     if (justActive) {
-      objectToolbar.setObjectAndBuild(aip);
+      objectToolbar.setObjectAndBuild(aip, aip.getPermissions(), handler);
     }
 
     // IDENTIFICATION
@@ -284,6 +275,17 @@ public class BrowseAIP extends Composite {
     }
 
     keyboardFocus.setFocus(true);
+  }
+
+  private void initHandlers() {
+    handlers.put(Actionable.ActionImpact.DESTROYED, () -> {
+      if (StringUtils.isNotBlank(aip.getParentID())) {
+        HistoryUtils.newHistory(BrowseTop.RESOLVER, aip.getParentID());
+      } else {
+        HistoryUtils.newHistory(BrowseTop.RESOLVER);
+      }
+    });
+    handlers.put(Actionable.ActionImpact.UPDATED, () -> refresh(aipId, new NoAsyncCallback<>()));
   }
 
   public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
@@ -381,106 +383,6 @@ public class BrowseAIP extends Composite {
 
   }
 
-  private void updateSectionDescriptiveMetadata(DescriptiveMetadataInfos descriptiveMetadataInfos) {
-    final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<>();
-    final Map<String, DescriptiveMetadataInfo> metadataInfos = new HashMap<>();
-
-    List<DescriptiveMetadataInfo> descMetadata = descriptiveMetadataInfos.getDescriptiveMetadataInfoList();
-    if (descMetadata != null) {
-      for (DescriptiveMetadataInfo descMetadatum : descMetadata) {
-        String title = descMetadatum.getLabel() != null ? descMetadatum.getLabel() : descMetadatum.getId();
-        HTML container = new HTML();
-        container.addStyleName("metadataContent");
-        descriptiveMetadataTabPanel.add(container, title);
-        descriptiveMetadataContainers.add(Pair.of(descMetadatum.getId(), container));
-        metadataInfos.put(descMetadatum.getId(), descMetadatum);
-      }
-    }
-
-    descriptiveMetadataTabPanel.addSelectionHandler(event -> {
-      if (event.getSelectedItem() < descriptiveMetadataContainers.size()) {
-        Pair<String, HTML> pair = descriptiveMetadataContainers.get(event.getSelectedItem());
-        String descId = pair.getFirst();
-        final HTML html = pair.getSecond();
-        final DescriptiveMetadataInfo descBundle = metadataInfos.get(descId);
-        if (html.getText().isEmpty()) {
-          getDescriptiveMetadataHTML(aipId, descId, descBundle, event.getSelectedItem(), new AsyncCallback<SafeHtml>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
-                Toast.showError(messages.errorLoadingDescriptiveMetadata(caught.getMessage()));
-              }
-            }
-
-            @Override
-            public void onSuccess(SafeHtml result) {
-              html.setHTML(result);
-            }
-          });
-        }
-      }
-    });
-
-    if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
-      RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE) && aip.getState().equals(AIPState.ACTIVE)
-      && !aip.isOnHold() && aip.getDisposalConfirmationId() == null) {
-      final int addTabIndex = descriptiveMetadataTabPanel.getWidgetCount();
-      FlowPanel addTab = new FlowPanel();
-      addTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>")));
-      descriptiveMetadataTabPanel.add(new Label(), addTab);
-      descriptiveMetadataTabPanel.addSelectionHandler(event -> {
-        if (event.getSelectedItem() == addTabIndex) {
-          newDescriptiveMetadataRedirect();
-        }
-      });
-
-      addTab.addStyleName("addTab");
-      addTab.getElement().setId("aipNewDescriptiveMetadata");
-      addTab.getParent().addStyleName("addTabWrapper");
-    }
-
-    descriptiveMetadataSavedButtons = new HashMap<>();
-    descriptiveMetadataButtons = new SimplePanel();
-    descriptiveMetadataButtons.addStyleName("descriptiveMetadataTabButtons");
-    descriptiveMetadataTabPanel.getTabBar().getElement().getStyle().clearProperty("width");
-    descriptiveMetadataTabPanel.getTabBar().getElement().getParentElement()
-      .insertFirst(descriptiveMetadataButtons.getElement());
-    descriptiveMetadataTabPanel.addSelectionHandler(event -> {
-      if (descriptiveMetadataSavedButtons.containsKey(event.getSelectedItem())) {
-        descriptiveMetadataButtons.setWidget(descriptiveMetadataSavedButtons.get(event.getSelectedItem()));
-      } else {
-        descriptiveMetadataButtons.clear();
-      }
-    });
-
-    if (descMetadata != null && !descMetadata.isEmpty()) {
-      descriptiveMetadataTabPanel.getParent().setVisible(true);
-      newDescriptiveMetadata.setVisible(false);
-
-      int index = ConfigurationManager.getInt(0, "ui.browser.metadata.index.aip");
-      if (index > 0) {
-        if (descMetadata.size() > index) {
-          descriptiveMetadataTabPanel.selectTab(index);
-        } else {
-          descriptiveMetadataTabPanel.selectTab(0);
-        }
-      } else {
-        int count = descMetadata.size() - Math.abs(index);
-        if (descMetadata.size() > count) {
-          descriptiveMetadataTabPanel.selectTab(count);
-        } else {
-          descriptiveMetadataTabPanel.selectTab(0);
-        }
-      }
-    } else {
-      descriptiveMetadataTabPanel.getParent().setVisible(false);
-      newDescriptiveMetadata.setVisible(true);
-    }
-
-    WCAGUtilities.getInstance().makeAccessible(descriptiveMetadataTabPanel.getElement());
-  }
-
   private void updateSectionIdentification(BrowseAIPResponse response) {
 
     title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
@@ -488,119 +390,6 @@ public class BrowseAIP extends Composite {
     Sliders.createAipInfoSlider(center, navigationToolbar.getInfoSidebarButton(), response);
 
     navigationToolbar.updateBreadcrumb(aip, response.getAncestors());
-  }
-
-  private void getDescriptiveMetadataHTML(final String aipId, final String descId, final DescriptiveMetadataInfo bundle,
-    final Integer selectedIndex, final AsyncCallback<SafeHtml> callback) {
-    SafeUri uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId);
-    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
-    try {
-      requestBuilder.sendRequest(null, new RequestCallback() {
-
-        @Override
-        public void onResponseReceived(Request request, Response response) {
-          String escapedDescId = SafeHtmlUtils.htmlEscape(descId);
-
-          if (200 == response.getStatusCode()) {
-            String html = response.getText();
-
-            SafeHtmlBuilder b = new SafeHtmlBuilder();
-            b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
-
-            if (bundle.isHasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
-              RodaConstants.PERMISSION_METHOD_RETRIEVE_AIP_DESCRIPTIVE_METADATA_VERSIONS)) {
-              // History link
-              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
-                escapedDescId);
-              String historyLinkHtml = "<a href='" + historyLink
-                + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
-              b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
-            }
-
-            // Edit link
-            if (!AIPState.DESTROYED.equals(aip.getState()) && !aip.isOnHold()
-              && aip.getDisposalConfirmationId() == null) {
-              if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
-                RodaConstants.PERMISSION_METHOD_UPDATE_AIP_DESCRIPTIVE_METADATA_FILE)) {
-                String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
-                  escapedDescId);
-                String editLinkHtml = "<a href='" + editLink
-                  + "' class='toolbarLink' id='aipEditDescriptiveMetadata'><i class='fa fa-edit'></i></a>";
-                b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
-              }
-            }
-
-            // Download link
-            SafeUri downloadUri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, escapedDescId);
-            String downloadLinkHtml = "<a href='" + downloadUri.asString()
-              + "' class='toolbarLink'><i class='fa fa-download'></i></a>";
-            b.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
-
-            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-            HTMLPanel buttons = new HTMLPanel(b.toSafeHtml());
-            descriptiveMetadataSavedButtons.put(selectedIndex, buttons);
-            descriptiveMetadataButtons.setWidget(buttons);
-
-            b = new SafeHtmlBuilder();
-            b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataHTML'>"));
-            b.append(SafeHtmlUtils.fromTrustedString(html));
-            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-            SafeHtml safeHtml = b.toSafeHtml();
-            callback.onSuccess(safeHtml);
-          } else {
-            String text = response.getText();
-            String message;
-            try {
-              RestErrorOverlayType error = JsonUtils.safeEval(text);
-              message = error.getMessage();
-            } catch (IllegalArgumentException e) {
-              message = text;
-            }
-
-            SafeHtmlBuilder b = new SafeHtmlBuilder();
-            b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
-
-            if (bundle.isHasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
-              RodaConstants.PERMISSION_METHOD_RETRIEVE_AIP_DESCRIPTIVE_METADATA_VERSIONS)) {
-              // History link
-              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
-                escapedDescId);
-              String historyLinkHtml = "<a href='" + historyLink
-                + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
-              b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
-            }
-
-            // Edit link
-            if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
-              RodaConstants.PERMISSION_METHOD_UPDATE_AIP_DESCRIPTIVE_METADATA_FILE)) {
-              String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
-                escapedDescId);
-              String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
-              b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
-            }
-
-            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-
-            // error message
-            b.append(SafeHtmlUtils.fromSafeConstant("<div class='error'>"));
-            b.append(messages.descriptiveMetadataTransformToHTMLError());
-            b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
-            b.append(SafeHtmlUtils.fromString(message));
-            b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
-            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-
-            callback.onSuccess(b.toSafeHtml());
-          }
-        }
-
-        @Override
-        public void onError(Request request, Throwable exception) {
-          callback.onFailure(exception);
-        }
-      });
-    } catch (RequestException e) {
-      callback.onFailure(e);
-    }
   }
 
   private void newDescriptiveMetadataRedirect() {
