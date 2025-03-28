@@ -1071,28 +1071,28 @@ button:after {
 }
 
 .btn-lock:after {
-    content: "\f023";
+    content: "\e933";
 }
 
 .btn-top:after {
-    content: "\f102";
+    content: "\e92f";
 }
 
 
 .btn-up:after {
-    content: "\f077";
+    content: "\e92d";
 }
 
 .btn-down:after {
-    content: "\f078";
+    content: "\e913";
 }
 
 .btn-bottom:after {
-    content: "\f103";
+    content: "\e92e";
 }
 
 .btn-envelope:after {
-    content: "\f0e0";
+    content: "\e928";
 }
 
 .btn-edit:after {
@@ -1100,15 +1100,15 @@ button:after {
 }
 
 .btn-key:after {
-    content: "\f084";
+    content: "\e930";
 }
 
 .btn-unlock:after {
-    content: "\f09c";
+    content: "\e932";
 }
 
 .btn-lift-hold:after {
-    content: "\f3c1";
+    content: "\e931";
 }
 
 .btn-edit + .btn-edit {
@@ -1140,39 +1140,39 @@ button:after {
 }
 
 .btn-upload:after {
-    content: "\f093";
+    content: "\e929";
 }
 
 .btn-print:after {
-    content: "\f02f";
+    content: "\e935";
 }
 
 .btn-refresh:after {
-    content: "\f021";
+    content: "\e937";
 }
 
 .btn-bookmark:after {
-  content: "\f02e";
+  content: "\e924";
 }
 
 .btn-times-circle:after {
-    content: "\f057";
+    content: "\e926";
 }
 
 .btn-check:after {
-    content: "\f058";
+    content: "\e927";
 }
 
 .btn-ban:after {
-    content: "\f05e";
+    content: "\e923";
 }
 
 .btn-preview:after {
-  content: "\f06e";
+  content: "\e938";
 }
 
 .btn-th-list:after {
-    content: "\f00b";
+    content: "\e92a";
 }
 
 .btn-search:after {
@@ -1180,31 +1180,31 @@ button:after {
 }
 
 .btn-chevron-left:after {
-    content: "\f053";
+    content: "\e92b";
 }
 
 .btn-chevron-right:after {
-    content: "\f054";
+    content: "\e92c";
 }
 
 .btn-stop:after{
-	content: "\f04d"
+	content: "\e921"
 }
 
 .btn-back:after {
-    content: "\f0a8";
+    content: "\e93a";
 }
 
 .btn-next-file:after {
-    content: "\f0a9";
+    content: "\e93b";
 }
 
 .btn-previous-file:after {
-    content: "\f0a8";
+    content: "\e93a";
 }
 
 .btn-exclamation-triangle:after {
-    content: "\f071";
+    content: "\e940";
 }
 
 .btn-archive:after {
@@ -1212,7 +1212,7 @@ button:after {
 }
 
 .btn-sitemap:after {
-    content: "\f0e8";
+    content: "\e93f";
 }
 
 .btn-incremental-list-add {
@@ -1222,15 +1222,15 @@ button:after {
 }
 
 .btn-file-signature:after {
-    content: "\f573";
+    content: "\e93d";
 }
 
 .btn-stamp:after {
-    content: "\f5bf";
+    content: "\e939";
 }
 
 .btn-book:after {
-    content: "\f02d";
+    content: "\e93c";
 }
 
 .btn-home:after {
@@ -1238,7 +1238,7 @@ button:after {
 }
 
 .btn-clear:after {
-     content: "\f12d";
+     content: "\e93e";
 }
 
 .ma {
@@ -8478,10 +8478,6 @@ span.code {
     border-radius: 4px;
 }
 
-.groupedActionableDropdown button:not(:first-child) {
-    border-top: 1px solid COLOR_GREY_LIGHT;
-}
-
 .groupedActionableDropdown button:first-child {
     border-radius: 4px 0px 0px 0px;
 }
@@ -8493,7 +8489,7 @@ span.code {
 .groupedActionableDropdown .actionable-button {
     flex-direction: row;
     justify-content: flex-start;
-    padding: 8px;
+    padding: 11px;
     white-space: nowrap;
 }
 
