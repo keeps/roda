@@ -673,7 +673,7 @@ public final class PremisV3Utils {
           objectCharacteristics.getFixity().add(premisFixity);
         }
       } catch (IOException | NoSuchAlgorithmException e) {
-        LOGGER.warn("Could not calculate fixity for file " + originalFile);
+        LOGGER.warn("Could not calculate fixity for file {}", originalFile);
       }
     }
 
@@ -690,7 +690,7 @@ public final class PremisV3Utils {
       contentLocation = String
         .valueOf(model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile)).getContent().getURI());
     } catch (IOException e) {
-      LOGGER.debug(String.format("Can't create URI, %s: %s", e.getCause(), e.getMessage()));
+      LOGGER.debug("Can't create URI, {}: {}", e.getCause(), e.getMessage());
       contentLocation = ModelUtils.getFileStoragePath(originalFile).asString("/", null, null, false);
     }
 
@@ -1037,8 +1037,9 @@ public final class PremisV3Utils {
   }
 
   public static PreservationMetadata createOrUpdatePremisUserAgentBinary(String username, ModelService model,
-                                                                         IndexService index, boolean notify, List<JobUserDetails> jobUserDetails) throws GenericException, ValidationException, NotFoundException,
-      RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    IndexService index, boolean notify, List<JobUserDetails> jobUserDetails)
+    throws GenericException, ValidationException, NotFoundException, RequestNotValidException,
+    AuthorizationDeniedException, AlreadyExistsException {
     PreservationMetadata pm = null;
 
     if (StringUtils.isNotBlank(username)) {
@@ -1176,8 +1177,8 @@ public final class PremisV3Utils {
     ValidationEventCollector validationCollector = new ValidationEventCollector();
 
     try {
-      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.PremisComplexType.class, gov.loc.premis.v3.AgentComplexType.class,
-              gov.loc.premis.v3.EventComplexType.class);
+      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.PremisComplexType.class,
+        gov.loc.premis.v3.AgentComplexType.class, gov.loc.premis.v3.EventComplexType.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
       if (validate) {
