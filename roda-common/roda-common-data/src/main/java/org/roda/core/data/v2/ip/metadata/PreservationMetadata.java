@@ -26,7 +26,7 @@ public class PreservationMetadata implements IsModelObject, HasId, HasInstanceID
   private static final long serialVersionUID = -4312941542769679721L;
 
   public enum PreservationMetadataType {
-    REPRESENTATION, FILE, INTELLECTUAL_ENTITY, AGENT, EVENT, RIGHTS_STATEMENT, ENVIRONMENT, OTHER;
+    TECHNICAL, REPRESENTATION, FILE, INTELLECTUAL_ENTITY, AGENT, EVENT, RIGHTS_STATEMENT, ENVIRONMENT, OTHER;
   }
 
   private String id;

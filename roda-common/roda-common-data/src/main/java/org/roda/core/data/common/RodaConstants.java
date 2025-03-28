@@ -969,6 +969,7 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_METADATA = "metadata";
   public static final String STORAGE_DIRECTORY_DESCRIPTIVE = "descriptive";
   public static final String STORAGE_DIRECTORY_PRESERVATION = "preservation";
+  public static final String STORAGE_DIRECTORY_TECHNICAL = "technical";
   public static final String STORAGE_DIRECTORY_OTHER_TECH_METADATA = "otherTechMd";
   public static final String STORAGE_DIRECTORY_REPRESENTATIONS = "representations";
   public static final String STORAGE_DIRECTORY_SUBMISSION = "submission";
@@ -1824,6 +1825,10 @@ public final class RodaConstants {
     public String toString() {
       return text;
     }
+  }
+
+  public static PreservationAgentType getPreservationAgentType(String type) {
+    return PreservationAgentType.valueOf(type);
   }
 
   public enum PreservationAgentRole {

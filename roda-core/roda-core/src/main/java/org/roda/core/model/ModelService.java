@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.characterization.model.TechnicalMetadata;
 import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -1638,6 +1640,29 @@ public class ModelService extends ModelObservable {
     String urn = URNUtils.createRodaPreservationURN(type, identifier, RODAInstanceUtils.getLocalInstanceIdentifier());
     return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload, username,
       notify);
+  }
+
+  public void createTechnicalMetadata(String aipId, String representationId, String metadataType, String fileId,
+    ContentPayload payload, String createdBy, boolean notify) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    String urn = URNUtils.createRodaTechnicalMetadataURN(fileId, RODAInstanceUtils.getLocalInstanceIdentifier(),
+      metadataType.toLowerCase());
+
+    StoragePath binaryPath = ModelUtils.getTechnicalMetadataPath(aipId, representationId,
+      Collections.singletonList(metadataType), urn);
+    storage.createBinary(binaryPath, payload, false);
+
+    AIP updatedAIP = null;
+    if (aipId != null) {
+      AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+      updatedAIP = updateAIPMetadata(aip, createdBy);
+    }
+
+    if (notify && updatedAIP != null) {
+      notifyAipUpdatedOnChanged(updatedAIP).failOnError();
+    }
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
