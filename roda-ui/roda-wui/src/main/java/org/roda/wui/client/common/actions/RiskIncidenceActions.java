@@ -92,12 +92,12 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
   }
 
   @Override
-  public boolean canAct(Action<RiskIncidence> action, RiskIncidence object) {
+  public boolean userCanAct(Action<RiskIncidence> action, RiskIncidence object) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_RISK_INCIDENCE.contains(action);
   }
 
   @Override
-  public boolean canAct(Action<RiskIncidence> action, SelectedItems<RiskIncidence> objects) {
+  public boolean userCanAct(Action<RiskIncidence> action, SelectedItems<RiskIncidence> objects) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_RISK_INCIDENCES.contains(action);
   }
 

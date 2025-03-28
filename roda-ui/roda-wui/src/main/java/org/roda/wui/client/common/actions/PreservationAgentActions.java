@@ -50,7 +50,7 @@ public class PreservationAgentActions extends AbstractActionable<IndexedPreserva
   }
 
   @Override
-  public boolean canAct(Action<IndexedPreservationAgent> action, IndexedPreservationAgent agent) {
+  public boolean userCanAct(Action<IndexedPreservationAgent> action, IndexedPreservationAgent agent) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_AGENT.contains(action);
   }
 

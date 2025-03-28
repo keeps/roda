@@ -67,13 +67,13 @@ public class JobActions extends AbstractActionable<IndexedJob> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedJob> action) {
+  public boolean userCanAct(Action<IndexedJob> action) {
     return hasPermissions(action) && JobAction.NEW_PROCESS.equals(action)
       && NEW_PROCESS_RESOLVERS.contains(newProcessResolver);
   }
 
   @Override
-  public boolean canAct(Action<IndexedJob> action, IndexedJob object) {
+  public boolean userCanAct(Action<IndexedJob> action, IndexedJob object) {
     if (hasPermissions(action) && object != null) {
       if (JobAction.STOP.equals(action)) {
         return !object.isInFinalState() && !object.isStopping();
@@ -91,7 +91,7 @@ public class JobActions extends AbstractActionable<IndexedJob> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedJob> action, SelectedItems<IndexedJob> objects) {
+  public boolean userCanAct(Action<IndexedJob> action, SelectedItems<IndexedJob> objects) {
     if (hasPermissions(action) && objects != null) {
       if (JobAction.APPROVE.equals(action) || JobAction.REJECT.equals(action)) {
         return true;

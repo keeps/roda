@@ -94,18 +94,18 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedRisk> action) {
+  public boolean userCanAct(Action<IndexedRisk> action) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_RISK.contains(action);
   }
 
   @Override
-  public boolean canAct(Action<IndexedRisk> action, IndexedRisk object) {
+  public boolean userCanAct(Action<IndexedRisk> action, IndexedRisk object) {
     return hasPermissions(action)
       && (POSSIBLE_ACTIONS_ON_SINGLE_RISK.contains(action) || (action.equals(IndexedRiskAction.HISTORY) && hasHistory));
   }
 
   @Override
-  public boolean canAct(Action<IndexedRisk> action, SelectedItems<IndexedRisk> objects) {
+  public boolean userCanAct(Action<IndexedRisk> action, SelectedItems<IndexedRisk> objects) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_RISKS.contains(action);
   }
 

@@ -335,7 +335,7 @@ public class InfoSliderHelper {
     nameColumn.setCellStyleNames("nowrap slider-aip-permissions-table-name");
 
     AipActions aipActions = AipActions.get();
-    if (aipActions.canAct(AipActions.AipAction.UPDATE_PERMISSIONS, aip)) {
+    if (aipActions.userCanAct(AipActions.AipAction.UPDATE_PERMISSIONS, aip)) {
       table.addStyleName("slider-aip-permissions-table-with-grant");
       SingleSelectionModel<Entry<String, Set<Permissions.PermissionType>>> selectionModel = new SingleSelectionModel<>(
         item -> item.getKey().substring(2));

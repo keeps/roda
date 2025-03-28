@@ -82,7 +82,7 @@ public class DisposalScheduleActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
+  public boolean userCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
     if (object.getObject() != null || object.getObjects() != null) {
       return hasPermissions(action) && POSSIBLE_ACTIONS_ON_DISPOSAL_SCHEDULE.contains(action);
     } else {

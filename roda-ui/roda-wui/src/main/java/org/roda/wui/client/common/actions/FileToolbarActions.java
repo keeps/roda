@@ -105,7 +105,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
     IndexedFile parentFolder, Permissions permissions) {
     return new FileToolbarActions(aipId, representationId, parentFolder, permissions) {
       @Override
-      public boolean canAct(Action<IndexedFile> action) {
+      public boolean userCanAct(Action<IndexedFile> action) {
         return false;
       }
     };
@@ -122,13 +122,13 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedFile> action) {
+  public boolean userCanAct(Action<IndexedFile> action) {
     return aipId != null && representationId != null && hasPermissions(action, permissions)
       && POSSIBLE_ACTIONS_WITH_REPRESENTATION.contains(action);
   }
 
   @Override
-  public boolean canAct(Action<IndexedFile> action, IndexedFile file) {
+  public boolean userCanAct(Action<IndexedFile> action, IndexedFile file) {
     boolean canAct = false;
 
     if (hasPermissions(action, permissions)) {
@@ -143,7 +143,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
+  public boolean userCanAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
     boolean canAct = false;
 
     if (hasPermissions(action, permissions)) {
@@ -556,7 +556,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
     ActionableBundle<IndexedFile> fileActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionableGroup<IndexedFile> managementGroup = new ActionableGroup<>(messages.manage());
+    ActionableGroup<IndexedFile> managementGroup = new ActionableGroup<>(messages.manage(), "btn-edit");
     managementGroup.addButton(messages.renameButton(), FileAction.RENAME, ActionImpact.UPDATED, "btn-edit",
       "fileRenameButton");
     managementGroup.addButton(messages.moveButton(), FileAction.MOVE, ActionImpact.UPDATED, "btn-edit",

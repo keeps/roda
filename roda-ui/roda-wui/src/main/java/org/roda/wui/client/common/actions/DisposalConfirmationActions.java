@@ -47,7 +47,7 @@ public class DisposalConfirmationActions extends AbstractActionable<DisposalConf
   }
 
   @Override
-  public boolean canAct(Action<DisposalConfirmation> action) {
+  public boolean userCanAct(Action<DisposalConfirmation> action) {
     return hasPermissions(action);
   }
 

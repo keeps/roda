@@ -87,12 +87,12 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   }
 
   @Override
-  public boolean canAct(Action<DisposalConfirmation> action) {
+  public boolean userCanAct(Action<DisposalConfirmation> action) {
     return hasPermissions(action);
   }
 
   @Override
-  public boolean canAct(Action<DisposalConfirmation> action, DisposalConfirmation object) {
+  public boolean userCanAct(Action<DisposalConfirmation> action, DisposalConfirmation object) {
     switch (object.getState()) {
       case PENDING:
         return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_PENDING.contains(action);

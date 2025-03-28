@@ -74,12 +74,12 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   }
 
   @Override
-  public boolean canAct(Action<RODAMember> action) {
+  public boolean userCanAct(Action<RODAMember> action) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_MEMBER.contains(action);
   }
 
   @Override
-  public boolean canAct(Action<RODAMember> action, RODAMember object) {
+  public boolean userCanAct(Action<RODAMember> action, RODAMember object) {
     if (hasPermissions(action)) {
       if (object.isUser()) {
         return (action.equals(RODAMemberAction.DEACTIVATE) && object.isActive())
@@ -95,7 +95,7 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   }
 
   @Override
-  public boolean canAct(Action<RODAMember> action, SelectedItems<RODAMember> objects) {
+  public boolean userCanAct(Action<RODAMember> action, SelectedItems<RODAMember> objects) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MEMBERS.contains(action);
   }
 

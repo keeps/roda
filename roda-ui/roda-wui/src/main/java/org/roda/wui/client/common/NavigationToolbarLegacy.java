@@ -399,7 +399,7 @@ public class NavigationToolbarLegacy<T extends IsIndexed> extends Composite impl
     }
 
     @Override
-    public boolean canAct(Action<IndexedAIP> action, IndexedAIP object) {
+    public boolean userCanAct(Action<IndexedAIP> action, IndexedAIP object) {
       return POSSIBLE_ACTIONS.contains(action);
     }
 

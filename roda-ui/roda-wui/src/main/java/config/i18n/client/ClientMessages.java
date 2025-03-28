@@ -2537,4 +2537,15 @@ public interface ClientMessages extends Messages {
 
   /* Audit logs */
   String relatedAuditLogs();
+
+  /* Action permission reasons */
+  String reasonAIPUnderAppraisalWithoutParent();
+
+  String reasonAIPUnderAppraisal();
+
+  String reasonNoParentAIP();
+
+  String reasonNoAIPSelected();
+
+  String reasonUserLacksPermission();
 }

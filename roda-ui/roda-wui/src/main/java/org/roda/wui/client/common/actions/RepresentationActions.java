@@ -80,7 +80,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   public static RepresentationActions getWithoutNoRepresentationActions(String parentAipId, Permissions permissions) {
     return new RepresentationActions(parentAipId, permissions) {
       @Override
-      public boolean canAct(Action<IndexedRepresentation> action) {
+      public boolean userCanAct(Action<IndexedRepresentation> action) {
         return false;
       }
     };
@@ -97,18 +97,18 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   @Override
-  public boolean canAct(Action<IndexedRepresentation> action) {
+  public boolean userCanAct(Action<IndexedRepresentation> action) {
     return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action)
       && parentAipId != null;
   }
 
   @Override
-  public boolean canAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
+  public boolean userCanAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
     return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action);
   }
 
   @Override
-  public boolean canAct(Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems) {
+  public boolean userCanAct(Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems) {
     return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS.contains(action);
   }
 

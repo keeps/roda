@@ -72,7 +72,7 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   }
 
   @Override
-  public boolean canAct(Action<DIPFile> action, DIPFile dipFile) {
+  public boolean userCanAct(Action<DIPFile> action, DIPFile dipFile) {
     return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE.contains(action);
   }
 

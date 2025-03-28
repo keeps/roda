@@ -68,12 +68,12 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, IndexedAIP object) {
+  public boolean userCanAct(Action<IndexedAIP> action, IndexedAIP object) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_WITH_RECORDS.contains(action);
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
+  public boolean userCanAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_WITH_RECORDS.contains(action);
   }
 

@@ -125,7 +125,7 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     Permissions permissions) {
     return new AipToolbarActions(parentAipId, parentAipState, permissions) {
       @Override
-      public boolean canAct(Action<IndexedAIP> action) {
+      public boolean userCanAct(Action<IndexedAIP> action) {
         return false;
       }
     };
@@ -142,7 +142,7 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action) {
+  public boolean userCanAct(Action<IndexedAIP> action) {
     if (!AIPState.UNDER_APPRAISAL.equals(parentAipState)) {
       if (Objects.equals(parentAipId, NO_AIP_PARENT)) {
         return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_TOP.contains(action);
@@ -155,7 +155,7 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, IndexedAIP aip) {
+  public boolean userCanAct(Action<IndexedAIP> action, IndexedAIP aip) {
     if (aip == NO_AIP_OBJECT) {
       return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState()) && AIPState.UNDER_APPRAISAL.equals(parentAipState)
@@ -178,7 +178,7 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
+  public boolean userCanAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
     boolean canAct = false;
 
     if (hasPermissions(action, permissions)) {

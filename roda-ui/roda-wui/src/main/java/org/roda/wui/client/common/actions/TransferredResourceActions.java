@@ -118,12 +118,12 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   }
 
   @Override
-  public boolean canAct(Action<TransferredResource> action) {
+  public boolean userCanAct(Action<TransferredResource> action) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_TRANSFERRED_RESOURCE.contains(action);
   }
 
   @Override
-  public boolean canAct(Action<TransferredResource> action, TransferredResource object) {
+  public boolean userCanAct(Action<TransferredResource> action, TransferredResource object) {
     if (object.isFile()) {
       return hasPermissions(action) && POSSIBLE_ACTIONS_ON_FILE_TRANSFERRED_RESOURCE.contains(action);
     } else {
@@ -132,7 +132,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   }
 
   @Override
-  public boolean canAct(Action<TransferredResource> action, SelectedItems<TransferredResource> objects) {
+  public boolean userCanAct(Action<TransferredResource> action, SelectedItems<TransferredResource> objects) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_TRANSFERRED_RESOURCES.contains(action);
   }
 

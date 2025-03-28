@@ -116,7 +116,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     Permissions permissions) {
     return new AipActions(parentAipId, parentAipState, permissions) {
       @Override
-      public boolean canAct(Action<IndexedAIP> action) {
+      public boolean userCanAct(Action<IndexedAIP> action) {
         return false;
       }
     };
@@ -133,20 +133,28 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action) {
+  public CanActResult userCanAct(Action<IndexedAIP> action) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedAIP> action) {
     if (!AIPState.UNDER_APPRAISAL.equals(parentAipState)) {
       if (Objects.equals(parentAipId, NO_AIP_PARENT)) {
-        return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_TOP.contains(action);
+        return new CanActResult(POSSIBLE_ACTIONS_ON_NO_AIP_TOP.contains(action), CanActResult.Reason.CONTEXT,
+          messages.reasonNoParentAIP());
       } else {
-        return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
+        return new CanActResult(POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action), CanActResult.Reason.CONTEXT,
+          messages.reasonNoAIPSelected());
       }
     } else {
-      return false;
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonUnderAppraisal());
     }
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, IndexedAIP aip) {
+  public boolean userCanAct(Action<IndexedAIP> action, IndexedAIP aip) {
     if (aip == NO_AIP_OBJECT) {
       return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState()) && AIPState.UNDER_APPRAISAL.equals(parentAipState)
@@ -169,7 +177,33 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
+  public CanActResult contextCanAct(Action<IndexedAIP> action, IndexedAIP aip) {
+    if (aip == NO_AIP_OBJECT) {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonNoAIPSelected());
+    } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState()) && AIPState.UNDER_APPRAISAL.equals(parentAipState)
+      && Objects.equals(parentAipId, NO_AIP_PARENT)) {
+      return new CanActResult(APPRAISAL_ACTIONS.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonAIPUnderAppraisalWithoutParent());
+    } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
+      if (!POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action)
+      return hasPermissions(action, aip.getPermissions())
+        && (POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action) || APPRAISAL_ACTIONS.contains(action));
+    } else if (action.equals(AipAction.REMOVE)
+      && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
+      return false;
+    } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId()) && (action.equals(AipAction.MOVE_IN_HIERARCHY)
+      || action.equals(AipAction.ASSOCIATE_DISPOSAL_SCHEDULE) || action.equals(AipAction.ASSOCIATE_DISPOSAL_HOLD))) {
+      return false;
+    } else if (action.equals(AipAction.MOVE_IN_HIERARCHY) && aip.isOnHold()) {
+      return false;
+    } else {
+      return hasPermissions(action, aip.getPermissions()) && POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action);
+    }
+  }
+
+  @Override
+  public boolean userCanAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
     boolean canAct = false;
 
     if (hasPermissions(action, permissions)) {

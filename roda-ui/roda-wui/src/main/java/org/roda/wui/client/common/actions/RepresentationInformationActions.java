@@ -112,7 +112,7 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   }
 
   @Override
-  public boolean canAct(Action<RepresentationInformation> action) {
+  public boolean userCanAct(Action<RepresentationInformation> action) {
     if (hasPermissions(action)) {
       return objectsToAssociate == null ? POSSIBLE_ACTIONS_WITHOUT_RI.contains(action)
         : POSSIBLE_ACTIONS_WITHOUT_RI_ASSOCIATING.contains(action);
@@ -122,12 +122,12 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   }
 
   @Override
-  public boolean canAct(Action<RepresentationInformation> action, RepresentationInformation object) {
+  public boolean userCanAct(Action<RepresentationInformation> action, RepresentationInformation object) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_RI.contains(action);
   }
 
   @Override
-  public boolean canAct(Action<RepresentationInformation> action, SelectedItems<RepresentationInformation> objects) {
+  public boolean userCanAct(Action<RepresentationInformation> action, SelectedItems<RepresentationInformation> objects) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_RI.contains(action);
   }
 

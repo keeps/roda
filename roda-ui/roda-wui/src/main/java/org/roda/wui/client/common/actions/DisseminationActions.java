@@ -75,12 +75,12 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedDIP> action, IndexedDIP dip) {
+  public boolean userCanAct(Action<IndexedDIP> action, IndexedDIP dip) {
     return hasPermissions(action, dip.getPermissions()) && POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION.contains(action);
   }
 
   @Override
-  public boolean canAct(Action<IndexedDIP> action, SelectedItems<IndexedDIP> selectedItems) {
+  public boolean userCanAct(Action<IndexedDIP> action, SelectedItems<IndexedDIP> selectedItems) {
     return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATIONS.contains(action);
   }
 

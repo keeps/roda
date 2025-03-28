@@ -72,7 +72,7 @@ public class PreservationEventActions extends AbstractActionable<IndexedPreserva
   }
 
   @Override
-  public boolean canAct(Action<IndexedPreservationEvent> action, IndexedPreservationEvent event) {
+  public boolean userCanAct(Action<IndexedPreservationEvent> action, IndexedPreservationEvent event) {
     return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_EVENT.contains(action);
   }
 

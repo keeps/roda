@@ -60,7 +60,7 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
+  public boolean userCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
     if (object.getObject().getDisposalConfirmationId() == null) {
       return hasPermissions(action);
     } else {
