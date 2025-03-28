@@ -151,16 +151,5 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
         }
       });
     }
-    // Create button
-    Button createButton = new Button(messages.newButton());
-    createButton.setStyleName("linkButton btn-plus");
-    createButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        HistoryUtils.newHistory(BrowseTop.RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(),
-          RodaConstants.RODA_OBJECT_AIP, aip.getId());
-      }
-    });
-    addStaticElement(createButton);
   }
 }
