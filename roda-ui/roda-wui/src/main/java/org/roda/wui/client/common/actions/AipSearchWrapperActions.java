@@ -28,7 +28,6 @@ import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
@@ -57,7 +56,6 @@ import org.roda.wui.client.services.DisposalHoldRestService;
 import org.roda.wui.client.services.DisposalScheduleRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -66,55 +64,55 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.regexp.shared.RegExp;
-import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
-public class AipActions extends AbstractActionable<IndexedAIP> {
+public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
 
   public static final IndexedAIP NO_AIP_OBJECT = null;
   public static final String NO_AIP_PARENT = null;
   public static final AIPState NO_AIP_STATE = null;
   public static final String BTN_EDIT = "btn-edit";
-  private static final AipActions GENERAL_INSTANCE = new AipActions(NO_AIP_PARENT, NO_AIP_STATE, null);
+  private static final AipSearchWrapperActions GENERAL_INSTANCE = new AipSearchWrapperActions(NO_AIP_PARENT,
+    NO_AIP_STATE, null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP_TOP = new HashSet<>(
-    Arrays.asList(AipAction.NEW_CHILD_AIP_TOP));
-  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
-    Arrays.asList(AipAction.NEW_CHILD_AIP_BELOW));
-  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(Arrays.asList(AipAction.DOWNLOAD,
-    AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
-    AipAction.DOWNLOAD_EVENTS, AipAction.DOWNLOAD_DOCUMENTATION, AipAction.DOWNLOAD_SUBMISSIONS, AipAction.CHANGE_TYPE,
-    AipAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipAction.ASSOCIATE_DISPOSAL_HOLD));
-  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
-    Arrays.asList(AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
-      AipAction.CHANGE_TYPE, AipAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipAction.ASSOCIATE_DISPOSAL_HOLD));
-  private static final Set<AipAction> APPRAISAL_ACTIONS = new HashSet<>(
-    Arrays.asList(AipAction.APPRAISAL_ACCEPT, AipAction.APPRAISAL_REJECT));
+  private static final Set<AipSearchWrapperAction> POSSIBLE_ACTIONS_ON_NO_AIP_TOP = new HashSet<>(
+    List.of(AipSearchWrapperAction.NEW_CHILD_AIP_TOP));
+  private static final Set<AipSearchWrapperAction> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
+    List.of(AipSearchWrapperAction.NEW_CHILD_AIP_BELOW));
+  private static final Set<AipSearchWrapperAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
+    Arrays.asList(AipSearchWrapperAction.MOVE_IN_HIERARCHY, AipSearchWrapperAction.UPDATE_PERMISSIONS,
+      AipSearchWrapperAction.REMOVE, AipSearchWrapperAction.NEW_PROCESS, AipSearchWrapperAction.CHANGE_TYPE,
+      AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD));
+  private static final Set<AipSearchWrapperAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
+    Arrays.asList(AipSearchWrapperAction.MOVE_IN_HIERARCHY, AipSearchWrapperAction.UPDATE_PERMISSIONS,
+      AipSearchWrapperAction.REMOVE, AipSearchWrapperAction.NEW_PROCESS, AipSearchWrapperAction.CHANGE_TYPE,
+      AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD));
+  private static final Set<AipSearchWrapperAction> APPRAISAL_ACTIONS = new HashSet<>(
+    Arrays.asList(AipSearchWrapperAction.APPRAISAL_ACCEPT, AipSearchWrapperAction.APPRAISAL_REJECT));
   private final String parentAipId;
   private final AIPState parentAipState;
   private final Permissions permissions;
 
-  private AipActions(String parentAipId, AIPState parentAipState, Permissions permissions) {
+  private AipSearchWrapperActions(String parentAipId, AIPState parentAipState, Permissions permissions) {
     this.parentAipId = parentAipId;
     this.parentAipState = parentAipState;
     this.permissions = permissions;
   }
 
-  public static AipActions get() {
+  public static AipSearchWrapperActions get() {
     return GENERAL_INSTANCE;
   }
 
-  public static AipActions get(String parentAipId, AIPState parentAipState, Permissions permissions) {
-    return new AipActions(parentAipId, parentAipState, permissions);
+  public static AipSearchWrapperActions get(String parentAipId, AIPState parentAipState, Permissions permissions) {
+    return new AipSearchWrapperActions(parentAipId, parentAipState, permissions);
   }
 
-  public static AipActions getWithoutNoAipActions(String parentAipId, AIPState parentAipState,
+  public static AipSearchWrapperActions getWithoutNoAipActions(String parentAipId, AIPState parentAipState,
     Permissions permissions) {
-    return new AipActions(parentAipId, parentAipState, permissions) {
+    return new AipSearchWrapperActions(parentAipId, parentAipState, permissions) {
       @Override
       public CanActResult userCanAct(Action<IndexedAIP> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
@@ -128,13 +126,13 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
-  public AipAction[] getActions() {
-    return AipAction.values();
+  public AipSearchWrapperAction[] getActions() {
+    return AipSearchWrapperAction.values();
   }
 
   @Override
-  public AipAction actionForName(String name) {
-    return AipAction.valueOf(name);
+  public AipSearchWrapperAction actionForName(String name) {
+    return AipSearchWrapperAction.valueOf(name);
   }
 
   @Override
@@ -181,13 +179,15 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
       return new CanActResult(APPRAISAL_ACTIONS.contains(action) || POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action),
         CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
-    } else if (action.equals(AipAction.REMOVE)
+    } else if (action.equals(AipSearchWrapperAction.REMOVE)
       && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
-    } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId()) && (action.equals(AipAction.MOVE_IN_HIERARCHY)
-      || action.equals(AipAction.ASSOCIATE_DISPOSAL_SCHEDULE) || action.equals(AipAction.ASSOCIATE_DISPOSAL_HOLD))) {
+    } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())
+      && (action.equals(AipSearchWrapperAction.MOVE_IN_HIERARCHY)
+        || action.equals(AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE)
+        || action.equals(AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
-    } else if (action.equals(AipAction.MOVE_IN_HIERARCHY) && aip.isOnHold()) {
+    } else if (action.equals(AipSearchWrapperAction.MOVE_IN_HIERARCHY) && aip.isOnHold()) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
     } else {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action), CanActResult.Reason.CONTEXT,
@@ -216,7 +216,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   @Override
   public void act(Action<IndexedAIP> action, AsyncCallback<ActionImpact> callback) {
-    if (AipAction.NEW_CHILD_AIP_TOP.equals(action) || AipAction.NEW_CHILD_AIP_BELOW.equals(action)) {
+    if (AipSearchWrapperAction.NEW_CHILD_AIP_TOP.equals(action)
+      || AipSearchWrapperAction.NEW_CHILD_AIP_BELOW.equals(action)) {
       newChildAip(callback);
     } else {
       unsupportedAction(action, callback);
@@ -225,31 +226,23 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   @Override
   public void act(Action<IndexedAIP> action, IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    if (AipAction.DOWNLOAD.equals(action)) {
-      download(aip, callback);
-    } else if (AipAction.MOVE_IN_HIERARCHY.equals(action)) {
+    if (AipSearchWrapperAction.MOVE_IN_HIERARCHY.equals(action)) {
       move(aip, callback);
-    } else if (AipAction.UPDATE_PERMISSIONS.equals(action)) {
+    } else if (AipSearchWrapperAction.UPDATE_PERMISSIONS.equals(action)) {
       updatePermissions(aip, callback);
-    } else if (AipAction.REMOVE.equals(action)) {
+    } else if (AipSearchWrapperAction.REMOVE.equals(action)) {
       remove(aip, callback);
-    } else if (AipAction.NEW_PROCESS.equals(action)) {
+    } else if (AipSearchWrapperAction.NEW_PROCESS.equals(action)) {
       newProcess(aip, callback);
-    } else if (AipAction.DOWNLOAD_EVENTS.equals(action)) {
-      downloadEvents(aip, callback);
-    } else if (AipAction.DOWNLOAD_SUBMISSIONS.equals(action)) {
-      downloadSubmissions(aip, callback);
-    } else if (AipAction.APPRAISAL_ACCEPT.equals(action)) {
+    } else if (AipSearchWrapperAction.APPRAISAL_ACCEPT.equals(action)) {
       appraisalAccept(aip, callback);
-    } else if (AipAction.APPRAISAL_REJECT.equals(action)) {
+    } else if (AipSearchWrapperAction.APPRAISAL_REJECT.equals(action)) {
       appraisalReject(aip, callback);
-    } else if (AipAction.DOWNLOAD_DOCUMENTATION.equals(action)) {
-      downloadDocumentation(aip, callback);
-    } else if (AipAction.CHANGE_TYPE.equals(action)) {
+    } else if (AipSearchWrapperAction.CHANGE_TYPE.equals(action)) {
       changeType(aip, callback);
-    } else if (AipAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
+    } else if (AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aip, callback);
-    } else if (AipAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
+    } else if (AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
       manageDisposalHold(aip, callback);
     } else {
       unsupportedAction(action, callback);
@@ -258,23 +251,23 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   @Override
   public void act(Action<IndexedAIP> action, SelectedItems<IndexedAIP> aips, AsyncCallback<ActionImpact> callback) {
-    if (AipAction.MOVE_IN_HIERARCHY.equals(action)) {
+    if (AipSearchWrapperAction.MOVE_IN_HIERARCHY.equals(action)) {
       move(aips, callback);
-    } else if (AipAction.UPDATE_PERMISSIONS.equals(action)) {
+    } else if (AipSearchWrapperAction.UPDATE_PERMISSIONS.equals(action)) {
       updatePermissions(aips, callback);
-    } else if (AipAction.REMOVE.equals(action)) {
+    } else if (AipSearchWrapperAction.REMOVE.equals(action)) {
       remove(aips, callback);
-    } else if (AipAction.NEW_PROCESS.equals(action)) {
+    } else if (AipSearchWrapperAction.NEW_PROCESS.equals(action)) {
       newProcess(aips, callback);
-    } else if (AipAction.APPRAISAL_ACCEPT.equals(action)) {
+    } else if (AipSearchWrapperAction.APPRAISAL_ACCEPT.equals(action)) {
       appraisalAccept(aips, callback);
-    } else if (AipAction.APPRAISAL_REJECT.equals(action)) {
+    } else if (AipSearchWrapperAction.APPRAISAL_REJECT.equals(action)) {
       appraisalReject(aips, callback);
-    } else if (AipAction.CHANGE_TYPE.equals(action)) {
+    } else if (AipSearchWrapperAction.CHANGE_TYPE.equals(action)) {
       changeType(aips, callback);
-    } else if (AipAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
+    } else if (AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aips, callback);
-    } else if (AipAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
+    } else if (AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
       manageDisposalHold(aips, callback);
     } else {
       unsupportedAction(action, callback);
@@ -290,17 +283,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     service.aipResource(s -> s.createAIP(parentAipId, aipType)).whenComplete((value, error) -> {
       if (value != null) {
         LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
-        callback.onSuccess(Actionable.ActionImpact.NONE);
+        callback.onSuccess(ActionImpact.NONE);
         HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, RodaConstants.RODA_OBJECT_AIP, value.getId(),
           CreateDescriptiveMetadata.NEW);
       }
     });
-  }
-
-  private void download(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    SafeUri downloadUri = RestUtils.createAIPDownloadUri(aip.getId());
-    callback.onSuccess(ActionImpact.NONE);
-    Window.Location.assign(downloadUri.asString());
   }
 
   private void move(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
@@ -327,7 +314,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
               public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
                 final IndexedAIP parentAIP = event.getValue();
                 final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
-                final SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId),
+                final SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Collections.singletonList(aipId),
                   IndexedAIP.class.getName());
 
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
@@ -390,7 +377,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
                 int counter = 0;
-                boolean justActive = parentAipState != null ? AIPState.ACTIVE.equals(parentAipState) : true;
+                boolean justActive = parentAipState == null || AIPState.ACTIVE.equals(parentAipState);
                 Filter filter = new Filter();
 
                 if (selected instanceof SelectedItemsList) {
@@ -591,12 +578,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
   }
 
-  private void downloadEvents(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aip.getId());
-    callback.onSuccess(ActionImpact.NONE);
-    Window.Location.assign(downloadUri.asString());
-  }
-
   private void appraisalAccept(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     appraisalAccept(objectToSelectedItems(aip, IndexedAIP.class), callback);
   }
@@ -617,12 +598,12 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
           @Override
           public void onFailure(Throwable caught) {
-            callback.onSuccess(Actionable.ActionImpact.UPDATED);
+            callback.onSuccess(ActionImpact.UPDATED);
           }
 
           @Override
           public void onSuccess(final Void nothing) {
-            callback.onSuccess(Actionable.ActionImpact.NONE);
+            callback.onSuccess(ActionImpact.NONE);
             HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
           }
         });
@@ -670,47 +651,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
         }
       });
-  }
-
-  private void downloadDocumentation(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
-    Services service = new Services("Download documentation", "get");
-
-    service.aipResource(s -> s.getDocumentation(aip.getId())).whenComplete((value, throwable) -> {
-      if (throwable == null) {
-        if (Boolean.TRUE.equals(value)) {
-          SafeUri downloadUri = RestUtils.createAIPPartDownloadUri(aip.getId(),
-            RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
-          callback.onSuccess(Actionable.ActionImpact.NONE);
-          Window.Location.assign(downloadUri.asString());
-        } else {
-          Toast.showInfo(messages.downloadNoDocumentationTitle(), messages.downloadNoDocumentationDescription());
-          callback.onSuccess(Actionable.ActionImpact.NONE);
-        }
-      } else {
-        callback.onFailure(throwable);
-      }
-    });
-  }
-
-  private void downloadSubmissions(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-
-    Services service = new Services("Download submission", "get");
-
-    service.aipResource(s -> s.getSubmissions(aip.getId())).whenComplete((value, throwable) -> {
-      if (throwable == null) {
-        if (value) {
-          SafeUri downloadUri = RestUtils.createAIPPartDownloadUri(aip.getId(),
-            RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
-          callback.onSuccess(Actionable.ActionImpact.NONE);
-          Window.Location.assign(downloadUri.asString());
-        } else {
-          Toast.showInfo(messages.downloadNoSubmissionsTitle(), messages.downloadNoSubmissionsDescription());
-          callback.onSuccess(Actionable.ActionImpact.NONE);
-        }
-      } else {
-        callback.onFailure(throwable);
-      }
-    });
   }
 
   private void changeType(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
@@ -1059,66 +999,59 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     // MANAGEMENT
     ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.intellectualEntity(), "btn-search");
-    managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP_TOP, ActionImpact.UPDATED,
+    managementGroup.addButton(messages.newArchivalPackage(), AipSearchWrapperAction.NEW_CHILD_AIP_TOP,
+      ActionImpact.UPDATED, "btn-plus-circle");
+    managementGroup.addButton(messages.newSublevel(), AipSearchWrapperAction.NEW_CHILD_AIP_BELOW, ActionImpact.UPDATED,
       "btn-plus-circle");
-    managementGroup.addButton(messages.newSublevel(), AipAction.NEW_CHILD_AIP_BELOW, ActionImpact.UPDATED,
-      "btn-plus-circle");
-    managementGroup.addButton(messages.changeTypeButton(), AipAction.CHANGE_TYPE, ActionImpact.UPDATED, BTN_EDIT);
-    managementGroup.addButton(messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, ActionImpact.UPDATED,
+    managementGroup.addButton(messages.changeTypeButton(), AipSearchWrapperAction.CHANGE_TYPE, ActionImpact.UPDATED,
       BTN_EDIT);
-    managementGroup.addButton(messages.archivalPackagePermissions(), AipAction.UPDATE_PERMISSIONS, ActionImpact.UPDATED,
-      BTN_EDIT);
-    managementGroup.addButton(messages.removeArchivalPackage(), AipAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
+    managementGroup.addButton(messages.moveArchivalPackage(), AipSearchWrapperAction.MOVE_IN_HIERARCHY,
+      ActionImpact.UPDATED, BTN_EDIT);
+    managementGroup.addButton(messages.archivalPackagePermissions(), AipSearchWrapperAction.UPDATE_PERMISSIONS,
+      ActionImpact.UPDATED, BTN_EDIT);
+    managementGroup.addButton(messages.removeArchivalPackage(), AipSearchWrapperAction.REMOVE, ActionImpact.DESTROYED,
+      "btn-ban");
 
     // PRESERVATION
     ActionableGroup<IndexedAIP> preservationGroup = new ActionableGroup<>(messages.preservationTitle(),
       "btn-play-circle");
-    preservationGroup.addButton(messages.newProcessPreservation(), AipAction.NEW_PROCESS, ActionImpact.UPDATED,
-      "btn-play");
+    preservationGroup.addButton(messages.newProcessPreservation(), AipSearchWrapperAction.NEW_PROCESS,
+      ActionImpact.UPDATED, "btn-play");
 
     // APPRAISAL
     ActionableGroup<IndexedAIP> appraisalGroup = new ActionableGroup<>(messages.appraisalTitle());
-    appraisalGroup.addButton(messages.appraisalAccept(), AipAction.APPRAISAL_ACCEPT, ActionImpact.UPDATED, "btn-play");
-    appraisalGroup.addButton(messages.appraisalReject(), AipAction.APPRAISAL_REJECT, ActionImpact.DESTROYED, "btn-ban");
-
-    // DOWNLOAD
-    ActionableGroup<IndexedAIP> downloadGroup = new ActionableGroup<>(messages.downloadButton());
-    downloadGroup.addButton(messages.downloadButton() + " " + messages.oneOfAObject(AIP.class.getName()),
-      AipAction.DOWNLOAD, ActionImpact.NONE, "btn-download");
-    downloadGroup.addButton(messages.preservationEventsDownloadButton(), AipAction.DOWNLOAD_EVENTS, ActionImpact.NONE,
-      "btn-download");
-    downloadGroup.addButton(messages.downloadDocumentation(), AipAction.DOWNLOAD_DOCUMENTATION, ActionImpact.NONE,
-      "btn-download");
-    downloadGroup.addButton(messages.downloadSubmissions(), AipAction.DOWNLOAD_SUBMISSIONS, ActionImpact.NONE,
-      "btn-download");
+    appraisalGroup.addButton(messages.appraisalAccept(), AipSearchWrapperAction.APPRAISAL_ACCEPT, ActionImpact.UPDATED,
+      "btn-play");
+    appraisalGroup.addButton(messages.appraisalReject(), AipSearchWrapperAction.APPRAISAL_REJECT,
+      ActionImpact.DESTROYED, "btn-ban");
 
     // Disposal
     ActionableGroup<IndexedAIP> disposalGroup = new ActionableGroup<>(messages.disposalTitle(), "btn-calendar");
-    disposalGroup.addButton(messages.associateDisposalScheduleButton(), AipAction.ASSOCIATE_DISPOSAL_SCHEDULE,
-      ActionImpact.NONE, "btn-calendar");
-    disposalGroup.addButton(messages.associateDisposalHoldButton(), AipAction.ASSOCIATE_DISPOSAL_HOLD,
+    disposalGroup.addButton(messages.associateDisposalScheduleButton(),
+      AipSearchWrapperAction.ASSOCIATE_DISPOSAL_SCHEDULE, ActionImpact.NONE, "btn-calendar");
+    disposalGroup.addButton(messages.associateDisposalHoldButton(), AipSearchWrapperAction.ASSOCIATE_DISPOSAL_HOLD,
       ActionImpact.NONE, "btn-lock");
 
     aipActionableBundle.addGroup(managementGroup).addGroup(disposalGroup).addGroup(preservationGroup)
-      .addGroup(appraisalGroup).addGroup(downloadGroup);
+      .addGroup(appraisalGroup);
     return aipActionableBundle;
   }
 
-  public enum AipAction implements Action<IndexedAIP> {
+  public enum AipSearchWrapperAction implements Action<IndexedAIP> {
     NEW_CHILD_AIP_BELOW(RodaConstants.PERMISSION_METHOD_CREATE_AIP_BELOW),
-    NEW_CHILD_AIP_TOP(RodaConstants.PERMISSION_METHOD_CREATE_AIP_TOP), DOWNLOAD(),
+    NEW_CHILD_AIP_TOP(RodaConstants.PERMISSION_METHOD_CREATE_AIP_TOP),
     MOVE_IN_HIERARCHY(RodaConstants.PERMISSION_METHOD_MOVE_AIP_IN_HIERARCHY),
     UPDATE_PERMISSIONS(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS),
     REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_AIP), NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    DOWNLOAD_EVENTS(), DOWNLOAD_SUBMISSIONS(), APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
-    APPRAISAL_REJECT(RodaConstants.PERMISSION_METHOD_APPRAISAL), DOWNLOAD_DOCUMENTATION(),
+    APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
+    APPRAISAL_REJECT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
     CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_AIP_TYPE),
     ASSOCIATE_DISPOSAL_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE),
     ASSOCIATE_DISPOSAL_HOLD(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD);
 
-    private List<String> methods;
+    private final List<String> methods;
 
-    AipAction(String... methods) {
+    AipSearchWrapperAction(String... methods) {
       this.methods = Arrays.asList(methods);
     }
 

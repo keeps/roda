@@ -7,28 +7,17 @@
  */
 package org.roda.wui.client.common.search;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Permissions;
-import org.roda.wui.client.common.actions.AipActions;
-import org.roda.wui.client.common.actions.FileActions;
-import org.roda.wui.client.common.actions.RepresentationActions;
+import org.roda.core.data.v2.ip.*;
+import org.roda.wui.client.common.actions.AipSearchWrapperActions;
+import org.roda.wui.client.common.actions.FileSearchWrapperActions;
+import org.roda.wui.client.common.actions.RepresentationSearchWrapperActions;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -95,7 +84,7 @@ public class CatalogueSearch extends Composite {
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId)
               .withActionable(
-                AipActions.getWithoutSingleSelectionDependantAipActions(null, AIPState.ACTIVE, permissions))
+                AipSearchWrapperActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
               .withFilter(filter).withStartHidden(startHidden));
         } else if (searchableClass.equals(IndexedRepresentation.class)
@@ -103,7 +92,7 @@ public class CatalogueSearch extends Composite {
 
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
-              .withActionable(RepresentationActions.getWithoutNoRepresentationActions(null, null))
+              .withActionable(RepresentationSearchWrapperActions.getWithoutNoRepresentationActions(null, null))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
               .withFilter(filter).withStartHidden(startHidden));
         } else if (searchableClass.equals(IndexedFile.class)
@@ -111,7 +100,7 @@ public class CatalogueSearch extends Composite {
 
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedFile.class, filesListId)
-              .withActionable(FileActions.getWithoutNoFileActions(null, null, null, null))
+              .withActionable(FileSearchWrapperActions.getWithoutNoFileActions(null, null, null, null))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
               .withFilter(filter).withStartHidden(startHidden));
         }
