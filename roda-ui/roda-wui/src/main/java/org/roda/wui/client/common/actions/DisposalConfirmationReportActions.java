@@ -87,25 +87,40 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   }
 
   @Override
-  public boolean canAct(Action<DisposalConfirmation> action) {
-    return hasPermissions(action);
+  public CanActResult userCanAct(Action<DisposalConfirmation> action) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<DisposalConfirmation> action, DisposalConfirmation object) {
+  public CanActResult contextCanAct(Action<DisposalConfirmation> action) {
+    return new CanActResult(true, CanActResult.Reason.CONTEXT, null);
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<DisposalConfirmation> action, DisposalConfirmation object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<DisposalConfirmation> action, DisposalConfirmation object) {
     switch (object.getState()) {
       case PENDING:
-        return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_PENDING.contains(action);
+        return new CanActResult(POSSIBLE_ACTIONS_FOR_PENDING.contains(action), CanActResult.Reason.CONTEXT,
+          messages.reasonDisposalConfirmationIsPending());
       case APPROVED:
-        return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_APPROVED.contains(action);
+        return new CanActResult(POSSIBLE_ACTIONS_FOR_APPROVED.contains(action), CanActResult.Reason.CONTEXT,
+          messages.reasonDisposalConfirmationIsApproved());
       case RESTORED:
-        return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_RECOVERED.contains(action);
+        return new CanActResult(POSSIBLE_ACTIONS_FOR_RECOVERED.contains(action), CanActResult.Reason.CONTEXT,
+          messages.reasonDisposalConfirmationIsRecovered());
       case PERMANENTLY_DELETED:
-        return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_DELETED.contains(action);
+        return new CanActResult(POSSIBLE_ACTIONS_FOR_DELETED.contains(action), CanActResult.Reason.CONTEXT,
+          messages.reasonDisposalConfirmationIsDeleted());
       case EXECUTION_FAILED:
-        return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_EXECUTION_FAILED.contains(action);
+        return new CanActResult(POSSIBLE_ACTIONS_FOR_EXECUTION_FAILED.contains(action), CanActResult.Reason.CONTEXT,
+          messages.reasonDisposalConfirmationExecutionFailed());
       default:
-        return false;
+        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonInvalidContext());
     }
   }
 

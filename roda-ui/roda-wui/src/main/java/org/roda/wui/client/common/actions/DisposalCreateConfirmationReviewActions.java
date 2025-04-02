@@ -68,13 +68,25 @@ public class DisposalCreateConfirmationReviewActions extends AbstractActionable<
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, IndexedAIP object) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_WITH_RECORDS.contains(action);
+  public CanActResult userCanAct(Action<IndexedAIP> action, IndexedAIP object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_WITH_RECORDS.contains(action);
+  public CanActResult contextCanAct(Action<IndexedAIP> action, IndexedAIP object) {
+    return new CanActResult(POSSIBLE_ACTIONS_WITH_RECORDS.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonDisposalConfirmationHasRecords());
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
+    return new CanActResult(POSSIBLE_ACTIONS_WITH_RECORDS.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonDisposalConfirmationHasRecords());
   }
 
   @Override

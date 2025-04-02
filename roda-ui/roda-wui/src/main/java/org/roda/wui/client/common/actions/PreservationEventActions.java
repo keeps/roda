@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -72,8 +73,14 @@ public class PreservationEventActions extends AbstractActionable<IndexedPreserva
   }
 
   @Override
-  public boolean canAct(Action<IndexedPreservationEvent> action, IndexedPreservationEvent event) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_EVENT.contains(action);
+  public CanActResult userCanAct(Action<IndexedPreservationEvent> action, IndexedPreservationEvent event) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedPreservationEvent> action, IndexedPreservationEvent event) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_EVENT.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnMultipleObjects());
   }
 
   @Override

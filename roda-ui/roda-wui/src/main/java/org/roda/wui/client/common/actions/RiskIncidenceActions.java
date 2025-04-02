@@ -92,13 +92,25 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
   }
 
   @Override
-  public boolean canAct(Action<RiskIncidence> action, RiskIncidence object) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_RISK_INCIDENCE.contains(action);
+  public CanActResult userCanAct(Action<RiskIncidence> action, RiskIncidence object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<RiskIncidence> action, SelectedItems<RiskIncidence> objects) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_RISK_INCIDENCES.contains(action);
+  public CanActResult contextCanAct(Action<RiskIncidence> action, RiskIncidence object) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_RISK_INCIDENCE.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnSingleObject());
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<RiskIncidence> action, SelectedItems<RiskIncidence> objects) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<RiskIncidence> action, SelectedItems<RiskIncidence> objects) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_RISK_INCIDENCES.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnMultipleObjects());
   }
 
   @Override

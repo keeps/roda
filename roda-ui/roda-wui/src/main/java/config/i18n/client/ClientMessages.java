@@ -2537,4 +2537,59 @@ public interface ClientMessages extends Messages {
 
   /* Audit logs */
   String relatedAuditLogs();
+
+  /* Action permission reasons */
+  String reasonAffectedAIPUnderAppraisal();
+
+  String reasonAIPUnderAppraisal();
+
+  String reasonNoParentObject();
+
+  String reasonNoObjectSelected();
+
+  String reasonUserLacksPermission();
+
+  String reasonAIPProtectedByDisposalPolicy();
+
+  String reasonCantActOnSingleObject();
+
+  String reasonCantActOnMultipleObjects();
+
+  String reasonCantActOnFileDirectory();
+
+  String reasonCantActOnFileBitstream();
+
+  String reasonFilesAreOnSameRepresentation();
+
+  String reasonFilesAreOnDifferentRepresentations();
+
+  String reasonNoDisposalConfirmation();
+
+  String reasonDisposalConfirmationIsPending();
+
+  String reasonDisposalConfirmationIsApproved();
+
+  String reasonDisposalConfirmationIsRecovered();
+
+  String reasonDisposalConfirmationIsDeleted();
+
+  String reasonDisposalConfirmationExecutionFailed();
+
+  String reasonInvalidContext();
+
+  String reasonDisposalConfirmationHasRecords();
+
+  String reasonJobIsFinishedOrStopping();
+
+  String reasonJobNotPendingApproval();
+
+  String reasonJobDoesNotNeedAppraisal();
+
+  String reasonPluginIsNotIngest();
+
+  String reasonRiskHasNoHistory();
+
+  String reasonCantActOnUser();
+
+  String reasonCantActOnGroup();
 }

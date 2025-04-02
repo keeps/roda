@@ -94,7 +94,8 @@ public class CatalogueSearch extends Composite {
 
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId)
-              .withActionable(AipActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
+              .withActionable(
+                AipActions.getWithoutSingleSelectionDependantAipActions(null, AIPState.ACTIVE, permissions))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
               .withFilter(filter).withStartHidden(startHidden));
         } else if (searchableClass.equals(IndexedRepresentation.class)

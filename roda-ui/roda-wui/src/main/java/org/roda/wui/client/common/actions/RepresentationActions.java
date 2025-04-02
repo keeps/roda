@@ -80,8 +80,13 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   public static RepresentationActions getWithoutNoRepresentationActions(String parentAipId, Permissions permissions) {
     return new RepresentationActions(parentAipId, permissions) {
       @Override
-      public boolean canAct(Action<IndexedRepresentation> action) {
-        return false;
+      public CanActResult userCanAct(Action<IndexedRepresentation> action) {
+        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
+      }
+
+      @Override
+      public CanActResult contextCanAct(Action<IndexedRepresentation> action) {
+        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
       }
     };
   }
@@ -97,19 +102,41 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   @Override
-  public boolean canAct(Action<IndexedRepresentation> action) {
-    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action)
-      && parentAipId != null;
+  public CanActResult userCanAct(Action<IndexedRepresentation> action) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
-    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action);
+  public CanActResult contextCanAct(Action<IndexedRepresentation> action) {
+    return new CanActResult(POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAipId != null,
+      CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
   }
 
   @Override
-  public boolean canAct(Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems) {
-    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS.contains(action);
+  public CanActResult userCanAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnSingleObject());
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<IndexedRepresentation> action,
+    SelectedItems<IndexedRepresentation> selectedItems) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedRepresentation> action,
+    SelectedItems<IndexedRepresentation> selectedItems) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnMultipleObjects());
   }
 
   @Override
@@ -224,7 +251,9 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                 @Override
                 public void onSuccess(String details) {
                   Services services = new Services("Delete representation", "delete");
-                  services.representationResource(s -> s.deleteRepresentation(SelectedItemsUtils.convertToRESTRequest(selectedList), details))
+                  services
+                    .representationResource(
+                      s -> s.deleteRepresentation(SelectedItemsUtils.convertToRESTRequest(selectedList), details))
                     .whenComplete((result, error) -> {
                       if (result != null) {
                         Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
@@ -277,8 +306,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                     public void onSuccess(String details) {
                       Services services = new Services("Change representation type", "update");
                       ChangeTypeRequest request = new ChangeTypeRequest(
-                        SelectedItemsUtils.convertToRESTRequest(representations),
-                        newType, details);
+                        SelectedItemsUtils.convertToRESTRequest(representations), newType, details);
                       services.representationResource(s -> s.changeRepresentationType(request))
                         .whenComplete((result, error) -> {
                           if (result != null) {
@@ -327,24 +355,26 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   private void identifyFormats(SelectedItems<IndexedRepresentation> selected,
     final AsyncCallback<ActionImpact> callback) {
     Services services = new Services("Create format identification job", "create");
-    services.representationResource(s -> s.createFormatIdentificationJob(SelectedItemsUtils.convertToRESTRequest(selected))).whenComplete((result, error) -> {
-      if (result != null) {
-        Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
+    services
+      .representationResource(s -> s.createFormatIdentificationJob(SelectedItemsUtils.convertToRESTRequest(selected)))
+      .whenComplete((result, error) -> {
+        if (result != null) {
+          Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
 
-        Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(), new AsyncCallback<Void>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onSuccess(Actionable.ActionImpact.UPDATED);
-          }
+          Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(), new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onSuccess(Actionable.ActionImpact.UPDATED);
+            }
 
-          @Override
-          public void onSuccess(final Void nothing) {
-            callback.onSuccess(Actionable.ActionImpact.NONE);
-            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-          }
-        });
-      }
-    });
+            @Override
+            public void onSuccess(final Void nothing) {
+              callback.onSuccess(Actionable.ActionImpact.NONE);
+              HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+            }
+          });
+        }
+      });
   }
 
   private void changeState(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {

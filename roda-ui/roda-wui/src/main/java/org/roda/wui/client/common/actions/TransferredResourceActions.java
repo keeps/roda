@@ -118,22 +118,42 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   }
 
   @Override
-  public boolean canAct(Action<TransferredResource> action) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_TRANSFERRED_RESOURCE.contains(action);
+  public CanActResult userCanAct(Action<TransferredResource> action) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<TransferredResource> action, TransferredResource object) {
+  public CanActResult contextCanAct(Action<TransferredResource> action) {
+    return new CanActResult(POSSIBLE_ACTIONS_WITHOUT_TRANSFERRED_RESOURCE.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonNoObjectSelected());
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<TransferredResource> action, TransferredResource object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<TransferredResource> action, TransferredResource object) {
     if (object.isFile()) {
-      return hasPermissions(action) && POSSIBLE_ACTIONS_ON_FILE_TRANSFERRED_RESOURCE.contains(action);
+      return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_TRANSFERRED_RESOURCE.contains(action),
+        CanActResult.Reason.CONTEXT, messages.reasonCantActOnFileBitstream());
     } else {
-      return hasPermissions(action) && POSSIBLE_ACTIONS_ON_FOLDER_TRANSFERRED_RESOURCE.contains(action);
+      return new CanActResult(POSSIBLE_ACTIONS_ON_FOLDER_TRANSFERRED_RESOURCE.contains(action),
+        CanActResult.Reason.CONTEXT, messages.reasonCantActOnFileDirectory());
     }
   }
 
   @Override
-  public boolean canAct(Action<TransferredResource> action, SelectedItems<TransferredResource> objects) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_TRANSFERRED_RESOURCES.contains(action);
+  public CanActResult userCanAct(Action<TransferredResource> action, SelectedItems<TransferredResource> objects) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<TransferredResource> action, SelectedItems<TransferredResource> objects) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_TRANSFERRED_RESOURCES.contains(action),
+      CanActResult.Reason.CONTEXT, messages.reasonCantActOnMultipleObjects());
   }
 
   @Override
@@ -233,70 +253,76 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   private void move(SelectedItems<TransferredResource> objects, AsyncCallback<ActionImpact> callback) {
     Services service = new Services("Moving transferred resource", "move");
 
-    service.transferredResource(s -> s.getSelectedTransferredResources(SelectedItemsUtils.convertToRESTRequest(objects))).whenComplete((resources, error) -> {
-      if (resources != null && resources.getObjects() != null) {
-        Filter filter = new Filter();
-        filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
+    service
+      .transferredResource(s -> s.getSelectedTransferredResources(SelectedItemsUtils.convertToRESTRequest(objects)))
+      .whenComplete((resources, error) -> {
+        if (resources != null && resources.getObjects() != null) {
+          Filter filter = new Filter();
+          filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
 
-        boolean moveToRootVisible = false;
-        if (!resources.getObjects().isEmpty() && resources.getObjects().get(0) != NO_TRANSFERRED_RESOURCE
-          && StringUtils.isNotBlank(resources.getObjects().get(0).getParentUUID())) {
-          filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resources.getObjects().get(0).getParentUUID()));
-          moveToRootVisible = true;
-        }
+          boolean moveToRootVisible = false;
+          if (!resources.getObjects().isEmpty() && resources.getObjects().get(0) != NO_TRANSFERRED_RESOURCE
+            && StringUtils.isNotBlank(resources.getObjects().get(0).getParentUUID())) {
+            filter.add(
+              new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resources.getObjects().get(0).getParentUUID()));
+            moveToRootVisible = true;
+          }
 
-        SelectTransferResourceDialog dialog = new SelectTransferResourceDialog(messages.selectParentTitle(), filter);
+          SelectTransferResourceDialog dialog = new SelectTransferResourceDialog(messages.selectParentTitle(), filter);
 
-        if (resources.getObjects().size() <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
-          dialog.addStyleName("object-dialog");
-        }
-        dialog.setEmptyParentButtonVisible(moveToRootVisible);
-        dialog.showAndCenter();
-        dialog.addCloseHandler(e -> callback.onSuccess(ActionImpact.NONE));
-        dialog.addValueChangeHandler(event -> {
-          TransferredResource transferredResource = event.getValue();
-          String resourceId = transferredResource == null ? null : transferredResource.getUUID();
-          service.transferredResource(s -> s.moveTransferredResources(SelectedItemsUtils.convertToRESTRequest(objects), resourceId)).whenComplete((result, err) -> {
-            if (result != null) {
-              Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
+          if (resources.getObjects().size() <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
+            dialog.addStyleName("object-dialog");
+          }
+          dialog.setEmptyParentButtonVisible(moveToRootVisible);
+          dialog.showAndCenter();
+          dialog.addCloseHandler(e -> callback.onSuccess(ActionImpact.NONE));
+          dialog.addValueChangeHandler(event -> {
+            TransferredResource transferredResource = event.getValue();
+            String resourceId = transferredResource == null ? null : transferredResource.getUUID();
+            service
+              .transferredResource(
+                s -> s.moveTransferredResources(SelectedItemsUtils.convertToRESTRequest(objects), resourceId))
+              .whenComplete((result, err) -> {
+                if (result != null) {
+                  Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                @Override
-                public void onFailure(Throwable caught) {
-                  Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-
-                  Timer timer = new Timer() {
                     @Override
-                    public void run() {
-                      if (transferredResource != null) {
-                        HistoryUtils.newHistory(IngestTransfer.RESOLVER, transferredResource.getUUID());
-                      } else {
-                        HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-                      }
-                      callback.onSuccess(Actionable.ActionImpact.UPDATED);
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          if (transferredResource != null) {
+                            HistoryUtils.newHistory(IngestTransfer.RESOLVER, transferredResource.getUUID());
+                          } else {
+                            HistoryUtils.newHistory(IngestTransfer.RESOLVER);
+                          }
+                          callback.onSuccess(Actionable.ActionImpact.UPDATED);
+                        }
+                      };
+
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
                     }
-                  };
 
-                  timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                }
-
-                @Override
-                public void onSuccess(final Void nothing) {
-                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                  callback.onSuccess(Actionable.ActionImpact.NONE);
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                      callback.onSuccess(Actionable.ActionImpact.NONE);
+                    }
+                  });
+                } else if (err != null) {
+                  Toast.showError(messages.dialogFailure(), messages.moveSIPFailed());
+                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                  callback.onSuccess(Actionable.ActionImpact.UPDATED);
                 }
               });
-            } else if (err != null) {
-              Toast.showError(messages.dialogFailure(), messages.moveSIPFailed());
-              HistoryUtils.newHistory(InternalProcess.RESOLVER);
-              callback.onSuccess(Actionable.ActionImpact.UPDATED);
-            }
           });
-        });
-      } else if (error != null) {
-        Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
-        callback.onSuccess(Actionable.ActionImpact.UPDATED);
-      }
-    });
+        } else if (error != null) {
+          Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
+          callback.onSuccess(Actionable.ActionImpact.UPDATED);
+        }
+      });
   }
 
   private void remove(SelectedItems<TransferredResource> objects, AsyncCallback<ActionImpact> callback) {
@@ -312,12 +338,14 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                service.transferredResource(s -> s.deleteMultipleResources(SelectedItemsUtils.convertToRESTRequest(objects))).whenComplete((value, error) -> {
-                  if (error == null) {
-                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
-                    doActionCallbackDestroyed();
-                  }
-                });
+                service
+                  .transferredResource(s -> s.deleteMultipleResources(SelectedItemsUtils.convertToRESTRequest(objects)))
+                  .whenComplete((value, error) -> {
+                    if (error == null) {
+                      Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
+                      doActionCallbackDestroyed();
+                    }
+                  });
               } else {
                 doActionCallbackNone();
               }

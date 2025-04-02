@@ -105,8 +105,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     Permissions permissions) {
     return new FileActions(aipId, representationId, parentFolder, permissions) {
       @Override
-      public boolean canAct(Action<IndexedFile> action) {
-        return false;
+      public CanActResult userCanAct(Action<IndexedFile> action) {
+        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
+      }
+
+      @Override
+      public CanActResult contextCanAct(Action<IndexedFile> action) {
+        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
       }
     };
   }
@@ -122,39 +127,50 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedFile> action) {
-    return aipId != null && representationId != null && hasPermissions(action, permissions)
-      && POSSIBLE_ACTIONS_WITH_REPRESENTATION.contains(action);
+  public CanActResult userCanAct(Action<IndexedFile> action) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<IndexedFile> action, IndexedFile file) {
-    boolean canAct = false;
-
-    if (hasPermissions(action, permissions)) {
-      if (file.isDirectory()) {
-        canAct = POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action);
-      } else {
-        canAct = POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM.contains(action);
-      }
-    }
-
-    return canAct;
+  public CanActResult contextCanAct(Action<IndexedFile> action) {
+    return new CanActResult(
+      aipId != null && representationId != null && POSSIBLE_ACTIONS_WITH_REPRESENTATION.contains(action),
+      CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
   }
 
   @Override
-  public boolean canAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
-    boolean canAct = false;
+  public CanActResult userCanAct(Action<IndexedFile> action, IndexedFile file) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
 
-    if (hasPermissions(action, permissions)) {
-      if (aipId != null && representationId != null) {
-        canAct = POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION.contains(action);
-      } else {
-        canAct = POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_DIFFERENT_REPRESENTATIONS.contains(action);
-      }
+  @Override
+  public CanActResult contextCanAct(Action<IndexedFile> action, IndexedFile file) {
+    if (file.isDirectory()) {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonCantActOnFileDirectory());
+    } else {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonCantActOnFileBitstream());
     }
+  }
 
-    return canAct;
+  @Override
+  public CanActResult userCanAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
+    if (aipId != null && representationId != null) {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION.contains(action),
+        CanActResult.Reason.CONTEXT, messages.reasonFilesAreOnSameRepresentation());
+    } else {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_DIFFERENT_REPRESENTATIONS.contains(action),
+        CanActResult.Reason.CONTEXT, messages.reasonFilesAreOnDifferentRepresentations());
+    }
   }
 
   @Override
@@ -467,25 +483,26 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   private void identifyFormats(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
     Services services = new Services("Create format identification job", "action");
-    services.fileResource(s -> s.identifyFileFormat(SelectedItemsUtils.convertToRESTRequest(selected))).whenComplete((job, throwable) -> {
-      if (throwable == null) {
-        Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
+    services.fileResource(s -> s.identifyFileFormat(SelectedItemsUtils.convertToRESTRequest(selected)))
+      .whenComplete((job, throwable) -> {
+        if (throwable == null) {
+          Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
 
-        Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(),
-          new ActionAsyncCallback<Void>(callback) {
-            @Override
-            public void onFailure(Throwable caught) {
-              doActionCallbackUpdated();
-            }
+          Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(),
+            new ActionAsyncCallback<Void>(callback) {
+              @Override
+              public void onFailure(Throwable caught) {
+                doActionCallbackUpdated();
+              }
 
-            @Override
-            public void onSuccess(final Void nothing) {
-              doActionCallbackNone();
-              HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-            }
-          });
-      }
-    });
+              @Override
+              public void onSuccess(final Void nothing) {
+                doActionCallbackNone();
+                HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+              }
+            });
+        }
+      });
   }
 
   private void remove(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {

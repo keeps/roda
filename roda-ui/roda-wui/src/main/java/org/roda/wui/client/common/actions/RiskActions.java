@@ -94,19 +94,43 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedRisk> action) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_RISK.contains(action);
+  public CanActResult userCanAct(Action<IndexedRisk> action) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<IndexedRisk> action, IndexedRisk object) {
-    return hasPermissions(action)
-      && (POSSIBLE_ACTIONS_ON_SINGLE_RISK.contains(action) || (action.equals(IndexedRiskAction.HISTORY) && hasHistory));
+  public CanActResult contextCanAct(Action<IndexedRisk> action) {
+    return new CanActResult(POSSIBLE_ACTIONS_WITHOUT_RISK.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonNoObjectSelected());
   }
 
   @Override
-  public boolean canAct(Action<IndexedRisk> action, SelectedItems<IndexedRisk> objects) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_RISKS.contains(action);
+  public CanActResult userCanAct(Action<IndexedRisk> action, IndexedRisk object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedRisk> action, IndexedRisk object) {
+    if (action.equals(IndexedRiskAction.HISTORY)) {
+      return new CanActResult(hasHistory, CanActResult.Reason.CONTEXT, messages.reasonRiskHasNoHistory());
+    } else {
+      return new CanActResult(
+        POSSIBLE_ACTIONS_ON_SINGLE_RISK.contains(action) || (action.equals(IndexedRiskAction.HISTORY) && hasHistory),
+        CanActResult.Reason.CONTEXT, messages.reasonCantActOnSingleObject());
+    }
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<IndexedRisk> action, SelectedItems<IndexedRisk> objects) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedRisk> action, SelectedItems<IndexedRisk> objects) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_RISKS.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnMultipleObjects());
   }
 
   @Override
@@ -173,22 +197,22 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
               if (confirmed) {
                 service.riskResource(s -> s.deleteRisk(SelectedItemsUtils.convertToRESTRequest(objects)))
                   .whenComplete((value, error) -> {
-                  if (value != null) {
-                    doActionCallbackNone();
-                    HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
-                  } else if (error != null) {
+                    if (value != null) {
+                      doActionCallbackNone();
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
+                    } else if (error != null) {
 
-                    Timer timer = new Timer() {
-                      @Override
-                      public void run() {
-                        Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                        doActionCallbackDestroyed();
-                      }
-                    };
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
+                          doActionCallbackDestroyed();
+                        }
+                      };
 
-                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                  }
-                });
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                    }
+                  });
               } else {
                 doActionCallbackNone();
               }

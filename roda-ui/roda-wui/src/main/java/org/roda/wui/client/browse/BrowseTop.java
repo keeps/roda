@@ -16,6 +16,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -130,7 +131,8 @@ public class BrowseTop extends Composite {
     ListBuilder<IndexedAIP> listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseTop_aip")
         .withFilter(new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID))).withJustActive(true)
-        .withSummary(messages.listOfAIPs()).bindOpener().withActionable(AipActions.get()));
+        .withSummary(messages.listOfAIPs()).bindOpener()
+        .withActionable(AipActions.getWithoutSingleSelectionDependantAipActions(null, null, null)));
 
     search = new SearchWrapper(false).createListAndSearchPanel(listBuilder);
 

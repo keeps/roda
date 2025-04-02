@@ -4283,7 +4283,12 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchWrapper .objectToolbar .objectToolbarActions .actionable-title {
-    display: none;
+    margin-top: 0;
+    font-size: 10px;
+    font-weight: 300;
+    margin-bottom: 0;
+    color: #343A3F;
+    text-transform: uppercase;
 }
 
 

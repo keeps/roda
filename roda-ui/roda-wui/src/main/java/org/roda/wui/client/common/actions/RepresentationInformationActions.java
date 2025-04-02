@@ -45,6 +45,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
+import javax.naming.Context;
+
 public class RepresentationInformationActions extends AbstractActionable<RepresentationInformation> {
   private static final RepresentationInformationActions INSTANCE = new RepresentationInformationActions();
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -112,23 +114,40 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   }
 
   @Override
-  public boolean canAct(Action<RepresentationInformation> action) {
-    if (hasPermissions(action)) {
-      return objectsToAssociate == null ? POSSIBLE_ACTIONS_WITHOUT_RI.contains(action)
-        : POSSIBLE_ACTIONS_WITHOUT_RI_ASSOCIATING.contains(action);
-    } else {
-      return false;
-    }
+  public CanActResult userCanAct(Action<RepresentationInformation> action) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<RepresentationInformation> action, RepresentationInformation object) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_RI.contains(action);
+  public CanActResult contextCanAct(Action<RepresentationInformation> action) {
+    return new CanActResult(
+      objectsToAssociate == null ? POSSIBLE_ACTIONS_WITHOUT_RI.contains(action)
+        : POSSIBLE_ACTIONS_WITHOUT_RI_ASSOCIATING.contains(action),
+      CanActResult.Reason.CONTEXT, messages.reasonInvalidContext());
   }
 
   @Override
-  public boolean canAct(Action<RepresentationInformation> action, SelectedItems<RepresentationInformation> objects) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_RI.contains(action);
+  public CanActResult userCanAct(Action<RepresentationInformation> action, RepresentationInformation object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<RepresentationInformation> action, RepresentationInformation object) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_RI.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnSingleObject());
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<RepresentationInformation> action,
+    SelectedItems<RepresentationInformation> objects) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<RepresentationInformation> action,
+    SelectedItems<RepresentationInformation> objects) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_RI.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnMultipleObjects());
   }
 
   @Override
@@ -164,20 +183,20 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
                 if (throwable == null) {
                   Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
-                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    doActionCallbackUpdated();
-                  }
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      doActionCallbackUpdated();
+                    }
 
-                  @Override
-                  public void onSuccess(final Void nothing) {
-                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                  }
-                });
-              }
-            });
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                    }
+                  });
+                }
+              });
           } else {
             associateWithNew(callback);
           }
@@ -253,7 +272,9 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
                 Services services = new Services("Delete representation information", "delete");
-                services.representationInformationResource(s -> s.deleteMultipleRepresentationInformation(SelectedItemsUtils.convertToRESTRequest(objects)))
+                services
+                  .representationInformationResource(
+                    s -> s.deleteMultipleRepresentationInformation(SelectedItemsUtils.convertToRESTRequest(objects)))
                   .whenComplete((job, throwable) -> {
                     if (throwable == null) {
                       Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),

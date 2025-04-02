@@ -83,8 +83,13 @@ public class RepresentationToolbarActions extends AbstractActionable<IndexedRepr
     Permissions permissions) {
     return new RepresentationToolbarActions(parentAipId, permissions) {
       @Override
-      public boolean canAct(Action<IndexedRepresentation> action) {
-        return false;
+      public CanActResult userCanAct(Action<IndexedRepresentation> action) {
+        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
+      }
+
+      @Override
+      public CanActResult contextCanAct(Action<IndexedRepresentation> action) {
+        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
       }
     };
   }
@@ -100,19 +105,41 @@ public class RepresentationToolbarActions extends AbstractActionable<IndexedRepr
   }
 
   @Override
-  public boolean canAct(Action<IndexedRepresentation> action) {
-    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action)
-      && parentAipId != null;
+  public CanActResult userCanAct(Action<IndexedRepresentation> action) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
-    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action);
+  public CanActResult contextCanAct(Action<IndexedRepresentation> action) {
+    return new CanActResult(POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAipId != null,
+      CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
   }
 
   @Override
-  public boolean canAct(Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems) {
-    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS.contains(action);
+  public CanActResult userCanAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnSingleObject());
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<IndexedRepresentation> action,
+    SelectedItems<IndexedRepresentation> selectedItems) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedRepresentation> action,
+    SelectedItems<IndexedRepresentation> selectedItems) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnMultipleObjects());
   }
 
   @Override

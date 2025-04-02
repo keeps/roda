@@ -75,13 +75,27 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedDIP> action, IndexedDIP dip) {
-    return hasPermissions(action, dip.getPermissions()) && POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION.contains(action);
+  public CanActResult userCanAct(Action<IndexedDIP> action, IndexedDIP dip) {
+    return new CanActResult(hasPermissions(action, dip.getPermissions()), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<IndexedDIP> action, SelectedItems<IndexedDIP> selectedItems) {
-    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATIONS.contains(action);
+  public CanActResult contextCanAct(Action<IndexedDIP> action, IndexedDIP dip) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnSingleObject());
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<IndexedDIP> action, SelectedItems<IndexedDIP> selectedItems) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedDIP> action, SelectedItems<IndexedDIP> selectedItems) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATIONS.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnMultipleObjects());
   }
 
   @Override
