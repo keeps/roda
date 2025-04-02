@@ -125,6 +125,8 @@ import org.roda.core.index.utils.ZkController;
 import org.roda.core.migration.MigrationManager;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.transactional.ModelTransactionManager;
+import org.roda.core.model.transactional.TransactionalModelService;
 import org.roda.core.model.utils.LdapUtility;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginManager;
@@ -140,6 +142,8 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceWrapper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.storage.transactional.DefaultTransactionalStorageService;
+import org.roda.core.storage.transactional.TransactionalStorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -851,9 +855,16 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateStorageAndModel() throws GenericException {
-    storage = new StorageServiceWrapper(instantiateStorage(), nodeType);
+    StorageService stagingStorageService = new StorageServiceWrapper(instantiateStagingStorage(), nodeType);
+    StorageService mainStorageService = new StorageServiceWrapper(instantiateStorage(), nodeType);
+    storage = new DefaultTransactionalStorageService(mainStorageService, stagingStorageService);
     LOGGER.debug("Finished instantiating storage...");
-    model = new ModelService(storage, eventsManager, nodeType, instanceId);
+    ModelTransactionManager modelTransactionManager = new ModelTransactionManager(storage, eventsManager, nodeType, instanceId);
+    model = modelTransactionManager.beginTransaction();
+    if (storage instanceof TransactionalStorageService) {
+        LOGGER.info("Commiting to storage service...");
+        ((TransactionalStorageService) storage).commit();
+    }
     LOGGER.debug("Finished instantiating model...");
   }
 
@@ -883,6 +894,41 @@ public class RodaCoreFactory {
       String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
         RodaConstants.TRASH_CONTAINER);
       StorageService fileStorageService = new FileStorageService(configurationManager.getStoragePath(), trashDirName);
+      return fileStorageService;
+    } else {
+      LOGGER.error("Unknown storage service '{}'", storageType.name());
+      throw new GenericException();
+    }
+
+  }
+
+  private static StorageService instantiateStagingStorage() throws GenericException {
+    String newStorageService = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_NEW_SERVICE);
+    Path stagingStoragePath = Paths.get("/tmp/staging");
+    if (StringUtils.isNotBlank(newStorageService)) {
+      try {
+        Class<?> storageClass = Class.forName(newStorageService);
+        Constructor<?> constructor = storageClass.getConstructor(Path.class, String.class);
+
+        LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(),
+                stagingStoragePath);
+        String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
+                RodaConstants.TRASH_CONTAINER);
+
+        return (StorageService) constructor.newInstance(stagingStoragePath, trashDirName);
+      } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException
+               | InvocationTargetException e) {
+        LOGGER.warn("Error instantiating storage service defined on properties, falling back to a default service", e);
+      }
+    }
+
+    StorageType storageType = StorageType.valueOf(
+            getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE, RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
+    if (storageType == RodaConstants.StorageType.FILESYSTEM) {
+      LOGGER.debug("Going to instantiate Filesystem on '{}'", stagingStoragePath);
+      String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
+              RodaConstants.TRASH_CONTAINER);
+      StorageService fileStorageService = new FileStorageService(stagingStoragePath, false, trashDirName, false);
       return fileStorageService;
     } else {
       LOGGER.error("Unknown storage service '{}'", storageType.name());
