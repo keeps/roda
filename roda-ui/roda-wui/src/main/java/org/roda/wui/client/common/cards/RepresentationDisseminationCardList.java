@@ -35,7 +35,7 @@ public class RepresentationDisseminationCardList extends ThumbnailCardList<Index
         @Override
         public ThumbnailCard constructCard(ClientMessages messages, IndexedDIP dip) {
           // Title
-          String title = dip.getType();
+          String title = dip.getTitle();
 
           // Thumbnail
           HTML iconThumbnailHTML = new HTML(DescriptionLevelUtils.getRepresentationTypeIcon(dip.getType(), false));

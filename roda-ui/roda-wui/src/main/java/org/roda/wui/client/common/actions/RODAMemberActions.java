@@ -74,29 +74,45 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   }
 
   @Override
-  public boolean canAct(Action<RODAMember> action) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_MEMBER.contains(action);
+  public CanActResult userCanAct(Action<RODAMember> action) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<RODAMember> action, RODAMember object) {
-    if (hasPermissions(action)) {
-      if (object.isUser()) {
-        return (action.equals(RODAMemberAction.DEACTIVATE) && object.isActive())
+  public CanActResult contextCanAct(Action<RODAMember> action) {
+    return new CanActResult(POSSIBLE_ACTIONS_WITHOUT_MEMBER.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonNoObjectSelected());
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<RODAMember> action, RODAMember object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<RODAMember> action, RODAMember object) {
+    if (object.isUser()) {
+      return new CanActResult(
+        (action.equals(RODAMemberAction.DEACTIVATE) && object.isActive())
           || (action.equals(RODAMemberAction.ACTIVATE) && !object.isActive())
           || (action.equals(RODAMemberAction.REMOVE) || (action.equals(RODAMemberAction.EDIT)
-            || (action.equals(RODAMemberAction.NEW_ACCESS_KEY) && object.isUser())));
-      } else {
-        return POSSIBLE_ACTIONS_ON_GROUP.contains(action);
-      }
+            || (action.equals(RODAMemberAction.NEW_ACCESS_KEY) && object.isUser()))),
+        CanActResult.Reason.CONTEXT, messages.reasonCantActOnUser());
     } else {
-      return false;
+      return new CanActResult(POSSIBLE_ACTIONS_ON_GROUP.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonCantActOnGroup());
     }
   }
 
   @Override
-  public boolean canAct(Action<RODAMember> action, SelectedItems<RODAMember> objects) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MEMBERS.contains(action);
+  public CanActResult userCanAct(Action<RODAMember> action, SelectedItems<RODAMember> objects) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.CONTEXT, messages.reasonCantActOnGroup());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<RODAMember> action, SelectedItems<RODAMember> objects) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_MEMBERS.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnMultipleObjects());
   }
 
   @Override

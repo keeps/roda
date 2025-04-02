@@ -2,7 +2,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-             xmlns:b="urn:import:org.roda.wui.client.browse" xmlns:common="urn:import:org.roda.wui.client.common">
+             xmlns:b="urn:import:org.roda.wui.client.browse" xmlns:common="urn:import:org.roda.wui.client.common"
+             xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs">
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
@@ -11,8 +12,16 @@
             <g:FlowPanel styleName="viewRepresentationFile">
                 <common:NavigationToolbar ui:field="navigationToolbar"/>
                 <common:BrowseFileActionsToolbar ui:field="objectToolbar" label="{messages.catalogueFileTitle}"/>
-                <g:FlowPanel addStyleNames="viewRepresentationFile-center" ui:field="center">
-                    <b:IndexedFilePreview addStyleNames="viewRepresentationFilePreview" ui:field="filePreview"/>
+                <g:FlowPanel styleName="row full_width skip_padding slider-container">
+                    <g:FlowPanel styleName="col_12 content">
+                        <!-- IDENTIFICATION -->
+                        <g:FlowPanel styleName="browseItemPanel">
+                            <common:TitlePanel ui:field="title" />
+                        </g:FlowPanel>
+
+                        <!-- TABS -->
+                        <tabs:BrowseFileTabs ui:field="browseTab" />
+                    </g:FlowPanel>
                 </g:FlowPanel>
             </g:FlowPanel>
         </wcag:AccessibleFocusPanel>

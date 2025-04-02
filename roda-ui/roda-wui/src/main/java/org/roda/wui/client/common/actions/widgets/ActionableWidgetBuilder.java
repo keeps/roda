@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.CanActResult;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableButton;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -98,13 +99,21 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return createActionsMenu(actionableBundle, objects);
   }
 
-  public Widget buildListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist) {
+  public Widget buildListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist,
+    List<Actionable.Action<T>> actionBlacklist) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
 
     if (!actionWhitelist.isEmpty()) {
       // remove unwanted buttons, and the whole group if it is empty
       actionableBundle.getGroups().removeIf(group -> {
         group.getButtons().removeIf(button -> !actionWhitelist.contains(button.getAction()));
+        return group.getButtons().isEmpty();
+      });
+    }
+    if (!actionBlacklist.isEmpty()) {
+      // remove blacklisted buttons
+      actionableBundle.getGroups().removeIf(group -> {
+        group.getButtons().removeIf(button -> actionBlacklist.contains(button.getAction()));
         return group.getButtons().isEmpty();
       });
     }
@@ -117,14 +126,21 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return createActionsMenuWithDefaults(actionableBundle, objects);
   }
 
-  public Widget buildListWithObjectsAndDefaults(ActionableObject<T> objects,
-    List<Actionable.Action<T>> actionWhitelist) {
+  public Widget buildListWithObjectsAndDefaults(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist,
+    List<Actionable.Action<T>> actionBlacklist) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
 
     if (!actionWhitelist.isEmpty()) {
       // remove unwanted buttons, and the whole group if it is empty
       actionableBundle.getGroups().removeIf(group -> {
         group.getButtons().removeIf(button -> !actionWhitelist.contains(button.getAction()));
+        return group.getButtons().isEmpty();
+      });
+    }
+    if (!actionBlacklist.isEmpty()) {
+      // remove blacklisted buttons
+      actionableBundle.getGroups().removeIf(group -> {
+        group.getButtons().removeIf(button -> actionBlacklist.contains(button.getAction()));
         return group.getButtons().isEmpty();
       });
     }
@@ -166,7 +182,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
       boolean hasButtonsOnThisGroup = false;
       for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
         if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
-          && actionable.canAct(actionButton.getAction(), objects)) {
+          && actionable.canAct(actionButton.getAction(), objects).canAct()) {
           ActionableTitle actionableTitle = actionGroup.getTitle();
           Label groupTitle = new Label(actionableTitle.getTitle());
           groupTitle.addStyleName("h4 actionable-title");
@@ -182,7 +198,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
       if (hasButtonsOnThisGroup) {
         for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
           if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
-            && actionable.canAct(actionButton.getAction(), objects)) {
+            && actionable.canAct(actionButton.getAction(), objects).canAct()) {
 
             ActionButton<T> button = new ActionButton<>(actionButton);
 
@@ -242,7 +258,6 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     int addedButtonCount = 0;
 
     for (ActionableGroup<T> actionGroup : actionableBundle.getGroups()) {
-      boolean hasButtonsOnThisGroup = false;
       ActionableTitle actionableTitle = actionGroup.getTitle();
       Label groupTitle = new Label(actionableTitle.getTitle());
       groupTitle.addStyleName("h4 actionable-title");
@@ -252,33 +267,36 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
       panel.add(groupTitle);
 
       for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
-        ActionButton<T> button = new ActionButton<>(actionButton);
-        panel.add(button);
-        addedButtonCount++;
         if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
-          && actionable.canAct(actionButton.getAction(), objects)) {
-          button.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-              button.setEnabled(false);
-              actionable.act(actionButton.getAction(), objects, new AsyncCallback<Actionable.ActionImpact>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                  actionImpactCallback.onFailure(caught);
-                  button.setEnabled(true);
-                }
+          && actionable.userCanAct(actionButton.getAction(), objects).canAct()) {
+          ActionButton<T> button = new ActionButton<>(actionButton);
+          panel.add(button);
+          addedButtonCount++;
+          CanActResult contextCanAct = actionable.contextCanAct(actionButton.getAction(), objects);
+          if (contextCanAct.canAct()) {
+            button.addClickHandler(new ClickHandler() {
+              @Override
+              public void onClick(ClickEvent event) {
+                button.setEnabled(false);
+                actionable.act(actionButton.getAction(), objects, new AsyncCallback<Actionable.ActionImpact>() {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    actionImpactCallback.onFailure(caught);
+                    button.setEnabled(true);
+                  }
 
-                @Override
-                public void onSuccess(Actionable.ActionImpact result) {
-                  actionImpactCallback.onSuccess(result);
-                  button.setEnabled(true);
-                }
-              });
-            }
-          });
-        }
-        else {
-          button.setEnabled(false);
+                  @Override
+                  public void onSuccess(Actionable.ActionImpact result) {
+                    actionImpactCallback.onSuccess(result);
+                    button.setEnabled(true);
+                  }
+                });
+              }
+            });
+          } else {
+            button.setTitle(contextCanAct.getReasonSummary());
+            button.setEnabled(false);
+          }
         }
       }
 
@@ -320,7 +338,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
       Button groupButton = null;
       for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
         if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
-          && actionable.canAct(actionButton.getAction(), objects)
+          && actionable.canAct(actionButton.getAction(), objects).canAct()
           && !ungroupedActions.contains(actionButton.getAction())) {
           ActionableTitle actionableTitle = actionGroup.getTitle();
 
@@ -370,7 +388,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
       for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
         if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
-          && actionable.canAct(actionButton.getAction(), objects)) {
+          && actionable.canAct(actionButton.getAction(), objects).canAct()) {
 
           ActionButton<T> button = new ActionButton<>(actionButton);
 

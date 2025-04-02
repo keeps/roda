@@ -6,10 +6,12 @@
 
     <g:FlowPanel styleName="thumbnailCard">
         <g:Label ui:field="title" styleName="thumbnailCardTitle"/>
-        <g:FlowPanel styleName="thumbnailCardDetails">
-            <g:FocusPanel ui:field="thumbnail" />
-            <g:FlowPanel ui:field="tags" styleName="thumbnailCardTags"/>
-            <g:FlowPanel ui:field="attributes" styleName="thumbnailCardAttributes"/>
-        </g:FlowPanel>
+        <g:FocusPanel styleName="clickable" ui:field="clickable">
+            <g:FlowPanel styleName="thumbnailCardDetails">
+                <g:FlowPanel ui:field="thumbnail" />
+                <g:FlowPanel ui:field="tags" styleName="thumbnailCardTags"/>
+                <g:FlowPanel ui:field="attributes" styleName="thumbnailCardAttributes"/>
+            </g:FlowPanel>
+        </g:FocusPanel>
     </g:FlowPanel>
 </ui:UiBinder>

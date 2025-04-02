@@ -17,7 +17,6 @@ import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.representation.ChangeRepresentationStatesRequest;
 import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.wui.client.browse.BrowseRepresentation;
@@ -33,52 +32,50 @@ import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.regexp.shared.RegExp;
-import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
-public class RepresentationActions extends AbstractActionable<IndexedRepresentation> {
-  private static final RepresentationActions GENERAL_INSTANCE = new RepresentationActions(null, null);
+public class RepresentationSearchWrapperActions extends AbstractActionable<IndexedRepresentation> {
+  private static final RepresentationSearchWrapperActions GENERAL_INSTANCE = new RepresentationSearchWrapperActions(
+    null, null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final Set<RepresentationAction> POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION = new HashSet<>(
-    Arrays.asList(RepresentationAction.NEW));
+  private static final Set<RepresentationSearchWrapperAction> POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION = new HashSet<>(
+    Arrays.asList(RepresentationSearchWrapperAction.NEW));
 
-  private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION = new HashSet<>(
-    Arrays.asList(RepresentationAction.DOWNLOAD, RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE,
-      RepresentationAction.NEW_PROCESS, RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.CHANGE_STATE,
-      RepresentationAction.DOWNLOAD_METADATA));
+  private static final Set<RepresentationSearchWrapperAction> POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION = new HashSet<>(
+    Arrays.asList(RepresentationSearchWrapperAction.CHANGE_TYPE, RepresentationSearchWrapperAction.REMOVE, RepresentationSearchWrapperAction.NEW_PROCESS,
+      RepresentationSearchWrapperAction.IDENTIFY_FORMATS, RepresentationSearchWrapperAction.CHANGE_STATE));
 
-  private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS = new HashSet<>(
-    Arrays.asList(RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE, RepresentationAction.NEW_PROCESS,
-      RepresentationAction.IDENTIFY_FORMATS));
+  private static final Set<RepresentationSearchWrapperAction> POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS = new HashSet<>(
+    Arrays.asList(RepresentationSearchWrapperAction.CHANGE_TYPE, RepresentationSearchWrapperAction.REMOVE, RepresentationSearchWrapperAction.NEW_PROCESS,
+      RepresentationSearchWrapperAction.IDENTIFY_FORMATS));
 
   private final String parentAipId;
   private final Permissions permissions;
 
-  private RepresentationActions(String parentAipId, Permissions permissions) {
+  private RepresentationSearchWrapperActions(String parentAipId, Permissions permissions) {
     this.parentAipId = parentAipId;
     this.permissions = permissions;
   }
 
-  public static RepresentationActions get() {
+  public static RepresentationSearchWrapperActions get() {
     return GENERAL_INSTANCE;
   }
 
-  public static RepresentationActions get(String parentAipId, Permissions permissions) {
-    return new RepresentationActions(parentAipId, permissions);
+  public static RepresentationSearchWrapperActions get(String parentAipId, Permissions permissions) {
+    return new RepresentationSearchWrapperActions(parentAipId, permissions);
   }
 
-  public static RepresentationActions getWithoutNoRepresentationActions(String parentAipId, Permissions permissions) {
-    return new RepresentationActions(parentAipId, permissions) {
+  public static RepresentationSearchWrapperActions getWithoutNoRepresentationActions(String parentAipId,
+    Permissions permissions) {
+    return new RepresentationSearchWrapperActions(parentAipId, permissions) {
       @Override
       public CanActResult userCanAct(Action<IndexedRepresentation> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
@@ -92,13 +89,13 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   @Override
-  public RepresentationAction[] getActions() {
-    return RepresentationAction.values();
+  public RepresentationSearchWrapperAction[] getActions() {
+    return RepresentationSearchWrapperAction.values();
   }
 
   @Override
-  public RepresentationAction actionForName(String name) {
-    return RepresentationAction.valueOf(name);
+  public RepresentationSearchWrapperAction actionForName(String name) {
+    return RepresentationSearchWrapperAction.valueOf(name);
   }
 
   @Override
@@ -141,7 +138,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   @Override
   public void act(Action<IndexedRepresentation> action, AsyncCallback<ActionImpact> callback) {
-    if (RepresentationAction.NEW.equals(action)) {
+    if (RepresentationSearchWrapperAction.NEW.equals(action)) {
       create(callback);
     } else {
       unsupportedAction(action, callback);
@@ -169,20 +166,16 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   @Override
   public void act(Action<IndexedRepresentation> action, IndexedRepresentation representation,
     AsyncCallback<ActionImpact> callback) {
-    if (RepresentationAction.DOWNLOAD.equals(action)) {
-      download(representation, callback);
-    } else if (RepresentationAction.CHANGE_TYPE.equals(action)) {
+    if (RepresentationSearchWrapperAction.CHANGE_TYPE.equals(action)) {
       changeType(representation, callback);
-    } else if (RepresentationAction.REMOVE.equals(action)) {
+    } else if (RepresentationSearchWrapperAction.REMOVE.equals(action)) {
       remove(representation, callback);
-    } else if (RepresentationAction.NEW_PROCESS.equals(action)) {
+    } else if (RepresentationSearchWrapperAction.NEW_PROCESS.equals(action)) {
       newProcess(representation, callback);
-    } else if (RepresentationAction.IDENTIFY_FORMATS.equals(action)) {
+    } else if (RepresentationSearchWrapperAction.IDENTIFY_FORMATS.equals(action)) {
       identifyFormats(representation, callback);
-    } else if (RepresentationAction.CHANGE_STATE.equals(action)) {
+    } else if (RepresentationSearchWrapperAction.CHANGE_STATE.equals(action)) {
       changeState(representation, callback);
-    } else if (RepresentationAction.DOWNLOAD_METADATA.equals(action)) {
-      downloadOtherMetadata(representation, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -194,13 +187,13 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   @Override
   public void act(Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems,
     AsyncCallback<ActionImpact> callback) {
-    if (RepresentationAction.REMOVE.equals(action)) {
+    if (RepresentationSearchWrapperAction.REMOVE.equals(action)) {
       remove(selectedItems, callback);
-    } else if (RepresentationAction.CHANGE_TYPE.equals(action)) {
+    } else if (RepresentationSearchWrapperAction.CHANGE_TYPE.equals(action)) {
       changeType(selectedItems, callback);
-    } else if (RepresentationAction.NEW_PROCESS.equals(action)) {
+    } else if (RepresentationSearchWrapperAction.NEW_PROCESS.equals(action)) {
       newProcess(selectedItems, callback);
-    } else if (RepresentationAction.IDENTIFY_FORMATS.equals(action)) {
+    } else if (RepresentationSearchWrapperAction.IDENTIFY_FORMATS.equals(action)) {
       identifyFormats(selectedItems, callback);
     } else {
       unsupportedAction(action, callback);
@@ -208,29 +201,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   // ACTIONS
-  private void download(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
-    SafeUri downloadUri = null;
-    if (representation != null) {
-      downloadUri = RestUtils.createRepresentationDownloadUri(representation.getAipId(), representation.getId());
-    }
-    if (downloadUri != null) {
-      Window.Location.assign(downloadUri.asString());
-    }
-    callback.onSuccess(ActionImpact.NONE);
-  }
-
-  private void downloadOtherMetadata(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
-    SafeUri downloadUri = null;
-    if (representation != null) {
-      downloadUri = RestUtils.createRepresentationOtherMetadataDownloadUri(representation.getAipId(),
-        representation.getId());
-    }
-    if (downloadUri != null) {
-      Window.Location.assign(downloadUri.asString());
-    }
-    callback.onSuccess(ActionImpact.NONE);
-  }
-
   private void remove(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     remove(objectToSelectedItems(representation, IndexedRepresentation.class), callback);
   }
@@ -364,12 +334,12 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
           Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(), new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
-              callback.onSuccess(Actionable.ActionImpact.UPDATED);
+              callback.onSuccess(ActionImpact.UPDATED);
             }
 
             @Override
             public void onSuccess(final Void nothing) {
-              callback.onSuccess(Actionable.ActionImpact.NONE);
+              callback.onSuccess(ActionImpact.NONE);
               HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
             }
           });
@@ -427,43 +397,36 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
     // MANAGEMENT
     ActionableGroup<IndexedRepresentation> managementGroup = new ActionableGroup<>(messages.representation());
-    managementGroup.addButton(messages.newRepresentationButton(), RepresentationAction.NEW, ActionImpact.UPDATED,
+    managementGroup.addButton(messages.newRepresentationButton(), RepresentationSearchWrapperAction.NEW, ActionImpact.UPDATED,
       "btn-plus");
-    managementGroup.addButton(messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, ActionImpact.UPDATED,
+    managementGroup.addButton(messages.changeTypeButton(), RepresentationSearchWrapperAction.CHANGE_TYPE, ActionImpact.UPDATED,
       "btn-edit");
-    managementGroup.addButton(messages.changeStatusButton(), RepresentationAction.CHANGE_STATE, ActionImpact.UPDATED,
+    managementGroup.addButton(messages.changeStatusButton(), RepresentationSearchWrapperAction.CHANGE_STATE, ActionImpact.UPDATED,
       "btn-edit");
-    managementGroup.addButton(messages.removeButton(), RepresentationAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
+    managementGroup.addButton(messages.removeButton(), RepresentationSearchWrapperAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
     // PRESERVATION
     ActionableGroup<IndexedRepresentation> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
-    preservationGroup.addButton(messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS,
+    preservationGroup.addButton(messages.newProcessPreservation(), RepresentationSearchWrapperAction.NEW_PROCESS,
       ActionImpact.UPDATED, "btn-play");
-    preservationGroup.addButton(messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS,
+    preservationGroup.addButton(messages.identifyFormatsButton(), RepresentationSearchWrapperAction.IDENTIFY_FORMATS,
       ActionImpact.UPDATED, "btn-play");
 
-    // DOWNLOAD
-    ActionableGroup<IndexedRepresentation> downloadGroup = new ActionableGroup<>(messages.downloadButton());
-    downloadGroup.addButton(messages.downloadButton() + " " + messages.oneOfAObject(Representation.class.getName()),
-      RepresentationAction.DOWNLOAD, ActionImpact.NONE, "btn-download");
-    downloadGroup.addButton(messages.downloadButton() + " " + messages.otherMetadata(),
-      RepresentationAction.DOWNLOAD_METADATA, ActionImpact.NONE, "btn-download");
-
-    representationActionableBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(downloadGroup);
+    representationActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
     return representationActionableBundle;
   }
 
-  public enum RepresentationAction implements Action<IndexedRepresentation> {
-    NEW(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION), DOWNLOAD(),
+  public enum RepresentationSearchWrapperAction implements Action<IndexedRepresentation> {
+    NEW(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION),
     CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_REPRESENTATION_TYPE),
     REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_REPRESENTATION),
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
     IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    CHANGE_STATE(RodaConstants.PERMISSION_METHOD_CHANGE_REPRESENTATION_STATES), DOWNLOAD_METADATA();
+    CHANGE_STATE(RodaConstants.PERMISSION_METHOD_CHANGE_REPRESENTATION_STATES);
 
     private List<String> methods;
 
-    RepresentationAction(String... methods) {
+    RepresentationSearchWrapperAction(String... methods) {
       this.methods = Arrays.asList(methods);
     }
 

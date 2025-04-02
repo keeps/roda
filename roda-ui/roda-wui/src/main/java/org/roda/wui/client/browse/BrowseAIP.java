@@ -10,16 +10,11 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
@@ -29,21 +24,14 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.tabs.BrowseAIPTabs;
-import org.roda.wui.client.common.BrowseAIPActionsToolbar;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NavigationToolbar;
-import org.roda.wui.client.common.NoAsyncCallback;
-import org.roda.wui.client.common.TitlePanel;
+import org.roda.wui.client.common.*;
 import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.actions.AipActions;
-import org.roda.wui.client.common.actions.DisseminationActions;
-import org.roda.wui.client.common.actions.RepresentationActions;
+import org.roda.wui.client.common.actions.AipSearchWrapperActions;
 import org.roda.wui.client.common.cards.AIPDisseminationCardList;
 import org.roda.wui.client.common.cards.AIPRepresentationCardList;
 import org.roda.wui.client.common.labels.Header;
@@ -58,42 +46,19 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.services.AIPRestService;
 import org.roda.wui.client.services.Services;
-import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.RestErrorOverlayType;
-import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TabPanel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 
 import config.i18n.client.ClientMessages;
 
@@ -164,9 +129,7 @@ public class BrowseAIP extends Composite {
     aipId = aip.getId();
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
-    RepresentationActions representationActions = RepresentationActions.get(aip.getId(), aip.getPermissions());
-    DisseminationActions disseminationActions = DisseminationActions.get();
-    AipActions aipActions = AipActions.get(aip.getId(), aip.getState(), aip.getPermissions());
+    AipSearchWrapperActions aipActions = AipSearchWrapperActions.get(aip.getId(), aip.getState(), aip.getPermissions());
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));

@@ -30,7 +30,9 @@ public class ThumbnailCard extends Composite {
   @UiField
   Label title;
   @UiField
-  FocusPanel thumbnail;
+  FocusPanel clickable;
+  @UiField
+  FlowPanel thumbnail;
   @UiField
   FlowPanel tags;
   @UiField
@@ -45,14 +47,16 @@ public class ThumbnailCard extends Composite {
 
     collapse();
 
+    // Click handler
+    this.clickable.addClickHandler(thumbnailClickHandler);
+
     // Title
     this.title.setText(title);
     this.title.addClickHandler(event -> toggleCollapse());
 
     // Thumbnail
     iconThumbnail.addStyleName("thumbnailCardIconThumbnail");
-    this.thumbnail.setWidget(iconThumbnail);
-    this.thumbnail.addClickHandler(thumbnailClickHandler);
+    this.thumbnail.add(iconThumbnail);
 
     // Tags
     for (Tag tag : tags) {

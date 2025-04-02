@@ -11,7 +11,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.common.actions.FileActions;
+import org.roda.wui.client.common.actions.FileSearchWrapperActions;
 import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
@@ -49,7 +49,7 @@ public class BrowseRepresentationTabs extends Tabs {
         ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
           new AsyncTableCellOptions<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
             .withJustActive(justActive).withSummary(summary).bindOpener()
-            .withActionable(FileActions.get(aip.getId(), representation.getId(), aip.getPermissions())));
+            .withActionable(FileSearchWrapperActions.get(aip.getId(), representation.getId(), aip.getPermissions())));
 
         return new SearchWrapper(false).createListAndSearchPanel(fileListBuilder);
       }

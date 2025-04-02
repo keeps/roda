@@ -16,6 +16,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HTMLPanel;
 
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.v2.ip.IndexedFile;
 
 public class DescriptionLevelUtils {
 
@@ -135,5 +136,15 @@ public class DescriptionLevelUtils {
     b.append("'></i>");
     appendLevel(b, showText, representationType);
     return SafeHtmlUtils.fromSafeConstant(b.toString());
+  }
+
+  public static String getFileLevel(IndexedFile file) {
+    if (file.isDirectory()) {
+      return RodaConstants.VIEW_REPRESENTATION_FOLDER;
+    } else if (file.isReference()) {
+      return RodaConstants.VIEW_REPRESENTATION_FILE_REFERENCE;
+    } else {
+      return RodaConstants.VIEW_REPRESENTATION_FILE;
+    }
   }
 }
