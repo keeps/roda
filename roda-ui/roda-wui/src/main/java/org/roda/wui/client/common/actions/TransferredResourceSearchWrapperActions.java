@@ -48,39 +48,38 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>
  */
-public class TransferredResourceActions extends AbstractActionable<TransferredResource> {
+public class TransferredResourceSearchWrapperActions extends AbstractActionable<TransferredResource> {
 
   public static final TransferredResource NO_TRANSFERRED_RESOURCE = null;
 
-  private static final TransferredResourceActions GENERAL_INSTANCE = new TransferredResourceActions(
+  private static final TransferredResourceSearchWrapperActions GENERAL_INSTANCE = new TransferredResourceSearchWrapperActions(
     NO_TRANSFERRED_RESOURCE);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final Set<TransferredResourceAction> POSSIBLE_ACTIONS_WITHOUT_TRANSFERRED_RESOURCE = new HashSet<>(
-    Arrays.asList(TransferredResourceAction.REFRESH, TransferredResourceAction.UPLOAD,
-      TransferredResourceAction.NEW_FOLDER));
+  private static final Set<TransferredResourceSearchWrapperAction> POSSIBLE_ACTIONS_WITHOUT_TRANSFERRED_RESOURCE = new HashSet<>(
+    Arrays.asList(TransferredResourceSearchWrapperAction.REFRESH, TransferredResourceSearchWrapperAction.UPLOAD,
+      TransferredResourceSearchWrapperAction.NEW_FOLDER));
 
-  private static final Set<TransferredResourceAction> POSSIBLE_ACTIONS_ON_FOLDER_TRANSFERRED_RESOURCE = new HashSet<>(
-    Arrays.asList(TransferredResourceAction.RENAME, TransferredResourceAction.MOVE, TransferredResourceAction.REMOVE,
-      TransferredResourceAction.NEW_PROCESS));
+  private static final Set<TransferredResourceSearchWrapperAction> POSSIBLE_ACTIONS_ON_FOLDER_TRANSFERRED_RESOURCE = new HashSet<>(
+    Arrays.asList(TransferredResourceSearchWrapperAction.MOVE, TransferredResourceSearchWrapperAction.REMOVE,
+      TransferredResourceSearchWrapperAction.NEW_PROCESS));
 
-  private static final Set<TransferredResourceAction> POSSIBLE_ACTIONS_ON_FILE_TRANSFERRED_RESOURCE = new HashSet<>(
-    Arrays.asList(TransferredResourceAction.RENAME, TransferredResourceAction.MOVE, TransferredResourceAction.REMOVE,
-      TransferredResourceAction.NEW_PROCESS));
+  private static final Set<TransferredResourceSearchWrapperAction> POSSIBLE_ACTIONS_ON_FILE_TRANSFERRED_RESOURCE = new HashSet<>(
+    Arrays.asList(TransferredResourceSearchWrapperAction.MOVE, TransferredResourceSearchWrapperAction.REMOVE,
+      TransferredResourceSearchWrapperAction.NEW_PROCESS));
 
-  private static final Set<TransferredResourceAction> POSSIBLE_ACTIONS_ON_MULTIPLE_TRANSFERRED_RESOURCES = new HashSet<>(
-    Arrays.asList(TransferredResourceAction.MOVE, TransferredResourceAction.REMOVE,
-      TransferredResourceAction.NEW_PROCESS));
+  private static final Set<TransferredResourceSearchWrapperAction> POSSIBLE_ACTIONS_ON_MULTIPLE_TRANSFERRED_RESOURCES = new HashSet<>(
+    Arrays.asList(TransferredResourceSearchWrapperAction.MOVE, TransferredResourceSearchWrapperAction.REMOVE,
+      TransferredResourceSearchWrapperAction.NEW_PROCESS));
 
   private final TransferredResource parentTransferredResource;
 
-  private TransferredResourceActions(TransferredResource parentTransferredResource) {
+  private TransferredResourceSearchWrapperActions(TransferredResource parentTransferredResource) {
     this.parentTransferredResource = parentTransferredResource;
   }
 
-  public enum TransferredResourceAction implements Action<TransferredResource> {
+  public enum TransferredResourceSearchWrapperAction implements Action<TransferredResource> {
     REFRESH(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    RENAME(RodaConstants.PERMISSION_METHOD_RENAME_TRANSFERRED_RESOURCE),
     MOVE(RodaConstants.PERMISSION_METHOD_MOVE_TRANSFERRED_RESOURCE),
     UPLOAD(RodaConstants.PERMISSION_METHOD_CREATE_TRANSFERRED_RESOURCE_FILE),
     NEW_FOLDER(RodaConstants.PERMISSION_METHOD_CREATE_TRANSFERRED_RESOURCE_FOLDER),
@@ -89,7 +88,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
 
     private List<String> methods;
 
-    TransferredResourceAction(String... methods) {
+    TransferredResourceSearchWrapperAction(String... methods) {
       this.methods = Arrays.asList(methods);
     }
 
@@ -100,20 +99,20 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   }
 
   @Override
-  public TransferredResourceAction[] getActions() {
-    return TransferredResourceAction.values();
+  public TransferredResourceSearchWrapperAction[] getActions() {
+    return TransferredResourceSearchWrapperAction.values();
   }
 
   @Override
-  public TransferredResourceAction actionForName(String name) {
-    return TransferredResourceAction.valueOf(name);
+  public TransferredResourceSearchWrapperAction actionForName(String name) {
+    return TransferredResourceSearchWrapperAction.valueOf(name);
   }
 
-  public static TransferredResourceActions get(TransferredResource parentTransferredResource) {
+  public static TransferredResourceSearchWrapperActions get(TransferredResource parentTransferredResource) {
     if (parentTransferredResource == NO_TRANSFERRED_RESOURCE) {
       return GENERAL_INSTANCE;
     } else {
-      return new TransferredResourceActions(parentTransferredResource);
+      return new TransferredResourceSearchWrapperActions(parentTransferredResource);
     }
   }
 
@@ -158,11 +157,11 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
 
   @Override
   public void act(Action<TransferredResource> action, AsyncCallback<ActionImpact> callback) {
-    if (action.equals(TransferredResourceAction.REFRESH)) {
+    if (action.equals(TransferredResourceSearchWrapperAction.REFRESH)) {
       refresh(callback);
-    } else if (action.equals(TransferredResourceAction.UPLOAD)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.UPLOAD)) {
       upload(callback);
-    } else if (action.equals(TransferredResourceAction.NEW_FOLDER)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.NEW_FOLDER)) {
       newFolder(callback);
     } else {
       unsupportedAction(action, callback);
@@ -172,19 +171,17 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   @Override
   public void act(Action<TransferredResource> action, TransferredResource object,
     AsyncCallback<ActionImpact> callback) {
-    if (action.equals(TransferredResourceAction.REFRESH)) {
+    if (action.equals(TransferredResourceSearchWrapperAction.REFRESH)) {
       refresh(object, callback);
-    } else if (action.equals(TransferredResourceAction.RENAME)) {
-      rename(object, callback);
-    } else if (action.equals(TransferredResourceAction.MOVE)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.MOVE)) {
       move(objectToSelectedItems(object, TransferredResource.class), callback);
-    } else if (action.equals(TransferredResourceAction.UPLOAD)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.UPLOAD)) {
       upload(object, callback);
-    } else if (action.equals(TransferredResourceAction.NEW_FOLDER)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.NEW_FOLDER)) {
       newFolder(object, callback);
-    } else if (action.equals(TransferredResourceAction.REMOVE)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.REMOVE)) {
       remove(objectToSelectedItems(object, TransferredResource.class), callback);
-    } else if (action.equals(TransferredResourceAction.NEW_PROCESS)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.NEW_PROCESS)) {
       newProcess(objectToSelectedItems(object, TransferredResource.class), callback);
     } else {
       unsupportedAction(action, callback);
@@ -194,17 +191,17 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   @Override
   public void act(Action<TransferredResource> action, SelectedItems<TransferredResource> objects,
     AsyncCallback<ActionImpact> callback) {
-    if (action.equals(TransferredResourceAction.REFRESH)) {
+    if (action.equals(TransferredResourceSearchWrapperAction.REFRESH)) {
       refresh(callback);
-    } else if (action.equals(TransferredResourceAction.MOVE)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.MOVE)) {
       move(objects, callback);
-    } else if (action.equals(TransferredResourceAction.UPLOAD)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.UPLOAD)) {
       upload(callback);
-    } else if (action.equals(TransferredResourceAction.NEW_FOLDER)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.NEW_FOLDER)) {
       newFolder(callback);
-    } else if (action.equals(TransferredResourceAction.REMOVE)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.REMOVE)) {
       remove(objects, callback);
-    } else if (action.equals(TransferredResourceAction.NEW_PROCESS)) {
+    } else if (action.equals(TransferredResourceSearchWrapperAction.NEW_PROCESS)) {
       newProcess(objects, callback);
     } else {
       unsupportedAction(action, callback);
@@ -298,7 +295,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
                           } else {
                             HistoryUtils.newHistory(IngestTransfer.RESOLVER);
                           }
-                          callback.onSuccess(Actionable.ActionImpact.UPDATED);
+                          callback.onSuccess(ActionImpact.UPDATED);
                         }
                       };
 
@@ -308,19 +305,19 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
                     @Override
                     public void onSuccess(final Void nothing) {
                       HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                      callback.onSuccess(Actionable.ActionImpact.NONE);
+                      callback.onSuccess(ActionImpact.NONE);
                     }
                   });
                 } else if (err != null) {
                   Toast.showError(messages.dialogFailure(), messages.moveSIPFailed());
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                  callback.onSuccess(Actionable.ActionImpact.UPDATED);
+                  callback.onSuccess(ActionImpact.UPDATED);
                 }
               });
           });
         } else if (error != null) {
           Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
-          callback.onSuccess(Actionable.ActionImpact.UPDATED);
+          callback.onSuccess(ActionImpact.UPDATED);
         }
       });
   }
@@ -365,7 +362,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
     services.transferredResource(s -> s.refreshTransferResource(relativePath)).whenComplete((value, error) -> {
       if (error == null) {
         Toast.showInfo(messages.dialogRefresh(), messages.updatedFilesUnderFolder());
-        callback.onSuccess(Actionable.ActionImpact.UPDATED);
+        callback.onSuccess(ActionImpact.UPDATED);
         History.fireCurrentHistoryState();
       } else {
         if (error instanceof IsStillUpdatingException) {
@@ -420,22 +417,21 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
 
     // MANAGEMENT
     ActionableGroup<TransferredResource> managementGroup = new ActionableGroup<>(messages.sidebarFoldersFilesTitle());
-    managementGroup.addButton(messages.refreshButton(), TransferredResourceAction.REFRESH, ActionImpact.UPDATED,
-      "btn-refresh");
+    managementGroup.addButton(messages.refreshButton(), TransferredResourceSearchWrapperAction.REFRESH,
+      ActionImpact.UPDATED, "btn-refresh");
     // TODO: add title:
     // messages.ingestTransferLastScanned(resource.getLastScanDate())
-    managementGroup.addButton(messages.renameButton(), TransferredResourceAction.RENAME, ActionImpact.UPDATED,
+    managementGroup.addButton(messages.moveButton(), TransferredResourceSearchWrapperAction.MOVE, ActionImpact.UPDATED,
       "btn-edit");
-    managementGroup.addButton(messages.moveButton(), TransferredResourceAction.MOVE, ActionImpact.UPDATED, "btn-edit");
-    managementGroup.addButton(messages.uploadFilesButton(), TransferredResourceAction.UPLOAD, ActionImpact.NONE,
-      "btn-upload");
-    managementGroup.addButton(messages.createFolderButton(), TransferredResourceAction.NEW_FOLDER, ActionImpact.UPDATED,
-      "btn-plus-circle");
-    managementGroup.addButton(messages.removeWholeFolderButton(), TransferredResourceAction.REMOVE,
+    managementGroup.addButton(messages.uploadFilesButton(), TransferredResourceSearchWrapperAction.UPLOAD,
+      ActionImpact.NONE, "btn-upload");
+    managementGroup.addButton(messages.createFolderButton(), TransferredResourceSearchWrapperAction.NEW_FOLDER,
+      ActionImpact.UPDATED, "btn-plus-circle");
+    managementGroup.addButton(messages.removeWholeFolderButton(), TransferredResourceSearchWrapperAction.REMOVE,
       ActionImpact.DESTROYED, "btn-danger btn-ban");
 
     ActionableGroup<TransferredResource> preservationGroup = new ActionableGroup<>(messages.sidebarIngestTitle());
-    preservationGroup.addButton(messages.ingestWholeFolderButton(), TransferredResourceAction.NEW_PROCESS,
+    preservationGroup.addButton(messages.ingestWholeFolderButton(), TransferredResourceSearchWrapperAction.NEW_PROCESS,
       ActionImpact.UPDATED, "btn-play");
 
     transferredResourcesActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);

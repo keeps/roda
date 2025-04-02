@@ -67,37 +67,55 @@ public class JobActions extends AbstractActionable<IndexedJob> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedJob> action) {
-    return hasPermissions(action) && JobAction.NEW_PROCESS.equals(action)
-      && NEW_PROCESS_RESOLVERS.contains(newProcessResolver);
+  public CanActResult userCanAct(Action<IndexedJob> action) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<IndexedJob> action, IndexedJob object) {
-    if (hasPermissions(action) && object != null) {
-      if (JobAction.STOP.equals(action)) {
-        return !object.isInFinalState() && !object.isStopping();
-      } else if (JobAction.APPROVE.equals(action)) {
-        return Job.JOB_STATE.PENDING_APPROVAL.equals(object.getState());
-      } else if (JobAction.REJECT.equals(action)) {
-        return Job.JOB_STATE.PENDING_APPROVAL.equals(object.getState());
-      } else if (JobAction.INGEST_APPRAISAL.equals(action)) {
-        return object.getJobStats() != null && object.getJobStats().getOutcomeObjectsWithManualIntervention() > 0;
-      } else if (JobAction.INGEST_PROCESS.equals(action)) {
-        return PluginType.INGEST.equals(object.getPluginType());
-      }
-    }
-    return false;
+  public CanActResult contextCanAct(Action<IndexedJob> action) {
+    return new CanActResult(JobAction.NEW_PROCESS.equals(action) && NEW_PROCESS_RESOLVERS.contains(newProcessResolver),
+      CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
   }
 
   @Override
-  public boolean canAct(Action<IndexedJob> action, SelectedItems<IndexedJob> objects) {
-    if (hasPermissions(action) && objects != null) {
-      if (JobAction.APPROVE.equals(action) || JobAction.REJECT.equals(action)) {
-        return true;
-      }
+  public CanActResult userCanAct(Action<IndexedJob> action, IndexedJob object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedJob> action, IndexedJob object) {
+    if (JobAction.STOP.equals(action)) {
+      return new CanActResult(!object.isInFinalState() && !object.isStopping(), CanActResult.Reason.CONTEXT,
+        messages.reasonJobIsFinishedOrStopping());
+    } else if (JobAction.APPROVE.equals(action)) {
+      return new CanActResult(Job.JOB_STATE.PENDING_APPROVAL.equals(object.getState()), CanActResult.Reason.CONTEXT,
+        messages.reasonJobNotPendingApproval());
+    } else if (JobAction.REJECT.equals(action)) {
+      return new CanActResult(Job.JOB_STATE.PENDING_APPROVAL.equals(object.getState()), CanActResult.Reason.CONTEXT,
+        messages.reasonJobNotPendingApproval());
+    } else if (JobAction.INGEST_APPRAISAL.equals(action)) {
+      return new CanActResult(
+        object.getJobStats() != null && object.getJobStats().getOutcomeObjectsWithManualIntervention() > 0,
+        CanActResult.Reason.CONTEXT, messages.reasonJobDoesNotNeedAppraisal());
+    } else if (JobAction.INGEST_PROCESS.equals(action)) {
+      return new CanActResult(PluginType.INGEST.equals(object.getPluginType()), CanActResult.Reason.CONTEXT,
+        messages.reasonPluginIsNotIngest());
     }
-    return false;
+    return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonInvalidContext());
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<IndexedJob> action, SelectedItems<IndexedJob> objects) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedJob> action, SelectedItems<IndexedJob> objects) {
+    if (objects != null) {
+      return new CanActResult(JobAction.APPROVE.equals(action) || JobAction.REJECT.equals(action),
+        CanActResult.Reason.CONTEXT, messages.reasonCantActOnMultipleObjects());
+    }
+    return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
   }
 
   @Override
@@ -251,8 +269,9 @@ public class JobActions extends AbstractActionable<IndexedJob> {
 
                 public void onSuccess(final String details) {
                   Services services = new Services("Reject job", "Reject");
-                  services.jobsResource(
-                    s -> s.rejectJob(new SelectedItemsListRequest(Collections.singletonList(object.getUUID())), details))
+                  services
+                    .jobsResource(s -> s
+                      .rejectJob(new SelectedItemsListRequest(Collections.singletonList(object.getUUID())), details))
                     .whenComplete((value, error) -> {
                       if (error == null) {
                         // FIXME 20160826 hsilva: do proper handling of the success
@@ -289,14 +308,15 @@ public class JobActions extends AbstractActionable<IndexedJob> {
                     @Override
                     public void onSuccess(final String details) {
                       Services services = new Services("Reject selected jobs", "Reject");
-                      services.jobsResource(s -> s.rejectJob(SelectedItemsUtils.convertToRESTRequest(objects), details)).whenComplete((value, error) -> {
-                        if (error == null) {
-                          doActionCallbackDestroyed();
-                        } else {
-                          callback.onFailure(error);
-                          doActionCallbackDestroyed();
-                        }
-                      });
+                      services.jobsResource(s -> s.rejectJob(SelectedItemsUtils.convertToRESTRequest(objects), details))
+                        .whenComplete((value, error) -> {
+                          if (error == null) {
+                            doActionCallbackDestroyed();
+                          } else {
+                            callback.onFailure(error);
+                            doActionCallbackDestroyed();
+                          }
+                        });
                     }
                   });
               } else {

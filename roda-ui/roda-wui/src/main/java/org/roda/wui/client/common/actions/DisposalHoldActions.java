@@ -69,11 +69,17 @@ public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
+  public CanActResult userCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
     if (object.getObject() != null || object.getObjects() != null) {
-      return hasPermissions(action) && POSSIBLE_ACTIONS_ON_DISPOSAL_HOLD.contains(action);
+      return new CanActResult(POSSIBLE_ACTIONS_ON_DISPOSAL_HOLD.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonInvalidContext());
     } else {
-      return false;
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
     }
   }
 

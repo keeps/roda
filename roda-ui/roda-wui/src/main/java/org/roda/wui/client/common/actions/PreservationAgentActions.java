@@ -50,8 +50,14 @@ public class PreservationAgentActions extends AbstractActionable<IndexedPreserva
   }
 
   @Override
-  public boolean canAct(Action<IndexedPreservationAgent> action, IndexedPreservationAgent agent) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_AGENT.contains(action);
+  public CanActResult userCanAct(Action<IndexedPreservationAgent> action, IndexedPreservationAgent agent) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedPreservationAgent> action, IndexedPreservationAgent agent) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_AGENT.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonCantActOnMultipleObjects());
   }
 
   @Override

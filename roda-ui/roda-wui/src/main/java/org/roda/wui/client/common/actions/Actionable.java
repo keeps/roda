@@ -30,7 +30,11 @@ public interface Actionable<T extends IsIndexed> {
 
   // Generic, implemented in AbstractActionable
 
-  boolean canAct(Action<T> action, ActionableObject<T> object);
+  CanActResult canAct(Action<T> action, ActionableObject<T> object);
+
+  CanActResult userCanAct(Action<T> action, ActionableObject<T> object);
+
+  CanActResult contextCanAct(Action<T> action, ActionableObject<T> object);
 
   void act(Action<T> action, ActionableObject<T> object);
 
@@ -38,7 +42,11 @@ public interface Actionable<T extends IsIndexed> {
 
   // NO OBJECT
 
-  boolean canAct(Action<T> action);
+  CanActResult canAct(Action<T> action);
+
+  CanActResult userCanAct(Action<T> action);
+
+  CanActResult contextCanAct(Action<T> action);
 
   void act(Action<T> action);
 
@@ -46,7 +54,11 @@ public interface Actionable<T extends IsIndexed> {
 
   // SINGLE OBJECT
 
-  boolean canAct(Action<T> action, T object);
+  CanActResult canAct(Action<T> action, T object);
+
+  CanActResult userCanAct(Action<T> action, T object);
+
+  CanActResult contextCanAct(Action<T> action, T object);
 
   void act(Action<T> action, T object);
 
@@ -54,7 +66,11 @@ public interface Actionable<T extends IsIndexed> {
 
   // MULTIPLE OBJECTS
 
-  boolean canAct(Action<T> action, SelectedItems<T> objects);
+  CanActResult canAct(Action<T> action, SelectedItems<T> object);
+
+  CanActResult userCanAct(Action<T> action, SelectedItems<T> objects);
+
+  CanActResult contextCanAct(Action<T> action, SelectedItems<T> objects);
 
   void act(Action<T> action, SelectedItems<T> objects);
 

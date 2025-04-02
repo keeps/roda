@@ -59,15 +59,38 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   @Override
-  public boolean canAct(Action<T> action, ActionableObject<T> object) {
+  public CanActResult canAct(Action<T> action, ActionableObject<T> object) {
+    CanActResult userCanActResult = userCanAct(action, object);
+    if (userCanActResult.canAct()) {
+      return contextCanAct(action, object);
+    } else {
+      return userCanActResult;
+    }
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<T> action, ActionableObject<T> object) {
     switch (object.getType()) {
       case MULTIPLE:
-        return canAct(action, object.getObjects());
+        return userCanAct(action, object.getObjects());
       case SINGLE:
-        return canAct(action, object.getObject());
+        return userCanAct(action, object.getObject());
       case NONE:
       default:
-        return canAct(action);
+        return userCanAct(action);
+    }
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<T> action, ActionableObject<T> object) {
+    switch (object.getType()) {
+      case MULTIPLE:
+        return contextCanAct(action, object.getObjects());
+      case SINGLE:
+        return contextCanAct(action, object.getObject());
+      case NONE:
+      default:
+        return contextCanAct(action);
     }
   }
 
@@ -92,9 +115,25 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   @Override
-  public boolean canAct(Action<T> action) {
+  public CanActResult canAct(Action<T> action) {
+    CanActResult userCanActResult = userCanAct(action);
+    if (userCanActResult.canAct()) {
+      return contextCanAct(action);
+    } else {
+      return userCanActResult;
+    }
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<T> action) {
     // by default the actionable can not act
-    return false;
+    return new CanActResult(false, CanActResult.Reason.USER, "");
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<T> action) {
+    // by default the actionable can not act
+    return new CanActResult(false, CanActResult.Reason.CONTEXT, "");
   }
 
   @Override
@@ -104,9 +143,25 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   @Override
-  public boolean canAct(Action<T> action, T object) {
+  public CanActResult canAct(Action<T> action, T object) {
+    CanActResult userCanActResult = userCanAct(action, object);
+    if (userCanActResult.canAct()) {
+      return contextCanAct(action, object);
+    } else {
+      return userCanActResult;
+    }
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<T> action, T object) {
     // by default the actionable can not act
-    return false;
+    return new CanActResult(false, CanActResult.Reason.USER, "");
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<T> action, T object) {
+    // by default the actionable can not act
+    return new CanActResult(false, CanActResult.Reason.CONTEXT, "");
   }
 
   @Override
@@ -116,9 +171,25 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   @Override
-  public boolean canAct(Action<T> action, SelectedItems<T> objects) {
+  public CanActResult canAct(Action<T> action, SelectedItems<T> objects) {
+    CanActResult userCanActResult = userCanAct(action, objects);
+    if (userCanActResult.canAct()) {
+      return contextCanAct(action, objects);
+    } else {
+      return userCanActResult;
+    }
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<T> action, SelectedItems<T> objects) {
     // by default the actionable can not act
-    return false;
+    return new CanActResult(false, CanActResult.Reason.USER, "");
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<T> action, SelectedItems<T> objects) {
+    // by default the actionable can not act
+    return new CanActResult(false, CanActResult.Reason.CONTEXT, "");
   }
 
   @Override

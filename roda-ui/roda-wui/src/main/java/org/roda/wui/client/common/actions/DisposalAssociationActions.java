@@ -60,12 +60,14 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
-    if (object.getObject().getDisposalConfirmationId() == null) {
-      return hasPermissions(action);
-    } else {
-      return false;
-    }
+  public CanActResult userCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
+    return new CanActResult(object.getObject().getDisposalConfirmationId() == null, CanActResult.Reason.CONTEXT,
+      messages.reasonNoDisposalConfirmation());
   }
 
   @Override
@@ -123,7 +125,9 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Disassociate disposal schedule from AIP", "job");
-            services.disposalScheduleResource(s -> s.disassociatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips)))
+            services
+              .disposalScheduleResource(
+                s -> s.disassociatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips)))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);
@@ -171,7 +175,8 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Associated disposal schedule", "job");
-            services.disposalScheduleResource(s -> s.associatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips), disposalSchedule.getId()))
+            services.disposalScheduleResource(s -> s
+              .associatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips), disposalSchedule.getId()))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);

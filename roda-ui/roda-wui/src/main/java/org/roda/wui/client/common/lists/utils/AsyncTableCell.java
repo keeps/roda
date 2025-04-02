@@ -255,10 +255,11 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     ActionsToolbar toolbar = new ActionsToolbar();
     if (options.getActionable() != null && options.getActionable().hasAnyRoles() && isSelectable()) {
       ActionableWidgetBuilder<T> builder = new ActionableWidgetBuilder<>(options.getActionable());
-      toolbar.setLabel(messages.actions());
+      toolbar.setLabelVisible(false);
       toolbar.setIcon(null);
       toolbar.setTagsVisible(false);
-      toolbar.setActionableMenu(builder.buildListWithObjectsAndDefaults(getActionableObject()));
+      toolbar.setActionableMenu(builder.buildListWithObjectsAndDefaults(getActionableObject(),
+        options.getActionWhitelist(), options.getActionBlacklist()));
       addCheckboxSelectionListener(new CheckboxSelectionListener<T>() {
         @Override
         public void onSelectionChange(SelectedItems<T> selected) {
@@ -294,7 +295,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
               }
             }
           });
-          toolbar.setActionableMenu(builder.buildListWithObjectsAndDefaults(getActionableObject()));
+          toolbar.setActionableMenu(builder.buildListWithObjectsAndDefaults(getActionableObject(),
+            options.getActionWhitelist(), options.getActionBlacklist()));
         }
       });
     } else {

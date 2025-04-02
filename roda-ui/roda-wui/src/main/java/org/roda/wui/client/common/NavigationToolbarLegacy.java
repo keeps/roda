@@ -132,7 +132,7 @@ public class NavigationToolbarLegacy<T extends IsIndexed> extends Composite impl
   }
 
   public NavigationToolbarLegacy<T> withModifierKeys(boolean requireControlKeyModifier, boolean requireShiftKeyModifier,
-                                                     boolean requireAltKeyModifier) {
+    boolean requireAltKeyModifier) {
     this.requireControlKeyModifier = requireControlKeyModifier;
     this.requireShiftKeyModifier = requireShiftKeyModifier;
     this.requireAltKeyModifier = requireAltKeyModifier;
@@ -399,8 +399,14 @@ public class NavigationToolbarLegacy<T extends IsIndexed> extends Composite impl
     }
 
     @Override
-    public boolean canAct(Action<IndexedAIP> action, IndexedAIP object) {
-      return POSSIBLE_ACTIONS.contains(action);
+    public CanActResult userCanAct(Action<IndexedAIP> action, IndexedAIP object) {
+      return new CanActResult(true, CanActResult.Reason.USER, null);
+    }
+
+    @Override
+    public CanActResult contextCanAct(Action<IndexedAIP> action, IndexedAIP object) {
+      return new CanActResult(POSSIBLE_ACTIONS.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonInvalidContext());
     }
 
     @Override

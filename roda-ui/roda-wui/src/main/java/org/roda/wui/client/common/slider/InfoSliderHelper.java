@@ -215,9 +215,6 @@ public class InfoSliderHelper {
     populate(infoSliderPanel, values);
   }
 
-
-
-
   private static Widget createAipPermissionDetailsHTML(IndexedAIP aip) {
     Permissions permissions = aip.getPermissions();
 
@@ -335,7 +332,7 @@ public class InfoSliderHelper {
     nameColumn.setCellStyleNames("nowrap slider-aip-permissions-table-name");
 
     AipActions aipActions = AipActions.get();
-    if (aipActions.canAct(AipActions.AipAction.UPDATE_PERMISSIONS, aip)) {
+    if (aipActions.canAct(AipActions.AipAction.UPDATE_PERMISSIONS, aip).canAct()) {
       table.addStyleName("slider-aip-permissions-table-with-grant");
       SingleSelectionModel<Entry<String, Set<Permissions.PermissionType>>> selectionModel = new SingleSelectionModel<>(
         item -> item.getKey().substring(2));
@@ -602,8 +599,6 @@ public class InfoSliderHelper {
     return panel;
   }
 
-
-
   private static FlowPanel createIdHTML(BrowseRepresentationResponse response) {
     IndexedRepresentation representation = response.getIndexedRepresentation();
     FlowPanel panel = new FlowPanel();
@@ -627,8 +622,6 @@ public class InfoSliderHelper {
     return panel;
   }
 
-
-
   private static FlowPanel createAipLevelHTML(BrowseAIPResponse response) {
     IndexedAIP aip = response.getIndexedAIP();
     FlowPanel panel = new FlowPanel();
@@ -641,7 +634,6 @@ public class InfoSliderHelper {
 
     return panel;
   }
-
 
   private static FlowPanel createRepresentationTypeHTML(BrowseRepresentationResponse response) {
     IndexedRepresentation representation = response.getIndexedRepresentation();

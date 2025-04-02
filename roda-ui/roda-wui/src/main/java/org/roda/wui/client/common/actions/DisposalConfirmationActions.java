@@ -47,8 +47,13 @@ public class DisposalConfirmationActions extends AbstractActionable<DisposalConf
   }
 
   @Override
-  public boolean canAct(Action<DisposalConfirmation> action) {
-    return hasPermissions(action);
+  public CanActResult userCanAct(Action<DisposalConfirmation> action) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<DisposalConfirmation> action) {
+    return new CanActResult(true, CanActResult.Reason.CONTEXT, null);
   }
 
   @Override

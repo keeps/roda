@@ -68,13 +68,25 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, IndexedAIP object) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_WITH_RECORDS.contains(action);
+  public CanActResult userCanAct(Action<IndexedAIP> action, IndexedAIP object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }
 
   @Override
-  public boolean canAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_WITH_RECORDS.contains(action);
+  public CanActResult contextCanAct(Action<IndexedAIP> action, IndexedAIP object) {
+    return new CanActResult(POSSIBLE_ACTIONS_WITH_RECORDS.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonDisposalConfirmationHasRecords());
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
+    return new CanActResult(POSSIBLE_ACTIONS_WITH_RECORDS.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonDisposalConfirmationHasRecords());
   }
 
   @Override
@@ -169,7 +181,9 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Disassociate disposal schedule from AIP", "job");
-            services.disposalScheduleResource(s -> s.disassociatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips)))
+            services
+              .disposalScheduleResource(
+                s -> s.disassociatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips)))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);
@@ -217,7 +231,8 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Associated disposal schedule", "job");
-            services.disposalScheduleResource(s -> s.associatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips), disposalSchedule.getId()))
+            services.disposalScheduleResource(s -> s
+              .associatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips), disposalSchedule.getId()))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);

@@ -72,8 +72,15 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   }
 
   @Override
-  public boolean canAct(Action<DIPFile> action, DIPFile dipFile) {
-    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE.contains(action);
+  public CanActResult userCanAct(Action<DIPFile> action, DIPFile dipFile) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<DIPFile> action, DIPFile dipFile) {
+    return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE.contains(action), CanActResult.Reason.CONTEXT,
+      messages.reasonInvalidContext());
   }
 
   @Override

@@ -26,9 +26,9 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.wui.client.common.actions.AipActions;
-import org.roda.wui.client.common.actions.FileActions;
-import org.roda.wui.client.common.actions.RepresentationActions;
+import org.roda.wui.client.common.actions.AipSearchWrapperActions;
+import org.roda.wui.client.common.actions.FileSearchWrapperActions;
+import org.roda.wui.client.common.actions.RepresentationSearchWrapperActions;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -94,15 +94,18 @@ public class CatalogueSearch extends Composite {
 
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId)
-              .withActionable(AipActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
+              .withActionable(AipSearchWrapperActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
-              .withFilter(filter).withStartHidden(startHidden));
+              .withFilter(filter).withStartHidden(startHidden)
+              .withActionBlacklist(List.of(AipSearchWrapperActions.AipSearchWrapperAction.NEW_CHILD_AIP_BELOW,
+                AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_ACCEPT,
+                AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_REJECT)));
         } else if (searchableClass.equals(IndexedRepresentation.class)
           && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
 
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
-              .withActionable(RepresentationActions.getWithoutNoRepresentationActions(null, null))
+              .withActionable(RepresentationSearchWrapperActions.getWithoutNoRepresentationActions(null, null))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
               .withFilter(filter).withStartHidden(startHidden));
         } else if (searchableClass.equals(IndexedFile.class)
@@ -110,7 +113,7 @@ public class CatalogueSearch extends Composite {
 
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedFile.class, filesListId)
-              .withActionable(FileActions.getWithoutNoFileActions(null, null, null, null))
+              .withActionable(FileSearchWrapperActions.getWithoutNoFileActions(null, null, null, null))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
               .withFilter(filter).withStartHidden(startHidden));
         }
