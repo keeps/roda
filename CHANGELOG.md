@@ -1,5 +1,14 @@
 # Changelog
 
+## v5.7.3 (03/04/2025)
+#### Security
+-  Fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.2 (24/03/2025)
 #### Bugs
 
@@ -441,19 +450,4 @@ To try out this version, check the [install instructions](https://github.com/kee
 Install for demonstration:
 ```
 docker pull keeps/roda:v4.5.4
-```
----
-
-## v4.5.3 (25/01/2023)
-#### Bug fixes:
-
-- Support very large queries to Solr (fix regression) #2311
-
-#### Enhancements:
-
-- Add icon to experimental plugin categories #2306
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.5.3
 ```
