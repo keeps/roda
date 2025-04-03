@@ -29,25 +29,26 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.wui.client.browse.tabs.BrowseFileTabs;
 import org.roda.wui.client.common.BrowseFileActionsToolbar;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.cards.FileDisseminationCardList;
 import org.roda.wui.client.common.model.BrowseFileResponse;
-import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.services.ConfigurationRestService;
 import org.roda.wui.client.services.FileRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
-import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
@@ -206,12 +207,6 @@ public class BrowseFile extends Composite {
   @UiField
   AccessibleFocusPanel keyboardFocus;
 
-  @UiField(provided = true)
-  IndexedFilePreview filePreview;
-
-  @UiField
-  FlowPanel center;
-
   @UiField
   NavigationToolbar<IndexedFile> navigationToolbar;
 
@@ -223,6 +218,12 @@ public class BrowseFile extends Composite {
 
   @UiField
   FlowPanel disseminationCards;
+
+  @UiField
+  BrowseFileTabs browseTab;
+
+  @UiField
+  TitlePanel title;
 
   private final Map<Actionable.ActionImpact, Runnable> handlers;
   private AsyncCallback<Actionable.ActionImpact> handler = new NoAsyncCallback<Actionable.ActionImpact>() {
@@ -238,11 +239,6 @@ public class BrowseFile extends Composite {
 
   public BrowseFile(Viewers viewers, final BrowseFileResponse response, IndexedFile indexedFile, Services services) {
     final boolean justActive = AIPState.ACTIVE.equals(response.getIndexedAIP().getState());
-    // initialize preview
-    filePreview = new IndexedFilePreview(viewers, indexedFile, indexedFile.isAvailable(), justActive,
-      response.getIndexedAIP().getPermissions(), () -> {
-      });
-
     // initialize widget
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -260,6 +256,11 @@ public class BrowseFile extends Composite {
 
     // STATUS
     this.keyboardFocus.addStyleName(response.getIndexedAIP().getState().toString().toLowerCase());
+
+    // TITLE
+    this.title.setIcon(
+      DescriptionLevelUtils.getElementLevelIconSafeHtml(DescriptionLevelUtils.getFileLevel(indexedFile), false));
+    this.title.setText(indexedFile.getId());
 
     // TOOLBAR
     this.objectToolbar.setObjectAndBuild(indexedFile, response.getIndexedAIP().getPermissions(), handler);
@@ -280,8 +281,8 @@ public class BrowseFile extends Composite {
         }
       });
 
-    // bind slider buttons
-    Sliders.createFileInfoSlider(center, navigationToolbar.getInfoSidebarButton(), indexedFile, response);
+    // TABS
+    browseTab.init(viewers, indexedFile, response, services);
 
     keyboardFocus.setFocus(true);
 
@@ -291,8 +292,6 @@ public class BrowseFile extends Composite {
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
     }
-
-    WCAGUtilities.getInstance().makeAccessible(center.getElement());
   }
 
   private void initHandlers() {

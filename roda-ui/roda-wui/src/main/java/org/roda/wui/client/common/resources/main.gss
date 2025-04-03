@@ -1721,7 +1721,7 @@ button:after {
 }
 
 .dropdown-popup .dropdown-item {
-    padding: 4px;
+    padding: 11px;
 }
 
 .dropdown-popup tr:last-child .dropdown-item {
@@ -4407,9 +4407,6 @@ td.datePickerMonth, td.datePickerYear {
     gap: 16px;
 }
 
-.searchInputListBoxPopup tr:not(:first-child) {
-    border-top: 1px solid COLOR_GREY_LIGHT;
-}
 .searchPanelLeft .selected-count-panel {
     min-width: 0;
     padding-right: 20px;

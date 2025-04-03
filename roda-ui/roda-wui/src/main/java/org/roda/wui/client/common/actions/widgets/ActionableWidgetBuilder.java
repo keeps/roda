@@ -99,13 +99,21 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return createActionsMenu(actionableBundle, objects);
   }
 
-  public Widget buildListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist) {
+  public Widget buildListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist,
+    List<Actionable.Action<T>> actionBlacklist) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
 
     if (!actionWhitelist.isEmpty()) {
       // remove unwanted buttons, and the whole group if it is empty
       actionableBundle.getGroups().removeIf(group -> {
         group.getButtons().removeIf(button -> !actionWhitelist.contains(button.getAction()));
+        return group.getButtons().isEmpty();
+      });
+    }
+    if (!actionBlacklist.isEmpty()) {
+      // remove blacklisted buttons
+      actionableBundle.getGroups().removeIf(group -> {
+        group.getButtons().removeIf(button -> actionBlacklist.contains(button.getAction()));
         return group.getButtons().isEmpty();
       });
     }
@@ -118,14 +126,21 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return createActionsMenuWithDefaults(actionableBundle, objects);
   }
 
-  public Widget buildListWithObjectsAndDefaults(ActionableObject<T> objects,
-    List<Actionable.Action<T>> actionWhitelist) {
+  public Widget buildListWithObjectsAndDefaults(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist,
+    List<Actionable.Action<T>> actionBlacklist) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
 
     if (!actionWhitelist.isEmpty()) {
       // remove unwanted buttons, and the whole group if it is empty
       actionableBundle.getGroups().removeIf(group -> {
         group.getButtons().removeIf(button -> !actionWhitelist.contains(button.getAction()));
+        return group.getButtons().isEmpty();
+      });
+    }
+    if (!actionBlacklist.isEmpty()) {
+      // remove blacklisted buttons
+      actionableBundle.getGroups().removeIf(group -> {
+        group.getButtons().removeIf(button -> actionBlacklist.contains(button.getAction()));
         return group.getButtons().isEmpty();
       });
     }
@@ -278,8 +293,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
                 });
               }
             });
-          }
-          else {
+          } else {
             button.setTitle(contextCanAct.getReasonSummary());
             button.setEnabled(false);
           }

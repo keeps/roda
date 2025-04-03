@@ -688,6 +688,8 @@ public interface ClientMessages extends Messages {
 
   String detailsTab();
 
+  String viewTab();
+
 
   /************* Search ****************/
   String searchDropdownLabels(@Select String objectClass);

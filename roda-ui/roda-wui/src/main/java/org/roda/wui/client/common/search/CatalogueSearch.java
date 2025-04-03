@@ -7,14 +7,25 @@
  */
 package org.roda.wui.client.common.search;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.actions.AipSearchWrapperActions;
 import org.roda.wui.client.common.actions.FileSearchWrapperActions;
 import org.roda.wui.client.common.actions.RepresentationSearchWrapperActions;
@@ -83,10 +94,12 @@ public class CatalogueSearch extends Composite {
 
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId)
-              .withActionable(
-                AipSearchWrapperActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
+              .withActionable(AipSearchWrapperActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
-              .withFilter(filter).withStartHidden(startHidden));
+              .withFilter(filter).withStartHidden(startHidden)
+              .withActionBlacklist(List.of(AipSearchWrapperActions.AipSearchWrapperAction.NEW_CHILD_AIP_BELOW,
+                AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_ACCEPT,
+                AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_REJECT)));
         } else if (searchableClass.equals(IndexedRepresentation.class)
           && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
 
