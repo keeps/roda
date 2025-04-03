@@ -7,6 +7,7 @@
  */
 package org.roda.core.storage;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -18,6 +19,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 
 public class DefaultStoragePath implements StoragePath {
 
+  @Serial
   private static final long serialVersionUID = 2199265942023315218L;
   private final List<String> path;
 

@@ -219,7 +219,8 @@ public class EARKSIP2ToAIPPluginUtils {
               agentComplexType.getAgentIdentifier().getFirst().getAgentIdentifierValue(),
               agentComplexType.getAgentName().getFirst().getValue(),
               RodaConstants.getPreservationAgentType(agentComplexType.getAgentType().getValue().toUpperCase()), null,
-              agentComplexType.getAgentNote().getFirst(), agentComplexType.getVersion());
+              !agentComplexType.getAgentNote().isEmpty() ? agentComplexType.getAgentNote().getFirst() : null,
+              agentComplexType.getVersion());
 
             try {
               if (model.retrievePreservationAgent(
@@ -246,11 +247,25 @@ public class EARKSIP2ToAIPPluginUtils {
   }
 
   private static void processTechnicalMetadata(ModelService model, List<IPMetadata> technicalMetadata, String aipId,
-    Optional<String> representationId, String username, boolean notify) {
+    Optional<String> representationId, String username, boolean notify) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
     for (IPMetadata techMd : technicalMetadata) {
-      IPFileInterface metadata = techMd.getMetadata();
-      ContentPayload payload = new FSPathContentPayload(metadata.getPath());
+      IPFileInterface file = techMd.getMetadata();
+      ContentPayload payload = new FSPathContentPayload(file.getPath());
 
+      model.createTechnicalMetadata(aipId, representationId.orElse(null), techMd.getMetadataType().asString(),
+        file.getFileName(), payload, username, notify);
+
+      // if (representationId.isPresent()) {
+      // model.createPreservationMetadata(PreservationMetadataType.TECHNICAL, aipId,
+      // representationId.get(),
+      // metadata.getRelativeFolders(), metadata.getFileName(), payload, username,
+      // notify);
+      // } else {
+      // model.createPreservationMetadata(PreservationMetadataType.TECHNICAL, aipId,
+      // metadata.getRelativeFolders(),
+      // metadata.getFileName(), payload, username, notify);
+      // }
     }
   }
 

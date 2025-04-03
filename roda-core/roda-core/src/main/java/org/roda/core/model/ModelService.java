@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1631,10 +1632,27 @@ public class ModelService extends ModelObservable {
       notify);
   }
 
-  public void createTechnicalMetadata(String aipId, List<String> fileDirectoryPath, String fileId,
-    ContentPayload payload, String username, boolean notify) throws AuthorizationDeniedException {
+  public void createTechnicalMetadata(String aipId, String representationId, String metadataType, String fileId,
+    ContentPayload payload, String createdBy, boolean notify) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
+    String urn = URNUtils.createRodaPreservationURN(PreservationMetadataType.TECHNICAL, fileId,
+      RODAInstanceUtils.getLocalInstanceIdentifier());
+
+    StoragePath binaryPath = ModelUtils.getTechnicalMetadataPath(aipId, representationId,
+      Collections.singletonList(metadataType), urn);
+    storage.createBinary(binaryPath, payload, false);
+
+    AIP updatedAIP = null;
+    if (aipId != null) {
+      AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+      updatedAIP = updateAIPMetadata(aip, createdBy);
+    }
+
+    if (notify && updatedAIP != null) {
+      notifyAipUpdatedOnChanged(updatedAIP).failOnError();
+    }
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
