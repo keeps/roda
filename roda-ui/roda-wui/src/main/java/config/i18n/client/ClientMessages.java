@@ -1005,9 +1005,11 @@ public interface ClientMessages extends Messages {
 
   String detailsModifiedBy();
 
-  String detaislPermission();
-
   String detailsIngest();
+
+  //String sipIdentifier();
+
+  String ingestIdentifier();
 
   /************* RepresentationInformation register ****************/
 

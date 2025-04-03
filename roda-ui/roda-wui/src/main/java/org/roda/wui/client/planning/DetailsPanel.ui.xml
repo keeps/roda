@@ -54,13 +54,15 @@
 					<g:Label styleName="value" ui:field="modifiedBy" />
 				</g:FlowPanel>
 				<g:Label styleName="form-separator">
-					<ui:text from='{messages.detaislPermission}' />
-				</g:Label>
-				<g:FlowPanel ui:field="permissionsContainer" styleName="field"/>
-				<g:Label styleName="form-separator">
 					<ui:text from='{messages.detailsIngest}' />
 				</g:Label>
-				<g:FlowPanel ui:field="ingestContainer" styleName="field"/>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label">
+						<ui:text from='{messages.ingestIdentifier}' />
+					</g:Label>
+					<g:Anchor styleName="value" ui:field="jobIdentifier" />
+				</g:FlowPanel>
+
 
 				<!--<g:Label styleName="h4" ui:field="riskPreMitigationKey">
 					<ui:text from='{messages.riskPreMitigation}' />

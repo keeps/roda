@@ -8,52 +8,32 @@
 
 package org.roda.wui.client.planning;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.i18n.client.LocaleInfo;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.client.browse.DescriptiveMetadataHistory;
-import org.roda.wui.client.browse.EditDescriptiveMetadata;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.PermissionClientUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.RestErrorOverlayType;
-import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 /**
  * @author Luis Faria
  *
  */
-public class DetailsPanel extends Composite  {
+public class DetailsPanel extends Composite {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -75,58 +55,55 @@ public class DetailsPanel extends Composite  {
   Label modifiedBy;
 
   @UiField
-  FlowPanel permissionsContainer;
-
-  @UiField
-  FlowPanel ingestContainer;
+  Anchor jobIdentifier;
 
   /*
    * FlowPanel Permissions;
-   * 
+   *
    * @UiField
-   * 
+   *
    * Label riskNotesKey, riskNotesValue;
-   * 
+   *
    * @UiField Label riskPreMitigationKey;
-   * 
+   *
    * @UiField Label riskPreMitigationProbability;
-   * 
+   *
    * @UiField Label riskPreMitigationImpact;
-   * 
+   *
    * @UiField HTML riskPreMitigationSeverity;
-   * 
+   *
    * @UiField Label riskPreMitigationNotesKey, riskPreMitigationNotesValue;
-   * 
+   *
    * @UiField Label riskPosMitigationKey;
-   * 
+   *
    * @UiField Label riskPosMitigationProbabilityKey;
-   * 
+   *
    * @UiField Label riskPosMitigationProbability;
-   * 
+   *
    * @UiField Label riskPosMitigationImpactKey;
-   * 
+   *
    * @UiField Label riskPosMitigationImpact;
-   * 
+   *
    * @UiField Label riskPosMitigationSeverityKey;
-   * 
+   *
    * @UiField HTML riskPosMitigationSeverity;
-   * 
+   *
    * @UiField Label riskPosMitigationNotesKey, riskPosMitigationNotesValue;
-   * 
+   *
    * @UiField Label riskMitigationKey;
-   * 
+   *
    * @UiField Label riskMitigationStrategyKey, riskMitigationStrategyValue;
-   * 
+   *
    * @UiField Label riskMitigationOwnerTypeKey, riskMitigationOwnerTypeValue;
-   * 
+   *
    * @UiField Label riskMitigationOwnerKey, riskMitigationOwnerValue;
-   * 
+   *
    * @UiField Label riskMitigationRelatedEventIdentifierTypeKey,
    * riskMitigationRelatedEventIdentifierTypeValue;
-   * 
+   *
    * @UiField Label riskMitigationRelatedEventIdentifierValueKey,
    * riskMitigationRelatedEventIdentifierValueValue;
-   * 
+   *
    * @UiField(provided = true) SearchWrapper searchWrapper;
    */
   public DetailsPanel(IndexedAIP aip) {
@@ -146,126 +123,35 @@ public class DetailsPanel extends Composite  {
     modifiedOn.setText(String.valueOf(aip.getUpdatedOn()));
     modifiedBy.setText(aip.getUpdatedBy());
 
-    // Permissions information
-    Map<Permissions.PermissionType, Set<String>> userPermissions = aip.getPermissions().getUsers();
-    Map<Permissions.PermissionType, Set<String>> groupPermissions = aip.getPermissions().getGroups();
-
-    // Group permissions and create labels for users and groups in one go
-    Map<String, Set<String>> userToPermissions = new HashMap<>();
-    Map<String, Set<String>> groupToPermissions = new HashMap<>();
-
-    userPermissions.forEach((permission, users) -> {
-      users.forEach(user -> userToPermissions.computeIfAbsent(user, k -> new HashSet<>()).add(permission.name()));
-    });
-
-    groupPermissions.forEach((permission, groups) -> {
-      groups.forEach(group -> groupToPermissions.computeIfAbsent(group, k -> new HashSet<>()).add(permission.name()));
-    });
-
-    // Display user permissions
-    userToPermissions.forEach((user, permissions) -> {
-      Label userLable = new Label(user);
-      userLable.setStyleName("label");
-      Label permissionsLable = new Label(permissions.toString().replace("[", "").replace("]", "")); // Values
-      permissionsLable.setStyleName("value");
-      permissionsContainer.add(userLable);
-      permissionsContainer.add(permissionsLable);
-    });
-
-    // Display user permissions
-    groupToPermissions.forEach((group, permissions) -> {
-      Label groupLable = new Label(group);
-      groupLable.setStyleName("label");
-      Label permissionsLable = new Label(permissions.toString().replace("[", "").replace("]", "")); // Values
-      permissionsLable.setStyleName("value");
-      permissionsContainer.add(groupLable);
-      permissionsContainer.add(permissionsLable);
-    });
 
     // Ingest information
-    GWT.log("Ingest information -> " + aip.getAllIngestJobIds());
+    Anchor anchor = new Anchor();
+    jobIdentifier.setText(aip.getIngestJobId());
+    jobIdentifier.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, aip.getIngestJobId(),
+      RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
 
-    /*SafeUri uri = RestUtils.createJobReportsHTMLUri(aip.getIngestJobId())
-    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
-    try {
-      requestBuilder.sendRequest(null, new RequestCallback() {
-        @Override
-        public void onResponseReceived(Request request, Response response) {
-          // Edit button
-          if (!AIPState.DESTROYED.equals(aip.getState()) && !aip.isOnHold() && aip.getDisposalConfirmationId() == null
-            && PermissionClientUtils.hasPermissions(aip.getPermissions(),
-            RodaConstants.PERMISSION_METHOD_UPDATE_AIP_DESCRIPTIVE_METADATA_FILE)) {
-            descriptiveMetadataToolbar.addAction(new ClickHandler() {
-              @Override
-              public void onClick(ClickEvent event) {
-                HistoryUtils.newHistory(EditDescriptiveMetadata.RESOLVER, aip.getId(), metadataID);
-              }
-            }, messages.editButton(), "btn-edit");
-          }
 
-          // History button
-          if (metadataInfo.isHasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
-            RodaConstants.PERMISSION_METHOD_RETRIEVE_AIP_DESCRIPTIVE_METADATA_VERSIONS)) {
-            descriptiveMetadataToolbar.addAction(new ClickHandler() {
-              @Override
-              public void onClick(ClickEvent event) {
-                HistoryUtils.newHistory(DescriptiveMetadataHistory.RESOLVER, aip.getId(), metadataID);
-              }
-            }, messages.historyDescriptiveMetadataTitle(), "btn-history");
-          }
-
-          SafeHtml safeHtml;
-          if (200 == response.getStatusCode()) {
-            // Download button
-            descriptiveMetadataToolbar.addAction(new ClickHandler() {
-              @Override
-              public void onClick(ClickEvent event) {
-                Window.Location
-                  .assign(RestUtils.createDescriptiveMetadataDownloadUri(aip.getId(), metadataID).asString());
-              }
-            }, messages.downloadButton(), "btn-download");
-            // HTML
-            String html = response.getText();
-            SafeHtmlBuilder b = new SafeHtmlBuilder();
-            b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataHTML'>"));
-            b.append(SafeHtmlUtils.fromTrustedString(html));
-            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-            safeHtml = b.toSafeHtml();
-          } else {
-            String text = response.getText();
-            String message;
-            try {
-              RestErrorOverlayType error = JsonUtils.safeEval(text);
-              message = error.getMessage();
-            } catch (IllegalArgumentException e) {
-              message = text;
+    // Ingest information
+    Services services = new Services("Get Transferred Resource id", "get");
+    services.aipResource(s -> s.getModelAIP(aip.getId())).thenCompose(modelAIP ->
+      services.transferredResource(s -> s.getResource(modelAIP.getIngestSIPUUID()))
+        .whenComplete((transferredResource, error) -> {
+          GWT.log("AQUI " + transferredResource.toString());
+          if (error != null) {
+            if (error.getCause() instanceof NotFoundException) {
+              Toast.showError(messages.notFoundError(), messages.jobNotFound());
+            } else {
+              AsyncCallbackUtils.defaultFailureTreatment(error.getCause());
             }
-            SafeHtmlBuilder b = new SafeHtmlBuilder();
-            // error message
-            b.append(SafeHtmlUtils.fromSafeConstant("<div class='error'>"));
-            b.append(messages.descriptiveMetadataTransformToHTMLError());
-            b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
-            b.append(SafeHtmlUtils.fromString(message));
-            b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
-            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-            safeHtml = b.toSafeHtml();
+          } else {
+            GWT.log("PASSOU");
+            GWT.log("TR -> " + transferredResource.toString());
           }
-          metadataHTML.setHTML(safeHtml);
-        }
+        }));
 
-        @Override
-        public void onError(Request request, Throwable e) {
-          if (!AsyncCallbackUtils.treatCommonFailures(e)) {
-            Toast.showError(messages.errorLoadingDescriptiveMetadata(e.getMessage()));
-          }
-        }
-      });
-    } catch (RequestException e) {
-      if (!AsyncCallbackUtils.treatCommonFailures(e)) {
-        Toast.showError(messages.errorLoadingDescriptiveMetadata(e.getMessage()));
-      }
-    }
-*/
+
+    // GWT.log("Reports list -> " + reportsList.size());
+
     /*
      * riskIdentifiedOn.setText(Humanize.formatDate(risk.getIdentifiedOn()));
      * riskIdentifiedBy.setText(risk.getIdentifiedBy());
