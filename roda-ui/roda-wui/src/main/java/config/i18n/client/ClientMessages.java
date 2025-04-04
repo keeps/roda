@@ -991,6 +991,8 @@ public interface ClientMessages extends Messages {
 
   String detailsAIP();
 
+  String detailsRepresentation();
+
   String detailsIdentifier();
 
   String detailsType();
@@ -1007,7 +1009,9 @@ public interface ClientMessages extends Messages {
 
   String detailsIngest();
 
-  //String sipIdentifier();
+  String sipIdentifier();
+
+  String sipDeleted();
 
   String ingestIdentifier();
 

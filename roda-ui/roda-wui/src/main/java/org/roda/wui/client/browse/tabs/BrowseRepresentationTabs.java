@@ -96,5 +96,18 @@ public class BrowseRepresentationTabs extends Tabs {
         return riskIncidences;
       }
     });
+
+    // Details
+    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
+      @Override
+      public Widget buildTabWidget() {
+        DetailsTab detailsTab = new DetailsTab();
+        detailsTab.initRepresentationDetails(aip, representation);
+        detailsTab.setStyleName("descriptiveMetadataTabs");
+        return detailsTab;
+      }
+    });
+
   }
-}
+
+  }
