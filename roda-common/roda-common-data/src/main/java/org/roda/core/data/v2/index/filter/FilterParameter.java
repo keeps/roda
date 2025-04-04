@@ -39,13 +39,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
   @JsonSubTypes.Type(value = AndFiltersParameters.class, name = "AndFiltersParameters"),
   @JsonSubTypes.Type(value = AllFilterParameter.class, name = "AllFilterParameter"),
   @JsonSubTypes.Type(value = NestParentFilterParameter.class, name = "NestParentFilterParameter"),
-  @JsonSubTypes.Type(value = NestParentFilterParameter.class, name = "NestChildOfFilterParameter"),
-})
+  @JsonSubTypes.Type(value = NestChildOfFilterParameter.class, name = "NestChildOfFilterParameter"),})
 @Schema(type = "object", subTypes = {BasicSearchFilterParameter.class, EmptyKeyFilterParameter.class,
   LikeFilterParameter.class, NotSimpleFilterParameter.class, OneOfManyFilterParameter.class,
   DateIntervalFilterParameter.class, DateRangeFilterParameter.class, LongRangeFilterParameter.class,
   StringRangeFilterParameter.class, SimpleFilterParameter.class, OrFiltersParameters.class, AndFiltersParameters.class,
-  AllFilterParameter.class, NestParentFilterParameter.class}, discriminatorMapping = {
+  AllFilterParameter.class, NestParentFilterParameter.class, NestChildOfFilterParameter.class}, discriminatorMapping = {
     @DiscriminatorMapping(value = "BasicSearchFilterParameter", schema = BasicSearchFilterParameter.class),
     @DiscriminatorMapping(value = "LikeFilterParameter", schema = LikeFilterParameter.class),
     @DiscriminatorMapping(value = "NotSimpleFilterParameter", schema = NotSimpleFilterParameter.class),
@@ -59,8 +58,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
     @DiscriminatorMapping(value = "AndFiltersParameters", schema = AndFiltersParameters.class),
     @DiscriminatorMapping(value = "AllFilterParameter", schema = AllFilterParameter.class),
     @DiscriminatorMapping(value = "NestParentFilterParameter", schema = NestParentFilterParameter.class),
-    @DiscriminatorMapping(value = "NestChildOfFilterParameter", schema = NestChildOfFilterParameter.class),
-}, discriminatorProperty = "type")
+    @DiscriminatorMapping(value = "NestChildOfFilterParameter", schema = NestChildOfFilterParameter.class)}, discriminatorProperty = "type")
 public abstract class FilterParameter implements Serializable {
   @Serial
   private static final long serialVersionUID = 3744111668897879761L;

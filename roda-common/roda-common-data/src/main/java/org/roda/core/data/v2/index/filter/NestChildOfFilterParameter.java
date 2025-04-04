@@ -4,11 +4,13 @@ import java.io.Serial;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 @JsonTypeName("NestChildOfFilterParameter")
+@Schema(description = "This parser wraps a query that matches some parent documents and returns the children of those documents.")
 public class NestChildOfFilterParameter extends FilterParameter {
 
   @Serial
