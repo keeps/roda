@@ -1637,8 +1637,8 @@ public class ModelService extends ModelObservable {
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    String urn = URNUtils.createRodaPreservationURN(PreservationMetadataType.TECHNICAL, fileId,
-      RODAInstanceUtils.getLocalInstanceIdentifier());
+    String urn = URNUtils.createRodaTechnicalMetadataURN(fileId, RODAInstanceUtils.getLocalInstanceIdentifier(),
+      metadataType.toLowerCase());
 
     StoragePath binaryPath = ModelUtils.getTechnicalMetadataPath(aipId, representationId,
       Collections.singletonList(metadataType), urn);
