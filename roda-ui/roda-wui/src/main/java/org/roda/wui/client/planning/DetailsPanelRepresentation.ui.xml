@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+>
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+
+    <g:FlowPanel addStyleNames="descriptiveMetadataHTML">
+        <g:FlowPanel addStyleNames="descriptiveMetadata">
+            <g:Label styleName="form-separator">
+                <ui:text from='{messages.detailsRepresentation}'/>
+            </g:Label>
+            <g:FlowPanel styleName="field">
+                <g:Label styleName="label">
+                    <ui:text from='{messages.detailsIdentifier}'/>
+                </g:Label>
+                <g:Label styleName="value" ui:field="repID"/>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="field">
+                <g:Label styleName="label">
+                    <ui:text from='{messages.detailsType}'/>
+                </g:Label>
+                <g:Label styleName="value" ui:field="repType"/>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="field">
+                <g:Label styleName="label">
+                    <ui:text from='{messages.detailsCreatedOn}'/>
+                </g:Label>
+                <g:Label styleName="value" ui:field="repCreatedOn"/>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="field">
+                <g:Label styleName="label">
+                    <ui:text from='{messages.detailsCreatedBy}'/>
+                </g:Label>
+                <g:Label styleName="value" ui:field="repCreatedBy"/>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="field">
+                <g:Label styleName="label">
+                    <ui:text from='{messages.detailsModifiedOn}'/>
+                </g:Label>
+                <g:Label styleName="value" ui:field="modifiedOn"/>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="field">
+                <g:Label styleName="label">
+                    <ui:text from='{messages.detailsModifiedBy}'/>
+                </g:Label>
+                <g:Label styleName="value" ui:field="modifiedBy"/>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>

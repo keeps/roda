@@ -351,4 +351,13 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @PathVariable(name = "descriptive-metadata-id") String metadataId,
     @Parameter(name = "selected metadata values", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedType selectedType);
 
+  @RequestMapping(path = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get model AIP", description = "Returns model AIP", responses = {
+    @ApiResponse(responseCode = "200", description = "AIP", content = @Content(schema = @Schema(implementation = AIP.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  AIP getModelAIP(
+    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String id);
+
 }

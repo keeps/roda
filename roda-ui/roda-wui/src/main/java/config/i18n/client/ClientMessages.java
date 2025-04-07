@@ -989,6 +989,34 @@ public interface ClientMessages extends Messages {
 
   String riskCreatedMessage();
 
+  /************* Details Tabs ****************/
+
+  String detailsAIP();
+
+  String detailsRepresentation();
+
+  String detailsIdentifier();
+
+  String detailsType();
+
+  String detailsState();
+
+  String detailsCreatedOn();
+
+  String detailsCreatedBy();
+
+  String detailsModifiedOn();
+
+  String detailsModifiedBy();
+
+  String detailsIngest();
+
+  String sipIdentifier();
+
+  String sipDeleted();
+
+  String ingestIdentifier();
+
   /************* RepresentationInformation register ****************/
 
   String representationInformationRegisterTitle();
