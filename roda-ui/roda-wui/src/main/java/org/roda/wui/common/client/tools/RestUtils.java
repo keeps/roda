@@ -412,6 +412,12 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(RodaConstants.API_REST_V2_JOBS + jobId + "/attachment/" + attachmentId);
   }
 
+
+  public static SafeUri createJobReportsHTMLUri(String jobId) {
+    // api/v2/jobs/{id}/reports
+    return UriUtils.fromSafeConstant(RodaConstants.API_REST_V2_JOBS + jobId + "/reports");
+  }
+
   public static <T extends IsIndexed> void requestCSVExport(Class<T> classToReturn, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, boolean onlyActive, boolean exportFacets, String filename) {
     // api/v2/<resource>/export/csv?findRequest={findRequest}

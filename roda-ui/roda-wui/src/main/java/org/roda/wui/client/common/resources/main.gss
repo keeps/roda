@@ -9146,3 +9146,20 @@ wui-disposal-hold-data .form-textbox {
 .largeIcon {
     font-size: 20px;
 }
+
+.details-date {
+    font-size: 1.1rem;
+    color: #999;
+    font-style: italic;
+}
+
+.details-uuid {
+    font-size: 1.6rem;
+    color: rgb(88, 89, 91);
+    font-family: 'MonoUbuntu'
+}
+
+.details-anchor {
+    display: block;
+    margin-bottom: 0.5em;
+}

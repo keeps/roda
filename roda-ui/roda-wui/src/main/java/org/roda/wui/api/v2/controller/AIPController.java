@@ -1672,4 +1672,41 @@ public class AIPController implements AIPRestService, Exportable {
     return ApiUtils.okResponse(
       indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedAIP.class, requestContext));
   }
+
+  @Override
+  public AIP getModelAIP(String aipId) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
+      // delegate
+      return RodaCoreFactory.getModelService().retrieveAIP(aipId);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (GenericException | NotFoundException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
+    }
+  }
+
+
 }

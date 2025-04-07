@@ -88,7 +88,7 @@ public interface JobsRestService extends RODAEntityRestService<IndexedJob> {
   Reports listJobReports(@PathVariable(name = "id") String id,
     @Parameter(description = "If just the failed reports should be included in the response or all the job reports", schema = @Schema(defaultValue = "false")) @RequestParam(name = RodaConstants.API_PATH_PARAM_JOB_JUST_FAILED, defaultValue = "false", required = false) boolean justFailed,
     @Parameter(description = "Index of the first element to return", schema = @Schema(defaultValue = "0")) @RequestParam(value = RodaConstants.API_QUERY_KEY_START, defaultValue = "0", required = false) String start,
-    @Parameter(description = "Maximum number of elements to return", schema = @Schema(defaultValue = "100")) @RequestParam(value = RodaConstants.API_QUERY_KEY_LIMIT, defaultValue = "0", required = false) String limit);
+    @Parameter(description = "Maximum number of elements to return", schema = @Schema(defaultValue = "100")) @RequestParam(value = RodaConstants.API_QUERY_KEY_LIMIT, defaultValue = "100", required = false) String limit);
 
   @RequestMapping(method = RequestMethod.GET, path = "/{id}/report/{" + RodaConstants.API_PATH_PARAM_JOB_REPORT_ID
     + "}", produces = MediaType.APPLICATION_JSON_VALUE)
