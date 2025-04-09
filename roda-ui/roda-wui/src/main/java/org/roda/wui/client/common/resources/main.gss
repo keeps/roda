@@ -4283,10 +4283,10 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchWrapper .objectToolbar .objectToolbarActions .actionable-title {
-    margin-top: 0;
+    margin-top: 7px;
+    margin-bottom: 7px;
     font-size: 10px;
     font-weight: 300;
-    margin-bottom: 0;
     color: #343A3F;
     text-transform: uppercase;
 }
@@ -9137,6 +9137,10 @@ wui-disposal-hold-data .form-textbox {
 
 .cmi-file:after {
     content: "\e911"
+}
+
+.cmi-envelope:after {
+    content: "\e928"
 }
 
 .largeIcon {
