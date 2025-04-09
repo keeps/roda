@@ -718,6 +718,18 @@ public class HtmlSnippetUtils {
       .fromSafeConstant("<span class='" + labelClass + "'>" + messages.disposalConfirmationState(state) + CLOSE_SPAN);
   }
 
+  public static String getTransferredResourceStateHTML(String state) {
+    String response = "";
+
+    switch (state) {
+      case "Deleted":
+       response = OPEN_SPAN_CLASS_LABEL_DANGER + messages.sipDeleted() + CLOSE_SPAN;
+        break;
+      }
+
+    return response;
+  }
+
   public static SimplePanel getNoItemsToDisplay(String object) {
     Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(object)));
     label.addStyleName("table-empty-inner-label");

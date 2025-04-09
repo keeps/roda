@@ -14,6 +14,7 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.EditPermissionsTab;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipToolbarActions;
+import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.LogEntryList;
@@ -103,6 +104,17 @@ public class BrowseAIPTabs extends Tabs {
         return new EditPermissionsTab(new ActionableWidgetBuilder<>(aipToolbarActions).buildGroupedListWithObjects(
           new ActionableObject<>(aip), List.of(AipToolbarActions.AIPAction.UPDATE_PERMISSIONS),
           List.of(AipToolbarActions.AIPAction.UPDATE_PERMISSIONS)), IndexedAIP.class.getName(), aip);
+      }
+    });
+
+    // Details
+    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
+      @Override
+      public Widget buildTabWidget() {
+        DetailsTab detailsTab = new DetailsTab();
+        detailsTab.initAipDetails(aip);
+        detailsTab.setStyleName("descriptiveMetadataTabs");
+        return detailsTab;
       }
     });
 
