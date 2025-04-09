@@ -9,6 +9,7 @@ package org.roda.core.plugins.orchestrate.pekko;
 
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.pekko.Messages;
 import org.roda.core.common.pekko.PekkoBaseActor;
 import org.roda.core.common.pekko.messages.plugins.PluginAfterAllExecuteIsReady;
@@ -27,6 +28,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.transaction.StorageTransactionManager;
+import org.roda.core.storage.transaction.TransactionalStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,11 +40,15 @@ public class PekkoWorkerActor extends PekkoBaseActor {
   private final ModelService model;
   private final StorageService storage;
 
+  private ModelService transactionalModelService;
+  private StorageTransactionManager storageTransactionManager;
+
   public PekkoWorkerActor() {
     super();
     this.storage = getStorage();
     this.model = getModel();
     this.index = getIndex();
+    this.storageTransactionManager = getStorageTransactionManager();
   }
 
   @Override
@@ -63,7 +70,12 @@ public class PekkoWorkerActor extends PekkoBaseActor {
     message.logProcessingStarted();
     Plugin<IsRODAObject> messagePlugin = message.getPlugin();
     try {
-      messagePlugin.execute(index, model, storage, objectsToBeProcessed);
+      Job job = PluginHelper.getJob(message.getPlugin(), model);
+
+      TransactionalStorageService transactionalStorageService = storageTransactionManager.beginTransaction(job.getId());
+      transactionalModelService = RodaCoreFactory.getTransactionalModelService(transactionalStorageService);
+
+      messagePlugin.execute(index, transactionalModelService, transactionalStorageService, objectsToBeProcessed);
       getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, false).withParallelism(message.getParallelism())
         .withJobPriority(message.getJobPriority()), getSelf());
     } catch (Throwable e) {
@@ -97,7 +109,13 @@ public class PekkoWorkerActor extends PekkoBaseActor {
       JobParallelism parallelism = job.getParallelism();
       JobPriority priority = job.getPriority();
       try {
-        plugin.afterAllExecute(index, model, storage);
+        TransactionalStorageService transactionalStorageService = storageTransactionManager.getTransactionalStorageService(job.getId());
+        if(transactionalStorageService != null) {
+          plugin.afterAllExecute(index, model, transactionalStorageService);
+          storageTransactionManager.commitTransaction(job.getId());
+        } else {
+          plugin.afterAllExecute(index, model, storage);
+        }
         getSender().tell(
           Messages.newPluginAfterAllExecuteIsDone(plugin, false).withJobPriority(priority).withParallelism(parallelism),
           getSelf());

@@ -1,4 +1,4 @@
-package org.roda.core.model.transactional;
+package org.roda.core.model.transaction;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,8 +69,6 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.core.events.EventsManager;
-import org.roda.core.model.DefaultModelService;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
@@ -83,15 +81,16 @@ import org.roda.core.storage.StorageService;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class TransactionalModelService implements ModelService {
-  private final ModelService defaultModelService;
+  private final ModelService mainModelService;
+  private final ModelService stagingModelService;
 
-  public TransactionalModelService(StorageService storage, EventsManager eventsManager, RodaConstants.NodeType nodeType,
-    String instanceId) {
-    defaultModelService = new DefaultModelService(storage, eventsManager, nodeType, instanceId);
+  public TransactionalModelService(ModelService mainModelService, ModelService stagingModelService) {
+    this.mainModelService = mainModelService;
+    this.stagingModelService = stagingModelService;
   }
 
   private ModelService getModelService() {
-    return defaultModelService;
+    return stagingModelService;
   }
 
   public void rollback() throws NotImplementedException {
@@ -1005,55 +1004,55 @@ public class TransactionalModelService implements ModelService {
   @Override
   public void createJob(Job job)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    getModelService().createJob(job);
+    mainModelService.createJob(job);
   }
 
   @Override
   public void createOrUpdateJob(Job job)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    getModelService().createOrUpdateJob(job);
+    mainModelService.createOrUpdateJob(job);
   }
 
   @Override
   public Job retrieveJob(String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().retrieveJob(jobId);
+    return mainModelService.retrieveJob(jobId);
   }
 
   @Override
   public void deleteJob(String jobId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    getModelService().deleteJob(jobId);
+    mainModelService.deleteJob(jobId);
   }
 
   @Override
   public Report retrieveJobReport(String jobId, String jobReportId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().retrieveJobReport(jobId, jobReportId);
+    return mainModelService.retrieveJobReport(jobId, jobReportId);
   }
 
   @Override
   public Report retrieveJobReport(String jobId, String sourceObjectId, String outcomeObjectId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().retrieveJobReport(jobId, sourceObjectId, outcomeObjectId);
+    return mainModelService.retrieveJobReport(jobId, sourceObjectId, outcomeObjectId);
   }
 
   @Override
   public void createOrUpdateJobReport(Report jobReport, Job cachedJob)
     throws GenericException, AuthorizationDeniedException {
-    getModelService().createOrUpdateJobReport(jobReport, cachedJob);
+    mainModelService.createOrUpdateJobReport(jobReport, cachedJob);
   }
 
   @Override
   public void createOrUpdateJobReport(Report jobReport, IndexedJob indexJob)
     throws GenericException, AuthorizationDeniedException {
-    getModelService().createOrUpdateJobReport(jobReport, indexJob);
+    mainModelService.createOrUpdateJobReport(jobReport, indexJob);
   }
 
   @Override
   public void deleteJobReport(String jobId, String jobReportId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    getModelService().deleteJobReport(jobId, jobReportId);
+    mainModelService.deleteJobReport(jobId, jobReportId);
   }
 
   @Override
@@ -1083,7 +1082,7 @@ public class TransactionalModelService implements ModelService {
   @Override
   public Job updateJobInstanceId(Job job)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    return getModelService().updateJobInstanceId(job);
+    return mainModelService.updateJobInstanceId(job);
   }
 
   @Override
@@ -1845,27 +1844,27 @@ public class TransactionalModelService implements ModelService {
 
   @Override
   public ReturnWithExceptionsWrapper notifyJobCreatedOrUpdated(Job job, boolean reindexJobReports) {
-    return getModelService().notifyJobCreatedOrUpdated(job, reindexJobReports);
+    return mainModelService.notifyJobCreatedOrUpdated(job, reindexJobReports);
   }
 
   @Override
   public ReturnWithExceptionsWrapper notifyJobDeleted(String jobId) {
-    return getModelService().notifyJobDeleted(jobId);
+    return mainModelService.notifyJobDeleted(jobId);
   }
 
   @Override
   public ReturnWithExceptionsWrapper notifyJobReportCreatedOrUpdated(Report jobReport, Job cachedJob) {
-    return getModelService().notifyJobReportCreatedOrUpdated(jobReport, cachedJob);
+    return mainModelService.notifyJobReportCreatedOrUpdated(jobReport, cachedJob);
   }
 
   @Override
   public ReturnWithExceptionsWrapper notifyJobReportCreatedOrUpdated(Report jobReport, IndexedJob indexedJob) {
-    return getModelService().notifyJobReportCreatedOrUpdated(jobReport, indexedJob);
+    return mainModelService.notifyJobReportCreatedOrUpdated(jobReport, indexedJob);
   }
 
   @Override
   public ReturnWithExceptionsWrapper notifyJobReportDeleted(String jobReportId) {
-    return getModelService().notifyJobReportDeleted(jobReportId);
+    return mainModelService.notifyJobReportDeleted(jobReportId);
   }
 
   @Override

@@ -1,4 +1,4 @@
-package org.roda.core.storage.transactional;
+package org.roda.core.storage.transaction;
 
 import org.roda.core.storage.StorageService;
 
