@@ -1,4 +1,4 @@
-package org.roda.core.model.transactional;
+package org.roda.core.model.transaction;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.events.EventsManager;
@@ -10,9 +10,8 @@ import org.roda.core.storage.StorageService;
 public class ModelTransactionManager {
   TransactionalModelService transactionalModelService;
 
-  public ModelTransactionManager(StorageService storage, EventsManager eventsManager, RodaConstants.NodeType nodeType,
-    String instanceId) {
-    this.transactionalModelService = new TransactionalModelService(storage, eventsManager, nodeType, instanceId);
+  public ModelTransactionManager() {
+
   }
 
   public TransactionalModelService beginTransaction() {
