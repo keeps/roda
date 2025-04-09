@@ -368,6 +368,11 @@ public interface StorageService {
 
   DirectResourceAccess getDirectAccess(StoragePath storagePath);
 
+  // TODO: gbarros, implement this
+  default DirectResourceAccess getDirectAccess(StoragePath storagePath, Boolean isReadOnly) {
+    return getDirectAccess(storagePath);
+  }
+
   CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
 
