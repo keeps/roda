@@ -12,9 +12,8 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.EditPermissionsTab;
-import org.roda.wui.client.common.actions.AipToolbarActions;
 import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.actions.PreservationEventActions;
+import org.roda.wui.client.common.actions.AipToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.LogEntryList;
@@ -58,8 +57,7 @@ public class BrowseAIPTabs extends Tabs {
         eventFilter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
         return new SearchWrapper(false).createListAndSearchPanel(new ListBuilder<>(() -> new PreservationEventList(),
           new AsyncTableCellOptions<>(IndexedPreservationEvent.class, "BrowseAIP_preservationEvents")
-            .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()
-            .withActionable(PreservationEventActions.get(aip.getId(), null, null))));
+            .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()));
       }
     });
 
