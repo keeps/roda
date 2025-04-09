@@ -14,7 +14,6 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.EditPermissionsTab;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipToolbarActions;
-import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.LogEntryList;
