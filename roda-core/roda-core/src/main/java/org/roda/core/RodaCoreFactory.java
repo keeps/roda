@@ -123,10 +123,11 @@ import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.index.utils.ZkController;
 import org.roda.core.migration.MigrationManager;
+import org.roda.core.model.DefaultModelService;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.transactional.ModelTransactionManager;
-import org.roda.core.model.transactional.TransactionalModelService;
+import org.roda.core.model.transaction.Transaction;
+import org.roda.core.model.transaction.TransactionalModelService;
 import org.roda.core.model.utils.LdapUtility;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginManager;
@@ -142,8 +143,9 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceWrapper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
-import org.roda.core.storage.transactional.DefaultTransactionalStorageService;
-import org.roda.core.storage.transactional.TransactionalStorageService;
+import org.roda.core.storage.transaction.DefaultTransactionalStorageService;
+import org.roda.core.storage.transaction.StorageTransactionManager;
+import org.roda.core.storage.transaction.TransactionalStorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -248,6 +250,8 @@ public class RodaCoreFactory {
   private static HTTPServer prometheusMetricsServer;
 
   private static Map<String, Function<Locale, ResourceBundle>> pluginMessageRegistry = new HashMap<>();
+
+  private static StorageTransactionManager storageTransactionManager;
 
   /** Private empty constructor */
   private RodaCoreFactory() {
@@ -855,16 +859,11 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateStorageAndModel() throws GenericException {
-    StorageService stagingStorageService = new StorageServiceWrapper(instantiateStagingStorage(), nodeType);
-    StorageService mainStorageService = new StorageServiceWrapper(instantiateStorage(), nodeType);
-    storage = new DefaultTransactionalStorageService(mainStorageService, stagingStorageService);
+    storage = new StorageServiceWrapper(instantiateStorage(), nodeType);
     LOGGER.debug("Finished instantiating storage...");
-    ModelTransactionManager modelTransactionManager = new ModelTransactionManager(storage, eventsManager, nodeType, instanceId);
-    model = modelTransactionManager.beginTransaction();
-    if (storage instanceof TransactionalStorageService) {
-        LOGGER.info("Commiting to storage service...");
-        ((TransactionalStorageService) storage).commit();
-    }
+    model = new DefaultModelService(storage, eventsManager, nodeType, instanceId);
+
+    storageTransactionManager = new StorageTransactionManager();
     LOGGER.debug("Finished instantiating model...");
   }
 
@@ -902,9 +901,19 @@ public class RodaCoreFactory {
 
   }
 
-  private static StorageService instantiateStagingStorage() throws GenericException {
+  public static StorageTransactionManager getStorageTransactionManager() {
+    return storageTransactionManager;
+  }
+
+  public static TransactionalStorageService getTransactionalStorageService(Transaction transaction) throws GenericException {
+    String storagePath = "/tmp/tx-" + transaction.getTransactionId();
+    StorageService storageService = instantiateStagingStorage(storagePath);
+    return new DefaultTransactionalStorageService(storage, storageService, transaction);
+  }
+
+  private static StorageService instantiateStagingStorage(String storagePath) throws GenericException {
     String newStorageService = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_NEW_SERVICE);
-    Path stagingStoragePath = Paths.get("/tmp/staging");
+    Path stagingStoragePath = Paths.get(storagePath);
     if (StringUtils.isNotBlank(newStorageService)) {
       try {
         Class<?> storageClass = Class.forName(newStorageService);
@@ -934,7 +943,12 @@ public class RodaCoreFactory {
       LOGGER.error("Unknown storage service '{}'", storageType.name());
       throw new GenericException();
     }
+  }
 
+  public static ModelService getTransactionalModelService(StorageService transactionalStorageService) {
+    ModelService stagingModelService = new DefaultModelService(transactionalStorageService, eventsManager, nodeType, instanceId);
+
+    return new TransactionalModelService(model, stagingModelService);
   }
 
   /**

@@ -17,6 +17,7 @@ import org.roda.core.storage.StorageService;
 import com.codahale.metrics.MetricRegistry;
 
 import org.apache.pekko.actor.UntypedAbstractActor;
+import org.roda.core.storage.transaction.StorageTransactionManager;
 
 public abstract class PekkoBaseActor extends UntypedAbstractActor {
 
@@ -60,5 +61,7 @@ public abstract class PekkoBaseActor extends UntypedAbstractActor {
   public MetricRegistry getMetricRegistry() {
     return RodaCoreFactory.getMetrics();
   }
+
+  public StorageTransactionManager getStorageTransactionManager() { return RodaCoreFactory.getStorageTransactionManager(); }
 
 }
