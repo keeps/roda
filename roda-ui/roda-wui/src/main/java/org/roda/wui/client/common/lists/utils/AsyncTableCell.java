@@ -127,6 +127,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private Actionable<T> actionable;
   private FlowPanel mainPanel;
   private FlowPanel sidePanel;
+  private ActionsToolbar actionsToolbar;
+  private SimplePanel sidePanelDivider;
   private FlowPanel facetsPanel;
   private MyAsyncDataProvider<T> dataProvider;
   private SingleSelectionModel<T> selectionModel;
@@ -252,13 +254,16 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     csvDownloadButton.addStyleName("btn btn-link btn-download csvDownloadButton");
     csvDownloadButton.setVisible(options.isCsvDownloadButtonVisibility());
 
-    ActionsToolbar toolbar = new ActionsToolbar();
+    sidePanelDivider = new SimplePanel();
+    sidePanelDivider.setStyleName("sidebarActionsDivider");
+
+    actionsToolbar = new ActionsToolbar();
     if (options.getActionable() != null && options.getActionable().hasAnyRoles() && isSelectable()) {
       ActionableWidgetBuilder<T> builder = new ActionableWidgetBuilder<>(options.getActionable());
-      toolbar.setLabelVisible(false);
-      toolbar.setIcon(null);
-      toolbar.setTagsVisible(false);
-      toolbar.setActionableMenu(builder.buildListWithObjectsAndDefaults(getActionableObject(),
+      actionsToolbar.setLabelVisible(false);
+      actionsToolbar.setIcon(null);
+      actionsToolbar.setTagsVisible(false);
+      actionsToolbar.setActionableMenu(builder.buildListWithObjectsAndDefaults(getActionableObject(),
         options.getActionWhitelist(), options.getActionBlacklist()));
       addCheckboxSelectionListener(new CheckboxSelectionListener<T>() {
         @Override
@@ -295,12 +300,13 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
               }
             }
           });
-          toolbar.setActionableMenu(builder.buildListWithObjectsAndDefaults(getActionableObject(),
+          actionsToolbar.setActionableMenu(builder.buildListWithObjectsAndDefaults(getActionableObject(),
             options.getActionWhitelist(), options.getActionBlacklist()));
         }
       });
     } else {
-      toolbar.setVisible(false);
+      actionsToolbar.setVisible(false);
+      sidePanelDivider.setVisible(false);
     }
 
     sidePanel = new FlowPanel();
@@ -327,7 +333,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     footer.add(resultsPager);
     footer.add(autoUpdatePanel);
 
-    sidePanel.add(toolbar);
+    sidePanel.add(actionsToolbar);
+    sidePanel.add(sidePanelDivider);
     sidePanel.add(facetsPanel);
 
     SimplePanel clearfix = new SimplePanel();
@@ -1186,6 +1193,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       }
 
       facetsPanel.setVisible(!allFacetsAreEmpty);
+      sidePanelDivider.setVisible(facetsPanel.isVisible() && actionsToolbar.isVisible());
     });
     return !facetPanels.isEmpty();
   }
