@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 134.83 30">
+    <defs>
+        <style>.cls-1{fill:#fff;}.cls-2{fill:#e4142b;}.cls-3{fill:#25a6d6;}.cls-4{opacity:0.3;}</style>
+    </defs>
+    <g id="Layer_2" data-name="Layer 2">
+        <g id="logos">
+            <path class="cls-3" d="M27.14,23.81A15,15,0,1,1,23.81,2.86,15,15,0,0,1,27.14,23.81Z"/>
+            <ellipse class="cls-4" cx="15" cy="16.67" rx="5" ry="6.25"/>
+            <circle class="cls-1" cx="15" cy="15" r="5"/>
+        </g>
+    </g>
+</svg>

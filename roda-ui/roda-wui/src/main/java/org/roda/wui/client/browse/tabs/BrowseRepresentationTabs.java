@@ -12,7 +12,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.actions.FileSearchWrapperActions;
-import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
@@ -78,8 +77,7 @@ public class BrowseRepresentationTabs extends Tabs {
           new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representation.getUUID()));
         return new SearchWrapper(false).createListAndSearchPanel(new ListBuilder<>(() -> new PreservationEventList(),
           new AsyncTableCellOptions<>(IndexedPreservationEvent.class, "BrowseRepresentation_preservationEvents")
-            .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()
-            .withActionable(PreservationEventActions.get(aip.getId(), representation.getUUID(), null))));
+            .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()));
       }
     });
 

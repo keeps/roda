@@ -12,7 +12,6 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.IndexedFilePreview;
 import org.roda.wui.client.browse.Viewers;
-import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
@@ -53,8 +52,7 @@ public class BrowseFileTabs extends Tabs {
         eventFilter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, file.getUUID()));
         return new SearchWrapper(false).createListAndSearchPanel(new ListBuilder<>(() -> new PreservationEventList(),
           new AsyncTableCellOptions<>(IndexedPreservationEvent.class, "BrowseFile_preservationEvents")
-            .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()
-            .withActionable(PreservationEventActions.get(aip.getId(), representation.getUUID(), file.getUUID()))));
+            .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()));
       }
     });
 

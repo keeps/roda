@@ -265,10 +265,12 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
         groupTitle.addStyleName("actionable-title-empty");
       }
       panel.add(groupTitle);
+      groupTitle.setVisible(false);
 
       for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
         if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
           && actionable.userCanAct(actionButton.getAction(), objects).canAct()) {
+          groupTitle.setVisible(true);
           ActionButton<T> button = new ActionButton<>(actionButton);
           panel.add(button);
           addedButtonCount++;
@@ -309,12 +311,6 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
       backButton.addStyleName("actionable-button-back");
       panel.add(backButton);
       addedButtonCount++;
-    }
-
-    if (addedButtonCount == 0) {
-      Label emptyHelpText = new Label(messages.actionableEmptyHelp(objects.getType()));
-      emptyHelpText.addStyleName("actions-empty-help");
-      panel.add(emptyHelpText);
     }
 
     widgetCreatedHandler.accept(addedButtonCount);

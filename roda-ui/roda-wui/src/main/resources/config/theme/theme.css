@@ -19,42 +19,194 @@
   padding: 17px 18.75%;
 }
 
+.column-split {
+    display:flex;
+}
+
+.first-column {
+    flex: 0.5;
+}
+
+.second-column {
+    flex: 0.5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.credentials-card {
+  width: 325px;
+}
+
+.grey-card {
+  background-color: #e9e9e9;
+  border-radius: 8px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  padding: 12px 16px;
+  background-color: #e2e2e2;
+  border-radius: 8px 8px 0 0;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-weight: bold;
+  font-size: 16px;
+  color: black;
+}
+
+.card-body {
+  padding: 18px 24px;
+}
+
+.credentials-card-elements {
+  gap: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.small-text {
+  font-size: 12px;
+}
+
+.credentials-card-elements .white-card {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: none;
+}
+
+.credentials-card-elements .field-label {
+  font-size: 10px;
+  flex: 0.45;
+}
+
+
+
+.field-faux-input {
+  background-color: #e9e9e9;
+  flex: 1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  color: black;
+}
+
+.credentials-card-elements button {
+  box-shadow: none;
+  font-size: 16px;
+  font-weight: bold;
+}
+.button-with-icon {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 18px;
+}
+.hero-button {
+  background-color: #25a6d6;
+  padding: 8px 28px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 18px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+.hero-logo {
+  height: 70px
+}
+
+.white-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.credentials-card-elements .field {
+  margin: 0;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.hero-elements {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 22px;
+}
+
 hr.hero-separator {
   width: 100px;
   height: 3px;
-  background: #127faa;
-  margin-top: 16px;
-  margin-bottom: 16px;
-  display: inline-block;
+  background: #25a6d6;
   border: unset;
+  margin: 0;
 }
 
 hr.separator-sm {
   width: 50px;
   height: 3px;
-  background: #127faa;
+  background: #25a6d6;
   margin-top: 8px;
   margin-bottom: 8px;
   display: inline-block;
   border: unset;
 }
 
-.hero {
-  background-color: #201d1d;
-  color: #ffffff;
-}
-
 h1.title {
-  margin-top: unset !important;
+  margin: unset !important;
 }
 
 .title {
-  max-width: 515px;
   font-family: "Inter", "Ubuntu";
   font-style: normal;
-  font-weight: 400;
-  font-size: 36px;
-  line-height: 41px;
+  font-weight: 800;
+  font-size: 50px;
+  line-height: 46px;
+}
+
+.keyword {
+  text-transform: uppercase;
+  background-color: #25a6d6;
+  padding: 0 4px;
+  font-weight: bold;
+  color: black;
+}
+
+.tag-line {
+    text-transform: uppercase;
+}
+
+.hero-tags {
+  display: flex;
+  flex-flow: wrap;
+  gap: 8px;
+}
+
+.standard-tag {
+  display: flex;
+  background-color: #ddc;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 12px;
+  gap: 8px;
+  align-items: center;
+  color: black;
+  text-wrap: nowrap;
+}
+
+.standard-inner-tag {
+  background-color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 10px;
 }
 
 .hero-details {
@@ -70,34 +222,30 @@ h1.title {
 }
 
 .more-info-btn {
-  padding: 12px 24px;
-
-  width: 151px;
-  height: 43px;
+  padding: 8px 28px;
 
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
   border-radius: 8px;
-  border: 1px solid;
+}
+
+.btn-row {
+  display: flex;
 }
 
 a.btn-hero, a.btn-welcome {
   text-decoration: none;
   font-family: "Inter", "Ubuntu";
   font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 18px;
+  font-weight: bold;
+  font-size: 18px;
   text-transform: uppercase;
   color: #ffffff;
+  background-color: #25a6d6;
 }
 
 .request-trial-btn, .learn-more-btn {
-  padding: 12px 24px;
+  padding: 8px 28px;
 
-  width: 151px;
-  height: 43px;
-
-  background: #127faa;
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
   border-radius: 8px;
 }
@@ -114,15 +262,14 @@ a.btn-hero:visited, a.btn-welcome:visited {
   text-decoration: none;
 }
 
-.row-highlight {
+.highlight {
     background-color: #eceaea;
 }
 
-.row-highlight h2 {
-  color: #000000;
+.hero-elements h2 {
   font-family: "Inter", "Ubuntu";
   font-style: normal;
-  font-weight: 400;
+  font-weight: 800;
   font-size: 24px;
   line-height: 28px;
   text-transform: capitalize;
@@ -130,7 +277,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
   margin-bottom: 0 !important;
 }
 
-.row-highlight p {
+.highlight p {
   font-family: "Inter", "Ubuntu";
   font-style: normal;
   font-weight: 400;
@@ -139,35 +286,35 @@ a.btn-hero:visited, a.btn-welcome:visited {
   padding-bottom: 16px;
 }
 
-.row-highlight-alt {
+.highlight-alt {
     background-color: white;
 }
 
-.row-get-quote {
-  background-color: #e4142b;
+.get-quote {
+  background-color: #25a6d6;
   color: #ffffff;
 }
 
-.row-get-quote .align-center {
+.get-quote .align-center {
   display: flex;
   align-items: center;
 }
 
-.row-get-quote .col_6 {
+.get-quote .col_6 {
   margin-right: unset;
 }
 
-.row-get-quote p {
+.get-quote p {
   display: inline;
   font-family: "Inter", "Ubuntu";
   font-style: normal;
-  font-weight: 400;
+  font-weight: bold;
   font-size: 24px;
   line-height: 28px;
   text-transform: uppercase;
 }
 
-.row-get-quote p.alt {
+.get-quote p.alt {
   color: #363030;
   font-family: "Inter", "Ubuntu";
   font-style: normal;
@@ -177,21 +324,22 @@ a.btn-hero:visited, a.btn-welcome:visited {
   padding-left: 5px;
 }
 
-.row-get-quote p.values {
+.get-quote p.values {
   font-family: "Inter", "Ubuntu";
   font-style: normal;
-  font-weight: 400;
+  font-weight: bold;
   font-size: 16px;
   line-height: 22px;
 
   text-align: center;
   text-transform: uppercase;
 
-  color: #ffffff;
+  color: #363030;
 }
 
-.row-get-quote p.values-alt {
-  color: #363030;
+
+.get-quote p.values-alt {
+  color: #ffffff;
 }
 
 .highligth-details {
@@ -199,21 +347,98 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .highlight-image {
-  height: 100%;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 250px;
+}
+
+.text-columns {
+  display: flex;
+  gap: 32px;
+}
+
+.text-column {
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  flex: 1;
+}
+
+.highlight-image img {
+  height: 100%;
+}
+
+.suite-cards {
+  display: flex;
+  gap: 32px;
+  padding: 24px;
+  align-items: start;
+}
+
+.suite-cards .white-card {
+  flex: 1;
+  color: #1d1f20;
+}
+
+.suite-cards .white-card .btn-hero {
+  box-shadow: none;
+  font-size: 14px;
+  padding: 6px 8px;
+}
+
+.suite-cards .card-header {
+  background-color: #f5f5f5;
+}
+
+.suite-cards .card-footer {
+  background-color: #f5f5f5;
+}
+
+.button-row-right {
+  display: flex;
+  justify-content: end;
+  gap: 8px;
+}
+
+.card-footer {
+  padding: 12px 16px;
+}
+
+.tag-line {
+  padding-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.primary-text {
+  color: #25a6d6;
+}
+
+.suite-cards .card-body {
+  padding: 24px;
+}
+
+.input-with-icon-wrapper {
+  background: white;
+  box-shadow: 0px 5px 10px rgba(54, 48, 48, 0.25);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border-radius: 8px;
+  flex: 1;
 }
 
 .form {
   display: flex;
+  gap: 12px;
+  width: 100%;
 }
 
 .form input[type="text"], .form input[type="email"] {
   flex: 1;
   margin-right: 5px;
   background: #ffffff;
-  box-shadow: 0px 5px 10px rgba(54, 48, 48, 0.25);
   border-radius: 8px;
   flex-direction: row;
   align-items: center;
@@ -229,34 +454,34 @@ a.btn-hero:visited, a.btn-welcome:visited {
   color: #ffffff;
   margin-bottom: 0;
   cursor: pointer;
-  padding: 12px 24px;
+  padding: 8px 28px;
   width: 134px;
+  font-weight: bold;
 }
 
-.row-get-quote .middle-info-quote {
-  width: 300px;
+.get-quote .middle-info-quote {
+  font-weight: bold;
 }
 
-.row-get-quote .custom-row {
+.get-quote .custom-row {
   display: flex;
 }
 
-.row-get-quote .custom-column {
-  flex: 1;
+.get-quote .custom-column {
   padding: 10px;
+  text-wrap: nowrap;
 }
 
 .row-learn-more {
   color: #ffffff;
-  background: #363030;
 }
 
-.row-learn-more h1 {
+.learn-more h1 {
   margin-top: unset !important;
+  font-weight: bold;
 }
 
-.row-learn-more p {
-  display: inline;
+.learn-more p {
   font-family: "Inter", "Ubuntu";
   font-style: normal;
   font-weight: 300;
@@ -264,30 +489,28 @@ a.btn-hero:visited, a.btn-welcome:visited {
   line-height: 22px;
 }
 
-.row-learn-more h1 span {
+.learn-more h1 span {
   color: #127faa;
   font-weight: 500;
 }
 
-.row-learn-more .subtitle p {
+.learn-more .subtitle p {
+  display: inline;
   text-transform: uppercase;
+  font-weight:bold;
 }
 
-.row-learn-more .subtitle p.alt {
+.learn-more .subtitle p.alt {
   color: #127faa;
 }
 
-.row-learn-more .details {
+.learn-more .details {
   text-align: justify;
   text-transform: unset;
   padding-bottom: 32px;
 }
 
-.row-features {
-    background-color: #eceaea;
-}
-
-.row-features h6 {
+.features h6 {
   margin: 0;
   font-weight: 500;
   font-family: "Inter", "Ubuntu";
@@ -295,7 +518,11 @@ a.btn-hero:visited, a.btn-welcome:visited {
   font-size: 16px;
 }
 
-/* FOOTER */
+.authenticity .second-column,
+.vendor .second-column
+{
+  justify-content: center;
+}
 
 .tutorial-roda-community {
 
@@ -307,15 +534,19 @@ a.btn-hero:visited, a.btn-welcome:visited {
 
 .custom-row {
   display: flex;
-  flex-wrap: wrap;
+  gap: 32px;
+  align-items: center;
 }
 
 .custom-column {
-  flex-basis: 100%;
   margin-bottom: 10px;
 }
 
-.feature-details p {
+.custom-column {
+    flex: 0.25
+}
+
+.row-feature-details p {
   font-family: "Inter", "Ubuntu";
   font-weight: 400;
   font-size: 13px;
@@ -356,17 +587,17 @@ a.btn-hero:visited, a.btn-welcome:visited {
 
 .component-column h6 {
   margin: 0;
-  font-weight: 500;
+  font-weight: bold;
   font-family: "Inter", "Ubuntu";
   line-height: 18px;
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .component-column p {
   font-family: "Inter", "Ubuntu";
   font-weight: 400;
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 14px;
+  line-height: 20px;
 
 }
 
@@ -398,18 +629,76 @@ a.btn-hero:visited, a.btn-welcome:visited {
     width: 100%;
   }
 
-  .row-get-quote .custom-row {
+  .get-quote .custom-row {
     flex-wrap: wrap;
-  }
-
-  .row-get-quote .custom-column {
-    flex-basis: 100%;
   }
 }
 
-@media screen and (min-width: 900px) {
-  .custom-column {
-    flex-basis: calc(33.33% - 60px);
-    margin: 0px 50px 0px 0px;
-  }
+.background-black {
+    background-color: #1d1f20;
+    border-radius: 50%;
+}
+
+.background-white {
+    background-color: white;
+    border-radius: 50%;
+}
+
+.background-grey {
+    background-color: #eaebec;
+    border-radius: 50%;
+}
+
+.background-dark-grey {
+    background-color: #303436;
+    border-radius: 50%;
+}
+
+.background-primary {
+    background-color: #25a6d6;
+    border-radius: 50%;
+}
+
+.background-very-dark-grey {
+  background-color: #2f3335;
+  border-radius: 50%;
+}
+
+.hero {
+    background: radial-gradient(ellipse 150% 100% at top, #1d1f20 0%, #1d1f20 99.1%, white 100%);
+    color: white;
+}
+
+.tutorial-roda-community {
+    background: radial-gradient(ellipse 150% 100% at top, white 0%, white 99.1%, #eaebec 100%);
+    color: #1d1f20;
+}
+
+.authenticity {
+    background: radial-gradient(ellipse 150% 100% at top, #eaebec 0%, #eaebec 99.1%, white 100%);
+    color: #1d1f20;
+}
+
+.vendor {
+    background: radial-gradient(ellipse 150% 100% at top, white 0%, white 99.1%, #eaebec 100%);
+    color: #1d1f20;
+}
+
+.features {
+    background: radial-gradient(ellipse 150% 100% at top, #eaebec 0%, #eaebec 99.1%, #303436 100%);
+    color: #1d1f20;
+}
+
+.learn-more {
+    background: radial-gradient(ellipse 150% 100% at top, #303436 0%, #303436 99.1%, #25a6d6 100%);
+    color: white;
+}
+
+.get-quote {
+    background: radial-gradient(ellipse 150% 100% at top, #25a6d6 0%, #25a6d6 99.1%, #2f3335 100%);
+}
+
+.enterprise-editions {
+    background: radial-gradient(ellipse 150% 100% at top, #2f3335 0%, #2f3335 99.1%, black 100%);
+    color: white;
 }
