@@ -73,10 +73,7 @@ public class BrowseFileTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        DetailsTab detailsTab = new DetailsTab();
-        detailsTab.initFileDetails(aip, representation, file);
-        detailsTab.setStyleName("descriptiveMetadataTabs");
-        return detailsTab;
+        return new DetailsTab(aip, representation, file);
       }
     });
   }

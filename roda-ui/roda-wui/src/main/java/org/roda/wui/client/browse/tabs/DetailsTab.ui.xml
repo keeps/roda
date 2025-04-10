@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:m="urn:import:org.roda.wui.client.main"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+    <g:FlowPanel styleName="descriptiveMetadataTabContainer roda6Card">
+        <g:FlowPanel ui:field="content" styleName="cardBody" />
+    </g:FlowPanel>
+</ui:UiBinder>
