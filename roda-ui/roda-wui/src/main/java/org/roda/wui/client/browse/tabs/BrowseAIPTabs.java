@@ -110,12 +110,8 @@ public class BrowseAIPTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        DetailsTab detailsTab = new DetailsTab();
-        detailsTab.initAipDetails(aip);
-        detailsTab.setStyleName("descriptiveMetadataTabs");
-        return detailsTab;
+        return new DetailsTab(aip);
       }
     });
-
   }
 }
