@@ -1414,17 +1414,20 @@ button:after {
 }
 
 .my-asyncdatagrid-side-panel {
-    vertical-align: top;
-    float: right;
-    margin-left: 20px;
-    background-color: COLOR_TABLE_SIDEBAR_BACKGROUND;
-    padding: 1rem 1.5rem 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: top;
+  float: right;
+  margin-left: 20px;
+  background-color: COLOR_TABLE_SIDEBAR_BACKGROUND;
+  padding: 1rem 1.5rem 0 1.5rem;
 }
 
 .searchWrapperSidePanel .my-asyncdatagrid-side-panel {
-    padding: 0 16px;
-    background-color: transparent;
-    margin: 0;
+  padding: 0 16px;
+  background-color: transparent;
+  margin: 0;
 }
 
 .my-asyncdatagrid-side-panel .sidebar-facet-panel {
