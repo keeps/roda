@@ -3,104 +3,50 @@ package org.roda.wui.client.browse.tabs;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.planning.DetailsPanelAIP;
-
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
 import org.roda.wui.client.planning.DetailsPanelFile;
 import org.roda.wui.client.planning.DetailsPanelRepresentation;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Carlos Afonso <cafonso@keep.pt>
  */
-public class DetailsTab extends Tabs {
-  public void initAipDetails(IndexedAIP aip) {
-      // Tab button
-      SafeHtml buttonTitle = SafeHtmlUtils.fromString(messages.detailsTab());
-      // Content container
-      FlowPanel content = new FlowPanel();
-      content.addStyleName("descriptiveMetadataTabContainer roda6CardWithHeader");
-      // Create Toolbar
-      ActionsToolbar descriptiveMetadataToolbar = new ActionsToolbar();
-      descriptiveMetadataToolbar.setLabelVisible(false);
-      descriptiveMetadataToolbar.setTagsVisible(false);
-      // Get metadata and populate widget
-      FlowPanel cardBody = new FlowPanel();
-      content.add(cardBody);
-      cardBody.setStyleName("cardBody");
-      DetailsPanelAIP detailsPanel = new DetailsPanelAIP(aip);
+public class DetailsTab extends Composite {
+  protected static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static DetailsTab.MyUiBinder uiBinder = GWT.create(DetailsTab.MyUiBinder.class);
 
+  @UiField
+  FlowPanel content;
 
-      cardBody.add(detailsPanel);
-      // Create and add tab
-      // This descriptive metadata content is NOT lazy loading!
-      createAndAddTab(buttonTitle, new TabContentBuilder() {
-        @Override
-        public Widget buildTabWidget() {
-          return content;
-        }
-      });
-
+  public DetailsTab(IndexedAIP aip) {
+    initWidget(uiBinder.createAndBindUi(this));
+    // Get metadata and populate widget
+    DetailsPanelAIP detailsPanel = new DetailsPanelAIP(aip);
+    content.add(detailsPanel);
   }
 
-  public void initRepresentationDetails(IndexedAIP aip, IndexedRepresentation rep) {
-    // Tab button
-    SafeHtml buttonTitle = SafeHtmlUtils.fromString(messages.detailsTab());
-    // Content container
-    FlowPanel content = new FlowPanel();
-    content.addStyleName("descriptiveMetadataTabContainer roda6CardWithHeader");
-    // Create Toolbar
-    ActionsToolbar descriptiveMetadataToolbar = new ActionsToolbar();
-    descriptiveMetadataToolbar.setLabelVisible(false);
-    descriptiveMetadataToolbar.setTagsVisible(false);
+  public DetailsTab(IndexedAIP aip, IndexedRepresentation representation) {
+    initWidget(uiBinder.createAndBindUi(this));
     // Get metadata and populate widget
-    FlowPanel cardBody = new FlowPanel();
-    content.add(cardBody);
-    cardBody.setStyleName("cardBody");
-    DetailsPanelRepresentation detailsPanel = new DetailsPanelRepresentation(aip, rep);
-
-
-    cardBody.add(detailsPanel);
-    // Create and add tab
-    // This descriptive metadata content is NOT lazy loading!
-    createAndAddTab(buttonTitle, new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        return content;
-      }
-    });
-
+    DetailsPanelRepresentation detailsPanel = new DetailsPanelRepresentation(aip, representation);
+    content.add(detailsPanel);
   }
 
-  public void initFileDetails(IndexedAIP aip, IndexedRepresentation rep, IndexedFile file) {
-    // Tab button
-    SafeHtml buttonTitle = SafeHtmlUtils.fromString(messages.detailsTab());
-    // Content container
-    FlowPanel content = new FlowPanel();
-    content.addStyleName("descriptiveMetadataTabContainer roda6CardWithHeader");
-    // Create Toolbar
-    ActionsToolbar descriptiveMetadataToolbar = new ActionsToolbar();
-    descriptiveMetadataToolbar.setLabelVisible(false);
-    descriptiveMetadataToolbar.setTagsVisible(false);
+  public DetailsTab(IndexedAIP aip, IndexedRepresentation representation, IndexedFile file) {
+    initWidget(uiBinder.createAndBindUi(this));
     // Get metadata and populate widget
-    FlowPanel cardBody = new FlowPanel();
-    content.add(cardBody);
-    cardBody.setStyleName("cardBody");
-    DetailsPanelFile detailsPanel = new DetailsPanelFile(aip, rep, file);
+    DetailsPanelFile detailsPanel = new DetailsPanelFile(aip, representation, file);
+    content.add(detailsPanel);
+  }
 
-
-    cardBody.add(detailsPanel);
-    // Create and add tab
-    // This descriptive metadata content is NOT lazy loading!
-    createAndAddTab(buttonTitle, new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        return content;
-      }
-    });
-
+  interface MyUiBinder extends UiBinder<Widget, DetailsTab> {
   }
 }
