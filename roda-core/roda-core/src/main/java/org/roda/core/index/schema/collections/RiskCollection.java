@@ -29,6 +29,7 @@ import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 
 public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
 
@@ -103,10 +104,10 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(Risk risk, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, Risk risk, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(risk, info);
+    SolrInputDocument doc = super.toSolrDocument(model, risk, info);
 
     doc.addField(RodaConstants.RISK_NAME, risk.getName());
     doc.addField(RodaConstants.RISK_DESCRIPTION, risk.getDescription());

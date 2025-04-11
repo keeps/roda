@@ -28,6 +28,7 @@ import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 
 public class RepresentationInformationCollection
   extends AbstractSolrCollection<RepresentationInformation, RepresentationInformation> {
@@ -97,10 +98,10 @@ public class RepresentationInformationCollection
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(RepresentationInformation ri, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, RepresentationInformation ri, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(ri, info);
+    SolrInputDocument doc = super.toSolrDocument(model, ri, info);
 
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_NAME, ri.getName());
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_DESCRIPTION, ri.getDescription());

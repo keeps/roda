@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -145,10 +144,10 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(AIP aip, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, AIP aip, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     boolean safemode = info.getFlags().contains(Flags.SAFE_MODE_ON);
-    SolrInputDocument doc = super.toSolrDocument(aip, info);
+    SolrInputDocument doc = super.toSolrDocument(model, aip, info);
 
     doc.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
     doc.addField(RodaConstants.AIP_TYPE, aip.getType());
@@ -205,14 +204,12 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.AIP_HAS_SHALLOW_FILES,
       aip.getHasShallowFiles() != null ? aip.getHasShallowFiles() : false);
 
-    ModelService model = RodaCoreFactory.getModelService();
     if (!safemode) {
-      SolrUtils.indexDescriptiveMetadataFields(RodaCoreFactory.getModelService(), aip.getId(), null,
-        aip.getDescriptiveMetadata(), doc);
+      SolrUtils.indexDescriptiveMetadataFields(model, aip.getId(), null, aip.getDescriptiveMetadata(), doc);
     }
 
     // Calculate number of documentation and schema files
-    StorageService storage = RodaCoreFactory.getStorageService();
+    StorageService storage = model.getStorage();
 
     Long numberOfSubmissionFiles;
     try {
