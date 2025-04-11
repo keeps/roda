@@ -32,6 +32,7 @@ import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 
 import gov.loc.premis.v3.AgentComplexType;
@@ -89,12 +90,12 @@ public class PreservationAgentCollection
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(PreservationMetadata pm, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, PreservationMetadata pm, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(pm, info);
+    SolrInputDocument doc = super.toSolrDocument(model, pm, info);
 
-    Binary binary = RodaCoreFactory.getModelService().retrievePreservationAgent(pm.getId());
+    Binary binary = model.retrievePreservationAgent(pm.getId());
 
     boolean validate = false;
     try {
