@@ -34,6 +34,7 @@ import org.roda.core.data.v2.ip.SetsUUID;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 
 public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsModelObject>
@@ -83,7 +84,7 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(M object, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, M object, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     SolrInputDocument doc = new SolrInputDocument();

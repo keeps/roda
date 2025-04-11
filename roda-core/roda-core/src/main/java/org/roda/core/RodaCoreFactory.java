@@ -908,7 +908,11 @@ public class RodaCoreFactory {
   public static TransactionalStorageService getTransactionalStorageService(Transaction transaction) throws GenericException {
     String storagePath = "/tmp/tx-" + transaction.getTransactionId();
     StorageService storageService = instantiateStagingStorage(storagePath);
-    return new DefaultTransactionalStorageService(storage, storageService, transaction);
+    return new DefaultTransactionalStorageService(storage, storageService, transaction, storageTransactionManager.getInMemoryLockService());
+  }
+
+  public static IndexService getTransactionalIndexService(ModelService trasactionalModelService) {
+    return new IndexService(solr, trasactionalModelService, metricsRegistry, getRodaConfiguration(), nodeType);
   }
 
   private static StorageService instantiateStagingStorage(String storagePath) throws GenericException {

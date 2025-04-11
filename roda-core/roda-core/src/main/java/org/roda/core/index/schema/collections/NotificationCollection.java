@@ -28,6 +28,7 @@ import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 
 public class NotificationCollection extends AbstractSolrCollection<Notification, Notification> {
 
@@ -83,10 +84,10 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(Notification notification, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, Notification notification, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(notification, info);
+    SolrInputDocument doc = super.toSolrDocument(model, notification, info);
 
     doc.addField(RodaConstants.NOTIFICATION_SUBJECT, notification.getSubject());
     doc.addField(RodaConstants.NOTIFICATION_BODY, notification.getBody());

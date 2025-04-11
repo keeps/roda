@@ -144,7 +144,7 @@ public class SolrRetryTest {
 
     DisposalConfirmation disposalConfirmation = model.createDisposalConfirmation(confirmation, "admin");
 
-    SolrUtils.create2(spy, this, DisposalConfirmation.class, disposalConfirmation);
+    SolrUtils.create2(spy, model, this, DisposalConfirmation.class, disposalConfirmation);
 
     Mockito.verify(spy, times(3)).add(anyString(), any(SolrInputDocument.class));
 
@@ -219,7 +219,7 @@ public class SolrRetryTest {
 
     DisposalConfirmation disposalConfirmation = model.createDisposalConfirmation(confirmation, "admin");
 
-    ReturnWithExceptions<Void, SolrRetryTest> returnWithExceptions = SolrUtils.create2(spy, this,
+    ReturnWithExceptions<Void, SolrRetryTest> returnWithExceptions = SolrUtils.create2(spy, model, this,
       DisposalConfirmation.class, disposalConfirmation);
 
     Assert.assertFalse(returnWithExceptions.getExceptions().isEmpty());
