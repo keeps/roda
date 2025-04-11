@@ -39,8 +39,6 @@ public class PekkoWorkerActor extends PekkoBaseActor {
   private final IndexService index;
   private final ModelService model;
   private final StorageService storage;
-
-  private ModelService transactionalModelService;
   private StorageTransactionManager storageTransactionManager;
 
   public PekkoWorkerActor() {
@@ -73,9 +71,11 @@ public class PekkoWorkerActor extends PekkoBaseActor {
       Job job = PluginHelper.getJob(message.getPlugin(), model);
 
       TransactionalStorageService transactionalStorageService = storageTransactionManager.beginTransaction(job.getId());
-      transactionalModelService = RodaCoreFactory.getTransactionalModelService(transactionalStorageService);
+      ModelService transactionalModelService = RodaCoreFactory.getTransactionalModelService(transactionalStorageService);
+      IndexService transactionalIndexService = RodaCoreFactory.getTransactionalIndexService(transactionalModelService);
 
-      messagePlugin.execute(index, transactionalModelService, transactionalStorageService, objectsToBeProcessed);
+
+      messagePlugin.execute(transactionalIndexService, transactionalModelService, transactionalStorageService, objectsToBeProcessed);
       getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, false).withParallelism(message.getParallelism())
         .withJobPriority(message.getJobPriority()), getSelf());
     } catch (Throwable e) {

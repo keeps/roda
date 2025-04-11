@@ -42,6 +42,7 @@ import org.roda.core.index.schema.collections.RepresentationInformationCollectio
 import org.roda.core.index.schema.collections.RiskCollection;
 import org.roda.core.index.schema.collections.RiskIncidenceCollection;
 import org.roda.core.index.schema.collections.TransferredResourceCollection;
+import org.roda.core.model.ModelService;
 
 public final class SolrCollectionRegistry {
 
@@ -137,22 +138,22 @@ public final class SolrCollectionRegistry {
     return fromSolrDocument(indexClass, doc, Collections.emptyList());
   }
 
-  public static <I extends IsIndexed, M extends IsModelObject> SolrInputDocument toSolrDocument(Class<I> indexClass,
+  public static <I extends IsIndexed, M extends IsModelObject> SolrInputDocument toSolrDocument(Class<I> indexClass, ModelService model,
     M object, IndexingAdditionalInfo utils) throws GenericException, NotSupportedException, RequestNotValidException,
     NotFoundException, AuthorizationDeniedException {
     SolrCollection<I, M> solrCollection = get(indexClass);
     if (solrCollection != null) {
-      return solrCollection.toSolrDocument(object, utils);
+      return solrCollection.toSolrDocument(model, object, utils);
     } else {
       throw new NotSupportedException(
         "Could not find Solr collection relative to '" + indexClass.getName() + "' in registry.");
     }
   }
 
-  public static <I extends IsIndexed, M extends IsModelObject> SolrInputDocument toSolrDocument(Class<I> indexClass,
+  public static <I extends IsIndexed, M extends IsModelObject> SolrInputDocument toSolrDocument(Class<I> indexClass, ModelService model,
     M object) throws GenericException, NotSupportedException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
-    return toSolrDocument(indexClass, object, IndexingAdditionalInfo.empty());
+    return toSolrDocument(indexClass, model, object, IndexingAdditionalInfo.empty());
   }
 
   public static <I extends IsIndexed> String getIndexName(Class<I> indexClass) throws NotSupportedException {

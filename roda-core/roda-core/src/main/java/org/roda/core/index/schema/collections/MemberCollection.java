@@ -30,6 +30,7 @@ import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 
 public class MemberCollection extends AbstractSolrCollection<RODAMember, RODAMember> {
 
@@ -84,10 +85,10 @@ public class MemberCollection extends AbstractSolrCollection<RODAMember, RODAMem
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(RODAMember member, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, RODAMember member, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(member, info);
+    SolrInputDocument doc = super.toSolrDocument(model, member, info);
 
     doc.addField(RodaConstants.MEMBERS_IS_ACTIVE, member.isActive());
     doc.addField(RodaConstants.MEMBERS_IS_USER, member.isUser());

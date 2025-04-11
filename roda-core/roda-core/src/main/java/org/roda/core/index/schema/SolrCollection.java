@@ -29,6 +29,7 @@ import org.roda.core.data.v2.ip.HasState;
 import org.roda.core.data.v2.ip.HasStateFilter;
 import org.roda.core.data.v2.ip.SetsUUID;
 import org.roda.core.index.IndexingAdditionalInfo;
+import org.roda.core.model.ModelService;
 
 public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
 
@@ -127,7 +128,7 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
    */
-  SolrInputDocument toSolrDocument(M object, IndexingAdditionalInfo info)
+  SolrInputDocument toSolrDocument(ModelService model, M object, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
   I fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn) throws GenericException;

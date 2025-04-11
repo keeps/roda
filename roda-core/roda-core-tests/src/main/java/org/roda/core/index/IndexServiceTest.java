@@ -774,7 +774,7 @@ public class IndexServiceTest {
       aip.setPermissions(new Permissions());
 
       index.getSolrClient().add(SolrCollectionRegistry.getIndexName(IndexedAIP.class),
-        SolrCollectionRegistry.toSolrDocument(IndexedAIP.class, aip));
+        SolrCollectionRegistry.toSolrDocument(IndexedAIP.class, model, aip));
 
       index.commit(IndexedAIP.class);
 

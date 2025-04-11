@@ -38,6 +38,7 @@ import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -99,10 +100,10 @@ public class PreservationEventCollection
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(PreservationMetadata pm, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, PreservationMetadata pm, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(pm, info);
+    SolrInputDocument doc = super.toSolrDocument(model, pm, info);
     String objectClass = PreservationMetadataEventClass.REPOSITORY.toString();
 
     if (StringUtils.isNotBlank(pm.getAipId())) {
@@ -142,8 +143,8 @@ public class PreservationEventCollection
     }
 
     doc.addField(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS, objectClass);
-    Binary binary = RodaCoreFactory.getModelService().retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
-      pm.getFileDirectoryPath(), pm.getFileId(), pm.getId());
+    Binary binary = model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
+      pm.getFileId(), pm.getId());
 
     boolean validate = false;
     try {

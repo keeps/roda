@@ -35,6 +35,7 @@ import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,10 +116,10 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(Report jobReport, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model,  Report jobReport, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(jobReport, info);
+    SolrInputDocument doc = super.toSolrDocument(model, jobReport, info);
 
     doc.addField(RodaConstants.JOB_REPORT_JOB_ID, jobReport.getJobId());
     doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, jobReport.getSourceObjectId());

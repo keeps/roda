@@ -30,6 +30,7 @@ import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,9 +91,9 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(LogEntry logEntry, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, LogEntry logEntry, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    SolrInputDocument doc = super.toSolrDocument(logEntry, info);
+    SolrInputDocument doc = super.toSolrDocument(model, logEntry, info);
 
     doc.addField(RodaConstants.LOG_ACTION_COMPONENT, logEntry.getActionComponent());
     doc.addField(RodaConstants.LOG_ACTION_METHOD, logEntry.getActionMethod());

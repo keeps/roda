@@ -166,7 +166,7 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     SolrUtils
-      .create2(index, (ModelObserver) this, IndexedAIP.class, aip,
+      .create2(index, model, (ModelObserver) this, IndexedAIP.class, aip,
         new AIPCollection.Info(ancestors, safemode, disposalSchedule, retentionPeriodCalculation, disposalHoldStatus))
       .addTo(ret);
 
@@ -227,7 +227,7 @@ public class IndexModelObserver implements ModelObserver {
       ret.add(e);
     }
 
-    SolrUtils.create2(index, (ModelObserver) this, IndexedPreservationEvent.class, pm,
+    SolrUtils.create2(index, model, (ModelObserver) this, IndexedPreservationEvent.class, pm,
       new PreservationEventCollection.Info(aip)).addTo(ret);
 
     return ret;
@@ -303,7 +303,7 @@ public class IndexModelObserver implements ModelObserver {
 
       RepresentationCollection.Info info = new RepresentationCollection.Info(aip, ancestors, sizeInBytes,
         numberOfDataFiles, numberOfDataFolders, safemode);
-      SolrUtils.create2(index, (ModelObserver) this, IndexedRepresentation.class, representation, info).addTo(ret);
+      SolrUtils.create2(index, model, (ModelObserver) this, IndexedRepresentation.class, representation, info).addTo(ret);
     } catch (IOException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index representation", e);
@@ -379,7 +379,7 @@ public class IndexModelObserver implements ModelObserver {
         for (OptionalWithCause<File> shallowFile : allExternalFiles) {
           if (shallowFile.isPresent()) {
             shallowFile.get().setInstanceId(aip.getInstanceId());
-            SolrUtils.create2(index, (ModelObserver) this, IndexedFile.class, shallowFile.get(), info).addTo(ret);
+            SolrUtils.create2(index, model, (ModelObserver) this, IndexedFile.class, shallowFile.get(), info).addTo(ret);
           }
         }
         sizeInBytes = getExternalFilesTotalSize(file);
@@ -389,7 +389,7 @@ public class IndexModelObserver implements ModelObserver {
       }
 
     } else {
-      SolrUtils.create2(index, (ModelObserver) this, IndexedFile.class, file, info).addTo(ret);
+      SolrUtils.create2(index, model, (ModelObserver) this, IndexedFile.class, file, info).addTo(ret);
       sizeInBytes = (Long) info.getAccumulators().get(RodaConstants.FILE_SIZE);
     }
 
@@ -1018,7 +1018,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> logEntryCreated(LogEntry entry) {
-    return SolrUtils.create2(index, this, LogEntry.class, entry);
+    return SolrUtils.create2(index, model, this, LogEntry.class, entry);
   }
 
   @Override
@@ -1070,7 +1070,7 @@ public class IndexModelObserver implements ModelObserver {
         | IOException e) {
         LOGGER.error("Could not set the creation date of Preservation Agent");
       }
-      SolrUtils.create2(index, (ModelObserver) this, IndexedPreservationAgent.class, pm).addTo(ret);
+      SolrUtils.create2(index, model, (ModelObserver) this, IndexedPreservationAgent.class, pm).addTo(ret);
     }
 
     return ret;
@@ -1130,7 +1130,7 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> jobCreatedOrUpdated(Job job, boolean reindexJobReports) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    SolrUtils.create2(index, (ModelObserver) this, IndexedJob.class, job).addTo(ret);
+    SolrUtils.create2(index, model, (ModelObserver) this, IndexedJob.class, job).addTo(ret);
 
     if (ret.isEmpty() && reindexJobReports) {
       indexJobReports(job).addTo(ret);
@@ -1181,7 +1181,7 @@ public class IndexModelObserver implements ModelObserver {
 
   private <T extends IsIndexed, M extends IsModelObject> ReturnWithExceptions<Void, ModelObserver> addDocumentToIndex(
     Class<T> classToAdd, M instance, boolean commit) {
-    return SolrUtils.create(index, classToAdd, instance, this, commit);
+    return SolrUtils.create(index, model, classToAdd, instance, this, commit);
   }
 
   private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentFromIndex(
@@ -1207,13 +1207,13 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, Job cachedJob) {
-    return SolrUtils.create2(index, this, IndexedReport.class, jobReport,
+    return SolrUtils.create2(index, model, this, IndexedReport.class, jobReport,
       new JobReportCollection.Info(jobReport, cachedJob));
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, IndexedJob indexedJob) {
-    return SolrUtils.create2(index, this, IndexedReport.class, jobReport,
+    return SolrUtils.create2(index, model, this, IndexedReport.class, jobReport,
       new JobReportCollection.Info(jobReport, indexedJob));
   }
 
@@ -1357,7 +1357,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> riskCreatedOrUpdated(Risk risk, int incidences, boolean commit) {
-    return SolrUtils.create2(index, (ModelObserver) this, IndexedRisk.class, risk,
+    return SolrUtils.create2(index, model, (ModelObserver) this, IndexedRisk.class, risk,
       new RiskCollection.Info(risk, incidences));
   }
 
@@ -1369,7 +1369,7 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence,
     boolean commit) {
-    return SolrUtils.create(index, RiskIncidence.class, riskIncidence, this, commit);
+    return SolrUtils.create(index, model, RiskIncidence.class, riskIncidence, this, commit);
   }
 
   @Override
@@ -1380,7 +1380,7 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> representationInformationCreatedOrUpdated(
     RepresentationInformation ri, boolean commit) {
-    return SolrUtils.create2(index, this, RepresentationInformation.class, ri);
+    return SolrUtils.create2(index, model, this, RepresentationInformation.class, ri);
   }
 
   @Override
@@ -1409,7 +1409,7 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> dipCreated(DIP dip, boolean commit) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    SolrUtils.create2(index, (ModelObserver) this, IndexedDIP.class, dip).addTo(ret);
+    SolrUtils.create2(index, model, (ModelObserver) this, IndexedDIP.class, dip).addTo(ret);
 
     if (ret.isEmpty()) {
       // index DIP Files
@@ -1461,7 +1461,7 @@ public class IndexModelObserver implements ModelObserver {
   private ReturnWithExceptions<Void, ModelObserver> indexDIPFile(DIP dip, DIPFile file, boolean recursive) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    SolrUtils.create2(index, (ModelObserver) this, DIPFile.class, file, new DIPFileCollection.Info(dip)).addTo(ret);
+    SolrUtils.create2(index, model, (ModelObserver) this, DIPFile.class, file, new DIPFileCollection.Info(dip)).addTo(ret);
 
     if (recursive && file.isDirectory() && ret.isEmpty()) {
       try (CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(file, true)) {
@@ -1512,7 +1512,7 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationCreateOrUpdate(
     DisposalConfirmation confirmation) {
-    return SolrUtils.create2(index, this, DisposalConfirmation.class, confirmation);
+    return SolrUtils.create2(index, model, this, DisposalConfirmation.class, confirmation);
   }
 
   @Override

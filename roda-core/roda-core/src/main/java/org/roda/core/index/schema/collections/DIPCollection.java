@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -32,8 +31,8 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
-import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,9 +98,9 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(DIP dip, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, DIP dip, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    SolrInputDocument doc = super.toSolrDocument(dip, info);
+    SolrInputDocument doc = super.toSolrDocument(model, dip, info);
 
     doc.addField(RodaConstants.DIP_TITLE, dip.getTitle());
     doc.addField(RodaConstants.DIP_DESCRIPTION, dip.getDescription());

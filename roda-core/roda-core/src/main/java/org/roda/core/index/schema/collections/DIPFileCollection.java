@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -28,6 +27,7 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -84,9 +84,9 @@ public class DIPFileCollection extends AbstractSolrCollection<DIPFile, DIPFile> 
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(DIPFile file, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, DIPFile file, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    SolrInputDocument doc = super.toSolrDocument(file, info);
+    SolrInputDocument doc = super.toSolrDocument(model, file, info);
 
     List<String> path = file.getPath();
     doc.addField(RodaConstants.DIPFILE_PATH, path);
@@ -107,8 +107,7 @@ public class DIPFileCollection extends AbstractSolrCollection<DIPFile, DIPFile> 
     // extra-fields
     try {
       StoragePath filePath = ModelUtils.getDIPFileStoragePath(file);
-      doc.addField(RodaConstants.DIPFILE_STORAGE_PATH,
-        RodaCoreFactory.getStorageService().getStoragePathAsString(filePath, false));
+      doc.addField(RodaConstants.DIPFILE_STORAGE_PATH, model.getStorage().getStoragePathAsString(filePath, false));
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index DIP file storage path", e);
     }

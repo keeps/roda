@@ -703,7 +703,7 @@ public class IndexService {
     throws AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    SolrUtils.create(getSolrClient(), classToCreate, instance, this);
+    SolrUtils.create(getSolrClient(), model, classToCreate, instance, this);
   }
 
   public SolrClient getSolrClient() {

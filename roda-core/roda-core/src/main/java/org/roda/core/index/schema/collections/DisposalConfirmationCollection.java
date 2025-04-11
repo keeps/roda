@@ -27,6 +27,7 @@ import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -82,10 +83,10 @@ public class DisposalConfirmationCollection extends AbstractSolrCollection<Dispo
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(DisposalConfirmation confirmation, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, DisposalConfirmation confirmation, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(confirmation, info);
+    SolrInputDocument doc = super.toSolrDocument(model, confirmation, info);
 
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_TITLE, confirmation.getTitle());
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_EXTRA_INFO,

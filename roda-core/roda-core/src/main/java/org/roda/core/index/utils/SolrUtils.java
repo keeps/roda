@@ -1421,7 +1421,7 @@ public class SolrUtils {
   }
 
   public static <I extends IsIndexed, M extends IsModelObject, S extends Object> ReturnWithExceptions<Void, S> create2(
-    SolrClient index, S source, Class<I> indexClass, M object, IndexingAdditionalInfo utils) {
+    SolrClient index, ModelService model, S source, Class<I> indexClass, M object, IndexingAdditionalInfo utils) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
 
     Fallback<Object> fallback = Fallback.of(e -> {
@@ -1430,7 +1430,7 @@ public class SolrUtils {
 
     if (object != null) {
       try {
-        SolrInputDocument solrDocument = SolrCollectionRegistry.toSolrDocument(indexClass, object, utils);
+        SolrInputDocument solrDocument = SolrCollectionRegistry.toSolrDocument(indexClass, model, object, utils);
         if (solrDocument != null) {
           Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy())
             .onFailure(e -> LOGGER.error("Error adding document to index", e.getException()))
@@ -1447,21 +1447,21 @@ public class SolrUtils {
   }
 
   public static <I extends IsIndexed, M extends IsModelObject, S extends Object> ReturnWithExceptions<Void, S> create2(
-    SolrClient index, S source, Class<I> indexClass, M object) {
-    return create2(index, source, indexClass, object, IndexingAdditionalInfo.empty());
+    SolrClient index,  ModelService model, S source, Class<I> indexClass, M object) {
+    return create2(index, model, source, indexClass, object, IndexingAdditionalInfo.empty());
   }
 
   public static <T extends IsIndexed, M extends IsModelObject, S extends Object> ReturnWithExceptions<Void, S> create(
-    SolrClient index, Class<T> classToCreate, M instance, S source) {
-    return create(index, classToCreate, instance, source, false);
+    SolrClient index, ModelService model, Class<T> classToCreate, M instance, S source) {
+    return create(index, model, classToCreate, instance, source, false);
   }
 
   public static <T extends IsIndexed, M extends IsModelObject, S extends Object> ReturnWithExceptions<Void, S> create(
-    SolrClient index, Class<T> classToCreate, M instance, S source, boolean commit) {
+    SolrClient index, ModelService model, Class<T> classToCreate, M instance, S source, boolean commit) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
     try {
       Optional<SolrInputDocument> solrDocument = Optional
-        .of(SolrCollectionRegistry.toSolrDocument(classToCreate, instance));
+        .of(SolrCollectionRegistry.toSolrDocument(classToCreate, model, instance));
       if (solrDocument.isPresent()) {
         create(index, SolrCollectionRegistry.getIndexName(classToCreate), solrDocument.get(), source).addTo(ret);
         if (commit) {

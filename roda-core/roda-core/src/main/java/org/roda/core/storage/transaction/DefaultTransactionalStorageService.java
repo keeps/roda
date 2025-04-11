@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.common.transaction.InMemoryLockService;
+import org.roda.core.common.transaction.LockService;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -23,40 +23,33 @@ import org.roda.core.storage.Entity;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class DefaultTransactionalStorageService implements TransactionalStorageService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTransactionalStorageService.class);
+
   private StorageService stagingStorageService;
   private StorageService mainStorageService;
   private Transaction transaction;
-
-  private InMemoryLockService lockService;
+  private LockService lockService;
 
   public DefaultTransactionalStorageService(StorageService mainStorageService, StorageService stagingStorageService,
-    Transaction transaction) throws GenericException {
+    Transaction transaction, LockService lockService) {
     this.mainStorageService = mainStorageService;
     this.stagingStorageService = stagingStorageService;
     this.transaction = transaction;
-  }
-
-  public void setLockService(InMemoryLockService lockService) {
     this.lockService = lockService;
   }
-
-  private void acquireLock(StoragePath storagePath) {
-    lockService.acquireLock(storagePath.toString(), transaction.getTransactionId());
-  }
-
 
   @Override
   public boolean exists(StoragePath storagePath) {
     acquireLock(storagePath);
-    return mainStorageService.exists(storagePath);
+    return getStorageService(storagePath).exists(storagePath);
   }
 
   @Override
@@ -68,7 +61,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   @Override
   public Container createContainer(StoragePath storagePath)
     throws GenericException, AlreadyExistsException, AuthorizationDeniedException, RequestNotValidException {
-    addStoragePath(storagePath);
+    acquireLock(storagePath);
     return stagingStorageService.createContainer(storagePath);
   }
 
@@ -76,7 +69,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public Container getContainer(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     acquireLock(storagePath);
-    return mainStorageService.getContainer(storagePath);
+    return getStorageService(storagePath).getContainer(storagePath);
   }
 
   @Override
@@ -91,27 +84,27 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     acquireLock(storagePath);
-    return mainStorageService.listResourcesUnderContainer(storagePath, recursive);
+    return getStorageService(storagePath).listResourcesUnderContainer(storagePath, recursive);
   }
 
   @Override
   public Long countResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     acquireLock(storagePath);
-    return mainStorageService.countResourcesUnderContainer(storagePath, recursive);
+    return getStorageService(storagePath).countResourcesUnderContainer(storagePath, recursive);
   }
 
   @Override
   public Directory createDirectory(StoragePath storagePath)
     throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
-    addStoragePath(storagePath);
+    acquireLock(storagePath);
     return stagingStorageService.createDirectory(storagePath);
   }
 
   @Override
   public Directory createRandomDirectory(StoragePath parentStoragePath) throws RequestNotValidException,
     GenericException, NotFoundException, AlreadyExistsException, AuthorizationDeniedException {
-    addStoragePath(parentStoragePath);
+    acquireLock(parentStoragePath);
     return stagingStorageService.createRandomDirectory(parentStoragePath);
   }
 
@@ -119,48 +112,48 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public Directory getDirectory(StoragePath storagePath)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     acquireLock(storagePath);
-    return mainStorageService.getDirectory(storagePath);
+    return getStorageService(storagePath).getDirectory(storagePath);
   }
 
   @Override
   public boolean hasDirectory(StoragePath storagePath) {
     acquireLock(storagePath);
-    return mainStorageService.hasDirectory(storagePath);
+    return getStorageService(storagePath).hasDirectory(storagePath);
   }
 
   @Override
   public CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     acquireLock(storagePath);
-    return mainStorageService.listResourcesUnderDirectory(storagePath, recursive);
+    return getStorageService(storagePath).listResourcesUnderDirectory(storagePath, recursive);
   }
 
   @Override
   public CloseableIterable<Resource> listResourcesUnderFile(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     acquireLock(storagePath);
-    return mainStorageService.listResourcesUnderFile(storagePath, recursive);
+    return getStorageService(storagePath).listResourcesUnderFile(storagePath, recursive);
   }
 
   @Override
   public Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     acquireLock(storagePath);
-    return mainStorageService.countResourcesUnderDirectory(storagePath, recursive);
+    return getStorageService(storagePath).countResourcesUnderDirectory(storagePath, recursive);
   }
 
   @Override
   public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
     throws GenericException, AlreadyExistsException, RequestNotValidException, AuthorizationDeniedException,
     NotFoundException {
-    addStoragePath(storagePath);
+    acquireLock(storagePath);
     return stagingStorageService.createBinary(storagePath, payload, asReference);
   }
 
   @Override
   public Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    addStoragePath(parentStoragePath);
+    acquireLock(parentStoragePath);
     return stagingStorageService.createRandomBinary(parentStoragePath, payload, asReference);
   }
 
@@ -168,13 +161,13 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public Binary getBinary(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     acquireLock(storagePath);
-    return mainStorageService.getBinary(storagePath);
+    return getStorageService(storagePath).getBinary(storagePath);
   }
 
   @Override
   public boolean hasBinary(StoragePath storagePath) {
     acquireLock(storagePath);
-    return mainStorageService.hasBinary(storagePath);
+    return getStorageService(storagePath).hasBinary(storagePath);
   }
 
   @Override
@@ -195,8 +188,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   @Override
   public Class<? extends Entity> getEntity(StoragePath storagePath)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    acquireLock(storagePath);
-    return mainStorageService.getEntity(storagePath);
+    return getStorageService(storagePath).getEntity(storagePath);
   }
 
   @Override
@@ -232,14 +224,14 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     acquireLock(storagePath);
-    return mainStorageService.listBinaryVersions(storagePath);
+    return getStorageService(storagePath).listBinaryVersions(storagePath);
   }
 
   @Override
   public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
     throws RequestNotValidException, NotFoundException, GenericException {
     acquireLock(storagePath);
-    return mainStorageService.getBinaryVersion(storagePath, version);
+    return getStorageService(storagePath).getBinaryVersion(storagePath, version);
   }
 
   @Override
@@ -267,59 +259,86 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public String getStoragePathAsString(StoragePath storagePath, boolean skipStoragePathContainer,
     StoragePath anotherStoragePath, boolean skipAnotherStoragePathContainer) {
     acquireLock(storagePath);
-    return mainStorageService.getStoragePathAsString(storagePath, skipStoragePathContainer, anotherStoragePath,
-      skipAnotherStoragePathContainer);
+    return getStorageService(storagePath).getStoragePathAsString(storagePath, skipStoragePathContainer,
+      anotherStoragePath, skipAnotherStoragePathContainer);
   }
 
   @Override
   public String getStoragePathAsString(StoragePath storagePath, boolean skipContainer) {
     acquireLock(storagePath);
-    return mainStorageService.getStoragePathAsString(storagePath, skipContainer);
+    return getStorageService(storagePath).getStoragePathAsString(storagePath, skipContainer);
   }
 
   @Override
   public List<StoragePath> getShallowFiles(StoragePath storagePath) throws NotFoundException, GenericException {
     acquireLock(storagePath);
-    return mainStorageService.getShallowFiles(storagePath);
+    return getStorageService(storagePath).getShallowFiles(storagePath);
   }
 
   @Override
   public void commit() {
     for (StoragePath storagePath : transaction.getStoragePathList()) {
+      if(!stagingStorageService.exists(storagePath)) {
+        // TODO: release lock now or wait for the transaction to finish?
+        releaseLock(storagePath);
+        continue;
+      }
       try {
-        StorageServiceUtils.moveBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
-          storagePath, Resource.class);
+        if(mainStorageService.exists(storagePath)) {
+          mainStorageService.deleteResource(storagePath);
+        }
+        LOGGER.info("Moving resource from staging to main storage service: {}", storagePath);
+        StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
+          storagePath, getEntity(storagePath));
       } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
         | AuthorizationDeniedException e) {
-        e.printStackTrace();
+        // TODO: Handle this exceptions
+      } finally {
+        // TODO: release lock now or wait for the transaction to finish?
+        releaseLock(storagePath);
       }
     }
   }
 
   private void copyFromMainStorageService(StoragePath storagePath) {
     acquireLock(storagePath);
-    if (!transaction.exist(storagePath)) {
-      try {
-        StorageServiceUtils.copyBetweenStorageServices(mainStorageService, storagePath, stagingStorageService,
-          storagePath, Resource.class);
-        transaction.addStoragePath(storagePath);
-      } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException
-        | GenericException e) {
-        // Do nothing
-      }
-    }
-  }
-
-  private void addStoragePath(StoragePath storagePath) {
-    acquireLock(storagePath);
-    if (!transaction.exist(storagePath)) {
-      transaction.addStoragePath(storagePath);
+    try {
+      StorageServiceUtils.copyBetweenStorageServices(mainStorageService, storagePath, stagingStorageService,
+        storagePath, Resource.class);
+    } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException
+      | GenericException e) {
+      // Do nothing
     }
   }
 
   @Override
   public void rollback() {
 
+  }
+
+  private void acquireLock(StoragePath storagePath) {
+    if (!storagePath.isFromAContainer()) {
+      LOGGER.info("Acquiring lock for storage path: {}", storagePath);
+      // lockService.acquireLock(storagePath.toString(),
+      // transaction.getTransactionId());
+      if (!transaction.exist(storagePath)) {
+        transaction.addStoragePath(storagePath);
+      }
+    }
+  }
+
+  private void releaseLock(StoragePath storagePath) {
+    LOGGER.info("Releasing lock for storage path: {}", storagePath);
+    // lockService.releaseLock(storagePath.toString(),
+    // transaction.getTransactionId());
+  }
+
+  private StorageService getStorageService(StoragePath storagePath) {
+    if (stagingStorageService.exists(storagePath)) {
+      return stagingStorageService;
+    } else {
+      return mainStorageService;
+    }
   }
 
 }

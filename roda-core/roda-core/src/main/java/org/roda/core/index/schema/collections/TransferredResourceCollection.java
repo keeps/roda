@@ -25,6 +25,7 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,10 +83,10 @@ public class TransferredResourceCollection extends AbstractSolrCollection<Transf
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(TransferredResource tr, IndexingAdditionalInfo info)
+  public SolrInputDocument toSolrDocument(ModelService model, TransferredResource tr, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(tr, info);
+    SolrInputDocument doc = super.toSolrDocument(model, tr, info);
 
     doc.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, tr.getFullPath());
     if (tr.getParentId() != null) {
