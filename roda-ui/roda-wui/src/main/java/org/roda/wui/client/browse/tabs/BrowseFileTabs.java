@@ -35,14 +35,15 @@ public class BrowseFileTabs extends Tabs {
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
     // PREVIEW
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.viewTab()), new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        return new IndexedFilePreview(viewers, file, file.isAvailable(), justActive,
-          browseFileResponse.getIndexedAIP().getPermissions(), () -> {
-          });
-      }
-    });
+    createAndAddTab(SafeHtmlUtils.fromSafeConstant(file.isDirectory() ? messages.filesTab() : messages.viewTab()),
+      new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          return new IndexedFilePreview(viewers, file, file.isAvailable(), justActive,
+            browseFileResponse.getIndexedAIP().getPermissions(), () -> {
+            });
+        }
+      });
 
     // PRESERVATION EVENTS
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.preservationEvents()), new TabContentBuilder() {
@@ -73,7 +74,7 @@ public class BrowseFileTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DetailsTab(aip, representation, file);
+        return new DetailsTab(file, browseFileResponse.getRepresentationInformationFields());
       }
     });
   }

@@ -10,7 +10,11 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
@@ -29,7 +33,11 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.tabs.BrowseAIPTabs;
-import org.roda.wui.client.common.*;
+import org.roda.wui.client.common.BrowseAIPActionsToolbar;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipSearchWrapperActions;
 import org.roda.wui.client.common.cards.AIPDisseminationCardList;
@@ -58,7 +66,12 @@ import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -167,6 +180,9 @@ public class BrowseAIP extends Composite {
           new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
             .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
             .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener().withActionable(aipActions)
+            .withActionBlacklist(List.of(AipSearchWrapperActions.AipSearchWrapperAction.NEW_CHILD_AIP_BELOW,
+              AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_ACCEPT,
+              AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_REJECT))
             .withActionableCallback(listActionableCallback));
       }
 
