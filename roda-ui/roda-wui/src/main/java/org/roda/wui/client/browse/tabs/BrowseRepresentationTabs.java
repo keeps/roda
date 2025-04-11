@@ -99,7 +99,7 @@ public class BrowseRepresentationTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DetailsTab(aip, representation);
+        return new DetailsTab(browseRepresentationResponse);
       }
     });
   }

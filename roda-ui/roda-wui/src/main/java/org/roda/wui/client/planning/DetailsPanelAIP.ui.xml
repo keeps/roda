@@ -3,70 +3,18 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
 >
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
-		<g:FlowPanel addStyleNames="descriptiveMetadataHTML">
-			<g:FlowPanel addStyleNames="descriptiveMetadata">
-				<g:Label styleName="form-separator">
-					<ui:text from='{messages.detailsAIP}' />
-				</g:Label>
-				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">
-						<ui:text from='{messages.detailsIdentifier}' />
-					</g:Label>
-					<g:Label styleName="value" ui:field="aipID" />
-				</g:FlowPanel>
-				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">
-						<ui:text from='{messages.detailsType}' />
-					</g:Label>
-					<g:Label styleName="value" ui:field="aipType" />
-				</g:FlowPanel>
-				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">
-						<ui:text from='{messages.detailsState}' />
-					</g:Label>
-					<g:Label styleName="value value" ui:field="aipState" />
-				</g:FlowPanel>
-				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">
-						<ui:text from='{messages.detailsCreatedOn}' />
-					</g:Label>
-					<g:Label styleName="value" ui:field="aipCreatedOn" />
-				</g:FlowPanel>
-				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">
-						<ui:text from='{messages.detailsCreatedBy}' />
-					</g:Label>
-					<g:Label styleName="value" ui:field="aipCreatedBy" />
-				</g:FlowPanel>
-				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">
-						<ui:text from='{messages.detailsModifiedOn}' />
-					</g:Label>
-					<g:Label styleName="value" ui:field="modifiedOn" />
-				</g:FlowPanel>
-				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">
-						<ui:text from='{messages.detailsModifiedBy}' />
-					</g:Label>
-					<g:Label styleName="value" ui:field="modifiedBy" />
-				</g:FlowPanel>
-				<g:Label styleName="form-separator">
-					<ui:text from='{messages.detailsIngest}' />
-				</g:Label>
-				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">
-						<ui:text from='{messages.sipIdentifier}' />
-					</g:Label>
-					<g:FlowPanel ui:field="identifiersPanel" />
-				</g:FlowPanel>
-				<g:FlowPanel styleName="field">
-					<g:Label styleName="label">
-						<ui:text from='{messages.ingestIdentifier}' />
-					</g:Label>
-					<g:FlowPanel ui:field="jobsPanel" />
-				</g:FlowPanel>
-			</g:FlowPanel>
-	</g:FlowPanel>
+    <g:FlowPanel addStyleNames="descriptiveMetadataHTML">
+        <g:FlowPanel addStyleNames="descriptiveMetadata">
+            <g:Label styleName="form-separator">
+                <ui:text from='{messages.detailsAIP}'/>
+            </g:Label>
+            <g:FlowPanel ui:field="aipDetails" addStyleNames="descriptiveMetadata"/>
+            <g:Label styleName="form-separator" ui:field="ingestLabel">
+                <ui:text from='{messages.detailsIngest}'/>
+            </g:Label>
+            <g:FlowPanel ui:field="ingestDetails" addStyleNames="descriptiveMetadata"/>
+        </g:FlowPanel>
+    </g:FlowPanel>
 </ui:UiBinder>

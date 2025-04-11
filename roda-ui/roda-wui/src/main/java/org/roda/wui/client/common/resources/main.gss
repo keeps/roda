@@ -2951,11 +2951,15 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .representationInformationMissing i {
-    color: #af1612;
+    color: COLOR_PRIMARY;
     background-color: white;
     border-radius: 1em;
     width: 1em;
     text-align: center;
+}
+
+.representationInformationMissing i:before {
+    content: "\e903";
 }
 
 .representationInformationPresent i {
@@ -2964,6 +2968,10 @@ td.datePickerMonth, td.datePickerYear {
     border-radius: 1em;
     width: 1em;
     text-align: center;
+}
+
+.representationInformationPresent i:before {
+    content: "\e910";
 }
 
 .slider .representationInformationPresent i {
@@ -9154,6 +9162,10 @@ wui-disposal-hold-data .form-textbox {
     content: "\e928"
 }
 
+.cmi-circle-plus:after {
+    content: "\e902";
+}
+
 .largeIcon {
     font-size: 20px;
 }
@@ -9167,7 +9179,7 @@ wui-disposal-hold-data .form-textbox {
 .details-uuid {
     font-size: 1.6rem;
     color: rgb(88, 89, 91);
-    font-family: 'MonoUbuntu'
+    font-family: FONT_MONOSPACED;
 }
 
 .details-anchor {

@@ -42,8 +42,7 @@ public class RepresentationInformationHelper {
 
     if (createIcon) {
       final Anchor icon = new Anchor();
-      icon.setHTML(
-        SafeHtmlUtils.fromSafeConstant("<i class='fa fa-info-circle " + iconCssClass + "' aria-hidden='true'></i>"));
+      icon.setHTML(SafeHtmlUtils.fromSafeConstant("<i class='cmi " + iconCssClass + "' aria-hidden='true'></i>"));
       icon.addStyleName("icon-left-padding");
 
       if (StringUtils.isBlank(iconCssClass)) {
@@ -65,12 +64,12 @@ public class RepresentationInformationHelper {
 
           if (longResponse.getResult() > 0) {
             icon.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
-                RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
+              RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
           } else {
             icon.addStyleName("representationInformationMissing");
             icon.removeStyleName("representationInformationPresent");
             icon.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
-                RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
+              RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
           }
         }
       });

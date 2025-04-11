@@ -1,8 +1,10 @@
 package org.roda.wui.client.browse.tabs;
 
-import org.roda.core.data.v2.ip.IndexedAIP;
+import java.util.List;
+
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.wui.client.common.model.BrowseAIPResponse;
+import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.planning.DetailsPanelAIP;
 import org.roda.wui.client.planning.DetailsPanelFile;
 import org.roda.wui.client.planning.DetailsPanelRepresentation;
@@ -26,24 +28,24 @@ public class DetailsTab extends Composite {
   @UiField
   FlowPanel content;
 
-  public DetailsTab(IndexedAIP aip) {
+  public DetailsTab(BrowseAIPResponse response) {
     initWidget(uiBinder.createAndBindUi(this));
     // Get metadata and populate widget
-    DetailsPanelAIP detailsPanel = new DetailsPanelAIP(aip);
+    DetailsPanelAIP detailsPanel = new DetailsPanelAIP(response);
     content.add(detailsPanel);
   }
 
-  public DetailsTab(IndexedAIP aip, IndexedRepresentation representation) {
+  public DetailsTab(BrowseRepresentationResponse response) {
     initWidget(uiBinder.createAndBindUi(this));
     // Get metadata and populate widget
-    DetailsPanelRepresentation detailsPanel = new DetailsPanelRepresentation(aip, representation);
+    DetailsPanelRepresentation detailsPanel = new DetailsPanelRepresentation(response);
     content.add(detailsPanel);
   }
 
-  public DetailsTab(IndexedAIP aip, IndexedRepresentation representation, IndexedFile file) {
+  public DetailsTab(IndexedFile file, List<String> riRules) {
     initWidget(uiBinder.createAndBindUi(this));
     // Get metadata and populate widget
-    DetailsPanelFile detailsPanel = new DetailsPanelFile(aip, representation, file);
+    DetailsPanelFile detailsPanel = new DetailsPanelFile(file, riRules);
     content.add(detailsPanel);
   }
 

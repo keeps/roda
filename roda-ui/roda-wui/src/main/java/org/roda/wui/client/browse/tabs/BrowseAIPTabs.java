@@ -110,7 +110,7 @@ public class BrowseAIPTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DetailsTab(aip);
+        return new DetailsTab(browseAIPResponse);
       }
     });
   }

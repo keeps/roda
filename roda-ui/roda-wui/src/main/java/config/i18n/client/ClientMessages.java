@@ -995,7 +995,11 @@ public interface ClientMessages extends Messages {
 
   String detailsRepresentation();
 
+  String detailsFile();
+
   String detailsIdentifier();
+
+  String detailsLevel();
 
   String detailsType();
 

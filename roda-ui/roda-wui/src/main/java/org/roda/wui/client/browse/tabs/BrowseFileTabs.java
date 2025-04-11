@@ -73,7 +73,7 @@ public class BrowseFileTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DetailsTab(aip, representation, file);
+        return new DetailsTab(file, browseFileResponse.getRepresentationInformationFields());
       }
     });
   }

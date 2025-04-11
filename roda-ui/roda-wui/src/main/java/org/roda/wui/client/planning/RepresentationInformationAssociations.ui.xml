@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search" xmlns:common="urn:import:org.roda.wui.client.common">
+             xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+             xmlns:common="urn:import:org.roda.wui.client.common">
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
-	<g:FlowPanel styleName="wui-format-register" addStyleNames="wrapper skip_padding">
-		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_12 content">
-				<common:TitlePanel text="{messages.representationInformationAssociationsTitle}"
-					iconClass="RepresentationInformation" />
-				<g:HTML addStyleNames="h4 representationInformationSubtitle" ui:field="resultsPanelTitle" />
-				<g:HTML addStyleNames="page-description" ui:field="description" />
+    <g:FlowPanel styleName="wui-format-register" addStyleNames="wrapper skip_padding">
+        <g:FlowPanel addStyleNames="row full_width skip_padding">
+            <g:FlowPanel addStyleNames="col_12 content">
+                <common:TitlePanel text="{messages.representationInformationAssociationsTitle}"
+                                   iconClass="RepresentationInformation"/>
+                <g:HTML addStyleNames="h4 representationInformationSubtitle" ui:field="resultsPanelTitle"/>
+                <g:HTML addStyleNames="page-description" ui:field="description"/>
 
-				<g:FlowPanel ui:field="resultsPanel"
-					addStyleNames="card representationInformationCard representationInformationCardList">
-					<commonsearch:SearchWrapper ui:field="searchWrapper" />
-				</g:FlowPanel>
-			</g:FlowPanel>
-		</g:FlowPanel>
-	</g:FlowPanel>
+                <g:FlowPanel ui:field="resultsPanel"
+                             addStyleNames="representationInformationCard representationInformationCardList">
+                    <commonsearch:SearchWrapper ui:field="searchWrapper"/>
+                </g:FlowPanel>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
 </ui:UiBinder>
