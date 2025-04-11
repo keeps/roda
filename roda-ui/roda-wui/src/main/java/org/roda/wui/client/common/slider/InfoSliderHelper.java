@@ -7,8 +7,14 @@
  */
 package org.roda.wui.client.common.slider;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
@@ -28,19 +34,33 @@ import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
-import org.roda.wui.common.client.tools.*;
+import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.RestUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.http.client.*;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 
@@ -117,12 +137,9 @@ public class InfoSliderHelper {
     populate(infoSliderPanel, values);
   }
 
-  public static void updateInfoSliderPanel(BrowseRepresentationResponse response, SliderPanel infoSliderPanel) {
-    IndexedRepresentation representation = response.getIndexedRepresentation();
-
+  public static HashMap<String, Widget> getRepresentationInfoDetailsMap(BrowseRepresentationResponse response) {
     HashMap<String, Widget> values = new HashMap<>();
-    infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedRepresentation.class.getName())));
+    IndexedRepresentation representation = response.getIndexedRepresentation();
 
     values.put(messages.representationId(), createIdHTML(response));
 
@@ -140,18 +157,25 @@ public class InfoSliderHelper {
       values.put(messages.representationType(), createRepresentationTypeHTML(response));
     }
 
+    return values;
+  }
+
+  public static void updateInfoSliderPanel(BrowseRepresentationResponse response, SliderPanel infoSliderPanel) {
+    IndexedRepresentation representation = response.getIndexedRepresentation();
+
+    HashMap<String, Widget> values = getRepresentationInfoDetailsMap(response);
+    infoSliderPanel.clear();
+    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedRepresentation.class.getName())));
+
     addLinkIfCentralInstance(values, representation.getInstanceName(), representation.isLocalInstance(),
       representation.getInstanceId());
 
     populate(infoSliderPanel, values);
   }
 
-  public static void updateInfoSliderPanel(BrowseAIPResponse response, SliderPanel infoSliderPanel) {
-    IndexedAIP aip = response.getIndexedAIP();
-
+  public static HashMap<String, Widget> getAipInfoDetailsMap(BrowseAIPResponse response) {
     HashMap<String, Widget> values = new HashMap<>();
-    infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedAIP.class.getName())));
+    IndexedAIP aip = response.getIndexedAIP();
 
     values.put(messages.itemId(), createIdHTML(response));
 
@@ -172,9 +196,6 @@ public class InfoSliderHelper {
     if (StringUtils.isNotBlank(aip.getType())) {
       values.put(messages.aipType(), createAipTypeHTML(response));
     }
-
-    addLinkIfCentralInstance(values, response.getIndexedAIP().getInstanceName(),
-      response.getIndexedAIP().isLocalInstance(), aip.getInstanceId());
 
     if (!aip.getIngestSIPIds().isEmpty()) {
       FlowPanel sipIds = new FlowPanel();
@@ -207,6 +228,19 @@ public class InfoSliderHelper {
 
       values.put(messages.updateProcessIdTitle(), jobIdsList);
     }
+
+    return values;
+  }
+
+  public static void updateInfoSliderPanel(BrowseAIPResponse response, SliderPanel infoSliderPanel) {
+    IndexedAIP aip = response.getIndexedAIP();
+
+    HashMap<String, Widget> values = getAipInfoDetailsMap(response);
+    infoSliderPanel.clear();
+    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedAIP.class.getName())));
+
+    addLinkIfCentralInstance(values, response.getIndexedAIP().getInstanceName(),
+      response.getIndexedAIP().isLocalInstance(), aip.getInstanceId());
 
     if (!response.getIndexedAIP().getPermissions().getUsers().equals(new Permissions().getUsers())
       || !response.getIndexedAIP().getPermissions().getGroups().equals(new Permissions().getGroups())) {
@@ -346,19 +380,12 @@ public class InfoSliderHelper {
     return table;
   }
 
-  public static void createFileInfoSliderPanel(IndexedFile file, BrowseFileResponse response,
-    SliderPanel infoSliderPanel) {
+  public static HashMap<String, Widget> getFileInfoDetailsMap(IndexedFile file, List<String> riRules) {
     HashMap<String, Widget> values = new HashMap<>();
-    infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedFile.class.getName())));
-
-    Long risksCounter = response.getRiskCounterResponse().getResult();
-    Long preservationEventsCounter = response.getPreservationCounterResponse().getResult();
 
     if (file != null) {
       String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-      values.put(messages.viewRepresentationInfoFilename(),
-        createIdHTML(response.getRepresentationInformationFields(), fileName, file.getUUID()));
+      values.put(messages.viewRepresentationInfoFilename(), createIdHTML(riRules, fileName, file.getUUID()));
 
       if (file.getSize() > 0) {
         values.put(messages.viewRepresentationInfoSize(),
@@ -370,33 +397,31 @@ public class InfoSliderHelper {
 
         if (StringUtils.isNotBlank(fileFormat.getExtension())) {
           values.put(messages.viewRepresentationInfoExtension(),
-            createExtensionHTML(response.getRepresentationInformationFields(), fileFormat.getExtension()));
+            createExtensionHTML(riRules, fileFormat.getExtension()));
         }
 
         if (StringUtils.isNotBlank(fileFormat.getMimeType())) {
-          values.put(messages.viewRepresentationInfoMimetype(),
-            createMimetypeHTML(response.getRepresentationInformationFields(), fileFormat.getMimeType()));
+          values.put(messages.viewRepresentationInfoMimetype(), createMimetypeHTML(riRules, fileFormat.getMimeType()));
         }
 
         if (StringUtils.isNotBlank(fileFormat.getFormatDesignationName())) {
-          values.put(messages.viewRepresentationInfoFormat(), createFormatDesignationHTML(
-            response.getRepresentationInformationFields(), fileFormat.getFormatDesignation()));
+          values.put(messages.viewRepresentationInfoFormat(),
+            createFormatDesignationHTML(riRules, fileFormat.getFormatDesignation()));
         }
 
         if (StringUtils.isNotBlank(fileFormat.getPronom())) {
-          values.put(messages.viewRepresentationInfoPronom(),
-            createPronomHTML(response.getRepresentationInformationFields(), fileFormat.getPronom()));
+          values.put(messages.viewRepresentationInfoPronom(), createPronomHTML(riRules, fileFormat.getPronom()));
         }
       }
 
       if (StringUtils.isNotBlank(file.getCreatingApplicationName())) {
-        values.put(messages.viewRepresentationInfoCreatingApplicationName(), createCreatingApplicationNameHTML(
-          response.getRepresentationInformationFields(), file.getCreatingApplicationName()));
+        values.put(messages.viewRepresentationInfoCreatingApplicationName(),
+          createCreatingApplicationNameHTML(riRules, file.getCreatingApplicationName()));
       }
 
       if (StringUtils.isNotBlank(file.getCreatingApplicationVersion())) {
-        values.put(messages.viewRepresentationInfoCreatingApplicationVersion(), createCreatingApplicationVersionHTML(
-          response.getRepresentationInformationFields(), file.getCreatingApplicationVersion()));
+        values.put(messages.viewRepresentationInfoCreatingApplicationVersion(),
+          createCreatingApplicationVersionHTML(riRules, file.getCreatingApplicationVersion()));
       }
 
       if (StringUtils.isNotBlank(file.getDateCreatedByApplication())) {
@@ -435,7 +460,20 @@ public class InfoSliderHelper {
           values.put(messages.viewRepresentationInfoStoragePath(), new InlineHTML(b.toSafeHtml()));
         }
       }
+    }
+    return values;
+  }
 
+  public static void createFileInfoSliderPanel(IndexedFile file, BrowseFileResponse response,
+    SliderPanel infoSliderPanel) {
+    HashMap<String, Widget> values = getFileInfoDetailsMap(file, response.getRepresentationInformationFields());
+    infoSliderPanel.clear();
+    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedFile.class.getName())));
+
+    Long risksCounter = response.getRiskCounterResponse().getResult();
+    Long preservationEventsCounter = response.getPreservationCounterResponse().getResult();
+
+    if (file != null) {
       addLinkIfCentralInstance(values, file.getInstanceName(), file.isLocalInstance(), file.getInstanceId());
 
       List<String> history = new ArrayList<>();

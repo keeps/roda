@@ -10,42 +10,7 @@
             <g:Label styleName="form-separator">
                 <ui:text from='{messages.detailsRepresentation}'/>
             </g:Label>
-            <g:FlowPanel styleName="field">
-                <g:Label styleName="label">
-                    <ui:text from='{messages.detailsIdentifier}'/>
-                </g:Label>
-                <g:Label styleName="value" ui:field="repID"/>
-            </g:FlowPanel>
-            <g:FlowPanel styleName="field">
-                <g:Label styleName="label">
-                    <ui:text from='{messages.detailsType}'/>
-                </g:Label>
-                <g:Label styleName="value" ui:field="repType"/>
-            </g:FlowPanel>
-            <g:FlowPanel styleName="field">
-                <g:Label styleName="label">
-                    <ui:text from='{messages.detailsCreatedOn}'/>
-                </g:Label>
-                <g:Label styleName="value" ui:field="repCreatedOn"/>
-            </g:FlowPanel>
-            <g:FlowPanel styleName="field">
-                <g:Label styleName="label">
-                    <ui:text from='{messages.detailsCreatedBy}'/>
-                </g:Label>
-                <g:Label styleName="value" ui:field="repCreatedBy"/>
-            </g:FlowPanel>
-            <g:FlowPanel styleName="field">
-                <g:Label styleName="label">
-                    <ui:text from='{messages.detailsModifiedOn}'/>
-                </g:Label>
-                <g:Label styleName="value" ui:field="modifiedOn"/>
-            </g:FlowPanel>
-            <g:FlowPanel styleName="field">
-                <g:Label styleName="label">
-                    <ui:text from='{messages.detailsModifiedBy}'/>
-                </g:Label>
-                <g:Label styleName="value" ui:field="modifiedBy"/>
-            </g:FlowPanel>
+            <g:FlowPanel ui:field="details" addStyleNames="descriptiveMetadata"/>
         </g:FlowPanel>
     </g:FlowPanel>
 </ui:UiBinder>

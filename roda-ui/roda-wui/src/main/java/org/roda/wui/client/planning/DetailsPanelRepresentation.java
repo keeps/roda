@@ -1,13 +1,15 @@
 package org.roda.wui.client.planning;
 
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.common.client.tools.Humanize;
+import java.util.Map;
+
+import org.roda.wui.client.common.model.BrowseRepresentationResponse;
+import org.roda.wui.client.common.slider.InfoSliderHelper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -23,49 +25,40 @@ public class DetailsPanelRepresentation extends Composite {
     .create(DetailsPanelRepresentation.MyUiBinder.class);
 
   @UiField
-  Label repID;
+  FlowPanel details;
 
-  @UiField
-  Label repType;
-
-  @UiField
-  Label repCreatedOn;
-
-  @UiField
-  Label repCreatedBy;
-
-  @UiField
-  Label modifiedOn;
-
-  @UiField
-  Label modifiedBy;
-
-  public DetailsPanelRepresentation(IndexedAIP aip, IndexedRepresentation representation) {
+  public DetailsPanelRepresentation(BrowseRepresentationResponse response) {
     initWidget(uiBinder.createAndBindUi(this));
-    init(aip, representation);
+    init(response);
   }
 
-  public void init(IndexedAIP aip, IndexedRepresentation representation) {
+  public void init(BrowseRepresentationResponse response) {
     GWT.log("DetailsPanel init");
 
-    repID.setText(representation.getId());
-    repType.setText(representation.getType());
+    Map<String, Widget> detailsMap = InfoSliderHelper.getRepresentationInfoDetailsMap(response);
 
-    repCreatedOn.setText(Humanize.formatDateTime(representation.getCreatedOn()));
-    repCreatedBy.setText(representation.getCreatedBy());
+    for (Map.Entry<String, Widget> field : detailsMap.entrySet()) {
+      String fieldLabelString = field.getKey();
+      Widget fieldValueWidget = field.getValue();
 
-    modifiedOn.setText(Humanize.formatDateTime(representation.getUpdatedOn()));
-    modifiedBy.setText(representation.getUpdatedBy());
+      FlowPanel fieldPanel = new FlowPanel();
+      fieldPanel.setStyleName("field");
 
+      Label fieldLabel = new Label(fieldLabelString);
+      fieldLabel.setStyleName("label");
+
+      FlowPanel fieldValuePanel = new FlowPanel();
+      fieldValuePanel.setStyleName("value");
+      fieldValuePanel.add(fieldValueWidget);
+
+      fieldPanel.add(fieldLabel);
+      fieldPanel.add(fieldValuePanel);
+      details.add(fieldPanel);
+    }
   }
 
   public void clear() {
-    repID.setText("");
-    repType.setText("");
-    repCreatedOn.setText("");
-    repCreatedBy.setText("");
-    modifiedOn.setText("");
-    modifiedBy.setText("");
+    details.clear();
   }
 
   interface MyUiBinder extends UiBinder<Widget, DetailsPanelRepresentation> {
