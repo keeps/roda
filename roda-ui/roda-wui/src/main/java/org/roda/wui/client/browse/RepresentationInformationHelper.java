@@ -43,7 +43,7 @@ public class RepresentationInformationHelper {
     if (createIcon) {
       final Anchor icon = new Anchor();
       icon.setHTML(SafeHtmlUtils.fromSafeConstant("<i class='cmi " + iconCssClass + "' aria-hidden='true'></i>"));
-      icon.addStyleName("icon-left-padding");
+      icon.addStyleName("icon-left-padding associateRI");
 
       if (StringUtils.isBlank(iconCssClass)) {
         icon.addStyleName("representationInformationPresent");

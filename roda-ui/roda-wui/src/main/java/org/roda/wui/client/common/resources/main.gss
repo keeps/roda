@@ -2950,7 +2950,7 @@ td.datePickerMonth, td.datePickerYear {
     margin-left: 3px;
 }
 
-.representationInformationMissing i {
+.associateRI.representationInformationMissing i {
     color: COLOR_PRIMARY;
     background-color: white;
     border-radius: 1em;
@@ -2958,11 +2958,11 @@ td.datePickerMonth, td.datePickerYear {
     text-align: center;
 }
 
-.representationInformationMissing i:before {
+.associateRI.representationInformationMissing i:before {
     content: "\e903";
 }
 
-.representationInformationPresent i {
+.associateRI:not(.representationInformationMissing) i {
     color: COLOR_PRIMARY;
     background-color: white;
     border-radius: 1em;
@@ -2970,7 +2970,7 @@ td.datePickerMonth, td.datePickerYear {
     text-align: center;
 }
 
-.representationInformationPresent i:before {
+.associateRI:not(.representationInformationMissing) i:before {
     content: "\e910";
 }
 
@@ -5372,11 +5372,6 @@ td.datePickerMonth, td.datePickerYear {
     width: 100%;
     text-align: center;
     padding-top: 0px;
-}
-
-.bitstreamPreview-directory {
-    padding: 2%;
-    width: 96%;
 }
 
 .viewRepresentationImageFilePreview {
