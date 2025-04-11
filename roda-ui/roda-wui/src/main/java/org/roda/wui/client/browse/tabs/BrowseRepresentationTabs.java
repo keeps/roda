@@ -56,7 +56,6 @@ public class BrowseRepresentationTabs extends Tabs {
 
     // Descriptive metadata
     if (!browseRepresentationResponse.getDescriptiveMetadataInfos().getDescriptiveMetadataInfoList().isEmpty()) {
-
       createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.descriptiveMetadataTab()), new TabContentBuilder() {
         @Override
         public Widget buildTabWidget() {

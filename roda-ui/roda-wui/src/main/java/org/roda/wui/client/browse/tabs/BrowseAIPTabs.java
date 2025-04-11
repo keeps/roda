@@ -39,15 +39,17 @@ public class BrowseAIPTabs extends Tabs {
 
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
     // Descriptive metadata
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.descriptiveMetadataTab()), new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        AIPDescriptiveMetadataTabs aipDescriptiveMetadataTabs = new AIPDescriptiveMetadataTabs();
-        aipDescriptiveMetadataTabs.init(aip, browseAIPResponse.getDescriptiveMetadataInfos());
-        aipDescriptiveMetadataTabs.setStyleName("descriptiveMetadataTabs");
-        return aipDescriptiveMetadataTabs;
-      }
-    });
+    if (!browseAIPResponse.getDescriptiveMetadataInfos().getDescriptiveMetadataInfoList().isEmpty()) {
+      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.descriptiveMetadataTab()), new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          AIPDescriptiveMetadataTabs aipDescriptiveMetadataTabs = new AIPDescriptiveMetadataTabs();
+          aipDescriptiveMetadataTabs.init(aip, browseAIPResponse.getDescriptiveMetadataInfos());
+          aipDescriptiveMetadataTabs.setStyleName("descriptiveMetadataTabs");
+          return aipDescriptiveMetadataTabs;
+        }
+      });
+    }
 
     // Preservation events
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.preservationEventsTab()), new TabContentBuilder() {
