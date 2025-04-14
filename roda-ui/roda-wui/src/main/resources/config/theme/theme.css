@@ -672,7 +672,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .hero-bg {
-  background-image: url("api/v2/themes?resource-id=images/hero-bg.svg");
+  background-image: url("themes?resource-id=images/hero-bg.svg");
   background-repeat: no-repeat;
   background-position: right;
   background-position-x: 82vw;
