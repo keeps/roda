@@ -8,7 +8,7 @@
 }
 
 .padding-lg {
-  padding: 100px 18.75%;
+  padding: 100px 30%;
 }
 
 .padding-md {
@@ -95,7 +95,7 @@
   color: black;
 }
 
-.credentials-card-elements btn-hero {
+.credentials-card-elements hero-button {
   box-shadow: none;
   font-size: 16px;
   font-weight: bold;
@@ -139,7 +139,7 @@
   display: flex;
   flex-direction: column;
   align-items: start;
-  gap: 22px;
+  gap: 24px;
 }
 
 hr.hero-separator {
@@ -292,7 +292,6 @@ a.btn-hero:visited, a.btn-welcome:visited {
 }
 
 .get-quote {
-  background-color: #25a6d6;
   color: #ffffff;
 }
 
@@ -358,6 +357,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 .text-columns {
   display: flex;
   gap: 32px;
+  text-align: justify;
 }
 
 .text-column {
@@ -643,71 +643,81 @@ a.btn-hero:visited, a.btn-welcome:visited {
   }
 }
 
+.background-footer {
+    background-color: black;
+}
+
 .background-black {
     background-color: #1d1f20;
-    border-radius: 50%;
 }
 
 .background-white {
     background-color: white;
-    border-radius: 50%;
 }
 
 .background-grey {
     background-color: #eaebec;
-    border-radius: 50%;
 }
 
 .background-dark-grey {
     background-color: #303436;
-    border-radius: 50%;
 }
 
 .background-primary {
     background-color: #25a6d6;
-    border-radius: 50%;
 }
 
 .background-very-dark-grey {
   background-color: #2f3335;
-  border-radius: 50%;
+}
+
+.hero-bg {
+  background-image: url("themes?resource-id=images/hero-bg.svg");
+  background-repeat: no-repeat;
+  background-position: right;
+  background-position-x: 82vw;
+}
+.flex-align-center {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+}
+
+.circular-bg {
+  margin: 0;
+  width: 160%;
+  border-radius: 50% / 0 0 100px 100px;
 }
 
 .hero {
-    background: radial-gradient(ellipse 150% 100% at top, #1d1f20 0%, #1d1f20 99.1%, white 100%);
     color: white;
 }
 
 .tutorial-roda-community {
-    background: radial-gradient(ellipse 150% 100% at top, white 0%, white 99.1%, #eaebec 100%);
     color: #1d1f20;
 }
 
 .authenticity {
-    background: radial-gradient(ellipse 150% 100% at top, #eaebec 0%, #eaebec 99.1%, white 100%);
     color: #1d1f20;
 }
 
 .vendor {
-    background: radial-gradient(ellipse 150% 100% at top, white 0%, white 99.1%, #eaebec 100%);
     color: #1d1f20;
 }
 
 .features {
-    background: radial-gradient(ellipse 150% 100% at top, #eaebec 0%, #eaebec 99.1%, #303436 100%);
     color: #1d1f20;
 }
 
 .learn-more {
-    background: radial-gradient(ellipse 150% 100% at top, #303436 0%, #303436 99.1%, #25a6d6 100%);
     color: white;
 }
 
 .get-quote {
-    background: radial-gradient(ellipse 150% 100% at top, #25a6d6 0%, #25a6d6 99.1%, #2f3335 100%);
 }
 
 .enterprise-editions {
-    background: radial-gradient(ellipse 150% 100% at top, #2f3335 0%, #2f3335 99.1%, black 100%);
     color: white;
 }
