@@ -18,7 +18,8 @@ import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.wui.client.common.NavigationToolbarLegacy;
+import org.roda.wui.client.common.BrowseTransferredResourceActionsToolbar;
+import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UpSalePanel;
@@ -166,7 +167,10 @@ public class IngestTransfer extends Composite {
   Label itemDates;
 
   @UiField
-  NavigationToolbarLegacy<TransferredResource> navigationToolbar;
+  NavigationToolbar<TransferredResource> navigationToolbar;
+
+  @UiField
+  BrowseTransferredResourceActionsToolbar objectToolbar;
 
   private NoAsyncCallback<Actionable.ActionImpact> actionCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
     @Override
@@ -207,7 +211,7 @@ public class IngestTransfer extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName()));
+    objectToolbar.setObjectAndBuild(resource, null, null);
 
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
 
@@ -230,8 +234,6 @@ public class IngestTransfer extends Composite {
       ingestTransferPanel.setVisible(false);
     }
 
-    navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName()));
-
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
 
     draw();
@@ -245,11 +247,13 @@ public class IngestTransfer extends Composite {
       itemDates.setText("");
       download.setVisible(false);
       navigationToolbar.setVisible(false);
+      objectToolbar.setVisible(false);
       if (!dropfolderActive){
         ingestTransferPanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
       }
       lastScanned.setText("");
     } else {
+      objectToolbar.setObjectAndBuild(resource, null, null);
       navigationToolbar.updateBreadcrumb(resource);
       navigationToolbar.withObject(resource).build();
       navigationToolbar.setVisible(true);

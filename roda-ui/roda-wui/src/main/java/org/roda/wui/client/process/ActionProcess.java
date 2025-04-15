@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.process;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -17,6 +18,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.JobActions;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.search.JobSearch;
@@ -83,7 +85,8 @@ public class ActionProcess extends Composite {
       new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.name()),
       new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.name()));
     jobSearch = new JobSearch("ActionProcess_jobs", "ActionProcess_reports", actionFilter, actionFilter, false,
-      CreateDefaultJob.RESOLVER);
+      CreateDefaultJob.RESOLVER, List.of(JobActions.JobAction.NEW_PROCESS, JobActions.JobAction.STOP),
+      new ArrayList<>());
 
     initWidget(uiBinder.createAndBindUi(this));
     preservationProcessDescription.add(new HTMLWidgetWrapper("PreservationProcessDescription.html"));

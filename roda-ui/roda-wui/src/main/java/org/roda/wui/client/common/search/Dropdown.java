@@ -101,12 +101,12 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
   }
 
   public void addItem(final String label, final String value, final String icon) {
+    popupValues.put(label, value);
+    popupIcons.put(label, icon);
+
     if (disableOnSingleItem && popupValues.size() > 1) {
       setEnabled(true);
     }
-
-    popupValues.put(label, value);
-    popupIcons.put(label, icon);
 
     FlowPanel item = new FlowPanel();
 
