@@ -267,11 +267,11 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
     actionableGroup.addButton(messages.editUserAction(), RODAMemberAction.EDIT, ActionImpact.UPDATED, "btn-edit");
 
     actionableGroup.addButton(messages.editUserActivate(), RODAMemberAction.ACTIVATE, ActionImpact.UPDATED,
-      "fas fa-user-check");
+      "btn-check");
     actionableGroup.addButton(messages.editUserDeactivate(), RODAMemberAction.DEACTIVATE, ActionImpact.UPDATED,
-      "fas fa-user-times");
+      "btn-ban");
     actionableGroup.addButton(messages.addAccessKeyButton(), RODAMemberAction.NEW_ACCESS_KEY, ActionImpact.UPDATED,
-      "btn-block btn-key");
+      "btn-key");
     actionableGroup.addButton(messages.editUserRemove(), RODAMemberAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
     transferredResourcesActionableBundle.addGroup(actionableGroup);
