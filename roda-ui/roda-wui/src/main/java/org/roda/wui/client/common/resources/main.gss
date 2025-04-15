@@ -1047,7 +1047,7 @@ pre code {
 
     @mixin fontawesome();
 
-    line-height: 1;
+    line-height: 0.9;
     float: right;
 
     position: absolute;
@@ -3281,6 +3281,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .contentWithSidePanel {
     display: flex;
+    min-height: 767px !important;
 }
 
 .browseSidePanel {
@@ -8606,11 +8607,6 @@ span.code {
     text-overflow: ellipsis;
 }
 
-.descriptiveMetadataTabs .tabButtonContainer.tabSelected {
-    font-weight: bold;
-    border-bottom: 2px solid COLOR_PRIMARY;
-}
-
 .descriptiveMetadataTabs .tabButtonContainer.tabSelected  button{
     font-weight: bold;
 }
@@ -8812,6 +8808,11 @@ wui-disposal-hold-data .form-textbox {
 
 .roda6CardWithHeader .cardBody {
   padding: 8px 16px;
+}
+
+.gwt-DialogBox .roda6Card,
+.gwt-DialogBox .roda6CardWithHeader {
+  box-shadow: none;
 }
 
 /******************************

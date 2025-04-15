@@ -111,7 +111,8 @@ public class IngestAppraisal extends Composite {
     // prepare lists
     ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "IngestAppraisal_searchAIPs").withJustActive(false)
-        .withFilter(BASE_FILTER).bindOpener().withActionable(appraisalAipActions));
+        .withFilter(BASE_FILTER).bindOpener().withActionable(appraisalAipActions)
+        .withActionWhitelist(List.of(AipActions.AipAction.APPRAISAL_ACCEPT, AipActions.AipAction.APPRAISAL_REJECT)));
 
     ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(
       () -> new ConfigurableAsyncTableCell<>(),
