@@ -9,7 +9,7 @@ Az ártalmatlanítási ütemtervekkel kapcsolatos további információkat a *S�
 A visszatartást kiváltó elem azonosítója a speciális keresőmező elemeinek használatával töltődik fel. Ezek közül a mezők közül a `date_interval` típusú mezők kerülnek kiválasztásra és felhasználásra a megőrzési időszak kiszámításához.
 A *Súgó* > *Használat* > *Külső keresés* menüpontban talál további információkat az új, külső keresési mezőelemek hozzáadásáról.
 
-## Disposal rule
+## Eltávolítási szabály
 
 Az ártalmatlanítási szabályokkal kapcsolatos további információkat a *Súgó* > *Használat* > *Eltávolítási irányelvek* menüpontban talál.
 
