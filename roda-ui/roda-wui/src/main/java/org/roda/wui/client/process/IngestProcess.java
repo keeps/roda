@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.process;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -18,6 +19,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.common.UpSalePanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.JobActions;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -111,7 +113,8 @@ public class IngestProcess extends Composite {
       new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, PluginType.INGEST.name()));
 
     jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", jobIngestFilter, jobReportIngestFilter,
-      true, IngestTransfer.RESOLVER);
+      true, IngestTransfer.RESOLVER, List.of(JobActions.JobAction.NEW_PROCESS, JobActions.JobAction.STOP),
+      new ArrayList<>());
 
     Boolean dropfolderActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_SERVICE_DROPFOLDER_ACTIVE);
 

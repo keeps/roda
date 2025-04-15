@@ -48,7 +48,6 @@ import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.search.SearchWrapper;
-import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
@@ -366,7 +365,6 @@ public class BrowseAIP extends Composite {
 
     title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
     title.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
-    Sliders.createAipInfoSlider(center, navigationToolbar.getInfoSidebarButton(), response);
 
     navigationToolbar.updateBreadcrumb(aip, response.getAncestors());
   }

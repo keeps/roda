@@ -41,7 +41,6 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.cards.RepresentationDisseminationCardList;
 import org.roda.wui.client.common.model.BrowseRepresentationResponse;
-import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.services.RepresentationRestService;
 import org.roda.wui.client.services.Services;
@@ -324,7 +323,6 @@ public class BrowseRepresentation extends Composite {
 
     // IDENTIFICATION
     representationIcon.setHTML(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
-    Sliders.createRepresentationInfoSlider(center, navigationToolbar.getInfoSidebarButton(), response);
 
     String title = representation.getTitle() != null ? representation.getTitle() : representation.getType();
     title = title == null ? representation.getId() : title;
