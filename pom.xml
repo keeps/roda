@@ -122,14 +122,13 @@
         <java_version>21</java_version>
         <gwt.version>2.12.2</gwt.version>
         <cas.client.version>4.0.4</cas.client.version>
-        <jersey.version>3.1.9</jersey.version>
         <swagger.version>2.2.30</swagger.version>
         <jackson.version>2.18.3</jackson.version>
         <spring.version>6.2.5</spring.version>
         <solr.version>9.8.1</solr.version>
         <pekko.version>1.1.3</pekko.version>
         <httpcomponents.version>4.5.14</httpcomponents.version>
-        <commons_ip2.version>2.6.1</commons_ip2.version>
+        <commons_ip2.version>2.10.0</commons_ip2.version>
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
@@ -861,7 +860,7 @@
             </dependency>
             <!-- RODA Commons IP -->
             <dependency>
-                <groupId>org.roda-project</groupId>
+                <groupId>org.roda-community</groupId>
                 <artifactId>commons-ip2</artifactId>
                 <version>${commons_ip2.version}</version>
                 <exclusions>
