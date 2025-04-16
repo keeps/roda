@@ -537,6 +537,10 @@ public class AIPService {
       InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
         + "/" + descriptiveMetadataId + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
 
+      if (templateStream == null) {
+        return new SupportedMetadataValue(values);
+      }
+
       if (checkIfDescriptiveMetadataExists(aip, representation, descriptiveMetadataId + XML_EXT)) {
         template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         String representationId = representation != null ? representation.getId() : null;
@@ -548,12 +552,10 @@ public class AIPService {
 
         return new SupportedMetadataValue(result);
       } else {
-        if (templateStream != null) {
-          template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
-          Set<MetadataValue> result = getDefaultDescriptiveMetadataValues(template, aip, representation, user, locale,
-            messages);
-          return new SupportedMetadataValue(result);
-        }
+        template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+        Set<MetadataValue> result = getDefaultDescriptiveMetadataValues(template, aip, representation, user, locale,
+          messages);
+        return new SupportedMetadataValue(result);
       }
     } catch (IOException e) {
       LOGGER.error("Error getting the template from the stream", e);
@@ -569,20 +571,13 @@ public class AIPService {
       Representation modelRepresentation = RodaCoreFactory.getModelService().retrieveRepresentation(aip.getId(),
         representation.getId());
       if (!modelRepresentation.getDescriptiveMetadata().isEmpty()) {
-        for (DescriptiveMetadata dm : modelRepresentation.getDescriptiveMetadata()) {
-          if (dm.getId().equals(descriptiveMetadataId)) {
-            return true;
-          }
-        }
+        return modelRepresentation.getDescriptiveMetadata().stream()
+          .anyMatch(dm -> dm.getId().equals(descriptiveMetadataId));
       }
     } else {
       AIP aipModel = RodaCoreFactory.getModelService().retrieveAIP(aip.getId());
       if (!aipModel.getDescriptiveMetadata().isEmpty()) {
-        for (DescriptiveMetadata dm : aipModel.getDescriptiveMetadata()) {
-          if (dm.getId().equals(descriptiveMetadataId)) {
-            return true;
-          }
-        }
+        return aipModel.getDescriptiveMetadata().stream().anyMatch(dm -> dm.getId().equals(descriptiveMetadataId));
       }
     }
     return false;
