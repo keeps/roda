@@ -1,8 +1,10 @@
-package org.roda.core.model.transaction;
+package org.roda.core.model;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +22,8 @@ import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
+import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
@@ -52,6 +54,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -69,36 +72,35 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.core.model.ModelObserver;
-import org.roda.core.model.ModelService;
+import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.utils.RODAInstanceUtils;
+import org.roda.core.transaction.RODATransactionManager;
+import org.roda.core.util.IdUtils;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class TransactionalModelService implements ModelService {
+public class DefaultTransactionalModelService implements TransactionalModelService {
   private final ModelService mainModelService;
   private final ModelService stagingModelService;
+  private final TransactionLog transaction;
+  private RODATransactionManager RODATransactionManager;
 
-  public TransactionalModelService(ModelService mainModelService, ModelService stagingModelService) {
+  public DefaultTransactionalModelService(ModelService mainModelService, ModelService stagingModelService,
+    TransactionLog transaction, RODATransactionManager RODATransactionManager) {
     this.mainModelService = mainModelService;
     this.stagingModelService = stagingModelService;
+    this.transaction = transaction;
+    this.RODATransactionManager = RODATransactionManager;
   }
 
   private ModelService getModelService() {
     return stagingModelService;
-  }
-
-  public void rollback() throws NotImplementedException {
-    throw new NotImplementedException("rollback method not implemented yet");
-  }
-
-  public void commit() throws NotImplementedException {
-    throw new NotImplementedException("rollback method not implemented yet");
   }
 
   @Override
@@ -115,13 +117,23 @@ public class TransactionalModelService implements ModelService {
   @Override
   public AIP retrieveAIP(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    return getModelService().retrieveAIP(aipId);
+
+    acquireLock(AIP.class, Arrays.asList(aipId));
+
+    AIP aip;
+    try {
+      aip = stagingModelService.retrieveAIP(aipId);
+    } catch (NotFoundException e) {
+      aip = mainModelService.retrieveAIP(aipId);
+    }
+    return aip;
   }
 
   @Override
   public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, boolean notify,
     String createdBy) throws RequestNotValidException, GenericException, AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException, ValidationException {
+    acquireLock(AIP.class, Arrays.asList(aipId));
     return getModelService().createAIP(aipId, sourceStorage, sourcePath, notify, createdBy);
   }
 
@@ -129,55 +141,69 @@ public class TransactionalModelService implements ModelService {
   public AIP createAIP(String parentId, String type, Permissions permissions, List<String> ingestSIPIds,
     String ingestJobId, boolean notify, String createdBy, boolean isGhost) throws RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
-    return getModelService().createAIP(parentId, type, permissions, ingestSIPIds, ingestJobId, notify, createdBy,
+    AIP aip = getModelService().createAIP(parentId, type, permissions, ingestSIPIds, ingestJobId, notify, createdBy,
       isGhost);
+    acquireLock(AIP.class, Arrays.asList(aip.getId()));
+    return aip;
   }
 
   @Override
   public AIP createAIP(String parentId, String type, Permissions permissions, String createdBy)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
-    return getModelService().createAIP(parentId, type, permissions, createdBy);
+    AIP aip = getModelService().createAIP(parentId, type, permissions, createdBy);
+    acquireLock(AIP.class, Arrays.asList(aip.getId()));
+    return aip;
   }
 
   @Override
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
-    return getModelService().createAIP(state, parentId, type, permissions, createdBy);
+    AIP aip = getModelService().createAIP(state, parentId, type, permissions, createdBy);
+    acquireLock(AIP.class, Arrays.asList(aip.getId()));
+    return aip;
   }
 
   @Override
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify,
     String createdBy) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
-    return getModelService().createAIP(state, parentId, type, permissions, notify, createdBy);
+    AIP aip = getModelService().createAIP(state, parentId, type, permissions, notify, createdBy);
+    acquireLock(AIP.class, Arrays.asList(aip.getId()));
+    return aip;
   }
 
   @Override
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String ingestSIPUUID,
     List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy) throws RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
-    return getModelService().createAIP(state, parentId, type, permissions, ingestSIPUUID, ingestSIPIds, ingestJobId,
+    AIP aip = getModelService().createAIP(state, parentId, type, permissions, ingestSIPUUID, ingestSIPIds, ingestJobId,
       notify, createdBy);
+    acquireLock(AIP.class, Arrays.asList(aip.getId()));
+    return aip;
   }
 
   @Override
   public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, String createdBy)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
     NotFoundException, ValidationException {
-    return getModelService().createAIP(aipId, sourceStorage, sourcePath, createdBy);
+    AIP aip = getModelService().createAIP(aipId, sourceStorage, sourcePath, createdBy);
+    acquireLock(AIP.class, Arrays.asList(aip.getId()));
+    return aip;
   }
 
   @Override
   public AIP notifyAipCreated(String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(AIP.class, Arrays.asList(aipId));
     return getModelService().notifyAipCreated(aipId);
   }
 
   @Override
   public AIP notifyAipUpdated(String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(AIP.class, Arrays.asList(aipId));
     return getModelService().notifyAipUpdated(aipId);
   }
 
@@ -185,66 +211,77 @@ public class TransactionalModelService implements ModelService {
   public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, String updatedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException {
+    acquireLock(AIP.class, Arrays.asList(aipId));
     return getModelService().updateAIP(aipId, sourceStorage, sourcePath, updatedBy);
   }
 
   @Override
   public AIP destroyAIP(AIP aip, String updatedBy)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    acquireLock(AIP.class, Arrays.asList(aip.getId()));
     return getModelService().destroyAIP(aip, updatedBy);
   }
 
   @Override
   public AIP updateAIP(AIP aip, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    acquireLock(AIP.class, Arrays.asList(aip.getId()));
     return getModelService().updateAIP(aip, updatedBy);
   }
 
   @Override
   public AIP updateAIPState(AIP aip, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    acquireLock(AIP.class, Arrays.asList(aip.getId()));
     return getModelService().updateAIPState(aip, updatedBy);
   }
 
   @Override
   public AIP updateAIPInstanceId(AIP aip, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    acquireLock(AIP.class, Arrays.asList(aip.getId()));
     return getModelService().updateAIPInstanceId(aip, updatedBy);
   }
 
   @Override
   public AIP moveAIP(String aipId, String parentId, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    acquireLock(AIP.class, Arrays.asList(aipId));
     return getModelService().moveAIP(aipId, parentId, updatedBy);
   }
 
   @Override
   public void deleteAIP(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    acquireLock(AIP.class, Arrays.asList(aipId));
     getModelService().deleteAIP(aipId);
   }
 
   @Override
   public void changeAIPType(String aipId, String type, String updatedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    acquireLock(AIP.class, Arrays.asList(aipId));
     getModelService().changeAIPType(aipId, type, updatedBy);
   }
 
   @Override
   public Binary retrieveDescriptiveMetadataBinary(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, descriptiveMetadataId));
     return getModelService().retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
   }
 
   @Override
   public Binary retrieveDescriptiveMetadataBinary(String aipId, String representationId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, representationId, descriptiveMetadataId));
     return getModelService().retrieveDescriptiveMetadataBinary(aipId, representationId, descriptiveMetadataId);
   }
 
   @Override
   public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, descriptiveMetadataId));
     return getModelService().retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
   }
 
@@ -252,6 +289,7 @@ public class TransactionalModelService implements ModelService {
   public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String representationId,
     String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, representationId, descriptiveMetadataId));
     return getModelService().retrieveDescriptiveMetadata(aipId, representationId, descriptiveMetadataId);
   }
 
@@ -260,6 +298,7 @@ public class TransactionalModelService implements ModelService {
     ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion, String createdBy,
     boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, descriptiveMetadataId));
     return getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType,
       descriptiveMetadataVersion, createdBy, notify);
   }
@@ -269,6 +308,7 @@ public class TransactionalModelService implements ModelService {
     ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion, String createdBy)
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
     NotFoundException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, descriptiveMetadataId));
     return getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType,
       descriptiveMetadataVersion, createdBy);
   }
@@ -278,6 +318,7 @@ public class TransactionalModelService implements ModelService {
     String descriptiveMetadataId, ContentPayload payload, String descriptiveMetadataType,
     String descriptiveMetadataVersion, String createdBy) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, representationId, descriptiveMetadataId));
     return getModelService().createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload,
       descriptiveMetadataType, descriptiveMetadataVersion, createdBy);
   }
@@ -287,6 +328,7 @@ public class TransactionalModelService implements ModelService {
     String descriptiveMetadataId, ContentPayload payload, String descriptiveMetadataType,
     String descriptiveMetadataVersion, String createdBy, boolean notify) throws RequestNotValidException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, representationId, descriptiveMetadataId));
     return getModelService().createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload,
       descriptiveMetadataType, descriptiveMetadataVersion, createdBy, notify);
   }
@@ -296,6 +338,7 @@ public class TransactionalModelService implements ModelService {
     ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType, String descriptiveMetadataVersion,
     Map<String, String> properties, String updatedBy)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, descriptiveMetadataId));
     return getModelService().updateDescriptiveMetadata(aipId, descriptiveMetadataId, descriptiveMetadataPayload,
       descriptiveMetadataType, descriptiveMetadataVersion, properties, updatedBy);
   }
@@ -305,6 +348,7 @@ public class TransactionalModelService implements ModelService {
     String descriptiveMetadataId, ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType,
     String descriptiveMetadataVersion, Map<String, String> properties, String updatedBy)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, representationId, descriptiveMetadataId));
     return getModelService().updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, properties, updatedBy);
   }
@@ -312,6 +356,7 @@ public class TransactionalModelService implements ModelService {
   @Override
   public void deleteDescriptiveMetadata(String aipId, String descriptiveMetadataId, String deletedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, descriptiveMetadataId));
     getModelService().deleteDescriptiveMetadata(aipId, descriptiveMetadataId, deletedBy);
   }
 
@@ -319,6 +364,7 @@ public class TransactionalModelService implements ModelService {
   public void deleteDescriptiveMetadata(String aipId, String representationId, String descriptiveMetadataId,
     String deletedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, representationId, descriptiveMetadataId));
     getModelService().deleteDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, deletedBy);
   }
 
@@ -326,6 +372,7 @@ public class TransactionalModelService implements ModelService {
   public CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(String aipId, String representationId,
     String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, representationId, descriptiveMetadataId));
     return getModelService().listDescriptiveMetadataVersions(aipId, representationId, descriptiveMetadataId);
   }
 
@@ -333,6 +380,7 @@ public class TransactionalModelService implements ModelService {
   public BinaryVersion revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
     Map<String, String> properties)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, descriptiveMetadataId));
     return getModelService().revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId, properties);
   }
 
@@ -340,6 +388,7 @@ public class TransactionalModelService implements ModelService {
   public BinaryVersion revertDescriptiveMetadataVersion(String aipId, String representationId,
     String descriptiveMetadataId, String versionId, Map<String, String> properties)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, representationId, descriptiveMetadataId));
     return getModelService().revertDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId, versionId,
       properties);
   }
@@ -354,6 +403,7 @@ public class TransactionalModelService implements ModelService {
   public CloseableIterable<OptionalWithCause<DescriptiveMetadata>> listDescriptiveMetadata(String aipId,
     boolean includeRepresentations)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId));
     return getModelService().listDescriptiveMetadata(aipId, includeRepresentations);
   }
 
@@ -361,19 +411,29 @@ public class TransactionalModelService implements ModelService {
   public CloseableIterable<OptionalWithCause<DescriptiveMetadata>> listDescriptiveMetadata(String aipId,
     String representationId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    acquireLock(DescriptiveMetadata.class, Arrays.asList(aipId, representationId));
     return getModelService().listDescriptiveMetadata(aipId, representationId);
   }
 
   @Override
   public Representation retrieveRepresentation(String aipId, String representationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().retrieveRepresentation(aipId, representationId);
+    acquireLock(Representation.class, Arrays.asList(aipId, representationId));
+
+    Representation representation;
+    try {
+      representation = stagingModelService.retrieveRepresentation(aipId, representationId);
+    } catch (NotFoundException e) {
+      representation = mainModelService.retrieveRepresentation(aipId, representationId);
+    }
+    return representation;
   }
 
   @Override
   public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
     boolean notify, String createdBy, List<String> representationState) throws RequestNotValidException,
     GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
+    acquireLock(Representation.class, Arrays.asList(aipId, representationId));
     return getModelService().createRepresentation(aipId, representationId, original, type, notify, createdBy,
       representationState);
   }
@@ -382,6 +442,7 @@ public class TransactionalModelService implements ModelService {
   public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
     boolean notify, String createdBy) throws RequestNotValidException, GenericException, NotFoundException,
     AuthorizationDeniedException, AlreadyExistsException {
+    acquireLock(Representation.class, Arrays.asList(aipId, representationId));
     return getModelService().createRepresentation(aipId, representationId, original, type, notify, createdBy);
   }
 
@@ -390,18 +451,21 @@ public class TransactionalModelService implements ModelService {
     StorageService sourceStorage, StoragePath sourcePath, boolean justData, String createdBy)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     AlreadyExistsException {
+    acquireLock(Representation.class, Arrays.asList(aipId, representationId));
     return getModelService().createRepresentation(aipId, representationId, original, type, sourceStorage, sourcePath,
       justData, createdBy);
   }
 
   @Override
   public Representation updateRepresentationInfo(Representation representation) throws GenericException {
+    acquireLock(Representation.class, Arrays.asList(representation.getAipId(), representation.getId()));
     return getModelService().updateRepresentationInfo(representation);
   }
 
   @Override
   public void changeRepresentationType(String aipId, String representationId, String type, String updatedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    acquireLock(Representation.class, Arrays.asList(aipId, representationId));
     getModelService().changeRepresentationType(aipId, representationId, type, updatedBy);
   }
 
@@ -409,6 +473,7 @@ public class TransactionalModelService implements ModelService {
   public void changeRepresentationShallowFileFlag(String aipId, String representationId, boolean hasShallowFiles,
     String updatedBy, boolean notify)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    acquireLock(Representation.class, Arrays.asList(aipId, representationId));
     getModelService().changeRepresentationShallowFileFlag(aipId, representationId, hasShallowFiles, updatedBy, notify);
   }
 
@@ -416,6 +481,7 @@ public class TransactionalModelService implements ModelService {
   public void changeRepresentationStates(String aipId, String representationId, List<String> newStates,
     String updatedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    acquireLock(Representation.class, Arrays.asList(aipId, representationId));
     getModelService().changeRepresentationStates(aipId, representationId, newStates, updatedBy);
   }
 
@@ -423,6 +489,7 @@ public class TransactionalModelService implements ModelService {
   public Representation updateRepresentation(String aipId, String representationId, boolean original, String type,
     StorageService sourceStorage, StoragePath sourcePath, String updatedBy) throws RequestNotValidException,
     NotFoundException, GenericException, AuthorizationDeniedException, ValidationException {
+    acquireLock(Representation.class, Arrays.asList(aipId, representationId));
     return getModelService().updateRepresentation(aipId, representationId, original, type, sourceStorage, sourcePath,
       updatedBy);
   }
@@ -430,6 +497,7 @@ public class TransactionalModelService implements ModelService {
   @Override
   public void deleteRepresentation(String aipId, String representationId, String username)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    acquireLock(Representation.class, Arrays.asList(aipId, representationId));
     getModelService().deleteRepresentation(aipId, representationId, username);
   }
 
@@ -443,12 +511,14 @@ public class TransactionalModelService implements ModelService {
   @Override
   public CloseableIterable<OptionalWithCause<File>> listExternalFilesUnder(File file)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    acquireLockForFile(file);
     return getModelService().listExternalFilesUnder(file);
   }
 
   @Override
   public CloseableIterable<OptionalWithCause<File>> listFilesUnder(File f, boolean recursive)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    acquireLockForFile(f);
     return getModelService().listFilesUnder(f, recursive);
   }
 
@@ -456,12 +526,14 @@ public class TransactionalModelService implements ModelService {
   public CloseableIterable<OptionalWithCause<File>> listFilesUnder(String aipId, String representationId,
     List<String> directoryPath, String fileId, boolean recursive)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    acquireLockForFile(aipId, representationId, directoryPath, fileId);
     return getModelService().listFilesUnder(aipId, representationId, directoryPath, fileId, recursive);
   }
 
   @Override
   public File retrieveFile(String aipId, String representationId, List<String> directoryPath, String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLockForFile(aipId, representationId, directoryPath, fileId);
     return getModelService().retrieveFile(aipId, representationId, directoryPath, fileId);
   }
 
@@ -469,6 +541,7 @@ public class TransactionalModelService implements ModelService {
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, String createdBy) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    acquireLockForFile(aipId, representationId, directoryPath, fileId);
     return getModelService().createFile(aipId, representationId, directoryPath, fileId, contentPayload, createdBy);
   }
 
@@ -476,6 +549,7 @@ public class TransactionalModelService implements ModelService {
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, String createdBy, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    acquireLockForFile(aipId, representationId, directoryPath, fileId);
     return getModelService().createFile(aipId, representationId, directoryPath, fileId, contentPayload, createdBy,
       notify);
   }
@@ -484,6 +558,7 @@ public class TransactionalModelService implements ModelService {
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     String dirName, String createdBy, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    acquireLockForFile(aipId, representationId, directoryPath, fileId);
     return getModelService().createFile(aipId, representationId, directoryPath, fileId, dirName, createdBy, notify);
   }
 
@@ -491,6 +566,7 @@ public class TransactionalModelService implements ModelService {
   public File updateFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, boolean createIfNotExists, String updatedBy, boolean notify)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLockForFile(aipId, representationId, directoryPath, fileId);
     return getModelService().updateFile(aipId, representationId, directoryPath, fileId, contentPayload,
       createIfNotExists, updatedBy, notify);
   }
@@ -498,6 +574,7 @@ public class TransactionalModelService implements ModelService {
   @Override
   public File updateFile(File file, ContentPayload contentPayload, boolean createIfNotExists, String updatedBy,
     boolean notify) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLockForFile(file);
     return getModelService().updateFile(file, contentPayload, createIfNotExists, updatedBy, notify);
   }
 
@@ -505,18 +582,21 @@ public class TransactionalModelService implements ModelService {
   public void deleteFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     String deletedBy, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    acquireLockForFile(aipId, representationId, directoryPath, fileId);
     getModelService().deleteFile(aipId, representationId, directoryPath, fileId, deletedBy, notify);
   }
 
   @Override
   public void deleteFile(File file, String deletedBy, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    acquireLockForFile(file);
     getModelService().deleteFile(file, deletedBy, notify);
   }
 
   @Override
   public File renameFolder(File folder, String newName, boolean reindexResources) throws AlreadyExistsException,
     GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    acquireLockForFile(folder);
     return getModelService().renameFolder(folder, newName, reindexResources);
   }
 
@@ -524,75 +604,96 @@ public class TransactionalModelService implements ModelService {
   public File moveFile(File file, String newAipId, String newRepresentationId, List<String> newDirectoryPath,
     String newId, boolean reindexResources) throws AlreadyExistsException, GenericException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException {
+    acquireLockForFile(file);
     return getModelService().moveFile(file, newAipId, newRepresentationId, newDirectoryPath, newId, reindexResources);
   }
 
   @Override
-  public void createRepositoryEvent(RodaConstants.PreservationEventType eventType, String eventDescription,
-    PluginState outcomeState, String outcomeText, String outcomeDetail, String agentName, boolean notify) {
-    getModelService().createRepositoryEvent(eventType, eventDescription, outcomeState, outcomeText, outcomeDetail,
-      agentName, notify);
+  public PreservationMetadata createRepositoryEvent(RodaConstants.PreservationEventType eventType,
+    String eventDescription, PluginState outcomeState, String outcomeText, String outcomeDetail, String agentName,
+    boolean notify) {
+    PreservationMetadata event = getModelService().createRepositoryEvent(eventType, eventDescription, outcomeState,
+      outcomeText, outcomeDetail, agentName, notify);
+    acquireLockForEvent(event);
+    return event;
   }
 
   @Override
-  public void createRepositoryEvent(RodaConstants.PreservationEventType eventType, String eventDescription,
-    List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText,
-    String outcomeDetail, String agentName, boolean notify) {
-    getModelService().createRepositoryEvent(eventType, eventDescription, sources, targets, outcomeState, outcomeText,
-      outcomeDetail, agentName, notify);
-  }
-
-  @Override
-  public void createUpdateAIPEvent(String aipId, String representationId, List<String> filePath, String fileId,
-    RodaConstants.PreservationEventType eventType, String eventDescription, PluginState outcomeState,
+  public PreservationMetadata createRepositoryEvent(RodaConstants.PreservationEventType eventType,
+    String eventDescription, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, PluginState outcomeState,
     String outcomeText, String outcomeDetail, String agentName, boolean notify) {
-    getModelService().createUpdateAIPEvent(aipId, representationId, filePath, fileId, eventType, eventDescription,
+    PreservationMetadata event = getModelService().createRepositoryEvent(eventType, eventDescription, sources, targets,
       outcomeState, outcomeText, outcomeDetail, agentName, notify);
+    acquireLockForEvent(event);
+    return event;
   }
 
   @Override
-  public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
+  public PreservationMetadata createUpdateAIPEvent(String aipId, String representationId, List<String> filePath,
+    String fileId, RodaConstants.PreservationEventType eventType, String eventDescription, PluginState outcomeState,
+    String outcomeText, String outcomeDetail, String agentName, boolean notify) {
+    PreservationMetadata event = getModelService().createUpdateAIPEvent(aipId, representationId, filePath, fileId,
+      eventType, eventDescription, outcomeState, outcomeText, outcomeDetail, agentName, notify);
+    acquireLockForEvent(event);
+    return event;
+  }
+
+  @Override
+  public PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     RodaConstants.PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
     String agentName, boolean notify) {
-    getModelService().createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources,
-      targets, outcomeState, outcomeText, outcomeDetail, agentName, notify);
+    PreservationMetadata event = getModelService().createEvent(aipId, representationId, filePath, fileId, eventType,
+      eventDescription, sources, targets, outcomeState, outcomeText, outcomeDetail, agentName, notify);
+    acquireLockForEvent(event);
+    return event;
   }
 
   @Override
-  public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
+  public PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     RodaConstants.PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
     String agentName, String agentRole, boolean notify) {
-    getModelService().createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources,
-      targets, outcomeState, outcomeText, outcomeDetail, agentName, agentRole, notify);
+    PreservationMetadata event = getModelService().createEvent(aipId, representationId, filePath, fileId, eventType,
+      eventDescription, sources, targets, outcomeState, outcomeText, outcomeDetail, agentName, agentRole, notify);
+    acquireLockForEvent(event);
+    return event;
   }
 
   @Override
-  public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
+  public PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     RodaConstants.PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeDetail, String outcomeExtension,
     List<LinkingIdentifier> agentIds, String username, boolean notify) throws GenericException, ValidationException,
     NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
-    getModelService().createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources,
-      targets, outcomeState, outcomeDetail, outcomeExtension, agentIds, username, notify);
+    PreservationMetadata event = getModelService().createEvent(aipId, representationId, filePath, fileId, eventType,
+      eventDescription, sources, targets, outcomeState, outcomeDetail, outcomeExtension, agentIds, username, notify);
+    acquireLockForEvent(event);
+    return event;
   }
 
   @Override
   public PreservationMetadata retrievePreservationMetadata(String id,
     PreservationMetadata.PreservationMetadataType type) {
+    acquireLock(PreservationMetadata.class, Arrays.asList(id));
     return getModelService().retrievePreservationMetadata(id, type);
   }
 
   @Override
   public PreservationMetadata retrievePreservationMetadata(String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, PreservationMetadata.PreservationMetadataType type) {
+    String eventId = IdUtils.getPreservationId(type, aipId, representationId, fileDirectoryPath, fileId,
+      RODAInstanceUtils.getLocalInstanceIdentifier());
+    acquireLock(PreservationMetadata.class, Arrays.asList(aipId, representationId, eventId));
     return getModelService().retrievePreservationMetadata(aipId, representationId, fileDirectoryPath, fileId, type);
   }
 
   @Override
   public Binary retrievePreservationRepresentation(String aipId, String representationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    String eventId = IdUtils.getRepresentationPreservationId(aipId, representationId,
+      RODAInstanceUtils.getLocalInstanceIdentifier());
+    acquireLock(PreservationMetadata.class, Arrays.asList(aipId, representationId, eventId));
     return getModelService().retrievePreservationRepresentation(aipId, representationId);
   }
 
@@ -605,12 +706,18 @@ public class TransactionalModelService implements ModelService {
   @Override
   public Binary retrievePreservationFile(File file)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    String eventId = IdUtils.getPreservationId(PreservationMetadata.PreservationMetadataType.FILE, file.getAipId(),
+      file.getRepresentationId(), file.getPath(), file.getId(), RODAInstanceUtils.getLocalInstanceIdentifier());
+    acquireLock(PreservationMetadata.class, Arrays.asList(file.getAipId(), file.getRepresentationId(), eventId));
     return getModelService().retrievePreservationFile(file);
   }
 
   @Override
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    String eventId = IdUtils.getPreservationId(PreservationMetadata.PreservationMetadataType.FILE, aipId,
+      representationId, fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
+    acquireLock(PreservationMetadata.class, Arrays.asList(aipId, representationId, eventId));
     return getModelService().retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
   }
 
@@ -623,6 +730,7 @@ public class TransactionalModelService implements ModelService {
   @Override
   public Binary retrieveRepositoryPreservationEvent(String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(PreservationMetadata.class, Arrays.asList(fileId));
     return getModelService().retrieveRepositoryPreservationEvent(fileId);
   }
 
@@ -630,12 +738,14 @@ public class TransactionalModelService implements ModelService {
   public Binary retrievePreservationEvent(String aipId, String representationId, List<String> filePath, String fileId,
     String preservationID)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(PreservationMetadata.class, Arrays.asList(aipId, representationId, preservationID));
     return getModelService().retrievePreservationEvent(aipId, representationId, filePath, fileId, preservationID);
   }
 
   @Override
   public Binary retrievePreservationAgent(String preservationID)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    acquireLock(PreservationMetadata.class, Arrays.asList(preservationID));
     return getModelService().retrievePreservationAgent(preservationID);
   }
 
@@ -644,8 +754,10 @@ public class TransactionalModelService implements ModelService {
     String aipId, String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload,
     String username, boolean notify) throws GenericException, NotFoundException, RequestNotValidException,
     AuthorizationDeniedException, AlreadyExistsException {
-    return getModelService().createPreservationMetadata(type, aipId, representationId, fileDirectoryPath, fileId,
-      payload, username, notify);
+    PreservationMetadata event = getModelService().createPreservationMetadata(type, aipId, representationId,
+      fileDirectoryPath, fileId, payload, username, notify);
+    acquireLockForEvent(event);
+    return event;
   }
 
   @Override
@@ -661,8 +773,10 @@ public class TransactionalModelService implements ModelService {
     String aipId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, String username,
     boolean notify) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException {
-    return getModelService().createPreservationMetadata(type, aipId, fileDirectoryPath, fileId, payload, username,
-      notify);
+    PreservationMetadata event = getModelService().createPreservationMetadata(type, aipId, fileDirectoryPath, fileId,
+      payload, username, notify);
+    acquireLockForEvent(event);
+    return event;
   }
 
   @Override
@@ -670,14 +784,19 @@ public class TransactionalModelService implements ModelService {
     String aipId, String representationId, ContentPayload payload, String username, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException {
-    return getModelService().createPreservationMetadata(type, aipId, representationId, payload, username, notify);
+    PreservationMetadata event = getModelService().createPreservationMetadata(type, aipId, representationId, payload,
+      username, notify);
+    acquireLockForEvent(event);
+    return event;
   }
 
   @Override
   public PreservationMetadata createPreservationMetadata(PreservationMetadata.PreservationMetadataType type, String id,
     ContentPayload payload, boolean notify) throws GenericException, NotFoundException, RequestNotValidException,
     AuthorizationDeniedException, AlreadyExistsException {
-    return getModelService().createPreservationMetadata(type, id, payload, notify);
+    PreservationMetadata event = getModelService().createPreservationMetadata(type, id, payload, notify);
+    acquireLockForEvent(event);
+    return event;
   }
 
   @Override
@@ -685,14 +804,17 @@ public class TransactionalModelService implements ModelService {
     String aipId, String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload,
     String createdBy, boolean notify) throws GenericException, NotFoundException, RequestNotValidException,
     AuthorizationDeniedException, AlreadyExistsException {
-    return getModelService().createPreservationMetadata(type, id, aipId, representationId, fileDirectoryPath, fileId,
-      payload, createdBy, notify);
+    PreservationMetadata event = getModelService().createPreservationMetadata(type, id, aipId, representationId,
+      fileDirectoryPath, fileId, payload, createdBy, notify);
+    acquireLockForEvent(event);
+    return event;
   }
 
   @Override
   public PreservationMetadata updatePreservationMetadata(PreservationMetadata.PreservationMetadataType type, String id,
     ContentPayload payload, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    acquireLock(PreservationMetadata.class, Arrays.asList(id));
     return getModelService().updatePreservationMetadata(type, id, payload, notify);
   }
 
@@ -701,6 +823,7 @@ public class TransactionalModelService implements ModelService {
     String aipId, String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload,
     String updatedBy, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    acquireLock(PreservationMetadata.class, Arrays.asList(aipId, representationId, id));
     return getModelService().updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId,
       payload, updatedBy, notify);
   }
@@ -708,6 +831,7 @@ public class TransactionalModelService implements ModelService {
   @Override
   public void deletePreservationMetadata(PreservationMetadata pm, boolean notify)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+    acquireLockForEvent(pm);
     getModelService().deletePreservationMetadata(pm, notify);
   }
 
@@ -715,6 +839,7 @@ public class TransactionalModelService implements ModelService {
   public void deletePreservationMetadata(PreservationMetadata.PreservationMetadataType type, String aipId,
     String representationId, String id, List<String> filePath, boolean notify)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+    acquireLock(PreservationMetadata.class, Arrays.asList(aipId, representationId, id));
     getModelService().deletePreservationMetadata(type, aipId, representationId, id, filePath, notify);
   }
 
@@ -753,6 +878,7 @@ public class TransactionalModelService implements ModelService {
   @Override
   public Binary retrieveOtherMetadataBinary(OtherMetadata om)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    //TODO: There is no LiteRODAObject for OtherMetadata, so we cannot acquire a lock
     return getModelService().retrieveOtherMetadataBinary(om);
   }
 
@@ -1967,5 +2093,61 @@ public class TransactionalModelService implements ModelService {
   @Override
   public ReturnWithExceptionsWrapper notifyDisposalConfirmationDeleted(String disposalConfirmationId, boolean commit) {
     return getModelService().notifyDisposalConfirmationDeleted(disposalConfirmationId, commit);
+  }
+
+  private <T extends IsRODAObject> void acquireLock(Class<T> objectClass, List<String> ids) {
+    Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, ids);
+    if (liteRODAObject.isPresent()) {
+      try {
+        RODATransactionManager.acquireLock(transaction.getId(), liteRODAObject.get().getInfo());
+      } catch (LockingException | GenericException e) {
+        throw new RuntimeException(e);
+      }
+    } else {
+      throw new IllegalArgumentException("Cannot acquire lock for object: " + liteRODAObject);
+    }
+  }
+
+  private void acquireLockForFile(File file) {
+    List<String> list = new ArrayList<>();
+    list.add(file.getAipId());
+    list.add(file.getRepresentationId());
+    list.addAll(file.getPath());
+    list.add(file.getId());
+    acquireLock(File.class, list);
+  }
+
+  private void acquireLockForFile(String aipId, String representationId, List<String> directoryPath, String fileId) {
+    List<String> list = new ArrayList<>();
+    list.add(aipId);
+    list.add(representationId);
+    list.addAll(directoryPath);
+    list.add(fileId);
+    acquireLock(File.class, list);
+  }
+
+  private void acquireLockForEvent(PreservationMetadata event) {
+    if (event != null) {
+      if (event.getAipId() == null) {
+        acquireLock(IndexedPreservationEvent.class, Arrays.asList(event.getId()));
+      } else if (event.getRepresentationId() == null) {
+        acquireLock(IndexedPreservationEvent.class, Arrays.asList(event.getAipId(), event.getId()));
+      } else {
+        acquireLock(IndexedPreservationEvent.class,
+                Arrays.asList(event.getAipId(), event.getRepresentationId(), event.getId()));
+      }
+    }
+  }
+
+  @Override
+  public void commit() {
+    for (String liteObject : transaction.getLiteObjects()) {
+      RODATransactionManager.releaseLock(transaction.getId(), liteObject);
+    }
+  }
+
+  @Override
+  public void rollback() {
+
   }
 }

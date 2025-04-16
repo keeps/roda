@@ -108,6 +108,8 @@ public class FSUtils {
    */
   public static void safeUpdate(InputStream stream, Path toPath) throws IOException {
     try {
+      Files.createDirectories(toPath.getParent());
+
       Path tempToPath = toPath.getParent().resolve(toPath.getFileName().toString() + ".temp" + System.nanoTime());
       Files.copy(stream, tempToPath);
       Files.move(tempToPath, toPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
