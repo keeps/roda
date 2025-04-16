@@ -123,7 +123,7 @@
         <gwt.version>2.12.2</gwt.version>
         <cas.client.version>4.0.4</cas.client.version>
         <jersey.version>3.1.9</jersey.version>
-        <swagger.version>2.2.22</swagger.version>
+        <swagger.version>2.2.30</swagger.version>
         <jackson.version>2.18.2</jackson.version>
         <spring.version>6.2.5</spring.version>
         <solr.version>9.8.1</solr.version>
@@ -809,6 +809,11 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-jaxrs2-servlet-initializer-v2</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
                 <version>${swagger.version}</version>
             </dependency>
             <!-- REST API related dependencies - end -->
