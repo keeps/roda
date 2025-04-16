@@ -9,6 +9,7 @@ package org.roda.wui.servlets;
 
 import java.io.Serial;
 
+import jakarta.servlet.annotation.WebServlet;
 import org.apache.commons.configuration.ConfigurationException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.model.utils.LdapUtility;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 
+@WebServlet(urlPatterns = "/info", loadOnStartup = 1)
 public class RodaWuiServlet extends HttpServlet {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaWuiServlet.class);
   @Serial
@@ -31,6 +33,7 @@ public class RodaWuiServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     LOGGER.info("Starting up RODA, please wait...");
+
     RodaCoreFactory.setLdapUtility(ldapUtility);
     RodaCoreFactory.instantiate();
     if (!RodaCoreFactory.instantiatedWithoutErrors()) {
