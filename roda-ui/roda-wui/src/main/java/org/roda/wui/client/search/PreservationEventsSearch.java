@@ -40,8 +40,7 @@ public class PreservationEventsSearch extends SimplePanel {
     SearchWrapper searchWrapper = new SearchWrapper(false)
       .createListAndSearchPanel(new ListBuilder<>(() -> new PreservationEventList(),
         new AsyncTableCellOptions<>(IndexedPreservationEvent.class, eventsListId).withFilter(filter)
-          .withSummary(messages.searchResults()).bindOpener()
-          .withActionable(PreservationEventActions.get(aipId, representationUUID, fileUUID))));
+          .withSummary(messages.searchResults()).bindOpener()));
 
     setWidget(searchWrapper);
   }
