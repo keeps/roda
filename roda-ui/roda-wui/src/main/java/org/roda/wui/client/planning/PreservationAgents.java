@@ -80,8 +80,7 @@ public class PreservationAgents extends Composite {
   public PreservationAgents() {
     ListBuilder<IndexedPreservationAgent> preservationAgentListBuilder = new ListBuilder<>(
       () -> new PreservationAgentList(),
-      new AsyncTableCellOptions<>(IndexedPreservationAgent.class, "PreservationAgents_agents").bindOpener()
-        .withActionable(PreservationAgentActions.get()));
+      new AsyncTableCellOptions<>(IndexedPreservationAgent.class, "PreservationAgents_agents").bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(preservationAgentListBuilder);
 
