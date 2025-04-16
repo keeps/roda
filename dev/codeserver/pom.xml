@@ -5,7 +5,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.roda-project</groupId>
+    <groupId>org.roda-community</groupId>
     <artifactId>codeserver</artifactId>
     <version>1.0.0</version>
 
@@ -43,12 +43,12 @@
             <version>${gwt.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.roda-project</groupId>
+            <groupId>org.roda-community</groupId>
             <artifactId>roda-common-data</artifactId>
             <version>${roda.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.roda-project</groupId>
+            <groupId>org.roda-community</groupId>
             <artifactId>roda-common-data</artifactId>
             <classifier>sources</classifier>
             <version>${roda.version}</version>

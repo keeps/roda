@@ -6,7 +6,7 @@
     <artifactId>roda-core-tests</artifactId>
     <packaging>jar</packaging>
     <parent>
-        <groupId>org.roda-project</groupId>
+        <groupId>org.roda-community</groupId>
         <artifactId>roda</artifactId>
         <version>6.0.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
@@ -52,7 +52,7 @@
     </profiles>
     <dependencies>
         <dependency>
-            <groupId>org.roda-project</groupId>
+            <groupId>org.roda-community</groupId>
             <artifactId>roda-core</artifactId>
         </dependency>
 
