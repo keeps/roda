@@ -7,7 +7,9 @@
  */
 package org.roda.core.common.pekko;
 
+import org.apache.pekko.actor.UntypedAbstractActor;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.transaction.RODATransactionManager;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.PluginManager;
@@ -15,9 +17,6 @@ import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.storage.StorageService;
 
 import com.codahale.metrics.MetricRegistry;
-
-import org.apache.pekko.actor.UntypedAbstractActor;
-import org.roda.core.storage.transaction.StorageTransactionManager;
 
 public abstract class PekkoBaseActor extends UntypedAbstractActor {
 
@@ -62,6 +61,8 @@ public abstract class PekkoBaseActor extends UntypedAbstractActor {
     return RodaCoreFactory.getMetrics();
   }
 
-  public StorageTransactionManager getStorageTransactionManager() { return RodaCoreFactory.getStorageTransactionManager(); }
+  public RODATransactionManager getStorageTransactionManager() {
+    return RodaCoreFactory.getTransactionManager();
+  }
 
 }

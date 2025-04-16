@@ -93,9 +93,23 @@ services:
       - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
     volumes:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
+
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: storagedb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
 volumes:
   zookeeper_data:
   zookeeper_datalog:
   solr_data:
   clam_data:
   siegfried_data:
+  pg_data:
