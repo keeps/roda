@@ -1,4 +1,4 @@
-package org.roda.core.repository;
+package org.roda.core.repository.ldap;
 
 import org.roda.core.model.utils.LdapRole;
 import org.springframework.data.ldap.repository.LdapRepository;

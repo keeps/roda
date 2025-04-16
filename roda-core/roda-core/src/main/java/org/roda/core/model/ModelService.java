@@ -299,28 +299,28 @@ public interface ModelService extends ModelObservable {
     boolean reindexResources) throws AlreadyExistsException, GenericException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException;
 
-  void createRepositoryEvent(RodaConstants.PreservationEventType eventType, String eventDescription,
+  PreservationMetadata createRepositoryEvent(RodaConstants.PreservationEventType eventType, String eventDescription,
     PluginState outcomeState, String outcomeText, String outcomeDetail, String agentName, boolean notify);
 
-  void createRepositoryEvent(RodaConstants.PreservationEventType eventType, String eventDescription,
+  PreservationMetadata createRepositoryEvent(RodaConstants.PreservationEventType eventType, String eventDescription,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText,
     String outcomeDetail, String agentName, boolean notify);
 
-  void createUpdateAIPEvent(String aipId, String representationId, List<String> filePath, String fileId,
+  PreservationMetadata createUpdateAIPEvent(String aipId, String representationId, List<String> filePath, String fileId,
     RodaConstants.PreservationEventType eventType, String eventDescription, PluginState outcomeState,
     String outcomeText, String outcomeDetail, String agentName, boolean notify);
 
-  void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
+  PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     RodaConstants.PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
     String agentName, boolean notify);
 
-  void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
+  PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     RodaConstants.PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
     String agentName, String agentRole, boolean notify);
 
-  void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
+  PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     RodaConstants.PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeDetail, String outcomeExtension,
     List<LinkingIdentifier> agentIds, String username, boolean notify) throws GenericException, ValidationException,

@@ -1527,42 +1527,44 @@ public class DefaultModelService implements ModelService {
 
   /***********************
    * Preservation related
-   ***********************/
+   **********************
+   * @return
+   */
 
   @Override
-  public void createRepositoryEvent(PreservationEventType eventType, String eventDescription, PluginState outcomeState,
-    String outcomeText, String outcomeDetail, String agentName, boolean notify) {
-    createRepositoryEvent(eventType, eventDescription, null, null, outcomeState, outcomeText, outcomeDetail, agentName,
-      notify);
+  public PreservationMetadata createRepositoryEvent(PreservationEventType eventType, String eventDescription,
+    PluginState outcomeState, String outcomeText, String outcomeDetail, String agentName, boolean notify) {
+    return createRepositoryEvent(eventType, eventDescription, null, null, outcomeState, outcomeText, outcomeDetail,
+      agentName, notify);
   }
 
   @Override
-  public void createRepositoryEvent(PreservationEventType eventType, String eventDescription,
+  public PreservationMetadata createRepositoryEvent(PreservationEventType eventType, String eventDescription,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText,
     String outcomeDetail, String agentName, boolean notify) {
-    createEvent(null, null, null, null, eventType, eventDescription, sources, targets, outcomeState, outcomeText,
+    return createEvent(null, null, null, null, eventType, eventDescription, sources, targets, outcomeState, outcomeText,
       outcomeDetail, agentName, notify);
   }
 
   @Override
-  public void createUpdateAIPEvent(String aipId, String representationId, List<String> filePath, String fileId,
-    PreservationEventType eventType, String eventDescription, PluginState outcomeState, String outcomeText,
-    String outcomeDetail, String agentName, boolean notify) {
-    createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, null, null, outcomeState,
+  public PreservationMetadata createUpdateAIPEvent(String aipId, String representationId, List<String> filePath,
+    String fileId, PreservationEventType eventType, String eventDescription, PluginState outcomeState,
+    String outcomeText, String outcomeDetail, String agentName, boolean notify) {
+    return createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, null, null, outcomeState,
       outcomeText, outcomeDetail, agentName, notify);
   }
 
   @Override
-  public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
+  public PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
     String agentName, boolean notify) {
-    createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets, outcomeState,
-      outcomeText, outcomeDetail, agentName, null, notify);
+    return createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets,
+      outcomeState, outcomeText, outcomeDetail, agentName, null, notify);
   }
 
   @Override
-  public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
+  public PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
     String agentName, String agentRole, boolean notify) {
@@ -1577,16 +1579,17 @@ public class DefaultModelService implements ModelService {
       if (agentRole != null) {
         linkingIdentifier.getRoles().add(agentRole);
       }
-      createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets,
+      return createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets,
         outcomeState, builder.toString(), "", Collections.singletonList(linkingIdentifier), agentName, notify);
     } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
       | RequestNotValidException | AuthorizationDeniedException e1) {
       LOGGER.error("Could not create an event for: {}", eventDescription, e1);
+      return null;
     }
   }
 
   @Override
-  public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
+  public PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeDetail, String outcomeExtension,
     List<LinkingIdentifier> agentIds, String username, boolean notify) throws GenericException, ValidationException,
@@ -1600,17 +1603,17 @@ public class DefaultModelService implements ModelService {
 
     if (eventType.equals(PreservationEventType.DELETION)) {
       if (aipId != null && representationId == null) {
-        createPreservationMetadata(PreservationMetadataType.EVENT, id, null, null, null, null, premisEvent, username,
-          notify);
-      } else if (representationId != null && fileId == null) {
-        createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, null, null, null, premisEvent, username,
-          notify);
-      } else {
-        createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, null, null, premisEvent,
+        return createPreservationMetadata(PreservationMetadataType.EVENT, id, null, null, null, null, premisEvent,
           username, notify);
+      } else if (representationId != null && fileId == null) {
+        return createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, null, null, null, premisEvent,
+          username, notify);
+      } else {
+        return createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, null, null,
+          premisEvent, username, notify);
       }
     } else {
-      createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
+      return createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
         premisEvent, username, notify);
     }
   }
