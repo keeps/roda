@@ -72,8 +72,10 @@ import org.roda.core.common.RodaUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferUpdateStatus;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
+import org.roda.core.common.transactions.RODATransactionManager;
 import org.roda.core.config.ConfigurationManager;
 import org.roda.core.config.DirectoryInitializer;
+import org.roda.core.config.SpringContext;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.DistributedModeType;
 import org.roda.core.data.common.RodaConstants.NodeType;
@@ -126,7 +128,7 @@ import org.roda.core.migration.MigrationManager;
 import org.roda.core.model.DefaultModelService;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.transaction.Transaction;
+import org.roda.core.model.transaction.TransactionLog;
 import org.roda.core.model.transaction.TransactionalModelService;
 import org.roda.core.model.utils.LdapUtility;
 import org.roda.core.model.utils.UserUtility;
@@ -144,7 +146,6 @@ import org.roda.core.storage.StorageServiceWrapper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.storage.transaction.DefaultTransactionalStorageService;
-import org.roda.core.storage.transaction.StorageTransactionManager;
 import org.roda.core.storage.transaction.TransactionalStorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -251,7 +252,7 @@ public class RodaCoreFactory {
 
   private static Map<String, Function<Locale, ResourceBundle>> pluginMessageRegistry = new HashMap<>();
 
-  private static StorageTransactionManager storageTransactionManager;
+  private static RODATransactionManager RODATransactionManager;
 
   /** Private empty constructor */
   private RodaCoreFactory() {
@@ -863,7 +864,7 @@ public class RodaCoreFactory {
     LOGGER.debug("Finished instantiating storage...");
     model = new DefaultModelService(storage, eventsManager, nodeType, instanceId);
 
-    storageTransactionManager = new StorageTransactionManager();
+    RODATransactionManager = SpringContext.getBean(RODATransactionManager.class);
     LOGGER.debug("Finished instantiating model...");
   }
 
@@ -901,18 +902,8 @@ public class RodaCoreFactory {
 
   }
 
-  public static StorageTransactionManager getStorageTransactionManager() {
-    return storageTransactionManager;
-  }
-
-  public static TransactionalStorageService getTransactionalStorageService(Transaction transaction) throws GenericException {
-    String storagePath = "/tmp/tx-" + transaction.getTransactionId();
-    StorageService storageService = instantiateStagingStorage(storagePath);
-    return new DefaultTransactionalStorageService(storage, storageService, transaction, storageTransactionManager.getInMemoryLockService());
-  }
-
-  public static IndexService getTransactionalIndexService(ModelService trasactionalModelService) {
-    return new IndexService(solr, trasactionalModelService, metricsRegistry, getRodaConfiguration(), nodeType);
+  public static RODATransactionManager getTransactionManager() {
+    return RODATransactionManager;
   }
 
   private static StorageService instantiateStagingStorage(String storagePath) throws GenericException {
@@ -923,24 +914,23 @@ public class RodaCoreFactory {
         Class<?> storageClass = Class.forName(newStorageService);
         Constructor<?> constructor = storageClass.getConstructor(Path.class, String.class);
 
-        LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(),
-                stagingStoragePath);
+        LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(), stagingStoragePath);
         String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
-                RodaConstants.TRASH_CONTAINER);
+          RodaConstants.TRASH_CONTAINER);
 
         return (StorageService) constructor.newInstance(stagingStoragePath, trashDirName);
       } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException
-               | InvocationTargetException e) {
+        | InvocationTargetException e) {
         LOGGER.warn("Error instantiating storage service defined on properties, falling back to a default service", e);
       }
     }
 
     StorageType storageType = StorageType.valueOf(
-            getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE, RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
+      getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE, RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
     if (storageType == RodaConstants.StorageType.FILESYSTEM) {
       LOGGER.debug("Going to instantiate Filesystem on '{}'", stagingStoragePath);
       String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
-              RodaConstants.TRASH_CONTAINER);
+        RodaConstants.TRASH_CONTAINER);
       StorageService fileStorageService = new FileStorageService(stagingStoragePath, false, trashDirName, false);
       return fileStorageService;
     } else {
@@ -949,10 +939,22 @@ public class RodaCoreFactory {
     }
   }
 
-  public static ModelService getTransactionalModelService(StorageService transactionalStorageService) {
-    ModelService stagingModelService = new DefaultModelService(transactionalStorageService, eventsManager, nodeType, instanceId);
+  public static TransactionalStorageService getTransactionalStorageService(TransactionLog transaction)
+    throws GenericException {
+    String storagePath = "/tmp/tx-" + transaction.getId();
+    StorageService storageService = instantiateStagingStorage(storagePath);
+    return new DefaultTransactionalStorageService(storage, storageService, transaction, getTransactionManager());
+  }
 
-    return new TransactionalModelService(model, stagingModelService);
+  public static ModelService getTransactionalModelService(StorageService transactionalStorageService,
+    TransactionLog transaction) {
+    ModelService stagingModelService = new DefaultModelService(transactionalStorageService, eventsManager, nodeType,
+      instanceId);
+    return new TransactionalModelService(model, stagingModelService, transaction);
+  }
+
+  public static IndexService getTransactionalIndexService(ModelService trasactionalModelService) {
+    return new IndexService(solr, trasactionalModelService, metricsRegistry, getRodaConfiguration(), nodeType);
   }
 
   /**

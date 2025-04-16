@@ -9,11 +9,12 @@ package org.roda.core.plugins.orchestrate.pekko;
 
 import java.util.List;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.pekko.Messages;
 import org.roda.core.common.pekko.PekkoBaseActor;
 import org.roda.core.common.pekko.messages.plugins.PluginAfterAllExecuteIsReady;
 import org.roda.core.common.pekko.messages.plugins.PluginExecuteIsReady;
+import org.roda.core.common.transactions.RODATransactionManager;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -28,8 +29,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.transaction.StorageTransactionManager;
 import org.roda.core.storage.transaction.TransactionalStorageService;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,14 +40,14 @@ public class PekkoWorkerActor extends PekkoBaseActor {
   private final IndexService index;
   private final ModelService model;
   private final StorageService storage;
-  private StorageTransactionManager storageTransactionManager;
+  private RODATransactionManager RODATransactionManager;
 
   public PekkoWorkerActor() {
     super();
     this.storage = getStorage();
     this.model = getModel();
     this.index = getIndex();
-    this.storageTransactionManager = getStorageTransactionManager();
+    this.RODATransactionManager = getStorageTransactionManager();
   }
 
   @Override
@@ -66,26 +67,32 @@ public class PekkoWorkerActor extends PekkoBaseActor {
     PluginExecuteIsReady message = (PluginExecuteIsReady) msg;
     List<LiteOptionalWithCause> objectsToBeProcessed = message.getList();
     message.logProcessingStarted();
-    Plugin<IsRODAObject> messagePlugin = message.getPlugin();
+    Plugin<IsRODAObject> plugin = message.getPlugin();
+
+    String requestUUID = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+            IdUtils.createUUID());
     try {
-      Job job = PluginHelper.getJob(message.getPlugin(), model);
+      RODATransactionManager.beginTransaction(requestUUID, objectsToBeProcessed);
 
-      TransactionalStorageService transactionalStorageService = storageTransactionManager.beginTransaction(job.getId());
-      ModelService transactionalModelService = RodaCoreFactory.getTransactionalModelService(transactionalStorageService);
-      IndexService transactionalIndexService = RodaCoreFactory.getTransactionalIndexService(transactionalModelService);
+      TransactionalStorageService transactionalStorageService = RODATransactionManager
+        .getTransactionalStorageService(requestUUID);
+      ModelService transactionalModelService = RODATransactionManager.getTransactionalModelService(requestUUID);
+      IndexService transactionalIndexService = RODATransactionManager.getTransactionalIndexService(requestUUID);
 
-
-      messagePlugin.execute(transactionalIndexService, transactionalModelService, transactionalStorageService, objectsToBeProcessed);
-      getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, false).withParallelism(message.getParallelism())
+      plugin.execute(transactionalIndexService, transactionalModelService, transactionalStorageService,
+        objectsToBeProcessed);
+      getSender().tell(Messages.newPluginExecuteIsDone(plugin, false).withParallelism(message.getParallelism())
         .withJobPriority(message.getJobPriority()), getSelf());
     } catch (Throwable e) {
       // 20170120 hsilva: it is required to catch Throwable as there are some
       // linking errors that only will happen during the execution (e.g.
       // java.lang.NoSuchMethodError)
       LOGGER.error("Error executing plugin.execute()", e);
-      getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, true, getErrorMessage(e))
+      getSender().tell(Messages.newPluginExecuteIsDone(plugin, true, getErrorMessage(e))
         .withParallelism(message.getParallelism()).withJobPriority(message.getJobPriority()), getSelf());
+      RODATransactionManager.rollbackTransaction(requestUUID);
     }
+
     message.logProcessingEnded();
   }
 
@@ -104,15 +111,19 @@ public class PekkoWorkerActor extends PekkoBaseActor {
     PluginAfterAllExecuteIsReady message = (PluginAfterAllExecuteIsReady) msg;
     message.logProcessingStarted();
     Plugin<?> plugin = message.getPlugin();
+    String requestUUID = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+            IdUtils.createUUID());
     try {
       Job job = PluginHelper.getJob(plugin, model);
       JobParallelism parallelism = job.getParallelism();
       JobPriority priority = job.getPriority();
       try {
-        TransactionalStorageService transactionalStorageService = storageTransactionManager.getTransactionalStorageService(job.getId());
-        if(transactionalStorageService != null) {
-          plugin.afterAllExecute(index, model, transactionalStorageService);
-          storageTransactionManager.commitTransaction(job.getId());
+        if (RODATransactionManager.isTransactional(requestUUID)) {
+          plugin.afterAllExecute(RODATransactionManager.getTransactionalIndexService(requestUUID),
+            RODATransactionManager.getTransactionalModelService(requestUUID),
+            RODATransactionManager.getTransactionalStorageService(requestUUID));
+
+          RODATransactionManager.endTransaction(requestUUID);
         } else {
           plugin.afterAllExecute(index, model, storage);
         }
@@ -127,6 +138,7 @@ public class PekkoWorkerActor extends PekkoBaseActor {
         getSender().tell(
           Messages.newPluginAfterAllExecuteIsDone(plugin, true).withJobPriority(priority).withParallelism(parallelism),
           getSelf());
+        RODATransactionManager.rollbackTransaction(job.getId());
       }
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.warn("Unable to get Job from model. Reason: {}", e.getMessage());

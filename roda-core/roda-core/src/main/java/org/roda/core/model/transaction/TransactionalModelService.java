@@ -83,10 +83,12 @@ import org.roda.core.storage.StorageService;
 public class TransactionalModelService implements ModelService {
   private final ModelService mainModelService;
   private final ModelService stagingModelService;
+  private final TransactionLog transaction;
 
-  public TransactionalModelService(ModelService mainModelService, ModelService stagingModelService) {
+  public TransactionalModelService(ModelService mainModelService, ModelService stagingModelService, TransactionLog transaction) {
     this.mainModelService = mainModelService;
     this.stagingModelService = stagingModelService;
+    this.transaction = transaction;
   }
 
   private ModelService getModelService() {

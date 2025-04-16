@@ -1,22 +1,26 @@
 package org.roda.core.storage.transaction;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.common.transaction.LockService;
+import org.roda.core.common.transactions.RODATransactionManager;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.model.transaction.Transaction;
+import org.roda.core.model.transaction.TransactionLog;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.Entity;
@@ -35,15 +39,15 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   private StorageService stagingStorageService;
   private StorageService mainStorageService;
-  private Transaction transaction;
-  private LockService lockService;
+  private TransactionLog transaction;
+  private RODATransactionManager RODATransactionManager;
 
   public DefaultTransactionalStorageService(StorageService mainStorageService, StorageService stagingStorageService,
-    Transaction transaction, LockService lockService) {
+    TransactionLog transaction, RODATransactionManager RODATransactionManager) {
     this.mainStorageService = mainStorageService;
     this.stagingStorageService = stagingStorageService;
     this.transaction = transaction;
-    this.lockService = lockService;
+    this.RODATransactionManager = RODATransactionManager;
   }
 
   @Override
@@ -277,26 +281,37 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   @Override
   public void commit() {
-    for (StoragePath storagePath : transaction.getStoragePathList()) {
-      if(!stagingStorageService.exists(storagePath)) {
-        // TODO: release lock now or wait for the transaction to finish?
-        releaseLock(storagePath);
-        continue;
-      }
-      try {
-        if(mainStorageService.exists(storagePath)) {
-          mainStorageService.deleteResource(storagePath);
+    try {
+      for (String stringStoragePath : RODATransactionManager.getStoragePaths(transaction)) {
+
+        Path path = Paths.get(stringStoragePath);
+        List<String> parts = StreamSupport.stream(path.spliterator(), false).map(Path::toString)
+          .collect(Collectors.toList());
+
+        DefaultStoragePath storagePath = DefaultStoragePath.parse(parts);
+        if (!stagingStorageService.exists(storagePath)) {
+          // TODO: release lock now or wait for the transaction to finish?
+          releaseLock(storagePath);
+          continue;
         }
-        LOGGER.info("Moving resource from staging to main storage service: {}", storagePath);
-        StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
-          storagePath, getEntity(storagePath));
-      } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
-        | AuthorizationDeniedException e) {
-        // TODO: Handle this exceptions
-      } finally {
-        // TODO: release lock now or wait for the transaction to finish?
-        releaseLock(storagePath);
+        try {
+          if (mainStorageService.exists(storagePath)) {
+            mainStorageService.deleteResource(storagePath);
+          }
+          LOGGER.info("Moving resource from staging to main storage service: {}", storagePath);
+          StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
+            storagePath, getEntity(storagePath));
+        } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
+          | AuthorizationDeniedException e) {
+          // TODO: Handle this exceptions
+        } finally {
+          // TODO: release lock now or wait for the transaction to finish?
+          releaseLock(storagePath);
+        }
+
       }
+    } catch (RequestNotValidException | GenericException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -313,24 +328,27 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   @Override
   public void rollback() {
-
+    RODATransactionManager.releaseLock(transaction);
   }
 
   private void acquireLock(StoragePath storagePath) {
     if (!storagePath.isFromAContainer()) {
       LOGGER.info("Acquiring lock for storage path: {}", storagePath);
-      // lockService.acquireLock(storagePath.toString(),
-      // transaction.getTransactionId());
-      if (!transaction.exist(storagePath)) {
-        transaction.addStoragePath(storagePath);
+      try {
+        RODATransactionManager.acquireLock(transaction, storagePath);
+      } catch (InterruptedException | GenericException e) {
+        throw new RuntimeException(e);
       }
     }
   }
 
   private void releaseLock(StoragePath storagePath) {
     LOGGER.info("Releasing lock for storage path: {}", storagePath);
-    // lockService.releaseLock(storagePath.toString(),
-    // transaction.getTransactionId());
+    try {
+      RODATransactionManager.releaseLock(transaction, storagePath);
+    } catch (GenericException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private StorageService getStorageService(StoragePath storagePath) {
