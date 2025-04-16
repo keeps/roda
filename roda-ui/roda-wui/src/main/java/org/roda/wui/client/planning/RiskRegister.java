@@ -93,6 +93,7 @@ public class RiskRegister extends Composite {
 
     ListBuilder<IndexedRisk> riskListBuilder = new ListBuilder<>(() -> new RiskList(),
       new AsyncTableCellOptions<>(IndexedRisk.class, "RiskRegister_risks").withActionable(RiskActions.get())
+        .withActionBlacklist(List.of(RiskActions.IndexedRiskAction.HISTORY))
         .withActionableCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
           @Override
           public void onSuccess(Actionable.ActionImpact result) {
