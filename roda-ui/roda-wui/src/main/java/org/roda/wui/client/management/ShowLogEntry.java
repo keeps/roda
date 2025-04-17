@@ -204,7 +204,10 @@ public class ShowLogEntry extends Composite {
 
     expandedAuditLogsList.setVisible(false);
 
+    GWT.log(logEntry.getAuditLogRequestHeaders().toString());
+
     if (logEntry.getAuditLogRequestHeaders() != null) {
+      GWT.log("HERE!");
       Label relatedAuditLogs = new Label();
       relatedAuditLogs.addStyleName("h5");
       relatedAuditLogs.setText(messages.relatedAuditLogs());
