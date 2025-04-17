@@ -13,8 +13,6 @@ package org.roda.wui.client.search;
 import java.util.List;
 import java.util.Optional;
 
-import com.google.gwt.user.client.Window;
-import config.i18n.client.ClientMessages;
 import org.roda.wui.client.common.SubTitlePanel;
 import org.roda.wui.client.common.search.CatalogueSearch;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -23,10 +21,13 @@ import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -81,10 +82,10 @@ public class SearchWithPreFilters extends Composite {
     } else {
       preparedHistoryToken = historyTokens.subList(1, historyTokens.size());
     }
-    
+
     // Create main search
-    catalogueSearch = new CatalogueSearch(preparedHistoryToken, true, "Search_AIPs", "Search_representations", "Search_files",
-      null, false, true);
+    catalogueSearch = new CatalogueSearch(preparedHistoryToken, true, "Search_AIPs", "Search_representations",
+      "Search_files", null, true, true);
 
     initWidget(uiBinder.createAndBindUi(this));
 
