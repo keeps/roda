@@ -105,11 +105,6 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     Permissions permissions) {
     return new FileActions(aipId, representationId, parentFolder, permissions) {
       @Override
-      public CanActResult userCanAct(Action<IndexedFile> action) {
-        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
-      }
-
-      @Override
       public CanActResult contextCanAct(Action<IndexedFile> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
       }
