@@ -141,7 +141,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
     if (!AIPState.UNDER_APPRAISAL.equals(parentAipState)) {
       if (Objects.equals(parentAipId, NO_AIP_PARENT)) {
         return new CanActResult(POSSIBLE_ACTIONS_ON_NO_AIP_TOP.contains(action), CanActResult.Reason.CONTEXT,
-          messages.reasonNoParentObject());
+          messages.reasonNoObjectSelected());
       } else {
         return new CanActResult(POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action), CanActResult.Reason.CONTEXT,
           messages.reasonNoObjectSelected());
