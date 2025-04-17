@@ -83,11 +83,6 @@ public class RepresentationToolbarActions extends AbstractActionable<IndexedRepr
     Permissions permissions) {
     return new RepresentationToolbarActions(parentAipId, permissions) {
       @Override
-      public CanActResult userCanAct(Action<IndexedRepresentation> action) {
-        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
-      }
-
-      @Override
       public CanActResult contextCanAct(Action<IndexedRepresentation> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
       }
