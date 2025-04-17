@@ -7,7 +7,11 @@
  */
 package org.roda.wui.client.common.actions;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -96,11 +100,6 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
   public static FileSearchWrapperActions getWithoutNoFileActions(String aipId, String representationId,
     IndexedFile parentFolder, Permissions permissions) {
     return new FileSearchWrapperActions(aipId, representationId, parentFolder, permissions) {
-      @Override
-      public CanActResult userCanAct(Action<IndexedFile> action) {
-        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
-      }
-
       @Override
       public CanActResult contextCanAct(Action<IndexedFile> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
