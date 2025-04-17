@@ -23,9 +23,6 @@ public class BrowseAIPResponse implements Serializable {
   private LongResponse childAipsCount;
   private LongResponse representationCount;
   private LongResponse dipCount;
-  private LongResponse incidenceCount;
-  private LongResponse eventCount;
-  private LongResponse logCount;
 
   public BrowseAIPResponse() {
     // empty constructor
@@ -86,29 +83,4 @@ public class BrowseAIPResponse implements Serializable {
   public void setDipCount(LongResponse dipCount) {
     this.dipCount = dipCount;
   }
-
-  public LongResponse getIncidenceCount() {
-    return incidenceCount;
-  }
-
-  public void setIncidenceCount(LongResponse incidenceCount) {
-    this.incidenceCount = incidenceCount;
-  }
-
-  public LongResponse getEventCount() {
-    return eventCount;
-  }
-
-  public void setEventCount(LongResponse eventCount) {
-    this.eventCount = eventCount;
-  }
-
-  public LongResponse getLogCount() {
-    return logCount;
-  }
-
-  public void setLogCount(LongResponse logCount) {
-    this.logCount = logCount;
-  }
-
 }

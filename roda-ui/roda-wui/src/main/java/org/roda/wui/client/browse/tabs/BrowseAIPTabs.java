@@ -56,51 +56,44 @@ public class BrowseAIPTabs extends Tabs {
     }
 
     // Preservation events
-    if (browseAIPResponse.getEventCount().getResult() >= 0) {
+    // Check if user has permissions to see the preservation events
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_PRESERVATION_EVENT)) {
       createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.preservationEventsTab()), new TabContentBuilder() {
-
         @Override
         public Widget buildTabWidget() {
           Filter eventFilter = new Filter(new AllFilterParameter());
           eventFilter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
           return new SearchWrapper(false).createListAndSearchPanel(new ListBuilder<>(() -> new PreservationEventList(),
-            new AsyncTableCellOptions<>(IndexedPreservationEvent.class, "BrowseAIP_preservationEvents")
-              .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()));
+                  new AsyncTableCellOptions<>(IndexedPreservationEvent.class, "BrowseAIP_preservationEvents")
+                          .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()));
         }
       });
     }
-
     // Logs
-    if (browseAIPResponse.getLogCount().getResult() >= 0) {
-      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.auditLogsTab()), new TabContentBuilder() {
-        @Override
-        public Widget buildTabWidget() {
-          SearchWrapper auditLogs = new SearchWrapper(false);
-          auditLogs.createListAndSearchPanel(new ListBuilder<>(() -> new LogEntryList(),
-            new AsyncTableCellOptions<>(LogEntry.class, "BrowseAIP_auditLogs")
-              .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aip.getId())))
-              .withJustActive(justActive).bindOpener()));
-          return auditLogs;
-        }
-      });
-    }
+    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.auditLogsTab()), new TabContentBuilder() {
+      @Override
+      public Widget buildTabWidget() {
+        SearchWrapper auditLogs = new SearchWrapper(false);
+        auditLogs.createListAndSearchPanel(new ListBuilder<>(() -> new LogEntryList(),
+          new AsyncTableCellOptions<>(LogEntry.class, "BrowseAIP_auditLogs")
+            .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aip.getId())))
+            .withJustActive(justActive).bindOpener()));
+        return auditLogs;
+      }
+    });
 
     // Risk incidences
-    if (browseAIPResponse.getIncidenceCount().getResult() >= 0)
-
-    {
-      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.risksTab()), new TabContentBuilder() {
-        @Override
-        public Widget buildTabWidget() {
-          SearchWrapper riskIncidences = new SearchWrapper(false);
-          riskIncidences.createListAndSearchPanel(new ListBuilder<>(() -> new RiskIncidenceList(),
-            new AsyncTableCellOptions<>(RiskIncidence.class, "BrowseAIP_riskIncidences")
-              .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aip.getId())))
-              .withJustActive(justActive).bindOpener()));
-          return riskIncidences;
-        }
-      });
-    }
+    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.risksTab()), new TabContentBuilder() {
+      @Override
+      public Widget buildTabWidget() {
+        SearchWrapper riskIncidences = new SearchWrapper(false);
+        riskIncidences.createListAndSearchPanel(new ListBuilder<>(() -> new RiskIncidenceList(),
+          new AsyncTableCellOptions<>(RiskIncidence.class, "BrowseAIP_riskIncidences")
+            .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aip.getId())))
+            .withJustActive(justActive).bindOpener()));
+        return riskIncidences;
+      }
+    });
 
     // Disposal
     List<String> disposalMethods = new ArrayList<>();

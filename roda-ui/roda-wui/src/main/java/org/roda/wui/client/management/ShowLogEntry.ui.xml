@@ -79,9 +79,8 @@
 								<g:HTML styleName="value" ui:field="logStateValue" />
 							</g:FlowPanel>
 							<g:FlowPanel>
-								<g:SimplePanel ui:field="expandedAuditLogs">
-								</g:SimplePanel>
-								<g:SimplePanel ui:field="expandedAuditLogsList" addStyleNames="card representationsCard" />
+								<g:SimplePanel ui:field="expandedAuditLogs" />
+								<g:SimplePanel ui:field="expandedAuditLogsList" />
 							</g:FlowPanel>
 						</g:FlowPanel>
 					</g:FlowPanel>

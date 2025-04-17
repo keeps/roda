@@ -318,24 +318,9 @@ public class BrowseAIP extends Composite {
             s -> s.count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, id)), false)),
             IndexedDIP.class);
 
-          CompletableFuture<LongResponse> futureIncidenceCount = service.rodaEntityRestService(
-            s -> s.count(
-              new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, id)), false)),
-            RiskIncidence.class);
-
-          CompletableFuture<LongResponse> futureEventCount = service.rodaEntityRestService(
-            s -> s.count(new CountRequest(
-              new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, id)), false)),
-            IndexedPreservationEvent.class);
-
-          CompletableFuture<LongResponse> futureLogCount = service.rodaEntityRestService(
-            s -> s.count(
-              new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, id)), false)),
-            LogEntry.class);
-
           CompletableFuture
             .allOf(futureChildAipCount, futureRepCount, futureDipCount, futureAncestors, futureAncestors,
-              futureRepFields, futureDescriptiveMetadataInfos, futureIncidenceCount, futureEventCount, futureLogCount)
+              futureRepFields, futureDescriptiveMetadataInfos)
             .thenApply(v -> {
               BrowseAIPResponse rp = new BrowseAIPResponse();
               rp.setIndexedAIP(aip);
@@ -345,9 +330,6 @@ public class BrowseAIP extends Composite {
               rp.setChildAipsCount(futureChildAipCount.join());
               rp.setRepresentationCount(futureRepCount.join());
               rp.setDipCount(futureDipCount.join());
-              rp.setIncidenceCount(futureIncidenceCount.join());
-              rp.setEventCount(futureEventCount.join());
-              rp.setLogCount(futureLogCount.join());
               return rp;
             }).whenComplete((value, throwable) -> {
 

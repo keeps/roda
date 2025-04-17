@@ -14,18 +14,18 @@ public class AuditLogRequestHeaders implements Serializable {
   @Serial
   private static final long serialVersionUID = -166139273669982053L;
 
-  private String uuid = null;
-  private String reason = null;
-  private String type = null;
+  private String uuid;
+  private String reason;
+  private String requestType;
 
   public AuditLogRequestHeaders() {
     // empty constructor
   }
 
-  public AuditLogRequestHeaders(String uuid, String reason, String type) {
+  public AuditLogRequestHeaders(String uuid, String reason, String requestType) {
     this.uuid = uuid;
     this.reason = reason;
-    this.type = type;
+    this.requestType = requestType;
   }
 
   public String getUuid() {
@@ -44,11 +44,11 @@ public class AuditLogRequestHeaders implements Serializable {
     this.reason = reason;
   }
 
-  public String getType() {
-    return type;
+  public String getRequestType() {
+    return requestType;
   }
 
-  public void setType(String type) {
-    this.type = type;
+  public void setRequestType(String requestType) {
+    this.requestType = requestType;
   }
 }

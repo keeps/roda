@@ -108,7 +108,7 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     if (logEntry.getAuditLogRequestHeaders() != null) {
       doc.addField(RodaConstants.LOG_REQUEST_HEADER_UUID, logEntry.getAuditLogRequestHeaders().getUuid());
       doc.addField(RodaConstants.LOG_REQUEST_HEADER_REASON, logEntry.getAuditLogRequestHeaders().getReason());
-      doc.addField(RodaConstants.LOG_REQUEST_HEADER_TYPE, logEntry.getAuditLogRequestHeaders().getType());
+      doc.addField(RodaConstants.LOG_REQUEST_HEADER_TYPE, logEntry.getAuditLogRequestHeaders().getRequestType());
     }
 
     return doc;

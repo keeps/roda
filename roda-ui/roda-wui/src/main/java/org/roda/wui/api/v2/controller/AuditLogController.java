@@ -68,7 +68,8 @@ public class AuditLogController implements AuditLogRestService, Exportable {
     final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.LOG_ID,
       RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD, RodaConstants.LOG_ADDRESS,
       RodaConstants.LOG_DATETIME, RodaConstants.LOG_RELATED_OBJECT_ID, RodaConstants.LOG_USERNAME,
-      RodaConstants.LOG_PARAMETERS, RodaConstants.LOG_STATE);
+      RodaConstants.LOG_PARAMETERS, RodaConstants.LOG_STATE, RodaConstants.LOG_REQUEST_HEADER_UUID,
+      RodaConstants.LOG_REQUEST_HEADER_REASON, RodaConstants.LOG_REQUEST_HEADER_TYPE);
     return indexService.retrieve(requestContext, LogEntry.class, uuid, fieldsToReturn);
   }
 
