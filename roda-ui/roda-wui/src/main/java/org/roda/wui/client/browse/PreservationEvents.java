@@ -236,9 +236,6 @@ public class PreservationEvents extends Composite {
               rp.setChildAipsCount(futureChildAipCount.join());
               rp.setRepresentationCount(futureRepCount.join());
               rp.setDipCount(futureDipCount.join());
-              rp.setIncidenceCount(futureIncidenceCount.join());
-              rp.setEventCount(futureEventCount.join());
-              rp.setLogCount(futureLogCount.join());
               return rp;
             }).whenComplete((value, throwable) -> {
 
