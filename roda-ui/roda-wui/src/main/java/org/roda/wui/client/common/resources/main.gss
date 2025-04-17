@@ -56,10 +56,10 @@
 @def COLOR_GREEN eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.green")');
 
 @def FONT_PRIMARY "Inter", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-@def FONT_MONOSPACED "Roboto_Mono", "UbuntuMono", "Lucida Console", Monaco, monospace;
+@def FONT_MONOSPACED "RobotoMono", "UbuntuMono", "Lucida Console", Monaco, monospace;
 
 @defmixin fontawesome() {
-	font-family: 'CustomMaterialIcons', 'Font Awesome 5 Free';
+	font-family: 'MaterialIcons', 'Font Awesome 5 Free';
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -943,7 +943,7 @@ pre code {
 }
 
 .btn {
-    border-radius: 2px;
+    border-radius: 4px;
     padding: 8px 27px 8px 10px;
     border: none;
     background-color: COLOR_PRIMARY;
@@ -1063,8 +1063,7 @@ pre code {
 
 button:after {
     @mixin fontawesome();
-
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .btn-link:after {
@@ -1072,19 +1071,19 @@ button:after {
 }
 
 .btn-plus:after {
-    content: "\e903";
+    content: "\e148";
 }
 
 .btn-plus-circle:after {
-    content: "\e902";
+    content: "\e147";
 }
 
 .btn-calendar:after {
-    content: "\e908";
+    content: "\e935";
 }
 
 .btn-lock:after {
-    content: "\e933";
+    content: "\e897";
 }
 
 .btn-top:after {
@@ -1109,11 +1108,11 @@ button:after {
 }
 
 .btn-edit:after {
-    content: "\e90c";
+    content: "\e3c9";
 }
 
 .btn-key:after {
-    content: "\e930";
+    content: "\e73c";
 }
 
 .btn-unlock:after {
@@ -1129,11 +1128,15 @@ button:after {
 }
 
 .btn-play:after {
-    content: "\e918";
+    content: "\e1c4";
+}
+
+.btn-assessment:after {
+    content: "\e85c";
 }
 
 .btn-download:after {
-    content: "\e90f";
+    content: "\e2c4";
 }
 
 .btn-disposal-schedule:after {
@@ -1145,7 +1148,7 @@ button:after {
 }
 
 .btn-history:after {
-    content: "\e919";
+    content: "\e8b3";
 }
 
 .btn-info:after {
@@ -1153,7 +1156,7 @@ button:after {
 }
 
 .btn-upload:after {
-    content: "\e929";
+    content: "\e2c6";
 }
 
 .btn-print:after {
@@ -1161,7 +1164,7 @@ button:after {
 }
 
 .btn-refresh:after {
-    content: "\e937";
+    content: "\e5d5";
 }
 
 .btn-bookmark:after {
@@ -1173,11 +1176,15 @@ button:after {
 }
 
 .btn-check:after {
-    content: "\e927";
+    content: "\e86c";
+}
+
+.btn-check-circle:after {
+    content: "\e86c";
 }
 
 .btn-ban:after {
-    content: "\e923";
+    content: "\e14b";
 }
 
 .btn-preview:after {
@@ -1189,7 +1196,7 @@ button:after {
 }
 
 .btn-search:after {
-    content: "\e91b";
+    content: "\e8b6";
 }
 
 .btn-chevron-left:after {
@@ -1201,7 +1208,7 @@ button:after {
 }
 
 .btn-stop:after{
-	content: "\e921"
+	content: "\ef71"
 }
 
 .btn-back:after {
@@ -1254,13 +1261,20 @@ button:after {
      content: "\e93e";
 }
 
+ /******************************
+  Material Icons - Outlined (https://fonts.google.com/icons?icon.set=Material+Symbols&icon.size=24&icon.color=%2380A4AE)
+  ******************************/
 .ma {
-    font-family: 'CustomMaterialIcons';
+    font-family: 'MaterialIcons';
     font-style: normal;
 }
 
+.ma-account-tree:after {
+    content: "\e97a";
+}
+
 .ma-tune:after {
-    content: "\e91e";
+    content: "\e429";
 }
 
 .appendIconAttribute:after {
@@ -1766,7 +1780,7 @@ button:after {
 .dropdown-label:after {
     display: inline-block;
 
-    content: "\f107";
+    content: "\e5cf";
     @mixin fontawesome();
 
     font-size: inherit;
@@ -1793,7 +1807,7 @@ button:after {
 }
 
 .open .dropdown-label:after {
-    content: "\f106";
+    content: "\e5ce";
 }
 
 /**********************************************
@@ -3353,12 +3367,22 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .thumbnailCardExpandable .thumbnailCardTitle:after {
-    @mixin fontawesome();
+    font-family: 'Font Awesome 5 Free';
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 900;
+    font-style: normal;
     content: "\f078";
 }
 
 .thumbnailCardCollapsible .thumbnailCardTitle:after {
-    @mixin fontawesome();
+    font-family: 'Font Awesome 5 Free';
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 900;
+    font-style: normal;
     content: "\f077";
 }
 
@@ -3403,7 +3427,7 @@ td.datePickerMonth, td.datePickerYear {
 .tag {
     padding: 2px 8px;
     border-radius: 4px;
-    flex: 1;
+    /*flex: 1;*/
     text-transform: uppercase;
     text-align: center;
 }
@@ -3417,8 +3441,9 @@ td.datePickerMonth, td.datePickerYear {
     background-color: COLOR_GREEN;
 }
 
-.tagLightRed .tagRed {
+.tagLightRed, .tagRed {
     background-color: COLOR_RED_LIGHT;
+    color: white;
 }
 
 .tagLightYellow {
@@ -5700,7 +5725,7 @@ td.datePickerMonth, td.datePickerYear {
     width: 2rem;
     height: 2rem;
 
-    content: "\f00c";
+    content: "\e876";
     @mixin fontawesome();
 
     position: absolute;
@@ -5715,7 +5740,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 #upload-list li.working span.icon:after {
-    content: "\f1ce";
+    content: "\e1af";
     color: #f4d03f;
     -webkit-animation:spin 3s linear infinite;
     -moz-animation:spin 3s linear infinite;
@@ -5730,7 +5755,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 #upload-list li.error span.icon:after {
-    content: "\f071";
+    content: "\e002";
     color: #D20707;
     -webkit-animation: none;
     -moz-animation: none;
@@ -8090,7 +8115,6 @@ span.code {
     justify-content: center;
     align-items: center;
     font-size: 14px;
-    height: 32px;
     width: 32px;
 }
 
@@ -9125,7 +9149,11 @@ wui-disposal-hold-data .form-textbox {
   ******************************/
 
 .cmi {
-    @mixin fontawesome();
+    font-family: 'CustomMaterialIcons';
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 900;
     font-style: normal;
 }
 
@@ -9168,10 +9196,6 @@ wui-disposal-hold-data .form-textbox {
 .cmi-enter:after {
     content: "\e92c";
 }
-
-
-
-
 
 .details-date {
     font-size: 1.1rem;

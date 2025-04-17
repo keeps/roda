@@ -48,7 +48,7 @@ public class BrowseRepresentationTabs extends Tabs {
         ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
           new AsyncTableCellOptions<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
             .withJustActive(justActive).withSummary(summary).bindOpener()
-            .withActionable(FileSearchWrapperActions.get(aip.getId(), representation.getId(), aip.getPermissions())));
+            .withActionable(FileSearchWrapperActions.get(aip.getId(), representation.getId(), aip.getState(), aip.getPermissions())));
 
         return new SearchWrapper(false).createListAndSearchPanel(fileListBuilder);
       }

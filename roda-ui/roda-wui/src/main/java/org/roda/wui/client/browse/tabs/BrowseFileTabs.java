@@ -7,7 +7,6 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.IndexedFilePreview;
@@ -30,7 +29,6 @@ import com.google.gwt.user.client.ui.Widget;
 public class BrowseFileTabs extends Tabs {
   public void init(Viewers viewers, IndexedFile file, BrowseFileResponse browseFileResponse, Services services) {
     IndexedAIP aip = browseFileResponse.getIndexedAIP();
-    IndexedRepresentation representation = browseFileResponse.getIndexedRepresentation();
 
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
@@ -39,7 +37,7 @@ public class BrowseFileTabs extends Tabs {
       new TabContentBuilder() {
         @Override
         public Widget buildTabWidget() {
-          return new IndexedFilePreview(viewers, file, file.isAvailable(), justActive,
+          return new IndexedFilePreview(viewers, file, file.isAvailable(), justActive, aip.getState(),
             browseFileResponse.getIndexedAIP().getPermissions(), () -> {
             });
         }

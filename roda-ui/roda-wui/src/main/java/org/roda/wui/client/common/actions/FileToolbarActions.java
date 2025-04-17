@@ -25,6 +25,7 @@ import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -55,9 +56,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import config.i18n.client.ClientMessages;
 
 public class FileToolbarActions extends AbstractActionable<IndexedFile> {
-
-  private static final FileToolbarActions GENERAL_INSTANCE = new FileToolbarActions(null, null, null, null);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<FileAction> POSSIBLE_ACTIONS_WITH_REPRESENTATION = new HashSet<>(
@@ -76,34 +74,36 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   private static final Set<FileAction> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_DIFFERENT_REPRESENTATIONS = new HashSet<>(
     Arrays.asList(FileAction.REMOVE, FileAction.NEW_PROCESS, FileAction.IDENTIFY_FORMATS));
 
+  private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL = new HashSet<>(
+    Arrays.asList(FileAction.MOVE, FileAction.REMOVE));
+
   private final String aipId;
   private final String representationId;
+  private final AIPState state;
   private final IndexedFile parentFolder;
   private final Permissions permissions;
 
-  private FileToolbarActions(String aipId, String representationId, IndexedFile parentFolder, Permissions permissions) {
+  private FileToolbarActions(String aipId, String representationId, AIPState state, IndexedFile parentFolder,
+    Permissions permissions) {
     this.aipId = aipId;
     this.representationId = representationId;
+    this.state = state;
     this.permissions = permissions;
     this.parentFolder = parentFolder != null && parentFolder.isDirectory() ? parentFolder : null;
   }
 
-  public static FileToolbarActions get() {
-    return GENERAL_INSTANCE;
-  }
-
   public static FileToolbarActions get(String aipId, String representationId, Permissions permissions) {
-    return new FileToolbarActions(aipId, representationId, null, permissions);
+    return new FileToolbarActions(aipId, representationId, null, null, permissions);
   }
 
-  public static FileToolbarActions get(String aipId, String representationId, IndexedFile parentFolder,
+  public static FileToolbarActions get(String aipId, String representationId, AIPState state, IndexedFile parentFolder,
     Permissions permissions) {
-    return new FileToolbarActions(aipId, representationId, parentFolder, permissions);
+    return new FileToolbarActions(aipId, representationId, state, parentFolder, permissions);
   }
 
   public static FileToolbarActions getWithoutNoFileActions(String aipId, String representationId,
     IndexedFile parentFolder, Permissions permissions) {
-    return new FileToolbarActions(aipId, representationId, parentFolder, permissions) {
+    return new FileToolbarActions(aipId, representationId, null, parentFolder, permissions) {
       @Override
       public CanActResult contextCanAct(Action<IndexedFile> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
@@ -142,6 +142,11 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
 
   @Override
   public CanActResult contextCanAct(Action<IndexedFile> action, IndexedFile file) {
+    if (AIPState.UNDER_APPRAISAL.equals(state)) {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL.contains(action),
+              CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+    }
+
     if (file.isDirectory()) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonCantActOnFileDirectory());
@@ -159,6 +164,11 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
 
   @Override
   public CanActResult contextCanAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
+    if (AIPState.UNDER_APPRAISAL.equals(state)) {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL.contains(action),
+              CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+    }
+
     if (aipId != null && representationId != null) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION.contains(action),
         CanActResult.Reason.CONTEXT, messages.reasonFilesAreOnSameRepresentation());

@@ -428,10 +428,10 @@ public class FilesController implements FileRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
-      controllerAssistant.checkAIPstate(aip);
+      controllerAssistant.checkAIPState(aip);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
       // delegate
       Path file = Files.createTempFile("descriptive", ".tmp");

@@ -11,12 +11,9 @@
 			<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
 				<common:NavigationToolbar ui:field="navigationToolbar" />
 				<common:BrowseAIPActionsToolbar ui:field="objectToolbar" label="{messages.catalogueItemTitle}"/>
-				<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
+				<g:FlowPanel addStyleNames="row full_width skip_padding">
 					<g:FlowPanel addStyleNames="content">
 						<g:FlowPanel addStyleNames="upperContent">
-							<!-- STATUS -->
-							<g:HTML ui:field="aipState" />
-
 							<!-- IDENTIFICATION -->
 							<common:TitlePanel ui:field="title" />
 

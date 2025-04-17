@@ -64,8 +64,6 @@ public class EditPermissionsTab extends Composite {
   @UiField
   FlowPanel groupPermissionsPanel;
   @UiField
-  Header title;
-  @UiField
   ActionsToolbar actionsToolbar;
 
   private List<HasPermissions> objects = new ArrayList<>();
@@ -105,8 +103,6 @@ public class EditPermissionsTab extends Composite {
   }
 
   private void initLabels() {
-    title.setHeaderText(messages.archivalPackagePermissionsTitle());
-    title.setLevel(3);
     userPermissionsTitle.setHeaderText(messages.permissionAssignedGroups());
     userPermissionsTitle.setLevel(4);
     groupPermissionsTitle.setHeaderText(messages.permissionAssignedUsers());

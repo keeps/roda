@@ -6,6 +6,7 @@ import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.wui.client.common.cards.utils.CardBuilder;
 import org.roda.wui.client.common.labels.Header;
 import org.roda.wui.client.services.Services;
@@ -41,12 +42,10 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
   private static final ClientLogger LOGGER = new ClientLogger(ThumbnailCardList.class.getName());
 
   protected final ArrayList<ThumbnailCard> cards;
-
+  private final FindRequest findRequest;
   private final Class<T> objectClass;
-
   private IndexResult<T> results;
   private Filter resultsFilter;
-
   private CardBuilder<T> cardBuilder;
 
   protected ThumbnailCardList() {
@@ -55,7 +54,28 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
     this.objectClass = null;
     this.results = null;
     this.resultsFilter = null;
+    this.findRequest = null;
     this.cards = new ArrayList<>();
+  }
+
+  public ThumbnailCardList(String title, String icon, Class<T> objectClass, FindRequest findRequest,
+    CardBuilder<T> cardBuilder) {
+    // UI Elements
+    initWidget(uiBinder.createAndBindUi(this));
+    this.title.setHeaderStyleName("noMargin");
+    this.title.setHeaderText(title);
+    this.title.setLevel(5);
+    this.title.setIcon(icon);
+
+    // Data
+    this.objectClass = objectClass;
+    this.results = new IndexResult<>();
+    this.findRequest = findRequest;
+    this.cardBuilder = cardBuilder;
+    this.cards = new ArrayList<>();
+
+    // Initialize
+    refresh();
   }
 
   public ThumbnailCardList(String title, String icon, Class<T> objectClass, Filter resultsFilter,
@@ -73,6 +93,7 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
     if (resultsFilter != null) {
       this.resultsFilter = resultsFilter;
     }
+    this.findRequest = null;
     this.cardBuilder = cardBuilder;
     this.cards = new ArrayList<>();
 
@@ -92,9 +113,9 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
   private void updateResultsAndRebuildCards() {
     this.cards.clear();
     this.cardsPanel.clear();
-    Services services = new Services("Retrieve AIP representations and disseminations", "get");
-    services.rodaEntityRestService(s -> s.find(new FindRequest.FindRequestBuilder(this.resultsFilter, true).build(),
-      LocaleInfo.getCurrentLocale().getLocaleName()), objectClass).whenComplete((requestResults, error) -> {
+    Services services = new Services("Retrieve AIP representations or dissemination", "get");
+    services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()), objectClass)
+      .whenComplete((requestResults, error) -> {
         if (error == null) {
           this.results = requestResults;
           for (T object : this.results.getResults()) {

@@ -11,7 +11,9 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
  */
 public class BrowseFileActionsToolbar extends BrowseObjectActionsToolbar<IndexedFile> {
   protected void buildTags() {
-    // do nothing
+    tags.clear();
+
+    getStateTag().ifPresent(tag -> tags.add(tag));
   }
 
   protected void buildIcon() {
@@ -20,7 +22,7 @@ public class BrowseFileActionsToolbar extends BrowseObjectActionsToolbar<Indexed
 
   protected void buildActions() {
     this.actions.clear();
-    FileToolbarActions fileActions = FileToolbarActions.get(object.getAipId(), object.getRepresentationId(),
+    FileToolbarActions fileActions = FileToolbarActions.get(object.getAipId(), object.getRepresentationId(), state,
       object.isDirectory() ? object : null, actionPermissions);
     this.actions.add(new ActionableWidgetBuilder<IndexedFile>(fileActions)
       .buildGroupedListWithObjects(new ActionableObject<>(object)));

@@ -106,8 +106,6 @@ public class BrowseRepresentation extends Composite {
   @UiField
   FocusPanel keyboardFocus;
   @UiField
-  HTML aipState;
-  @UiField
   FlowPanel center;
   @UiField
   NavigationToolbar<IndexedRepresentation> navigationToolbar;
@@ -190,63 +188,30 @@ public class BrowseRepresentation extends Composite {
         return longResponse;
       });
 
-    AndFiltersParameters riskIncidenceFilter = new AndFiltersParameters(
-      Arrays.asList(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, repId),
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, representation.getAipId())));
-    CountRequest riskIncidenceCountRequest = new CountRequest(new Filter(riskIncidenceFilter), true);
-    CompletableFuture<LongResponse> riskIncidenceCounterCompletableFuture = services
-      .rodaEntityRestService(s -> s.count(riskIncidenceCountRequest), RiskIncidence.class)
-      .handle((longResponse, throwable1) -> {
-        if (throwable1 != null) {
-          return new LongResponse(-1L);
-        }
-        return longResponse;
-      });
+    CompletableFuture.allOf(dipCounterCompletableFuture).thenRun(() -> {
+      LongResponse dipCounterResponse = dipCounterCompletableFuture.join();
 
-    Filter preservationEventFilter = new Filter(
-      new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, repUUID));
-    CountRequest preservationEventsCountRequest = new CountRequest(preservationEventFilter, true);
+      updateLayout(response);
 
-    CompletableFuture<LongResponse> preservationCounterCompletableFuture = services
-      .rodaEntityRestService(s -> s.count(preservationEventsCountRequest), IndexedPreservationEvent.class)
-      .handle((longResponse, throwable2) -> {
-        if (throwable2 != null) {
-          return new LongResponse(-1L);
-        }
-        return longResponse;
-      });
+      // CARDS
+      if (dipCounterResponse.getResult() > 0) {
+        this.disseminationCards.add(new RepresentationDisseminationCardList(aipId, repId));
+      } else {
+        this.sidePanel.setVisible(false);
+      }
 
-    CompletableFuture
-      .allOf(dipCounterCompletableFuture, riskIncidenceCounterCompletableFuture, preservationCounterCompletableFuture)
-      .thenRun(() -> {
-        LongResponse riskIncidenceCounterResponse = riskIncidenceCounterCompletableFuture.join();
-        LongResponse preservationCounterResponse = preservationCounterCompletableFuture.join();
-        LongResponse dipCounterResponse = dipCounterCompletableFuture.join();
+      // CSS
+      keyboardFocus.addStyleName("browse browse-representation browse_main_panel");
+      this.addStyleName(state.toString().toLowerCase());
 
-        updateLayout(response, riskIncidenceCounterResponse.getResult(), preservationCounterResponse.getResult(), state,
-          justActive);
-
-        // CARDS
-        if (dipCounterResponse.getResult() > 0) {
-          this.disseminationCards.add(new RepresentationDisseminationCardList(aipId, repId));
-        } else {
-          this.sidePanel.setVisible(false);
-        }
-
-        // CSS
-        keyboardFocus.addStyleName("browse browse-representation browse_main_panel");
-        this.addStyleName(state.toString().toLowerCase());
-
-        Element firstElement = this.getElement().getFirstChildElement();
-        if ("input".equalsIgnoreCase(firstElement.getTagName())) {
-          firstElement.setAttribute("title", "browse input");
-        }
-      });
+      Element firstElement = this.getElement().getFirstChildElement();
+      if ("input".equalsIgnoreCase(firstElement.getTagName())) {
+        firstElement.setAttribute("title", "browse input");
+      }
+    });
 
     // OBJECT TOOLBAR
-    if (justActive) {
-      objectToolbar.setObjectAndBuild(representation, aip.getPermissions(), handler);
-    }
+    objectToolbar.setObjectAndBuild(representation, aip.getState(), aip.getPermissions(), handler);
 
     // TABS
     browseTab.init(response);
@@ -315,12 +280,7 @@ public class BrowseRepresentation extends Composite {
 
   }
 
-  private void updateLayout(final BrowseRepresentationResponse response, long riskIncidenceCounter,
-    long preservationCounter, final AIPState state, final boolean justActive) {
-    // STATUS
-    aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(state));
-    aipState.setVisible(!justActive);
-
+  private void updateLayout(final BrowseRepresentationResponse response) {
     // IDENTIFICATION
     representationIcon.setHTML(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
 

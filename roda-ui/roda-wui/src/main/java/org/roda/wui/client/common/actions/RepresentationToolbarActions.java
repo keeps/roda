@@ -15,6 +15,7 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
@@ -48,7 +49,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import config.i18n.client.ClientMessages;
 
 public class RepresentationToolbarActions extends AbstractActionable<IndexedRepresentation> {
-  private static final RepresentationToolbarActions GENERAL_INSTANCE = new RepresentationToolbarActions(null, null);
+  private static final RepresentationToolbarActions GENERAL_INSTANCE = new RepresentationToolbarActions(null, null,
+    null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<RepresentationAction> POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION = new HashSet<>(
@@ -63,11 +65,16 @@ public class RepresentationToolbarActions extends AbstractActionable<IndexedRepr
     Arrays.asList(RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE, RepresentationAction.NEW_PROCESS,
       RepresentationAction.IDENTIFY_FORMATS));
 
+  private static final Set<Action<IndexedRepresentation>> POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION_UNDER_APPRAISAL = new HashSet<>(
+    Arrays.asList(RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE, RepresentationAction.CHANGE_STATE));
+
   private final String parentAipId;
+  private final AIPState parentAipState;
   private final Permissions permissions;
 
-  private RepresentationToolbarActions(String parentAipId, Permissions permissions) {
+  private RepresentationToolbarActions(String parentAipId, AIPState parentAipState, Permissions permissions) {
     this.parentAipId = parentAipId;
+    this.parentAipState = parentAipState;
     this.permissions = permissions;
   }
 
@@ -75,13 +82,13 @@ public class RepresentationToolbarActions extends AbstractActionable<IndexedRepr
     return GENERAL_INSTANCE;
   }
 
-  public static RepresentationToolbarActions get(String parentAipId, Permissions permissions) {
-    return new RepresentationToolbarActions(parentAipId, permissions);
+  public static RepresentationToolbarActions get(String parentAipId, AIPState parentAipState, Permissions permissions) {
+    return new RepresentationToolbarActions(parentAipId, parentAipState, permissions);
   }
 
   public static RepresentationToolbarActions getWithoutNoRepresentationActions(String parentAipId,
     Permissions permissions) {
-    return new RepresentationToolbarActions(parentAipId, permissions) {
+    return new RepresentationToolbarActions(parentAipId, AIPState.CREATED, permissions) {
       @Override
       public CanActResult contextCanAct(Action<IndexedRepresentation> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
@@ -107,12 +114,23 @@ public class RepresentationToolbarActions extends AbstractActionable<IndexedRepr
 
   @Override
   public CanActResult contextCanAct(Action<IndexedRepresentation> action) {
+    if (parentAipState.equals(AIPState.UNDER_APPRAISAL)) {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAffectedAIPUnderAppraisal());
+    }
+
     return new CanActResult(POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAipId != null,
       CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
   }
 
   @Override
   public CanActResult userCanAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
+    if (parentAipState.equals(AIPState.UNDER_APPRAISAL)) {
+      return new CanActResult(
+        hasPermissions(action, permissions)
+          && POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION_UNDER_APPRAISAL.contains(action),
+        CanActResult.Reason.CONTEXT, messages.reasonAffectedAIPUnderAppraisal());
+    }
+
     return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
       messages.reasonUserLacksPermission());
   }

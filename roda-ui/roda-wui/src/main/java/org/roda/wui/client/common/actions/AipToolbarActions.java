@@ -103,6 +103,10 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE, AIPAction.ASSOCIATE_DISPOSAL_HOLD));
   private static final Set<AIPAction> APPRAISAL_ACTIONS = new HashSet<>(
     Arrays.asList(AIPAction.APPRAISAL_ACCEPT, AIPAction.APPRAISAL_REJECT));
+  private static final Set<Action<IndexedAIP>> DOWNLOAD_ACTIONS = new HashSet<>(Arrays.asList(AIPAction.DOWNLOAD_EVENTS,
+    AIPAction.DOWNLOAD_DOCUMENTATION, AIPAction.DOWNLOAD, AIPAction.DOWNLOAD_SUBMISSIONS));
+  private static final Set<Action<IndexedAIP>> SEARCH_WITHIN_ACTIONS = new HashSet<>(
+    Arrays.asList(AIPAction.SEARCH_PACKAGE, AIPAction.SEARCH_DESCENDANTS));
   private final String parentAipId;
   private final AIPState parentAipState;
   private final Permissions permissions;
@@ -167,6 +171,18 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     if (aip == NO_AIP_OBJECT) {
       return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
         messages.reasonUserLacksPermission());
+    } else if ((AIPAction.REMOVE.equals(action) || AIPAction.NEW_CHILD_AIP_BELOW.equals(action)
+      || AIPAction.MOVE_IN_HIERARCHY.equals(action) || AIPAction.CHANGE_TYPE.equals(action)
+      || AIPAction.NEW_REPRESENTATION.equals(action) || AIPAction.CREATE_DESCRIPTIVE_METADATA.equals(action))
+      && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalConfirmationId()))) {
+      return new CanActResult(false, CanActResult.Reason.USER, messages.reasonAIPProtectedByDisposalPolicy());
+    } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState()) && (AIPAction.CREATE_DESCRIPTIVE_METADATA.equals(action)
+      || AIPAction.NEW_CHILD_AIP_BELOW.equals(action) || SEARCH_WITHIN_ACTIONS.contains(action)
+      || DOWNLOAD_ACTIONS.contains(action) || AIPAction.NEW_PROCESS.equals(action)
+      || AIPAction.CHANGE_TYPE.equals(action) || AIPAction.MOVE_IN_HIERARCHY.equals(action)
+      || AIPAction.REMOVE.equals(action) || AIPAction.UPDATE_PERMISSIONS.equals(action)
+      || AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action) || AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action))) {
+      return new CanActResult(false, CanActResult.Reason.USER, messages.reasonAIPUnderAppraisal());
     } else {
       return new CanActResult(hasPermissions(action, aip.getPermissions()), CanActResult.Reason.USER,
         messages.reasonUserLacksPermission());
@@ -185,15 +201,15 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
       return new CanActResult(APPRAISAL_ACTIONS.contains(action) || POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action),
         CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
-    } else if (action.equals(AipActions.AipAction.REMOVE)
+    } else if (action.equals(AIPAction.REMOVE)
       && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
     } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())
-      && (action.equals(AipActions.AipAction.MOVE_IN_HIERARCHY)
-        || action.equals(AipActions.AipAction.ASSOCIATE_DISPOSAL_SCHEDULE)
-        || action.equals(AipActions.AipAction.ASSOCIATE_DISPOSAL_HOLD))) {
+      && (action.equals(AIPAction.MOVE_IN_HIERARCHY)
+        || action.equals(AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE)
+        || action.equals(AIPAction.ASSOCIATE_DISPOSAL_HOLD))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
-    } else if (action.equals(AipActions.AipAction.MOVE_IN_HIERARCHY) && aip.isOnHold()) {
+    } else if (action.equals(AIPAction.MOVE_IN_HIERARCHY) && aip.isOnHold()) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
     } else {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action), CanActResult.Reason.CONTEXT,
@@ -1178,7 +1194,7 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     preservationGroup.addButton(messages.runAction(), AIPAction.NEW_PROCESS, ActionImpact.UPDATED, "btn-play");
 
     // APPRAISAL
-    ActionableGroup<IndexedAIP> appraisalGroup = new ActionableGroup<>(messages.appraisalTitle());
+    ActionableGroup<IndexedAIP> appraisalGroup = new ActionableGroup<>(messages.appraisalTitle(), "btn-assessment");
     appraisalGroup.addButton(messages.appraisalAccept(), AIPAction.APPRAISAL_ACCEPT, ActionImpact.UPDATED, "btn-play");
     appraisalGroup.addButton(messages.appraisalReject(), AIPAction.APPRAISAL_REJECT, ActionImpact.DESTROYED, "btn-ban");
 
@@ -1200,7 +1216,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     MOVE_IN_HIERARCHY(RodaConstants.PERMISSION_METHOD_MOVE_AIP_IN_HIERARCHY),
     UPDATE_PERMISSIONS(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS),
     REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_AIP), NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    DOWNLOAD_EVENTS(), DOWNLOAD_SUBMISSIONS(), APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
+    DOWNLOAD_EVENTS(RodaConstants.PERMISSION_METHOD_FIND_PRESERVATION_EVENT), DOWNLOAD_SUBMISSIONS(),
+    APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
     APPRAISAL_REJECT(RodaConstants.PERMISSION_METHOD_APPRAISAL), DOWNLOAD_DOCUMENTATION(),
     CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_AIP_TYPE),
     ASSOCIATE_DISPOSAL_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE),

@@ -2,7 +2,6 @@ package org.roda.wui.client.common.labels;
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 
 /**

@@ -6,8 +6,6 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
-import org.roda.wui.client.browse.BrowseTop;
-import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.DescriptiveMetadataHistory;
 import org.roda.wui.client.browse.EditDescriptiveMetadata;
 import org.roda.wui.client.common.ActionsToolbar;
@@ -31,7 +29,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 
@@ -40,6 +37,7 @@ import com.google.gwt.user.client.ui.HTML;
  * @author Alexandre Flores <aflores@keep.pt>
  */
 public class AIPDescriptiveMetadataTabs extends Tabs {
+
   public void init(IndexedAIP aip, DescriptiveMetadataInfos descriptiveMetadataInfos) {
     for (DescriptiveMetadataInfo metadataInfo : descriptiveMetadataInfos.getDescriptiveMetadataInfoList()) {
       // Tab button
@@ -81,7 +79,7 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
 
             // History button
             if (metadataInfo.isHasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
-              RodaConstants.PERMISSION_METHOD_RETRIEVE_AIP_DESCRIPTIVE_METADATA_VERSIONS)) {
+              RodaConstants.PERMISSION_METHOD_RETRIEVE_AIP_DESCRIPTIVE_METADATA_VERSIONS) && !aip.isOnHold()) {
               descriptiveMetadataToolbar.addAction(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent event) {

@@ -755,7 +755,7 @@ public class MembersController implements MembersRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
     User user = new User(createUserRequest.getName(), createUserRequest.getName(), createUserRequest.getFullName(),
-      true, new HashSet<>(), new HashSet<>(), createUserRequest.getGroups(), createUserRequest.getEmail(),
+      true, new HashSet<>(), createUserRequest.getRoles(), createUserRequest.getGroups(), createUserRequest.getEmail(),
       createUserRequest.getGuest(), null, createUserRequest.getValues(), null, null, null, null);
     try {
       // check user permissions

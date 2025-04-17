@@ -1,5 +1,8 @@
 package org.roda.wui.client.common;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -26,6 +29,9 @@ public class BrowseRepresentationActionsToolbar extends BrowseObjectActionsToolb
 
   public void buildTags() {
     this.tags.clear();
+
+    getStateTag().ifPresent(tag -> tags.add(tag));
+
     for (String state : object.getRepresentationStates()) {
       Tag tag = Tag.fromText(state, Tag.TagStyle.SUCCESS);
       final String filter = RepresentationInformationUtils.createRepresentationInformationFilter(
@@ -43,7 +49,7 @@ public class BrowseRepresentationActionsToolbar extends BrowseObjectActionsToolb
 
   public void buildActions() {
     this.actions.clear();
-    RepresentationToolbarActions representationActions = RepresentationToolbarActions.get(object.getAipId(),
+    RepresentationToolbarActions representationActions = RepresentationToolbarActions.get(object.getAipId(), state,
       actionPermissions);
     this.actions.add(new ActionableWidgetBuilder<IndexedRepresentation>(representationActions)
       .buildGroupedListWithObjects(new ActionableObject<>(object)));

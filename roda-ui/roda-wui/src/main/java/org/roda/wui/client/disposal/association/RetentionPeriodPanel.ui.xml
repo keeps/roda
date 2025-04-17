@@ -1,6 +1,6 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder' xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
-	<g:FlowPanel addStyleNames="wui-retention-period-panel" ui:field="retentionPeriodPanel">
+	<g:FlowPanel addStyleNames="wui-retention-period-panel" ui:field="retentionPeriodInnerPanel">
 		<g:FlowPanel addStyleNames="panel">
 			<g:FlowPanel addStyleNames="panel-heading">
 				<g:Label addStyleNames="panel-title">

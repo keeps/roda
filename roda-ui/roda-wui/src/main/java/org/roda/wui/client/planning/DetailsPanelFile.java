@@ -32,8 +32,6 @@ public class DetailsPanelFile extends Composite {
   }
 
   public void init(IndexedFile file, List<String> riRules) {
-    GWT.log("DetailsPanel init");
-
     Map<String, Widget> detailsMap = InfoSliderHelper.getFileInfoDetailsMap(file, riRules);
 
     for (Map.Entry<String, Widget> field : detailsMap.entrySet()) {

@@ -13,8 +13,6 @@
         <g:FlowPanel styleName="cardBody">
             <g:FlowPanel addStyleNames="row full_width">
                 <g:FlowPanel addStyleNames="content">
-                    <labels:Header ui:field="title"/>
-
                     <g:FlowPanel addStyleNames="page-description" ui:field="editPermissionsDescription"/>
                     <labels:Header ui:field="userPermissionsTitle"/>
                     <g:Label styleName="info-empty" ui:field="groupPermissionsEmpty">

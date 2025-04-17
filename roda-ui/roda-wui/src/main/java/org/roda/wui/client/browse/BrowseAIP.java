@@ -27,11 +27,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.tabs.BrowseAIPTabs;
 import org.roda.wui.client.common.BrowseAIPActionsToolbar;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -49,13 +45,11 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.services.AIPRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -68,7 +62,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -98,8 +91,7 @@ public class BrowseAIP extends Composite {
   NavigationToolbar<IndexedAIP> navigationToolbar;
   @UiField
   BrowseAIPActionsToolbar objectToolbar;
-  @UiField
-  HTML aipState;
+
   // IDENTIFICATION
   @UiField
   TitlePanel title;
@@ -113,8 +105,6 @@ public class BrowseAIP extends Composite {
   Header aipChildrenTitle;
   @UiField
   SimplePanel aipChildrenCard;
-  @UiField
-  FlowPanel center;
 
   // SIDEBAR
   @UiField
@@ -164,7 +154,7 @@ public class BrowseAIP extends Composite {
 
     // AIP CHILDREN
     aipChildrenTitle.setHeaderText(messages.sublevels());
-    aipChildrenTitle.setIcon("cmi cmi-accountTree");
+    aipChildrenTitle.setIcon("ma ma-account-tree");
     aipChildrenTitle.setLevel(5);
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
       ListBuilder<IndexedAIP> aipChildrenListBuilder;
@@ -179,7 +169,7 @@ public class BrowseAIP extends Composite {
           new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
             .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
             .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener().withActionable(aipActions)
-            .withActionBlacklist(List.of(AipSearchWrapperActions.AipSearchWrapperAction.NEW_CHILD_AIP_BELOW,
+            .withActionBlacklist(List.of(AipSearchWrapperActions.AipSearchWrapperAction.NEW_CHILD_AIP_TOP,
               AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_ACCEPT,
               AipSearchWrapperActions.AipSearchWrapperAction.APPRAISAL_REJECT))
             .withActionableCallback(listActionableCallback));
@@ -202,11 +192,6 @@ public class BrowseAIP extends Composite {
       firstElement.setAttribute("title", "browse input");
     }
 
-    // STATE
-    keyboardFocus.addStyleName(aip.getState().toString().toLowerCase());
-    aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(aip.getState()));
-    aipState.setVisible(!justActive);
-
     // NAVIGATION TOOLBAR
     if (justActive) {
       navigationToolbar.withObject(aip);
@@ -224,30 +209,33 @@ public class BrowseAIP extends Composite {
     }
 
     // OBJECT TOOLBAR
-    if (justActive) {
-      objectToolbar.setObjectAndBuild(aip, aip.getPermissions(), handler);
-    }
+    objectToolbar.setObjectAndBuild(aip, aip.getState(), aip.getPermissions(), handler);
 
     // IDENTIFICATION
     updateSectionIdentification(response);
 
     // AIP CHILDREN
-    if (aip.getState().equals(AIPState.ACTIVE)) {
-      if (response.getChildAipsCount().getResult() > 0) {
-        LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
-      }
-
-      lowerContent.setVisible(response.getChildAipsCount().getResult() > 0);
+    if (aip.getState().equals(AIPState.ACTIVE) && response.getChildAipsCount().getResult() > 0) {
+      LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     }
 
+    lowerContent.setVisible(response.getChildAipsCount().getResult() > 0);
+
     // Side panel representations
-    if (response.getRepresentationCount().getResult() > 0 || response.getDipCount().getResult() > 0) {
-      if (response.getRepresentationCount().getResult() > 0) {
-        this.representationCards.add(new AIPRepresentationCardList(aipId));
+    // Check if user has permissions to see the representations
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
+      boolean showSidePanel = false;
+      if (Boolean.TRUE.equals(response.getIndexedAIP().getHasRepresentations())) {
+        showSidePanel = true;
+        this.representationCards.add(new AIPRepresentationCardList(aipId, justActive));
       }
+
       if (response.getDipCount().getResult() > 0) {
+        showSidePanel = true;
         this.disseminationCards.add(new AIPDisseminationCardList(aipId));
       }
+
+      this.sidePanel.setVisible(showSidePanel);
     } else {
       this.sidePanel.setVisible(false);
     }
@@ -289,8 +277,8 @@ public class BrowseAIP extends Composite {
       .whenComplete((aip, error) -> {
         if (error != null) {
           if (error instanceof NotFoundException) {
-            Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
-            HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
+            Toast.showError(messages.notFoundError());
+            HistoryUtils.newHistory(BrowseTop.RESOLVER);
           } else {
             AsyncCallbackUtils.defaultFailureTreatment(error);
           }
@@ -301,7 +289,8 @@ public class BrowseAIP extends Composite {
             .aipResource(AIPRestService::retrieveAIPRuleProperties);
 
           CompletableFuture<DescriptiveMetadataInfos> futureDescriptiveMetadataInfos = service
-            .aipResource(s -> s.getDescriptiveMetadata(id, LocaleInfo.getCurrentLocale().getLocaleName()));
+            .aipResource(s -> s.getDescriptiveMetadata(id, LocaleInfo.getCurrentLocale().getLocaleName()))
+            .exceptionally(throwable -> new DescriptiveMetadataInfos());
 
           CompletableFuture<LongResponse> futureChildAipCount = service
             .rodaEntityRestService(
@@ -309,26 +298,18 @@ public class BrowseAIP extends Composite {
                 new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, id)), false).build()),
               IndexedAIP.class);
 
-          CompletableFuture<LongResponse> futureRepCount = service.rodaEntityRestService(
-            s -> s.count(
-              new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, id)), false)),
-            IndexedRepresentation.class);
-
           CompletableFuture<LongResponse> futureDipCount = service.rodaEntityRestService(
             s -> s.count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, id)), false)),
             IndexedDIP.class);
 
-          CompletableFuture
-            .allOf(futureChildAipCount, futureRepCount, futureDipCount, futureAncestors, futureAncestors,
-              futureRepFields, futureDescriptiveMetadataInfos)
-            .thenApply(v -> {
+          CompletableFuture.allOf(futureChildAipCount, futureDipCount, futureAncestors, futureAncestors,
+            futureRepFields, futureDescriptiveMetadataInfos).thenApply(v -> {
               BrowseAIPResponse rp = new BrowseAIPResponse();
               rp.setIndexedAIP(aip);
               rp.setAncestors(futureAncestors.join());
               rp.setRepresentationInformationFields(futureRepFields.join());
               rp.setDescriptiveMetadataInfos(futureDescriptiveMetadataInfos.join());
               rp.setChildAipsCount(futureChildAipCount.join());
-              rp.setRepresentationCount(futureRepCount.join());
               rp.setDipCount(futureDipCount.join());
               return rp;
             }).whenComplete((value, throwable) -> {

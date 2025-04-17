@@ -661,16 +661,16 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
-      controllerAssistant.checkAIPstate(aip);
+      controllerAssistant.checkAIPState(aip);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
-      if (createDescriptiveMetadataRequest instanceof DescriptiveMetadataRequestForm) {
+      if (createDescriptiveMetadataRequest instanceof DescriptiveMetadataRequestForm descriptiveMetadataRequestForm) {
         payload = new StringContentPayload(aipService.retrieveDescriptiveMetadataPreview(aipId, representationId,
-          metadataId, ((DescriptiveMetadataRequestForm) createDescriptiveMetadataRequest).getValues()));
+          metadataId, descriptiveMetadataRequestForm.getValues()));
       } else {
-        payload = new StringContentPayload(((DescriptiveMetadataRequestXML)createDescriptiveMetadataRequest).getXml());
+        payload = new StringContentPayload(((DescriptiveMetadataRequestXML) createDescriptiveMetadataRequest).getXml());
       }
 
       // delegate
@@ -768,14 +768,14 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
-      controllerAssistant.checkAIPstate(aip);
+      controllerAssistant.checkAIPState(aip);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
-      if (descriptiveMetadataRequest instanceof DescriptiveMetadataRequestForm) {
+      if (descriptiveMetadataRequest instanceof DescriptiveMetadataRequestForm descriptiveMetadataRequestForm) {
         payload = new StringContentPayload(aipService.retrieveDescriptiveMetadataPreview(aipId, null, metadataId,
-          ((DescriptiveMetadataRequestForm) descriptiveMetadataRequest).getValues()));
+          descriptiveMetadataRequestForm.getValues()));
       } else {
         payload = new StringContentPayload(((DescriptiveMetadataRequestXML) descriptiveMetadataRequest).getXml());
       }
@@ -937,10 +937,10 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), parentSDO);
 
       // check state
-      controllerAssistant.checkAIPstate(parentSDO);
+      controllerAssistant.checkAIPState(parentSDO);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(parentSDO);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(parentSDO);
 
       Permissions parentPermissions = parentSDO.getPermissions();
 
@@ -1044,10 +1044,10 @@ public class AIPController implements AIPRestService, Exportable {
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
 
         // check state
-        controllerAssistant.checkAIPstate(parentAip);
+        controllerAssistant.checkAIPState(parentAip);
 
         // check if AIP is in a disposal confirmation
-        controllerAssistant.checkIfAIPInConfirmation(parentAip);
+        controllerAssistant.checkIfAIPIsUnderADisposalPolicy(parentAip);
       }
 
       // delegate
@@ -1209,7 +1209,7 @@ public class AIPController implements AIPRestService, Exportable {
 
       // check object permissions
       IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
-              RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // delegate
@@ -1219,15 +1219,13 @@ public class AIPController implements AIPRestService, Exportable {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_TEMPLATE_PARAM,
-              selectedType);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_TEMPLATE_PARAM, selectedType);
     }
 
   }
 
   @Override
-  public boolean isAIPMetadataSimilar(String aipId, String metadataId,
-    @RequestBody SelectedType selectedType) {
+  public boolean isAIPMetadataSimilar(String aipId, String metadataId, @RequestBody SelectedType selectedType) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -1238,7 +1236,7 @@ public class AIPController implements AIPRestService, Exportable {
 
       // check object permissions
       IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
-              RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // delegate
@@ -1248,8 +1246,7 @@ public class AIPController implements AIPRestService, Exportable {
       throw new RESTException(e);
     } finally {
       // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_TEMPLATE_PARAM,
-              selectedType);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_TEMPLATE_PARAM, selectedType);
     }
   }
 
@@ -1300,10 +1297,10 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
-      controllerAssistant.checkAIPstate(aip);
+      controllerAssistant.checkAIPState(aip);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
       // delegate
       aipService.deleteDescriptiveMetadataFile(aipId, null, metadataId, requestContext.getUser().getId());
@@ -1337,10 +1334,10 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
-      controllerAssistant.checkAIPstate(aip);
+      controllerAssistant.checkAIPState(aip);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
       // delegate
       aipService.deleteDescriptiveMetadataFile(aipId, representationId, metadataId, requestContext.getUser().getId());
@@ -1375,10 +1372,10 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
-      controllerAssistant.checkAIPstate(aip);
+      controllerAssistant.checkAIPState(aip);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
       // delegate
       return aipService.updateDescriptiveMetadataFile(requestContext.getUser(), aipId, content);
@@ -1412,10 +1409,10 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
-      controllerAssistant.checkAIPstate(aip);
+      controllerAssistant.checkAIPState(aip);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
       // delegate
       return aipService.updateDescriptiveMetadataFile(requestContext.getUser(), aipId, representationId, content);
@@ -1428,8 +1425,8 @@ public class AIPController implements AIPRestService, Exportable {
     } finally {
       // register action
       controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
-        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
-        RodaConstants.CONTROLLER_METADATA_ID_PARAM, content.getId());
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_METADATA_ID_PARAM,
+        content.getId());
     }
   }
 
@@ -1604,10 +1601,10 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
-      controllerAssistant.checkAIPstate(aip);
+      controllerAssistant.checkAIPState(aip);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
       // delegate
       return aipService.revertDescriptiveMetadataVersion(requestContext.getUser(), aipId, descriptiveMetadataId,
@@ -1643,10 +1640,10 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
-      controllerAssistant.checkAIPstate(aip);
+      controllerAssistant.checkAIPState(aip);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
       // delegate
       return aipService.revertDescriptiveMetadataVersion(requestContext.getUser(), aipId, representationId,
@@ -1689,10 +1686,10 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
-      controllerAssistant.checkAIPstate(aip);
+      controllerAssistant.checkAIPState(aip);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
       // delegate
       return RodaCoreFactory.getModelService().retrieveAIP(aipId);
@@ -1707,6 +1704,5 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
     }
   }
-
 
 }

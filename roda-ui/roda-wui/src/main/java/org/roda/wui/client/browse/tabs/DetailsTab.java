@@ -3,8 +3,10 @@ package org.roda.wui.client.browse.tabs;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.model.BrowseRepresentationResponse;
+import org.roda.wui.client.ingest.transfer.DetailsPanelTransferredResource;
 import org.roda.wui.client.planning.DetailsPanelAIP;
 import org.roda.wui.client.planning.DetailsPanelFile;
 import org.roda.wui.client.planning.DetailsPanelRepresentation;
@@ -46,6 +48,13 @@ public class DetailsTab extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     // Get metadata and populate widget
     DetailsPanelFile detailsPanel = new DetailsPanelFile(file, riRules);
+    content.add(detailsPanel);
+  }
+
+  public DetailsTab(TransferredResource resource) {
+    initWidget(uiBinder.createAndBindUi(this));
+
+    DetailsPanelTransferredResource detailsPanel = new DetailsPanelTransferredResource(resource);
     content.add(detailsPanel);
   }
 

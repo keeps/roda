@@ -63,7 +63,8 @@ public class PreservationEvents extends Composite {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final List<String> aipFieldsToReturn = new ArrayList<>(
-    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));  public static final HistoryResolver PLANNING_RESOLVER = new HistoryResolver() {
+    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
+  public static final HistoryResolver PLANNING_RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
@@ -125,9 +126,11 @@ public class PreservationEvents extends Composite {
   private String aipId;
   private String representationUUID;
   private String fileUUID;
+
   public PreservationEvents() {
     this(null);
   }
+
   public PreservationEvents(final String aipId) {
     this(aipId, null);
   }
@@ -199,11 +202,6 @@ public class PreservationEvents extends Composite {
               new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId)), false).build()),
             IndexedAIP.class);
 
-          CompletableFuture<LongResponse> futureRepCount = service.rodaEntityRestService(
-            s -> s.count(new CountRequest(
-              new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId)), false)),
-            IndexedRepresentation.class);
-
           CompletableFuture<LongResponse> futureDipCount = service.rodaEntityRestService(
             s -> s
               .count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, aipId)), false)),
@@ -224,9 +222,8 @@ public class PreservationEvents extends Composite {
               new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aipId)), false)),
             LogEntry.class);
 
-          CompletableFuture
-            .allOf(futureChildAipCount, futureRepCount, futureDipCount, futureAncestors, futureAncestors,
-              futureRepFields, futureDescriptiveMetadataInfos, futureIncidenceCount, futureEventCount, futureLogCount)
+          CompletableFuture.allOf(futureChildAipCount, futureDipCount, futureAncestors, futureAncestors,
+            futureRepFields, futureDescriptiveMetadataInfos, futureIncidenceCount, futureEventCount, futureLogCount)
             .thenApply(v -> {
               BrowseAIPResponse rp = new BrowseAIPResponse();
               rp.setIndexedAIP(aip);
@@ -234,7 +231,6 @@ public class PreservationEvents extends Composite {
               rp.setRepresentationInformationFields(futureRepFields.join());
               rp.setDescriptiveMetadataInfos(futureDescriptiveMetadataInfos.join());
               rp.setChildAipsCount(futureChildAipCount.join());
-              rp.setRepresentationCount(futureRepCount.join());
               rp.setDipCount(futureDipCount.join());
               return rp;
             }).whenComplete((value, throwable) -> {
@@ -351,6 +347,5 @@ public class PreservationEvents extends Composite {
 
   interface MyUiBinder extends UiBinder<Widget, PreservationEvents> {
   }
-
 
 }

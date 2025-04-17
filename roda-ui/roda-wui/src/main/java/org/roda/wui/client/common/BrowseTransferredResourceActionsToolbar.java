@@ -5,6 +5,8 @@ import org.roda.wui.client.common.actions.TransferredResourceToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 
+import java.util.List;
+
 /**
  *
  * @author Alexandre Flores <aflores@keep.pt>
@@ -24,7 +26,8 @@ public class BrowseTransferredResourceActionsToolbar extends BrowseObjectActions
     TransferredResourceToolbarActions transferredResourceToolbarActions;
     transferredResourceToolbarActions = TransferredResourceToolbarActions.get(null);
     this.actions.add(new ActionableWidgetBuilder<TransferredResource>(transferredResourceToolbarActions)
-      .buildGroupedListWithObjects(new ActionableObject<>(object)));
-
+      .buildGroupedListWithObjects(new ActionableObject<>(object), List.of(),
+        List.of(TransferredResourceToolbarActions.TransferredResourceAction.DOWNLOAD,
+          TransferredResourceToolbarActions.TransferredResourceAction.NEW_PROCESS)));
   }
 }

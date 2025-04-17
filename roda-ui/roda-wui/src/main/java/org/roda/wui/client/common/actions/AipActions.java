@@ -81,18 +81,18 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   public static final String BTN_EDIT = "btn-edit";
   private static final AipActions GENERAL_INSTANCE = new AipActions(NO_AIP_PARENT, NO_AIP_STATE, null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP_TOP = new HashSet<>(
+  private static final Set<Action<IndexedAIP>> POSSIBLE_ACTIONS_ON_NO_AIP_TOP = new HashSet<>(
     Arrays.asList(AipAction.NEW_CHILD_AIP_TOP));
-  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
+  private static final Set<Action<IndexedAIP>> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
     Arrays.asList(AipAction.NEW_CHILD_AIP_BELOW));
-  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(Arrays.asList(AipAction.DOWNLOAD,
-    AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
-    AipAction.DOWNLOAD_EVENTS, AipAction.DOWNLOAD_DOCUMENTATION, AipAction.DOWNLOAD_SUBMISSIONS, AipAction.CHANGE_TYPE,
-    AipAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipAction.ASSOCIATE_DISPOSAL_HOLD));
-  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
+  private static final Set<Action<IndexedAIP>> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(Arrays.asList(
+    AipAction.DOWNLOAD, AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE,
+    AipAction.NEW_PROCESS, AipAction.DOWNLOAD_EVENTS, AipAction.DOWNLOAD_DOCUMENTATION, AipAction.DOWNLOAD_SUBMISSIONS,
+    AipAction.CHANGE_TYPE, AipAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipAction.ASSOCIATE_DISPOSAL_HOLD));
+  private static final Set<Action<IndexedAIP>> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
       AipAction.CHANGE_TYPE, AipAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipAction.ASSOCIATE_DISPOSAL_HOLD));
-  private static final Set<AipAction> APPRAISAL_ACTIONS = new HashSet<>(
+  private static final Set<Action<IndexedAIP>> APPRAISAL_ACTIONS = new HashSet<>(
     Arrays.asList(AipAction.APPRAISAL_ACCEPT, AipAction.APPRAISAL_REJECT));
   private final String parentAipId;
   private final AIPState parentAipState;
@@ -174,8 +174,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       return new CanActResult(APPRAISAL_ACTIONS.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonAffectedAIPUnderAppraisal());
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
-      return new CanActResult(APPRAISAL_ACTIONS.contains(action) || POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action),
-        CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+      return new CanActResult(APPRAISAL_ACTIONS.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonAIPUnderAppraisal());
     } else if (action.equals(AipAction.REMOVE)
       && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
@@ -199,10 +199,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   @Override
   public CanActResult contextCanAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
     if (AIPState.UNDER_APPRAISAL.equals(parentAipState)) {
-      return new CanActResult(
-        (!Objects.equals(parentAipId, NO_AIP_PARENT) && POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS.contains(action))
-          || APPRAISAL_ACTIONS.contains(action),
-        CanActResult.Reason.CONTEXT, messages.reasonAffectedAIPUnderAppraisal());
+      return new CanActResult(APPRAISAL_ACTIONS.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonAffectedAIPUnderAppraisal());
     } else {
       return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonCantActOnMultipleObjects());
@@ -1073,7 +1071,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     // APPRAISAL
     ActionableGroup<IndexedAIP> appraisalGroup = new ActionableGroup<>(messages.appraisalTitle());
-    appraisalGroup.addButton(messages.appraisalAccept(), AipAction.APPRAISAL_ACCEPT, ActionImpact.UPDATED, "btn-play");
+    appraisalGroup.addButton(messages.appraisalAccept(), AipAction.APPRAISAL_ACCEPT, ActionImpact.UPDATED,
+      "btn-check-circle");
     appraisalGroup.addButton(messages.appraisalReject(), AipAction.APPRAISAL_REJECT, ActionImpact.DESTROYED, "btn-ban");
 
     // DOWNLOAD

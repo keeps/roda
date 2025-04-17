@@ -2,12 +2,12 @@ package org.roda.wui.client.common;
 
 import java.util.List;
 
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.actions.AipToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.labels.Tag;
+import org.roda.wui.client.common.utils.DisposalPolicyUtils;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 
 /**
@@ -23,16 +23,12 @@ public class BrowseAIPActionsToolbar extends BrowseObjectActionsToolbar<IndexedA
     this.tags.clear();
     // AIP tags
     // Use state
-    AIPState state = object.getState();
-    switch (state) {
-      case ACTIVE:
-        break;
-      case UNDER_APPRAISAL:
-        tags.add(Tag.fromText(messages.aipState(state), List.of(Tag.TagStyle.WARNING_LIGHT, Tag.TagStyle.MONO)));
-        break;
-      default:
-        tags.add(Tag.fromText(messages.aipState(state), List.of(Tag.TagStyle.DANGER_LIGHT, Tag.TagStyle.MONO)));
-        break;
+
+    getStateTag().ifPresent(tag -> tags.add(tag));
+
+    Tag disposalPolicySummaryTag = DisposalPolicyUtils.getDisposalPolicySummaryTag(object);
+    if (disposalPolicySummaryTag != null) {
+      tags.add(disposalPolicySummaryTag);
     }
   }
 
@@ -49,7 +45,8 @@ public class BrowseAIPActionsToolbar extends BrowseObjectActionsToolbar<IndexedA
           AipToolbarActions.AIPAction.CHANGE_TYPE, AipToolbarActions.AIPAction.MOVE_IN_HIERARCHY,
           AipToolbarActions.AIPAction.REMOVE, AipToolbarActions.AIPAction.NEW_PROCESS,
           AipToolbarActions.AIPAction.NEW_CHILD_AIP_BELOW, AipToolbarActions.AIPAction.NEW_REPRESENTATION,
-          AipToolbarActions.AIPAction.CREATE_DESCRIPTIVE_METADATA),
+          AipToolbarActions.AIPAction.CREATE_DESCRIPTIVE_METADATA, AipToolbarActions.AIPAction.APPRAISAL_ACCEPT,
+          AipToolbarActions.AIPAction.APPRAISAL_REJECT),
         List.of(AipToolbarActions.AIPAction.NEW_PROCESS)));
 
   }

@@ -282,7 +282,7 @@ public class CreateUserPanel extends Composite implements HasValueChangeHandlers
 
   private void updatePermissions(List<Group> groups) {
     permissionsPanel.clear();
-    permissionsPanel.checkPermissions(new HashSet<String>(permissionsPanel.getUserSelections()), false);
+    permissionsPanel.checkPermissions(new HashSet<>(permissionsPanel.getUserSelections()), false);
     for (Group group : groups) {
       permissionsPanel.checkPermissions(group.getAllRoles(), true);
     }

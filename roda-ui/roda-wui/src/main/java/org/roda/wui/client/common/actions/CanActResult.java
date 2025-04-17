@@ -9,9 +9,9 @@ public class CanActResult {
     USER, CONTEXT
   }
 
-  private boolean canAct;
-  private Reason reason;
-  private String reasonSummary;
+  private final boolean canAct;
+  private final Reason reason;
+  private final String reasonSummary;
 
   public CanActResult(boolean canAct, Reason reason, String reasonSummary) {
     this.canAct = canAct;

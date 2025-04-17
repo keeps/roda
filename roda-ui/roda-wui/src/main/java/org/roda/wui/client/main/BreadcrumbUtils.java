@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
@@ -20,6 +21,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.PreservationEvents;
+import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -77,9 +79,13 @@ public class BreadcrumbUtils {
 
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip, boolean events) {
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
-    breadcrumb.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.allCollectionsTitle()),
-      messages.allCollectionsTitle(), BrowseTop.RESOLVER.getHistoryPath()));
-
+    if (aip.getState().equals(AIPState.UNDER_APPRAISAL)) {
+      breadcrumb.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.ingestAppraisalTitle()),
+        messages.ingestAppraisalTitle(), IngestAppraisal.RESOLVER.getHistoryPath()));
+    } else {
+      breadcrumb.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.allCollectionsTitle()),
+        messages.allCollectionsTitle(), BrowseTop.RESOLVER.getHistoryPath()));
+    }
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
         if (ancestor != null) {
@@ -201,22 +207,20 @@ public class BreadcrumbUtils {
   public static List<BreadcrumbItem> getTransferredResourceBreadcrumbs(TransferredResource r) {
     List<BreadcrumbItem> ret = new ArrayList<>();
 
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.allCollectionsTitle()),
-      messages.allCollectionsTitle(), IngestTransfer.RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.transferredResourcesTitle()),
+      messages.transferredResourcesTitle(), IngestTransfer.RESOLVER.getHistoryPath()));
     if (r != null) {
 
       // add parent
       if (r.getParentUUID() != null) {
-        List<String> path = new ArrayList<>();
-        path.addAll(IngestTransfer.RESOLVER.getHistoryPath());
+        List<String> path = new ArrayList<>(IngestTransfer.RESOLVER.getHistoryPath());
         path.add(r.getParentUUID());
         SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(r.getParentId());
         ret.add(new BreadcrumbItem(breadcrumbLabel, r.getParentId(), path));
       }
 
       // add self
-      List<String> path = new ArrayList<>();
-      path.addAll(IngestTransfer.RESOLVER.getHistoryPath());
+      List<String> path = new ArrayList<>(IngestTransfer.RESOLVER.getHistoryPath());
       path.add(r.getUUID());
       SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(r.getName());
       ret.add(new BreadcrumbItem(breadcrumbLabel, r.getName(), path));

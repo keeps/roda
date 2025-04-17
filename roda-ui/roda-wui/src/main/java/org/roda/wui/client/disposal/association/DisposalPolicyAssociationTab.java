@@ -14,20 +14,23 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.ActionsToolbar;
-import org.roda.wui.client.common.DisposalPolicySummaryPanel;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
-import org.roda.wui.client.common.utils.DisposalPolicyUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -44,14 +47,13 @@ public class DisposalPolicyAssociationTab extends Composite {
   @UiField
   ActionsToolbar actionsToolbar;
   @UiField
-  DisposalPolicySummaryPanel disposalPolicySummaryPanel;
+  SimplePanel informationPanel;
   @UiField(provided = true)
   DisposalConfirmationPanel disposalConfirmationPanel;
   @UiField(provided = true)
   RetentionPeriodPanel retentionPeriodPanel;
   @UiField(provided = true)
   DisposalHoldsPanel disposalHoldsPanel;
-  private IndexedAIP aip;
 
   public DisposalPolicyAssociationTab(BrowseAIPResponse response,
     AsyncCallback<Actionable.ActionImpact> actionCallback) {
@@ -63,7 +65,12 @@ public class DisposalPolicyAssociationTab extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    aip = response.getIndexedAIP();
+    if (showNotAssigned(response.getIndexedAIP())) {
+      informationPanel.addStyleName("table-empty-inner");
+      informationPanel.setWidget(getNoItemsToDisplay());
+    }
+
+    IndexedAIP aip = response.getIndexedAIP();
 
     // TOOLBAR
     actionsToolbar.setLabelVisible(false);
@@ -77,11 +84,25 @@ public class DisposalPolicyAssociationTab extends Composite {
             AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_HOLD)),
       true);
     header.setVisible(actionsToolbar.isVisible());
+  }
 
-    // DISPOSAL POLICY SUMMARY
-    disposalPolicySummaryPanel.setIcon("fas fa-info-circle");
-    disposalPolicySummaryPanel.setText(DisposalPolicyUtils.getDisposalPolicySummaryText(aip));
+  private boolean showNotAssigned(IndexedAIP aip) {
+    if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())) {
+      return false;
+    }
 
+    if (aip.isOnHold()) {
+      return false;
+    }
+
+    return !StringUtils.isNotBlank(aip.getDisposalScheduleId());
+  }
+
+  private Label getNoItemsToDisplay() {
+    Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.disposalPolicyNoneSummary()));
+    label.addStyleName("table-empty-inner-label");
+
+    return label;
   }
 
   interface MyUiBinder extends UiBinder<Widget, DisposalPolicyAssociationTab> {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -27,10 +28,13 @@ import config.i18n.client.ClientMessages;
  * @author Alexandre Flores <aflores@keep.pt>
  */
 public class AIPRepresentationCardList extends ThumbnailCardList<IndexedRepresentation> {
-  public AIPRepresentationCardList(String aipId) {
+  public AIPRepresentationCardList(String aipId, boolean justActive) {
     super(messages.someOfAObject(IndexedRepresentation.class.getName()),
       ConfigurationManager.getString(RodaConstants.UI_ICONS_CLASS, IndexedRepresentation.class.getSimpleName()),
-      IndexedRepresentation.class, new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId)),
+      IndexedRepresentation.class,
+      FindRequest
+        .getBuilder(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId)), justActive)
+        .build(),
       new CardBuilder<IndexedRepresentation>() {
         @Override
         public ThumbnailCard constructCard(ClientMessages messages, IndexedRepresentation representation) {

@@ -24,6 +24,7 @@ import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -51,55 +52,58 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import config.i18n.client.ClientMessages;
 
 public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
-
-  private static final FileSearchWrapperActions GENERAL_INSTANCE = new FileSearchWrapperActions(null, null, null, null);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<FileSearchWrapperAction> POSSIBLE_ACTIONS_WITH_REPRESENTATION = new HashSet<>(
     Arrays.asList(FileSearchWrapperAction.UPLOAD_FILES, FileSearchWrapperAction.CREATE_FOLDER));
 
-  private static final Set<FileSearchWrapperAction> POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY = new HashSet<>(
-    Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS, FileSearchWrapperAction.IDENTIFY_FORMATS));
+  private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY = new HashSet<>(
+    Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
+      FileSearchWrapperAction.IDENTIFY_FORMATS));
 
-  private static final Set<FileSearchWrapperAction> POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM = new HashSet<>(
-    Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS, FileSearchWrapperAction.IDENTIFY_FORMATS));
+  private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM = new HashSet<>(
+    Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
+      FileSearchWrapperAction.IDENTIFY_FORMATS));
 
-  private static final Set<FileSearchWrapperAction> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION = new HashSet<>(
-    Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS, FileSearchWrapperAction.IDENTIFY_FORMATS));
+  private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION = new HashSet<>(
+    Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
+      FileSearchWrapperAction.IDENTIFY_FORMATS));
 
-  private static final Set<FileSearchWrapperAction> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_DIFFERENT_REPRESENTATIONS = new HashSet<>(
-    Arrays.asList(FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS, FileSearchWrapperAction.IDENTIFY_FORMATS));
+  private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_DIFFERENT_REPRESENTATIONS = new HashSet<>(
+    Arrays.asList(FileSearchWrapperAction.REMOVE, FileSearchWrapperAction.NEW_PROCESS,
+      FileSearchWrapperAction.IDENTIFY_FORMATS));
+
+  private static final Set<Action<IndexedFile>> POSSIBLE_ACTIONS_ON_SINGLE_FILE_UNDER_APPRAISAL = new HashSet<>(
+    Arrays.asList(FileSearchWrapperAction.MOVE, FileSearchWrapperAction.REMOVE));
 
   private final String aipId;
   private final String representationId;
+  private final AIPState state;
   private final IndexedFile parentFolder;
   private final Permissions permissions;
 
-  private FileSearchWrapperActions(String aipId, String representationId, IndexedFile parentFolder,
+  private FileSearchWrapperActions(String aipId, String representationId, AIPState state, IndexedFile parentFolder,
     Permissions permissions) {
     this.aipId = aipId;
     this.representationId = representationId;
+    this.state = state;
     this.permissions = permissions;
     this.parentFolder = parentFolder != null && parentFolder.isDirectory() ? parentFolder : null;
   }
 
-  public static FileSearchWrapperActions get() {
-    return GENERAL_INSTANCE;
-  }
-
-  public static FileSearchWrapperActions get(String aipId, String representationId, Permissions permissions) {
-    return new FileSearchWrapperActions(aipId, representationId, null, permissions);
-  }
-
-  public static FileSearchWrapperActions get(String aipId, String representationId, IndexedFile parentFolder,
+  public static FileSearchWrapperActions get(String aipId, String representationId, AIPState state,
     Permissions permissions) {
-    return new FileSearchWrapperActions(aipId, representationId, parentFolder, permissions);
+    return new FileSearchWrapperActions(aipId, representationId, state, null, permissions);
   }
 
-  public static FileSearchWrapperActions getWithoutNoFileActions(String aipId, String representationId,
+  public static FileSearchWrapperActions get(String aipId, String representationId, AIPState state,
     IndexedFile parentFolder, Permissions permissions) {
-    return new FileSearchWrapperActions(aipId, representationId, parentFolder, permissions) {
+    return new FileSearchWrapperActions(aipId, representationId, state, parentFolder, permissions);
+  }
+
+  public static FileSearchWrapperActions getWithoutNoFileActions(String aipId, String representationId, AIPState state,
+    IndexedFile parentFolder, Permissions permissions) {
+    return new FileSearchWrapperActions(aipId, representationId, state, parentFolder, permissions) {
       @Override
       public CanActResult contextCanAct(Action<IndexedFile> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
@@ -138,6 +142,11 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
 
   @Override
   public CanActResult contextCanAct(Action<IndexedFile> action, IndexedFile file) {
+    if (AIPState.UNDER_APPRAISAL.equals(state)) {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_UNDER_APPRAISAL.contains(action),
+        CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+    }
+
     if (file.isDirectory()) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonCantActOnFileDirectory());
@@ -155,6 +164,11 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
 
   @Override
   public CanActResult contextCanAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
+    if (AIPState.UNDER_APPRAISAL.equals(state)) {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_FILE_UNDER_APPRAISAL.contains(action),
+        CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+    }
+
     if (aipId != null && representationId != null) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION.contains(action),
         CanActResult.Reason.CONTEXT, messages.reasonFilesAreOnSameRepresentation());
@@ -524,19 +538,19 @@ public class FileSearchWrapperActions extends AbstractActionable<IndexedFile> {
     ActionableGroup<IndexedFile> managementGroup = new ActionableGroup<>(messages.sidebarFoldersFilesTitle());
     managementGroup.addButton(messages.moveButton(), FileSearchWrapperAction.MOVE, ActionImpact.UPDATED, "btn-edit",
       "fileMoveButton");
-    managementGroup.addButton(messages.uploadFilesButton(), FileSearchWrapperAction.UPLOAD_FILES, ActionImpact.UPDATED, "btn-upload",
-      "fileUploadButton");
-    managementGroup.addButton(messages.createFolderButton(), FileSearchWrapperAction.CREATE_FOLDER, ActionImpact.UPDATED,
-      "btn-plus-circle", "fileCreateFolderButton");
-    managementGroup.addButton(messages.removeButton(), FileSearchWrapperAction.REMOVE, ActionImpact.DESTROYED, "btn-ban",
-      "fileRemoveButton");
+    managementGroup.addButton(messages.uploadFilesButton(), FileSearchWrapperAction.UPLOAD_FILES, ActionImpact.UPDATED,
+      "btn-upload", "fileUploadButton");
+    managementGroup.addButton(messages.createFolderButton(), FileSearchWrapperAction.CREATE_FOLDER,
+      ActionImpact.UPDATED, "btn-plus-circle", "fileCreateFolderButton");
+    managementGroup.addButton(messages.removeButton(), FileSearchWrapperAction.REMOVE, ActionImpact.DESTROYED,
+      "btn-ban", "fileRemoveButton");
 
     // PRESERVATION
     ActionableGroup<IndexedFile> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
-    preservationGroup.addButton(messages.newProcessPreservation(), FileSearchWrapperAction.NEW_PROCESS, ActionImpact.UPDATED,
-      "btn-play", "fileNewProcessButton");
-    preservationGroup.addButton(messages.identifyFormatsButton(), FileSearchWrapperAction.IDENTIFY_FORMATS, ActionImpact.UPDATED,
-      "btn-play", "fileIdentifyFormatsButton");
+    preservationGroup.addButton(messages.newProcessPreservation(), FileSearchWrapperAction.NEW_PROCESS,
+      ActionImpact.UPDATED, "btn-play", "fileNewProcessButton");
+    preservationGroup.addButton(messages.identifyFormatsButton(), FileSearchWrapperAction.IDENTIFY_FORMATS,
+      ActionImpact.UPDATED, "btn-play", "fileIdentifyFormatsButton");
 
     fileActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
     return fileActionableBundle;

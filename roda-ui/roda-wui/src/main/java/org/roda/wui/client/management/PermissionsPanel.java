@@ -269,8 +269,8 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     }
 
     Set<String> specialRoles = new HashSet<>();
-    for (int i = 0; i < checkedPermissions.size(); i++) {
-      specialRoles.add(checkedPermissions.get(i).getRole());
+    for (Permission checkedPermission : checkedPermissions) {
+      specialRoles.add(checkedPermission.getRole());
     }
 
     return specialRoles;

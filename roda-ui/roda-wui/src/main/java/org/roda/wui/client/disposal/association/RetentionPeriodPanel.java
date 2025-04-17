@@ -7,12 +7,16 @@
  */
 package org.roda.wui.client.disposal.association;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.RetentionPeriodCalculation;
 import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
+import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
@@ -35,7 +39,7 @@ public class RetentionPeriodPanel extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static RetentionPeriodPanel.MyUiBinder uiBinder = GWT.create(RetentionPeriodPanel.MyUiBinder.class);
   @UiField
-  FlowPanel retentionPeriodPanel;
+  FlowPanel retentionPeriodInnerPanel;
   @UiField
   FlowPanel scheduleInfo;
   @UiField
@@ -59,7 +63,7 @@ public class RetentionPeriodPanel extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     if (aip.getDisposalScheduleId() == null) {
-      retentionPeriodPanel.clear();
+      retentionPeriodInnerPanel.clear();
     } else {
       if (RetentionPeriodCalculation.SUCCESS.equals(aip.getRetentionPeriodState())) {
         handleRetentionCorrectCalculation(aip);
