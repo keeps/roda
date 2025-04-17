@@ -438,7 +438,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
     preservationGroup.addButton(messages.ingestWholeFolderButton(), TransferredResourceAction.NEW_PROCESS,
       ActionImpact.UPDATED, "btn-play");
 
-    transferredResourcesActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
+    transferredResourcesActionableBundle.addGroup(preservationGroup).addGroup(managementGroup);
     return transferredResourcesActionableBundle;
   }
 }
