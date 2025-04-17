@@ -12,6 +12,5 @@
 <g style="mix-blend-mode:multiply">
 <ellipse cx="50.25" cy="7.5" rx="50.25" ry="7.5" transform="matrix(1 0 0 -1 24.75 142.5)" fill="#D9D9D9"/>
 </g>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M109 52.0165L68.1611 101.931L49 77.9792L52.7197 75.0035L68.2027 94.3572L105.313 49L109 52.0165Z" fill="white"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M109 52.0165L68.1611 101.931L49 77.9792L52.7197 75.0035L68.2027 94.3572L105.313 49L109 52.0165Z" fill="white"/>
+<path d="M64.7915 100.849L40.0645 76.1219L46.3936 69.7917L64.7915 88.1896L103.814 49.1667L110.144 55.4969L64.7915 100.849Z" fill="white"/>
 </svg>

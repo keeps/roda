@@ -9167,6 +9167,22 @@ wui-disposal-hold-data .form-textbox {
     font-size: 20px;
 }
 
+.cmi-user:after {
+    content: "\e922";
+}
+
+.cmi-password:after {
+    content: "\e941";
+}
+
+.cmi-enter:after {
+    content: "\e92c";
+}
+
+
+
+
+
 .details-date {
     font-size: 1.1rem;
     color: #999;

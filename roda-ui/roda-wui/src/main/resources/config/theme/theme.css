@@ -82,9 +82,14 @@
 .credentials-card-elements .field-label {
   font-size: 10px;
   flex: 0.45;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-
+.credentials-card-elements .field-label i {
+  font-size: 14px;
+}
 
 .field-faux-input {
   background-color: #e9e9e9;
@@ -95,17 +100,18 @@
   color: black;
 }
 
-.credentials-card-elements hero-button {
+.credentials-card-elements .hero-button {
   box-shadow: none;
   font-size: 16px;
   font-weight: bold;
 }
 
-.button-with-icon {
+.hero-button.button-with-icon {
   display: flex;
   justify-content: space-between;
   padding: 8px 18px;
 }
+
 .hero-button {
   background-color: #25a6d6;
   padding: 8px 28px;
