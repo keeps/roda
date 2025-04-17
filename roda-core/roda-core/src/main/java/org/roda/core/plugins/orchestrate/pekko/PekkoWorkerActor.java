@@ -71,6 +71,7 @@ public class PekkoWorkerActor extends PekkoBaseActor {
 
     String requestUUID = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
             IdUtils.createUUID());
+    plugin.getParameterValues().put(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID, requestUUID);
     try {
       RODATransactionManager.beginTransaction(requestUUID, objectsToBeProcessed);
 
@@ -81,6 +82,7 @@ public class PekkoWorkerActor extends PekkoBaseActor {
 
       plugin.execute(transactionalIndexService, transactionalModelService, transactionalStorageService,
         objectsToBeProcessed);
+      RODATransactionManager.endTransaction(requestUUID);
       getSender().tell(Messages.newPluginExecuteIsDone(plugin, false).withParallelism(message.getParallelism())
         .withJobPriority(message.getJobPriority()), getSelf());
     } catch (Throwable e) {
@@ -111,22 +113,12 @@ public class PekkoWorkerActor extends PekkoBaseActor {
     PluginAfterAllExecuteIsReady message = (PluginAfterAllExecuteIsReady) msg;
     message.logProcessingStarted();
     Plugin<?> plugin = message.getPlugin();
-    String requestUUID = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
-            IdUtils.createUUID());
     try {
       Job job = PluginHelper.getJob(plugin, model);
       JobParallelism parallelism = job.getParallelism();
       JobPriority priority = job.getPriority();
       try {
-        if (RODATransactionManager.isTransactional(requestUUID)) {
-          plugin.afterAllExecute(RODATransactionManager.getTransactionalIndexService(requestUUID),
-            RODATransactionManager.getTransactionalModelService(requestUUID),
-            RODATransactionManager.getTransactionalStorageService(requestUUID));
-
-          RODATransactionManager.endTransaction(requestUUID);
-        } else {
-          plugin.afterAllExecute(index, model, storage);
-        }
+        plugin.afterAllExecute(index, model, storage);
         getSender().tell(
           Messages.newPluginAfterAllExecuteIsDone(plugin, false).withJobPriority(priority).withParallelism(parallelism),
           getSelf());
@@ -138,7 +130,6 @@ public class PekkoWorkerActor extends PekkoBaseActor {
         getSender().tell(
           Messages.newPluginAfterAllExecuteIsDone(plugin, true).withJobPriority(priority).withParallelism(parallelism),
           getSelf());
-        RODATransactionManager.rollbackTransaction(job.getId());
       }
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.warn("Unable to get Job from model. Reason: {}", e.getMessage());

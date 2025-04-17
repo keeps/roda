@@ -128,6 +128,7 @@ import org.roda.core.migration.MigrationManager;
 import org.roda.core.model.DefaultModelService;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.transaction.DefaultTransactionalModelService;
 import org.roda.core.model.transaction.TransactionLog;
 import org.roda.core.model.transaction.TransactionalModelService;
 import org.roda.core.model.utils.LdapUtility;
@@ -946,11 +947,11 @@ public class RodaCoreFactory {
     return new DefaultTransactionalStorageService(storage, storageService, transaction, getTransactionManager());
   }
 
-  public static ModelService getTransactionalModelService(StorageService transactionalStorageService,
+  public static TransactionalModelService getTransactionalModelService(StorageService transactionalStorageService,
     TransactionLog transaction) {
     ModelService stagingModelService = new DefaultModelService(transactionalStorageService, eventsManager, nodeType,
       instanceId);
-    return new TransactionalModelService(model, stagingModelService, transaction);
+    return new DefaultTransactionalModelService(model, stagingModelService, transaction, getTransactionManager());
   }
 
   public static IndexService getTransactionalIndexService(ModelService trasactionalModelService) {

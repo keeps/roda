@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -41,6 +42,16 @@ public class TransactionLog implements Serializable {
     if (storagePath != null) {
       storagePaths.removeIf(path -> path.getStoragePath().equals(storagePath));
     }
+  }
+
+  public void removeLiteObject(String lite) {
+    if (lite != null) {
+      liteObjects.removeIf(path -> path.getLiteObject().equals(lite));
+    }
+  }
+
+  public List<String> getLiteObjects() {
+    return liteObjects.stream().map(TransactionalLiteObject::getLiteObject).toList();
   }
 
   public enum TransactionStatus {

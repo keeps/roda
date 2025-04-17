@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface TransactionLogRepository extends JpaRepository<TransactionLog, String> {
-  @EntityGraph(attributePaths = "storagePaths")
+  @EntityGraph(attributePaths = {"storagePaths", "liteObjects"})
   @NonNull
   Optional<TransactionLog> findById(@NonNull String id);
 }
