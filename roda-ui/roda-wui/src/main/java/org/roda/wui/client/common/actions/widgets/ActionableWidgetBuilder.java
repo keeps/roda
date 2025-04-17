@@ -35,7 +35,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -94,12 +93,12 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
   // Builder methods for lists and titles
 
-  public Widget buildListWithObjects(ActionableObject<T> objects) {
+  public FlowPanel buildListWithObjects(ActionableObject<T> objects) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
     return createActionsMenu(actionableBundle, objects);
   }
 
-  public Widget buildListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist,
+  public FlowPanel buildListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist,
     List<Actionable.Action<T>> actionBlacklist) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
 
@@ -121,13 +120,13 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return createActionsMenu(actionableBundle, objects);
   }
 
-  public Widget buildListWithObjectsAndDefaults(ActionableObject<T> objects) {
+  public FlowPanel buildListWithObjectsAndDefaults(ActionableObject<T> objects) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
     return createActionsMenuWithDefaults(actionableBundle, objects);
   }
 
-  public Widget buildListWithObjectsAndDefaults(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist,
-    List<Actionable.Action<T>> actionBlacklist) {
+  public FlowPanel buildListWithObjectsAndDefaults(ActionableObject<T> objects,
+    List<Actionable.Action<T>> actionWhitelist, List<Actionable.Action<T>> actionBlacklist) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
 
     if (!actionWhitelist.isEmpty()) {
@@ -148,12 +147,12 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return createActionsMenuWithDefaults(actionableBundle, objects);
   }
 
-  public Widget buildGroupedListWithObjects(ActionableObject<T> objects) {
+  public FlowPanel buildGroupedListWithObjects(ActionableObject<T> objects) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
     return createGroupedActionsMenu(actionableBundle, objects, List.of());
   }
 
-  public Widget buildGroupedListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist,
+  public FlowPanel buildGroupedListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist,
     List<Actionable.Action<T>> ungroupedActions) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
 
@@ -432,12 +431,6 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
       backButton.addStyleName("groupedActionableButtonBack");
       panel.add(backButton);
       addedButtonCount++;
-    }
-
-    if (addedButtonCount == 0) {
-      Label emptyHelpText = new Label(messages.actionableEmptyHelp(objects.getType()));
-      emptyHelpText.addStyleName("groupedActionableEmptyHelp");
-      panel.add(emptyHelpText);
     }
 
     widgetCreatedHandler.accept(addedButtonCount);
