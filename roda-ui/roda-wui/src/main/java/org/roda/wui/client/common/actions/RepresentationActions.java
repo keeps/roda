@@ -80,11 +80,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   public static RepresentationActions getWithoutNoRepresentationActions(String parentAipId, Permissions permissions) {
     return new RepresentationActions(parentAipId, permissions) {
       @Override
-      public CanActResult userCanAct(Action<IndexedRepresentation> action) {
-        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
-      }
-
-      @Override
       public CanActResult contextCanAct(Action<IndexedRepresentation> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
       }

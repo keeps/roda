@@ -116,11 +116,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     Permissions permissions) {
     return new AipActions(parentAipId, parentAipState, permissions) {
       @Override
-      public CanActResult userCanAct(Action<IndexedAIP> action) {
-        return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
-      }
-
-      @Override
       public CanActResult contextCanAct(Action<IndexedAIP> action) {
         return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
       }
