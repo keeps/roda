@@ -730,17 +730,6 @@ public class HtmlSnippetUtils {
     return response;
   }
 
-  public static SimplePanel getNoItemsToDisplay(String object) {
-    Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(object)));
-    label.addStyleName("table-empty-inner-label");
-
-    SimplePanel panel = new SimplePanel();
-    panel.addStyleName("table-empty-inner");
-    panel.add(label);
-
-    return panel;
-  }
-
   public static SafeHtml getDisposalScheduleActionHtml(DisposalActionCode disposalAction) {
     String labelClass;
 

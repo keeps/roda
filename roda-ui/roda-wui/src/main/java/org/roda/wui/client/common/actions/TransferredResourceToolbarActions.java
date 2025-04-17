@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.Window;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.utils.SelectedItemsUtils;
@@ -19,6 +21,8 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
@@ -34,6 +38,7 @@ import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -66,7 +71,7 @@ public class TransferredResourceToolbarActions extends AbstractActionable<Transf
 
   private static final Set<TransferredResourceAction> POSSIBLE_ACTIONS_ON_FILE_TRANSFERRED_RESOURCE = new HashSet<>(
     Arrays.asList(TransferredResourceAction.RENAME, TransferredResourceAction.MOVE, TransferredResourceAction.REMOVE,
-      TransferredResourceAction.NEW_PROCESS));
+      TransferredResourceAction.DOWNLOAD, TransferredResourceAction.NEW_PROCESS));
 
   private static final Set<TransferredResourceAction> POSSIBLE_ACTIONS_ON_MULTIPLE_TRANSFERRED_RESOURCES = new HashSet<>(
     Arrays.asList(TransferredResourceAction.MOVE, TransferredResourceAction.REMOVE,
@@ -85,6 +90,7 @@ public class TransferredResourceToolbarActions extends AbstractActionable<Transf
     UPLOAD(RodaConstants.PERMISSION_METHOD_CREATE_TRANSFERRED_RESOURCE_FILE),
     NEW_FOLDER(RodaConstants.PERMISSION_METHOD_CREATE_TRANSFERRED_RESOURCE_FOLDER),
     REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_TRANSFERRED_RESOURCE),
+    DOWNLOAD(RodaConstants.PERMISSION_METHOD_CREATE_TRANSFERRED_RESOURCE_FILE),
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB);
 
     private List<String> methods;
@@ -186,6 +192,8 @@ public class TransferredResourceToolbarActions extends AbstractActionable<Transf
       remove(objectToSelectedItems(object, TransferredResource.class), callback);
     } else if (action.equals(TransferredResourceAction.NEW_PROCESS)) {
       newProcess(objectToSelectedItems(object, TransferredResource.class), callback);
+    } else if (action.equals(TransferredResourceAction.DOWNLOAD)) {
+      download(object, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -209,6 +217,12 @@ public class TransferredResourceToolbarActions extends AbstractActionable<Transf
     } else {
       unsupportedAction(action, callback);
     }
+  }
+
+  private void download(TransferredResource resource, AsyncCallback<ActionImpact> callback) {
+    SafeUri downloadUri = RestUtils.createTransferredResourceDownloadUri(resource.getUUID());
+    Window.Location.assign(downloadUri.asString());
+    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void newProcess(SelectedItems<TransferredResource> objects, AsyncCallback<ActionImpact> callback) {
@@ -395,7 +409,7 @@ public class TransferredResourceToolbarActions extends AbstractActionable<Transf
   }
 
   private void newFolder(TransferredResource object, AsyncCallback<ActionImpact> callback) {
-    Services services = new Services("Renaming transferred resource", "rename");
+    Services services = new Services("Create transferred resource folder", "create");
     Dialogs.showPromptDialog(messages.ingestTransferCreateFolderTitle(), messages.ingestTransferCreateFolderMessage(),
       null, null, RegExp.compile("^[^/]+$"), messages.dialogCancel(), messages.dialogOk(), true, false,
       new ActionNoAsyncCallback<String>(callback) {
@@ -419,7 +433,7 @@ public class TransferredResourceToolbarActions extends AbstractActionable<Transf
     ActionableBundle<TransferredResource> transferredResourcesActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionableGroup<TransferredResource> managementGroup = new ActionableGroup<>(messages.sidebarFoldersFilesTitle());
+    ActionableGroup<TransferredResource> managementGroup = new ActionableGroup<>(messages.manage(), "btn-edit");
     managementGroup.addButton(messages.refreshButton(), TransferredResourceAction.REFRESH, ActionImpact.UPDATED,
       "btn-refresh");
     // TODO: add title:
@@ -438,7 +452,13 @@ public class TransferredResourceToolbarActions extends AbstractActionable<Transf
     preservationGroup.addButton(messages.ingestWholeFolderButton(), TransferredResourceAction.NEW_PROCESS,
       ActionImpact.UPDATED, "btn-play");
 
-    transferredResourcesActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
+    // DOWNLOAD
+    ActionableGroup<TransferredResource> downloadGroup = new ActionableGroup<>(messages.downloadButton(),
+      "btn-download");
+    downloadGroup.addButton(messages.downloadButton(), TransferredResourceAction.DOWNLOAD, ActionImpact.NONE,
+      "btn-download");
+
+    transferredResourcesActionableBundle.addGroup(managementGroup).addGroup(downloadGroup).addGroup(preservationGroup);
     return transferredResourcesActionableBundle;
   }
 }

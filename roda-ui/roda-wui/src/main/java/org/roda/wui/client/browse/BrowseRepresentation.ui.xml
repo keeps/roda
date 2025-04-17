@@ -15,8 +15,6 @@
                                                            label="{messages.catalogueRepresentationTitle}"/>
                 <g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
                     <g:FlowPanel addStyleNames="col_12 content">
-                        <!-- STATUS -->
-                        <g:HTML ui:field="aipState"/>
 
                         <!-- IDENTIFICATION -->
                         <g:FlowPanel styleName="browseItemPanel">

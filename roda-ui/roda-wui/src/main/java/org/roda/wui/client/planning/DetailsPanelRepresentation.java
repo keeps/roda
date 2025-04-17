@@ -33,8 +33,6 @@ public class DetailsPanelRepresentation extends Composite {
   }
 
   public void init(BrowseRepresentationResponse response) {
-    GWT.log("DetailsPanel init");
-
     Map<String, Widget> detailsMap = InfoSliderHelper.getRepresentationInfoDetailsMap(response);
 
     for (Map.Entry<String, Widget> field : detailsMap.entrySet()) {

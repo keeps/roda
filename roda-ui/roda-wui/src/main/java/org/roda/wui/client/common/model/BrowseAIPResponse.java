@@ -21,7 +21,6 @@ public class BrowseAIPResponse implements Serializable {
   private List<IndexedAIP> ancestors;
   private DescriptiveMetadataInfos descriptiveMetadataInfos;
   private LongResponse childAipsCount;
-  private LongResponse representationCount;
   private LongResponse dipCount;
 
   public BrowseAIPResponse() {
@@ -66,14 +65,6 @@ public class BrowseAIPResponse implements Serializable {
 
   public void setChildAipsCount(LongResponse childAipsCount) {
     this.childAipsCount = childAipsCount;
-  }
-
-  public LongResponse getRepresentationCount() {
-    return representationCount;
-  }
-
-  public void setRepresentationCount(LongResponse representationCount) {
-    this.representationCount = representationCount;
   }
 
   public LongResponse getDipCount() {

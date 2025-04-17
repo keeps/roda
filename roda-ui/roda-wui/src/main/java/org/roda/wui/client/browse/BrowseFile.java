@@ -254,16 +254,13 @@ public class BrowseFile extends Composite {
     repId = indexedFile.getRepresentationId();
     initHandlers();
 
-    // STATUS
-    this.keyboardFocus.addStyleName(response.getIndexedAIP().getState().toString().toLowerCase());
-
     // TITLE
     this.title.setIcon(
       DescriptionLevelUtils.getElementLevelIconSafeHtml(DescriptionLevelUtils.getFileLevel(indexedFile), false));
     this.title.setText(indexedFile.getId());
 
     // TOOLBAR
-    this.objectToolbar.setObjectAndBuild(indexedFile, response.getIndexedAIP().getPermissions(), handler);
+    this.objectToolbar.setObjectAndBuild(indexedFile, response.getIndexedAIP().getState(), response.getIndexedAIP().getPermissions(), handler);
 
     // SIDEBAR
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, indexedFile.getUUID()));

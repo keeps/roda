@@ -46,8 +46,6 @@ public class DetailsPanelAIP extends Composite {
   }
 
   public void init(BrowseAIPResponse response) {
-    GWT.log("DetailsPanel init");
-
     ingestLabel.setVisible(false);
     Map<String, Widget> detailsMap = InfoSliderHelper.getAipInfoDetailsMap(response);
 

@@ -104,7 +104,7 @@ public class CreateUser extends Composite {
       user = userDataPanel.getUser();
       Services services = new Services("Create RODA user", "create");
       CreateUserRequest userOperations = new CreateUserRequest(user.getEmail(), user.getName(), user.getFullName(),
-        user.getGroups(), user.isGuest(), null, userDataPanel.getUserExtra());
+        user.getDirectRoles(), user.getGroups(), user.isGuest(), null, userDataPanel.getUserExtra());
       services.membersResource(s -> s.createUser(userOperations, LocaleInfo.getCurrentLocale().getLocaleName()))
         .whenComplete((createdUser, error) -> {
           if (createdUser != null) {

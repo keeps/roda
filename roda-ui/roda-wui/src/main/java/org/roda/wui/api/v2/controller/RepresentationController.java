@@ -194,10 +194,10 @@ public class RepresentationController implements RepresentationRestService, Expo
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
-      controllerAssistant.checkAIPstate(aip);
+      controllerAssistant.checkAIPState(aip);
 
       // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
+      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
       // delegate
       return representationService.createRepresentation(requestContext.getUser(), aipId, representationId, type,

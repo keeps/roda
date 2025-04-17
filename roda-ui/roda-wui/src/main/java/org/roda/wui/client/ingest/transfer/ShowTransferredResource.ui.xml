@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:common="urn:import:org.roda.wui.client.common"
+             xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+
+
+    <g:FocusPanel ui:field="keyboardFocus">
+        <g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
+            <common:NavigationToolbar ui:field="navigationToolbar"/>
+            <common:BrowseTransferredResourceActionsToolbar ui:field="objectToolbar"
+                                                            label="{messages.catalogueTransferredResourceTitle}"/>
+            <g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
+                <g:FlowPanel addStyleNames="col_12 content">
+                    <!-- IDENTIFICATION -->
+                    <common:TitlePanel ui:field="title"/>
+
+                    <!-- DESCRIPTIVE METADATA -->
+                    <tabs:BrowseTransferredResourceTabs ui:field="browseTab"/>
+                </g:FlowPanel>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FocusPanel>
+</ui:UiBinder>
+
+

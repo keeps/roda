@@ -14,6 +14,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -37,11 +38,11 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
 
   private SearchWrapper searchWrapper = null;
 
-  public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean isAvailable, boolean justActive,
+  public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean isAvailable, boolean justActive, AIPState state,
     Permissions permissions, Command onPreviewFailure) {
     super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID(), CONTENT_DISPOSITION_INLINE),
       file.getFileFormat(), file.getOriginalName() != null ? file.getOriginalName() : file.getId(), file.getSize(),
-      file.isDirectory(), isAvailable, onPreviewFailure, file, justActive, permissions);
+      file.isDirectory(), isAvailable, onPreviewFailure, file, justActive, state, permissions);
   }
 
   @Override
@@ -50,9 +51,9 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
 
     ListBuilder<IndexedFile> folderListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedFile.class, "IndexedFilePreview_files").withFilter(filter)
-        .withSummary(messages.representationListOfFiles()).withJustActive(getJustActive()).bindOpener().withActionable(
-          FileSearchWrapperActions.get(getObject().getAipId(), getObject().getRepresentationId(), getObject(),
-            getPermissions())));
+        .withSummary(messages.representationListOfFiles()).withJustActive(getJustActive()).bindOpener()
+        .withActionable(FileSearchWrapperActions.get(getObject().getAipId(), getObject().getRepresentationId(), getState(),
+          getObject(), getPermissions())));
 
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(getJustActive());
 

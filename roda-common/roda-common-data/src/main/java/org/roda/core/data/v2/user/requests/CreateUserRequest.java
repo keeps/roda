@@ -22,16 +22,18 @@ public class CreateUserRequest implements Serializable {
   private String email;
   private String name;
   private String fullName;
+  private Set<String> roles;
   private Set<String> groups;
   private boolean guest;
   private SecureString password;
   private Set<MetadataValue> values;
 
-  public CreateUserRequest(String email, String name, String fullName, Set<String> groups, boolean guest,
-    SecureString password, Set<MetadataValue> values) {
+  public CreateUserRequest(String email, String name, String fullName, Set<String> roles, Set<String> groups,
+    boolean guest, SecureString password, Set<MetadataValue> values) {
     this.email = email;
     this.name = name;
     this.fullName = fullName;
+    this.roles = roles;
     this.groups = groups;
     this.guest = guest;
     this.password = password;
@@ -66,6 +68,18 @@ public class CreateUserRequest implements Serializable {
 
   public void setFullName(String fullName) {
     this.fullName = fullName;
+  }
+
+  public Set<String> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(Set<String> roles) {
+    this.roles = roles;
+  }
+
+  public boolean isGuest() {
+    return guest;
   }
 
   public Set<String> getGroups() {

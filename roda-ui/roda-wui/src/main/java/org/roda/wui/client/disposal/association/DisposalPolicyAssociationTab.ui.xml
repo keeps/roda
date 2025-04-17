@@ -12,7 +12,7 @@
         <g:FlowPanel addStyleNames="cardBody">
             <g:FlowPanel addStyleNames="row full_width skip_padding">
                 <g:FlowPanel addStyleNames="col_10 content">
-                    <common:DisposalPolicySummaryPanel ui:field="disposalPolicySummaryPanel"/>
+                    <g:SimplePanel ui:field="informationPanel"/>
                     <association:DisposalConfirmationPanel ui:field="disposalConfirmationPanel"/>
                     <association:RetentionPeriodPanel ui:field="retentionPeriodPanel"/>
                     <association:DisposalHoldsPanel ui:field="disposalHoldsPanel"/>

@@ -95,7 +95,7 @@
   font-family: "RODALogo";
   font-style: normal;
   font-weight: 300;
-  src: url(../../api/v2/themes?resource-id=fonts/RODA_logo/RODA_logo.ttf) format("truetype");
+  src: url(../../api/v2/themes?resource-id=fonts/RODA_logo/RODA_Logo.ttf) format("truetype");
 }
 
 @font-face {
@@ -120,15 +120,16 @@
 }
 
 @font-face {
-  font-family: "UbuntuMono";
-  font-style: italic;
+  font-family: "CustomMaterialIcons";
+  font-style: normal;
   font-weight: 1 1000;
-  src: local('UbuntuMono'), url(../../api/v2/themes?resource-id=fonts/Roboto_Mono/RobotoMono-Italic-VariableFont_wght.ttf) format("truetype-variations");
+  src: url(../../api/v2/themes?resource-id=fonts/Custom_Material_Icons/material-icons.ttf) format("truetype");
 }
 
+
 @font-face {
-    font-family: "CustomMaterialIcons";
-    font-style: normal;
-    font-weight: 1 1000;
-    src: url(../../api/v2/themes?resource-id=fonts/Custom_Material_Icons/material-icons.ttf) format("truetype");
+  font-family: "MaterialIcons";
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url(../../api/v2/themes?resource-id=fonts/Material_Icons/Material_Icons_Outlined/MaterialIconsOutlined-Regular.otf) format("truetype");
 }

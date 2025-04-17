@@ -19,8 +19,8 @@ import com.google.gwt.user.client.ui.Label;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class DisposalPolicySummaryPanel extends FlowPanel {
-  private HTML iconHTML;
-  private Label textLabel;
+  private final HTML iconHTML;
+  private final Label textLabel;
 
   public DisposalPolicySummaryPanel() {
     super();

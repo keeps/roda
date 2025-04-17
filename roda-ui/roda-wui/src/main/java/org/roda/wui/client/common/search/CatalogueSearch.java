@@ -113,7 +113,7 @@ public class CatalogueSearch extends Composite {
 
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedFile.class, filesListId)
-              .withActionable(FileSearchWrapperActions.getWithoutNoFileActions(null, null, null, null))
+              .withActionable(FileSearchWrapperActions.getWithoutNoFileActions(null, null, null, null, null))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
               .withFilter(filter).withStartHidden(startHidden));
         }

@@ -26,11 +26,9 @@ import org.roda.wui.client.common.UpSalePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.TransferredResourceActions;
-import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.search.TransferredResourceSearch;
-import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -66,45 +64,12 @@ public class IngestTransfer extends Composite {
   @SuppressWarnings("unused")
   private static final String TRANSFERRED_RESOURCE_ID_SEPARATOR = "/";
 
-  public static final String cardIdentifier = "collapsable-ingest-transfer-card";
+  public static final String CARD_IDENTIFIER = "collapsable-ingest-transfer-card";
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
-
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      Services services = new Services("History reason", "get");
-      if (historyTokens.isEmpty()) {
-        callback.onSuccess(new IngestTransfer());
-      } else if (historyTokens.get(0).equals(TransferUpload.INGEST_RESOLVER.getHistoryToken())) {
-        TransferUpload.INGEST_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-      } else {
-        String transferredResourceUUID = historyTokens.get(0);
-        if (transferredResourceUUID != null) {
-          services.transferredResource(s -> s.getResource(transferredResourceUUID))
-            .whenComplete((value,error) -> {
-              if (value != null) {
-                callback.onSuccess(new IngestTransfer(value));
-              } else if (error != null) {
-                Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
-                  messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
-                  false, new AsyncCallback<Void>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
-
-                    @Override
-                    public void onSuccess(Void result) {
-                      HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-                    }
-                  });
-              }
-          });
-        } else {
-          callback.onSuccess(new IngestTransfer());
-        }
-      }
+      getInstance().resolve(historyTokens, callback);
     }
 
     @Override
@@ -113,13 +78,13 @@ public class IngestTransfer extends Composite {
     }
 
     @Override
-    public String getHistoryToken() {
-      return "transfer";
+    public List<String> getHistoryPath() {
+      return ListUtils.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
-    public List<String> getHistoryPath() {
-      return ListUtils.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
+    public String getHistoryToken() {
+      return "transfer";
     }
   };
 
@@ -137,10 +102,23 @@ public class IngestTransfer extends Composite {
   interface MyUiBinder extends UiBinder<Widget, IngestTransfer> {
   }
 
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private Boolean dropfolderActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_SERVICE_DROPFOLDER_ACTIVE);
+  private final boolean dropFolderActive = ConfigurationManager.getBoolean(false,
+    RodaConstants.UI_SERVICE_DROPFOLDER_ACTIVE);
   private final TransferredResource resource;
+
+  /**
+   * Get the singleton instance
+   *
+   * @return the instance
+   */
+  public static IngestTransfer getInstance() {
+    if (instance == null) {
+      instance = new IngestTransfer();
+    }
+    return instance;
+  }
 
   @UiField
   FlowPanel ingestTransferDescription;
@@ -227,10 +205,10 @@ public class IngestTransfer extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     UpSalePanel widgets = new UpSalePanel(messages.dropFolderInformationText(), messages.learnMore(),
-      ConfigurationManager.getString(RodaConstants.UI_SERVICE_DROPFOLDER_URL), cardIdentifier);
+      ConfigurationManager.getString(RodaConstants.UI_SERVICE_DROPFOLDER_URL), CARD_IDENTIFIER);
     ingestTransferPanel.setWidget(widgets);
 
-    if (dropfolderActive){
+    if (dropFolderActive) {
       ingestTransferPanel.setVisible(false);
     }
 
@@ -248,8 +226,8 @@ public class IngestTransfer extends Composite {
       download.setVisible(false);
       navigationToolbar.setVisible(false);
       objectToolbar.setVisible(false);
-      if (!dropfolderActive){
-        ingestTransferPanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
+      if (!dropFolderActive) {
+        ingestTransferPanel.setVisible(JavascriptUtils.accessLocalStorage(CARD_IDENTIFIER));
       }
       lastScanned.setText("");
     } else {
@@ -284,6 +262,17 @@ public class IngestTransfer extends Composite {
     if (resource != null) {
       SafeUri downloadUri = RestUtils.createTransferredResourceDownloadUri(resource.getUUID());
       Window.Location.assign(downloadUri.asString());
+    }
+  }
+
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.isEmpty()) {
+      IngestTransfer ingestTransfer = new IngestTransfer();
+      callback.onSuccess(ingestTransfer);
+    } else if (historyTokens.get(0).equals(TransferUpload.INGEST_RESOLVER.getHistoryToken())) {
+      TransferUpload.INGEST_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else {
+      ShowTransferredResource.getAndRefresh(historyTokens.get(0), callback);
     }
   }
 }

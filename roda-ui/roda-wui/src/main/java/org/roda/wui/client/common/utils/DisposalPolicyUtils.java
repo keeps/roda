@@ -59,20 +59,20 @@ public class DisposalPolicyUtils {
         case CONFIRMATION:
         case OVERDUE:
         case ERROR:
-          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.DANGER_LIGHT));
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.DANGER_LIGHT, Tag.TagStyle.MONO));
         case REVIEW:
-          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.WARNING_LIGHT));
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.MONO, Tag.TagStyle.WARNING_LIGHT));
         case HOLD:
-          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.NEUTRAL));
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.MONO, Tag.TagStyle.NEUTRAL));
         case RETAIN:
-          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.SUCCESS));
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.MONO, Tag.TagStyle.SUCCESS));
         case NONE:
         default:
-          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.ICON_CLOCK, Tag.TagStyle.NEUTRAL));
+          return null;
       }
     } else if (AIPState.DESTROYED.equals(aip.getState())) {
       String message = messages.disposalPolicyDestroyedAIPSummary(Humanize.formatDate(aip.getDestroyedOn()));
-      return Tag.fromText(message, List.of(Tag.TagStyle.NEUTRAL, Tag.TagStyle.ICON_CLOCK));
+      return Tag.fromText(message, List.of(Tag.TagStyle.NEUTRAL, Tag.TagStyle.MONO));
     }
 
     return null;

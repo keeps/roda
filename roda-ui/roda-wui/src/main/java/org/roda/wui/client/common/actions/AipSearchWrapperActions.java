@@ -80,7 +80,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final Set<AipSearchWrapperAction> POSSIBLE_ACTIONS_ON_NO_AIP_TOP = new HashSet<>(
     List.of(AipSearchWrapperAction.NEW_CHILD_AIP_TOP));
-  private static final Set<AipSearchWrapperAction> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
+  private static final Set<Action<IndexedAIP>> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
     List.of(AipSearchWrapperAction.NEW_CHILD_AIP_BELOW));
   private static final Set<AipSearchWrapperAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
     Arrays.asList(AipSearchWrapperAction.MOVE_IN_HIERARCHY, AipSearchWrapperAction.UPDATE_PERMISSIONS,
@@ -172,8 +172,8 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
       return new CanActResult(APPRAISAL_ACTIONS.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonAffectedAIPUnderAppraisal());
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
-      return new CanActResult(APPRAISAL_ACTIONS.contains(action) || POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action),
-        CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+      return new CanActResult(APPRAISAL_ACTIONS.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonAIPUnderAppraisal());
     } else if (action.equals(AipSearchWrapperAction.REMOVE)
       && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
@@ -199,10 +199,8 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
   @Override
   public CanActResult contextCanAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
     if (AIPState.UNDER_APPRAISAL.equals(parentAipState)) {
-      return new CanActResult(
-        (!Objects.equals(parentAipId, NO_AIP_PARENT) && POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS.contains(action))
-          || APPRAISAL_ACTIONS.contains(action),
-        CanActResult.Reason.CONTEXT, messages.reasonAffectedAIPUnderAppraisal());
+      return new CanActResult(APPRAISAL_ACTIONS.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonAffectedAIPUnderAppraisal());
     } else {
       return new CanActResult(POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonCantActOnMultipleObjects());
