@@ -7,18 +7,10 @@
 
 	<g:FlowPanel styleName="wui-disposal-confirmation" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content" ui:field="contentFlowPanel">
+			<g:FlowPanel addStyleNames="content" ui:field="contentFlowPanel">
 				<common:TitlePanel text="{messages.disposalConfirmationsTitle}" iconClass="DisposalConfirmations" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="disposalConfirmationDescription" />
 				<commonsearch:SearchWrapper ui:field="searchWrapper" />
-			</g:FlowPanel>
-
-			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
-					</g:FlowPanel>
-				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>
