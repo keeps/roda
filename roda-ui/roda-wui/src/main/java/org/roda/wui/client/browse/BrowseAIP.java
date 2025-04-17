@@ -241,8 +241,9 @@ public class BrowseAIP extends Composite {
     }
 
     // Side panel representations
-    if (response.getRepresentationCount().getResult() > 0 || response.getDipCount().getResult() > 0) {
-      if (response.getRepresentationCount().getResult() > 0) {
+    if (response.getIndexedAIP().getHasRepresentations() || response.getDipCount().getResult() > 0) {
+      if (response.getIndexedAIP().getHasRepresentations()
+        && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
         this.representationCards.add(new AIPRepresentationCardList(aipId));
       }
       if (response.getDipCount().getResult() > 0) {
@@ -318,10 +319,8 @@ public class BrowseAIP extends Composite {
             s -> s.count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, id)), false)),
             IndexedDIP.class);
 
-          CompletableFuture
-            .allOf(futureChildAipCount, futureRepCount, futureDipCount, futureAncestors, futureAncestors,
-              futureRepFields, futureDescriptiveMetadataInfos)
-            .thenApply(v -> {
+          CompletableFuture.allOf(futureChildAipCount, futureRepCount, futureDipCount, futureAncestors, futureAncestors,
+            futureRepFields, futureDescriptiveMetadataInfos).thenApply(v -> {
               BrowseAIPResponse rp = new BrowseAIPResponse();
               rp.setIndexedAIP(aip);
               rp.setAncestors(futureAncestors.join());

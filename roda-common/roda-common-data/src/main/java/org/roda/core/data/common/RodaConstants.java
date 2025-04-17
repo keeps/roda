@@ -2079,7 +2079,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_DELETE_RISK_INCIDENCE = "org.roda.wui.api.v2.controller.RiskIncidenceController.deleteRiskIncidences";
   public static final String PERMISSION_METHOD_DELETE_TRANSFERRED_RESOURCE = "org.roda.wui.api.v2.controller.TransferredResourceController.deleteMultipleResources";
 
-  public static final String PERMISSION_METHOD_LIST_AIP_DESCRIPTIVE_METADATA = "org.roda.wui.api.v2.controller.AIPController.retrieveRepresentationSupportedMetadata";
+  public static final String PERMISSION_METHOD_LIST_AIP_DESCRIPTIVE_METADATA = "org.roda.wui.api.v2.controller.AIPController.getDescriptiveMetadata";
 
   public static final String PERMISSION_METHOD_CREATE_AIP_BELOW = "org.roda.wui.api.v2.controller.AIPController.createAIPBelow";
   public static final String PERMISSION_METHOD_CREATE_AIP_TOP = "org.roda.wui.api.v2.controller.AIPController.createAIPTop";
