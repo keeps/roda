@@ -460,51 +460,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
       emptyTablewidget.add(msgBeforeLink);
       emptyTablewidget.add(resetFacetsAnchor);
-    } else if (actionable != null) {
-      emptyTablewidget.addStyleName("ActionableStyleButtons");
-
-      Label label = new Label();
-      label.addStyleName("table-empty-inner-label");
-      if (originalFilter.equals(this.getFilter())) {
-        label.setText(messages.noItemsToDisplayPreFilters(someOfAObject));
-      } else {
-        label.setText(messages.noItemsToDisplay(someOfAObject));
-      }
-      emptyTablewidget.add(label);
-
-      emptyTablewidget.add(
-        new ActionableWidgetBuilder<>(actionable).withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
-          @Override
-          public void onSuccess(Actionable.ActionImpact impact) {
-            if (!Actionable.ActionImpact.NONE.equals(impact)) {
-              Timer timer = new Timer() {
-                @Override
-                public void run() {
-                  AsyncTableCell.this.refresh();
-                }
-              };
-              timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
-            }
-            if (actionableCallback != null) {
-              actionableCallback.onSuccess(impact);
-            }
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            Timer timer = new Timer() {
-              @Override
-              public void run() {
-                AsyncTableCell.this.refresh();
-              }
-            };
-            timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
-            super.onFailure(caught);
-            if (actionableCallback != null) {
-              actionableCallback.onFailure(caught);
-            }
-          }
-        }).buildListWithObjects(new ActionableObject<T>(classToReturn)));
     } else {
       Label label = new Label();
       label.addStyleName("table-empty-inner-label");
