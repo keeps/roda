@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:labels="urn:import:org.roda.wui.client.common.labels">
+             xmlns:common="urn:import:org.roda.wui.client.common"
+             xmlns:labels="urn:import:org.roda.wui.client.common.labels">
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
-	<g:FlowPanel styleName="permissionsTab roda6CardWithHeader" addStyleNames="wrapper skip_padding">
-		<g:FlowPanel styleName="cardHeader">
-			<common:ActionsToolbar ui:field="actionsToolbar" />
-		</g:FlowPanel>
-		<g:FlowPanel styleName="cardBody">
-			<g:FlowPanel addStyleNames="row full_width">
-				<g:FlowPanel addStyleNames="content">
-					<labels:Header ui:field="title" />
+    <g:FlowPanel styleName="permissionsTab roda6CardWithHeader" addStyleNames="wrapper skip_padding">
+        <g:FlowPanel styleName="cardHeader" ui:field="header">
+            <common:ActionsToolbar ui:field="actionsToolbar"/>
+        </g:FlowPanel>
+        <g:FlowPanel styleName="cardBody">
+            <g:FlowPanel addStyleNames="row full_width">
+                <g:FlowPanel addStyleNames="content">
+                    <labels:Header ui:field="title"/>
 
-					<g:FlowPanel addStyleNames="page-description" ui:field="editPermissionsDescription" />
-					<labels:Header ui:field="userPermissionsTitle" />
-					<g:Label styleName="info-empty" ui:field="groupPermissionsEmpty">
-						<ui:text from='{messages.permissionAssignedGroupsEmpty}' />
-					</g:Label>
-					<g:FlowPanel ui:field="groupPermissionsPanel" addStyleNames="plugin-category-padding" />
-					<labels:Header ui:field="groupPermissionsTitle" />
-					<g:Label styleName="info-empty" ui:field="userPermissionsEmpty">
-						<ui:text from='{messages.permissionAssignedUsersEmpty}' />
-					</g:Label>
-					<g:FlowPanel ui:field="userPermissionsPanel" addStyleNames="permission-box-padding" />
-				</g:FlowPanel>
-			</g:FlowPanel>
-		</g:FlowPanel>
-	</g:FlowPanel>
+                    <g:FlowPanel addStyleNames="page-description" ui:field="editPermissionsDescription"/>
+                    <labels:Header ui:field="userPermissionsTitle"/>
+                    <g:Label styleName="info-empty" ui:field="groupPermissionsEmpty">
+                        <ui:text from='{messages.permissionAssignedGroupsEmpty}'/>
+                    </g:Label>
+                    <g:FlowPanel ui:field="groupPermissionsPanel" addStyleNames="plugin-category-padding"/>
+                    <labels:Header ui:field="groupPermissionsTitle"/>
+                    <g:Label styleName="info-empty" ui:field="userPermissionsEmpty">
+                        <ui:text from='{messages.permissionAssignedUsersEmpty}'/>
+                    </g:Label>
+                    <g:FlowPanel ui:field="userPermissionsPanel" addStyleNames="permission-box-padding"/>
+                </g:FlowPanel>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
 </ui:UiBinder>

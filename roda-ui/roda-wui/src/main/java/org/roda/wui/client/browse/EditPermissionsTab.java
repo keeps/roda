@@ -48,6 +48,8 @@ public class EditPermissionsTab extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
+  FlowPanel header;
+  @UiField
   FlowPanel editPermissionsDescription;
   @UiField
   Header userPermissionsTitle;
@@ -78,13 +80,14 @@ public class EditPermissionsTab extends Composite {
     editPermissionsDescription.add(new HTMLWidgetWrapper("EditMultiplePermissionsDescription.html"));
   }
 
-  public EditPermissionsTab(Widget toolbarActionableMenu, String objectClass, HasPermissions object) {
+  public EditPermissionsTab(FlowPanel toolbarActionableMenu, String objectClass, HasPermissions object) {
     this.objects.add(object);
     this.objectId = object.getId();
     this.selectedItems = SelectedItemsList.create(objectClass, objectId);
     initWidget(uiBinder.createAndBindUi(this));
     initLabels();
-    actionsToolbar.setActionableMenu(toolbarActionableMenu);
+    actionsToolbar.setActionableMenu(toolbarActionableMenu, true);
+    header.setVisible(actionsToolbar.isVisible());
     actionsToolbar.setTagsVisible(false);
     actionsToolbar.setLabelVisible(false);
     createPermissionPanel();
