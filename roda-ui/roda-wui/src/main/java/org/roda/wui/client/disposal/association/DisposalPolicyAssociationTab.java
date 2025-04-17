@@ -27,6 +27,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -38,6 +39,8 @@ public class DisposalPolicyAssociationTab extends Composite {
 
   private static DisposalPolicyAssociationTab.MyUiBinder uiBinder = GWT
     .create(DisposalPolicyAssociationTab.MyUiBinder.class);
+  @UiField
+  FlowPanel header;
   @UiField
   ActionsToolbar actionsToolbar;
   @UiField
@@ -71,7 +74,9 @@ public class DisposalPolicyAssociationTab extends Composite {
           List.of(AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
             AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_HOLD),
           List.of(AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
-            AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_HOLD)));
+            AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_HOLD)),
+      true);
+    header.setVisible(actionsToolbar.isVisible());
 
     // DISPOSAL POLICY SUMMARY
     disposalPolicySummaryPanel.setIcon("fas fa-info-circle");

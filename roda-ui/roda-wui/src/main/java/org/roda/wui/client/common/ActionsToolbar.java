@@ -1,6 +1,5 @@
 package org.roda.wui.client.common;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.roda.wui.client.common.labels.LabelWithIcon;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
@@ -72,9 +71,21 @@ public class ActionsToolbar extends Composite {
     actions.add(actionButton);
   }
 
-  public void setActionableMenu(Widget actionableMenu) {
+  public void setActionableMenu(FlowPanel actionableMenu) {
     actions.clear();
     actions.add(actionableMenu);
+  }
+
+  public void setActionableMenu(FlowPanel actionableMenu, boolean hideOnEmpty) {
+    actions.clear();
+    actions.add(actionableMenu);
+    if (hideOnEmpty) {
+      if (actionableMenu.getWidgetCount() == 0) {
+        setVisible(false);
+      } else {
+        setVisible(true);
+      }
+    }
   }
 
   interface MyUiBinder extends UiBinder<Widget, ActionsToolbar> {
