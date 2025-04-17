@@ -1,6 +1,9 @@
 package org.roda.wui.client.browse.tabs;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
@@ -23,6 +26,7 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.association.DisposalPolicyAssociationTab;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -52,50 +56,64 @@ public class BrowseAIPTabs extends Tabs {
     }
 
     // Preservation events
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.preservationEventsTab()), new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        Filter eventFilter = new Filter(new AllFilterParameter());
-        eventFilter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
-        return new SearchWrapper(false).createListAndSearchPanel(new ListBuilder<>(() -> new PreservationEventList(),
-          new AsyncTableCellOptions<>(IndexedPreservationEvent.class, "BrowseAIP_preservationEvents")
-            .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()));
-      }
-    });
+    if (browseAIPResponse.getEventCount().getResult() >= 0) {
+      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.preservationEventsTab()), new TabContentBuilder() {
+
+        @Override
+        public Widget buildTabWidget() {
+          Filter eventFilter = new Filter(new AllFilterParameter());
+          eventFilter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
+          return new SearchWrapper(false).createListAndSearchPanel(new ListBuilder<>(() -> new PreservationEventList(),
+            new AsyncTableCellOptions<>(IndexedPreservationEvent.class, "BrowseAIP_preservationEvents")
+              .withFilter(eventFilter).withSummary(messages.searchResults()).bindOpener()));
+        }
+      });
+    }
 
     // Logs
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.auditLogsTab()), new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        SearchWrapper auditLogs = new SearchWrapper(false);
-        auditLogs.createListAndSearchPanel(new ListBuilder<>(() -> new LogEntryList(),
-          new AsyncTableCellOptions<>(LogEntry.class, "BrowseAIP_auditLogs")
-            .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aip.getId())))
-            .withJustActive(justActive).bindOpener()));
-        return auditLogs;
-      }
-    });
+    if (browseAIPResponse.getLogCount().getResult() >= 0) {
+      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.auditLogsTab()), new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          SearchWrapper auditLogs = new SearchWrapper(false);
+          auditLogs.createListAndSearchPanel(new ListBuilder<>(() -> new LogEntryList(),
+            new AsyncTableCellOptions<>(LogEntry.class, "BrowseAIP_auditLogs")
+              .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aip.getId())))
+              .withJustActive(justActive).bindOpener()));
+          return auditLogs;
+        }
+      });
+    }
 
     // Risk incidences
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.risksTab()), new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        SearchWrapper riskIncidences = new SearchWrapper(false);
-        riskIncidences.createListAndSearchPanel(new ListBuilder<>(() -> new RiskIncidenceList(),
-          new AsyncTableCellOptions<>(RiskIncidence.class, "BrowseAIP_riskIncidences")
-            .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aip.getId())))
-            .withJustActive(justActive).bindOpener()));
-        return riskIncidences;
-      }
-    });
+    if (browseAIPResponse.getIncidenceCount().getResult() >= 0)
+
+    {
+      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.risksTab()), new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          SearchWrapper riskIncidences = new SearchWrapper(false);
+          riskIncidences.createListAndSearchPanel(new ListBuilder<>(() -> new RiskIncidenceList(),
+            new AsyncTableCellOptions<>(RiskIncidence.class, "BrowseAIP_riskIncidences")
+              .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aip.getId())))
+              .withJustActive(justActive).bindOpener()));
+          return riskIncidences;
+        }
+      });
+    }
 
     // Disposal
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalTab()), new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        return new DisposalPolicyAssociationTab(browseAIPResponse, actionCallback);
-      }
-    });
+    List<String> disposalMethods = new ArrayList<>();
+    disposalMethods.addAll(AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_HOLD.getMethods());
+    disposalMethods.addAll(AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.getMethods());
+    if (PermissionClientUtils.hasPermissions(disposalMethods, aip.getPermissions())) {
+      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalTab()), new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          return new DisposalPolicyAssociationTab(browseAIPResponse, actionCallback);
+        }
+      });
+    }
 
     // Permissions
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.permissionsTab()), new TabContentBuilder() {

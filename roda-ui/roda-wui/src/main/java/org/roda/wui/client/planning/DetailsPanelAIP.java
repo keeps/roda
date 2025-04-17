@@ -10,8 +10,10 @@ package org.roda.wui.client.planning;
 
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.slider.InfoSliderHelper;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -49,6 +51,8 @@ public class DetailsPanelAIP extends Composite {
     ingestLabel.setVisible(false);
     Map<String, Widget> detailsMap = InfoSliderHelper.getAipInfoDetailsMap(response);
 
+    boolean canAccessJobs = PermissionClientUtils.hasPermissions(RodaConstants.REPOSITORY_PERMISSIONS_JOB_READ);
+
     for (Map.Entry<String, Widget> field : detailsMap.entrySet()) {
       String fieldLabelString = field.getKey();
       Widget fieldValueWidget = field.getValue();
@@ -66,8 +70,9 @@ public class DetailsPanelAIP extends Composite {
       fieldPanel.add(fieldLabel);
       fieldPanel.add(fieldValuePanel);
 
-      if (fieldLabelString.equals(messages.updateProcessIdTitle()) || fieldLabelString.equals(messages.processIdTitle())
-        || fieldLabelString.equals(messages.sipId())) {
+      if ((fieldLabelString.equals(messages.updateProcessIdTitle())
+        || fieldLabelString.equals(messages.processIdTitle()) || fieldLabelString.equals(messages.sipId()))
+        && canAccessJobs) {
         ingestDetails.add(fieldPanel);
         ingestLabel.setVisible(true);
       } else {
