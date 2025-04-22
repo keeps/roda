@@ -68,6 +68,16 @@ public class DisposalCreateConfirmationReviewActions extends AbstractActionable<
   }
 
   @Override
+  public CanActResult userCanAct(Action<IndexedAIP> action) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedAIP> action) {
+    return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
+  }
+
+  @Override
   public CanActResult userCanAct(Action<IndexedAIP> action, IndexedAIP object) {
     return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
   }

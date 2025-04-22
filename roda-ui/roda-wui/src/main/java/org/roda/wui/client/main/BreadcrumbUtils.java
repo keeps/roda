@@ -21,6 +21,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.PreservationEvents;
+import org.roda.wui.client.disposal.DisposalDestroyedRecords;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -79,13 +80,8 @@ public class BreadcrumbUtils {
 
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip, boolean events) {
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
-    if (aip.getState().equals(AIPState.UNDER_APPRAISAL)) {
-      breadcrumb.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.ingestAppraisalTitle()),
-        messages.ingestAppraisalTitle(), IngestAppraisal.RESOLVER.getHistoryPath()));
-    } else {
-      breadcrumb.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.allCollectionsTitle()),
-        messages.allCollectionsTitle(), BrowseTop.RESOLVER.getHistoryPath()));
-    }
+    breadcrumb.add(firstBreadcrumbItem(aip));
+
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
         if (ancestor != null) {
@@ -119,6 +115,26 @@ public class BreadcrumbUtils {
     breadcrumb.add(getBreadcrumbItem(aip));
 
     return breadcrumb;
+  }
+
+  private static BreadcrumbItem firstBreadcrumbItem(IndexedAIP aip) {
+    SafeHtml breadcrumbLabel = SafeHtmlUtils.fromSafeConstant(messages.allCollectionsTitle());
+    String breadcrumbTitle = messages.allCollectionsTitle();
+    List<String> breadcrumbPath = BrowseTop.RESOLVER.getHistoryPath();
+
+    if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
+      breadcrumbLabel = SafeHtmlUtils.fromSafeConstant(messages.ingestAppraisalTitle());
+      breadcrumbTitle = messages.ingestAppraisalTitle();
+      breadcrumbPath = IngestAppraisal.RESOLVER.getHistoryPath();
+    }
+
+    if (AIPState.DESTROYED.equals(aip.getState())) {
+      breadcrumbLabel = SafeHtmlUtils.fromSafeConstant(messages.disposalDestroyedRecordsTitle());
+      breadcrumbTitle = messages.disposalDestroyedRecordsTitle();
+      breadcrumbPath = DisposalDestroyedRecords.RESOLVER.getHistoryPath();
+    }
+
+    return new BreadcrumbItem(breadcrumbLabel, breadcrumbTitle, breadcrumbPath);
   }
 
   public static List<BreadcrumbItem> getRepresentationBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip,

@@ -144,7 +144,7 @@
 					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskPosMitigationNotesValue" />
 				</g:FlowPanel>
 
-				<g:SimplePanel addStyleNames="card">
+				<g:SimplePanel>
 					<commonsearch:SearchWrapper ui:field="searchWrapper" />
 				</g:SimplePanel>
 

@@ -1049,21 +1049,25 @@ pre code {
 
 .btn:after {
     display: inline-block;
-
     @mixin fontawesome();
-
     line-height: 0.9;
     float: right;
-
     position: absolute;
-    right: 10px;
-
+    right: 5px;
     font-size: 16px;
 }
 
 button:after {
     @mixin fontawesome();
     font-size: 15px;
+}
+
+.btn-disable-user:after {
+    content: "\e510";
+}
+
+.btn-enable-user:after {
+    content: "\e174";
 }
 
 .btn-link:after {
@@ -1168,7 +1172,7 @@ button:after {
 }
 
 .btn-bookmark:after {
-  content: "\e924";
+  content: "\e866";
 }
 
 .btn-times-circle:after {
@@ -1258,7 +1262,7 @@ button:after {
 }
 
 .btn-clear:after {
-     content: "\e93e";
+     content: "\e0b8";
 }
 
  /******************************

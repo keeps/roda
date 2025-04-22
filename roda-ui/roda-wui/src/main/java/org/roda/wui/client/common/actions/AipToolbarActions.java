@@ -194,6 +194,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     if (aip == NO_AIP_OBJECT) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonNoObjectSelected());
+    } else if (AIPState.DESTROYED.equals(parentAipState)) {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, "");
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState()) && AIPState.UNDER_APPRAISAL.equals(parentAipState)
       && Objects.equals(parentAipId, NO_AIP_PARENT)) {
       return new CanActResult(APPRAISAL_ACTIONS.contains(action), CanActResult.Reason.CONTEXT,
@@ -204,10 +206,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     } else if (action.equals(AIPAction.REMOVE)
       && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
-    } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())
-      && (action.equals(AIPAction.MOVE_IN_HIERARCHY)
-        || action.equals(AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE)
-        || action.equals(AIPAction.ASSOCIATE_DISPOSAL_HOLD))) {
+    } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId()) && (action.equals(AIPAction.MOVE_IN_HIERARCHY)
+      || action.equals(AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE) || action.equals(AIPAction.ASSOCIATE_DISPOSAL_HOLD))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
     } else if (action.equals(AIPAction.MOVE_IN_HIERARCHY) && aip.isOnHold()) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());

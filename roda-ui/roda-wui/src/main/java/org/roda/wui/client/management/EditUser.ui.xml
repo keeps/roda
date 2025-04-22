@@ -21,11 +21,11 @@
 						<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApply">
 							<ui:text from='{messages.editUserApply}' />
 						</g:Button>
-						<g:Button addStyleNames="btn btn-block btn-check btn-user-activation"
+						<g:Button addStyleNames="btn btn-block btn-disable-user"
 							ui:field="buttonDeActivate">
 							<ui:text from='{messages.editUserActivate}' />
 						</g:Button>
-						<g:Button addStyleNames="btn btn-block btn-danger btn-ban btn-user-activation"
+						<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
 							ui:field="buttonRemove">
 							<ui:text from='{messages.editUserRemove}' />
 						</g:Button>

@@ -72,7 +72,7 @@ public class DisposalPolicyUtils {
       }
     } else if (AIPState.DESTROYED.equals(aip.getState())) {
       String message = messages.disposalPolicyDestroyedAIPSummary(Humanize.formatDate(aip.getDestroyedOn()));
-      return Tag.fromText(message, List.of(Tag.TagStyle.NEUTRAL, Tag.TagStyle.MONO));
+      return Tag.fromText(message, List.of(Tag.TagStyle.DANGER_LIGHT, Tag.TagStyle.MONO));
     }
 
     return null;
