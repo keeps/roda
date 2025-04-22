@@ -226,7 +226,7 @@
         '<div class="cc_banner-wrapper {{containerClasses}}">',
         '<div class="cc_banner cc_container cc_container--open">',
         
-        '<button type="button" data-cc-event="click:dismiss" target="_blank" class="cc_btn btn btn-next-file">{{options.dismiss}}</button>',
+        '<button type="button" data-cc-event="click:dismiss" target="_blank" class="cc_btn btn btn-cookie">{{options.dismiss}}</button>',
 
         '<p class="cc_message">{{options.message}} <a data-cc-if="options.link" target="{{ options.target }}" class="cc_more_info" href="{{options.link || "#null"}}">{{options.learnMore}}</a></p>',
 

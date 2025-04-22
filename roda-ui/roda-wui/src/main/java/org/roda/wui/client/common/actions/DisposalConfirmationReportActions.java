@@ -128,13 +128,13 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   public void act(Action<DisposalConfirmation> action, DisposalConfirmation object,
     AsyncCallback<ActionImpact> callback) {
     if (DisposalConfirmationReportAction.DESTROY.equals(action)) {
-      destroyDisposalConfirmationContent(object, callback);
+      DisposalConfirmationActionsUtils.destroyDisposalConfirmationContent(object, callback);
     } else if (DisposalConfirmationReportAction.DELETE_REPORT.equals(action)) {
       deleteDisposalConfirmationReport(object, callback);
     } else if (DisposalConfirmationReportAction.REMOVE_FROM_BIN.equals(action)) {
-      permanentlyDeleteDisposalConfirmationReport(object, callback);
+      DisposalConfirmationActionsUtils.permanentlyDeleteDisposalConfirmationReport(object, callback);
     } else if (DisposalConfirmationReportAction.RESTORE_FROM_BIN.equals(action)) {
-      restoreDestroyedRecord(object, callback);
+      DisposalConfirmationActionsUtils.restoreDestroyedRecord(object, callback);
     } else if (DisposalConfirmationReportAction.RE_EXECUTE.equals(action)) {
       reExecuteDisposalConfirmation(object, callback);
     } else if (DisposalConfirmationReportAction.RECOVER_STATE.equals(action)) {
@@ -219,127 +219,6 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
       });
   }
 
-  private void restoreDestroyedRecord(DisposalConfirmation confirmation, AsyncCallback<ActionImpact> callback) {
-    Dialogs.showConfirmDialog(messages.restoreDestroyedRecordsConfirmDialogTitle(),
-      messages.restoreDestroyedRecordsConfirmDialogMessage(), messages.dialogNo(), messages.dialogYes(),
-      new ActionNoAsyncCallback<Boolean>(callback) {
-        @Override
-        public void onSuccess(Boolean result) {
-          if (result) {
-            Services services = new Services("Recover disposal confirmation", "recover");
-            services
-              .disposalConfirmationResource(s -> s.restoreDisposalConfirmation(
-                new SelectedItemsListRequest(Collections.singletonList(confirmation.getUUID()))))
-              .whenComplete((job, throwable) -> {
-                if (throwable != null) {
-                  callback.onFailure(throwable);
-                } else {
-                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      Toast.showInfo(messages.restoreDestroyedRecordsSuccessTitle(),
-                        messages.restoreDestroyedRecordsSuccessMessage());
-                      doActionCallbackUpdated();
-                      HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
-                    }
-
-                    @Override
-                    public void onSuccess(final Void nothing) {
-                      doActionCallbackUpdated();
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                    }
-                  });
-                }
-              });
-          } else {
-            doActionCallbackNone();
-          }
-        }
-      });
-  }
-
-  private void permanentlyDeleteDisposalConfirmationReport(DisposalConfirmation confirmation,
-    AsyncCallback<ActionImpact> callback) {
-    Dialogs.showConfirmDialog(messages.permanentlyDeleteConfirmDialogTitle(),
-      messages.permanentlyDeleteConfirmDialogMessage(), messages.dialogNo(), messages.dialogYes(),
-      new ActionNoAsyncCallback<Boolean>(callback) {
-        @Override
-        public void onSuccess(Boolean result) {
-          if (result) {
-            Services services = new Services("Permanently deletes records in disposal confirmation", "delete");
-            services
-              .disposalConfirmationResource(s -> s.permanentlyDeleteRecordsInDisposalConfirmation(
-                new SelectedItemsListRequest(Collections.singletonList(confirmation.getUUID()))))
-              .whenComplete((job, throwable) -> {
-                if (throwable != null) {
-                  callback.onFailure(throwable);
-                } else {
-                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      Toast.showInfo(messages.permanentlyDeleteRecordsSuccessTitle(),
-                        messages.permanentlyDeleteRecordsSuccessMessage());
-                      doActionCallbackUpdated();
-                      HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
-                    }
-
-                    @Override
-                    public void onSuccess(final Void nothing) {
-                      doActionCallbackUpdated();
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                    }
-                  });
-                }
-              });
-          } else {
-            doActionCallbackNone();
-          }
-        }
-      });
-  }
-
-  private void destroyDisposalConfirmationContent(DisposalConfirmation report, AsyncCallback<ActionImpact> callback) {
-    Dialogs.showConfirmDialog(messages.deleteConfirmationReportDialogTitle(),
-      messages.deleteConfirmationReportDialogMessage(), messages.dialogNo(), messages.dialogYes(),
-      new ActionNoAsyncCallback<Boolean>(callback) {
-        @Override
-        public void onSuccess(Boolean result) {
-          if (result) {
-            Services services = new Services("Destroy records in disposal confirmation", "delete");
-            services
-              .disposalConfirmationResource(s -> s.destroyRecordsInDisposalConfirmation(
-                new SelectedItemsListRequest(Collections.singletonList(report.getUUID()))))
-              .whenComplete((job, throwable) -> {
-                if (throwable != null) {
-                  callback.onFailure(throwable);
-                } else {
-                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      Toast.showInfo(messages.deleteConfirmationReportSuccessTitle(),
-                        messages.deleteConfirmationReportSuccessMessage());
-                      doActionCallbackUpdated();
-                      HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
-                    }
-
-                    @Override
-                    public void onSuccess(final Void nothing) {
-                      doActionCallbackUpdated();
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                    }
-                  });
-                }
-              });
-          } else {
-            doActionCallbackNone();
-          }
-        }
-      });
-  }
-
   private void deleteDisposalConfirmationReport(DisposalConfirmation report, AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.deleteConfirmationReportDialogTitle(),
       messages.deleteConfirmationReportDialogMessage(), messages.dialogNo(), messages.dialogYes(),
@@ -362,7 +241,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
                       if (throwable != null) {
                         callback.onFailure(throwable);
                       } else {
-                        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+                        Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                           @Override
                           public void onFailure(Throwable caught) {

@@ -136,6 +136,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
         return group.getButtons().isEmpty();
       });
     }
+
     if (!actionBlacklist.isEmpty()) {
       // remove blacklisted buttons
       actionableBundle.getGroups().removeIf(group -> {
