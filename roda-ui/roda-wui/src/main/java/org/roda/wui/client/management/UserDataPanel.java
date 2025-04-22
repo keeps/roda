@@ -21,7 +21,6 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
-import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
@@ -146,18 +145,18 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    * Create a new user data panel
    *
    * @param visible
-   * @param editmode
+   * @param editMode
    * @param enableGroupSelect
    * @param enablePermissions
    */
-  public UserDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect, boolean enablePermissions) {
+  public UserDataPanel(boolean visible, boolean editMode, boolean enableGroupSelect, boolean enablePermissions) {
 
-    password = new PasswordPanel(editmode);
+    password = new PasswordPanel(editMode);
     groupSelect = new GroupSelect();
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    this.editmode = editmode;
+    this.editmode = editMode;
     super.setVisible(visible);
     this.enableGroupSelect = enableGroupSelect;
 
@@ -386,7 +385,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    */
   public boolean isValid() {
     List<String> errorList = new ArrayList<>();
-    if (username.getText().length() == 0) {
+    if (username.getText().isEmpty()) {
       username.addStyleName("isWrong");
       usernameError.setText(messages.mandatoryField());
       usernameError.setVisible(true);
@@ -409,7 +408,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       errorList.add(messages.passwordIsTooSmall());
     }
 
-    if (fullname.getText().length() == 0) {
+    if (fullname.getText().isEmpty()) {
       fullname.addStyleName("isWrong");
       fullnameError.setText(messages.mandatoryField());
       fullnameError.setVisible(true);
@@ -459,7 +458,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     } else {
       errors.setVisible(false);
     }
-    return errorList.isEmpty() ? true : false;
+
+    return errorList.isEmpty();
   }
 
   /**

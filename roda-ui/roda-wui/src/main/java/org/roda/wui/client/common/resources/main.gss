@@ -1172,7 +1172,7 @@ button:after {
 }
 
 .btn-times-circle:after {
-    content: "\e926";
+    content: "\e5c9";
 }
 
 .btn-check:after {
@@ -6347,6 +6347,10 @@ td.datePickerMonth, td.datePickerYear {
 
 .wui-data-panel .password {
     margin-bottom: 5px;
+}
+
+.wui-data-panel .gwt-TextBox-readonly {
+    pointer-events: none;
 }
 
 /** User Log **/
