@@ -11,6 +11,7 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.roda.wui.client.services.Services;
 
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>
@@ -18,7 +19,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public abstract class ActionNoAsyncCallback<T> extends NoAsyncCallback<T> {
   private final AsyncCallback<Actionable.ActionImpact> actionCallback;
 
-  public ActionNoAsyncCallback(AsyncCallback<Actionable.ActionImpact> actionCallback) {
+  protected ActionNoAsyncCallback(AsyncCallback<Actionable.ActionImpact> actionCallback) {
     this.actionCallback = actionCallback;
   }
 

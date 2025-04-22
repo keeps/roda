@@ -2139,7 +2139,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.v2.controller.DisposalConfirmationController.createDisposalConfirmation";
   public static final String PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.v2.controller.DisposalConfirmationController.deleteDisposalConfirmation";
   public static final String PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.v2.controller.DisposalConfirmationController.destroyRecordsInDisposalConfirmation";
-  public static final String PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION = "oorg.roda.wui.api.v2.controller.DisposalConfirmationController.restoreDisposalConfirmation";
+  public static final String PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.v2.controller.DisposalConfirmationController.restoreDisposalConfirmation";
   public static final String PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.v2.controller.DisposalConfirmationController.permanentlyDeleteRecordsInDisposalConfirmation";
   public static final String PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT = "org.roda.wui.api.v2.controller.DisposalConfirmationController.retrieveDisposalConfirmationReport";
 

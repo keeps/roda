@@ -2199,6 +2199,10 @@ public interface ClientMessages extends Messages {
 
   String deleteConfirmationReportDialogMessage();
 
+  String destroyDisposalConfirmationContentDialogTitle();
+
+  String destroyDisposalConfirmationContentDialogMessage();
+
   String deleteConfirmationReportSuccessTitle();
 
   String deleteConfirmationReportSuccessMessage();

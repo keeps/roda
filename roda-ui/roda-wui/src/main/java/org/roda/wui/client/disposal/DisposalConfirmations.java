@@ -71,12 +71,12 @@ public class DisposalConfirmations extends Composite {
    */
   public DisposalConfirmations() {
 
-    final DisposalConfirmationActions confirmationActions = DisposalConfirmationActions.get();
+    final DisposalConfirmationActions confirmationActions = DisposalConfirmationActions.getInstance();
 
     ListBuilder<DisposalConfirmation> disposalConfirmationListBuilder = new ListBuilder<>(
       () -> new DisposalConfirmationList(),
-      new AsyncTableCellOptions<>(DisposalConfirmation.class, "Disposal_confirmations").bindOpener().withActionable(confirmationActions)
-        .withAutoUpdate(5000));
+      new AsyncTableCellOptions<>(DisposalConfirmation.class, "Disposal_confirmations").bindOpener()
+        .withActionable(confirmationActions).withAutoUpdate(5000));
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(disposalConfirmationListBuilder);
     initWidget(uiBinder.createAndBindUi(this));

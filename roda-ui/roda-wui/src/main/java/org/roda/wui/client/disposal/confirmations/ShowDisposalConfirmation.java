@@ -15,7 +15,6 @@ import org.roda.wui.client.common.actions.DisposalConfirmationReportActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.services.Services;
@@ -107,11 +106,12 @@ public class ShowDisposalConfirmation extends Composite {
                 @Override
                 public void onResponseReceived(Request request, Response response) {
                   if (200 == response.getStatusCode()) {
-                    final DisposalConfirmationReportActions confirmationActions = DisposalConfirmationReportActions.get();
+                    final DisposalConfirmationReportActions confirmationActions = DisposalConfirmationReportActions
+                      .get();
                     instance = new ShowDisposalConfirmation();
                     SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
-                    instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions).withBackButton()
-                        .buildListWithObjects(new ActionableObject<>(disposalConfirmation)));
+                    instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions)
+                      .withBackButton().buildListWithObjects(new ActionableObject<>(disposalConfirmation)));
                     HTML reportHtml = new HTML(SafeHtmlUtils.fromSafeConstant(response.getText()));
                     instance.contentFlowPanel.add(reportHtml);
                     callback.onSuccess(instance);
@@ -133,8 +133,6 @@ public class ShowDisposalConfirmation extends Composite {
       callback.onSuccess(null);
     }
   }
-
-
 
   interface MyUiBinder extends UiBinder<Widget, ShowDisposalConfirmation> {
   }

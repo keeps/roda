@@ -1219,8 +1219,23 @@ button:after {
     content: "\e93a";
 }
 
-.btn-next-file:after {
-    content: "\e93b";
+.btn-cookie:after {
+    content: "\eaac";
+}
+
+/* settings_backup_restore */
+.btn-restore:after {
+    content: "\e8ba";
+}
+
+/* delete_forever */
+.btn-delete-forever:after {
+    content: "\e92b";
+}
+
+/* delete */
+.btn-trash-alt:after {
+    content: "\e872";
 }
 
 .btn-previous-file:after {
