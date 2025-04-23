@@ -20,7 +20,6 @@ import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sublist.Sublist;
