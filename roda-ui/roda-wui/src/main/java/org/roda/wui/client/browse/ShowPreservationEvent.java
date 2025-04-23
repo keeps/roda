@@ -162,7 +162,7 @@ public class ShowPreservationEvent extends Composite {
       .thenCompose(event -> services.preservationEventsResource(s -> s.getPreservationAgents(event.getId()))
         .thenCompose(indexedPreservationAgents -> services
           .preservationEventsResource(s -> s.getLinkingIdentifierObjects(event.getId()))
-          .whenComplete((linkingObjects, throwable) -> {
+          .whenComplete((linkingObjectsResult, throwable) -> {
             if (throwable != null) {
               if (throwable instanceof NotFoundException) {
                 Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
@@ -173,7 +173,7 @@ public class ShowPreservationEvent extends Composite {
             } else {
               this.preservationEvent = event;
               this.agents = indexedPreservationAgents;
-              this.linkingObjects = linkingObjects;
+              this.linkingObjects = linkingObjectsResult;
               viewAction();
             }
           })));
@@ -388,7 +388,7 @@ public class ShowPreservationEvent extends Composite {
     layout.add(footer);
 
     Anchor link = new Anchor(messages.inspectPreservationAgent(),
-      HistoryUtils.createHistoryHashLink(ShowPreservationAgent.RESOLVER, eventId, agent.getId()));
+      HistoryUtils.createHistoryHashLink(ShowPreservationAgent.RESOLVER, agent.getId()));
 
     link.addStyleName("btn");
     footer.add(link);
