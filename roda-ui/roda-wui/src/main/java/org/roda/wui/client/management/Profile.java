@@ -130,13 +130,20 @@ public class Profile extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
+  private SecureString getPassword() {
+    if (userDataPanel.getPassword() != null) {
+      return new SecureString(userDataPanel.getPassword().toCharArray());
+    } else {
+      return null;
+    }
+  }
+
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isChanged()) {
       if (userDataPanel.isValid()) {
         final User user = userDataPanel.getUser();
-        try (SecureString password = new SecureString(userDataPanel.getPassword().toCharArray())) {
-
+        try (SecureString password = getPassword()) {
           UserManagementService.Util.getInstance().updateMyUser(user, password, userDataPanel.getExtra(),
             new AsyncCallback<User>() {
 
