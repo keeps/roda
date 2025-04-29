@@ -18,7 +18,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.LogEntryList;
+import org.roda.wui.client.common.lists.InternalLogEntryList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
@@ -98,7 +98,10 @@ public class ShowLogEntry extends Composite {
   Label logIdLabel;
   @UiField
   Label logIdValue;
-
+  @UiField
+  Label logReasonLabel;
+  @UiField
+  Label logReasonValue;
   @UiField
   Label logComponentLabel;
   @UiField
@@ -153,6 +156,10 @@ public class ShowLogEntry extends Composite {
     logIdLabel.setVisible(StringUtils.isNotBlank(logEntry.getId()));
     logIdValue.setVisible(StringUtils.isNotBlank(logEntry.getId()));
 
+    logReasonValue.setText(logEntry.getAuditLogRequestHeaders().getReason());
+    logReasonLabel.setVisible(StringUtils.isNotBlank(logEntry.getAuditLogRequestHeaders().getReason()));
+    logReasonValue.setVisible(StringUtils.isNotBlank(logEntry.getAuditLogRequestHeaders().getReason()));
+
     logInstanceIdValue.setText(logEntry.getInstanceId());
     logInstanceIdLabel.setVisible(StringUtils.isNotBlank(logEntry.getInstanceId()));
     logInstanceIdValue.setVisible(StringUtils.isNotBlank(logEntry.getInstanceId()));
@@ -204,8 +211,6 @@ public class ShowLogEntry extends Composite {
 
     expandedAuditLogsList.setVisible(false);
 
-    GWT.log(logEntry.getAuditLogRequestHeaders().toString());
-
     if (logEntry.getAuditLogRequestHeaders() != null) {
       Label relatedAuditLogs = new Label();
       relatedAuditLogs.addStyleName("h5");
@@ -215,7 +220,7 @@ public class ShowLogEntry extends Composite {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.LOG_REQUEST_HEADER_UUID,
         logEntry.getAuditLogRequestHeaders().getUuid()));
 
-      ListBuilder<LogEntry> auditLogListBuilder = new ListBuilder<>(() -> new LogEntryList(false),
+      ListBuilder<LogEntry> auditLogListBuilder = new ListBuilder<>(() -> new InternalLogEntryList(),
         new AsyncTableCellOptions<>(LogEntry.class, "AuditLogs_triggeredLogs").withFilter(filter)
           .withSummary(messages.listOfAIPs()).bindOpener());
 

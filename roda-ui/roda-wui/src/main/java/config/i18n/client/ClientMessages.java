@@ -1476,6 +1476,8 @@ public interface ClientMessages extends Messages {
 
   String logEntryIdentifier();
 
+  String logEntryReason();
+
   String logEntryComponent();
 
   String logEntryMethod();
