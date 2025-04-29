@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.collapse.Collapse;
-import org.roda.core.data.v2.index.collapse.NullPolicyEnum;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
@@ -38,32 +37,24 @@ import com.google.gwt.user.cellview.client.TextColumn;
 
 import config.i18n.client.ClientMessages;
 
-public class LogEntryList extends AsyncTableCell<LogEntry> {
+public class InternalLogEntryList extends AsyncTableCell<LogEntry> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<LogEntry, Date> dateColumn;
   private Column<LogEntry, SafeHtml> actionComponentColumn;
   private TextColumn<LogEntry> actionMethodColumn;
-  private TextColumn<LogEntry> requestReasonColumn;
   private TextColumn<LogEntry> usernameColumn;
   private TextColumn<LogEntry> durationColumn;
-  private TextColumn<LogEntry> addressColumn;
   private Column<LogEntry, SafeHtml> stateColumn;
-  private final boolean applyCollapse;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.LOG_ID,
     RodaConstants.LOG_DATETIME, RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD,
-    RodaConstants.LOG_USERNAME, RodaConstants.LOG_DURATION, RodaConstants.LOG_ADDRESS, RodaConstants.LOG_STATE,
-    RodaConstants.LOG_REQUEST_HEADER_UUID, RodaConstants.LOG_REQUEST_HEADER_REASON, RodaConstants.LOG_REQUEST_HEADER_TYPE);
+    RodaConstants.LOG_USERNAME, RodaConstants.LOG_DURATION, RodaConstants.LOG_STATE,
+    RodaConstants.LOG_REQUEST_HEADER_UUID);
 
-  public LogEntryList() {
-    this(true);
-  }
-
-  public LogEntryList(boolean applyCollapse) {
+  public InternalLogEntryList() {
     super();
-    this.applyCollapse = applyCollapse;
   }
 
   @Override
@@ -100,17 +91,6 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
       }
     };
 
-    requestReasonColumn = new TextColumn<LogEntry>() {
-      @Override
-      public String getValue(LogEntry logEntry) {
-        if (logEntry == null || logEntry.getAuditLogRequestHeaders() == null) {
-          return null;
-        }
-
-        return logEntry.getAuditLogRequestHeaders().getReason();
-      }
-    };
-
     usernameColumn = new TextColumn<LogEntry>() {
       @Override
       public String getValue(LogEntry logEntry) {
@@ -125,14 +105,6 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
       }
     };
 
-    addressColumn = new TextColumn<LogEntry>() {
-
-      @Override
-      public String getValue(LogEntry logEntry) {
-        return logEntry != null ? logEntry.getAddress() : null;
-      }
-    };
-
     stateColumn = new Column<LogEntry, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(LogEntry logEntry) {
@@ -143,19 +115,15 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     dateColumn.setSortable(true);
     actionComponentColumn.setSortable(true);
     actionMethodColumn.setSortable(true);
-    requestReasonColumn.setSortable(true);
     usernameColumn.setSortable(true);
     durationColumn.setSortable(true);
-    addressColumn.setSortable(true);
     stateColumn.setSortable(true);
 
     addColumn(dateColumn, messages.logEntryDate(), true, false, 14);
-    addColumn(requestReasonColumn, messages.logEntryReason(), true, false);
     addColumn(actionComponentColumn, messages.logEntryComponent(), true, false);
     addColumn(actionMethodColumn, messages.logEntryMethod(), true, false);
     addColumn(usernameColumn, messages.logEntryUser(), true, false);
     addColumn(durationColumn, messages.logEntryDuration(), true, true, 5);
-    addColumn(addressColumn, messages.logEntryAddress(), true, false);
     addColumn(stateColumn, messages.logEntryState(), true, false);
 
     // default sorting
@@ -169,23 +137,14 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     columnSortingKeyMap.put(dateColumn, Arrays.asList(RodaConstants.LOG_DATETIME));
     columnSortingKeyMap.put(actionComponentColumn, Arrays.asList(RodaConstants.LOG_ACTION_COMPONENT));
     columnSortingKeyMap.put(actionMethodColumn, Arrays.asList(RodaConstants.LOG_ACTION_METHOD));
-    columnSortingKeyMap.put(requestReasonColumn, Arrays.asList(RodaConstants.LOG_REQUEST_HEADER_REASON));
     columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.LOG_USERNAME));
     columnSortingKeyMap.put(durationColumn, Arrays.asList(RodaConstants.LOG_DURATION));
-    columnSortingKeyMap.put(addressColumn, Arrays.asList(RodaConstants.LOG_ADDRESS));
     columnSortingKeyMap.put(stateColumn, Arrays.asList(RodaConstants.LOG_STATE));
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 
   @Override
   public Collapse getCollapse() {
-    if (applyCollapse) {
-      Collapse collapse = new Collapse();
-      collapse.setField(RodaConstants.LOG_REQUEST_HEADER_UUID);
-      collapse.setNullPolicy(NullPolicyEnum.EXPAND);
-
-      return collapse;
-    }
     return null;
   }
 }

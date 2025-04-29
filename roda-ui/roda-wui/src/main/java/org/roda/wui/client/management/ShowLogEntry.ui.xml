@@ -19,6 +19,12 @@
 								<g:Label styleName="value" ui:field="logIdValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="logReasonLabel">
+									<ui:text from='{messages.logEntryReason}' />
+								</g:Label>
+								<g:Label styleName="value" ui:field="logReasonValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="logInstanceIdLabel">
 									<ui:text from='{messages.logEntryInstanceId}' />
 								</g:Label>
