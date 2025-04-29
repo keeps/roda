@@ -1,5 +1,21 @@
 # Changelog
 
+## v5.7.4 (29/04/2025)
+#### Enhancements 
+- Improve support for E-ARK SIP administrative metadata (amdSec) #3380
+
+#### Bug fixes
+- NPE when editing a user via profile #3405
+
+
+#### Security
+- Several major dependency upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.3 (03/04/2025)
 #### Security
 -  Fix security vulnerabilities
@@ -439,15 +455,3 @@ We would like to thank the contributions of:
 
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
 
-
----
-
-## v4.5.4 (27/01/2023)
-#### Enhancements:
-
-- Add metric per percentage of retries #2299
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.5.4
-```
