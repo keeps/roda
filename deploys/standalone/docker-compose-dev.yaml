@@ -68,9 +68,9 @@ services:
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
 
-  mailhog:
-    image: mailhog/mailhog
-    container_name: mailhog
+  mailpit:
+    image: axllent/mailpit:v1.24
+    container_name: mailpit
     restart: unless-stopped
     ports:
       - "1025:1025" # smtp server
