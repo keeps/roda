@@ -1,4 +1,5 @@
 services:
+
   zoo:
     image: docker.io/zookeeper:3.9-jre-17
     restart: unless-stopped
@@ -7,8 +8,9 @@ services:
     volumes:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
+
   solr:
-    image: docker.io/solr:9.6.1
+    image: docker.io/solr:9.8.1
     restart: unless-stopped
     ports:
       - "8983:8983"
@@ -20,13 +22,14 @@ services:
       - solr_data:/var/solr
 
   clamd:
-    image: docker.io/clamav/clamav:stable
+    image: docker.io/clamav/clamav:1.4
     restart: unless-stopped
     volumes:
       - clam_data:/var/lib/clamav
       - roda_data:/roda/data/
+
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.10.1
+    image: ghcr.io/keeps/siegfried:v1.11.0
     restart: unless-stopped
     environment:
       SIEGFRIED_HOST: 0.0.0.0
@@ -34,6 +37,7 @@ services:
     volumes:
       - siegfried_data:/root/siegfried/
       - roda_data:/roda/data/
+
   swagger:
     image: docker.io/swaggerapi/swagger-ui:latest
     restart: on-failure
@@ -44,8 +48,8 @@ services:
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
 
-  mailhog:
-    image: mailhog/mailhog
+  mailpit:
+    image: axllent/mailpit:v1.24
     restart: unless-stopped
     ports:
       - "1025:1025" # smtp server
@@ -69,7 +73,7 @@ services:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 
   roda:
-    image: docker.io/keeps/roda:latest
+    image: docker.io/keeps/roda:development
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -79,6 +83,7 @@ services:
       - siegfried
     volumes:
       - roda_data:/roda/data/
+      - ./roda/config/roda-core.properties:/roda/config/roda-core.properties:ro
     environment:
       # Solr Cloud configuration
       - RODA_CORE_SOLR_TYPE=CLOUD
@@ -89,6 +94,10 @@ services:
       - SIEGFRIED_SERVER_URL=http://siegfried:5138
       - CLAMD_TCPADDR=clamd
       - CLAMD_TCPSOCKET=3310
+      # SMTP configuration
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+
 volumes:
   zookeeper_data:
   zookeeper_datalog:
