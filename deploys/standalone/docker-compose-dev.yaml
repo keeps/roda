@@ -98,8 +98,8 @@ services:
     image: postgres:15
     restart: unless-stopped
     environment:
-      POSTGRES_USER: roda
-      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: roda
       POSTGRES_DB: roda_core_db
     ports:
       - "5432:5432"
