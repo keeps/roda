@@ -2,13 +2,15 @@ package org.roda.core.entity.transaction;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import org.roda.core.data.v2.ip.StoragePath;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,8 +23,8 @@ import jakarta.persistence.Table;
  */
 
 @Entity
-@Table(name = "TX_STORAGE_PATH")
-public class TransactionalStoragePath implements Serializable {
+@Table(name = "transactional_storage_path_operation_log")
+public class TransactionalStoragePathOperationLog implements Serializable {
 
   @Serial
   private static final long serialVersionUID = -359012958079838014L;
@@ -46,16 +48,16 @@ public class TransactionalStoragePath implements Serializable {
   @Column(name = "operation_type", nullable = false, length = 20)
   private OperationType operationType;
 
-  public TransactionalStoragePath() {
+  @Column(name = "created_at", nullable = false)
+  private LocalDateTime createdAt;
+
+  public TransactionalStoragePathOperationLog() {
   }
 
-  public TransactionalStoragePath(StoragePath storagePath) {
-    this(storagePath, OperationType.READ);
-  }
-
-  public TransactionalStoragePath(StoragePath storagePath, OperationType operationType) {
+  public TransactionalStoragePathOperationLog(StoragePath storagePath, OperationType operationType) {
     this.storagePath = storagePath.toString();
     this.operationType = operationType;
+    this.createdAt = LocalDateTime.now();
   }
 
   public String getStoragePath() {
@@ -68,5 +70,18 @@ public class TransactionalStoragePath implements Serializable {
 
   public OperationType getOperationType() {
     return operationType;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TransactionalStoragePathOperationLog that = (TransactionalStoragePathOperationLog) o;
+    return Objects.equals(id, that.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
   }
 }
