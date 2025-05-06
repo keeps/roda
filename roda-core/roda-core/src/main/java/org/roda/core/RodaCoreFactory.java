@@ -72,7 +72,6 @@ import org.roda.core.common.RodaUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferUpdateStatus;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
-import org.roda.core.transaction.RODATransactionManager;
 import org.roda.core.config.ConfigurationManager;
 import org.roda.core.config.DirectoryInitializer;
 import org.roda.core.config.SpringContext;
@@ -128,9 +127,6 @@ import org.roda.core.migration.MigrationManager;
 import org.roda.core.model.DefaultModelService;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.DefaultTransactionalModelService;
-import org.roda.core.entity.transaction.TransactionLog;
-import org.roda.core.model.TransactionalModelService;
 import org.roda.core.model.utils.LdapUtility;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginManager;
@@ -146,8 +142,7 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceWrapper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
-import org.roda.core.storage.DefaultTransactionalStorageService;
-import org.roda.core.storage.TransactionalStorageService;
+import org.roda.core.transaction.RODATransactionManager;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -866,10 +861,6 @@ public class RodaCoreFactory {
     storage = new StorageServiceWrapper(instantiateStorage(), nodeType);
     LOGGER.debug("Finished instantiating storage...");
     model = new DefaultModelService(storage, eventsManager, nodeType, instanceId);
-
-    if(SpringContext.isContextInitialized()) {
-      RODATransactionManager = SpringContext.getBean(RODATransactionManager.class);
-    }
     LOGGER.debug("Finished instantiating model...");
   }
 
@@ -908,58 +899,10 @@ public class RodaCoreFactory {
   }
 
   public static RODATransactionManager getTransactionManager() {
+    if (SpringContext.isContextInitialized()) {
+      RODATransactionManager = SpringContext.getBean(RODATransactionManager.class);
+    }
     return RODATransactionManager;
-  }
-
-  private static StorageService instantiateStagingStorage(String storagePath) throws GenericException {
-    String newStorageService = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_NEW_SERVICE);
-    Path stagingStoragePath = Paths.get(storagePath);
-    if (StringUtils.isNotBlank(newStorageService)) {
-      try {
-        Class<?> storageClass = Class.forName(newStorageService);
-        Constructor<?> constructor = storageClass.getConstructor(Path.class, String.class);
-
-        LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(), stagingStoragePath);
-        String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
-          RodaConstants.TRASH_CONTAINER);
-
-        return (StorageService) constructor.newInstance(stagingStoragePath, trashDirName);
-      } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException
-        | InvocationTargetException e) {
-        LOGGER.warn("Error instantiating storage service defined on properties, falling back to a default service", e);
-      }
-    }
-
-    StorageType storageType = StorageType.valueOf(
-      getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE, RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
-    if (storageType == RodaConstants.StorageType.FILESYSTEM) {
-      LOGGER.debug("Going to instantiate Filesystem on '{}'", stagingStoragePath);
-      String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
-        RodaConstants.TRASH_CONTAINER);
-      StorageService fileStorageService = new FileStorageService(stagingStoragePath, false, trashDirName, false);
-      return fileStorageService;
-    } else {
-      LOGGER.error("Unknown storage service '{}'", storageType.name());
-      throw new GenericException();
-    }
-  }
-
-  public static TransactionalStorageService getTransactionalStorageService(TransactionLog transaction)
-    throws GenericException {
-    String storagePath = "/tmp/tx-" + transaction.getId();
-    StorageService storageService = instantiateStagingStorage(storagePath);
-    return new DefaultTransactionalStorageService(storage, storageService, transaction, getTransactionManager());
-  }
-
-  public static TransactionalModelService getTransactionalModelService(StorageService transactionalStorageService,
-    TransactionLog transaction) {
-    ModelService stagingModelService = new DefaultModelService(transactionalStorageService, eventsManager, nodeType,
-      instanceId);
-    return new DefaultTransactionalModelService(model, stagingModelService, transaction, getTransactionManager());
-  }
-
-  public static IndexService getTransactionalIndexService(ModelService trasactionalModelService) {
-    return new IndexService(solr, trasactionalModelService, metricsRegistry, getRodaConfiguration(), nodeType);
   }
 
   /**
@@ -1525,6 +1468,10 @@ public class RodaCoreFactory {
 
   public static NodeType getNodeType() {
     return nodeType;
+  }
+
+  public static String getInstanceId() {
+    return instanceId;
   }
 
   @Deprecated
