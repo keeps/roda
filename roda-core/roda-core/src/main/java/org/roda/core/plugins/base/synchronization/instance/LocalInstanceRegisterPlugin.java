@@ -24,7 +24,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.base.multiple.NoObjectsMultipleStepPlugin;
 import org.roda.core.plugins.base.multiple.Step;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 
 /**
@@ -220,7 +219,7 @@ public class LocalInstanceRegisterPlugin extends NoObjectsMultipleStepPlugin {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     return null;
   }
 
@@ -250,7 +249,7 @@ public class LocalInstanceRegisterPlugin extends NoObjectsMultipleStepPlugin {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     return new Report();
   }

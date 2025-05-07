@@ -47,7 +47,7 @@ public class RiskService {
   public void deleteRiskVersion(String riskId, String versionId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
-    RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
+    RodaCoreFactory.getModelService().deleteBinaryVersion(storagePath, versionId);
   }
 
   public Risk retrieveRiskVersion(String riskId, String selectedVersion)
@@ -66,7 +66,7 @@ public class RiskService {
     RiskVersions versions = new RiskVersions();
 
     try (
-      CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getStorageService().listBinaryVersions(storagePath)) {
+      CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getModelService().listBinaryVersions(storagePath)) {
 
       for (BinaryVersion bv : iterable) {
         versions.addObject(new ResourceVersion(bv.getId(), bv.getCreatedDate(), bv.getProperties()));
@@ -88,7 +88,7 @@ public class RiskService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
     try (
-      CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getStorageService().listBinaryVersions(storagePath)) {
+      CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getModelService().listBinaryVersions(storagePath)) {
       return iterable.iterator().hasNext();
     } catch (IOException e) {
       throw new GenericException(e);

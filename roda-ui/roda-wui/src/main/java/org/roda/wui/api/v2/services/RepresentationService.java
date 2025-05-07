@@ -93,7 +93,7 @@ public class RepresentationService {
     try {
       StoragePath storagePath;
       storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, descriptiveMetadata.getId());
-      info.setHasHistory(!CloseableIterables.isEmpty(model.getStorage().listBinaryVersions(storagePath)));
+      info.setHasHistory(!CloseableIterables.isEmpty(model.listBinaryVersions(storagePath)));
     } catch (RODAException | RuntimeException e) {
       info.setHasHistory(false);
     }
@@ -115,7 +115,7 @@ public class RepresentationService {
     StoragePath storagePath = ModelUtils.getRepresentationStoragePath(representation.getAipId(),
       representation.getId());
 
-    Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
+    Directory directory = RodaCoreFactory.getModelService().getDirectory(storagePath);
     return ApiUtils.download(directory, representationId);
   }
 
@@ -234,7 +234,7 @@ public class RepresentationService {
     String aipId = representation.getAipId();
     String representationId = representation.getId();
     StoragePath storagePath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, "", "", "");
-    Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
+    Directory directory = RodaCoreFactory.getModelService().getDirectory(storagePath);
     return ApiUtils.download(directory, representationId);
   }
 

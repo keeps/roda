@@ -183,12 +183,12 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
         StoragePath filePath = ModelUtils.getFileStoragePath(file.getAipId(), file.getRepresentationId(),
           file.getPath(), RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
         doc.addField(RodaConstants.FILE_REFERENCE_MANIFEST,
-          model.getStorage().getStoragePathAsString(filePath, false));
+          model.getStoragePathAsString(filePath, false));
       }
 
       StoragePath filePath = ModelUtils.getFileStoragePath(file);
       doc.addField(RodaConstants.FILE_STORAGEPATH,
-        model.getStorage().getStoragePathAsString(filePath, false));
+        model.getStoragePathAsString(filePath, false));
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index file storage path", e);
     }

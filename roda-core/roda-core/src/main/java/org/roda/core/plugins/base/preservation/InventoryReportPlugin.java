@@ -50,7 +50,6 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -223,7 +222,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
 
     Path jobCSVTempFolder = getJobCSVTempFolder();
@@ -235,17 +234,17 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
         @Override
 
-        public void process(IndexService index, ModelService model, StorageService storage, Report report,
+        public void process(IndexService index, ModelService model, Report report,
           Job cachedJob, JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
-          processAIP(model, storage, jobPluginInfo, csvFilePrinter, object);
+          processAIP(model, jobPluginInfo, csvFilePrinter, object);
         }
-      }, index, model, storage, liteList);
+      }, index, model, liteList);
     } catch (IOException e) {
       throw new PluginException("Unable to create/write to CSVPrinter", e);
     }
   }
 
-  private void processAIP(ModelService model, StorageService storage, JobPluginInfo jobPluginInfo,
+  private void processAIP(ModelService model, JobPluginInfo jobPluginInfo,
     CSVPrinter csvFilePrinter, AIP aip) {
     if (csvFilePrinter == null) {
       LOGGER.warn("CSVPrinter is NULL! Skipping...");
@@ -254,18 +253,18 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
     try {
       if (outputDataInformation && aip.getRepresentations() != null) {
-        List<List<String>> dataInformation = InventoryReportPluginUtils.getDataInformation(fields, aip, model, storage);
+        List<List<String>> dataInformation = InventoryReportPluginUtils.getDataInformation(fields, aip, model);
         csvFilePrinter.printRecords(dataInformation);
       }
       if (outputDescriptiveMetadataInformation && aip.getDescriptiveMetadata() != null) {
         List<List<String>> dataInformation = InventoryReportPluginUtils.getDescriptiveMetadataInformation(fields, aip,
-          model, storage);
+          model);
         csvFilePrinter.printRecords(dataInformation);
       }
       if (otherMetadataTypes != null && !otherMetadataTypes.isEmpty()) {
         for (String otherMetadataType : otherMetadataTypes) {
           List<List<String>> otherMetadataInformation = InventoryReportPluginUtils.getOtherMetadataInformation(fields,
-            otherMetadataType, aip, model, storage);
+            otherMetadataType, aip, model);
           csvFilePrinter.printRecords(otherMetadataInformation);
         }
       }
@@ -277,7 +276,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     try {
       Path jobCSVTempFolder = getJobCSVTempFolder();
@@ -303,7 +302,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
     Path csvTempFolder = getJobCSVTempFolder();
 

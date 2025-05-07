@@ -32,8 +32,8 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +67,7 @@ public class IngestStepsUtils {
       plugin.setSipInformation(bundle.getSipInformation());
       List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(bundle.getModel(),
         bundle.getAips());
-      return plugin.execute(bundle.getIndex(), bundle.getModel(), bundle.getStorage(), lites);
+      return plugin.execute(bundle.getIndex(), bundle.getModel(), lites);
     } catch (InvalidParameterException | PluginException | RuntimeException e) {
       LOGGER.error("Error executing plugin: {}", step.getPluginName(), e);
 

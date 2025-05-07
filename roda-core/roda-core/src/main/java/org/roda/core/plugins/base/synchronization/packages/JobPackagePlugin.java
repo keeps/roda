@@ -23,8 +23,8 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
-import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
@@ -32,7 +32,6 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 
 /**
@@ -106,8 +105,6 @@ public class JobPackagePlugin extends RodaEntityPackagesPlugin<Job> {
 
   public void createJobBundle(ModelService model, Job jobToBundle) throws RequestNotValidException, NotFoundException,
     AuthorizationDeniedException, GenericException, AlreadyExistsException {
-
-    StorageService storage = model.getStorage();
     StoragePath jobContainerPath = ModelUtils.getJobContainerPath();
     String jobFile = jobToBundle.getId() + RodaConstants.JOB_FILE_EXTENSION;
 
@@ -116,15 +113,15 @@ public class JobPackagePlugin extends RodaEntityPackagesPlugin<Job> {
 
     Path jobPath = destinationPath.resolve(jobFile);
 
-    storage.copy(storage, jobContainerPath, jobPath, jobFile);
+    model.copy(jobContainerPath, jobPath, jobFile);
 
     // Job Report
     StoragePath jobReportsPath = ModelUtils.getJobReportContainerPath();
-    if (storage.exists(jobReportsPath)) {
+    if (model.exists(jobReportsPath)) {
       Path jobReportDestinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
         .resolve(RodaConstants.STORAGE_CONTAINER_JOB_REPORT).resolve(jobToBundle.getId());
 
-      storage.copy(storage, jobReportsPath, jobReportDestinationPath, jobToBundle.getId());
+      model.copy(jobReportsPath, jobReportDestinationPath, jobToBundle.getId());
     }
 
     // Job Attachments

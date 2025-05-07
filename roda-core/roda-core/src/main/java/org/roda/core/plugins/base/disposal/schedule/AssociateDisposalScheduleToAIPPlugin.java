@@ -45,7 +45,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +57,8 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID,
-        "Disposal schedule id", PluginParameter.PluginParameterType.STRING)
-        .withDescription("Disposal schedule identifier").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, "Disposal schedule id",
+        PluginParameter.PluginParameterType.STRING).withDescription("Disposal schedule identifier").build());
   }
 
   private String disposalScheduleId;
@@ -129,19 +127,18 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this, (RODAObjectsProcessingLogic<AIP>) (index1, model1, storage1, report,
-      cachedJob, jobPluginInfo, plugin, objects) -> {
-      processAIP(model1, index1, report, jobPluginInfo, cachedJob, objects);
-    }, index, model, storage, liteList);
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
+    return PluginHelper.processObjects(this,
+      (RODAObjectsProcessingLogic<AIP>) (index1, model1, report, cachedJob, jobPluginInfo, plugin, objects) -> {
+        processAIP(model1, index1, report, jobPluginInfo, cachedJob, objects);
+      }, index, model, liteList);
   }
 
   private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo,
@@ -242,7 +239,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return new Report();
   }

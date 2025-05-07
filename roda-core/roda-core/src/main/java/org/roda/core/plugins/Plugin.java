@@ -186,7 +186,7 @@ public interface Plugin<T extends IsRODAObject> {
    *
    * @throws PluginException
    */
-  Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
+  Report beforeAllExecute(IndexService index, ModelService model) throws PluginException;
 
   /**
    * Executes the {@link Plugin}.
@@ -195,7 +195,7 @@ public interface Plugin<T extends IsRODAObject> {
    *
    * @throws PluginException
    */
-  Report execute(IndexService index, ModelService model, StorageService storage, List<LiteOptionalWithCause> list)
+  Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> list)
     throws PluginException;
 
   /**
@@ -204,7 +204,7 @@ public interface Plugin<T extends IsRODAObject> {
    *
    * @throws PluginException
    */
-  Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
+  Report afterAllExecute(IndexService index, ModelService model) throws PluginException;
 
   /**
    * Stops all {@link Plugin} activity. This is the last method to be called by

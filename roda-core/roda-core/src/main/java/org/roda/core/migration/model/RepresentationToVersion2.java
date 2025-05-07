@@ -27,6 +27,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.migration.MigrationAction;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
@@ -40,21 +41,19 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
   private static final Logger LOGGER = LoggerFactory.getLogger(RepresentationToVersion2.class);
 
   @Override
-  public void migrate(StorageService storage) {
+  public void migrate(ModelService model) {
     try (
-      CloseableIterable<Resource> aips = storage.listResourcesUnderDirectory(ModelUtils.getAIPContainerPath(), false)) {
+      CloseableIterable<Resource> aips = model.listResourcesUnderDirectory(ModelUtils.getAIPContainerPath(), false)) {
       for (Resource aipResorce : aips) {
         try {
           StoragePath aipJsonPath = DefaultStoragePath.parse(aipResorce.getStoragePath(),
             RodaConstants.STORAGE_AIP_METADATA_FILENAME);
-          Binary aipJson = storage.getBinary(aipJsonPath);
+          Binary aipJson = model.getBinary(aipJsonPath);
           InputStream inputStream = aipJson.getContent().createInputStream();
 
           AIP aip = JsonUtils.getObjectFromJson(inputStream, AIP.class);
           for (Representation representation : aip.getRepresentations()) {
-            DefaultStoragePath representationStoragePath = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP,
-              aip.getId(), RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId());
-            Path representationPath = storage.getDirectAccess(representationStoragePath).getPath();
+            Path representationPath = model.getDirectAccess(representation).getPath();
 
             BasicFileAttributes attr = Files.readAttributes(representationPath, BasicFileAttributes.class);
             Date createDate = new Date(attr.creationTime().toMillis());
@@ -73,7 +72,7 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
           }
 
           StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromObject(aip));
-          storage.updateBinaryContent(aipJsonPath, payload, false, false);
+          model.updateBinaryContent(aipJsonPath, payload, false, false);
         } catch (IOException e) {
           LOGGER.warn("Could not get AIP json file of AIP " + aipResorce.getStoragePath().toString(), e);
         }

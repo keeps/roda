@@ -7,10 +7,6 @@
  */
 package org.roda.core.plugins.base.maintenance;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -35,9 +31,12 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class CleanUnfinishedJobsPlugin extends AbstractPlugin<Job> {
   private static final Logger LOGGER = LoggerFactory.getLogger(CleanUnfinishedJobsPlugin.class);
@@ -58,7 +57,7 @@ public class CleanUnfinishedJobsPlugin extends AbstractPlugin<Job> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     try {
       // make sure the index is up to date
@@ -70,15 +69,15 @@ public class CleanUnfinishedJobsPlugin extends AbstractPlugin<Job> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<Job>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Job> plugin, List<Job> objects) {
         cleanUnfinishedJobs(model, index, objects, plugin, report, jobPluginInfo);
       }
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
   }
 
   private void cleanUnfinishedJobs(ModelService model, IndexService index, List<Job> unfinishedJobsList,
@@ -122,7 +121,7 @@ public class CleanUnfinishedJobsPlugin extends AbstractPlugin<Job> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

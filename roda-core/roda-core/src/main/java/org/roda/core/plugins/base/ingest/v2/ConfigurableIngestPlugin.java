@@ -115,7 +115,8 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     }
 
     if (!deactivatedPlugins.contains(DefaultIngestPlugin.PLUGIN_CLASS_TIKA_FULLTEXT)) {
-      pluginParametersList.add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_AND_FULL_TEXT_EXTRACTION));
+      pluginParametersList
+        .add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_AND_FULL_TEXT_EXTRACTION));
     }
 
     if (!deactivatedPlugins.contains(DefaultIngestPlugin.PLUGIN_CLASS_DIGITAL_SIGNATURE)) {
@@ -171,9 +172,9 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
       PluginManager pluginManager = RodaCoreFactory.getPluginManager();
       Plugin<?> plugin = pluginManager.getPlugin(DefaultIngestPlugin.PLUGIN_CLASS_VERAPDF);
       if (plugin != null) {
-        pluginParameters.put(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK,
-          PluginParameter.getBuilder(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK, plugin.getName(),
-            PluginParameterType.BOOLEAN).withDefaultValue(FALSE).withDescription(plugin.getDescription()).build());
+        pluginParameters.put(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK, PluginParameter
+          .getBuilder(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK, plugin.getName(), PluginParameterType.BOOLEAN)
+          .withDefaultValue(FALSE).withDescription(plugin.getDescription()).build());
       } else {
         deactivatedPlugins.add(DefaultIngestPlugin.PLUGIN_CLASS_VERAPDF);
       }
@@ -204,8 +205,8 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
           PluginParameter
             .getBuilder(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_AND_FULL_TEXT_EXTRACTION,
               "Feature & full-text extraction", PluginParameterType.BOOLEAN)
-            .withDefaultValue(FALSE)
-            .withDescription("Extraction of technical metadata and full-text using Apache Tika").build());
+            .withDefaultValue(FALSE).withDescription("Extraction of technical metadata and full-text using Apache Tika")
+            .build());
       } else {
         deactivatedPlugins.add(DefaultIngestPlugin.PLUGIN_CLASS_TIKA_FULLTEXT);
       }
@@ -251,14 +252,12 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
             "Send a notification after finishing the ingest process to one or more e-mail addresses (comma separated)")
           .build());
 
-      pluginParameters.put(RodaConstants.NOTIFICATION_HTTP_ENDPOINT,
-        PluginParameter
-          .getBuilder(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "Ingest finished HTTP notification",
-            PluginParameterType.STRING)
-          .withDefaultValue(RodaCoreFactory.getRodaConfigurationAsString("ingest.configurable.http_endpoint"))
-          .isMandatory(false)
-          .withDescription("Send a notification after finishing the ingest process to a specific HTTP endpoint")
-          .build());
+      pluginParameters.put(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, PluginParameter
+        .getBuilder(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "Ingest finished HTTP notification",
+          PluginParameterType.STRING)
+        .withDefaultValue(RodaCoreFactory.getRodaConfigurationAsString("ingest.configurable.http_endpoint"))
+        .isMandatory(false)
+        .withDescription("Send a notification after finishing the ingest process to a specific HTTP endpoint").build());
     }
   }
 

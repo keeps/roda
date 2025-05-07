@@ -24,7 +24,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
@@ -35,7 +34,6 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.base.multiple.DefaultMultipleStepPlugin;
 import org.roda.core.plugins.base.multiple.NoObjectsMultipleStepPlugin;
 import org.roda.core.plugins.base.multiple.Step;
 import org.roda.core.plugins.base.synchronization.packages.AipPackagePlugin;
@@ -44,7 +42,6 @@ import org.roda.core.plugins.base.synchronization.packages.JobPackagePlugin;
 import org.roda.core.plugins.base.synchronization.packages.PreservationAgentPackagePlugin;
 import org.roda.core.plugins.base.synchronization.packages.RepositoryEventPackagePlugin;
 import org.roda.core.plugins.base.synchronization.packages.RiskIncidencePackagePlugin;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,7 +223,7 @@ public class SynchronizeInstancePlugin extends NoObjectsMultipleStepPlugin {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     try {
       LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
@@ -251,7 +248,7 @@ public class SynchronizeInstancePlugin extends NoObjectsMultipleStepPlugin {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     try {
       LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
       if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH)) {

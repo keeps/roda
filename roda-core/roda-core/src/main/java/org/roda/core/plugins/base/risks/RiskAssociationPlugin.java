@@ -46,7 +46,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,14 +133,14 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     LOGGER.debug("Creating risk incidences");
     Report pluginReport = PluginHelper.initPluginReport(this);
@@ -182,7 +181,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     try {
       index.commit(RiskIncidence.class);
     } catch (GenericException | AuthorizationDeniedException e) {

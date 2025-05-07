@@ -10,7 +10,6 @@ package org.roda.core.plugins.base.multiple;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -21,8 +20,8 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +53,7 @@ public class MutipleStepUtils {
       plugin.setParameterValues(mergedParams);
       List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(bundle.getModel(),
         bundle.getObjects());
-      return plugin.execute(bundle.getIndex(), bundle.getModel(), bundle.getStorage(), lites);
+      return plugin.execute(bundle.getIndex(), bundle.getModel(), lites);
     } catch (InvalidParameterException | PluginException | RuntimeException e) {
       LOGGER.error("Error executing plugin: {}", step.getPluginName(), e);
 

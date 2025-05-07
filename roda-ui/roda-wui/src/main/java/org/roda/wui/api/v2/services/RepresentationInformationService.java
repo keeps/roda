@@ -30,8 +30,8 @@ import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
@@ -43,12 +43,12 @@ import org.roda.core.data.v2.ri.RepresentationInformationFilterRequest;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.core.data.v2.ri.RepresentationInformationRelationOptions;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.base.maintenance.AddRepresentationInformationFilterPlugin;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
-import org.roda.core.storage.StorageService;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.common.model.RequestContext;
@@ -356,8 +356,8 @@ public class RepresentationInformationService {
 
     final ConsumesOutputStream stream;
 
-    StorageService storage = RodaCoreFactory.getStorageService();
-    Binary riBinary = storage.getBinary(ModelUtils.getRepresentationInformationStoragePath(id));
+    ModelService model = RodaCoreFactory.getModelService();
+    Binary riBinary = model.getBinary(ModelUtils.getRepresentationInformationStoragePath(id));
     stream = new BinaryConsumesOutputStream(riBinary);
     return new StreamResponse(stream);
   }

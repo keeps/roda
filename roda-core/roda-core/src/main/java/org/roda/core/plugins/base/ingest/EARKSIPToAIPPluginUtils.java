@@ -75,7 +75,6 @@ public class EARKSIPToAIPPluginUtils {
       processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
     }
 
-
     // INFO 20190509 hsilva: this is required as the previous instructions
     // update the AIP metadata
     AIP createdAIP = model.retrieveAIP(aip.getId());
@@ -165,8 +164,8 @@ public class EARKSIPToAIPPluginUtils {
           Map<String, String> properties = new HashMap<>();
           properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
 
-          model.updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType, metadataVersion,
-            properties, username);
+          model.updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
+            metadataVersion, properties, username);
         } else {
           throw e;
         }

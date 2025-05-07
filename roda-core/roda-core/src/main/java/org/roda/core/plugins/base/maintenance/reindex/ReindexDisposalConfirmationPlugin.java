@@ -7,14 +7,14 @@
  */
 package org.roda.core.plugins.base.maintenance.reindex;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
+
+import java.util.Collections;
+import java.util.List;
 
 public class ReindexDisposalConfirmationPlugin extends ReindexRodaEntityPlugin<DisposalConfirmation> {
 

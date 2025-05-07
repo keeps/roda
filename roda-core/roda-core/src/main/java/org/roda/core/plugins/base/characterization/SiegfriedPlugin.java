@@ -44,7 +44,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,8 +130,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   }
 
   @Override
-  public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<AIP> list, Job cachedJob) {
+  public Report executeOnAIP(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    List<AIP> list, Job cachedJob) {
     try {
       for (AIP aip : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
@@ -272,7 +271,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   }
 
   @Override
-  public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
+  public Report executeOnRepresentation(IndexService index, ModelService model, Report report,
     JobPluginInfo jobPluginInfo, List<Representation> list, Job cachedJob) {
 
     for (Representation representation : list) {
@@ -284,8 +283,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
       try {
         sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, index, representation,
-          cachedJob.getId(),
-          cachedJob.getUsername(), overwriteManual));
+          cachedJob.getId(), cachedJob.getUsername(), overwriteManual));
         if (sources.isEmpty()) {
           jobPluginInfo.incrementObjectsProcessedWithSkipped();
           reportItem.setPluginState(PluginState.SKIPPED)
@@ -320,8 +318,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   }
 
   @Override
-  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<File> list, Job cachedJob) {
+  public Report executeOnFile(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    List<File> list, Job cachedJob) {
 
     for (File file : list) {
       List<LinkingIdentifier> sources = new ArrayList<>();
@@ -410,14 +408,13 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

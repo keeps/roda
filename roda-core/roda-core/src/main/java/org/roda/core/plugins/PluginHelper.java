@@ -132,13 +132,13 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
-    RODAObjectsProcessingLogic<T> objectsLogic, IndexService index, ModelService model, StorageService storage,
+    RODAObjectsProcessingLogic<T> objectsLogic, IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return processObjects(plugin, objectsLogic, index, model, storage, liteList, true);
+    return processObjects(plugin, objectsLogic, index, model, liteList, true);
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
-    RODAObjectsProcessingLogic<T> objectsLogic, IndexService index, ModelService model, StorageService storage,
+    RODAObjectsProcessingLogic<T> objectsLogic, IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList, boolean autoLocking) throws PluginException {
     Report report = PluginHelper.initPluginReport(plugin);
     List<T> list;
@@ -153,7 +153,7 @@ public final class PluginHelper {
 
       if (!list.isEmpty()) {
         try {
-          objectsLogic.process(index, model, storage, report, job, jobPluginInfo, plugin, list);
+          objectsLogic.process(index, model, report, job, jobPluginInfo, plugin, list);
         } catch (Throwable e) {
           LOGGER.error("Unexpected exception during 'objectsLogic' execution", e);
           jobPluginInfo.setSourceObjectsProcessedWithFailure(
@@ -192,14 +192,13 @@ public final class PluginHelper {
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin, RODAProcessingLogic<T> beforeLogic,
     RODAObjectProcessingLogic<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
-    ModelService model, StorageService storage, List<LiteOptionalWithCause> liteList) throws PluginException {
-    return processObjects(plugin, beforeLogic, perObjectLogic, afterLogic, index, model, storage, liteList, true);
+    ModelService model, List<LiteOptionalWithCause> liteList) throws PluginException {
+    return processObjects(plugin, beforeLogic, perObjectLogic, afterLogic, index, model, liteList, true);
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin, RODAProcessingLogic<T> beforeLogic,
     RODAObjectProcessingLogic<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
-    ModelService model, StorageService storage, List<LiteOptionalWithCause> liteList, boolean autoLocking)
-    throws PluginException {
+    ModelService model, List<LiteOptionalWithCause> liteList, boolean autoLocking) throws PluginException {
     Report report = PluginHelper.initPluginReport(plugin);
     Throwable exceptionOccurred = null;
 
@@ -213,7 +212,7 @@ public final class PluginHelper {
 
       if (beforeLogic != null) {
         try {
-          beforeLogic.process(index, model, storage, report, job, jobPluginInfo, plugin);
+          beforeLogic.process(index, model, report, job, jobPluginInfo, plugin);
         } catch (Throwable e) {
           LOGGER.error("Unexpected exception during 'beforeLogic' execution", e);
           exceptionOccurred = e;
@@ -226,7 +225,7 @@ public final class PluginHelper {
         // need to pass them to the orchestrator (via throw)
         try {
           for (T object : list) {
-            perObjectLogic.process(index, model, storage, report, job, jobPluginInfo, plugin, object);
+            perObjectLogic.process(index, model, report, job, jobPluginInfo, plugin, object);
           }
         } catch (Throwable e) {
           LOGGER.error("Unexpected exception during 'perObjectLogic' execution", e);
@@ -236,7 +235,7 @@ public final class PluginHelper {
 
       if (afterLogic != null && exceptionOccurred == null) {
         try {
-          afterLogic.process(index, model, storage, report, job, jobPluginInfo, plugin);
+          afterLogic.process(index, model, report, job, jobPluginInfo, plugin);
         } catch (Throwable e) {
           LOGGER.error("Unexpected exception during 'afterLogic' execution", e);
           exceptionOccurred = e;
@@ -269,30 +268,30 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin, RODAProcessingLogic<T> beforeLogic,
-    RODAObjectProcessingLogic<T> perObjectLogic, IndexService index, ModelService model, StorageService storage,
+    RODAObjectProcessingLogic<T> perObjectLogic, IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return processObjects(plugin, beforeLogic, perObjectLogic, null, index, model, storage, liteList);
+    return processObjects(plugin, beforeLogic, perObjectLogic, null, index, model, liteList);
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
     RODAObjectProcessingLogic<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
-    ModelService model, StorageService storage, List<LiteOptionalWithCause> liteList) throws PluginException {
-    return processObjects(plugin, null, perObjectLogic, afterLogic, index, model, storage, liteList);
+    ModelService model, List<LiteOptionalWithCause> liteList) throws PluginException {
+    return processObjects(plugin, null, perObjectLogic, afterLogic, index, model, liteList);
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
-    RODAObjectProcessingLogic<T> perObjectLogic, IndexService index, ModelService model, StorageService storage,
+    RODAObjectProcessingLogic<T> perObjectLogic, IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return processObjects(plugin, null, perObjectLogic, null, index, model, storage, liteList);
+    return processObjects(plugin, null, perObjectLogic, null, index, model, liteList);
   }
 
   public static Report processVoids(Plugin<Void> plugin, RODAProcessingLogic<Void> logic, IndexService index,
-    ModelService model, StorageService storage) throws PluginException {
-    return processVoids(plugin, logic, index, model, storage, 0);
+    ModelService model) throws PluginException {
+    return processVoids(plugin, logic, index, model, 0);
   }
 
   public static Report processVoids(Plugin<Void> plugin, RODAProcessingLogic<Void> logic, IndexService index,
-    ModelService model, StorageService storage, int setSourceObjectsCount) throws PluginException {
+    ModelService model, int setSourceObjectsCount) throws PluginException {
     Report report = PluginHelper.initPluginReport(plugin);
     Throwable exceptionOccurred = null;
 
@@ -304,7 +303,7 @@ public final class PluginHelper {
       Job job = PluginHelper.getJob(plugin, model);
 
       try {
-        logic.process(index, model, storage, report, job, jobPluginInfo, plugin);
+        logic.process(index, model, report, job, jobPluginInfo, plugin);
       } catch (Throwable e) {
         LOGGER.error("Unexpected exception during 'logic' execution", e);
         jobPluginInfo.setSourceObjectsProcessedWithFailure(
@@ -1169,7 +1168,7 @@ public final class PluginHelper {
     linkingIdentifierPlugin.setValue(agentId);
 
     try {
-      if (!RodaCoreFactory.getStorageService().exists(agentPath)) {
+      if (!model.exists(agentPath)) {
         PremisV3Utils.createPremisAgentBinary(plugin, model, true);
       }
       agentIds.add(linkingIdentifierPlugin);
@@ -1191,8 +1190,7 @@ public final class PluginHelper {
         jobUserDetails = null;
         jobUsername = null;
       }
-    }
-    else {
+    } else {
       jobUserDetails = cachedJob.getJobUsersDetails();
       jobUsername = cachedJob.getUsername();
     }
@@ -1250,7 +1248,7 @@ public final class PluginHelper {
     try {
       StoragePath userAgentPath = ModelUtils.getPreservationMetadataStoragePath(linkingIdentifierAgent.getValue(),
         PreservationMetadataType.AGENT);
-      if (!RodaCoreFactory.getStorageService().exists(userAgentPath)) {
+      if (!model.exists(userAgentPath)) {
         PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true,
           jobUserDetails);
         if (pm != null) {

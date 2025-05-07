@@ -28,7 +28,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.base.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.base.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
-import org.roda.core.storage.StorageService;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -191,11 +190,10 @@ public class MultiplePlugin extends DefaultMultipleStepPlugin<AIP> {
    *
    * @param index
    * @param model
-   * @param storage
    * @throws PluginException
    */
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     return null;
   }
 

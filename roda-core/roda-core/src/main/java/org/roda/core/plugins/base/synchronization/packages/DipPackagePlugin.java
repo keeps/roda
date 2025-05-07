@@ -29,7 +29,6 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.storage.StorageService;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -99,13 +98,12 @@ public class DipPackagePlugin extends RodaEntityPackagesPlugin<DIP> {
 
   private void createDIPBundle(ModelService model, DIP dip)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException {
-    StorageService storage = model.getStorage();
     StoragePath dipStoragePath = ModelUtils.getDIPStoragePath(dip.getId());
     Path destinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_DIP).resolve(dip.getId());
 
     Path dipFilePath = destinationPath.resolve(RodaConstants.STORAGE_DIP_METADATA_FILENAME);
 
-    storage.copy(storage, dipStoragePath, dipFilePath, RodaConstants.STORAGE_DIP_METADATA_FILENAME);
+    model.copy(dipStoragePath, dipFilePath, RodaConstants.STORAGE_DIP_METADATA_FILENAME);
   }
 }

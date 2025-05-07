@@ -437,7 +437,7 @@ public class IndexService {
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    try (CloseableIterable<Resource> actionLogs = model.getStorage()
+    try (CloseableIterable<Resource> actionLogs = model
       .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), false)) {
 
       for (Resource resource : actionLogs) {
