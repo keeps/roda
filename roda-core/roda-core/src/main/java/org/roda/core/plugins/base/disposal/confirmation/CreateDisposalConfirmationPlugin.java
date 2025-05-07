@@ -57,7 +57,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -158,19 +157,18 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this,
-      (RODAObjectsProcessingLogic<AIP>) (indexService, modelService, storageService, report, cachedJob, jobPluginInfo,
-        plugin, objects) -> processAIP(modelService, indexService, report, jobPluginInfo, cachedJob, objects),
-      index, model, storage, liteList);
+      (RODAObjectsProcessingLogic<AIP>) (indexService, modelService, report, cachedJob, jobPluginInfo, plugin,
+        objects) -> processAIP(modelService, indexService, report, jobPluginInfo, cachedJob, objects),
+      index, model, liteList);
   }
 
   private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo,
@@ -424,7 +422,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

@@ -17,10 +17,10 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.migration.MigrationAction;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,13 +43,14 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
   }
 
   @Override
-  public void migrate(StorageService storage) throws RODAException {
-    try (CloseableIterable<Resource> risks = storage.listResourcesUnderDirectory(ModelUtils.getRiskContainerPath(),
+  public void migrate(ModelService model) throws RODAException {
+    try (
+      CloseableIterable<Resource> risks = model.listResourcesUnderDirectory(ModelUtils.getRiskContainerPath(),
       false)) {
       for (Resource resource : risks) {
         if (!resource.isDirectory() && resource instanceof Binary) {
           Binary binary = (Binary) resource;
-          migrate(storage, binary);
+          migrate(model, binary);
         }
       }
     } catch (IOException e) {
@@ -57,7 +58,7 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
     }
   }
 
-  private void migrate(StorageService storage, Binary binary) {
+  private void migrate(ModelService model, Binary binary) {
     try (InputStream inputStream = binary.getContent().createInputStream()) {
       JsonNode json = JsonUtils.parseJson(inputStream);
       if (json instanceof ObjectNode) {
@@ -67,7 +68,7 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
         StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromNode(obj));
         boolean asReference = false;
         boolean createIfNotExists = false;
-        storage.updateBinaryContent(binary.getStoragePath(), payload, asReference, createIfNotExists);
+        model.updateBinaryContent(binary.getStoragePath(), payload, asReference, createIfNotExists);
       } else {
         LOGGER.error("Could not migrate risk {} because the JSON is not an object node", binary.getStoragePath());
       }

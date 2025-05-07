@@ -28,7 +28,6 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +59,7 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     // do nothing
     LOGGER.debug("Doing nothing in beforeAllExecute");
@@ -68,18 +67,18 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<T>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
-        processObjects(index, model, storage, report, jobPluginInfo, cachedJob, objects);
+        processObjects(index, model, report, jobPluginInfo, cachedJob, objects);
       }
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
   }
 
-  protected void processObjects(IndexService index, ModelService model, StorageService storage, Report report,
+  protected void processObjects(IndexService index, ModelService model, Report report,
     JobPluginInfo outerJobPluginInfo, Job cachedJob, List<T> resources) {
     try {
       boolean updateMetaPluginInformation = true;
@@ -93,7 +92,7 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
 
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
       for (Step step : steps) {
-        MultipleStepBundle bundle = new MultipleStepBundle(this, index, model, storage, jobPluginInfo,
+        MultipleStepBundle bundle = new MultipleStepBundle(this, index, model, jobPluginInfo,
           getPluginParameter(step.getParameterName()), getParameterValues(), resources, cachedJob);
         step.execute(bundle);
         if (updateMetaPluginInformation) {

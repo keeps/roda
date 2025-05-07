@@ -38,11 +38,9 @@ public class PekkoBackgroundWorkerActor extends PekkoBaseActor {
 
   private final IndexService index;
   private final ModelService model;
-  private final StorageService storage;
 
   public PekkoBackgroundWorkerActor() {
     super();
-    this.storage = getStorage();
     this.model = getModel();
     this.index = getIndex();
   }
@@ -66,7 +64,7 @@ public class PekkoBackgroundWorkerActor extends PekkoBaseActor {
     message.logProcessingStarted();
     Plugin<IsRODAObject> messagePlugin = message.getPlugin();
     try {
-      messagePlugin.execute(index, model, storage, objectsToBeProcessed);
+      messagePlugin.execute(index, model, objectsToBeProcessed);
       getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, false).withJobPriority(message.getJobPriority())
         .withParallelism(message.getParallelism()), getSelf());
     } catch (Throwable e) {
@@ -100,7 +98,7 @@ public class PekkoBackgroundWorkerActor extends PekkoBaseActor {
       JobParallelism parallelism = job.getParallelism();
       JobPriority priority = job.getPriority();
       try {
-        plugin.afterAllExecute(index, model, storage);
+        plugin.afterAllExecute(index, model);
         getSender().tell(
           Messages.newPluginAfterAllExecuteIsDone(plugin, false).withJobPriority(priority).withParallelism(parallelism),
           getSelf());

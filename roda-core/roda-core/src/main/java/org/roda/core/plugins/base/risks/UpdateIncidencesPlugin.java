@@ -38,7 +38,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 
 public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
   private IncidenceStatus status;
@@ -141,15 +140,15 @@ public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<RiskIncidence>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<RiskIncidence> plugin, List<RiskIncidence> objects) {
         processRiskIncidence(model, report, jobPluginInfo, cachedJob, objects);
       }
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
   }
 
   private void processRiskIncidence(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
@@ -184,13 +183,13 @@ public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     return new Report();
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 

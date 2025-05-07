@@ -15,10 +15,9 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 
 @FunctionalInterface
 public interface RODAObjectsProcessingLogic<T extends IsRODAObject> {
-  public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-    JobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects);
+  public void process(IndexService index, ModelService model, Report report, Job cachedJob, JobPluginInfo jobPluginInfo,
+    Plugin<T> plugin, List<T> objects);
 }

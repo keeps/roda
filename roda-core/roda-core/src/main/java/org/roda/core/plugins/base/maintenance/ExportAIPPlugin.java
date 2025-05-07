@@ -35,7 +35,6 @@ import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -45,7 +44,6 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -54,7 +52,6 @@ import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -152,12 +149,12 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<AIP>() {
 
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> aips) {
         Path outputPath = Paths.get(FilenameUtils.normalize(outputFolder));
         String error = null;
@@ -174,9 +171,9 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
         }
 
         if (error == null && exportType == ExportType.ZIP) {
-          report = exportMultiZip(aips, outputPath, report, model, index, storage, jobPluginInfo, cachedJob);
+          report = exportMultiZip(aips, outputPath, report, model, index, jobPluginInfo, cachedJob);
         } else if (error == null && exportType == ExportType.FOLDER) {
-          report = exportFolders(aips, storage, model, index, report, jobPluginInfo, cachedJob);
+          report = exportFolders(aips, model, index, report, jobPluginInfo, cachedJob);
         } else if (error != null) {
           jobPluginInfo.incrementObjectsProcessedWithFailure(aips.size());
           report.setCompletionPercentage(100);
@@ -184,11 +181,11 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
           report.setPluginDetails("Error exporting AIPs: " + error);
         }
       }
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
 
   }
 
-  private Report exportFolders(List<AIP> aips, StorageService storage, ModelService model, IndexService index,
+  private Report exportFolders(List<AIP> aips, ModelService model, IndexService index,
     Report report, JobPluginInfo jobPluginInfo, Job job) {
     try {
       FileStorageService localStorage = new FileStorageService(Paths.get(FilenameUtils.normalize(outputFolder)), false,
@@ -196,19 +193,18 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       for (AIP aip : aips) {
         LOGGER.debug("Exporting AIP {} to folder", aip.getId());
         String error = null;
-        StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
         try {
-          localStorage.copy(storage, aipPath, DefaultStoragePath.parse(aip.getId()));
+          model.copyAIPToStorage(aip, localStorage, DefaultStoragePath.parse(aip.getId()));
         } catch (AlreadyExistsException e) {
           if (removeIfAlreadyExists) {
             try {
               localStorage.deleteResource(DefaultStoragePath.parse(aip.getId()));
-              localStorage.copy(storage, aipPath, DefaultStoragePath.parse(aip.getId()));
+              model.copyAIPToStorage(aip, localStorage, DefaultStoragePath.parse(aip.getId()));
             } catch (AlreadyExistsException e2) {
-              error = "Error removing/creating folder " + aipPath.toString();
+              error = "Error removing/creating folder for AIP " + aip.getId();
             }
           } else {
-            error = "Folder " + aipPath.toString() + " already exists.";
+            error = "Folder for AIP " + aip.getId() + " already exists.";
           }
         }
 
@@ -239,7 +235,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   private Report exportMultiZip(List<AIP> aips, Path outputPath, Report report, ModelService model, IndexService index,
-    StorageService storage, JobPluginInfo jobPluginInfo, Job job) {
+    JobPluginInfo jobPluginInfo, Job job) {
     for (AIP aip : aips) {
       LOGGER.debug("Exporting AIP {} to ZIP", aip.getId());
       OutputStream os = null;
@@ -254,8 +250,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
         if (error == null) {
           os = Files.newOutputStream(zip, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
-          Directory directory = storage.getDirectory(ModelUtils.getAIPStoragePath(aip.getId()));
-          ConsumesOutputStream cos = DownloadUtils.download(storage, directory);
+          ConsumesOutputStream cos = model.downloadObject(aip);
           cos.consumeOutputStream(os);
         }
       } catch (Exception e) {
@@ -283,13 +278,13 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     return new Report();
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 

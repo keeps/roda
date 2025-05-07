@@ -349,7 +349,7 @@ public class EARKSIP2ToAIPPluginUtils {
           // this is an empty folder
           final StoragePath emptyDirectoryStoragePath = ModelUtils.getDirectoryStoragePath(aipId,
             representation.getId(), file.getRelativeFolders());
-          model.getStorage().createDirectory(emptyDirectoryStoragePath);
+          model.createDirectory(emptyDirectoryStoragePath);
           // TODO jgomes 2022-03-09: Create model service method to create empty directory
         }
 

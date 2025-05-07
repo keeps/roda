@@ -35,24 +35,27 @@ import org.roda.core.storage.StorageService;
 
 public class DownloadUtils {
 
-  private static final String ZIP_MEDIA_TYPE = "application/zip";
-  private static final String ZIP_FILE_NAME_EXTENSION = ".zip";
-  private static final String ZIP_PATH_DELIMITER = "/";
+  public static final String ZIP_MEDIA_TYPE = "application/zip";
+  public static final String ZIP_FILE_NAME_EXTENSION = ".zip";
+  public static final String ZIP_PATH_DELIMITER = "/";
 
   private DownloadUtils() {
     // do nothing
   }
 
+  @Deprecated
   public static ConsumesOutputStream download(final StorageService storage, final Resource resource)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     return download(storage, resource, null, false);
   }
 
+  @Deprecated
   public static ConsumesOutputStream download(final StorageService storage, final Resource resource, String name)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     return download(storage, resource, name, false);
   }
 
+  @Deprecated
   public static ConsumesOutputStream download(final StorageService storage, final Resource resource, String name,
     boolean addTopDirectory)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
@@ -127,7 +130,8 @@ public class DownloadUtils {
 
     } else {
       // send the one file
-      stream = new BinaryConsumesOutputStream(storage.getBinary(storagePath));
+      stream = new BinaryConsumesOutputStream(storage.getBinary(storagePath),
+        storage.getDirectAccess(storagePath).getPath());
     }
 
     return stream;

@@ -43,7 +43,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,8 +106,8 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
   }
 
   @Override
-  public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<AIP> list, Job cachedJob) throws PluginException {
+  public Report executeOnAIP(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    List<AIP> list, Job cachedJob) throws PluginException {
 
     try {
       List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
@@ -227,7 +226,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
   }
 
   @Override
-  public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
+  public Report executeOnRepresentation(IndexService index, ModelService model, Report report,
     JobPluginInfo jobPluginInfo, List<Representation> list, Job cachedJob) throws PluginException {
 
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
@@ -266,8 +265,8 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
   }
 
   @Override
-  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<File> list, Job cachedJob) throws PluginException {
+  public Report executeOnFile(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    List<File> list, Job cachedJob) throws PluginException {
 
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
     for (File file : list) {
@@ -338,14 +337,13 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

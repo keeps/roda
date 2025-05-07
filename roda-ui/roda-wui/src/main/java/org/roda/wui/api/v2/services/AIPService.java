@@ -38,6 +38,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.DefaultConsumesOutputStream;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.generics.MetadataValue;
@@ -67,6 +68,7 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.UserUtility;
@@ -80,8 +82,7 @@ import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.Directory;
-import org.roda.core.storage.StorageService;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
@@ -107,18 +108,23 @@ public class AIPService {
   public StreamResponse downloadAIPDescriptiveMetadata(String aipId, String metadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ModelService modelService = RodaCoreFactory.getModelService();
+    Optional<LiteRODAObject> liteMetadata = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId, metadataId);
+    if (liteMetadata.isEmpty()) {
+      throw new RequestNotValidException("Could not retrieve metadata " + metadataId + " lite for AIP " + aipId);
+    }
     Binary descriptiveMetadataBinary;
+    DirectResourceAccess descriptiveMetadataDirectAccess;
     if (versionId == null) {
-      descriptiveMetadataBinary = modelService.retrieveDescriptiveMetadataBinary(aipId, metadataId);
-
+      descriptiveMetadataBinary = modelService.getBinary(liteMetadata.get());
     } else {
-      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, metadataId);
-      BinaryVersion binaryVersion = modelService.getStorage().getBinaryVersion(storagePath, versionId);
+      BinaryVersion binaryVersion = modelService.getBinaryVersion(liteMetadata.get(), versionId, new ArrayList<>());
       descriptiveMetadataBinary = binaryVersion.getBinary();
     }
 
+    DirectResourceAccess directAccess = modelService.getDirectAccess(liteMetadata.get());
     return new StreamResponse(
-      new BinaryConsumesOutputStream(descriptiveMetadataBinary, RodaConstants.MEDIA_TYPE_APPLICATION_XML));
+      new BinaryConsumesOutputStream(descriptiveMetadataBinary, directAccess.getPath(),
+        RodaConstants.MEDIA_TYPE_APPLICATION_XML));
   }
 
   public StreamResponse retrieveAIPDescriptiveMetadata(String aipId, String metadataId, String versionId,
@@ -128,7 +134,7 @@ public class AIPService {
     Binary descriptiveMetadataBinary;
     if (versionId != null) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, metadataId);
-      BinaryVersion binaryVersion = model.getStorage().getBinaryVersion(storagePath, versionId);
+      BinaryVersion binaryVersion = model.getBinaryVersion(storagePath, versionId);
       descriptiveMetadataBinary = binaryVersion.getBinary();
     } else {
       descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
@@ -153,18 +159,27 @@ public class AIPService {
     String metadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ModelService modelService = RodaCoreFactory.getModelService();
+    Optional<LiteRODAObject> liteMetadata = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId,
+      representationId, metadataId);
+    if (liteMetadata.isEmpty()) {
+      throw new RequestNotValidException("Could not retrieve metadata " + metadataId + " lite for AIP " + aipId
+        + ", representation " + representationId);
+    }
     Binary descriptiveMetadataBinary;
+    DirectResourceAccess descriptiveMetadataAccess;
     if (versionId == null) {
-      descriptiveMetadataBinary = modelService.retrieveDescriptiveMetadataBinary(aipId, representationId, metadataId);
-
+      descriptiveMetadataBinary = modelService.getBinary(liteMetadata.get());
+      descriptiveMetadataAccess = modelService.getDirectAccess(liteMetadata.get());
     } else {
-      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, metadataId);
-      BinaryVersion binaryVersion = modelService.getStorage().getBinaryVersion(storagePath, versionId);
+      BinaryVersion binaryVersion = modelService.getBinaryVersion(liteMetadata.get(), versionId, new ArrayList<>());
       descriptiveMetadataBinary = binaryVersion.getBinary();
+      descriptiveMetadataAccess = modelService.getDirectAccessToVersion(liteMetadata.get(), versionId,
+        new ArrayList<>());
     }
 
     return new StreamResponse(
-      new BinaryConsumesOutputStream(descriptiveMetadataBinary, RodaConstants.MEDIA_TYPE_APPLICATION_XML));
+      new BinaryConsumesOutputStream(descriptiveMetadataBinary, descriptiveMetadataAccess.getPath(),
+        RodaConstants.MEDIA_TYPE_APPLICATION_XML));
   }
 
   public StreamResponse retrieveRepresentationDescriptiveMetadata(String aipId, String representationId,
@@ -174,7 +189,7 @@ public class AIPService {
     Binary descriptiveMetadataBinary;
     if (versionId != null) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, metadataId);
-      BinaryVersion binaryVersion = model.getStorage().getBinaryVersion(storagePath, versionId);
+      BinaryVersion binaryVersion = model.getBinaryVersion(storagePath, versionId);
       descriptiveMetadataBinary = binaryVersion.getBinary();
     } else {
       descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, representationId, metadataId);
@@ -319,7 +334,7 @@ public class AIPService {
         storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, descriptiveMetadata.getId());
       }
 
-      metadataInfo.setHasHistory(!CloseableIterables.isEmpty(model.getStorage().listBinaryVersions(storagePath)));
+      metadataInfo.setHasHistory(!CloseableIterables.isEmpty(model.listBinaryVersions(storagePath)));
     } catch (RODAException | RuntimeException e) {
       metadataInfo.setHasHistory(false);
     }
@@ -338,7 +353,7 @@ public class AIPService {
     StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
     StoragePath documentationPath = DefaultStoragePath.parse(aipPath, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
     try {
-      Long counter = RodaCoreFactory.getStorageService().countResourcesUnderContainer(documentationPath, false);
+      Long counter = RodaCoreFactory.getModelService().countResourcesUnderContainer(documentationPath, false);
       return counter > 0;
     } catch (NotFoundException e) {
       return false;
@@ -350,7 +365,7 @@ public class AIPService {
     StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
     StoragePath documentationPath = DefaultStoragePath.parse(aipPath, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
     try {
-      Long counter = RodaCoreFactory.getStorageService().countResourcesUnderContainer(documentationPath, false);
+      Long counter = RodaCoreFactory.getModelService().countResourcesUnderContainer(documentationPath, false);
       return counter > 0;
     } catch (NotFoundException e) {
       return false;
@@ -386,9 +401,11 @@ public class AIPService {
 
   public StreamResponse retrieveAIP(String aipId)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    StoragePath storagePath = ModelUtils.getAIPStoragePath(aipId);
-    Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-    return ApiUtils.download(directory, aipId);
+    Optional<LiteRODAObject> liteAIP = LiteRODAObjectFactory.get(AIP.class, aipId);
+    if (liteAIP.isEmpty()) {
+      throw new RequestNotValidException("Could not retrieve AIP " + aipId + " lite");
+    }
+    return ApiUtils.download(liteAIP.get());
   }
 
   public DescriptiveMetadata revertDescriptiveMetadataVersion(User user, String aipId, String representationId,
@@ -422,22 +439,18 @@ public class AIPService {
 
   public StreamResponse retrieveAIPPart(String aipId, String part)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-
-    switch (part) {
-      case RodaConstants.STORAGE_DIRECTORY_SUBMISSION -> {
-        Directory directory = RodaCoreFactory.getModelService().getSubmissionDirectory(aipId);
-        return ApiUtils.download(directory, part);
-      }
-      case RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION -> {
-        Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId);
-        return ApiUtils.download(directory, part);
-      }
-      case RodaConstants.STORAGE_DIRECTORY_SCHEMAS -> {
-        Directory directory = RodaCoreFactory.getModelService().getSchemasDirectory(aipId);
-        return ApiUtils.download(directory, part);
-      }
-      case null, default -> throw new GenericException("Unsupported part: " + part);
+    Optional<LiteRODAObject> liteAIP = LiteRODAObjectFactory.get(AIP.class, aipId);
+    if (liteAIP.isEmpty()) {
+      throw new RequestNotValidException("Could not retrieve AIP " + aipId + " lite");
     }
+
+    if (part.equals(RodaConstants.STORAGE_DIRECTORY_SUBMISSION)
+      || part.equals(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION)
+      || part.equals(RodaConstants.STORAGE_DIRECTORY_SCHEMAS)) {
+      return ApiUtils.download(liteAIP.get(), part);
+    }
+
+    throw new GenericException("Unsupported part: " + part);
   }
 
   public String retrieveDescriptiveMetadataPreview(String aipId, String representationId, String descriptiveMetadataId,
@@ -468,8 +481,8 @@ public class AIPService {
 
         result = HandlebarsUtility.executeHandlebars(rawTemplate, data);
       } else {
-        StorageService ss = RodaCoreFactory.getModelService().getStorage();
-        if (ss.exists(
+        ModelService model = RodaCoreFactory.getModelService();
+        if (model.exists(
           ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, descriptiveMetadataId + XML_EXT))) {
 
           Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aipId, representationId,
@@ -620,7 +633,7 @@ public class AIPService {
 
     try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationFiles = RodaCoreFactory
       .getModelService().listPreservationMetadata(aipId, true)) {
-      StorageService storage = RodaCoreFactory.getStorageService();
+      ModelService model = RodaCoreFactory.getModelService();
       List<ZipEntryInfo> zipEntries = new ArrayList<>();
       Map<String, ZipEntryInfo> agents = new HashMap<>();
 
@@ -628,9 +641,9 @@ public class AIPService {
         if (oPreservationFile.isPresent()) {
           PreservationMetadata preservationFile = oPreservationFile.get();
           StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationFile);
-          Binary binary = storage.getBinary(storagePath);
+          Binary binary = model.getBinary(storagePath);
 
-          ZipEntryInfo info = new ZipEntryInfo(storage.getStoragePathAsString(storagePath, true), binary.getContent());
+          ZipEntryInfo info = new ZipEntryInfo(model.getStoragePathAsString(storagePath, true), binary.getContent());
           zipEntries.add(info);
 
           if (preservationFile.getType() == PreservationMetadata.PreservationMetadataType.EVENT) {
@@ -642,9 +655,9 @@ public class AIPService {
                   if (!agents.containsKey(agentID)) {
                     StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentID,
                       PreservationMetadata.PreservationMetadataType.AGENT);
-                    Binary agentBinary = storage.getBinary(agentPath);
+                    Binary agentBinary = model.getBinary(agentPath);
                     info = new ZipEntryInfo(
-                      storage.getStoragePathAsString(DefaultStoragePath.parse(preservationFile.getAipId()), false,
+                      model.getStoragePathAsString(DefaultStoragePath.parse(preservationFile.getAipId()), false,
                         agentPath, true),
                       agentBinary.getContent());
                     agents.put(agentID, info);
@@ -823,7 +836,7 @@ public class AIPService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
       descriptiveMetadataId);
-    return RodaCoreFactory.getStorageService().listBinaryVersions(storagePath);
+    return RodaCoreFactory.getModelService().listBinaryVersions(storagePath);
   }
 
   public void deleteDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
@@ -836,7 +849,7 @@ public class AIPService {
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
     StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
       descriptiveMetadataId);
-    RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
+    RodaCoreFactory.getModelService().deleteBinaryVersion(storagePath, versionId);
   }
 
   public boolean isMetadataSimilar(IndexedAIP aip, String representationId, String metadataId,

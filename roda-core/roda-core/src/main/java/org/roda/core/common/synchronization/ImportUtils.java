@@ -69,7 +69,6 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -92,7 +91,7 @@ public class ImportUtils {
     // do nothing
   }
 
-  public static int importStorage(final ModelService model, final IndexService index, final StorageService storage,
+  public static int importStorage(final ModelService model, final IndexService index,
     final Path workingDir, final boolean importJobs) throws GenericException, NotFoundException,
     AuthorizationDeniedException, AlreadyExistsException, RequestNotValidException {
     FileStorageService tmpStorage = new FileStorageService(workingDir.resolve(RodaConstants.CORE_STORAGE_FOLDER), false,
@@ -111,10 +110,10 @@ public class ImportUtils {
               true);
             for (Resource pmResource : resources) {
               StoragePath pmStoragePath = pmResource.getStoragePath();
-              importResource(model, index, storage, tmpStorage, pmResource, pmStoragePath);
+              importResource(model, index, tmpStorage, pmResource, pmStoragePath);
             }
           } else {
-            importResource(model, index, storage, tmpStorage, resource, storagePath);
+            importResource(model, index, tmpStorage, resource, storagePath);
           }
           total++;
         }
@@ -123,15 +122,15 @@ public class ImportUtils {
     return total;
   }
 
-  private static void importResource(ModelService model, IndexService index, StorageService storage,
+  private static void importResource(ModelService model, IndexService index,
     FileStorageService tmpStorage, Resource resource, StoragePath storagePath) throws NotFoundException,
     GenericException, AuthorizationDeniedException, AlreadyExistsException, RequestNotValidException {
 
     // if the resource already exists, remove it before moving the updated resource
-    if (storage.exists(storagePath)) {
-      storage.deleteResource(storagePath);
+    if (model.exists(storagePath)) {
+      model.deleteResource(storagePath);
     }
-    storage.copy(tmpStorage, storagePath, storagePath);
+    model.copy(tmpStorage, storagePath, storagePath);
     reindexResource(model, index, resource);
   }
 

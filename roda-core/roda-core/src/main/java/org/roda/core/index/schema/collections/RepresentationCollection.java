@@ -33,7 +33,6 @@ import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Directory;
-import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 
 public class RepresentationCollection extends AbstractSolrCollection<IndexedRepresentation, Representation> {
@@ -146,7 +145,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     Long numberOfDocumentationFiles;
     try {
       Directory documentationDirectory = model.getDocumentationDirectory(rep.getAipId(), rep.getId());
-      numberOfDocumentationFiles = storage.countResourcesUnderDirectory(documentationDirectory.getStoragePath(), true);
+      numberOfDocumentationFiles = model.countResourcesUnderDirectory(documentationDirectory.getStoragePath(), true);
     } catch (NotFoundException e) {
       numberOfDocumentationFiles = 0L;
     }
@@ -154,7 +153,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     Long numberOfSchemaFiles;
     try {
       Directory schemasDirectory = model.getSchemasDirectory(rep.getAipId(), rep.getId());
-      numberOfSchemaFiles = storage.countResourcesUnderDirectory(schemasDirectory.getStoragePath(), true);
+      numberOfSchemaFiles = model.countResourcesUnderDirectory(schemasDirectory.getStoragePath(), true);
     } catch (NotFoundException e) {
       numberOfSchemaFiles = 0L;
     }

@@ -7,12 +7,6 @@
  */
 package org.roda.core.plugins.base.maintenance.reindex;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -38,10 +32,15 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
 
@@ -134,15 +133,15 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> list) throws PluginException {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         reindexActionLogs(index, model, report, cachedJob, jobPluginInfo);
       }
-    }, index, model, storage);
+    }, index, model);
   }
 
   private void reindexActionLogs(IndexService index, ModelService model, Report report, Job job,
@@ -206,7 +205,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
@@ -223,7 +222,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     if (optimizeIndexes) {
       LOGGER.debug("Optimizing indexes");
       try {

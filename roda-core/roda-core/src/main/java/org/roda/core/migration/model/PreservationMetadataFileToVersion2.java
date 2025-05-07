@@ -26,6 +26,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.migration.MigrationAction;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
@@ -44,24 +45,24 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
   private static final Logger LOGGER = LoggerFactory.getLogger(PreservationMetadataFileToVersion2.class);
 
   @Override
-  public void migrate(StorageService storage) {
+  public void migrate(ModelService model) {
     try (
-      CloseableIterable<Resource> aips = storage.listResourcesUnderDirectory(ModelUtils.getAIPContainerPath(), false)) {
+      CloseableIterable<Resource> aips = model.listResourcesUnderDirectory(ModelUtils.getAIPContainerPath(), false)) {
 
       for (Resource aip : aips) {
-        try (CloseableIterable<Resource> representations = storage.listResourcesUnderDirectory(
+        try (CloseableIterable<Resource> representations = model.listResourcesUnderDirectory(
           ModelUtils.getRepresentationsContainerPath(aip.getStoragePath().getName()), false)) {
 
           for (Resource representation : representations) {
             StoragePath pmPath = DefaultStoragePath.parse(representation.getStoragePath(),
               RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
 
-            try (CloseableIterable<Resource> pms = storage.listResourcesUnderDirectory(pmPath, true)) {
+            try (CloseableIterable<Resource> pms = model.listResourcesUnderDirectory(pmPath, true)) {
               for (Resource pm : pms) {
                 if (!pm.isDirectory() && pm instanceof Binary && pm.getStoragePath().getName().startsWith(URNUtils
                   .getPremisPrefix(PreservationMetadataType.FILE, RODAInstanceUtils.getLocalInstanceIdentifier()))) {
                   Binary binary = (Binary) pm;
-                  migrate(storage, binary);
+                  migrate(model, binary);
                 }
               }
             } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
@@ -81,7 +82,7 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
     }
   }
 
-  private void migrate(StorageService storage, Binary binary) {
+  private void migrate(ModelService model, Binary binary) {
     try (InputStream inputStream = binary.getContent().createInputStream()) {
       StoragePath oldStoragePath = binary.getStoragePath();
 
@@ -106,12 +107,12 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
       }
 
       StoragePath newStoragePath = DefaultStoragePath.parse(pathList);
-      storage.move(storage, oldStoragePath, newStoragePath);
+      model.move(oldStoragePath, newStoragePath);
 
       ContentPayload newPremis = PremisV3Utils.fileToBinary(file);
       boolean asReference = false;
       boolean createIfNotExists = false;
-      storage.updateBinaryContent(newStoragePath, newPremis, asReference, createIfNotExists);
+      model.updateBinaryContent(newStoragePath, newPremis, asReference, createIfNotExists);
     } catch (GenericException | IOException | ValidationException | NotFoundException | RequestNotValidException
       | AuthorizationDeniedException | AlreadyExistsException e) {
       LOGGER.error("Could not migrate preservation metadata file {}", binary.getStoragePath(), e);

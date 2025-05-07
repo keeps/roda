@@ -28,7 +28,6 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 
 /**
@@ -100,7 +99,6 @@ public class PreservationAgentPackagePlugin extends RodaEntityPackagesPlugin<Ind
 
   private void createAgentBundle(ModelService model, PreservationMetadata agent)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException {
-    StorageService storage = model.getStorage();
     StoragePath agentStoragePath = ModelUtils.getPreservationAgentStoragePath();
     String agentFile = FSUtils.encodePathPartial(agent.getId() + RodaConstants.PREMIS_SUFFIX);
 
@@ -109,6 +107,6 @@ public class PreservationAgentPackagePlugin extends RodaEntityPackagesPlugin<Ind
 
     Path agentPath = destinationPath.resolve(agentFile);
 
-    storage.copy(storage, agentStoragePath, agentPath, agentFile);
+    model.copy(agentStoragePath, agentPath, agentFile);
   }
 }

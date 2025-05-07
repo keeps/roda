@@ -7,9 +7,6 @@
  */
 package org.roda.core.plugins.base.maintenance.reindex;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -22,6 +19,9 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class ReindexAIPPlugin extends ReindexRodaEntityPlugin<AIP> {
 

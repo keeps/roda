@@ -276,7 +276,7 @@ public class PekkoJobStateInfoActor extends PekkoBaseActor {
     PluginBeforeAllExecuteIsReady message = (PluginBeforeAllExecuteIsReady) msg;
     markMessageProcessingAsStarted(message);
     try {
-      message.getPlugin().beforeAllExecute(getIndex(), getModel(), getStorage());
+      message.getPlugin().beforeAllExecute(getIndex(), getModel());
       // do nothing because if all goes good, the next messages are of type
       // PluginExecuteIsReady
     } catch (Throwable e) {

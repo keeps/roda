@@ -7,12 +7,6 @@
  */
 package org.roda.core.plugins.base.maintenance;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -38,9 +32,14 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ChangeTypePlugin.class);
@@ -106,17 +105,17 @@ public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> 
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
 
     return PluginHelper.processObjects(this,
-      (RODAObjectsProcessingLogic<T>) (index1, model1, storage1, report, cachedJob, jobPluginInfo, plugin, objects) -> {
+            (RODAObjectsProcessingLogic<T>) (index1, model1, report, cachedJob, jobPluginInfo, plugin, objects) -> {
         if (objects.get(0) instanceof AIP) {
           processAIP(model1, report, jobPluginInfo, cachedJob, (List<AIP>) objects);
         } else if (objects.get(0) instanceof Representation) {
           processRepresentation(model1, report, jobPluginInfo, cachedJob, (List<Representation>) objects);
         }
-      }, index, model, storage, liteList);
+            }, index, model, liteList);
   }
 
   private void processAIP(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job, List<AIP> aips) {
@@ -177,13 +176,13 @@ public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> 
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     return new Report();
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 

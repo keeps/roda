@@ -96,18 +96,18 @@ public class PluginThatFailsDuringExecuteMethod extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) {
+  public Report beforeAllExecute(IndexService index, ModelService model) {
     LOGGER.info("Doing nothing during beforeAllExecute");
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> list) throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
 
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
 
         String shouldFail = getParameterValues().get(object.getId());
@@ -123,11 +123,11 @@ public class PluginThatFailsDuringExecuteMethod extends AbstractPlugin<AIP> {
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         }
       }
-    }, index, model, storage, list);
+    }, index, model, list);
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) {
+  public Report afterAllExecute(IndexService index, ModelService model) {
     LOGGER.info("Doing nothing during afterAllExecute");
     return null;
   }

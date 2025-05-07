@@ -650,7 +650,7 @@ public final class PremisV3Utils {
     objectCharacteristics.getFormat().add(formatComplexType);
     file.getObjectCharacteristics().add(objectCharacteristics);
 
-    Binary binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
+    Binary binary = model.getBinary(ModelUtils.getFileStoragePath(originalFile));
     if (binary != null && binary.getContentDigest() != null && !binary.getContentDigest().isEmpty()) {
       // use binary content digest information
       for (Entry<String, String> entry : binary.getContentDigest().entrySet()) {
@@ -687,7 +687,7 @@ public final class PremisV3Utils {
     String contentLocation;
     try {
       contentLocation = String
-        .valueOf(model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile)).getContent().getURI());
+        .valueOf(model.getBinary(ModelUtils.getFileStoragePath(originalFile)).getContent().getURI());
     } catch (IOException e) {
       LOGGER.debug("Can't create URI, {}: {}", e.getCause(), e.getMessage());
       contentLocation = ModelUtils.getFileStoragePath(originalFile).asString("/", null, null, false);
@@ -979,7 +979,7 @@ public final class PremisV3Utils {
       || pm.getType().equals(PreservationMetadataType.FILE)) {
       try {
         StoragePath path = ModelUtils.getPreservationMetadataStoragePath(pm);
-        ContentPayload payload = model.getStorage().getBinary(path).getContent();
+        ContentPayload payload = model.getBinary(path).getContent();
 
         model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
           pm.getFileDirectoryPath(), pm.getFileId(), payload, username, false);

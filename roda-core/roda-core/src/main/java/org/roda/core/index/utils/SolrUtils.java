@@ -1554,7 +1554,7 @@ public class SolrUtils {
 
     for (DescriptiveMetadata metadata : metadataList) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, metadata.getId());
-      Binary binary = model.getStorage().getBinary(storagePath);
+      Binary binary = model.getBinary(storagePath);
       try {
         SolrInputDocument fields = getDescriptiveMetadataFields(binary, metadata.getType(), metadata.getVersion());
         for (SolrInputField field : fields) {

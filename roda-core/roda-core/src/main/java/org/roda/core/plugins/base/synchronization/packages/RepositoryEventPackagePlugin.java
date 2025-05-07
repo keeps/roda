@@ -29,7 +29,6 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.storage.StorageService;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -102,7 +101,6 @@ public class RepositoryEventPackagePlugin extends RodaEntityPackagesPlugin<Index
 
   private void createEventBundle(ModelService model, PreservationMetadata event)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException {
-    StorageService storage = model.getStorage();
     StoragePath eventStoragePath = ModelUtils.getPreservationRepositoryEventStoragePath();
     String eventFile = event.getId() + RodaConstants.PREMIS_SUFFIX;
 
@@ -111,6 +109,6 @@ public class RepositoryEventPackagePlugin extends RodaEntityPackagesPlugin<Index
 
     Path eventPath = destinationPath.resolve(eventFile);
 
-    storage.copy(storage, eventStoragePath, eventPath, eventFile);
+    model.copy(eventStoragePath, eventPath, eventFile);
   }
 }

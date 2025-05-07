@@ -7,11 +7,6 @@
  */
 package org.roda.core.plugins.base.maintenance;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -41,9 +36,13 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(CleanupFailedIngestAIPsPlugin.class);
@@ -76,11 +75,11 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> objects) throws PluginException {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         try {
           processAIPs(index, model, report, cachedJob, jobPluginInfo);
@@ -88,7 +87,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
           LOGGER.error("Could not update Job information");
         }
       }
-    }, index, model, storage);
+    }, index, model);
   }
 
   private void processAIPs(IndexService index, ModelService model, Report report, Job job, JobPluginInfo jobPluginInfo)
@@ -160,13 +159,13 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     return new Report();
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 

@@ -7,21 +7,6 @@
  */
 package org.roda.core.plugins.base.ingest;
 
-import java.io.IOException;
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.apache.commons.io.FilenameUtils;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -43,11 +28,25 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourceToAIPPlugin.class);
@@ -95,24 +94,24 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
 
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<TransferredResource>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<TransferredResource> plugin, TransferredResource object) {
         processTransferredResource(index, model, report, cachedJob, object);
       }
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
   }
 
   private void processTransferredResource(IndexService index, ModelService model, Report report, Job job,
@@ -169,7 +168,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 

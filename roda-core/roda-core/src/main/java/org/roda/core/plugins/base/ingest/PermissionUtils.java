@@ -39,8 +39,8 @@ public class PermissionUtils {
 
   }
 
-  public static Permissions calculatePermissions(User user, Optional<Permissions> inheritedPermissions, Optional<Permissions> otherPermissions)
-    throws GenericException {
+  public static Permissions calculatePermissions(User user, Optional<Permissions> inheritedPermissions,
+    Optional<Permissions> otherPermissions) throws GenericException {
 
     Permissions finalPermissions = new Permissions();
 
@@ -149,14 +149,14 @@ public class PermissionUtils {
 
     // add otherPermissions to final permissions
     if (otherPermissions.isPresent()) {
-      //add otherPermissions user permissions
+      // add otherPermissions user permissions
       for (String name : otherPermissions.get().getUsernames()) {
         Set<Permissions.PermissionType> tempPermissions = finalPermissions.getUserPermissions(name);
         tempPermissions.addAll(otherPermissions.get().getUserPermissions(name));
         finalPermissions.setUserPermissions(name, tempPermissions);
       }
 
-      //add otherPermissions user permissions
+      // add otherPermissions user permissions
       for (String name : otherPermissions.get().getGroupnames()) {
         Set<Permissions.PermissionType> tempPermissions = finalPermissions.getGroupPermissions(name);
         tempPermissions.addAll(otherPermissions.get().getGroupPermissions(name));
@@ -173,7 +173,7 @@ public class PermissionUtils {
       .map(g -> finalPermissions.getGroupPermissions(g)).flatMap(Set::stream).collect(Collectors.toSet());
     creatorPermissions.addAll(finalPermissions.getUserPermissions(creatorUsername));
 
-    if(mustHavePermissions.isEmpty()) {
+    if (mustHavePermissions.isEmpty()) {
       LOGGER.error("Minimum set of permissions is empty!");
       throw new GenericException("Configuration issue, please contact administrator");
     } else if (!creatorPermissions.containsAll(mustHavePermissions)) {

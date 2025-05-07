@@ -58,8 +58,9 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details",
-        PluginParameter.PluginParameterType.STRING).withDefaultValue("").isMandatory(false).isReadOnly(false)
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details", PluginParameter.PluginParameterType.STRING)
+        .withDefaultValue("").isMandatory(false).isReadOnly(false)
         .withDescription("Details that will be used when creating event").build());
   }
 
@@ -135,24 +136,23 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this,
-      (RODAObjectProcessingLogic<DisposalConfirmation>) (indexService, modelService, storageService, report, cachedJob,
-        jobPluginInfo, plugin,
-        object) -> processDisposalConfirmation(modelService, storageService, report, jobPluginInfo, cachedJob, object),
-      index, model, storage, liteList);
+      (RODAObjectProcessingLogic<DisposalConfirmation>) (indexService, modelService, report, cachedJob, jobPluginInfo,
+        plugin, object) -> processDisposalConfirmation(modelService, report, jobPluginInfo, cachedJob, object),
+      index, model, liteList);
   }
 
-  private void processDisposalConfirmation(ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, Job cachedJob, DisposalConfirmation confirmation) {
+  private void processDisposalConfirmation(ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    Job cachedJob, DisposalConfirmation confirmation) {
     String disposalConfirmationId = confirmation.getId();
 
     LOGGER.debug("Processing disposal confirmation {}", confirmation.getId());
@@ -161,7 +161,7 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
     String outcomeText;
     try {
       StoragePath disposalConfirmationAIPsPath = ModelUtils.getDisposalConfirmationAIPsPath(disposalConfirmationId);
-      Binary binary = storage.getBinary(disposalConfirmationAIPsPath);
+      Binary binary = model.getBinary(disposalConfirmationAIPsPath);
 
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()))) {
         while (reader.ready()) {
@@ -234,7 +234,7 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

@@ -45,7 +45,7 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
         .withDefaultValue(EARKSIP2ToAIPPlugin.class.getName()).withDescription(
           "Select the format of the Submission Information Packages to be ingested in this ingest process.")
         .build());
-    
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
       PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent node", PluginParameterType.AIP_ID)
         .isMandatory(false).withDescription("Use the provided parent node if the SIPs does not provide one.").build());

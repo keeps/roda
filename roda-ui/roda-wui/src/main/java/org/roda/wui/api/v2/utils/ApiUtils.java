@@ -1,16 +1,21 @@
 package org.roda.wui.api.v2.utils;
 
+import java.time.Duration;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.DownloadUtils;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.model.ModelService;
 import org.roda.core.storage.BinaryConsumesOutputStream;
-import org.roda.core.storage.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRange;
@@ -18,10 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-
-import java.time.Duration;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 public class ApiUtils {
 
@@ -94,21 +95,29 @@ public class ApiUtils {
     return new ResponseEntity<>(responseStream, responseHeaders, HttpStatus.PARTIAL_CONTENT);
   }
 
-  public static StreamResponse download(Resource resource)
+  public static StreamResponse download(IsRODAObject object, String... pathPartials)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return download(resource, null);
+    return download(object, null, false, pathPartials);
   }
 
-  public static StreamResponse download(Resource resource, String fileName)
+  public static StreamResponse download(LiteRODAObject lite, String... pathPartials)
+          throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    return download(lite, null, false, pathPartials);
+  }
+
+  public static StreamResponse download(IsRODAObject object, String fileName, boolean addTopDirectory,
+    String... pathPartials)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource, fileName);
+    ModelService model = RodaCoreFactory.getModelService();
+    ConsumesOutputStream download = model.downloadObject(object, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
   }
 
-  public static StreamResponse download(Resource resource, String fileName, boolean addTopDirectory)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource, fileName,
-        addTopDirectory);
+  public static StreamResponse download(LiteRODAObject lite, String fileName, boolean addTopDirectory,
+                                        String... pathPartials)
+          throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+    ConsumesOutputStream download = model.downloadObject(lite, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
   }
 

@@ -33,7 +33,6 @@ import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -151,17 +150,14 @@ public class SiegfriedPluginUtils {
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(ModelService model,
-    IndexService index,
-    Representation representation, String jobId, String username, boolean overwriteManual) throws GenericException,
-    RequestNotValidException, NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException {
-    StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(representation.getAipId(),
-      representation.getId());
-    StorageService storageService;
-
+    IndexService index, Representation representation, String jobId, String username, boolean overwriteManual)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, PluginException,
+    AlreadyExistsException {
     if (representation.getHasShallowFiles()) {
-      StorageService tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(jobId, model.getStorage(),
+      StorageService tmpStorageService = model.resolveTemporaryResourceShallow(jobId,
         ModelUtils.getAIPStoragePath(representation.getAipId()));
-      try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(representationDataPath)) {
+      try (DirectResourceAccess directAccess = model.getRepresentationDataDirectAccess(representation,
+        tmpStorageService)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, index, representation.getAipId(), representation.getId(),
           new ArrayList<>(), null, representationFsPath, username, overwriteManual);
@@ -171,14 +167,15 @@ public class SiegfriedPluginUtils {
         try {
           Job job = PluginHelper.getJob(jobId, model);
           if (!job.getPluginType().equals(PluginType.INGEST)) {
-            ModelUtils.removeTemporaryResourceShallow(job.getId(), representationDataPath);
+            ModelUtils.removeTemporaryRepresentationDataShallow(job.getId(), representation.getAipId(),
+              representation.getId());
           }
         } catch (IOException e) {
           LOGGER.error("Error on removing temporary Representation " + representation.getId(), e);
         }
       }
     } else {
-      try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath)) {
+      try (DirectResourceAccess directAccess = model.getRepresentationDataDirectAccess(representation)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, index, representation.getAipId(), representation.getId(),
           new ArrayList<>(), null, representationFsPath, username, overwriteManual);
@@ -189,12 +186,9 @@ public class SiegfriedPluginUtils {
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnFile(ModelService model,
-    IndexService index, File file,
-    String username, boolean overwriteManual) throws GenericException, RequestNotValidException, NotFoundException,
-    AuthorizationDeniedException, PluginException, AlreadyExistsException {
-    StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-
-    try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath)) {
+    IndexService index, File file, String username, boolean overwriteManual) throws GenericException,
+    RequestNotValidException, NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException {
+    try (DirectResourceAccess directAccess = model.getDirectAccess(file)) {
       Path filePath = directAccess.getPath();
       List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, index, file.getAipId(),
         file.getRepresentationId(), file.getPath(), file.getId(), filePath, username, overwriteManual);
@@ -207,10 +201,8 @@ public class SiegfriedPluginUtils {
 
   private static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentationOrFile(ModelService model,
     IndexService index, String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path,
-    String username,
-    Boolean overwriteManual)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, PluginException,
-    AlreadyExistsException {
+    String username, Boolean overwriteManual) throws RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException, PluginException, AlreadyExistsException {
     List<LinkingIdentifier> sources = new ArrayList<>();
 
     if (FSUtils.exists(path)) {

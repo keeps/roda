@@ -47,7 +47,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,17 +169,17 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     return new Report();
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
         try {
           modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
@@ -188,7 +187,7 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
           LOGGER.error("Could not modify Instance ID's in objects");
         }
       }
-    }, index, model, storage);
+    }, index, model);
   }
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
@@ -255,7 +254,7 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 

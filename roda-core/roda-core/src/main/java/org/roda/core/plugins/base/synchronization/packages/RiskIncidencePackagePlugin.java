@@ -97,7 +97,6 @@ public class RiskIncidencePackagePlugin extends RodaEntityPackagesPlugin<RiskInc
 
   private void createRiskIncidenceBundle(ModelService model, String incidenceId)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException {
-    StorageService storage = model.getStorage();
     StoragePath riskIncidenceStoragePath = ModelUtils.getRiskIncidenceContainerPath();
     String incidenceFile = incidenceId + RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
 
@@ -106,6 +105,6 @@ public class RiskIncidencePackagePlugin extends RodaEntityPackagesPlugin<RiskInc
 
     Path incidencePath = destinationPath.resolve(incidenceFile);
 
-    storage.copy(storage, riskIncidenceStoragePath, incidencePath, incidenceFile);
+    model.copy(riskIncidenceStoragePath, incidencePath, incidenceFile);
   }
 }

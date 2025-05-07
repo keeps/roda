@@ -7,6 +7,11 @@
  */
 package org.roda.core.common.notifications;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
+
 import org.apache.commons.io.FilenameUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -15,16 +20,10 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map;
 
 public class FileNotificationProcessor implements NotificationProcessor {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileNotificationProcessor.class);
@@ -52,10 +51,8 @@ public class FileNotificationProcessor implements NotificationProcessor {
 
         if (FSUtils.isDirectory(trimmedDropPath)) {
           try (
-            DirectResourceAccess jobAccess = model.getStorage()
-              .getDirectAccess(ModelUtils.getJobStoragePath(job.getId()));
-            DirectResourceAccess jobReportAccess = model.getStorage()
-              .getDirectAccess(ModelUtils.getJobReportsStoragePath(job.getId()))) {
+            DirectResourceAccess jobAccess = model.getDirectAccess(job);
+            DirectResourceAccess jobReportAccess = model.getJobReportsDirectAccess(job)) {
 
             Path jobPath = FSUtils.createDirectory(trimmedDropPath, job.getId());
 

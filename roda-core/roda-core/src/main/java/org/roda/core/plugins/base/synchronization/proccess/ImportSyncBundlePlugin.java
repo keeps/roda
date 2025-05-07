@@ -140,18 +140,18 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model )
     throws PluginException {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model , Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
-        importSyncBundle(model, index, storage, report, cachedJob, jobPluginInfo);
+        importSyncBundle(model, index, report, cachedJob, jobPluginInfo);
       }
-    }, index, model, storage);
+    }, index, model);
   }
 
-  private void importSyncBundle(final ModelService model, final IndexService index, final StorageService storage,
+  private void importSyncBundle(final ModelService model, final IndexService index,
     final Report report, final Job cachedJob, final JobPluginInfo jobPluginInfo) {
     if (Files.exists(Paths.get(bundlePath))) {
       try {
@@ -163,7 +163,7 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
         BundleManifest manifestFile = bundleManifestCreator.parse();
 
         // Import entities
-        ImportUtils.importStorage(model, index, storage, Paths.get(workingDir), true);
+        ImportUtils.importStorage(model, index, Paths.get(workingDir), true);
         // importStorage(model, index, storage, cachedJob, Paths.get(workingDir),
         // jobPluginInfo, report);
         ImportUtils.importAttachments(Paths.get(workingDir), manifestFile);
@@ -202,13 +202,13 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> list) throws PluginException {
     return null;
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 }

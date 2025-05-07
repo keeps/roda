@@ -7,13 +7,6 @@
  */
 package org.roda.core.plugins.base.maintenance;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -37,9 +30,15 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ChangeRepresentationStatusPlugin extends AbstractPlugin<Representation> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ChangeRepresentationStatusPlugin.class);
@@ -109,13 +108,13 @@ public class ChangeRepresentationStatusPlugin extends AbstractPlugin<Representat
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
 
-    return PluginHelper.processObjects(this, (RODAObjectsProcessingLogic<Representation>) (index1, model1, storage1,
+    return PluginHelper.processObjects(this, (RODAObjectsProcessingLogic<Representation>) (index1, model1,
       report, cachedJob, jobPluginInfo, plugin, objects) -> {
       processRepresentation(model1, report, jobPluginInfo, cachedJob, objects);
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
   }
 
   private void processRepresentation(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
@@ -150,13 +149,13 @@ public class ChangeRepresentationStatusPlugin extends AbstractPlugin<Representat
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     return new Report();
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 

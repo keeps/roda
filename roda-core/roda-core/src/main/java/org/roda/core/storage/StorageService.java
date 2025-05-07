@@ -368,6 +368,8 @@ public interface StorageService {
 
   DirectResourceAccess getDirectAccess(StoragePath storagePath);
 
+  DirectResourceAccess getDirectAccessToVersion(StoragePath storagePath, String version) throws GenericException, RequestNotValidException;
+
   // TODO: gbarros, implement this
   default DirectResourceAccess getDirectAccess(StoragePath storagePath, Boolean isReadOnly) {
     return getDirectAccess(storagePath);

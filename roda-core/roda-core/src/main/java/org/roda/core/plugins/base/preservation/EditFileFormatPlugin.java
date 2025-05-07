@@ -146,18 +146,18 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<File>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<File> plugin, List<File> objects) {
-        processFiles(index, model, storage, report, jobPluginInfo, cachedJob, objects);
+        processFiles(index, model, report, jobPluginInfo, cachedJob, objects);
       }
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
   }
 
-  private void processFiles(IndexService index, ModelService model, StorageService storage, Report report,
+  private void processFiles(IndexService index, ModelService model, Report report,
     JobPluginInfo jobPluginInfo, Job cachedJob, List<File> files) {
     Report parametersReport = validateParameters();
 
@@ -222,7 +222,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
     PluginException {
     StoragePath fileDataPath = ModelUtils.getFileStoragePath(file);
-    StorageService tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(jobId, model.getStorage(),
+    StorageService tmpStorageService = model.resolveTemporaryResourceShallow(jobId,
       ModelUtils.getAIPStoragePath(file.getAipId()));
     LinkingIdentifier source = null;
     try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(fileDataPath)) {
@@ -333,14 +333,14 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

@@ -7,12 +7,6 @@
  */
 package org.roda.core.plugins.base.maintenance;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -44,9 +38,14 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DeleteRODAObjectPlugin.class);
@@ -113,24 +112,24 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
 
     return PluginHelper.processObjects(this,
-      (RODAObjectProcessingLogic<T>) (index1, model1, storage1, report, cachedJob, jobPluginInfo, plugin,
+            (RODAObjectProcessingLogic<T>) (index1, model1, report, cachedJob, jobPluginInfo, plugin,
         object) -> DeleteRodaObjectPluginUtils.process(index1, model1, report, cachedJob, jobPluginInfo, plugin, object,
           details, dontCheckRelatives),
-      index, model, storage, liteList);
+            index, model, liteList);
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     return new Report();
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     try {
       Job job = PluginHelper.getJob(this, model);
       index.commit((Class<? extends IsIndexed>) Class.forName(job.getSourceObjects().getSelectedClass()));
