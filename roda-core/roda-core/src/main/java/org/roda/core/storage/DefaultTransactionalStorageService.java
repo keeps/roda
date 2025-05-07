@@ -1,5 +1,6 @@
 package org.roda.core.storage;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -190,6 +191,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
+    registerOperation(toStoragePath, TransactionalStoragePathOperationLog.OperationType.CREATE);
     copyFromMainStorageService(fromStoragePath);
     stagingStorageService.copy(fromService, fromStoragePath, toStoragePath);
   }
@@ -197,6 +199,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   @Override
   public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource)
     throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
+    registerOperation(fromStoragePath, TransactionalStoragePathOperationLog.OperationType.CREATE);
     copyFromMainStorageService(fromStoragePath);
     stagingStorageService.copy(fromService, fromStoragePath, toPath, resource);
   }
@@ -205,14 +208,28 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
+    registerOperation(fromStoragePath, TransactionalStoragePathOperationLog.OperationType.UPDATE);
     copyFromMainStorageService(fromStoragePath);
     stagingStorageService.move(fromService, fromStoragePath, toStoragePath);
   }
 
   @Override
   public DirectResourceAccess getDirectAccess(StoragePath storagePath) {
-    copyFromMainStorageService(storagePath);
-    return stagingStorageService.getDirectAccess(storagePath);
+    registerOperation(storagePath, TransactionalStoragePathOperationLog.OperationType.READ);
+    try {
+      // TODO: check if transaction has any changes below the storagePath, if not use
+      // mainStorageService.getDirectAccess
+      List<TransactionalStoragePathOperationLog> nonReadOps = transactionLogService
+        .findNonReadOpsByTransactionAndPathStartsWith(transaction.getId(), storagePath.toString());
+      if (nonReadOps.isEmpty()) {
+        return mainStorageService.getDirectAccess(storagePath);
+      }
+      // Prepare the staging storage area to be used
+      copyRequiredResourcesFromMainToStagingStorage(storagePath, nonReadOps);
+      return stagingStorageService.getDirectAccess(storagePath);
+    } catch (RODATransactionException | RequestNotValidException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
@@ -294,6 +311,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
           }
         }
       } else {
+        // TODO: READ
         if (!stagingStorageService.exists(storagePath)) {
           continue;
         }
@@ -318,8 +336,32 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     return transactionLogService.getStoragePathsOperations(transaction.getId());
   }
 
+  private void copyRequiredResourcesFromMainToStagingStorage(StoragePath storagePath,
+    List<TransactionalStoragePathOperationLog> nonReadOps) throws RequestNotValidException {
+    try (CloseableIterable<Resource> listResourcesUnderDirectory = mainStorageService
+      .listResourcesUnderDirectory(storagePath, true)) {
+      if (listResourcesUnderDirectory != null) {
+        for (Resource resource : listResourcesUnderDirectory) {
+          StoragePath resourceStoragePath = DefaultStoragePath.parse(resource.getStoragePath());
+          // Check if resourceStoragePath is in the nonReadOps list
+          boolean isInNonReadOps = nonReadOps.stream()
+            .anyMatch(op -> op.getStoragePath().equals(resourceStoragePath.toString())
+              && op.getOperationType() != TransactionalStoragePathOperationLog.OperationType.DELETE);
+
+          if (isInNonReadOps) {
+            copyFromMainStorageService(resourceStoragePath);
+          }
+        }
+      }
+
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private void copyFromMainStorageService(StoragePath storagePath) {
-    registerOperation(storagePath, TransactionalStoragePathOperationLog.OperationType.READ);
+    // TODO: Fetch the operations related to the transaction and do not overwrite
+    // the updated files or copy deleted files
     try {
       StorageServiceUtils.copyBetweenStorageServices(mainStorageService, storagePath, stagingStorageService,
         storagePath, Resource.class);
@@ -335,7 +377,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     // DO NOTHING
   }
 
-  private void registerOperation(StoragePath storagePath, TransactionalStoragePathOperationLog.OperationType operation) {
+  private void registerOperation(StoragePath storagePath,
+    TransactionalStoragePathOperationLog.OperationType operation) {
     if (!storagePath.isFromAContainer()) {
       LOGGER.info("Registering operation for storage path: {}", storagePath);
       try {

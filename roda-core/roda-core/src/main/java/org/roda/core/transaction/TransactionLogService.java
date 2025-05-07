@@ -1,6 +1,5 @@
 package org.roda.core.transaction;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -68,10 +67,20 @@ public class TransactionLogService {
     transactionLogRepository.save(transactionLog);
   }
 
+  @Transactional
   public void cleanUp(String transactionID) throws RODATransactionException {
     TransactionLog transactionLog = getTransactionLogById(transactionID);
-    transactionLog.setStoragePathsOperations(null);
-    transactionLog.setModelOperations(null);
+    transactionLog.getStoragePathsOperations().clear();
+    transactionLog.getModelOperations().clear();
     transactionLogRepository.save(transactionLog);
+  }
+
+  @Transactional
+  public List<TransactionalStoragePathOperationLog> findNonReadOpsByTransactionAndPathStartsWith(String transactionID,
+    String storagePath) throws RODATransactionException {
+    TransactionLog transactionLog = getTransactionLogById(transactionID);
+    // TODO create a query for this in the repository
+    return transactionLog.getStoragePathsOperations().stream().filter(op -> op.getStoragePath().startsWith(storagePath + "/")
+      && op.getOperationType() != TransactionalStoragePathOperationLog.OperationType.READ).toList();
   }
 }

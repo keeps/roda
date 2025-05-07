@@ -7,6 +7,6 @@ import org.roda.core.storage.TransactionalStorageService;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public record TransactionContext(TransactionalStorageService transactionalStorageService, TransactionalModelService transactionalModelService,
-                                 IndexService indexService) {
+public record TransactionContext(TransactionalStorageService transactionalStorageService,
+  TransactionalModelService transactionalModelService, IndexService indexService) {
 }

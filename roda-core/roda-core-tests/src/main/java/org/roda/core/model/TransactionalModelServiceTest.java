@@ -40,6 +40,7 @@ import org.roda.core.storage.TransactionalStorageService;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.transaction.RODATransactionManager;
 import org.roda.core.transaction.TransactionContext;
+import org.roda.core.transaction.TransactionLogService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +70,9 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
 
   @Autowired
   private RODATransactionManager transactionManager;
+
+  @Autowired
+  private TransactionLogService transactionLogService;
 
   @Autowired
   private Environment environment;
@@ -132,6 +136,8 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
       "AIP storage path should exist in the transactional storage service: " + aipStoragePath);
     assertFalse(storage.exists(aipStoragePath),
       "AIP storage path should not exist in the storage service service before transaction commit: " + aipStoragePath);
+
+    transactionLogService.findNonReadOpsByTransactionAndPathStartsWith(transactionId, aipStoragePath.toString());
 
     // Commit the transaction
     // TODO: use move method from StoragePath instead copy

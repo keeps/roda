@@ -28,10 +28,6 @@ public class RODATransactionManager {
     this.transactionContextFactory = transactionContextFactory;
   }
 
-  public TransactionLogService getTransactionLogService() {
-    return transactionLogService;
-  }
-
   public TransactionContext beginTransaction(String transactionID, List<LiteOptionalWithCause> objectsToBeProcessed)
     throws RODATransactionException {
 
@@ -44,6 +40,7 @@ public class RODATransactionManager {
 
   public void endTransaction(String transactionID) throws RODATransactionException {
 
+    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTING);
     TransactionContext context = transactionsContext.get(transactionID);
     if (context == null) {
       throw new RODATransactionException("No transaction context found for ID: " + transactionID);
