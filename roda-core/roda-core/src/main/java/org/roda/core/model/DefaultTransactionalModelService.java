@@ -2634,7 +2634,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     if (liteRODAObject.isPresent()) {
       try {
         String lite = liteRODAObject.get().getInfo();
-        PluginHelper.acquireObjectLock(lite, transaction.getId());
+        PluginHelper.acquireObjectLock(lite, transaction.getRequestId());
       } catch (LockingException e) {
         throw new IllegalArgumentException("Cannot acquire lock for object: " + liteRODAObject);
       }

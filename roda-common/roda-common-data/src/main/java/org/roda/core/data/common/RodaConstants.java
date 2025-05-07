@@ -37,6 +37,8 @@ public final class RodaConstants {
   public static final String CORE_STORAGE_FEDORA4_URL = "core.storage.fedora4.url";
   public static final String CORE_STORAGE_FEDORA4_USERNAME = "core.storage.fedora4.username";
   public static final String CORE_STORAGE_FEDORA4_PASSWORD = "core.storage.fedora4.password";
+
+  public static final String CORE_STAGING_STORAGE_PATH = "core.staging.storage.path";
   public static final String CORE_SOLR_TYPE = "core.solr.type";
   public static final String CORE_SOLR_HTTP_URL = "core.solr.http.url";
   public static final String CORE_SOLR_CLOUD_URLS = "core.solr.cloud.urls";
@@ -260,6 +262,7 @@ public final class RodaConstants {
   public static final String CORE_I18N_FOLDER = "i18n";
   public static final String CORE_DATA_FOLDER = "data";
   public static final String CORE_STORAGE_FOLDER = "storage";
+  public static final String CORE_STAGING_STORAGE_FOLDER = "staging-storage";
   public static final String CORE_STORAGE_HISTORY_FOLDER = "storage-history";
   public static final String CORE_INDEX_FOLDER = "index";
   public static final String CORE_CROSSWALKS_FOLDER = "crosswalks";
@@ -2220,16 +2223,13 @@ public final class RodaConstants {
     + "instance because they were removed from local instance";
   public static final String SYNCHRONIZATION_REPORT_VALUE_ISSUES_DESCRIPTION = "An entity was found is central "
     + "instance but is not listed in local instance or is listed as being removed from local instance";
-
   public static final String SYNCHRONIZATION_REPORT_VALUE_STATUS_SUCCESS = "Successful Synchronization";
   public static final String SYNCHRONIZATION_REPORT_VALUE_STATUS_ERROR = "Synchronization with errors";
-
   public static final String SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED = "removed";
   public static final String SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_UPDATED = "updated";
   public static final String SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE = "issue";
 
   public static final String PLUGIN_PARAMS_CONVERSION_REPRESENTATION = "rep";
-
   public static final String PLUGIN_PARAMS_CONVERSION_DISSEMINATION = "dip";
 
   /** Private empty constructor */

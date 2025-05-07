@@ -1,9 +1,7 @@
 package org.roda.core.transaction;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.entity.transaction.TransactionalModelOperationLog;
@@ -22,8 +20,8 @@ public class TransactionLogService {
   private TransactionLogRepository transactionLogRepository;
 
   @Transactional
-  public TransactionLog createTransactionLog(String transactionId, List<LiteOptionalWithCause> objectsToBeProcessed) {
-    TransactionLog transactionLog = new TransactionLog(transactionId);
+  public TransactionLog createTransactionLog(TransactionLog.TransactionRequestType requestType, String requestId) {
+    TransactionLog transactionLog = new TransactionLog(requestType, requestId);
     transactionLogRepository.save(transactionLog);
     return transactionLog;
   }
@@ -44,6 +42,10 @@ public class TransactionLogService {
   @Transactional
   public void registerStoragePathOperation(String transactionId, StoragePath storagePath,
     TransactionalStoragePathOperationLog.OperationType operation) throws RODATransactionException {
+    if (operation == TransactionalStoragePathOperationLog.OperationType.READ) {
+      // TODO: add a configuration to allow logging the read operation for debugging purposes
+      return;
+    }
     TransactionLog transactionLog = getTransactionLogById(transactionId);
     transactionLog.addStoragePath(storagePath, operation);
     transactionLogRepository.save(transactionLog);
@@ -63,15 +65,42 @@ public class TransactionLogService {
   @Transactional
   public void registerModelOperation(String transactionId, String liteObject,
     TransactionalModelOperationLog.OperationType operation) throws RODATransactionException {
+    if(operation == TransactionalModelOperationLog.OperationType.READ) {
+      //TODO: add a configuration to allow logging the read operation for debugging purposes
+      return;
+    }
+
     TransactionLog transactionLog = getTransactionLogById(transactionId);
     transactionLog.addModelOperation(liteObject, operation);
     transactionLogRepository.save(transactionLog);
   }
 
+  @Transactional
   public void cleanUp(String transactionID) throws RODATransactionException {
     TransactionLog transactionLog = getTransactionLogById(transactionID);
-    transactionLog.setStoragePathsOperations(null);
-    transactionLog.setModelOperations(null);
+    transactionLog.getStoragePathsOperations().clear();
+    transactionLog.getModelOperations().clear();
     transactionLogRepository.save(transactionLog);
+  }
+
+  @Transactional
+  public boolean hasModificationsUnderStoragePath(String transactionID, String storagePath)
+    throws RODATransactionException {
+    TransactionLog transactionLog = getTransactionLogById(transactionID);
+    // TODO create a query for this in the repository
+    return transactionLog.getStoragePathsOperations().stream()
+      .anyMatch(op -> op.getStoragePath().startsWith(storagePath + "/")
+        && op.getOperationType() != TransactionalStoragePathOperationLog.OperationType.READ);
+  }
+
+  @Transactional
+  public List<TransactionalStoragePathOperationLog> listModificationsUnderStoragePath(String transactionID,
+    String storagePath) throws RODATransactionException {
+    TransactionLog transactionLog = getTransactionLogById(transactionID);
+    // TODO create a query for this in the repository
+    return transactionLog.getStoragePathsOperations().stream()
+      .filter(op -> op.getStoragePath().startsWith(storagePath + "/")
+        && op.getOperationType() != TransactionalStoragePathOperationLog.OperationType.READ)
+      .toList();
   }
 }

@@ -66,12 +66,9 @@ public class PekkoWorkerActor extends PekkoBaseActor {
     message.logProcessingStarted();
     Plugin<IsRODAObject> plugin = message.getPlugin();
 
-    String requestUUID = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
-      IdUtils.createUUID());
-    plugin.getParameterValues().put(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID, requestUUID);
     try {
       if (RODATransactionManager != null) {
-        RODATransactionManager.runPluginInTransaction(requestUUID, objectsToBeProcessed, plugin);
+        RODATransactionManager.runPluginInTransaction(plugin, objectsToBeProcessed);
       } else {
         plugin.execute(index, model, objectsToBeProcessed);
       }

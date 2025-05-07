@@ -34,31 +34,33 @@ public class TransactionContextFactory {
     this.transactionLogService = transactionLogService;
   }
 
-  public TransactionContext create(TransactionLog transactionLog) throws RODATransactionException {
+  public TransactionalContext create(TransactionLog transactionLog) throws RODATransactionException {
     TransactionalStorageService storageService = createTransactionalStorageService(transactionLog);
     TransactionalModelService modelService = createTransactionalModelService(storageService, transactionLog);
     IndexService indexService = createTransactionalIndexService(modelService);
 
-    return new TransactionContext(storageService, modelService, indexService);
+    return new TransactionalContext(transactionLog, storageService, modelService, indexService);
   }
 
   private TransactionalStorageService createTransactionalStorageService(TransactionLog transactionLog)
     throws RODATransactionException {
 
-    Path stagingStoragePath = Paths.get("/tmp/tx-" + transactionLog.getId());
+    Path stagingStoragePath = Paths.get(configurationManager.getRodaConfiguration()
+      .getString(RodaConstants.CORE_STAGING_STORAGE_PATH, configurationManager.getStagingStoragePath().toString()));
+
+    Path transactionalStoragePath = stagingStoragePath.resolve(transactionLog.getId());
+
     RodaConstants.StorageType storageType = RodaConstants.StorageType
       .valueOf(configurationManager.getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE,
         RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
 
     if (storageType == RodaConstants.StorageType.FILESYSTEM) {
-      LOGGER.debug("Instantiating FileSystem storage at '{}'", stagingStoragePath);
-      String trashDirName = configurationManager.getRodaConfiguration().getString("core.storage.filesystem.trash",
-        RodaConstants.TRASH_CONTAINER);
+      LOGGER.debug("Instantiating FileSystem storage at '{}'", transactionalStoragePath);
 
       try {
-        StorageService staging = new FileStorageService(stagingStoragePath, false, trashDirName, false);
+        StorageService staging = new FileStorageService(transactionalStoragePath, false, null, false);
         return new DefaultTransactionalStorageService(RodaCoreFactory.getStorageService(), staging, transactionLog,
-                transactionLogService);
+          transactionLogService);
       } catch (GenericException e) {
         throw new RODATransactionException("Error creating staging storage service", e);
       }
@@ -73,7 +75,7 @@ public class TransactionContextFactory {
       RodaCoreFactory.getNodeType(), RodaCoreFactory.getInstanceId());
 
     return new DefaultTransactionalModelService(RodaCoreFactory.getModelService(), stagingModelService, transactionLog,
-            transactionLogService);
+      transactionLogService);
   }
 
   private IndexService createTransactionalIndexService(ModelService modelService) {

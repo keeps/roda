@@ -60,6 +60,7 @@ public class ConfigurationManager {
   private boolean configSymbolicLinksAllowed;
   private Path rodaHomePath;
   private Path storagePath;
+  private Path stagingStoragePath;
   private Path indexDataPath;
   private Path configPath;
   private Path dataPath;
@@ -186,6 +187,14 @@ public class ConfigurationManager {
 
   public void setStoragePath(Path storagePath) {
     this.storagePath = storagePath;
+  }
+
+  public Path getStagingStoragePath() {
+    return stagingStoragePath;
+  }
+
+  public void setStagingStoragePath(Path stagingStoragePath) {
+    this.stagingStoragePath = stagingStoragePath;
   }
 
   public Path getIndexDataPath() {
@@ -540,6 +549,7 @@ public class ConfigurationManager {
     dataPath = getEssentialDirectoryPath(rodaHomePath, RodaConstants.CORE_DATA_FOLDER);
     logPath = getEssentialDirectoryPath(dataPath, RodaConstants.CORE_LOG_FOLDER);
     storagePath = getEssentialDirectoryPath(dataPath, RodaConstants.CORE_STORAGE_FOLDER);
+    stagingStoragePath = getEssentialDirectoryPath(dataPath, RodaConstants.CORE_STAGING_STORAGE_FOLDER);
     indexDataPath = getEssentialDirectoryPath(dataPath, RodaConstants.CORE_INDEX_FOLDER);
     reportPath = getEssentialDirectoryPath(dataPath, RodaConstants.CORE_REPORT_FOLDER);
 

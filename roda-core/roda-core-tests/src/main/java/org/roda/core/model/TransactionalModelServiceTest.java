@@ -12,10 +12,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.config.TestConfig;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -35,11 +37,13 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.TransactionalStorageService;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.transaction.RODATransactionManager;
-import org.roda.core.transaction.TransactionContext;
+import org.roda.core.transaction.TransactionalContext;
+import org.roda.core.transaction.TransactionLogService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +73,9 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
 
   @Autowired
   private RODATransactionManager transactionManager;
+
+  @Autowired
+  private TransactionLogService transactionLogService;
 
   @Autowired
   private Environment environment;
@@ -109,9 +116,8 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
   }
 
   @Test
-  public void testCreateAIP() throws RODAException, IOException {
-    String transactionId = IdUtils.createUUID();
-    TransactionContext context = transactionManager.beginTransaction(transactionId, null);
+  public void testCreateAIP() throws RODAException {
+    TransactionalContext context = transactionManager.beginTransaction();
     assertNotNull(context);
 
     TransactionalModelService transactionalModelService = context.transactionalModelService();
@@ -135,7 +141,7 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
 
     // Commit the transaction
     // TODO: use move method from StoragePath instead copy
-    transactionManager.endTransaction(transactionId);
+    transactionManager.endTransaction(context.transactionLog().getId());
     // assertFalse(transactionalStorageService.exists(aipStoragePath), "AIP storage
     // path should not exist in the transactional storage service after transaction
     // commit: " + aipStoragePath);
@@ -145,8 +151,7 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
 
   @Test
   public void testCreateAIPRollback() throws RODAException, IOException {
-    String transactionId = IdUtils.createUUID();
-    TransactionContext context = transactionManager.beginTransaction(transactionId, null);
+    TransactionalContext context = transactionManager.beginTransaction();
     assertNotNull(context);
 
     TransactionalModelService transactionalModelService = context.transactionalModelService();
@@ -170,7 +175,7 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
       "AIP storage path should not exist in the storage service service before transaction commit: " + aipStoragePath);
 
     // Rollback the transaction
-    transactionManager.rollbackTransaction(transactionId);
+    transactionManager.rollbackTransaction(context.transactionLog().getId());
     // assertFalse(transactionalStorageService.exists(aipStoragePath),
     // "AIP storage path should not exist in the transactional storage service after
     // transaction rollback: "
@@ -206,12 +211,10 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
 
   @Test
   public void testTransactionalLock() throws RODAException {
-    String transactionId1 = IdUtils.createUUID();
-    String transactionId2 = IdUtils.createUUID();
     final String aipId = IdUtils.createUUID();
     JobsHelper.setLockRequestTimeout(5);
 
-    TransactionContext context1 = transactionManager.beginTransaction(transactionId1, null);
+    TransactionalContext context1 = transactionManager.beginTransaction();
     assertNotNull(context1);
     TransactionalModelService transactionalModelService1 = context1.transactionalModelService();
 
@@ -219,7 +222,7 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_VERSION_EAD_UNKNOWN),
       RodaConstants.ADMIN);
 
-    TransactionContext context2 = transactionManager.beginTransaction(transactionId2, null);
+    TransactionalContext context2 = transactionManager.beginTransaction();
     assertNotNull(context2);
     TransactionalModelService transactionalModelService2 = context2.transactionalModelService();
 
@@ -232,15 +235,50 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
     } catch (RODAException e) {
       Assert.fail("Unexpected exception: " + e.getMessage());
     } finally {
-      transactionManager.endTransaction(transactionId2);
+      transactionManager.endTransaction(context2.transactionLog().getId());
     }
 
-    transactionManager.endTransaction(transactionId1);
+    transactionManager.endTransaction(context1.transactionLog().getId());
 
     StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
     assertTrue(storage.exists(aipStoragePath),
-            "AIP storage path should exist in the storage service after transaction commit: " + aipStoragePath);
-
+      "AIP storage path should exist in the storage service after transaction commit: " + aipStoragePath);
   }
 
+  @Test
+  public void testTransactionalDirectAccess() throws RODAException, IOException {
+    final String aipId = IdUtils.createUUID();
+    AIP aip = model.createAIP(aipId, corporaService,
+            DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+            RodaConstants.ADMIN);
+
+    StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aipId);
+    
+    List<StoragePath> aipStoragePathList = new ArrayList<>();
+    try(CloseableIterable<Resource> listResourcesUnderDirectory = storage.listResourcesUnderDirectory(aipStoragePath, true)) {
+      for (Resource resource : listResourcesUnderDirectory) {
+          aipStoragePathList.add(resource.getStoragePath());
+      }  
+    }
+
+    TransactionalContext context = transactionManager.beginTransaction();
+    assertNotNull(context);
+    TransactionalModelService transactionalModelService = context.transactionalModelService();
+    TransactionalStorageService transactionalStorageService = context.transactionalStorageService();
+
+    transactionalModelService.updateAIP(aip, RodaConstants.ADMIN);
+    transactionalStorageService.getDirectAccess(aipStoragePath);
+
+    List<StoragePath> stagingAipStoragePathList = new ArrayList<>();
+    try(CloseableIterable<Resource> listResourcesUnderDirectory = transactionalStorageService.listResourcesUnderDirectory(aipStoragePath, true)) {
+      for (Resource resource : listResourcesUnderDirectory) {
+          stagingAipStoragePathList.add(resource.getStoragePath());
+      }
+    }
+
+    assertTrue(stagingAipStoragePathList.containsAll(aipStoragePathList),
+      "Missing files in the staging area: " + stagingAipStoragePathList);
+
+    transactionManager.endTransaction(context.transactionLog().getId());
+  }
 }

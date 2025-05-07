@@ -53,6 +53,7 @@ public class DirectoryInitializer {
     essentialDirectories.add(configurationManager.getDataPath());
     essentialDirectories.add(configurationManager.getLogPath());
     essentialDirectories.add(configurationManager.getStoragePath());
+    essentialDirectories.add(configurationManager.getStagingStoragePath());
     essentialDirectories.add(configurationManager.getIndexDataPath());
     essentialDirectories.add(configurationManager.getExampleConfigPath());
     essentialDirectories.add(configurationManager.getReportPath());

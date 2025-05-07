@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,7 @@ public class RODATransactionManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(RODATransactionManager.class);
   private final TransactionLogService transactionLogService;
   private final TransactionContextFactory transactionContextFactory;
-  private final Map<String, TransactionContext> transactionsContext = new ConcurrentHashMap<>();
+  private final Map<String, TransactionalContext> transactionsContext = new ConcurrentHashMap<>();
 
   public RODATransactionManager(TransactionLogService transactionLogService,
     TransactionContextFactory transactionContextFactory) {
@@ -28,23 +30,24 @@ public class RODATransactionManager {
     this.transactionContextFactory = transactionContextFactory;
   }
 
-  public TransactionLogService getTransactionLogService() {
-    return transactionLogService;
+  public TransactionalContext beginTransaction() throws RODATransactionException {
+    return this.beginTransaction(TransactionLog.TransactionRequestType.NON_DEFINED, null);
   }
 
-  public TransactionContext beginTransaction(String transactionID, List<LiteOptionalWithCause> objectsToBeProcessed)
+  public TransactionalContext beginTransaction(TransactionLog.TransactionRequestType requestType, String requestId)
     throws RODATransactionException {
 
-    TransactionLog transactionLog = transactionLogService.createTransactionLog(transactionID, objectsToBeProcessed);
-    TransactionContext context = transactionContextFactory.create(transactionLog);
+    TransactionLog transactionLog = transactionLogService.createTransactionLog(requestType, requestId);
+    TransactionalContext context = transactionContextFactory.create(transactionLog);
 
-    transactionsContext.put(transactionID, context);
+    transactionsContext.put(transactionLog.getId(), context);
     return context;
   }
 
   public void endTransaction(String transactionID) throws RODATransactionException {
 
-    TransactionContext context = transactionsContext.get(transactionID);
+    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTING);
+    TransactionalContext context = transactionsContext.get(transactionID);
     if (context == null) {
       throw new RODATransactionException("No transaction context found for ID: " + transactionID);
     }
@@ -62,10 +65,15 @@ public class RODATransactionManager {
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTED);
   }
 
-  public void runPluginInTransaction(String transactionId, List<LiteOptionalWithCause> objectsToBeProcessed,
-    Plugin<IsRODAObject> plugin) throws RODATransactionException {
+  public void runPluginInTransaction(Plugin<IsRODAObject> plugin, List<LiteOptionalWithCause> objectsToBeProcessed)
+    throws RODATransactionException {
+    String requestUUID = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+      IdUtils.createUUID());
+    plugin.getParameterValues().put(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID, requestUUID);
+
+    TransactionalContext context = beginTransaction(TransactionLog.TransactionRequestType.JOB, requestUUID);
+    String transactionId = context.transactionLog().getId();
     try {
-      TransactionContext context = beginTransaction(transactionId, objectsToBeProcessed);
       plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
       endTransaction(transactionId);
     } catch (Exception e) {
@@ -79,7 +87,7 @@ public class RODATransactionManager {
   }
 
   public void rollbackTransaction(String transactionID) throws RODATransactionException {
-    TransactionContext context = transactionsContext.get(transactionID);
+    TransactionalContext context = transactionsContext.get(transactionID);
     if (context == null) {
       throw new RODATransactionException("No transaction context found for ID: " + transactionID);
     }
