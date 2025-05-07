@@ -16,7 +16,4 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = "org.roda.core.repository")
 @EntityScan(basePackages = "org.roda.core.entity")
 public class TestConfig {
-//  public static void main(String[] args) {
-//    SpringApplication.run(TestConfig.class, args);
-//  }
 }

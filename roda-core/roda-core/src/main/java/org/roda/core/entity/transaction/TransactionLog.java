@@ -17,6 +17,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import org.roda.core.util.IdUtils;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -32,13 +33,23 @@ public class TransactionLog implements Serializable {
     PENDING, COMMITTING, COMMITTED, ROLLED_BACK
   }
 
+  public enum TransactionRequestType {
+    JOB, API, NON_DEFINED
+  }
+
   @Id
   private String id;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 20)
+  @Column(nullable = false, length = 15)
   private TransactionStatus status;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "request_type", nullable = false, length = 15)
+  private TransactionRequestType requestType;
+
+  @Column(name = "request_id", length = 36)
+  private String requestId;
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
 
@@ -52,16 +63,22 @@ public class TransactionLog implements Serializable {
   private List<TransactionalModelOperationLog> modelOperations = new ArrayList<>();;
 
   public TransactionLog() {
-  }
 
-  public TransactionLog(String id) {
-    this.id = id;
+  }
+  public TransactionLog(TransactionRequestType requestType, String requestId) {
+    this.id = IdUtils.createUUID();
     this.createdAt = LocalDateTime.now();
     this.status = TransactionStatus.PENDING;
+    this.requestType = requestType;
+    this.requestId = requestId;
   }
 
   public String getId() {
     return id;
+  }
+
+  public String getRequestId() {
+    return requestId;
   }
 
   public void setStatus(TransactionStatus transactionStatus) {
