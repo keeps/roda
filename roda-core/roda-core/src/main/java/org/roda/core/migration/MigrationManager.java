@@ -217,7 +217,7 @@ public class MigrationManager {
         LOGGER.info("Migrating to version {} using class '{}'", toVersion, migrationClass.getName());
         try {
           // migrate
-          migrationClass.newInstance().migrate(RodaCoreFactory.getStorageService());
+          migrationClass.newInstance().migrate(RodaCoreFactory.getModelService());
           LOGGER.info("Migrated with success to version {}", toVersion);
 
           // update class specific version after successful migration

@@ -9,14 +9,9 @@ package org.roda.core.index;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +88,6 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -317,7 +311,7 @@ public class IndexModelObserver implements ModelObserver {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     Long sizeInBytes = 0L;
     StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-    CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderFile(storagePath, false);
+    CloseableIterable<Resource> resources = model.listResourcesUnderFile(storagePath, false);
     for (Resource resource : resources) {
       if (resource instanceof DefaultBinary) {
         ContentPayload content = ((DefaultBinary) resource).getContent();
@@ -369,7 +363,7 @@ public class IndexModelObserver implements ModelObserver {
     FileCollection.Info info = new FileCollection.Info(aip, ancestors);
     try {
       final StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-      file.setCreatedOn(getDateFromStoragePath(storagePath));
+      file.setCreatedOn(model.getDateFromStoragePath(storagePath));
     } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
       | IOException e) {
       LOGGER.error("Could not set the creation date of File");
@@ -1065,7 +1059,7 @@ public class IndexModelObserver implements ModelObserver {
     } else if (PreservationMetadataType.AGENT.equals(type)) {
       try {
         final StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(pm);
-        pm.setCreatedOn(getDateFromStoragePath(storagePath));
+        pm.setCreatedOn(model.getDateFromStoragePath(storagePath));
       } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
         | IOException e) {
         LOGGER.error("Could not set the creation date of Preservation Agent");
@@ -1074,14 +1068,6 @@ public class IndexModelObserver implements ModelObserver {
     }
 
     return ret;
-  }
-
-  private Date getDateFromStoragePath(StoragePath storagePath)
-    throws IOException, AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Path path = model.getStorage().getDirectAccess(storagePath).getPath();
-    BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
-    FileTime fileTime = attr.creationTime();
-    return new Date(fileTime.toMillis());
   }
 
   @Override
@@ -1141,15 +1127,14 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> indexJobReports(Job job) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    StorageService storage = model.getStorage();
-    try (CloseableIterable<Resource> listResourcesUnderDirectory = storage
+    try (CloseableIterable<Resource> listResourcesUnderDirectory = model
       .listResourcesUnderDirectory(ModelUtils.getJobReportsStoragePath(job.getId()), true)) {
 
       if (listResourcesUnderDirectory != null) {
         for (Resource resource : listResourcesUnderDirectory) {
           if (!resource.isDirectory()) {
             try (
-              InputStream inputStream = storage.getBinary(resource.getStoragePath()).getContent().createInputStream()) {
+              InputStream inputStream = model.getBinary(resource.getStoragePath()).getContent().createInputStream()) {
               Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
               jobReportCreatedOrUpdated(objectFromJson, job).addTo(ret);
             } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException

@@ -26,7 +26,6 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,23 +33,23 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAIPComponentsPlugin.class);
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<T>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
         if (!objects.isEmpty()) {
           try {
             if (objects.get(0) instanceof AIP) {
-              report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) objects, cachedJob);
+              report = executeOnAIP(index, model, report, jobPluginInfo, (List<AIP>) objects, cachedJob);
             } else if (objects.get(0) instanceof Representation) {
-              report = executeOnRepresentation(index, model, storage, report, jobPluginInfo,
-                (List<Representation>) objects, cachedJob);
+              report = executeOnRepresentation(index, model, report, jobPluginInfo, (List<Representation>) objects,
+                cachedJob);
             } else if (objects.get(0) instanceof File) {
-              report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) objects, cachedJob);
+              report = executeOnFile(index, model, report, jobPluginInfo, (List<File>) objects, cachedJob);
             } else if (objects.get(0) instanceof RiskIncidence) {
-              report = executeOnIncidence(index, model, storage, report, jobPluginInfo, (List<RiskIncidence>) objects,
+              report = executeOnIncidence(index, model, report, jobPluginInfo, (List<RiskIncidence>) objects,
                 cachedJob);
             }
           } catch (PluginException e) {
@@ -59,19 +58,19 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
           }
         }
       }
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
   }
 
-  protected abstract Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
+  protected abstract Report executeOnAIP(IndexService index, ModelService model, Report report,
     JobPluginInfo jobPluginInfo, List<AIP> list, Job cachedJob) throws PluginException;
 
-  protected abstract Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    Report report, JobPluginInfo jobPluginInfo, List<Representation> list, Job cachedJob) throws PluginException;
+  protected abstract Report executeOnRepresentation(IndexService index, ModelService model, Report report,
+    JobPluginInfo jobPluginInfo, List<Representation> list, Job cachedJob) throws PluginException;
 
-  protected abstract Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
+  protected abstract Report executeOnFile(IndexService index, ModelService model, Report report,
     JobPluginInfo jobPluginInfo, List<File> list, Job cachedJob) throws PluginException;
 
-  protected Report executeOnIncidence(IndexService index, ModelService model, StorageService storage, Report report,
+  protected Report executeOnIncidence(IndexService index, ModelService model, Report report,
     JobPluginInfo jobPluginInfo, List<RiskIncidence> list, Job cachedJob) throws PluginException {
 
     List<File> fileList = new ArrayList<>();
@@ -94,15 +93,15 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
     }
 
     if (!fileList.isEmpty()) {
-      executeOnFile(index, model, storage, report, jobPluginInfo, fileList, cachedJob);
+      executeOnFile(index, model, report, jobPluginInfo, fileList, cachedJob);
     }
 
     if (!representationList.isEmpty()) {
-      executeOnRepresentation(index, model, storage, report, jobPluginInfo, representationList, cachedJob);
+      executeOnRepresentation(index, model, report, jobPluginInfo, representationList, cachedJob);
     }
 
     if (!aipList.isEmpty()) {
-      executeOnAIP(index, model, storage, report, jobPluginInfo, aipList, cachedJob);
+      executeOnAIP(index, model, report, jobPluginInfo, aipList, cachedJob);
     }
 
     return report;

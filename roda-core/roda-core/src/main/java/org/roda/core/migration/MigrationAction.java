@@ -9,13 +9,14 @@ package org.roda.core.migration;
 
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.model.ModelService;
 import org.roda.core.storage.StorageService;
 
 public interface MigrationAction<T extends IsModelObject> {
   /**
    * Method that knows how to migrate a certain model class to a certain version
    */
-  public void migrate(StorageService storage) throws RODAException;
+  public void migrate(ModelService model) throws RODAException;
 
   /**
    * Validates the toVersion configured in {@link MigrationManager} against

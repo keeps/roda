@@ -107,7 +107,8 @@ public class DIPFileCollection extends AbstractSolrCollection<DIPFile, DIPFile> 
     // extra-fields
     try {
       StoragePath filePath = ModelUtils.getDIPFileStoragePath(file);
-      doc.addField(RodaConstants.DIPFILE_STORAGE_PATH, model.getStorage().getStoragePathAsString(filePath, false));
+      doc.addField(RodaConstants.DIPFILE_STORAGE_PATH,
+        RodaCoreFactory.getModelService().getStoragePathAsString(filePath, false));
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index DIP file storage path", e);
     }

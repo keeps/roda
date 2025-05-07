@@ -12,7 +12,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.DownloadUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -23,6 +22,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.DefaultConsumesOutputStream;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.file.CreateFolderRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
@@ -31,16 +31,16 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
@@ -50,8 +50,7 @@ import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.Directory;
-import org.roda.core.storage.StorageService;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.HTMLUtils;
@@ -208,23 +207,24 @@ public class FilesService {
 
   public StreamResponse retrieveAIPRepresentationFile(IndexedFile indexedFile)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-
-    StoragePath filePath = ModelUtils.getFileStoragePath(indexedFile.getAipId(), indexedFile.getRepresentationId(),
-      indexedFile.getPath(), indexedFile.getId());
-
+    ModelService model = RodaCoreFactory.getModelService();
+    Optional<LiteRODAObject> liteFile = LiteRODAObjectFactory.get(File.class, indexedFile.getId());
+    if (liteFile.isEmpty()) {
+      throw new RequestNotValidException("Couldn't retrieve file with id: " + indexedFile.getId());
+    }
     if (!indexedFile.isDirectory()) {
       final ConsumesOutputStream stream;
-      StorageService storage = RodaCoreFactory.getStorageService();
-      Binary representationFileBinary = storage.getBinary(filePath);
+      Binary representationFileBinary = model.getBinary(liteFile.get());
+      DirectResourceAccess directFileAccess = model.getDirectAccess(liteFile.get());
       if (indexedFile.getFileFormat() != null && StringUtils.isNotBlank(indexedFile.getFileFormat().getMimeType())) {
-        stream = new BinaryConsumesOutputStream(representationFileBinary, indexedFile.getFileFormat().getMimeType());
+        stream = new BinaryConsumesOutputStream(representationFileBinary, directFileAccess.getPath(),
+          indexedFile.getFileFormat().getMimeType());
       } else {
-        stream = new BinaryConsumesOutputStream(representationFileBinary);
+        stream = new BinaryConsumesOutputStream(representationFileBinary, directFileAccess.getPath());
       }
       return new StreamResponse(stream);
     } else {
-      Directory directory = RodaCoreFactory.getStorageService().getDirectory(filePath);
-      ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), directory, null);
+      ConsumesOutputStream download = model.downloadObject(liteFile.get());
       return new StreamResponse(download);
     }
   }
@@ -312,7 +312,11 @@ public class FilesService {
     ModelService model = RodaCoreFactory.getModelService();
     Binary preservationMetadataBinary = model.retrievePreservationFile(file.getAipId(), file.getRepresentationId(),
       file.getAncestorsPath(), file.getId());
-    stream = new BinaryConsumesOutputStream(preservationMetadataBinary, RodaConstants.MEDIA_TYPE_TEXT_XML);
+    PreservationMetadata pm = model.retrievePreservationMetadata(file.getAipId(), file.getRepresentationId(),
+      file.getAncestorsPath(), file.getId(), PreservationMetadata.PreservationMetadataType.FILE);
+    DirectResourceAccess directMetadataAccess = model.getDirectAccess(pm);
+    stream = new BinaryConsumesOutputStream(preservationMetadataBinary, directMetadataAccess.getPath(),
+      RodaConstants.MEDIA_TYPE_TEXT_XML);
 
     ret = new StreamResponse(stream);
 

@@ -719,8 +719,8 @@ public class RodaCoreFactory {
 
   private static void instantiateDefaultObjects() {
     if (INSTANTIATE_DEFAULT_RESOURCES) {
-      try (CloseableIterable<Resource> resources = getStorageService()
-        .listResourcesUnderContainer(DefaultStoragePath.parse(""), true)) {
+      try (
+        CloseableIterable<Resource> resources = model.listResourcesUnderContainer(DefaultStoragePath.parse(""), true)) {
 
         Iterator<Resource> resourceIterator = resources.iterator();
         boolean hasFileResources = false;
@@ -1424,10 +1424,6 @@ public class RodaCoreFactory {
   public static void setTransferredResourcesScannerUpdateStatus(Optional<String> folderRelativePath,
     boolean isUpdating) {
     TransferUpdateStatus.getInstance().setUpdatingStatus(folderRelativePath, isUpdating);
-  }
-
-  public static StorageService getStorageService() {
-    return storage;
   }
 
   public static ModelService getModelService() {

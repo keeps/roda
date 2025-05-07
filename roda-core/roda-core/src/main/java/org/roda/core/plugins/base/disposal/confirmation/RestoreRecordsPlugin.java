@@ -39,11 +39,10 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
@@ -107,29 +106,28 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this,
-      (RODAObjectProcessingLogic<DisposalConfirmation>) (indexService, modelService, storageService, report, cachedJob,
-        jobPluginInfo, plugin, object) -> processDisposalConfirmation(indexService, modelService, storageService,
-          report, cachedJob, jobPluginInfo, object),
-      index, model, storage, liteList);
+      (RODAObjectProcessingLogic<DisposalConfirmation>) (indexService, modelService, report, cachedJob, jobPluginInfo,
+        plugin,
+        object) -> processDisposalConfirmation(indexService, modelService, report, cachedJob, jobPluginInfo, object),
+      index, model, liteList);
   }
 
-  private void processDisposalConfirmation(IndexService index, ModelService model, StorageService storage,
-    Report report, Job cachedJob, JobPluginInfo jobPluginInfo, DisposalConfirmation disposalConfirmation) {
+  private void processDisposalConfirmation(IndexService index, ModelService model, Report report, Job cachedJob,
+    JobPluginInfo jobPluginInfo, DisposalConfirmation disposalConfirmation) {
 
     try {
       StoragePath disposalConfirmationAIPsPath = ModelUtils
         .getDisposalConfirmationAIPsPath(disposalConfirmation.getId());
-      Binary binary = storage.getBinary(disposalConfirmationAIPsPath);
+      Binary binary = model.getBinary(disposalConfirmationAIPsPath);
 
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()))) {
         jobPluginInfo.setSourceObjectsCount(disposalConfirmation.getNumberOfAIPs().intValue());
@@ -251,7 +249,7 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

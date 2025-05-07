@@ -49,7 +49,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.ParseException;
 import org.roda_project.commons_ip.utils.IPEnums;
@@ -102,23 +101,23 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
     forceSearchScope = PluginHelper.getForceParentIdFromParameters(this);
     jobWorkingDirectory = PluginHelper.getJobWorkingDirectory(this);
 
-    return PluginHelper.processObjects(this,
-      (RODAObjectProcessingLogic<TransferredResource>) (index1, model1, storage1, report, cachedJob, jobPluginInfo,
-        plugin, object) -> processTransferredResource(index1, model1, report, cachedJob, object),
-      index, model, storage, liteList);
+    return PluginHelper
+      .processObjects(
+        this, (RODAObjectProcessingLogic<TransferredResource>) (index1, model1, report, cachedJob, jobPluginInfo,
+          plugin, object) -> processTransferredResource(index1, model1, report, cachedJob, object),
+        index, model, liteList);
   }
 
   private void processTransferredResource(IndexService index, ModelService model, Report report, Job cachedJob,
@@ -248,7 +247,7 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

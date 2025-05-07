@@ -7,12 +7,6 @@
  */
 package org.roda.core.plugins.base.maintenance.reindex;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -34,9 +28,14 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
 
@@ -108,15 +107,15 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
         processAIP(index, report, jobPluginInfo, object);
       }
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
   }
 
   public Report processAIP(IndexService index, Report report, JobPluginInfo jobPluginInfo, AIP aip) {
@@ -133,7 +132,7 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
@@ -150,7 +149,7 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     if (optimizeIndexes) {
       LOGGER.debug("Optimizing indexes");
       try {

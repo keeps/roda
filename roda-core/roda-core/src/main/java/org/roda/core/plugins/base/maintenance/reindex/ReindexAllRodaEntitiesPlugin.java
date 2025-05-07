@@ -7,11 +7,6 @@
  */
 package org.roda.core.plugins.base.maintenance.reindex;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -34,13 +29,17 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
-import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexAllRodaEntitiesPlugin.class);
@@ -73,16 +72,16 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> list) throws PluginException {
     final List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         reindexAll(model, report, jobPluginInfo, cachedJob, classes);
       }
-    }, index, model, storage, classes.size());
+    }, index, model, classes.size());
   }
 
   private void reindexAll(ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo, Job job,
@@ -152,14 +151,14 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     // Do not need to clear indexes, single jobs already does it by default
     return new Report();
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // Do not need to optimize indexes, single jobs already does it by default
     return new Report();
   }

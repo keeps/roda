@@ -48,7 +48,6 @@ import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -137,30 +136,30 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> list) throws PluginException {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
         try {
           localInstance = RodaCoreFactory.getLocalInstance();
         } catch (GenericException e) {
           throw new PluginException("Unable to retrieve local instance configuration", e);
         }
-        requestRemoteActions(model, index, storage, report, jobPluginInfo, cachedJob);
+        requestRemoteActions(model, index, report, jobPluginInfo, cachedJob);
       }
 
-    }, index, model, storage);
+    }, index, model);
   }
 
-  private void requestRemoteActions(ModelService model, IndexService index, StorageService storage, Report report,
+  private void requestRemoteActions(ModelService model, IndexService index, Report report,
     JobPluginInfo jobPluginInfo, Job cachedJob) {
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
@@ -176,7 +175,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
           BundleManifestCreator bundleManifestCreator = new BundleManifestCreator(workingDir);
           BundleManifest manifestFile = bundleManifestCreator.parse();
 
-          final int imported = ImportUtils.importStorage(model, index, storage, workingDir, false);
+          final int imported = ImportUtils.importStorage(model, index, workingDir, false);
           final int jobs = createJobs(workingDir, index);
 
           ImportUtils.deleteBundleEntities(model, index, cachedJob, this, jobPluginInfo, localInstance, workingDir,
@@ -252,7 +251,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 

@@ -50,8 +50,8 @@ import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.utils.IterableIndexResult;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
@@ -126,11 +126,11 @@ public class SyncUtils {
     IterableIndexResult<? extends IsIndexed> indexedObject, String fileExtension, Path destinationPath)
     throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
     if (indexedObject.getTotalCount() > 0) {
-      final StorageService storage = RodaCoreFactory.getStorageService();
+      final ModelService model = RodaCoreFactory.getModelService();
 
       for (IsIndexed object : indexedObject) {
         final String filename = object.getId() + fileExtension;
-        storage.copy(storage, containerPath, destinationPath.resolve(filename), filename);
+        model.copy(containerPath, destinationPath.resolve(filename), filename);
       }
       return true;
     }

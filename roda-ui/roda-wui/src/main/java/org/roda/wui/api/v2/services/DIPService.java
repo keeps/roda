@@ -2,9 +2,9 @@ package org.roda.wui.api.v2.services;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.DownloadUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -12,17 +12,21 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.UpdatePermissionsRequest;
+import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.LiteRODAObjectFactory;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.base.maintenance.UpdatePermissionsPlugin;
-import org.roda.core.storage.StorageService;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.springframework.stereotype.Service;
 
@@ -34,15 +38,21 @@ public class DIPService {
 
   public StreamResponse createStreamResponse(String dipUUID)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    StorageService storage = RodaCoreFactory.getStorageService();
-    StoragePath storagePath = ModelUtils.getDIPDataStoragePath(dipUUID);
+    ModelService model = RodaCoreFactory.getModelService();
 
-    if (!storage.hasDirectory(storagePath)) {
-      storagePath = ModelUtils.getDIPStoragePath(dipUUID);
+    Optional<LiteRODAObject> liteDIP = LiteRODAObjectFactory.get(DIP.class, dipUUID);
+    if (liteDIP.isEmpty()) {
+      throw new RequestNotValidException("Couldn't retrieve DIP with UUID: " + dipUUID);
     }
 
-    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(),
-      storage.getDirectory(storagePath), dipUUID);
+    ConsumesOutputStream download;
+    DirectResourceAccess dipData = model.getDirectAccess(liteDIP.get(), RodaConstants.STORAGE_DIRECTORY_DATA);
+    if (dipData.isDirectory()) {
+      download = model.downloadObject(liteDIP.get(), dipUUID, false, RodaConstants.STORAGE_DIRECTORY_DATA);
+    }
+    else {
+      download = model.downloadObject(liteDIP.get(), dipUUID, false);
+    }
     return new StreamResponse(download);
   }
 

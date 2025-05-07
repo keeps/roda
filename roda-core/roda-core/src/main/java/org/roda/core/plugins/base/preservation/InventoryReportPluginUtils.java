@@ -34,7 +34,6 @@ import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
 import org.slf4j.Logger;
@@ -61,8 +60,7 @@ public class InventoryReportPluginUtils {
     }
   }
 
-  public static List<List<String>> getDataInformation(List<String> fields, AIP aip, ModelService model,
-    StorageService storage) {
+  public static List<List<String>> getDataInformation(List<String> fields, AIP aip, ModelService model) {
     List<List<String>> dataInformation = new ArrayList<>();
     for (Representation representation : aip.getRepresentations()) {
       boolean recursive = true;
@@ -70,7 +68,7 @@ public class InventoryReportPluginUtils {
         representation.getId(), recursive)) {
         for (OptionalWithCause<File> subfile : representationFiles) {
           if (subfile.isPresent()) {
-            dataInformation.add(retrieveFileInfo(fields, subfile.get(), aip, model, storage));
+            dataInformation.add(retrieveFileInfo(fields, subfile.get(), aip, model));
           } else {
             LOGGER.error("Cannot retrieve file information", subfile.getCause());
           }
@@ -84,17 +82,16 @@ public class InventoryReportPluginUtils {
     return dataInformation;
   }
 
-  public static List<List<String>> getDescriptiveMetadataInformation(List<String> fields, AIP aip, ModelService model,
-    StorageService storage) {
+  public static List<List<String>> getDescriptiveMetadataInformation(List<String> fields, AIP aip, ModelService model) {
     List<List<String>> descriptiveMetadataInformation = new ArrayList<>();
     for (DescriptiveMetadata dm : aip.getDescriptiveMetadata()) {
-      descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, storage));
+      descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, model));
     }
 
     if (aip.getRepresentations() != null) {
       for (Representation r : aip.getRepresentations()) {
         for (DescriptiveMetadata dm : r.getDescriptiveMetadata()) {
-          descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, storage));
+          descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, model));
         }
       }
     }
@@ -103,7 +100,7 @@ public class InventoryReportPluginUtils {
   }
 
   private static List<String> retrieveDescriptiveMetadataInfo(List<String> fields, AIP aip, DescriptiveMetadata dm,
-    StorageService storage) {
+    ModelService model) {
     List<String> fileInfo = new ArrayList<>();
     Map<String, String> fixities = null;
     for (String fieldName : fields) {
@@ -125,7 +122,7 @@ public class InventoryReportPluginUtils {
         if (fixities == null) {
           try {
             StoragePath descriptiveMetadataStoragePath = ModelUtils.getDescriptiveMetadataStoragePath(dm);
-            Binary descriptiveMetadataBinary = storage.getBinary(descriptiveMetadataStoragePath);
+            Binary descriptiveMetadataBinary = model.getBinary(descriptiveMetadataStoragePath);
             fixities = FileUtility.checksums(descriptiveMetadataBinary.getContent().createInputStream(),
               InventoryReportPlugin.CHECKSUM_ALGORITHMS);
           } catch (IOException | GenericException | RequestNotValidException | NotFoundException
@@ -149,8 +146,7 @@ public class InventoryReportPluginUtils {
     return fileInfo;
   }
 
-  public static List<String> retrieveFileInfo(List<String> fields, File file, AIP aip, ModelService model,
-    StorageService storage) {
+  public static List<String> retrieveFileInfo(List<String> fields, File file, AIP aip, ModelService model) {
 
     List<String> fileInfo = new ArrayList<>();
     List<Fixity> fixities = null;
@@ -182,7 +178,7 @@ public class InventoryReportPluginUtils {
           }
 
           if (fixities != null) {
-            fileInfo.add(getFixity(fieldName, fixities, file, storage));
+            fileInfo.add(getFixity(fieldName, fixities, file, model));
           } else {
             fileInfo.add("");
           }
@@ -197,7 +193,7 @@ public class InventoryReportPluginUtils {
     return fileInfo;
   }
 
-  private static String getFixity(String fixityAlgorithm, List<Fixity> fixities, File file, StorageService storage) {
+  private static String getFixity(String fixityAlgorithm, List<Fixity> fixities, File file, ModelService model) {
     String fixity = "";
     if (fixities != null && !fixities.isEmpty()) {
       for (Fixity f : fixities) {
@@ -209,7 +205,7 @@ public class InventoryReportPluginUtils {
     }
     if (StringUtils.isBlank(fixity)) {
       try {
-        Binary binary = storage.getBinary(ModelUtils.getFileStoragePath(file));
+        Binary binary = model.getBinary(ModelUtils.getFileStoragePath(file));
         fixity = FileUtility.checksum(binary.getContent().createInputStream(), fixityAlgorithm);
       } catch (NoSuchAlgorithmException | IOException | GenericException | RequestNotValidException | NotFoundException
         | AuthorizationDeniedException e) {
@@ -220,14 +216,14 @@ public class InventoryReportPluginUtils {
   }
 
   public static List<List<String>> getOtherMetadataInformation(List<String> fields, String otherMetadataType, AIP aip,
-    ModelService model, StorageService storage) {
+    ModelService model) {
     List<List<String>> otherMetadataInformation = new ArrayList<>();
 
     try (CloseableIterable<OptionalWithCause<OtherMetadata>> otherMetadatas = model.listOtherMetadata(aip.getId(),
       otherMetadataType, true)) {
       for (OptionalWithCause<OtherMetadata> otherMetadata : otherMetadatas) {
         if (otherMetadata.isPresent()) {
-          otherMetadataInformation.add(retrieveOtherMetadataInfo(fields, otherMetadata.get(), aip, storage));
+          otherMetadataInformation.add(retrieveOtherMetadataInfo(fields, otherMetadata.get(), aip, model));
         } else {
           LOGGER.error("Cannot retrieve other metadata information", otherMetadata.getCause());
         }
@@ -241,7 +237,7 @@ public class InventoryReportPluginUtils {
   }
 
   private static List<String> retrieveOtherMetadataInfo(List<String> fields, OtherMetadata otherMetadata, AIP aip,
-    StorageService storage) {
+    ModelService model) {
     List<String> fileInfo = new ArrayList<>();
     Map<String, String> fixities = null;
     for (String fieldName : fields) {
@@ -263,7 +259,7 @@ public class InventoryReportPluginUtils {
       } else if (InventoryReportPlugin.CHECKSUM_ALGORITHMS.contains(fieldName.toUpperCase())) {
         if (fixities == null) {
           try {
-            Binary otherMetadataBinary = storage.getBinary(ModelUtils.getOtherMetadataStoragePath(
+            Binary otherMetadataBinary = model.getBinary(ModelUtils.getOtherMetadataStoragePath(
               otherMetadata.getAipId(), otherMetadata.getRepresentationId(), otherMetadata.getFileDirectoryPath(),
               otherMetadata.getFileId(), otherMetadata.getFileSuffix(), otherMetadata.getType()));
             fixities = FileUtility.checksums(otherMetadataBinary.getContent().createInputStream(),

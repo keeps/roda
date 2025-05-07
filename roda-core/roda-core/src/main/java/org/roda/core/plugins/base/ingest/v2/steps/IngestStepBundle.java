@@ -19,13 +19,11 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
-import org.roda.core.storage.StorageService;
 
 public class IngestStepBundle {
   private Plugin<?> ingestPlugin;
   private IndexService index;
   private ModelService model;
-  private StorageService storage;
   private IngestJobPluginInfo jobPluginInfo;
   private PluginParameter pluginParameter;
   private Map<String, String> parameterValues;
@@ -34,13 +32,12 @@ public class IngestStepBundle {
   private Job cachedJob;
   private SIPInformation sipInformation;
 
-  public IngestStepBundle(Plugin<?> ingestPlugin, IndexService index, ModelService model, StorageService storage,
+  public IngestStepBundle(Plugin<?> ingestPlugin, IndexService index, ModelService model,
     IngestJobPluginInfo jobPluginInfo, PluginParameter pluginParameter, Map<String, String> parameterValues,
     List<TransferredResource> resources, List<AIP> aips, Job cachedJob, SIPInformation sipInformation) {
     this.ingestPlugin = ingestPlugin;
     this.index = index;
     this.model = model;
-    this.storage = storage;
     this.jobPluginInfo = jobPluginInfo;
     this.pluginParameter = pluginParameter;
     this.parameterValues = parameterValues;
@@ -72,14 +69,6 @@ public class IngestStepBundle {
 
   public void setModel(ModelService model) {
     this.model = model;
-  }
-
-  public StorageService getStorage() {
-    return storage;
-  }
-
-  public void setStorage(StorageService storage) {
-    this.storage = storage;
   }
 
   public IngestJobPluginInfo getJobPluginInfo() {

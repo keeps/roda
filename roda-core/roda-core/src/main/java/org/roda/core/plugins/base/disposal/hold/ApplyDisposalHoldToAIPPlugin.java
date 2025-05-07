@@ -46,7 +46,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,14 +58,16 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
-        PluginParameter.PluginParameterType.STRING).isMandatory(true).isReadOnly(false)
-        .withDescription("Disposal hold identifier").build());
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
+          PluginParameter.PluginParameterType.STRING)
+        .isMandatory(true).isReadOnly(false).withDescription("Disposal hold identifier").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE,
-        "Override disposal holds", PluginParameter.PluginParameterType.BOOLEAN).withDefaultValue("false")
-        .isMandatory(true).isReadOnly(false)
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE, "Override disposal holds",
+          PluginParameter.PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").isMandatory(true).isReadOnly(false)
         .withDescription("Lift all disposal holds associated and apply the selected disposal hold").build());
 
   }
@@ -143,22 +144,21 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<AIP>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
         processAIP(index, model, objects, report, jobPluginInfo, cachedJob);
       }
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
   }
 
   private void processAIP(IndexService index, ModelService model, List<AIP> aips, Report report,
@@ -348,7 +348,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

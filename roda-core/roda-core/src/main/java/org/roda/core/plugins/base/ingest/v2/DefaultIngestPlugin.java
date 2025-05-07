@@ -45,15 +45,14 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectsProcessingLogic;
-import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.base.ingest.v2.steps.IngestStep;
 import org.roda.core.plugins.base.ingest.v2.steps.IngestStepBundle;
 import org.roda.core.plugins.base.ingest.v2.steps.IngestStepsUtils;
 import org.roda.core.plugins.base.notifications.JobNotification;
-import org.roda.core.storage.StorageService;
+import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,27 +115,26 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     LOGGER.debug("Doing nothing in beforeAllExecute");
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<TransferredResource>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<TransferredResource> plugin, List<TransferredResource> objects) {
-        processObjects(index, model, storage, report, jobPluginInfo, cachedJob, objects);
+        processObjects(index, model, report, jobPluginInfo, cachedJob, objects);
       }
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
   }
 
-  protected void processObjects(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo outerJobPluginInfo, Job cachedJob, List<TransferredResource> resources) {
+  protected void processObjects(IndexService index, ModelService model, Report report, JobPluginInfo outerJobPluginInfo,
+    Job cachedJob, List<TransferredResource> resources) {
     try {
       Date startDate = new Date();
       Report pluginReport;
@@ -157,7 +155,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       // 1) unpacking & wellformedness check (transform TransferredResource into
       // an AIP)
-      pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
+      pluginReport = transformTransferredResourceIntoAnAIP(index, model, resources);
       IngestStepsUtils.mergeReports(jobPluginInfo, pluginReport);
       final SIPInformation sipInformation = pluginReport.getSipInformation();
       final List<AIP> aips = getAIPsFromReports(model, index, jobPluginInfo);
@@ -172,7 +170,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       List<IngestStep> steps = getIngestSteps();
 
       for (IngestStep step : steps) {
-        IngestStepBundle bundle = new IngestStepBundle(this, index, model, storage, jobPluginInfo,
+        IngestStepBundle bundle = new IngestStepBundle(this, index, model, jobPluginInfo,
           getPluginParameter(step.getParameterName()), getParameterValues(), resources, aips, cachedJob,
           sipInformation);
         step.execute(bundle);
@@ -200,7 +198,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     LOGGER.debug("Doing stuff in afterAllExecute");
 
     try {
@@ -222,7 +220,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     return null;
   }
 
-  private Report transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
+  private Report transformTransferredResourceIntoAnAIP(IndexService index, ModelService model,
     List<TransferredResource> transferredResources) {
     Report report = null;
 
@@ -235,7 +233,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     try {
       plugin.setParameterValues(getParameterValues());
       List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(model, transferredResources);
-      report = plugin.execute(index, model, storage, lites);
+      report = plugin.execute(index, model, lites);
     } catch (PluginException | InvalidParameterException e) {
       // TODO handle failure
       LOGGER.error("Error executing plugin to transform transferred resource into AIP", e);

@@ -205,12 +205,10 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     }
 
     // Calculate number of documentation and schema files
-    StorageService storage = model.getStorage();
-
     Long numberOfSubmissionFiles;
     try {
       Directory submissionDirectory = model.getSubmissionDirectory(aip.getId());
-      numberOfSubmissionFiles = storage.countResourcesUnderDirectory(submissionDirectory.getStoragePath(), true);
+      numberOfSubmissionFiles = model.countResourcesUnderDirectory(submissionDirectory.getStoragePath(), true);
     } catch (NotFoundException e) {
       numberOfSubmissionFiles = 0L;
     }
@@ -218,7 +216,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     Long numberOfDocumentationFiles;
     try {
       Directory documentationDirectory = model.getDocumentationDirectory(aip.getId());
-      numberOfDocumentationFiles = storage.countResourcesUnderDirectory(documentationDirectory.getStoragePath(), true);
+      numberOfDocumentationFiles = model.countResourcesUnderDirectory(documentationDirectory.getStoragePath(), true);
     } catch (NotFoundException e) {
       numberOfDocumentationFiles = 0L;
     }
@@ -226,7 +224,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     Long numberOfSchemaFiles;
     try {
       Directory schemasDirectory = model.getSchemasDirectory(aip.getId());
-      numberOfSchemaFiles = storage.countResourcesUnderDirectory(schemasDirectory.getStoragePath(), true);
+      numberOfSchemaFiles = model.countResourcesUnderDirectory(schemasDirectory.getStoragePath(), true);
     } catch (NotFoundException e) {
       numberOfSchemaFiles = 0L;
     }

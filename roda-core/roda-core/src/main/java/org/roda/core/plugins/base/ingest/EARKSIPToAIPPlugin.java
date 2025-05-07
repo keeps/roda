@@ -50,7 +50,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.ParseException;
 import org.roda_project.commons_ip.model.SIP;
@@ -105,43 +104,42 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
     forceSearchScope = PluginHelper.getForceParentIdFromParameters(this);
     jobWorkingDirectory = PluginHelper.getJobWorkingDirectory(this);
 
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<TransferredResource>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<TransferredResource> plugin, TransferredResource object) {
-        processTransferredResource(index, model, storage, report, cachedJob, object);
+        processTransferredResource(index, model, report, cachedJob, object);
       }
-    }, index, model, storage, liteList);
+    }, index, model, liteList);
   }
 
-  private void processTransferredResource(IndexService index, ModelService model, StorageService storage, Report report,
-    Job job, TransferredResource transferredResource) {
+  private void processTransferredResource(IndexService index, ModelService model, Report report, Job job,
+    TransferredResource transferredResource) {
     Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
 
     Path earkSIPPath = Paths.get(FilenameUtils.normalize(transferredResource.getFullPath()));
     LOGGER.debug("Converting {} to AIP", earkSIPPath);
 
-    transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, createSubmission,
-      reportItem, job.getId(), computedSearchScope, forceSearchScope, jobWorkingDirectory, job);
+    transformTransferredResourceIntoAnAIP(index, model, transferredResource, earkSIPPath, createSubmission, reportItem,
+      job.getId(), computedSearchScope, forceSearchScope, jobWorkingDirectory, job);
     report.addReport(reportItem);
 
     PluginHelper.createJobReport(this, model, reportItem, job);
   }
 
-  private void transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
+  private void transformTransferredResourceIntoAnAIP(IndexService index, ModelService model,
     TransferredResource transferredResource, Path earkSIPPath, boolean createSubmission, Report reportItem,
     String jobId, Optional<String> computedSearchScope, boolean forceSearchScope, Path jobWorkingDirectory,
     Job cachedJob) {
@@ -160,7 +158,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
             forceSearchScope, jobId);
           aip = processNewSIP(index, model, reportItem, sip, parentId, transferredResource.getUUID());
         } else if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
-          aip = processUpdateSIP(index, model, storage, sip, computedSearchScope, forceSearchScope);
+          aip = processUpdateSIP(index, model, sip, computedSearchScope, forceSearchScope);
         } else {
           throw new GenericException("Unknown IP Status: " + sip.getStatus());
         }
@@ -208,9 +206,9 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       computedParentId, ingestSIPUUID, this);
   }
 
-  private AIP processUpdateSIP(IndexService index, ModelService model, StorageService storage, SIP sip,
-    Optional<String> searchScope, boolean forceSearchScope) throws GenericException, RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException, LockingException {
+  private AIP processUpdateSIP(IndexService index, ModelService model, SIP sip, Optional<String> searchScope,
+    boolean forceSearchScope) throws GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException, AlreadyExistsException, ValidationException, LockingException {
     String searchScopeString = searchScope.orElse(null);
 
     List<FilterParameter> possibleStates = new ArrayList<>();
@@ -256,7 +254,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

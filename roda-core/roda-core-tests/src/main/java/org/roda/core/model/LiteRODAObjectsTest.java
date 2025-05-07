@@ -139,7 +139,7 @@ public class LiteRODAObjectsTest {
       new StringContentPayload(""), RodaConstants.ADMIN, true);
     index.commit(IndexedFile.class);
 
-    RodaCoreFactory.getStorageService().deleteResource(ModelUtils.getFileStoragePath(file));
+    model.deleteResource(ModelUtils.getFileStoragePath(file));
     Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.FILE_HASH));
 
     try {

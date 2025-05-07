@@ -17,7 +17,6 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
-import org.roda.core.storage.StorageService;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
@@ -27,7 +26,6 @@ public class MultipleStepBundle {
   private Plugin<?> plugin;
   private IndexService index;
   private ModelService model;
-  private StorageService storage;
   private MultipleJobPluginInfo mutipleJobPluginInfo;
   private PluginParameter pluginParameter;
   private Map<String, String> parameterValues;
@@ -35,14 +33,13 @@ public class MultipleStepBundle {
   private Job cachedJob;
 
   public MultipleStepBundle(final Plugin<?> plugin, final IndexService index, final ModelService model,
-    final StorageService storage, final MultipleJobPluginInfo mutipleJobPluginInfo,
+    final MultipleJobPluginInfo mutipleJobPluginInfo,
     final PluginParameter pluginParameter, final Map<String, String> parameterValues,
     final List<? extends IsRODAObject> objects, final Job cachedJob) {
 
     this.plugin = plugin;
     this.index = index;
     this.model = model;
-    this.storage = storage;
     this.mutipleJobPluginInfo = mutipleJobPluginInfo;
     this.pluginParameter = pluginParameter;
     this.parameterValues = parameterValues;
@@ -72,14 +69,6 @@ public class MultipleStepBundle {
 
   public void setModel(final ModelService model) {
     this.model = model;
-  }
-
-  public StorageService getStorage() {
-    return storage;
-  }
-
-  public void setStorage(final StorageService storage) {
-    this.storage = storage;
   }
 
   public MultipleJobPluginInfo getJobPluginInfo() {

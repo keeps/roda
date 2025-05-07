@@ -7,15 +7,6 @@
  */
 package org.roda.core.plugins.base.maintenance;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.dips.DIPUtils;
@@ -32,7 +23,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
@@ -63,10 +53,18 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
@@ -567,8 +565,7 @@ public class DeleteRodaObjectPluginUtils {
       }
       List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(model,
         Collections.singletonList(dip));
-      externalDeletePlugin.execute(RodaCoreFactory.getIndexService(), model, RodaCoreFactory.getStorageService(),
-        lites);
+      externalDeletePlugin.execute(RodaCoreFactory.getIndexService(), model, lites);
     } catch (PluginException e) {
       Report reportItem = PluginHelper.initPluginReportItem(plugin, dip.getId(), DIP.class);
       PluginState state = PluginState.FAILURE;

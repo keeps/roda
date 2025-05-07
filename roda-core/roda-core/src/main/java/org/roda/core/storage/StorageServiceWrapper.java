@@ -197,6 +197,12 @@ public class StorageServiceWrapper implements StorageService {
   }
 
   @Override
+  public DirectResourceAccess getDirectAccessToVersion(StoragePath storagePath, String version)
+    throws RequestNotValidException, GenericException {
+    return storageService.getDirectAccessToVersion(storagePath, version);
+  }
+
+  @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     return storageService.listBinaryVersions(storagePath);

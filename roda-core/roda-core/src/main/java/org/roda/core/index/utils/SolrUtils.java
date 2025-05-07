@@ -97,7 +97,6 @@ import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.ChildOfFilterParameter;
-import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -108,6 +107,7 @@ import org.roda.core.data.v2.index.filter.LongRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
+import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -118,8 +118,6 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.HasPermissionFilters;
-import org.roda.core.data.v2.ip.HasPermissions;
-import org.roda.core.data.v2.ip.HasState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
@@ -1509,7 +1507,7 @@ public class SolrUtils {
 
     for (DescriptiveMetadata metadata : metadataList) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, metadata.getId());
-      Binary binary = model.getStorage().getBinary(storagePath);
+      Binary binary = model.getBinary(storagePath);
       try {
         SolrInputDocument fields = getDescriptiveMetadataFields(binary, metadata.getType(), metadata.getVersion());
         for (SolrInputField field : fields) {

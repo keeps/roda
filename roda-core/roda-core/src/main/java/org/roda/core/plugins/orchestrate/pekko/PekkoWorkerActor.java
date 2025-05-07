@@ -27,7 +27,6 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginHelper;
-import org.roda.core.storage.StorageService;
 import org.roda.core.transaction.RODATransactionException;
 import org.roda.core.transaction.RODATransactionManager;
 import org.roda.core.util.IdUtils;
@@ -39,12 +38,10 @@ public class PekkoWorkerActor extends PekkoBaseActor {
 
   private final IndexService index;
   private final ModelService model;
-  private final StorageService storage;
   private RODATransactionManager RODATransactionManager;
 
   public PekkoWorkerActor() {
     super();
-    this.storage = getStorage();
     this.model = getModel();
     this.index = getIndex();
     this.RODATransactionManager = getStorageTransactionManager();
@@ -76,7 +73,7 @@ public class PekkoWorkerActor extends PekkoBaseActor {
       if (RODATransactionManager != null) {
         RODATransactionManager.runPluginInTransaction(requestUUID, objectsToBeProcessed, plugin);
       } else {
-        plugin.execute(index, model, storage, objectsToBeProcessed);
+        plugin.execute(index, model, objectsToBeProcessed);
       }
       getSender().tell(Messages.newPluginExecuteIsDone(plugin, false).withParallelism(message.getParallelism())
         .withJobPriority(message.getJobPriority()), getSelf());
@@ -112,7 +109,7 @@ public class PekkoWorkerActor extends PekkoBaseActor {
       JobParallelism parallelism = job.getParallelism();
       JobPriority priority = job.getPriority();
       try {
-        plugin.afterAllExecute(index, model, storage);
+        plugin.afterAllExecute(index, model);
         getSender().tell(
           Messages.newPluginAfterAllExecuteIsDone(plugin, false).withJobPriority(priority).withParallelism(parallelism),
           getSelf());

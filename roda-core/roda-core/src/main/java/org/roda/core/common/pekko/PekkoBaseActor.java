@@ -14,7 +14,6 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginOrchestrator;
-import org.roda.core.storage.StorageService;
 
 import com.codahale.metrics.MetricRegistry;
 
@@ -35,10 +34,6 @@ public abstract class PekkoBaseActor extends UntypedAbstractActor {
   public void setup(Object msg) throws Exception {
     org.slf4j.MDC.put("pekkoSourceActor", self().path().toString());
     org.slf4j.MDC.put("pekkoSourceThread", Thread.currentThread().getName());
-  }
-
-  public StorageService getStorage() {
-    return RodaCoreFactory.getStorageService();
   }
 
   public ModelService getModel() {

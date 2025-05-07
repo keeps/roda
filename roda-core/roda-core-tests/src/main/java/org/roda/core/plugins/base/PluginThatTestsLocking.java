@@ -32,7 +32,6 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.pekko.PekkoJobsManager;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,20 +120,20 @@ public class PluginThatTestsLocking extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model)
     throws PluginException {
     LOGGER.info("Doing nothing during beforeAllExecute");
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
+  public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> list) throws PluginException {
 
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<AIP>() {
 
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+      public void process(IndexService index, ModelService model, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
         try {
           Thread.sleep(1000);
@@ -156,7 +155,7 @@ public class PluginThatTestsLocking extends AbstractPlugin<AIP> {
           report.addReport(reportItem);
         }
       }
-    }, index, model, storage, list, autoLoking);
+    }, index, model, list, autoLoking);
   }
 
   private static void addDetails(Report report, String details) {
@@ -168,7 +167,7 @@ public class PluginThatTestsLocking extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     LOGGER.info("Doing nothing during afterAllExecute");
     return null;
   }

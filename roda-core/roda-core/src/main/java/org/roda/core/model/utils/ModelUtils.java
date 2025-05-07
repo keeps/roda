@@ -22,15 +22,13 @@ import java.util.Optional;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
@@ -47,9 +45,9 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -63,14 +61,8 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
-import org.roda.core.protocols.Protocol;
-import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.JsonContentPayload;
-import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.storage.Directory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -849,6 +841,65 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
+  public static <T extends IsRODAObject> StoragePath getStoragePath(T object) throws RequestNotValidException {
+    if (object instanceof AIP aip) {
+      return getAIPStoragePath(aip.getId());
+    }
+    if (object instanceof Representation representation) {
+      return getRepresentationStoragePath(representation.getAipId(), representation.getId());
+    }
+    if (object instanceof DescriptiveMetadata descriptiveMetadata) {
+      return getDescriptiveMetadataStoragePath(descriptiveMetadata);
+    }
+    if (object instanceof Directory directory) {
+      return directory.getStoragePath();
+    }
+    if (object instanceof File file) {
+      return getFileStoragePath(file);
+    }
+    if (object instanceof DIPFile dipFile) {
+      return getDIPFileStoragePath(dipFile);
+    }
+    if (object instanceof PreservationMetadata pm) {
+      return getPreservationMetadataStoragePath(pm);
+    }
+    if (object instanceof IndexedPreservationEvent event) {
+      return getPreservationEventStoragePath(event.getFileUUID());
+    }
+    if (object instanceof Job job) {
+      return getJobStoragePath(job.getId());
+    }
+    if (object instanceof DisposalHold disposalHold) {
+      return getDisposalHoldStoragePath(disposalHold.getId());
+    }
+    if (object instanceof DistributedInstance distributedInstance) {
+      return getDistributedInstanceStoragePath(distributedInstance.getId());
+    }
+    if (object instanceof AccessKey accessKey) {
+      return getAccessKeysStoragePath(accessKey.getId());
+    }
+    if (object instanceof Report report) {
+      return getJobReportStoragePath(report.getJobId(), report.getId());
+    }
+    if (object instanceof Risk risk) {
+      return getRiskStoragePath(risk.getId());
+    }
+    if (object instanceof RiskIncidence riskIncidence) {
+      return getRiskIncidenceStoragePath(riskIncidence.getId());
+    }
+    if (object instanceof RepresentationInformation representationInformation) {
+      return getRepresentationInformationStoragePath(representationInformation.getId());
+    }
+    if (object instanceof Notification notification) {
+      return getNotificationStoragePath(notification.getId());
+    }
+    if (object instanceof DIP dip) {
+      return getDIPStoragePath(dip.getId());
+    }
+    throw new RequestNotValidException("Cannot get storage path for entity using only its object: "
+      + object.getClass().getSimpleName() + " " + object.getId());
+  }
+
   public static <T extends Serializable> StoragePath getContainerPath(Class<T> clazz) throws RequestNotValidException {
     if (clazz.equals(RepresentationInformation.class)) {
       return getRepresentationInformationContainerPath();
@@ -1015,46 +1066,6 @@ public final class ModelUtils {
     return Arrays.asList(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION, confirmationId);
   }
 
-  public static StorageService resolveTemporaryResourceShallow(String jobId, StorageService storage,
-    StoragePath storagePath) throws GenericException {
-    FileStorageService temporaryStorage;
-    Path tempPath = RodaCoreFactory.getFileShallowTmpDirectoryPath().resolve(jobId)
-      .resolve(String.valueOf(storagePath.hashCode()));
-    try {
-      if (Files.exists(tempPath)) {
-        temporaryStorage = new FileStorageService(tempPath, false, null, false);
-      } else {
-        Files.createDirectories(tempPath);
-        temporaryStorage = new FileStorageService(tempPath, false, null, false);
-
-        temporaryStorage.copy(storage, storagePath, storagePath);
-        List<StoragePath> externalFiles = temporaryStorage.getShallowFiles(storagePath);
-        for (StoragePath externalFile : externalFiles) {
-          final CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderFile(externalFile, true);
-          for (Resource resource : resources) {
-            if (resource instanceof DefaultBinary) {
-              ContentPayload content = ((DefaultBinary) resource).getContent();
-              if (content instanceof JsonContentPayload) {
-                ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
-                Protocol pm = RodaCoreFactory.getProtocol(shallowFile.getLocation());
-                // ProtocolManager pm =
-                // ProtocolManagerFactory.createProtocolManager(shallowFile.getLocation());
-                pm.downloadResource(temporaryStorage.getDirectAccess(externalFile).getPath().getParent());
-              }
-
-            }
-          }
-          temporaryStorage.deleteResource(externalFile);
-        }
-      }
-    } catch (IOException | AlreadyExistsException | AuthorizationDeniedException e) {
-      throw new GenericException("Cannot create temporary directory " + tempPath);
-    } catch (RequestNotValidException | NotFoundException e) {
-      throw new GenericException("Cannot found resources at " + storagePath.toString());
-    }
-    return temporaryStorage;
-  }
-
   public static void removeTemporaryResourceShallow(String jobId, StoragePath storagePath) throws IOException {
     Path tempPath = RodaCoreFactory.getFileShallowTmpDirectoryPath().resolve(jobId)
       .resolve(String.valueOf(storagePath.hashCode()));
@@ -1083,5 +1094,11 @@ public final class ModelUtils {
         LOGGER.error("Could not delete temporary AIP shallow" + aip.getId());
       }
     }
+  }
+
+  public static void removeTemporaryRepresentationDataShallow(String jobId, String aipId, String representationId)
+    throws RequestNotValidException, IOException {
+    StoragePath storagePath = getRepresentationDataStoragePath(aipId, representationId);
+    removeTemporaryResourceShallow(jobId, storagePath);
   }
 }
