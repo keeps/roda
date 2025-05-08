@@ -28,14 +28,12 @@ import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -125,9 +123,8 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     JobPluginInfo jobPluginInfo, DisposalConfirmation disposalConfirmation) {
 
     try {
-      StoragePath disposalConfirmationAIPsPath = ModelUtils
-        .getDisposalConfirmationAIPsPath(disposalConfirmation.getId());
-      Binary binary = model.getBinary(disposalConfirmationAIPsPath);
+      Binary binary = model.getBinary(disposalConfirmation,
+        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
 
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()))) {
         jobPluginInfo.setSourceObjectsCount(disposalConfirmation.getNumberOfAIPs().intValue());

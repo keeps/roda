@@ -113,8 +113,8 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, Report report, Job cachedJob,
@@ -124,8 +124,8 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     }, index, model, liteList);
   }
 
-  private void processAIP(IndexService index, ModelService model, Report report,
-    JobPluginInfo jobPluginInfo, Job job, AIP aip) {
+  private void processAIP(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    AIP aip) {
     boolean aipFailed = false;
     boolean aipSkipped = false;
     List<LinkingIdentifier> sources = new ArrayList<>();
@@ -155,8 +155,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                     LOGGER.error("Error on removing temporary AIP " + aip.getId(), e);
                   }
                 } else {
-                  StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-                  Binary currentFileBinary = model.getBinary(storagePath);
+                  Binary currentFileBinary = model.getBinary(file);
                   List<Fixity> fixities = null;
 
                   try {
@@ -455,8 +454,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

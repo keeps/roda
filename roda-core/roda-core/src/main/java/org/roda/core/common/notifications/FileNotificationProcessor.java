@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.model.ModelService;
@@ -52,7 +53,7 @@ public class FileNotificationProcessor implements NotificationProcessor {
         if (FSUtils.isDirectory(trimmedDropPath)) {
           try (
             DirectResourceAccess jobAccess = model.getDirectAccess(job);
-            DirectResourceAccess jobReportAccess = model.getJobReportsDirectAccess(job)) {
+            DirectResourceAccess jobReportAccess = model.getDirectAccess(Report.class, job.getId())) {
 
             Path jobPath = FSUtils.createDirectory(trimmedDropPath, job.getId());
 

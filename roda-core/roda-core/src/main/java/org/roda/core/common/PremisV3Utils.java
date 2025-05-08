@@ -56,7 +56,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -650,7 +649,7 @@ public final class PremisV3Utils {
     objectCharacteristics.getFormat().add(formatComplexType);
     file.getObjectCharacteristics().add(objectCharacteristics);
 
-    Binary binary = model.getBinary(ModelUtils.getFileStoragePath(originalFile));
+    Binary binary = model.getBinary(originalFile);
     if (binary != null && binary.getContentDigest() != null && !binary.getContentDigest().isEmpty()) {
       // use binary content digest information
       for (Entry<String, String> entry : binary.getContentDigest().entrySet()) {
@@ -686,8 +685,7 @@ public final class PremisV3Utils {
     StorageComplexType storage = FACTORY.createStorageComplexType();
     String contentLocation;
     try {
-      contentLocation = String
-        .valueOf(model.getBinary(ModelUtils.getFileStoragePath(originalFile)).getContent().getURI());
+      contentLocation = String.valueOf(model.getBinary(originalFile).getContent().getURI());
     } catch (IOException e) {
       LOGGER.debug("Can't create URI, {}: {}", e.getCause(), e.getMessage());
       contentLocation = ModelUtils.getFileStoragePath(originalFile).asString("/", null, null, false);
@@ -978,8 +976,7 @@ public final class PremisV3Utils {
     } else if (pm.getType().equals(PreservationMetadataType.REPRESENTATION)
       || pm.getType().equals(PreservationMetadataType.FILE)) {
       try {
-        StoragePath path = ModelUtils.getPreservationMetadataStoragePath(pm);
-        ContentPayload payload = model.getBinary(path).getContent();
+        ContentPayload payload = model.getBinary(pm).getContent();
 
         model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
           pm.getFileDirectoryPath(), pm.getFileId(), payload, username, false);

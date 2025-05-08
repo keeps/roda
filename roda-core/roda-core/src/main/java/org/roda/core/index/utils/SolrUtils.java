@@ -123,7 +123,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
@@ -135,7 +134,6 @@ import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.utils.RODAInstanceUtils;
@@ -1553,8 +1551,7 @@ public class SolrUtils {
     Set<String> usedNonRepeatableFields = new HashSet<>();
 
     for (DescriptiveMetadata metadata : metadataList) {
-      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, metadata.getId());
-      Binary binary = model.getBinary(storagePath);
+      Binary binary = model.getBinary(metadata);
       try {
         SolrInputDocument fields = getDescriptiveMetadataFields(binary, metadata.getType(), metadata.getVersion());
         for (SolrInputField field : fields) {

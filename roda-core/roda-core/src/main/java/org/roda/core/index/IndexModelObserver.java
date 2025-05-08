@@ -33,6 +33,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
@@ -81,11 +82,13 @@ import org.roda.core.index.schema.collections.RepresentationCollection;
 import org.roda.core.index.schema.collections.RiskCollection;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.fs.FSUtils;
@@ -1127,14 +1130,14 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> indexJobReports(Job job) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try (CloseableIterable<Resource> listResourcesUnderDirectory = model
-      .listResourcesUnderDirectory(ModelUtils.getJobReportsStoragePath(job.getId()), true)) {
+    try (CloseableIterable<OptionalWithCause<LiteRODAObject>> listJobReportLites = model
+      .listReportLitesUnder(job.getId())) {
 
-      if (listResourcesUnderDirectory != null) {
-        for (Resource resource : listResourcesUnderDirectory) {
-          if (!resource.isDirectory()) {
+      if (listJobReportLites != null) {
+        for (OptionalWithCause<LiteRODAObject> reportLite : listJobReportLites) {
+          if (reportLite.isPresent()) {
             try (
-              InputStream inputStream = model.getBinary(resource.getStoragePath()).getContent().createInputStream()) {
+              InputStream inputStream = model.getBinary(reportLite.get()).getContent().createInputStream()) {
               Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
               jobReportCreatedOrUpdated(objectFromJson, job).addTo(ret);
             } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
@@ -1142,6 +1145,9 @@ public class IndexModelObserver implements ModelObserver {
               LOGGER.error("Error getting report json from binary", e);
               ret.add(e);
             }
+          }
+          else {
+            LOGGER.error("Invalid report lite found during indexing", reportLite.getCause());
           }
         }
       }

@@ -156,8 +156,8 @@ public class SiegfriedPluginUtils {
     if (representation.getHasShallowFiles()) {
       StorageService tmpStorageService = model.resolveTemporaryResourceShallow(jobId,
         ModelUtils.getAIPStoragePath(representation.getAipId()));
-      try (DirectResourceAccess directAccess = model.getRepresentationDataDirectAccess(representation,
-        tmpStorageService)) {
+      try (DirectResourceAccess directAccess = model.getDirectAccess(representation, tmpStorageService,
+        RodaConstants.STORAGE_DIRECTORY_DATA)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, index, representation.getAipId(), representation.getId(),
           new ArrayList<>(), null, representationFsPath, username, overwriteManual);
@@ -175,7 +175,8 @@ public class SiegfriedPluginUtils {
         }
       }
     } else {
-      try (DirectResourceAccess directAccess = model.getRepresentationDataDirectAccess(representation)) {
+      try (DirectResourceAccess directAccess = model.getDirectAccess(representation,
+        RodaConstants.STORAGE_DIRECTORY_DATA)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, index, representation.getAipId(), representation.getId(),
           new ArrayList<>(), null, representationFsPath, username, overwriteManual);
