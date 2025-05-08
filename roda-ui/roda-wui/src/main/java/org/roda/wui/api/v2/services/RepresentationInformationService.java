@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -26,6 +27,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.FindRequest;
@@ -43,12 +45,13 @@ import org.roda.core.data.v2.ri.RepresentationInformationFilterRequest;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.core.data.v2.ri.RepresentationInformationRelationOptions;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.base.maintenance.AddRepresentationInformationFilterPlugin;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.common.model.RequestContext;
@@ -357,8 +360,13 @@ public class RepresentationInformationService {
     final ConsumesOutputStream stream;
 
     ModelService model = RodaCoreFactory.getModelService();
-    Binary riBinary = model.getBinary(ModelUtils.getRepresentationInformationStoragePath(id));
-    stream = new BinaryConsumesOutputStream(riBinary);
+    Optional<LiteRODAObject> liteRI = LiteRODAObjectFactory.get(RepresentationInformation.class, id);
+    if (liteRI.isEmpty()) {
+      throw new RequestNotValidException("Could not get representation information lite with id: " + id);
+    }
+    DirectResourceAccess riAccess = model.getDirectAccess(liteRI.get());
+    Binary riBinary = model.getBinary(liteRI.get());
+    stream = new BinaryConsumesOutputStream(riBinary, riAccess.getPath());
     return new StreamResponse(stream);
   }
 

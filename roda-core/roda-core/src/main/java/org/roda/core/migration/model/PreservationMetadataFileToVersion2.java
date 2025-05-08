@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -21,18 +22,20 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
+import org.roda.core.data.v2.LiteRODAObject;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.migration.MigrationAction;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageService;
+import org.roda.core.storage.DirectResourceAccess;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,23 +49,36 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
 
   @Override
   public void migrate(ModelService model) {
-    try (
-      CloseableIterable<Resource> aips = model.listResourcesUnderDirectory(ModelUtils.getAIPContainerPath(), false)) {
+    try (DirectResourceAccess aipsContainer = model.getDirectAccess(AIP.class);
+      CloseableIterable<DirectResourceAccess> aips = FSUtils.listDirectAccessResourceChildren(aipsContainer, false)) {
 
-      for (Resource aip : aips) {
-        try (CloseableIterable<Resource> representations = model.listResourcesUnderDirectory(
-          ModelUtils.getRepresentationsContainerPath(aip.getStoragePath().getName()), false)) {
+      for (DirectResourceAccess aip : aips) {
+        try (
+          DirectResourceAccess representationsContainer = FSUtils.resolve(aip,
+            RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS);
+          CloseableIterable<DirectResourceAccess> representations = FSUtils
+            .listDirectAccessResourceChildren(representationsContainer, false)) {
+          for (DirectResourceAccess representation : representations) {
+            DirectResourceAccess pmAccess = FSUtils.resolve(representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
+              RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
 
-          for (Resource representation : representations) {
-            StoragePath pmPath = DefaultStoragePath.parse(representation.getStoragePath(),
-              RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
+            try (
+              CloseableIterable<DirectResourceAccess> pms = FSUtils.listDirectAccessResourceChildren(pmAccess, true)) {
+              for (DirectResourceAccess pm : pms) {
 
-            try (CloseableIterable<Resource> pms = model.listResourcesUnderDirectory(pmPath, true)) {
-              for (Resource pm : pms) {
-                if (!pm.isDirectory() && pm instanceof Binary && pm.getStoragePath().getName().startsWith(URNUtils
-                  .getPremisPrefix(PreservationMetadataType.FILE, RODAInstanceUtils.getLocalInstanceIdentifier()))) {
-                  Binary binary = (Binary) pm;
-                  migrate(model, binary);
+                if (!pm.isDirectory()) {
+                  Optional<LiteRODAObject> litePM = LiteRODAObjectFactory.get(PreservationMetadata.class,
+                    aip.getPath().getFileName().toString(), representation.getPath().getFileName().toString(),
+                    pm.getPath().getFileName().toString().replace(RodaConstants.PREMIS_SUFFIX, ""));
+                  if (litePM.isPresent()) {
+                    if (pm.getPath().getFileName().startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.FILE,
+                      RODAInstanceUtils.getLocalInstanceIdentifier()))) {
+                      Binary pmBinary = model.getBinary(litePM.get());
+                      migrate(model, pmBinary);
+                    }
+                  } else {
+                    LOGGER.warn("Could not create LITE from preservation metadata file {}", pm.getPath().getFileName());
+                  }
                 }
               }
             } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException

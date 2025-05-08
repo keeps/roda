@@ -15,14 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.model.ModelService;
 import org.roda.core.util.IdUtils;
 import org.testng.Assert;
 
@@ -37,7 +35,7 @@ public class StorageTestUtils {
   }
 
   public static StoragePath generateRandomResourceStoragePathUnder(StoragePath basePath)
-    throws RequestNotValidException {
+          throws RequestNotValidException {
     List<String> path = new ArrayList<>(basePath.asList());
     path.add(IdUtils.createUUID());
 
@@ -45,7 +43,7 @@ public class StorageTestUtils {
   }
 
   public static void populate(StorageService storage, StoragePath basepath) throws AlreadyExistsException,
-    GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+          GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     // create 3 directories with 3 sub-directories each and 3 binaries under
     // each sub-directory
     int highLevelSize = 3;
@@ -58,12 +56,12 @@ public class StorageTestUtils {
 
       for (int j = 0; j < mediumLevelSize; j++) {
         final StoragePath subDirectoryStoragePath = StorageTestUtils
-          .generateRandomResourceStoragePathUnder(directoryStoragePath);
+                .generateRandomResourceStoragePathUnder(directoryStoragePath);
         storage.createDirectory(subDirectoryStoragePath);
 
         for (int k = 0; k < lowLevelSize; k++) {
           final StoragePath binaryStoragePath = StorageTestUtils
-            .generateRandomResourceStoragePathUnder(subDirectoryStoragePath);
+                  .generateRandomResourceStoragePathUnder(subDirectoryStoragePath);
           final ContentPayload payload = new RandomMockContentPayload();
           storage.createBinary(binaryStoragePath, payload, false);
         }
@@ -71,58 +69,9 @@ public class StorageTestUtils {
     }
   }
 
-  public static void testEntityEqualRODAStorageRecursively(StorageService sourceStorage, StoragePath sourceEntityStoragePath, StoragePath targetEntityStoragePath)
-          throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
-    ModelService model = RodaCoreFactory.getModelService();
-
-    assertEquals(sourceEntityStoragePath.isFromAContainer(), targetEntityStoragePath.isFromAContainer());
-
-    Class<? extends Entity> sourceEntity = sourceStorage.getEntity(sourceEntityStoragePath);
-    Class<? extends Entity> targetEntity = model.getEntity(targetEntityStoragePath);
-
-    Iterable<Resource> sourceResourceList = null;
-    if (Container.class.isAssignableFrom(sourceEntity) && Container.class.isAssignableFrom(targetEntity)) {
-      sourceResourceList = sourceStorage.listResourcesUnderContainer(sourceEntityStoragePath, false);
-
-    } else if (Directory.class.isAssignableFrom(sourceEntity) && Directory.class.isAssignableFrom(targetEntity)) {
-
-      Directory sourceDirectory = sourceStorage.getDirectory(sourceEntityStoragePath);
-      Directory targetDirectory = model.getDirectory(targetEntityStoragePath);
-
-      assertEquals(sourceDirectory.isDirectory(), targetDirectory.isDirectory());
-
-      sourceResourceList = sourceStorage.listResourcesUnderDirectory(sourceEntityStoragePath, false);
-
-    } else if (Binary.class.isAssignableFrom(sourceEntity) && Binary.class.isAssignableFrom(targetEntity)) {
-
-      Binary sourceBinary = sourceStorage.getBinary(sourceEntityStoragePath);
-      Binary targetBinary = model.getBinary(targetEntityStoragePath);
-
-      assertEquals(sourceBinary.isDirectory(), targetBinary.isDirectory());
-      assertEquals(sourceBinary.getContentDigest(), targetBinary.getContentDigest());
-      assertEquals(sourceBinary.getSizeInBytes(), targetBinary.getSizeInBytes());
-      assertEquals(sourceBinary.isReference(), targetBinary.isReference());
-      assertTrue(IOUtils.contentEquals(sourceBinary.getContent().createInputStream(),
-              targetBinary.getContent().createInputStream()));
-
-    } else {
-      Assert.fail("Compared entities are not of the same type. source=" + sourceEntity + " target=" + targetEntity);
-    }
-
-    // Recursive call
-    if (sourceResourceList != null) {
-      for (Resource r : sourceResourceList) {
-        StoragePath targetResourceStoragePath = DefaultStoragePath.parse(targetEntityStoragePath,
-                r.getStoragePath().getName());
-        testEntityEqualRODAStorageRecursively(sourceStorage, r.getStoragePath(), targetResourceStoragePath);
-      }
-    }
-
-  }
-
   public static void testEntityEqualRecursively(StorageService sourceStorage, StoragePath sourceEntityStoragePath,
-    StorageService targetStorage, StoragePath targetEntityStoragePath)
-    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
+                                                StorageService targetStorage, StoragePath targetEntityStoragePath)
+          throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
 
     assertEquals(sourceEntityStoragePath.isFromAContainer(), targetEntityStoragePath.isFromAContainer());
 
@@ -152,7 +101,7 @@ public class StorageTestUtils {
       assertEquals(sourceBinary.getSizeInBytes(), targetBinary.getSizeInBytes());
       assertEquals(sourceBinary.isReference(), targetBinary.isReference());
       assertTrue(IOUtils.contentEquals(sourceBinary.getContent().createInputStream(),
-        targetBinary.getContent().createInputStream()));
+              targetBinary.getContent().createInputStream()));
 
     } else {
       Assert.fail("Compared entities are not of the same type. source=" + sourceEntity + " target=" + targetEntity);
@@ -162,7 +111,7 @@ public class StorageTestUtils {
     if (sourceResourceList != null) {
       for (Resource r : sourceResourceList) {
         StoragePath targetResourceStoragePath = DefaultStoragePath.parse(targetEntityStoragePath,
-          r.getStoragePath().getName());
+                r.getStoragePath().getName());
         testEntityEqualRecursively(sourceStorage, r.getStoragePath(), targetStorage, targetResourceStoragePath);
       }
     }

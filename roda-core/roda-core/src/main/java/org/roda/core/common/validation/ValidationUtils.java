@@ -85,8 +85,7 @@ public class ValidationUtils {
     List<DescriptiveMetadata> descriptiveMetadata = aip.getDescriptiveMetadata();
     List<Pair<String, String>> schemasInfo = new ArrayList<>();
     for (DescriptiveMetadata dm : descriptiveMetadata) {
-      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(dm);
-      Binary binary = model.getBinary(storagePath);
+      Binary binary = model.getBinary(dm);
 
       if (forceDescriptiveMetadataType) {
         if (validateDescriptiveMetadata) {
@@ -216,9 +215,7 @@ public class ValidationUtils {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ValidationReport ret;
     if (metadata != null) {
-      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(metadata.getAipId(),
-        metadata.getRepresentationId(), metadata.getId());
-      Binary binary = model.getBinary(storagePath);
+      Binary binary = model.getBinary(metadata);
       ret = validateDescriptiveBinary(binary.getContent(), metadata.getType(), metadata.getVersion(), failIfNoSchema);
     } else {
       ret = new ValidationReport();
@@ -251,8 +248,7 @@ public class ValidationUtils {
   public static ValidationReport isPreservationMetadataValid(ModelService model, PreservationMetadata metadata,
     boolean failIfNoSchema)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(metadata);
-    Binary binary = model.getBinary(storagePath);
+    Binary binary = model.getBinary(metadata);
     return validatePreservationBinary(binary, failIfNoSchema);
   }
 
