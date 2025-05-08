@@ -27,12 +27,10 @@ import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
@@ -121,8 +119,7 @@ public class InventoryReportPluginUtils {
       } else if (InventoryReportPlugin.CHECKSUM_ALGORITHMS.contains(fieldName.toUpperCase())) {
         if (fixities == null) {
           try {
-            StoragePath descriptiveMetadataStoragePath = ModelUtils.getDescriptiveMetadataStoragePath(dm);
-            Binary descriptiveMetadataBinary = model.getBinary(descriptiveMetadataStoragePath);
+            Binary descriptiveMetadataBinary = model.getBinary(dm);
             fixities = FileUtility.checksums(descriptiveMetadataBinary.getContent().createInputStream(),
               InventoryReportPlugin.CHECKSUM_ALGORITHMS);
           } catch (IOException | GenericException | RequestNotValidException | NotFoundException
@@ -205,7 +202,7 @@ public class InventoryReportPluginUtils {
     }
     if (StringUtils.isBlank(fixity)) {
       try {
-        Binary binary = model.getBinary(ModelUtils.getFileStoragePath(file));
+        Binary binary = model.getBinary(file);
         fixity = FileUtility.checksum(binary.getContent().createInputStream(), fixityAlgorithm);
       } catch (NoSuchAlgorithmException | IOException | GenericException | RequestNotValidException | NotFoundException
         | AuthorizationDeniedException e) {
@@ -259,9 +256,7 @@ public class InventoryReportPluginUtils {
       } else if (InventoryReportPlugin.CHECKSUM_ALGORITHMS.contains(fieldName.toUpperCase())) {
         if (fixities == null) {
           try {
-            Binary otherMetadataBinary = model.getBinary(ModelUtils.getOtherMetadataStoragePath(
-              otherMetadata.getAipId(), otherMetadata.getRepresentationId(), otherMetadata.getFileDirectoryPath(),
-              otherMetadata.getFileId(), otherMetadata.getFileSuffix(), otherMetadata.getType()));
+            Binary otherMetadataBinary = model.getBinary(otherMetadata);
             fixities = FileUtility.checksums(otherMetadataBinary.getContent().createInputStream(),
               InventoryReportPlugin.CHECKSUM_ALGORITHMS);
           } catch (IOException | GenericException | RequestNotValidException | NotFoundException

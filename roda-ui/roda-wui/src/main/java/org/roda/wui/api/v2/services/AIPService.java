@@ -36,6 +36,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.DefaultConsumesOutputStream;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -84,6 +85,7 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StringContentPayload;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.HTMLUtils;
@@ -122,9 +124,8 @@ public class AIPService {
     }
 
     DirectResourceAccess directAccess = modelService.getDirectAccess(liteMetadata.get());
-    return new StreamResponse(
-      new BinaryConsumesOutputStream(descriptiveMetadataBinary, directAccess.getPath(),
-        RodaConstants.MEDIA_TYPE_APPLICATION_XML));
+    return new StreamResponse(new BinaryConsumesOutputStream(descriptiveMetadataBinary, directAccess.getPath(),
+      RodaConstants.MEDIA_TYPE_APPLICATION_XML));
   }
 
   public StreamResponse retrieveAIPDescriptiveMetadata(String aipId, String metadataId, String versionId,
@@ -177,9 +178,8 @@ public class AIPService {
         new ArrayList<>());
     }
 
-    return new StreamResponse(
-      new BinaryConsumesOutputStream(descriptiveMetadataBinary, descriptiveMetadataAccess.getPath(),
-        RodaConstants.MEDIA_TYPE_APPLICATION_XML));
+    return new StreamResponse(new BinaryConsumesOutputStream(descriptiveMetadataBinary,
+      descriptiveMetadataAccess.getPath(), RodaConstants.MEDIA_TYPE_APPLICATION_XML));
   }
 
   public StreamResponse retrieveRepresentationDescriptiveMetadata(String aipId, String representationId,
@@ -640,10 +640,10 @@ public class AIPService {
       for (OptionalWithCause<PreservationMetadata> oPreservationFile : preservationFiles) {
         if (oPreservationFile.isPresent()) {
           PreservationMetadata preservationFile = oPreservationFile.get();
-          StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationFile);
-          Binary binary = model.getBinary(storagePath);
+          Binary binary = model.getBinary(preservationFile);
 
-          ZipEntryInfo info = new ZipEntryInfo(model.getStoragePathAsString(storagePath, true), binary.getContent());
+          ZipEntryInfo info = new ZipEntryInfo(FSUtils.getStoragePathAsString(binary.getStoragePath(), true),
+            binary.getContent());
           zipEntries.add(info);
 
           if (preservationFile.getType() == PreservationMetadata.PreservationMetadataType.EVENT) {
@@ -655,12 +655,20 @@ public class AIPService {
                   if (!agents.containsKey(agentID)) {
                     StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentID,
                       PreservationMetadata.PreservationMetadataType.AGENT);
-                    Binary agentBinary = model.getBinary(agentPath);
-                    info = new ZipEntryInfo(
-                      model.getStoragePathAsString(DefaultStoragePath.parse(preservationFile.getAipId()), false,
-                        agentPath, true),
-                      agentBinary.getContent());
-                    agents.put(agentID, info);
+                    String pmURN = URNUtils
+                      .createRodaPreservationURN(PreservationMetadata.PreservationMetadataType.AGENT, agentID);
+                    Optional<LiteRODAObject> pmLite = LiteRODAObjectFactory.get(PreservationMetadata.class, pmURN);
+                    if (pmLite.isPresent()) {
+                      Binary agentBinary = model.getBinary(pmLite.get());
+
+                      info = new ZipEntryInfo(
+                        FSUtils.getStoragePathAsString(DefaultStoragePath.parse(preservationFile.getAipId()), false,
+                          agentPath, true),
+                        agentBinary.getContent());
+                      agents.put(agentID, info);
+                    } else {
+                      LOGGER.error("Could not get LITE object for agent {}", agentID);
+                    }
                   }
                 }
               }

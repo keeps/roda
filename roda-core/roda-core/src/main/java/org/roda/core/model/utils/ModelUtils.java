@@ -26,7 +26,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
@@ -48,6 +47,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -862,6 +862,10 @@ public final class ModelUtils {
     }
     if (object instanceof PreservationMetadata pm) {
       return getPreservationMetadataStoragePath(pm);
+    }
+    if (object instanceof OtherMetadata om) {
+      return getOtherMetadataStoragePath(om.getAipId(), om.getRepresentationId(), om.getFileDirectoryPath(),
+        om.getFileId(), om.getFileSuffix(), om.getType());
     }
     if (object instanceof IndexedPreservationEvent event) {
       return getPreservationEventStoragePath(event.getFileUUID());

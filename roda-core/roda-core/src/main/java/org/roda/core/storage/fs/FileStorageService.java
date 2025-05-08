@@ -224,9 +224,9 @@ public class FileStorageService implements StorageService {
     throws NotFoundException, GenericException {
     Path path = FSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
-      return FSUtils.recursivelyListPath(basePath, path);
+      return FSUtils.recursivelyListPathResources(basePath, path);
     } else {
-      return FSUtils.listPath(basePath, path);
+      return FSUtils.listPathResources(basePath, path);
     }
   }
 
@@ -311,9 +311,9 @@ public class FileStorageService implements StorageService {
     throws NotFoundException, GenericException {
     Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
-      return FSUtils.recursivelyListPath(basePath, directoryPath);
+      return FSUtils.recursivelyListPathResources(basePath, directoryPath);
     } else {
-      return FSUtils.listPath(basePath, directoryPath);
+      return FSUtils.listPathResources(basePath, directoryPath);
     }
   }
 
@@ -646,14 +646,14 @@ public class FileStorageService implements StorageService {
     if (historyDataPath == null) {
       throw new GenericException("Skipping get binary version because no history folder is defined!");
     }
+    // TODO disable write access to resource
+    // for UNIX programs using user with read-only permissions
+    // for Java programs using SecurityManager and Policy
     Path versionPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
 
     return new DirectResourceAccess() {
       @Override
       public Path getPath() {
-        // TODO disable write access to resource
-        // for UNIX programs using user with read-only permissions
-        // for Java programs using SecurityManager and Policy
         return versionPath;
       }
 
