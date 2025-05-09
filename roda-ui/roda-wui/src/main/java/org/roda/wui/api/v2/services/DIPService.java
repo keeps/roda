@@ -18,12 +18,10 @@ import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.UpdatePermissionsRequest;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.base.maintenance.UpdatePermissionsPlugin;
 import org.roda.core.storage.DirectResourceAccess;
@@ -48,10 +46,10 @@ public class DIPService {
     ConsumesOutputStream download;
     DirectResourceAccess dipData = model.getDirectAccess(liteDIP.get(), RodaConstants.STORAGE_DIRECTORY_DATA);
     if (dipData.isDirectory()) {
-      download = model.downloadObject(liteDIP.get(), dipUUID, false, RodaConstants.STORAGE_DIRECTORY_DATA);
+      download = model.exportObjectToStream(liteDIP.get(), dipUUID, false, RodaConstants.STORAGE_DIRECTORY_DATA);
     }
     else {
-      download = model.downloadObject(liteDIP.get(), dipUUID, false);
+      download = model.exportObjectToStream(liteDIP.get(), dipUUID, false);
     }
     return new StreamResponse(download);
   }

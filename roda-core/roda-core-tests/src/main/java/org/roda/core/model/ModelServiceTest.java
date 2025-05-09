@@ -630,7 +630,7 @@ public class ModelServiceTest {
       updatedDescriptiveMetadataBinary.getContent().createInputStream()));
 
     // check if binary version was created
-    assertEquals(1, Iterables.size(model.listBinaryVersions(updatedDescriptiveMetadataBinary)));
+    assertEquals(1, Iterables.size(model.listBinaryVersions(updatedDescriptiveMetadata)));
 
     // check if binary version message collisions are well treated
     model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
@@ -643,7 +643,7 @@ public class ModelServiceTest {
       CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, properties,
       RodaConstants.ADMIN);
 
-    assertEquals(4, Iterables.size(model.listBinaryVersions(updatedDescriptiveMetadataBinary)));
+    assertEquals(4, Iterables.size(model.listBinaryVersions(updatedDescriptiveMetadata)));
 
     // cleanup
     model.deleteAIP(aipId);

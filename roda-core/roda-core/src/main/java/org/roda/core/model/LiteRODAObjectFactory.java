@@ -25,15 +25,12 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
-import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -41,17 +38,16 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.lites.ParsedLite;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -326,60 +322,12 @@ public final class LiteRODAObjectFactory {
 
   public static <T extends IsRODAObject> OptionalWithCause<T> get(ModelService model, LiteRODAObject liteRODAObject) {
     try {
-      T ret = null;
-
-      String[] split = liteRODAObject.getInfo().split(SEPARATOR_REGEX);
-      if (split.length >= 2) {
-        String clazz = split[0];
-        String firstId = decodeId(split[1]);
-        if (AIP.class.getName().equals(clazz) || IndexedAIP.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveAIP(firstId);
-        } else if (DescriptiveMetadata.class.getName().equals(clazz)) {
-          ret = getDescriptiveMetadata(model, split);
-        } else if (DIP.class.getName().equals(clazz) || IndexedDIP.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveDIP(firstId);
-        } else if (DIPFile.class.getName().equals(clazz)) {
-          ret = getDIPFile(model, split);
-        } else if (File.class.getName().equals(clazz) || IndexedFile.class.getName().equals(clazz)) {
-          ret = getFile(model, split);
-        } else if (RepresentationInformation.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveRepresentationInformation(firstId);
-        } else if (Job.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveJob(firstId);
-        } else if (LogEntry.class.getName().equals(clazz)) {
-          // INFO 20161229 nvieira It is too complex to use model/storage and
-          // using index creates a circular dependency
-        } else if (Notification.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveNotification(firstId);
-        } else if (PreservationMetadata.class.getName().equals(clazz)) {
-          ret = getPreservationMetadata(model, split);
-        } else if (Report.class.getName().equals(clazz) || IndexedReport.class.getName().equals(clazz)) {
-          if (split.length == 3) {
-            ret = (T) model.retrieveJobReport(firstId, decodeId(split[2]));
-          }
-        } else if (Risk.class.getName().equals(clazz) || IndexedRisk.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveRisk(firstId);
-        } else if (RiskIncidence.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveRiskIncidence(firstId);
-        } else if (Representation.class.getName().equals(clazz)
-          || IndexedRepresentation.class.getName().equals(clazz)) {
-          if (split.length == 3) {
-            ret = (T) model.retrieveRepresentation(firstId, decodeId(split[2]));
-          }
-        } else if (TransferredResource.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveTransferredResource(firstId);
-        } else if (User.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveUser(firstId);
-        } else if (Group.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveGroup(firstId);
-        } else if (DisposalConfirmation.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveDisposalConfirmation(firstId);
-        } else if (DisposalHold.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveDisposalHold(firstId);
-        }
+      OptionalWithCause<ParsedLite> parsedLite = ParsedLite.parse(liteRODAObject);
+      if (parsedLite.isPresent()) {
+        return OptionalWithCause.of((T) parsedLite.get().toRODAObject(model));
+      } else {
+        throw new GenericException("Unable to parse LiteRODAObject: " + liteRODAObject, parsedLite.getCause());
       }
-
-      return OptionalWithCause.of(ret);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Unable to create object from {}", liteRODAObject, e);
       return OptionalWithCause.empty(e);
@@ -497,7 +445,7 @@ public final class LiteRODAObjectFactory {
     }
   }
 
-  private static String decodeId(String id) throws GenericException {
+  public static String decodeId(String id) throws GenericException {
     if (id != null) {
       return id.replaceAll(SEPARATOR_URL_ENCODED, SEPARATOR);
     } else {
@@ -606,5 +554,4 @@ public final class LiteRODAObjectFactory {
 
     return it;
   }
-
 }

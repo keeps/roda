@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -13,8 +14,8 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.ResourceVersion;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -23,7 +24,7 @@ import org.roda.core.data.v2.risks.RiskMitigationProperties;
 import org.roda.core.data.v2.risks.RiskMitigationTerms;
 import org.roda.core.data.v2.risks.RiskVersions;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
@@ -46,8 +47,11 @@ public class RiskService {
 
   public void deleteRiskVersion(String riskId, String versionId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
-    RodaCoreFactory.getModelService().deleteBinaryVersion(storagePath, versionId);
+    Optional<LiteRODAObject> liteRisk = LiteRODAObjectFactory.get(Risk.class, riskId);
+    if (liteRisk.isEmpty()) {
+      throw new RequestNotValidException("Could not get LITE for Risk " + riskId);
+    }
+    RodaCoreFactory.getModelService().deleteBinaryVersion(liteRisk.get(), versionId);
   }
 
   public Risk retrieveRiskVersion(String riskId, String selectedVersion)
@@ -62,11 +66,14 @@ public class RiskService {
 
   public RiskVersions retrieveRiskVersions(String riskId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
+    Optional<LiteRODAObject> liteRisk = LiteRODAObjectFactory.get(Risk.class, riskId);
+    if (liteRisk.isEmpty()) {
+      throw new RequestNotValidException("Could not get LITE for Risk " + riskId);
+    }
     RiskVersions versions = new RiskVersions();
 
-    try (
-      CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getModelService().listBinaryVersions(storagePath)) {
+    try (CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getModelService()
+      .listBinaryVersions(liteRisk.get())) {
 
       for (BinaryVersion bv : iterable) {
         versions.addObject(new ResourceVersion(bv.getId(), bv.getCreatedDate(), bv.getProperties()));
@@ -86,9 +93,12 @@ public class RiskService {
 
   public boolean hasRiskVersions(String riskId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
-    try (
-      CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getModelService().listBinaryVersions(storagePath)) {
+    Optional<LiteRODAObject> liteRisk = LiteRODAObjectFactory.get(Risk.class, riskId);
+    if (liteRisk.isEmpty()) {
+      throw new RequestNotValidException("Could not get LITE for Risk " + riskId);
+    }
+    try (CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getModelService()
+      .listBinaryVersions(liteRisk.get())) {
       return iterable.iterator().hasNext();
     } catch (IOException e) {
       throw new GenericException(e);
