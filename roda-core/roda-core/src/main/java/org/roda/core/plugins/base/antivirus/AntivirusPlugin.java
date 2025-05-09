@@ -25,7 +25,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -124,12 +123,11 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
 
     if (aip.getHasShallowFiles() != null && aip.getHasShallowFiles()) {
-      StorageService tmpStorageService = null;
+      StorageService tmpStorageService;
       try {
-        tmpStorageService = model.resolveTemporaryResourceShallow(job.getId(),
-          ModelUtils.getAIPStoragePath(aip.getId()));
+        tmpStorageService = model.resolveTemporaryResourceShallow(job.getId(), aip);
         processAIP(index, model, tmpStorageService, report, jobPluginInfo, job, aip, reportItem, reportState);
-      } catch (RequestNotValidException | GenericException e) {
+      } catch (GenericException e) {
         LOGGER.error("Error processing AIP " + aip.getId(), e);
         reportState = PluginState.FAILURE;
         reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());

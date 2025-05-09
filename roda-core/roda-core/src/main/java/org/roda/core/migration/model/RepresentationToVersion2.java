@@ -73,7 +73,7 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
             }
 
             StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromObject(aip));
-            model.updateBinaryContent(aipJson, payload, false, false);
+            model.updateBinaryContent(aipLite.get(), payload, false, false);
           } else {
             LOGGER.warn("Could not create LITE for AIP {}", aipResource.getPath().getFileName());
           }

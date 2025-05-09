@@ -7,13 +7,21 @@
  */
 package org.roda.core.model;
 
+import static org.roda.core.common.DownloadUtils.ZIP_FILE_NAME_EXTENSION;
+import static org.roda.core.common.DownloadUtils.ZIP_MEDIA_TYPE;
+import static org.roda.core.common.DownloadUtils.ZIP_PATH_DELIMITER;
+
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -33,6 +41,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -66,6 +76,7 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.utils.XMLUtils;
+import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -138,20 +149,25 @@ import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.ingest.PermissionUtils;
+import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.EmptyClosableIterable;
 import org.roda.core.storage.Entity;
 import org.roda.core.storage.ExternalFileManifestContentPayload;
+import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
@@ -3826,7 +3842,7 @@ public class DefaultModelService implements ModelService {
       } else {
         StoragePath storagePath = ModelUtils.getContainerPath(objectClass);
         try {
-          return RodaCoreFactory.getStorageService().countResourcesUnderContainer(storagePath, false).intValue() > 0;
+          return getStorage().countResourcesUnderContainer(storagePath, false).intValue() > 0;
         } catch (NotFoundException e) {
           // TODO 20160913 hsilva: we want to handle the non-existence of a
           // container
@@ -5147,5 +5163,532 @@ public class DefaultModelService implements ModelService {
   @Override
   public ReturnWithExceptionsWrapper notifyDisposalConfirmationDeleted(String disposalConfirmationId, boolean commit) {
     return notifyObserversSafely(observer -> observer.disposalConfirmationDeleted(disposalConfirmationId, commit));
+  }
+
+  /************************************
+   * Storage Utils
+   ************************************/
+  @Override
+  public StorageService resolveTemporaryResourceShallow(String jobId, IsRODAObject object, String... pathPartials)
+    throws GenericException, RequestNotValidException {
+    return resolveTemporaryResourceShallow(jobId, getStorage(), object, pathPartials);
+  }
+
+  @Override
+  public StorageService resolveTemporaryResourceShallow(String jobId, StorageService storage, IsRODAObject object,
+    String... pathPartials) throws GenericException, RequestNotValidException {
+    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object), pathPartials);
+    FileStorageService temporaryStorage;
+    Path tempPath = RodaCoreFactory.getFileShallowTmpDirectoryPath().resolve(jobId)
+      .resolve(String.valueOf(storagePath.hashCode()));
+    try {
+      if (Files.exists(tempPath)) {
+        temporaryStorage = new FileStorageService(tempPath, false, null, false);
+      } else {
+        Files.createDirectories(tempPath);
+        temporaryStorage = new FileStorageService(tempPath, false, null, false);
+
+        temporaryStorage.copy(storage, storagePath, storagePath);
+        List<StoragePath> externalFiles = temporaryStorage.getShallowFiles(storagePath);
+        for (StoragePath externalFile : externalFiles) {
+          final CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderFile(externalFile, true);
+          for (Resource resource : resources) {
+            if (resource instanceof DefaultBinary) {
+              ContentPayload content = ((DefaultBinary) resource).getContent();
+              if (content instanceof JsonContentPayload) {
+                ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
+                Protocol pm = RodaCoreFactory.getProtocol(shallowFile.getLocation());
+                pm.downloadResource(temporaryStorage.getDirectAccess(externalFile).getPath().getParent());
+              }
+
+            }
+          }
+          temporaryStorage.deleteResource(externalFile);
+        }
+      }
+    } catch (IOException | AlreadyExistsException | AuthorizationDeniedException e) {
+      throw new GenericException("Cannot create temporary directory " + tempPath);
+    } catch (RequestNotValidException | NotFoundException e) {
+      throw new GenericException("Cannot found resources at " + storagePath.toString());
+    }
+    return temporaryStorage;
+  }
+
+  @Override
+  public StorageService resolveTemporaryResourceShallow(String jobId, LiteRODAObject lite, String... pathPartials)
+    throws GenericException, RequestNotValidException {
+    return resolveTemporaryResourceShallow(jobId, getStorage(), lite, pathPartials);
+  }
+
+  @Override
+  public StorageService resolveTemporaryResourceShallow(String jobId, StorageService storage, LiteRODAObject lite,
+    String... pathPartials) throws GenericException, RequestNotValidException {
+    // TODO: Use LITE instead of converting to model object
+    OptionalWithCause<IsModelObject> object = retrieveObjectFromLite(lite);
+    if (object.isPresent()) {
+      return resolveTemporaryResourceShallow(jobId, storage, object.get(), pathPartials);
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + object.getCause() + ")");
+    }
+  }
+
+  @Override
+  public Binary getBinary(IsRODAObject object, String... pathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    return getStorage().getBinary(DefaultStoragePath.parse(ModelUtils.getStoragePath(object), pathPartials));
+  }
+
+  // TODO: Use LITE instead of converting to model object
+  @Override
+  public Binary getBinary(LiteRODAObject lite, String... pathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    OptionalWithCause<IsModelObject> object = retrieveObjectFromLite(lite);
+    if (object.isPresent()) {
+      return getBinary(object.get(), pathPartials);
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + object.getCause() + ")");
+    }
+  }
+
+  @Override
+  public BinaryVersion getBinaryVersion(IsRODAObject object, String version, List<String> pathPartials)
+    throws RequestNotValidException, NotFoundException, GenericException {
+    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object),
+      pathPartials.toArray(new String[0]));
+    return getStorage().getBinaryVersion(storagePath, version);
+  }
+
+  // TODO: Use LITE instead of converting to model object
+  @Override
+  public BinaryVersion getBinaryVersion(LiteRODAObject lite, String version, List<String> pathPartials)
+    throws RequestNotValidException, NotFoundException, GenericException {
+    OptionalWithCause<IsModelObject> object = retrieveObjectFromLite(lite);
+    if (object.isPresent()) {
+      return getBinaryVersion(object.get(), version, pathPartials);
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + object.getCause() + ")");
+    }
+  }
+
+  @Override
+  public CloseableIterable<BinaryVersion> listBinaryVersions(IsRODAObject object)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    StoragePath storagePath = ModelUtils.getStoragePath(object);
+    return getStorage().listBinaryVersions(storagePath);
+  }
+
+  @Override
+  public CloseableIterable<BinaryVersion> listBinaryVersions(LiteRODAObject lite)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    // TODO: Use LITE instead of converting to model object
+    OptionalWithCause<IsModelObject> object = retrieveObjectFromLite(lite);
+    if (object.isPresent()) {
+      return listBinaryVersions(object.get());
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + object.getCause() + ")");
+    }
+  }
+
+  @Override
+  public void deleteBinaryVersion(IsRODAObject object, String version)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    getStorage().deleteBinaryVersion(ModelUtils.getStoragePath(object), version);
+  }
+
+  @Override
+  public void deleteBinaryVersion(LiteRODAObject lite, String version)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    // TODO: Use LITE instead of converting to model object
+    OptionalWithCause<IsModelObject> object = retrieveObjectFromLite(lite);
+    if (object.isPresent()) {
+      deleteBinaryVersion(object.get(), version);
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + object.getCause() + ")");
+    }
+  }
+
+  @Override
+  public Binary updateBinaryContent(IsRODAObject object, ContentPayload payload, boolean asReference,
+    boolean createIfNotExists)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    StoragePath storagePath = ModelUtils.getStoragePath(object);
+    return getStorage().updateBinaryContent(storagePath, payload, asReference, createIfNotExists);
+  }
+
+  @Override
+  public Binary updateBinaryContent(LiteRODAObject lite, ContentPayload payload, boolean asReference,
+    boolean createIfNotExists)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    // TODO: Use LITE instead of converting to model object
+    OptionalWithCause<IsModelObject> object = retrieveObjectFromLite(lite);
+    if (object.isPresent()) {
+      return updateBinaryContent(object.get(), payload, asReference, createIfNotExists);
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + object.getCause() + ")");
+    }
+  }
+
+  @Override
+  @Deprecated
+  public Directory getDirectory(StoragePath storagePath)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    return getStorage().getDirectory(storagePath);
+  }
+
+  @Override
+  @Deprecated
+  public Directory createDirectory(StoragePath emptyDirectoryPath)
+    throws AuthorizationDeniedException, AlreadyExistsException, GenericException {
+    return createDirectory(getStorage(), emptyDirectoryPath);
+  }
+
+  @Override
+  @Deprecated
+  public Directory createDirectory(StorageService storage, StoragePath emptyDirectoryPath)
+    throws AuthorizationDeniedException, AlreadyExistsException, GenericException {
+    return storage.createDirectory(emptyDirectoryPath);
+  }
+
+  @Override
+  public DirectResourceAccess getDirectAccess(IsRODAObject obj, StorageService storage, String... pathPartials)
+    throws RequestNotValidException {
+    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(obj), pathPartials);
+    return storage.getDirectAccess(storagePath);
+  }
+
+  // TODO: Use LITE instead of converting to model object
+  @Override
+  public DirectResourceAccess getDirectAccess(LiteRODAObject liteObj, StorageService storage, String... pathPartials)
+    throws RequestNotValidException {
+    OptionalWithCause<IsModelObject> modelObject = retrieveObjectFromLite(liteObj);
+    if (modelObject.isPresent()) {
+      return getDirectAccess(modelObject.get(), storage, pathPartials);
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + modelObject.getCause() + ")");
+    }
+  }
+
+  @Override
+  public DirectResourceAccess getDirectAccess(IsRODAObject obj, String... pathPartials)
+    throws RequestNotValidException {
+    return getDirectAccess(obj, getStorage(), pathPartials);
+  }
+
+  // TODO: Use LITE instead of converting to model object
+  @Override
+  public DirectResourceAccess getDirectAccess(LiteRODAObject liteObj, String... pathPartials)
+    throws RequestNotValidException {
+    OptionalWithCause<IsModelObject> modelObject = retrieveObjectFromLite(liteObj);
+    if (modelObject.isPresent()) {
+      return getDirectAccess(modelObject.get(), pathPartials);
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + modelObject.getCause() + ")");
+    }
+  }
+
+  @Override
+  public DirectResourceAccess getDirectAccessToVersion(IsRODAObject obj, String version, List<String> pathPartials)
+    throws RequestNotValidException, GenericException {
+    StoragePath basePath = ModelUtils.getStoragePath(obj);
+    StoragePath fullPath = DefaultStoragePath.parse(basePath, pathPartials.toArray(new String[0]));
+    return getStorage().getDirectAccessToVersion(fullPath, version);
+  }
+
+  // TODO: Use LITE instead of converting to model object
+  @Override
+  public DirectResourceAccess getDirectAccessToVersion(LiteRODAObject liteObj, String version,
+    List<String> pathPartials) throws RequestNotValidException, GenericException {
+    OptionalWithCause<IsModelObject> modelObject = retrieveObjectFromLite(liteObj);
+    if (modelObject.isPresent()) {
+      return getDirectAccessToVersion(modelObject.get(), version, pathPartials);
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + modelObject.getCause() + ")");
+    }
+  }
+
+  @Override
+  public <T extends IsRODAObject> DirectResourceAccess getDirectAccess(Class<T> entityClass, String... pathPartials)
+    throws RequestNotValidException {
+    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getContainerPath(entityClass), pathPartials);
+    return getStorage().getDirectAccess(storagePath);
+  }
+
+  @Deprecated
+  @Override
+  public CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    return getStorage().listResourcesUnderDirectory(storagePath, recursive);
+  }
+
+  @Deprecated
+  @Override
+  public CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    return getStorage().listResourcesUnderContainer(storagePath, recursive);
+  }
+
+  @Deprecated
+  @Override
+  public CloseableIterable<Resource> listResourcesUnderFile(StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    return getStorage().listResourcesUnderFile(storagePath, recursive);
+  }
+
+  @Deprecated
+  @Override
+  public Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    return getStorage().countResourcesUnderDirectory(storagePath, recursive);
+  }
+
+  @Deprecated
+  @Override
+  public Long countResourcesUnderContainer(StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    return getStorage().countResourcesUnderContainer(storagePath, recursive);
+  }
+
+  @Deprecated
+  @Override
+  public void copyAIPToStorage(AIP aip, StorageService toStorage, StoragePath toPath)
+    throws AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    GenericException {
+    StoragePath aipPath = ModelUtils.getStoragePath(aip);
+    toStorage.copy(getStorage(), aipPath, toPath);
+  }
+
+  @Override
+  public void importAll(StorageService fromStorage) {
+    // TODO
+  }
+
+  @Override
+  public void exportAll(StorageService toStorage) {
+    // TODO
+  }
+
+  @Override
+  public void importObject(IsRODAObject object, StorageService fromStorage) {
+    // TODO
+  }
+
+  @Override
+  public void exportObject(IsRODAObject object, StorageService toStorage) {
+    // TODO
+  }
+
+  @Override
+  public void exportObject(LiteRODAObject lite, StorageService toStorage) {
+    // TODO
+  }
+
+  @Override
+  public ConsumesOutputStream exportObjectToStream(IsRODAObject object, String... pathPartials)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    return exportObjectToStream(object, null, false, pathPartials);
+  }
+
+  // TODO: Use LITE instead of converting to model object
+  @Override
+  public ConsumesOutputStream exportObjectToStream(LiteRODAObject lite, String... pathPartials)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    OptionalWithCause<IsModelObject> object = retrieveObjectFromLite(lite);
+    if (object.isPresent()) {
+      return exportObjectToStream(object.get(), null, false, pathPartials);
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + object.getCause() + ")");
+    }
+  }
+
+  @Override
+  public ConsumesOutputStream exportObjectToStream(IsRODAObject object, String name, boolean addTopDirectory,
+    String... pathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    ConsumesOutputStream stream;
+
+    final DirectResourceAccess directAccess = getDirectAccess(object, pathPartials);
+
+    if (directAccess.isDirectory()) {
+      // Send zip with directory contents
+      stream = exportObjectToZip(object, name, addTopDirectory, pathPartials);
+    } else {
+      // Send the one file
+      stream = new BinaryConsumesOutputStream(getBinary(object, pathPartials), directAccess.getPath());
+    }
+    return stream;
+  }
+
+  // TODO: Use LITE instead of converting to model object
+  @Override
+  public ConsumesOutputStream exportObjectToStream(LiteRODAObject lite, String name, boolean addTopDirectory,
+    String... pathPartials)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    OptionalWithCause<IsModelObject> object = retrieveObjectFromLite(lite);
+    if (object.isPresent()) {
+      return exportObjectToStream(object.get(), name, addTopDirectory, pathPartials);
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + object.getCause() + ")");
+    }
+  }
+
+  private ConsumesOutputStream exportObjectToZip(IsRODAObject object, String name, boolean addTopDirectory,
+    String... pathPartials) throws RequestNotValidException {
+    final StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object), pathPartials);
+    final String fileName = name == null ? storagePath.getName() : name;
+
+    return new ConsumesOutputStream() {
+      @Override
+      public void consumeOutputStream(OutputStream out) throws IOException {
+
+        try (BufferedOutputStream bos = new BufferedOutputStream(out);
+          ZipOutputStream zos = new ZipOutputStream(bos);
+          CloseableIterable<Resource> resources = getStorage().listResourcesUnderDirectory(storagePath, true);) {
+          int basePathSize = storagePath.asList().size();
+
+          for (Resource r : resources) {
+            List<String> pathAsList = r.getStoragePath().asList();
+            List<String> relativePathAsList = pathAsList.subList(basePathSize, pathAsList.size());
+            String entryPath = relativePathAsList.stream().collect(Collectors.joining(ZIP_PATH_DELIMITER));
+            String entryDirectoryPath;
+            if (addTopDirectory) {
+              entryDirectoryPath = storagePath.getName() + ZIP_PATH_DELIMITER + entryPath;
+            } else {
+              entryDirectoryPath = entryPath;
+            }
+            if (r.isDirectory()) {
+              // adding a directory
+              entryDirectoryPath += ZIP_PATH_DELIMITER;
+              zos.putNextEntry(new ZipEntry(entryDirectoryPath));
+              zos.closeEntry();
+            } else {
+              // adding a file
+              ZipEntry entry = new ZipEntry(entryDirectoryPath);
+              zos.putNextEntry(entry);
+              Binary binary = getStorage().getBinary(r.getStoragePath());
+              try (InputStream inputStream = binary.getContent().createInputStream()) {
+                IOUtils.copy(inputStream, zos);
+              }
+              zos.closeEntry();
+            }
+          }
+        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+          throw new IOException(e);
+        }
+      }
+
+      @Override
+      public String getFileName() {
+        return fileName + ZIP_FILE_NAME_EXTENSION;
+      }
+
+      @Override
+      public String getMediaType() {
+        return ZIP_MEDIA_TYPE;
+      }
+
+      @Override
+      public Date getLastModified() {
+        return null;
+      }
+
+      @Override
+      public long getSize() {
+        return -1;
+      }
+    };
+  }
+
+  // TODO: Use LITE instead of converting to model object
+  public ConsumesOutputStream exportObjectToZip(LiteRODAObject lite, String name, boolean addTopDirectory,
+    String... pathPartials) throws RequestNotValidException {
+    OptionalWithCause<IsModelObject> object = retrieveObjectFromLite(lite);
+    if (object.isPresent()) {
+      return exportObjectToZip(object.get(), name, addTopDirectory, pathPartials);
+    } else {
+      throw new RequestNotValidException("Could not retrieve object from Lite (" + object.getCause() + ")");
+    }
+  }
+
+  @Deprecated
+  @Override
+  public void copy(StorageService fromStorageService, StoragePath fromPath, StoragePath toPath)
+    throws AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    GenericException {
+    StorageService storageService = getStorage();
+    storageService.copy(fromStorageService, fromPath, toPath);
+  }
+
+  @Deprecated
+  @Override
+  public void copy(StoragePath fromPath, StoragePath toPath) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
+    StorageService storageService = getStorage();
+    storageService.copy(storageService, fromPath, toPath);
+  }
+
+  @Deprecated
+  @Override
+  public void copy(StoragePath fromPath, Path toPath, String resource)
+    throws AuthorizationDeniedException, AlreadyExistsException, GenericException {
+    StorageService storageService = getStorage();
+    storageService.copy(storageService, fromPath, toPath, resource);
+  }
+
+  @Override
+  public void moveObject(LiteRODAObject fromObject, LiteRODAObject toObject) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
+
+    StorageService storageService = getStorage();
+    storageService.move(storageService, fromPath, toPath);
+  }
+
+  @Deprecated
+  @Override
+  public void deleteContainer(StoragePath path)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    getStorage().deleteContainer(path);
+  }
+
+  @Deprecated
+  @Override
+  public void deleteResource(StoragePath path)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    getStorage().deleteResource(path);
+  }
+
+  @Deprecated
+  @Override
+  public boolean hasDirectory(StoragePath storagePath) {
+    return getStorage().hasDirectory(storagePath);
+  }
+
+  @Deprecated
+  @Override
+  public boolean exists(StoragePath storagePath) {
+    return getStorage().exists(storagePath);
+  }
+
+  @Deprecated
+  @Override
+  public Date getDateFromStoragePath(StoragePath storagePath)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException, IOException {
+    Path path = getStorage().getDirectAccess(storagePath).getPath();
+    BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+    FileTime fileTime = attr.creationTime();
+    return new Date(fileTime.toMillis());
+  }
+
+  @Deprecated
+  @Override
+  public String getStoragePathAsString(StoragePath filePath, boolean skipContainer) {
+    return getStorage().getStoragePathAsString(filePath, skipContainer);
+  }
+
+  @Deprecated
+  @Override
+  public String getStoragePathAsString(StoragePath filePath, boolean skipContainer, StoragePath anotherStoragePath,
+    boolean skipAnotherStoragePathContainer) {
+    return getStorage().getStoragePathAsString(filePath, skipContainer, anotherStoragePath,
+      skipAnotherStoragePathContainer);
   }
 }

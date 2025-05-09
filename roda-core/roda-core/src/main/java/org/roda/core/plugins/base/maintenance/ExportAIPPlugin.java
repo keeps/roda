@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.roda.core.common.DownloadUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.ExportType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -51,7 +50,6 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.Directory;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -250,7 +248,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
         if (error == null) {
           os = Files.newOutputStream(zip, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
-          ConsumesOutputStream cos = model.downloadObject(aip);
+          ConsumesOutputStream cos = model.exportObjectToStream(aip);
           cos.consumeOutputStream(os);
         }
       } catch (Exception e) {

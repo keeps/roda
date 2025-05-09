@@ -11,17 +11,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.migration.MigrationAction;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.Resource;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StringContentPayload;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,13 +48,20 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
 
   @Override
   public void migrate(ModelService model) throws RODAException {
-    try (
-      CloseableIterable<Resource> risks = model.listResourcesUnderDirectory(ModelUtils.getRiskContainerPath(),
-      false)) {
-      for (Resource resource : risks) {
-        if (!resource.isDirectory() && resource instanceof Binary) {
-          Binary binary = (Binary) resource;
-          migrate(model, binary);
+    try (DirectResourceAccess risksContainer = model.getDirectAccess(Risk.class);
+      CloseableIterable<DirectResourceAccess> risks = FSUtils.listDirectAccessResourceChildren(risksContainer, false)) {
+      for (DirectResourceAccess riskResource : risks) {
+        if (!riskResource.isDirectory()) {
+          String riskId = riskResource.getPath().getFileName().toString().replace(RodaConstants.RISK_FILE_EXTENSION,
+            "");
+          Optional<LiteRODAObject> riskLite = LiteRODAObjectFactory.get(Risk.class, riskId);
+          if (riskLite.isPresent()) {
+            Binary binary = model.getBinary(riskLite.get());
+            migrate(model, binary, riskLite.get());
+          }
+          else {
+            LOGGER.error("Could not migrate risk {} because it could not be made into a Lite", riskId);
+          }
         }
       }
     } catch (IOException e) {
@@ -58,7 +69,7 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
     }
   }
 
-  private void migrate(ModelService model, Binary binary) {
+  private void migrate(ModelService model, Binary binary, LiteRODAObject riskLite) {
     try (InputStream inputStream = binary.getContent().createInputStream()) {
       JsonNode json = JsonUtils.parseJson(inputStream);
       if (json instanceof ObjectNode) {
@@ -68,7 +79,7 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
         StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromNode(obj));
         boolean asReference = false;
         boolean createIfNotExists = false;
-        model.updateBinaryContent(binary.getStoragePath(), payload, asReference, createIfNotExists);
+        model.updateBinaryContent(riskLite, payload, asReference, createIfNotExists);
       } else {
         LOGGER.error("Could not migrate risk {} because the JSON is not an object node", binary.getStoragePath());
       }

@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -20,6 +21,8 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.LiteRODAObject;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -32,6 +35,7 @@ import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
@@ -146,8 +150,8 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<File>() {
       @Override
       public void process(IndexService index, ModelService model, Report report, Job cachedJob,
@@ -157,8 +161,8 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
     }, index, model, liteList);
   }
 
-  private void processFiles(IndexService index, ModelService model, Report report,
-    JobPluginInfo jobPluginInfo, Job cachedJob, List<File> files) {
+  private void processFiles(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    Job cachedJob, List<File> files) {
     Report parametersReport = validateParameters();
 
     for (File file : files) {
@@ -191,8 +195,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
             LOGGER.error("Error creating event: {}", e.getMessage(), e);
           }
         }
-      }
-      else {
+      } else {
         reportItem.setPluginState(PluginState.FAILURE);
         reportItem.setPluginDetails(parametersReport.getPluginDetails());
         jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -218,12 +221,14 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   }
 
   private LinkingIdentifier setFileFormatMetadata(ModelService model, IndexService index, File file, String jobId,
-    String username)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+    String username) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
     PluginException {
     StoragePath fileDataPath = ModelUtils.getFileStoragePath(file);
-    StorageService tmpStorageService = model.resolveTemporaryResourceShallow(jobId,
-      ModelUtils.getAIPStoragePath(file.getAipId()));
+    Optional<LiteRODAObject> liteAIP = LiteRODAObjectFactory.get(AIP.class, file.getAipId());
+    if (liteAIP.isEmpty()) {
+      throw new RequestNotValidException("Could not get LITE for AIP " + file.getAipId());
+    }
+    StorageService tmpStorageService = model.resolveTemporaryResourceShallow(jobId, liteAIP.get());
     LinkingIdentifier source = null;
     try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(fileDataPath)) {
       List<String> jsonFilePath = new ArrayList<>();
@@ -249,8 +254,8 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
       List<String> notes = mitigatePreviousIncidencesAndCreateNotes(model, index, file.getAipId(),
         file.getRepresentationId(), file.getId(), jsonFilePath, username);
       PremisV3Utils.updateFormatPreservationMetadata(model, file.getAipId(), file.getRepresentationId(), jsonFilePath,
-        jsonFileId, updatedFormat, updatedFormatVersion, updatedPronomIdentifier, updatedMimetype,
-        notes, username, true);
+        jsonFileId, updatedFormat, updatedFormatVersion, updatedPronomIdentifier, updatedMimetype, notes, username,
+        true);
 
       source = PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(), jsonFilePath, jsonFileId,
         RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
@@ -333,8 +338,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }
