@@ -224,7 +224,7 @@ public class FilesService {
       }
       return new StreamResponse(stream);
     } else {
-      ConsumesOutputStream download = model.downloadObject(liteFile.get());
+      ConsumesOutputStream download = model.exportObjectToStream(liteFile.get());
       return new StreamResponse(download);
     }
   }

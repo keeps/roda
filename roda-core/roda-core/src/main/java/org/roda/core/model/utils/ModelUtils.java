@@ -27,7 +27,9 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
@@ -61,6 +63,12 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.lites.ParsedAIPLite;
+import org.roda.core.model.lites.ParsedDIPFileLite;
+import org.roda.core.model.lites.ParsedDescriptiveMetadataLite;
+import org.roda.core.model.lites.ParsedFileLite;
+import org.roda.core.model.lites.ParsedLite;
+import org.roda.core.model.lites.ParsedRepresentationLite;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
 import org.slf4j.Logger;
@@ -902,6 +910,76 @@ public final class ModelUtils {
     }
     throw new RequestNotValidException("Cannot get storage path for entity using only its object: "
       + object.getClass().getSimpleName() + " " + object.getId());
+  }
+
+  public static StoragePath getStoragePath(LiteRODAObject lite) throws RequestNotValidException, GenericException {
+    OptionalWithCause<ParsedLite> parsedLiteOptional = ParsedLite.parse(lite);
+    if (!parsedLiteOptional.isPresent()) {
+      throw new RequestNotValidException("Couldn't parse Lite " + lite);
+    }
+    ParsedLite parsedLite = parsedLiteOptional.get();
+
+    if (parsedLite instanceof ParsedAIPLite aip) {
+      return getAIPStoragePath(aip.getId());
+    }
+    if (parsedLite instanceof ParsedRepresentationLite representation) {
+      return getRepresentationStoragePath(representation.getAipId(), representation.getId());
+    }
+    if (parsedLite instanceof ParsedDescriptiveMetadataLite descriptiveMetadata) {
+      if (descriptiveMetadata.getRepresentationId() != null) {
+        return getDescriptiveMetadataStoragePath(descriptiveMetadata.getAipId(),
+          descriptiveMetadata.getRepresentationId(), descriptiveMetadata.getId());
+      } else {
+        return getDescriptiveMetadataStoragePath(descriptiveMetadata.getAipId(), descriptiveMetadata.getId());
+      }
+    }
+    if (parsedLite instanceof ParsedFileLite file) {
+      return getFileStoragePath(file.getAipId(), file.getRepresentationId(), file.getDirectoryPath(), file.getId());
+    }
+    if (parsedLite instanceof ParsedDIPFileLite dipFile) {
+      return getDIPFileStoragePath(dipFile.getId(), dipFile.getDirectoryPath(), dipFile.getFileId());
+    }
+    if (parsedLite instanceof ParsedPreservationMetadataLite pm) {
+      return getPreservationMetadataStoragePath(pm);
+    }
+    if (parsedLite instanceof ParsedOtherMetadataLite om) {
+      return getOtherMetadataStoragePath(om.getAipId(), om.getRepresentationId(), om.getFileDirectoryPath(),
+        om.getFileId(), om.getFileSuffix(), om.getType());
+    }
+    if (parsedLite instanceof ParsedIndexedPreservationEventLite event) {
+      return getPreservationEventStoragePath(event.getFileUUID());
+    }
+    if (parsedLite instanceof ParsedJobLite job) {
+      return getJobStoragePath(job.getId());
+    }
+    if (parsedLite instanceof ParsedDisposalHoldLite disposalHold) {
+      return getDisposalHoldStoragePath(disposalHold.getId());
+    }
+    if (parsedLite instanceof ParsedDistributedInstanceLite distributedInstance) {
+      return getDistributedInstanceStoragePath(distributedInstance.getId());
+    }
+    if (parsedLite instanceof ParsedAccessKeyLite accessKey) {
+      return getAccessKeysStoragePath(accessKey.getId());
+    }
+    if (parsedLite instanceof ParsedReportLite report) {
+      return getJobReportStoragePath(report.getJobId(), report.getId());
+    }
+    if (parsedLite instanceof ParsedRiskLite risk) {
+      return getRiskStoragePath(risk.getId());
+    }
+    if (parsedLite instanceof ParsedRiskIncidenceLite riskIncidence) {
+      return getRiskIncidenceStoragePath(riskIncidence.getId());
+    }
+    if (parsedLite instanceof ParsedRepresentationInformationLite representationInformation) {
+      return getRepresentationInformationStoragePath(representationInformation.getId());
+    }
+    if (parsedLite instanceof ParsedNotificationLite notification) {
+      return getNotificationStoragePath(notification.getId());
+    }
+    if (parsedLite instanceof ParsedDIPLite dip) {
+      return getDIPStoragePath(dip.getId());
+    }
+    throw new RequestNotValidException("Cannot get storage path for entity using only its lite -> " + lite);
   }
 
   public static <T extends Serializable> StoragePath getContainerPath(Class<T> clazz) throws RequestNotValidException {

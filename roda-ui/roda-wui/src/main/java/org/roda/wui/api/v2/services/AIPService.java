@@ -134,8 +134,11 @@ public class AIPService {
     ModelService model = RodaCoreFactory.getModelService();
     Binary descriptiveMetadataBinary;
     if (versionId != null) {
-      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, metadataId);
-      BinaryVersion binaryVersion = model.getBinaryVersion(storagePath, versionId);
+      Optional<LiteRODAObject> liteDM = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId, metadataId);
+      if (liteDM.isEmpty()) {
+        throw new RequestNotValidException("Could not get LITE from AIP " + aipId + " with metadata id" + metadataId);
+      }
+      BinaryVersion binaryVersion = model.getBinaryVersion(liteDM.get(), versionId, new ArrayList<>());
       descriptiveMetadataBinary = binaryVersion.getBinary();
     } else {
       descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
@@ -188,8 +191,13 @@ public class AIPService {
     ModelService model = RodaCoreFactory.getModelService();
     Binary descriptiveMetadataBinary;
     if (versionId != null) {
-      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, metadataId);
-      BinaryVersion binaryVersion = model.getBinaryVersion(storagePath, versionId);
+      Optional<LiteRODAObject> liteDM = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId, representationId,
+        metadataId);
+      if (liteDM.isEmpty()) {
+        throw new RequestNotValidException("Could not get LITE from representation " + representationId + " of AIP "
+          + aipId + " with metadata id" + metadataId);
+      }
+      BinaryVersion binaryVersion = model.getBinaryVersion(liteDM.get(), versionId, new ArrayList<>());
       descriptiveMetadataBinary = binaryVersion.getBinary();
     } else {
       descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, representationId, metadataId);
@@ -326,15 +334,7 @@ public class AIPService {
     }
 
     try {
-      StoragePath storagePath;
-      if (representationId != null) {
-        storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
-          descriptiveMetadata.getId());
-      } else {
-        storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, descriptiveMetadata.getId());
-      }
-
-      metadataInfo.setHasHistory(!CloseableIterables.isEmpty(model.listBinaryVersions(storagePath)));
+      metadataInfo.setHasHistory(!CloseableIterables.isEmpty(model.listBinaryVersions(descriptiveMetadata)));
     } catch (RODAException | RuntimeException e) {
       metadataInfo.setHasHistory(false);
     }
@@ -842,9 +842,13 @@ public class AIPService {
   private CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(String aipId, String representationId,
     String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
+    Optional<LiteRODAObject> liteDM = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId, representationId,
       descriptiveMetadataId);
-    return RodaCoreFactory.getModelService().listBinaryVersions(storagePath);
+    if (liteDM.isEmpty()) {
+      throw new RequestNotValidException("Could not get LITE from representation " + representationId + " of AIP "
+        + aipId + " with metadata id" + descriptiveMetadataId);
+    }
+    return RodaCoreFactory.getModelService().listBinaryVersions(liteDM.get());
   }
 
   public void deleteDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
@@ -855,9 +859,13 @@ public class AIPService {
   public void deleteDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
     String versionId)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
+    Optional<LiteRODAObject> liteDM = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId, representationId,
       descriptiveMetadataId);
-    RodaCoreFactory.getModelService().deleteBinaryVersion(storagePath, versionId);
+    if (liteDM.isEmpty()) {
+      throw new RequestNotValidException("Could not get LITE from representation " + representationId + " of AIP "
+        + aipId + " with metadata id" + descriptiveMetadataId);
+    }
+    RodaCoreFactory.getModelService().deleteBinaryVersion(liteDM.get(), versionId);
   }
 
   public boolean isMetadataSimilar(IndexedAIP aip, String representationId, String metadataId,

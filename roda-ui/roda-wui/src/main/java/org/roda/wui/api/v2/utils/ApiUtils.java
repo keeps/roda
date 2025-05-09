@@ -109,7 +109,7 @@ public class ApiUtils {
     String... pathPartials)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
-    ConsumesOutputStream download = model.downloadObject(object, fileName, addTopDirectory, pathPartials);
+    ConsumesOutputStream download = model.exportObjectToStream(object, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
   }
 
@@ -117,7 +117,7 @@ public class ApiUtils {
                                         String... pathPartials)
           throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
-    ConsumesOutputStream download = model.downloadObject(lite, fileName, addTopDirectory, pathPartials);
+    ConsumesOutputStream download = model.exportObjectToStream(lite, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
   }
 

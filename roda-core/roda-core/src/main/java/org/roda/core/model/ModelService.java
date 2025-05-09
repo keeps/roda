@@ -23,6 +23,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -71,7 +72,9 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 
 /**
@@ -874,4 +877,166 @@ public interface ModelService extends ModelObservable {
 
   void deleteUserAccessKeys(String userId, String updatedBy)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
+
+  StorageService resolveTemporaryResourceShallow(String jobId, IsRODAObject object, String... pathPartials)
+    throws GenericException, RequestNotValidException;
+
+  StorageService resolveTemporaryResourceShallow(String jobId, StorageService storage, IsRODAObject object,
+    String... pathPartials) throws GenericException, RequestNotValidException;
+
+  StorageService resolveTemporaryResourceShallow(String jobId, LiteRODAObject object, String... pathPartials)
+    throws GenericException, RequestNotValidException;
+
+  StorageService resolveTemporaryResourceShallow(String jobId, StorageService storage, LiteRODAObject object,
+    String... pathPartials) throws GenericException, RequestNotValidException;
+
+  Binary getBinary(IsRODAObject object, String... pathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
+
+  Binary getBinary(LiteRODAObject lite, String... pathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
+
+  BinaryVersion getBinaryVersion(IsRODAObject object, String version, List<String> pathPartials)
+    throws RequestNotValidException, NotFoundException, GenericException;
+
+  BinaryVersion getBinaryVersion(LiteRODAObject lite, String version, List<String> pathPartials)
+    throws RequestNotValidException, NotFoundException, GenericException;
+
+  CloseableIterable<BinaryVersion> listBinaryVersions(IsRODAObject object)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
+
+  CloseableIterable<BinaryVersion> listBinaryVersions(LiteRODAObject lite)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  void deleteBinaryVersion(IsRODAObject object, String version)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
+
+  void deleteBinaryVersion(LiteRODAObject lite, String version)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  Binary updateBinaryContent(IsRODAObject object, ContentPayload payload, boolean asReference,
+    boolean createIfNotExists)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  Binary updateBinaryContent(LiteRODAObject lite, ContentPayload payload, boolean asReference,
+    boolean createIfNotExists)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  @Deprecated
+  Directory getDirectory(StoragePath storagePath)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  @Deprecated
+  Directory createDirectory(StoragePath emptyDirectoryPath)
+    throws AuthorizationDeniedException, AlreadyExistsException, GenericException;
+
+  @Deprecated
+  Directory createDirectory(StorageService storage, StoragePath emptyDirectoryPath)
+    throws AuthorizationDeniedException, AlreadyExistsException, GenericException;
+
+  DirectResourceAccess getDirectAccess(IsRODAObject obj, StorageService storage, String... pathPartials)
+    throws RequestNotValidException;
+
+  DirectResourceAccess getDirectAccess(LiteRODAObject liteObj, StorageService storage, String... pathPartials)
+    throws RequestNotValidException;
+
+  DirectResourceAccess getDirectAccess(IsRODAObject obj, String... pathPartials) throws RequestNotValidException;
+
+  DirectResourceAccess getDirectAccess(LiteRODAObject liteObj, String... pathPartials) throws RequestNotValidException;
+
+  DirectResourceAccess getDirectAccessToVersion(IsRODAObject obj, String version, List<String> pathPartials)
+    throws RequestNotValidException, GenericException;
+
+  DirectResourceAccess getDirectAccessToVersion(LiteRODAObject liteObj, String version, List<String> pathPartials)
+    throws RequestNotValidException, GenericException;
+
+  <T extends IsRODAObject> DirectResourceAccess getDirectAccess(Class<T> entityClass, String... pathPartials)
+    throws RequestNotValidException;
+
+  @Deprecated
+  CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  @Deprecated
+  CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  @Deprecated
+  CloseableIterable<Resource> listResourcesUnderFile(StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  @Deprecated
+  Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  @Deprecated
+  Long countResourcesUnderContainer(StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  @Deprecated
+  void copyAIPToStorage(AIP aip, StorageService toStorage, StoragePath toPath) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException;
+
+  void importAll(StorageService fromStorage);
+
+  void exportAll(StorageService toStorage);
+
+  void importObject(IsRODAObject object, StorageService fromStorage);
+
+  void exportObject(IsRODAObject object, StorageService toStorage);
+
+  void exportObject(LiteRODAObject lite, StorageService toStorage);
+
+  ConsumesOutputStream exportObjectToStream(IsRODAObject object, String... pathPartials)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  ConsumesOutputStream exportObjectToStream(LiteRODAObject lite, String... pathPartials)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  ConsumesOutputStream exportObjectToStream(IsRODAObject object, String name, boolean addTopDirectory,
+    String... pathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
+
+  ConsumesOutputStream exportObjectToStream(LiteRODAObject lite, String name, boolean addTopDirectory,
+    String... pathPartials)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  @Deprecated
+  void copy(StorageService fromStorageService, StoragePath fromPath, StoragePath toPath)
+    throws AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    GenericException;
+
+  @Deprecated
+  void copy(StoragePath fromPath, StoragePath toPath) throws AuthorizationDeniedException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException, GenericException;
+
+  @Deprecated
+  void copy(StoragePath fromPath, Path toPath, String resource)
+    throws AuthorizationDeniedException, AlreadyExistsException, GenericException;
+
+  void moveObject(LiteRODAObject fromPath, LiteRODAObject toPath) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException;
+
+  @Deprecated
+  void deleteContainer(StoragePath path) throws AuthorizationDeniedException, NotFoundException, GenericException;
+
+  @Deprecated
+  void deleteResource(StoragePath path) throws AuthorizationDeniedException, NotFoundException, GenericException;
+
+  @Deprecated
+  boolean hasDirectory(StoragePath storagePath);
+
+  @Deprecated
+  boolean exists(StoragePath storagePath);
+
+  @Deprecated
+  Date getDateFromStoragePath(StoragePath storagePath)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException, IOException;
+
+  @Deprecated
+  String getStoragePathAsString(StoragePath filePath, boolean skipContainer);
+
+  @Deprecated
+  String getStoragePathAsString(StoragePath filePath, boolean skipContainer, StoragePath anotherStoragePath,
+    boolean skipAnotherStoragePathContainer);
 }

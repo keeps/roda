@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,9 +29,11 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -41,6 +44,7 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.PluginException;
@@ -154,8 +158,11 @@ public class SiegfriedPluginUtils {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, PluginException,
     AlreadyExistsException {
     if (representation.getHasShallowFiles()) {
-      StorageService tmpStorageService = model.resolveTemporaryResourceShallow(jobId,
-        ModelUtils.getAIPStoragePath(representation.getAipId()));
+      Optional<LiteRODAObject> liteAIP = LiteRODAObjectFactory.get(AIP.class, representation.getAipId());
+      if (liteAIP.isEmpty()) {
+        throw new RequestNotValidException("Could not get LITE for AIP " + representation.getAipId());
+      }
+      StorageService tmpStorageService = model.resolveTemporaryResourceShallow(jobId, liteAIP.get());
       try (DirectResourceAccess directAccess = model.getDirectAccess(representation, tmpStorageService,
         RodaConstants.STORAGE_DIRECTORY_DATA)) {
         Path representationFsPath = directAccess.getPath();

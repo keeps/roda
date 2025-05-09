@@ -91,9 +91,7 @@ public class RepresentationService {
     }
 
     try {
-      StoragePath storagePath;
-      storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, descriptiveMetadata.getId());
-      info.setHasHistory(!CloseableIterables.isEmpty(model.listBinaryVersions(storagePath)));
+      info.setHasHistory(!CloseableIterables.isEmpty(model.listBinaryVersions(descriptiveMetadata)));
     } catch (RODAException | RuntimeException e) {
       info.setHasHistory(false);
     }
