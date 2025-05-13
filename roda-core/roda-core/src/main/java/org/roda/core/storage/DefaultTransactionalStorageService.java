@@ -381,7 +381,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   @Override
   public void rollback() throws RODATransactionException {
-    LOGGER.info("Rolling back transaction: {}", transaction.getId());
+    LOGGER.warn("Rolling back transaction: {}", transaction.getId());
     // DO NOTHING
   }
 
@@ -391,7 +391,11 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       return;
     }
 
-    LOGGER.info("Registering operation for storage path: {}", storagePath);
+    if (storagePath.getName().equals(RodaConstants.STORAGE_DIRECTORY_AGENTS)){
+      return;
+    }
+
+    LOGGER.debug("Registering operation for storage path: {}", storagePath);
     try {
       transactionLogService.registerStoragePathOperation(transaction.getId(), storagePath, operation);
     } catch (RODATransactionException e) {

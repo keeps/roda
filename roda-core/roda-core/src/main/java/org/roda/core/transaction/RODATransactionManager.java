@@ -31,7 +31,12 @@ public class RODATransactionManager {
   }
 
   public TransactionalContext beginTransaction() throws RODATransactionException {
-    return this.beginTransaction(TransactionLog.TransactionRequestType.NON_DEFINED, null);
+    return this.beginTransaction(TransactionLog.TransactionRequestType.NON_DEFINED);
+  }
+
+  public TransactionalContext beginTransaction(TransactionLog.TransactionRequestType requestType)
+    throws RODATransactionException {
+    return this.beginTransaction(requestType, IdUtils.createUUID());
   }
 
   public TransactionalContext beginTransaction(TransactionLog.TransactionRequestType requestType, String requestId)
