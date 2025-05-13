@@ -320,6 +320,29 @@ public final class LiteRODAObjectFactory {
     return get(File.class, list, false);
   }
 
+  public static <T extends IsRODAObject> OptionalWithCause<Class<T>> getClass(LiteRODAObject liteRODAObject) {
+    Class<T> ret = null;
+    String[] split = liteRODAObject.getInfo().split(SEPARATOR_REGEX);
+    if (split.length >= 2) {
+      String className = split[0];
+      try {
+        Class<?> clazz = Class.forName(className);
+        if (IsRODAObject.class.isAssignableFrom(clazz)) {
+          @SuppressWarnings("unchecked")
+          Class<T> casted = (Class<T>) clazz;
+          ret = casted;
+        } else {
+          return OptionalWithCause.empty(new GenericException(
+                  className + " is not a subtype of IsRODAObject"));
+        }
+      } catch (Exception e) {
+        return OptionalWithCause.empty(new GenericException("Failed to load class: " + className, e));
+      }
+    }
+
+    return OptionalWithCause.of(ret);
+  }
+
   public static <T extends IsRODAObject> OptionalWithCause<T> get(ModelService model, LiteRODAObject liteRODAObject) {
     try {
       OptionalWithCause<ParsedLite> parsedLite = ParsedLite.parse(liteRODAObject);

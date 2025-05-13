@@ -2600,14 +2600,21 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   private <T extends IsRODAObject> void registerOperation(Class<T> objectClass, List<String> ids,
     TransactionalModelOperationLog.OperationType operation) {
-    if (ids == null) {
-      throw new IllegalArgumentException("Object ID cannot be null");
+    if (ids == null || ids.isEmpty()) {
+      throw new IllegalArgumentException("Object IDs cannot be null or a empty list");
     }
+
+    if (operation == TransactionalModelOperationLog.OperationType.READ) {
+      // TODO: add a configuration to allow logging the read operation for debugging
+      // purposes
+      return;
+    }
+
     Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, ids);
     if (liteRODAObject.isPresent()) {
       String lite = liteRODAObject.get().getInfo();
-
       try {
+        LOGGER.debug("Registering operation {} for object {} with ID {}", operation, objectClass.getSimpleName(), ids);
         transactionLogService.registerModelOperation(transaction.getId(), lite, operation);
       } catch (RODATransactionException e) {
         throw new IllegalArgumentException("Cannot register operation for object: " + liteRODAObject, e);
@@ -2630,6 +2637,11 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     if (id == null) {
       throw new IllegalArgumentException("Object ID cannot be null");
     }
+
+    if (!isLockableClass(objectClass)) {
+      throw new IllegalArgumentException("Object class is not lockable: " + objectClass.getName());
+    }
+
     Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, id);
     if (liteRODAObject.isPresent()) {
       try {
@@ -2644,11 +2656,25 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     }
   }
 
+  private boolean isLockableClass(Class<? extends IsRODAObject> objectClass) {
+    return AIP.class.isAssignableFrom(objectClass) || DIP.class.isAssignableFrom(objectClass)
+      || LogEntry.class.isAssignableFrom(objectClass) || PreservationMetadata.class.isAssignableFrom(objectClass);
+  }
+
   @Override
   public void commit() throws RODATransactionException {
     for (TransactionalModelOperationLog modelOperation : transactionLogService
       .getModelOperations(transaction.getId())) {
-      PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getId());
+      LiteRODAObject liteRODAObject = new LiteRODAObject(modelOperation.getLiteObject());
+      OptionalWithCause<Class<IsRODAObject>> isRODAObjectClassOptionalWithCause = LiteRODAObjectFactory
+        .getClass(liteRODAObject);
+
+      if (isRODAObjectClassOptionalWithCause.isPresent()) {
+        Class<IsRODAObject> isRODAObjectClass = isRODAObjectClassOptionalWithCause.get();
+        if (isLockableClass(isRODAObjectClass)) {
+          PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId());
+        }
+      }
     }
   }
 
@@ -2673,7 +2699,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         }
       }
 
-      PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getId());
+      PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId());
     }
   }
 
