@@ -68,6 +68,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.TransactionalModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.maintenance.ChangeTypePlugin;
@@ -86,6 +87,7 @@ import org.roda.core.storage.StringContentPayload;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.HTMLUtils;
+import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -327,9 +329,10 @@ public class AIPService {
     return metadataInfo;
   }
 
-  public AIP createAIP(User user, String parentAipId, String type, Permissions permissions) throws GenericException,
+  public AIP createAIP(RequestContext requestContext, String parentAipId, String type, Permissions permissions) throws GenericException,
     AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
-    ModelService model = RodaCoreFactory.getModelService();
+    User user = requestContext.getUser();
+    TransactionalModelService model = requestContext.getTransactionalContext().transactionalModelService();
     return model.createAIP(parentAipId, type, permissions, user.getName());
   }
 
@@ -486,7 +489,7 @@ public class AIPService {
 
   public DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String representationId,
     String descriptiveMetadataId, String descriptiveMetadataType, String descriptiveMetadataVersion,
-    ContentPayload descriptiveMetadataPayload, String createdBy) throws GenericException, ValidationException,
+    ContentPayload descriptiveMetadataPayload, String createdBy, ModelService model) throws GenericException, ValidationException,
     AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
 
     ValidationReport report = ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload,
@@ -496,7 +499,7 @@ public class AIPService {
       throw new ValidationException(report);
     }
 
-    return RodaCoreFactory.getModelService().createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
+    return model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, createdBy);
   }
 

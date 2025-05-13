@@ -65,11 +65,6 @@ public class TransactionLogService {
   @Transactional
   public void registerModelOperation(String transactionId, String liteObject,
     TransactionalModelOperationLog.OperationType operation) throws RODATransactionException {
-    if(operation == TransactionalModelOperationLog.OperationType.READ) {
-      //TODO: add a configuration to allow logging the read operation for debugging purposes
-      return;
-    }
-
     TransactionLog transactionLog = getTransactionLogById(transactionId);
     transactionLog.addModelOperation(liteObject, operation);
     transactionLogRepository.save(transactionLog);
