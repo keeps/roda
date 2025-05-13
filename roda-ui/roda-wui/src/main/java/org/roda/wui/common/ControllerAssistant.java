@@ -24,8 +24,8 @@ import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.model.RequestContext;
 
 public class ControllerAssistant {
-  private final Date startDate;
-  private final Method enclosingMethod;
+  protected Date startDate;
+  protected Method enclosingMethod;
 
   public ControllerAssistant() {
     this.startDate = new Date();
