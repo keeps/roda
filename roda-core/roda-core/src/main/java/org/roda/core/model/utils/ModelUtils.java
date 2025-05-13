@@ -634,8 +634,8 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
-  public static StoragePath getTechnicalMetadataPath(String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
+  public static StoragePath getTechnicalMetadataStoragePath(String aipId, String representationId,
+                                                            List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
     List<String> path = build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_METADATA,
       RodaConstants.STORAGE_DIRECTORY_TECHNICAL);
     path.addAll(fileDirectoryPath);

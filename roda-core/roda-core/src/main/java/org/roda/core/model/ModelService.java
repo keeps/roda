@@ -22,7 +22,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,7 +39,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.common.PremisV3Utils;
-import org.roda.core.common.characterization.model.TechnicalMetadata;
 import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -111,6 +109,7 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadata;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -1650,13 +1649,15 @@ public class ModelService extends ModelObservable {
     String urn = URNUtils.createRodaTechnicalMetadataURN(fileId, RODAInstanceUtils.getLocalInstanceIdentifier(),
       metadataType.toLowerCase());
 
-    StoragePath binaryPath = ModelUtils.getTechnicalMetadataPath(aipId, representationId,
+    StoragePath binaryPath = ModelUtils.getTechnicalMetadataStoragePath(aipId, representationId,
       Collections.singletonList(metadataType), urn);
     storage.createBinary(binaryPath, payload, false);
+    TechnicalMetadata techMd = new TechnicalMetadata(metadataType, aipId, representationId, metadataType);
 
     AIP updatedAIP = null;
     if (aipId != null) {
       AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+      aip.addTechnicalMetadata(techMd);
       updatedAIP = updateAIPMetadata(aip, createdBy);
     }
 

@@ -31,8 +31,10 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadata;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
@@ -163,7 +165,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     if (path != null && !path.isEmpty()) {
       List<String> ancestorsPath = SolrUtils.getFileAncestorsPath(file.getAipId(), file.getRepresentationId(), path);
       if (!ancestorsPath.isEmpty()) {
-        doc.addField(RodaConstants.FILE_PARENT_UUID, ancestorsPath.get(ancestorsPath.size() - 1));
+        doc.addField(RodaConstants.FILE_PARENT_UUID, ancestorsPath.getLast());
         doc.addField(RodaConstants.FILE_ANCESTORS_PATH, ancestorsPath);
       }
     }
@@ -197,6 +199,9 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     }
 
     Long sizeInBytes = 0L;
+
+    SolrUtils.indexRepresentationTechnicalMetadata(RodaCoreFactory.getModelService(),
+      getRepresentationTechnicalMetadata(((Info) info).aip, file.getRepresentationId()), fileId, doc);
 
     // Add information from PREMIS
     Binary premisFile = getFilePremisFile(file);
@@ -261,6 +266,17 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
       LOGGER.warn("Could not load PREMIS for file: " + file, e);
     }
     return premisFile;
+  }
+
+  private List<TechnicalMetadata> getRepresentationTechnicalMetadata(AIP aip, String representationId) {
+    List<TechnicalMetadata> technicalMetadata = new ArrayList<>();
+    for (Representation representation : aip.getRepresentations()) {
+      if (representation.getId().equals(representationId)) {
+        technicalMetadata.addAll(representation.getTechnicalMetadata());
+      }
+    }
+
+    return technicalMetadata;
   }
 
   private String getFileFulltext(File file) {

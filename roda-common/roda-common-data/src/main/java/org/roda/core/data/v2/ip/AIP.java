@@ -19,6 +19,7 @@ import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -130,9 +131,13 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
           repDm.setAipId(id);
           repDm.setRepresentationId(representation.getId());
         }
+
+        for (TechnicalMetadata techMd : representation.getTechnicalMetadata()) {
+          techMd.setAipId(id);
+          techMd.setRepresentationId(representation.getId());
+        }
       }
     }
-
   }
 
   /**
@@ -254,6 +259,17 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
         if (representation.getId().equals(descriptiveMetadata.getRepresentationId())) {
           representation.addDescriptiveMetadata(descriptiveMetadata);
           break;
+        }
+      }
+    }
+  }
+
+  public void addTechnicalMetadata(TechnicalMetadata technicalMetadata) {
+    if (!technicalMetadata.isFromAIP()) {
+      for (Representation representation : this.representations) {
+        if (representation.getId().equals(technicalMetadata.getRepresentationId() )) {
+            representation.addTechnicalMetadata(technicalMetadata);
+            break;
         }
       }
     }

@@ -26,6 +26,8 @@ import org.apache.commons.io.IOUtils;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataMixIn;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadata;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadataMixIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,6 +129,16 @@ public final class JsonUtils {
         }
       } else {
         mapper.addMixIn(DescriptiveMetadata.class, DescriptiveMetadataMixIn.class);
+      }
+    }
+
+    if (!(object instanceof TechnicalMetadata)) {
+      if (object instanceof List<?> objectList) {
+        if (!objectList.isEmpty() && !(objectList.getFirst() instanceof TechnicalMetadata)) {
+          mapper.addMixIn(TechnicalMetadata.class, TechnicalMetadataMixIn.class);
+        }
+      } else {
+        mapper.addMixIn(TechnicalMetadata.class, TechnicalMetadataMixIn.class);
       }
     }
 

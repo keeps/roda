@@ -15,6 +15,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -42,21 +43,22 @@ public class Representation implements IsModelObject, HasId, HasInstanceID {
   private String updatedBy = null;
 
   private List<DescriptiveMetadata> descriptiveMetadata = new ArrayList<>();
+  private List<TechnicalMetadata> technicalMetadata = new ArrayList<>();
 
   public Representation() {
     super();
   }
 
   public Representation(String id, String aipId, boolean original, String type) {
-    this(id, aipId, original, type, null, new ArrayList<DescriptiveMetadata>(), false);
+    this(id, aipId, original, type, null, new ArrayList<>(), new ArrayList<>(), false);
   }
 
   public Representation(String id, String aipId, boolean original, String type, Boolean hasShallowFiles) {
-    this(id, aipId, original, type, null, new ArrayList<DescriptiveMetadata>(), hasShallowFiles);
+    this(id, aipId, original, type, null, new ArrayList<>(), new ArrayList<>(), hasShallowFiles);
   }
 
   public Representation(String id, String aipId, boolean original, String type, String instanceId,
-    List<DescriptiveMetadata> descriptiveMetadata, Boolean hasShallowFiles) {
+    List<DescriptiveMetadata> descriptiveMetadata, List<TechnicalMetadata> technicalMetadata, Boolean hasShallowFiles) {
     super();
     this.id = id;
     this.aipId = aipId;
@@ -65,6 +67,7 @@ public class Representation implements IsModelObject, HasId, HasInstanceID {
     this.instanceId = instanceId;
     this.hasShallowFiles = hasShallowFiles;
     this.descriptiveMetadata = descriptiveMetadata;
+    this.technicalMetadata = technicalMetadata;
     this.createdOn = new Date();
     this.updatedOn = new Date();
 
@@ -184,6 +187,18 @@ public class Representation implements IsModelObject, HasId, HasInstanceID {
 
   public void setRepresentationStates(List<String> states) {
     this.representationStates = states;
+  }
+
+  public List<TechnicalMetadata> getTechnicalMetadata() {
+    return this.technicalMetadata;
+  }
+
+  public void setTechnicalMetadata(List<TechnicalMetadata> technicalMetadata) {
+    this.technicalMetadata = technicalMetadata;
+  }
+
+  public void addTechnicalMetadata(TechnicalMetadata technicalMetadata) {
+    this.technicalMetadata.add(technicalMetadata);
   }
 
   @Override
