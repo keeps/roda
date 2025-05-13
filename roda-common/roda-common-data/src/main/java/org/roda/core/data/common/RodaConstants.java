@@ -317,6 +317,7 @@ public final class RodaConstants {
 
   public static final String CORE_CROSSWALKS_INGEST = "crosswalks/ingest/";
   public static final String CORE_CROSSWALKS_INGEST_OTHER = "crosswalks/ingest/other/";
+  public static final String CORE_CROSSWALKS_TECHNICAL = "crosswalks/technical/";
   public static final String CORE_DISPOSAL_METADATA_TRANSFORMERS = "disposal/destruction/";
 
   public static final String PREMIS_METADATA_TYPE = "premis";

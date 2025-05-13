@@ -74,6 +74,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.exceptions.SolrRetryException;
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.Pair;
@@ -97,7 +98,6 @@ import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.ChildOfFilterParameter;
-import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -108,6 +108,7 @@ import org.roda.core.data.v2.index.filter.LongRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
+import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -118,8 +119,6 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.HasPermissionFilters;
-import org.roda.core.data.v2.ip.HasPermissions;
-import org.roda.core.data.v2.ip.HasState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
@@ -128,6 +127,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadata;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.core.data.v2.user.User;
@@ -138,6 +138,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -874,15 +875,13 @@ public class SolrUtils {
     Map<String, String> parameters = new HashMap<>();
     parameters.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
 
-    String lowerCaseMetadataTypeWithVersion = metadataType.toLowerCase() + RodaConstants.METADATA_VERSION_SEPARATOR
-      + metadataVersion;
+    String technicalMetadataStylesheetName = getTechnicalMetadataStylesheetName(metadataType, metadataVersion);
 
-    if ((RodaCoreFactory.getConfigurationFileAsStream(
-      RodaConstants.CORE_CROSSWALKS_INGEST + lowerCaseMetadataTypeWithVersion + ".xslt")) == null) {
+    if ((RodaCoreFactory.getConfigurationFileAsStream(technicalMetadataStylesheetName)) == null) {
       return new SolrInputDocument();
     }
 
-    try (Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST,
+    try (Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_TECHNICAL,
       metadataType, metadataVersion, parameters)) {
 
       if (!transformationResult.ready()) {
@@ -913,6 +912,15 @@ public class SolrUtils {
     }
 
     return doc == null ? new SolrInputDocument() : validateDescriptiveMetadataFields(doc);
+  }
+
+  private static String getTechnicalMetadataStylesheetName(String type, String version) {
+    if (StringUtils.isBlank(version)) {
+      return RodaConstants.CORE_CROSSWALKS_TECHNICAL + type.toLowerCase() + ".xslt";
+    }
+
+    return RodaConstants.CORE_CROSSWALKS_TECHNICAL + type.toLowerCase() + RodaConstants.METADATA_VERSION_SEPARATOR
+      + version + ".xslt";
   }
 
   private static SolrInputDocument validateDescriptiveMetadataFields(SolrInputDocument doc) {
@@ -1500,6 +1508,43 @@ public class SolrUtils {
    * Common mappings of RODA objects
    * ____________________________________________________________________________________________________________________
    */
+
+  public static void indexRepresentationTechnicalMetadata(ModelService model,
+    List<TechnicalMetadata> technicalMetadatum, String fileId, SolrInputDocument doc)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+
+    // guarding against repeated fields
+    Set<String> usedNonRepeatableFields = new HashSet<>();
+
+    for (TechnicalMetadata techMd : technicalMetadatum) {
+      String urn = URNUtils.createRodaTechnicalMetadataURN(fileId, RODAInstanceUtils.getLocalInstanceIdentifier(),
+        techMd.getType().toLowerCase());
+
+      StoragePath storagePath = ModelUtils.getTechnicalMetadataStoragePath(techMd.getAipId(),
+        techMd.getRepresentationId(), Collections.singletonList(techMd.getType()),
+        urn + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
+
+      Binary binary = model.getStorage().getBinary(storagePath);
+
+      try {
+        SolrInputDocument technicalMetadataFields = getTechnicalMetadataFields(binary, techMd.getType(), null);
+        for (SolrInputField field : technicalMetadataFields) {
+          if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
+            boolean added = usedNonRepeatableFields.add(field.getName());
+            if (added) {
+              doc.addField(field.getName(), field.getValue());
+            }
+          } else {
+            doc.addField(field.getName(), field.getValue());
+          }
+        }
+      } catch (GenericException e) {
+        LOGGER.warn("Problem processing technical metadata: {}", e.getMessage(), e);
+      } catch (Exception e) {
+        LOGGER.error("Error processing technical metadata: {}", techMd, e);
+      }
+    }
+  }
 
   public static void indexDescriptiveMetadataFields(ModelService model, String aipId, String representationId,
     List<DescriptiveMetadata> metadataList, SolrInputDocument doc)
