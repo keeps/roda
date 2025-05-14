@@ -36,12 +36,10 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.ShallowFile;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.protocols.protocols.RODAProtocol;
 import org.roda.core.util.IdUtils;
@@ -141,7 +139,6 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
 
   public void createAIPBundle(ModelService model, IndexService index, AIP aip)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, AlreadyExistsException {
-    StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
     Path destinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_AIP).resolve(aip.getId());
 
@@ -153,11 +150,11 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
       Path submissionsPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
       Path aipMetadataPath = destinationPath.resolve(RodaConstants.STORAGE_AIP_METADATA_FILENAME);
 
-      model.copy(aipStoragePath, documentationPath, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
-      model.copy(aipStoragePath, metadataPath, RodaConstants.STORAGE_DIRECTORY_METADATA);
-      model.copy(aipStoragePath, schemasPath, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
-      model.copy(aipStoragePath, submissionsPath, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
-      model.copy(aipStoragePath, aipMetadataPath, RodaConstants.STORAGE_AIP_METADATA_FILENAME);
+      model.copyObjectFromContainer(aip, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION, documentationPath);
+      model.copyObjectFromContainer(aip, RodaConstants.STORAGE_DIRECTORY_METADATA, metadataPath);
+      model.copyObjectFromContainer(aip, RodaConstants.STORAGE_DIRECTORY_SCHEMAS, schemasPath);
+      model.copyObjectFromContainer(aip, RodaConstants.STORAGE_DIRECTORY_SUBMISSION, submissionsPath);
+      model.copyObjectFromContainer(aip, RodaConstants.STORAGE_AIP_METADATA_FILENAME, aipMetadataPath);
 
       for (Representation representation : aip.getRepresentations()) {
         Path repDataPath = Paths.get(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId(),
@@ -167,7 +164,7 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
         Path repMetadataPath = Paths.get(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId(),
           RodaConstants.STORAGE_DIRECTORY_METADATA);
         Path repMetadataDestinationPath = destinationPath.resolve(repMetadataPath);
-        model.copy(aipStoragePath, repMetadataDestinationPath, repMetadataPath.toString());
+        model.copyObjectFromContainer(aip, repMetadataPath.toString(), repMetadataDestinationPath);
 
         addFilesToBundle(aip, representation, index, repDataDestinationPath);
       }

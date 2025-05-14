@@ -48,6 +48,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -65,10 +66,19 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.lites.ParsedAIPLite;
 import org.roda.core.model.lites.ParsedDIPFileLite;
+import org.roda.core.model.lites.ParsedDIPLite;
 import org.roda.core.model.lites.ParsedDescriptiveMetadataLite;
+import org.roda.core.model.lites.ParsedDisposalHoldLite;
 import org.roda.core.model.lites.ParsedFileLite;
+import org.roda.core.model.lites.ParsedJobLite;
 import org.roda.core.model.lites.ParsedLite;
+import org.roda.core.model.lites.ParsedNotificationLite;
+import org.roda.core.model.lites.ParsedPreservationMetadataLite;
+import org.roda.core.model.lites.ParsedReportLite;
+import org.roda.core.model.lites.ParsedRepresentationInformationLite;
 import org.roda.core.model.lites.ParsedRepresentationLite;
+import org.roda.core.model.lites.ParsedRiskIncidenceLite;
+import org.roda.core.model.lites.ParsedRiskLite;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
 import org.slf4j.Logger;
@@ -940,26 +950,27 @@ public final class ModelUtils {
       return getDIPFileStoragePath(dipFile.getId(), dipFile.getDirectoryPath(), dipFile.getFileId());
     }
     if (parsedLite instanceof ParsedPreservationMetadataLite pm) {
-      return getPreservationMetadataStoragePath(pm);
-    }
-    if (parsedLite instanceof ParsedOtherMetadataLite om) {
-      return getOtherMetadataStoragePath(om.getAipId(), om.getRepresentationId(), om.getFileDirectoryPath(),
-        om.getFileId(), om.getFileSuffix(), om.getType());
-    }
-    if (parsedLite instanceof ParsedIndexedPreservationEventLite event) {
-      return getPreservationEventStoragePath(event.getFileUUID());
+      String id = pm.getId();
+      String aipId = pm.getAipId();
+      String representationId = pm.getRepresentationId();
+      String fileId = pm.getFileId();
+      List<String> filePath = pm.getFileDirectoryPath();
+
+      if (aipId != null && representationId != null && fileId != null && filePath != null) {
+        return getPreservationMetadataStoragePath(id, pm.getType(), aipId, representationId, filePath, fileId);
+      } else if (aipId != null && representationId != null) {
+        return getPreservationMetadataStoragePath(id, pm.getType(), aipId, representationId);
+      } else if (aipId != null) {
+        return getPreservationMetadataStoragePath(id, pm.getType(), aipId);
+      } else {
+        return getPreservationMetadataStoragePath(id, pm.getType());
+      }
     }
     if (parsedLite instanceof ParsedJobLite job) {
       return getJobStoragePath(job.getId());
     }
     if (parsedLite instanceof ParsedDisposalHoldLite disposalHold) {
       return getDisposalHoldStoragePath(disposalHold.getId());
-    }
-    if (parsedLite instanceof ParsedDistributedInstanceLite distributedInstance) {
-      return getDistributedInstanceStoragePath(distributedInstance.getId());
-    }
-    if (parsedLite instanceof ParsedAccessKeyLite accessKey) {
-      return getAccessKeysStoragePath(accessKey.getId());
     }
     if (parsedLite instanceof ParsedReportLite report) {
       return getJobReportStoragePath(report.getJobId(), report.getId());
@@ -1009,6 +1020,10 @@ public final class ModelUtils {
       return getDisposalConfirmationContainerPath();
     } else if (clazz.equals(DistributedInstance.class)) {
       return getDistributedInstancesContainerPath();
+    } else if (clazz.equals(IndexedPreservationAgent.class)) {
+      return getPreservationAgentStoragePath();
+    } else if (clazz.equals(IndexedPreservationEvent.class)) {
+      return getPreservationRepositoryEventStoragePath();
     } else {
       throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getName());
     }

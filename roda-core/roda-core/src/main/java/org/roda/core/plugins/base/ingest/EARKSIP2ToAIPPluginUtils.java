@@ -347,10 +347,12 @@ public class EARKSIP2ToAIPPluginUtils {
           hasShallowFile = true;
         } else {
           // this is an empty folder
-          final StoragePath emptyDirectoryStoragePath = ModelUtils.getDirectoryStoragePath(aipId,
-            representation.getId(), file.getRelativeFolders());
-          model.createDirectory(emptyDirectoryStoragePath);
-          // TODO jgomes 2022-03-09: Create model service method to create empty directory
+          String[] pathPartials = new String[file.getRelativeFolders().size()+1];
+          pathPartials[0] = RodaConstants.STORAGE_DIRECTORY_DATA;
+          for (int i = 0; i < file.getRelativeFolders().size(); i++) {
+            pathPartials[i + 1] = file.getRelativeFolders().get(i);
+          }
+          model.createDirectory(representation, pathPartials);
         }
 
       } else {

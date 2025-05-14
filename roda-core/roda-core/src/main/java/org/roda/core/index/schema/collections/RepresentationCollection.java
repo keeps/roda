@@ -7,6 +7,7 @@
  */
 package org.roda.core.index.schema.collections;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,7 +33,8 @@ import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.storage.Directory;
+import org.roda.core.storage.DirectResourceAccess;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 
 public class RepresentationCollection extends AbstractSolrCollection<IndexedRepresentation, Representation> {
@@ -141,20 +143,20 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     }
 
     // Calculate number of documentation and schema files
-    StorageService storage = model.getStorage();
     Long numberOfDocumentationFiles;
     try {
-      Directory documentationDirectory = model.getDocumentationDirectory(rep.getAipId(), rep.getId());
-      numberOfDocumentationFiles = model.countResourcesUnderDirectory(documentationDirectory.getStoragePath(), true);
-    } catch (NotFoundException e) {
+      DirectResourceAccess documentationResource = model.getDirectAccess(rep,
+        RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+      numberOfDocumentationFiles = FSUtils.countDirectAccessResourceChildren(documentationResource, true);
+    } catch (NotFoundException | IOException e) {
       numberOfDocumentationFiles = 0L;
     }
 
     Long numberOfSchemaFiles;
     try {
-      Directory schemasDirectory = model.getSchemasDirectory(rep.getAipId(), rep.getId());
-      numberOfSchemaFiles = model.countResourcesUnderDirectory(schemasDirectory.getStoragePath(), true);
-    } catch (NotFoundException e) {
+      DirectResourceAccess schemaResource = model.getDirectAccess(rep, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+      numberOfSchemaFiles = FSUtils.countDirectAccessResourceChildren(schemaResource, true);
+    } catch (NotFoundException | IOException e) {
       numberOfSchemaFiles = 0L;
     }
 

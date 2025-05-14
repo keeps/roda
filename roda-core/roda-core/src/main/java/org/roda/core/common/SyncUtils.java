@@ -37,21 +37,22 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ConsumesOutputStream;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.IndexedJob;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
@@ -92,7 +93,7 @@ public class SyncUtils {
 
     final Path destinationPath = workingDir.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_JOB);
-    return createCentralPackage(ModelUtils.getJobContainerPath(), jobs, RodaConstants.JOB_FILE_EXTENSION,
+    return createCentralPackage(Job.class, jobs, RodaConstants.JOB_FILE_EXTENSION,
       destinationPath);
   }
 
@@ -105,7 +106,7 @@ public class SyncUtils {
     final Path destinationPath = workingDir.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_RISK);
 
-    return createCentralPackage(ModelUtils.getRiskContainerPath(), risks, RodaConstants.RISK_FILE_EXTENSION,
+    return createCentralPackage(Risk.class, risks, RodaConstants.RISK_FILE_EXTENSION,
       destinationPath);
   }
 
@@ -118,19 +119,19 @@ public class SyncUtils {
     final Path destinationPath = workingDir.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
 
-    return createCentralPackage(ModelUtils.getRepresentationInformationContainerPath(), representationInformation,
+    return createCentralPackage(RepresentationInformation.class, representationInformation,
       RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION, destinationPath);
   }
 
-  private static boolean createCentralPackage(StoragePath containerPath,
+  private static <T extends IsRODAObject> boolean createCentralPackage(Class<T> containerClass,
     IterableIndexResult<? extends IsIndexed> indexedObject, String fileExtension, Path destinationPath)
-    throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
+    throws AlreadyExistsException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     if (indexedObject.getTotalCount() > 0) {
       final ModelService model = RodaCoreFactory.getModelService();
 
       for (IsIndexed object : indexedObject) {
         final String filename = object.getId() + fileExtension;
-        model.copy(containerPath, destinationPath.resolve(filename), filename);
+        model.copyObjectFromContainer(containerClass, filename, destinationPath);
       }
       return true;
     }
