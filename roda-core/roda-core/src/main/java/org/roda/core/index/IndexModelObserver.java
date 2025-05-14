@@ -33,7 +33,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
-import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
@@ -82,15 +81,13 @@ import org.roda.core.index.schema.collections.RepresentationCollection;
 import org.roda.core.index.schema.collections.RiskCollection;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
-import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.JsonContentPayload;
-import org.roda.core.storage.Resource;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -313,11 +310,12 @@ public class IndexModelObserver implements ModelObserver {
   private Long getExternalFilesTotalSize(File file)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     Long sizeInBytes = 0L;
-    StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-    CloseableIterable<Resource> resources = model.listResourcesUnderFile(storagePath, false);
-    for (Resource resource : resources) {
-      if (resource instanceof DefaultBinary) {
-        ContentPayload content = ((DefaultBinary) resource).getContent();
+    DirectResourceAccess fileResource = model.getDirectAccess(file);
+    CloseableIterable<DirectResourceAccess> resources = FSUtils.listDirectAccessResourceChildren(fileResource, false);
+    for (DirectResourceAccess resource : resources) {
+      if (!resource.isDirectory()) {
+        Binary binary = model.getBinary(file, resource.getPath().getFileName().toString());
+        ContentPayload content = binary.getContent();
         if (content instanceof JsonContentPayload) {
           ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
           sizeInBytes += shallowFile.getSize();
@@ -1130,27 +1128,21 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> indexJobReports(Job job) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try (CloseableIterable<OptionalWithCause<LiteRODAObject>> listJobReportLites = model
-      .listReportLitesUnder(job.getId())) {
-
-      if (listJobReportLites != null) {
-        for (OptionalWithCause<LiteRODAObject> reportLite : listJobReportLites) {
-          if (reportLite.isPresent()) {
-            try (
-              InputStream inputStream = model.getBinary(reportLite.get()).getContent().createInputStream()) {
+    try (DirectResourceAccess jobReportsContainer = model.getDirectAccess(Report.class, job.getId());
+      CloseableIterable<DirectResourceAccess> jobReports = FSUtils.listDirectAccessResourceChildren(jobReportsContainer,
+        false)) {
+      for (DirectResourceAccess report : jobReports) {
+        if (!report.isDirectory()) {
+          Binary reportBinary = model.getBinary(Report.class, job.getId(), report.getPath().getFileName().toString());
+          try (InputStream inputStream = reportBinary.getContent().createInputStream()) {
               Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
               jobReportCreatedOrUpdated(objectFromJson, job).addTo(ret);
-            } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-              | IOException e) {
+            } catch (GenericException | IOException e) {
               LOGGER.error("Error getting report json from binary", e);
               ret.add(e);
             }
           }
-          else {
-            LOGGER.error("Invalid report lite found during indexing", reportLite.getCause());
-          }
         }
-      }
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
       LOGGER.error("Error reindexing job reports", e);

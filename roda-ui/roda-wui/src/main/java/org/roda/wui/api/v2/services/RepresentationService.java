@@ -27,7 +27,6 @@ import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
@@ -38,7 +37,6 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
@@ -46,7 +44,6 @@ import org.roda.core.plugins.base.maintenance.ChangeRepresentationStatusPlugin;
 import org.roda.core.plugins.base.maintenance.ChangeTypePlugin;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.Directory;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.HTMLUtils;
@@ -109,12 +106,7 @@ public class RepresentationService {
 
   public StreamResponse retrieveAIPRepresentationBinary(IndexedRepresentation representation)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    String representationId = representation.getId();
-    StoragePath storagePath = ModelUtils.getRepresentationStoragePath(representation.getAipId(),
-      representation.getId());
-
-    Directory directory = RodaCoreFactory.getModelService().getDirectory(storagePath);
-    return ApiUtils.download(directory, representationId);
+    return ApiUtils.download(representation);
   }
 
   public Representation createRepresentation(User user, String aipId, String representationId, String type,
@@ -229,11 +221,8 @@ public class RepresentationService {
 
   public StreamResponse retrieveAIPRepresentationOtherMetadata(IndexedRepresentation representation)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    String aipId = representation.getAipId();
-    String representationId = representation.getId();
-    StoragePath storagePath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, "", "", "");
-    Directory directory = RodaCoreFactory.getModelService().getDirectory(storagePath);
-    return ApiUtils.download(directory, representationId);
+    return ApiUtils.download(representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
+      RodaConstants.STORAGE_DIRECTORY_OTHER);
   }
 
   public DescriptiveMetadataInfos getDescriptiveMetadata(IndexedRepresentation indexedRepresentation,

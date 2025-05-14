@@ -465,6 +465,30 @@ public class FSUtils {
     }
   }
 
+  /**
+   * Counts direct access resources under a direct access resource
+   *
+   * @param resource
+   * @param recursive
+   * @return
+   * @throws RequestNotValidException
+   * @throws AuthorizationDeniedException
+   * @throws NotFoundException
+   * @throws GenericException
+   * @throws IOException
+   */
+  public static Long countDirectAccessResourceChildren(DirectResourceAccess resource, boolean recursive)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException, IOException {
+    Long count = 0L;
+    try (final CloseableIterable<Path> listPaths = recursive ? FSUtils.recursivelyListPaths(resource.getPath())
+      : FSUtils.listPaths(resource.getPath())) {
+      for (Path ignored : listPaths) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   public static DirectResourceAccess resolve(DirectResourceAccess directResourceAccess, String... pathPartials)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Path resolved = directResourceAccess.getPath();

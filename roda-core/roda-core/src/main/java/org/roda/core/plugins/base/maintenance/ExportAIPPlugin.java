@@ -192,12 +192,12 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
         LOGGER.debug("Exporting AIP {} to folder", aip.getId());
         String error = null;
         try {
-          model.copyAIPToStorage(aip, localStorage, DefaultStoragePath.parse(aip.getId()));
+          model.exportObject(aip, localStorage, aip.getId());
         } catch (AlreadyExistsException e) {
           if (removeIfAlreadyExists) {
             try {
               localStorage.deleteResource(DefaultStoragePath.parse(aip.getId()));
-              model.copyAIPToStorage(aip, localStorage, DefaultStoragePath.parse(aip.getId()));
+              model.exportObject(aip, localStorage, aip.getId());
             } catch (AlreadyExistsException e2) {
               error = "Error removing/creating folder for AIP " + aip.getId();
             }

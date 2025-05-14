@@ -928,8 +928,8 @@ public class ModelServiceTest {
     DefaultStoragePath preservationContainerPath = DefaultStoragePath
       .parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER);
 
-    model.deleteContainer(preservationContainerPath);
-    model.copy(corporaService, preservationContainerPath,
+    storage.deleteContainer(preservationContainerPath);
+    storage.copy(corporaService, preservationContainerPath,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));
 
     Binary agentBinary = model.retrievePreservationAgent(CorporaConstants.AGENT_RODA_8);

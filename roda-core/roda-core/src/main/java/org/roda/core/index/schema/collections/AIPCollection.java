@@ -7,12 +7,14 @@
  */
 package org.roda.core.index.schema.collections;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.data.common.RodaConstants;
@@ -41,8 +43,8 @@ import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.storage.Directory;
-import org.roda.core.storage.StorageService;
+import org.roda.core.storage.DirectResourceAccess;
+import org.roda.core.storage.fs.FSUtils;
 
 public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
@@ -207,25 +209,26 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     // Calculate number of documentation and schema files
     Long numberOfSubmissionFiles;
     try {
-      Directory submissionDirectory = model.getSubmissionDirectory(aip.getId());
-      numberOfSubmissionFiles = model.countResourcesUnderDirectory(submissionDirectory.getStoragePath(), true);
-    } catch (NotFoundException e) {
+      DirectResourceAccess submissionResource = model.getDirectAccess(aip, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+      numberOfSubmissionFiles = FSUtils.countDirectAccessResourceChildren(submissionResource, true);
+    } catch (NotFoundException | IOException e) {
       numberOfSubmissionFiles = 0L;
     }
 
     Long numberOfDocumentationFiles;
     try {
-      Directory documentationDirectory = model.getDocumentationDirectory(aip.getId());
-      numberOfDocumentationFiles = model.countResourcesUnderDirectory(documentationDirectory.getStoragePath(), true);
-    } catch (NotFoundException e) {
+      DirectResourceAccess documentationResource = model.getDirectAccess(aip,
+        RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+      numberOfDocumentationFiles = FSUtils.countDirectAccessResourceChildren(documentationResource, true);
+    } catch (NotFoundException | IOException e) {
       numberOfDocumentationFiles = 0L;
     }
 
     Long numberOfSchemaFiles;
     try {
-      Directory schemasDirectory = model.getSchemasDirectory(aip.getId());
-      numberOfSchemaFiles = model.countResourcesUnderDirectory(schemasDirectory.getStoragePath(), true);
-    } catch (NotFoundException e) {
+      DirectResourceAccess schemaResource = model.getDirectAccess(aip, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+      numberOfSchemaFiles = FSUtils.countDirectAccessResourceChildren(schemaResource, true);
+    } catch (NotFoundException | IOException e) {
       numberOfSchemaFiles = 0L;
     }
 
