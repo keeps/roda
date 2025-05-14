@@ -69,13 +69,14 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.IndexService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
-import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FileStorageService;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -896,6 +897,9 @@ public interface ModelService extends ModelObservable {
   Binary getBinary(LiteRODAObject lite, String... pathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
 
+  <T extends IsRODAObject> Binary getBinary(Class<T> entityClass, String... pathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
+
   BinaryVersion getBinaryVersion(IsRODAObject object, String version, List<String> pathPartials)
     throws RequestNotValidException, NotFoundException, GenericException;
 
@@ -922,27 +926,22 @@ public interface ModelService extends ModelObservable {
     boolean createIfNotExists)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
-  @Deprecated
-  Directory getDirectory(StoragePath storagePath)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+  Directory createDirectory(IsRODAObject object, String... pathPartials)
+    throws AuthorizationDeniedException, AlreadyExistsException, GenericException, RequestNotValidException;
 
-  @Deprecated
-  Directory createDirectory(StoragePath emptyDirectoryPath)
-    throws AuthorizationDeniedException, AlreadyExistsException, GenericException;
-
-  @Deprecated
-  Directory createDirectory(StorageService storage, StoragePath emptyDirectoryPath)
-    throws AuthorizationDeniedException, AlreadyExistsException, GenericException;
+  Directory createDirectory(LiteRODAObject lite, String... pathPartials)
+    throws AuthorizationDeniedException, AlreadyExistsException, GenericException, RequestNotValidException;
 
   DirectResourceAccess getDirectAccess(IsRODAObject obj, StorageService storage, String... pathPartials)
     throws RequestNotValidException;
 
   DirectResourceAccess getDirectAccess(LiteRODAObject liteObj, StorageService storage, String... pathPartials)
-    throws RequestNotValidException;
+    throws RequestNotValidException, GenericException;
 
   DirectResourceAccess getDirectAccess(IsRODAObject obj, String... pathPartials) throws RequestNotValidException;
 
-  DirectResourceAccess getDirectAccess(LiteRODAObject liteObj, String... pathPartials) throws RequestNotValidException;
+  DirectResourceAccess getDirectAccess(LiteRODAObject liteObj, String... pathPartials)
+    throws RequestNotValidException, GenericException;
 
   DirectResourceAccess getDirectAccessToVersion(IsRODAObject obj, String version, List<String> pathPartials)
     throws RequestNotValidException, GenericException;
@@ -953,39 +952,27 @@ public interface ModelService extends ModelObservable {
   <T extends IsRODAObject> DirectResourceAccess getDirectAccess(Class<T> entityClass, String... pathPartials)
     throws RequestNotValidException;
 
-  @Deprecated
-  CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
-
-  @Deprecated
-  CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
-
-  @Deprecated
-  CloseableIterable<Resource> listResourcesUnderFile(StoragePath storagePath, boolean recursive)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
-
-  @Deprecated
-  Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
-
-  @Deprecated
-  Long countResourcesUnderContainer(StoragePath storagePath, boolean recursive)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
-
-  @Deprecated
-  void copyAIPToStorage(AIP aip, StorageService toStorage, StoragePath toPath) throws AuthorizationDeniedException,
-    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException;
-
-  void importAll(StorageService fromStorage);
+  int importAll(IndexService index, final FileStorageService fromStorage, final boolean importJobs)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException;
 
   void exportAll(StorageService toStorage);
 
   void importObject(IsRODAObject object, StorageService fromStorage);
 
-  void exportObject(IsRODAObject object, StorageService toStorage);
+  void exportObject(IsRODAObject object, StorageService toStorage, String... toPathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
+    GenericException;
 
-  void exportObject(LiteRODAObject lite, StorageService toStorage);
+  void exportObject(LiteRODAObject lite, StorageService toStorage, String... toPathPartials)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException;
+
+  <T extends IsRODAObject> void copyObjectFromContainer(Class<T> clazz, String resource, Path toPath)
+    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException;
+
+  <T extends IsRODAObject> void copyObjectFromContainer(IsRODAObject object, String resource, Path toPath)
+    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException;
 
   ConsumesOutputStream exportObjectToStream(IsRODAObject object, String... pathPartials)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
@@ -1001,30 +988,11 @@ public interface ModelService extends ModelObservable {
     String... pathPartials)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
-  @Deprecated
-  void copy(StorageService fromStorageService, StoragePath fromPath, StoragePath toPath)
-    throws AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException,
-    GenericException;
-
-  @Deprecated
-  void copy(StoragePath fromPath, StoragePath toPath) throws AuthorizationDeniedException, RequestNotValidException,
-    AlreadyExistsException, NotFoundException, GenericException;
-
-  @Deprecated
-  void copy(StoragePath fromPath, Path toPath, String resource)
-    throws AuthorizationDeniedException, AlreadyExistsException, GenericException;
-
   void moveObject(LiteRODAObject fromPath, LiteRODAObject toPath) throws AuthorizationDeniedException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException;
 
   @Deprecated
-  void deleteContainer(StoragePath path) throws AuthorizationDeniedException, NotFoundException, GenericException;
-
-  @Deprecated
   void deleteResource(StoragePath path) throws AuthorizationDeniedException, NotFoundException, GenericException;
-
-  @Deprecated
-  boolean hasDirectory(StoragePath storagePath);
 
   @Deprecated
   boolean exists(StoragePath storagePath);
@@ -1035,8 +1003,4 @@ public interface ModelService extends ModelObservable {
 
   @Deprecated
   String getStoragePathAsString(StoragePath filePath, boolean skipContainer);
-
-  @Deprecated
-  String getStoragePathAsString(StoragePath filePath, boolean skipContainer, StoragePath anotherStoragePath,
-    boolean skipAnotherStoragePathContainer);
 }

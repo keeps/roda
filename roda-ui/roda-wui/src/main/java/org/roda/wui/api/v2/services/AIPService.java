@@ -350,24 +350,32 @@ public class AIPService {
 
   public boolean hasDocumentation(String aipId)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
-    StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
-    StoragePath documentationPath = DefaultStoragePath.parse(aipPath, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
     try {
-      Long counter = RodaCoreFactory.getModelService().countResourcesUnderContainer(documentationPath, false);
+      Optional<LiteRODAObject> aipLite = LiteRODAObjectFactory.get(AIP.class, aipId);
+      if (aipLite.isEmpty()) {
+        throw new RequestNotValidException("Could not get LITE from AIP " + aipId);
+      }
+      DirectResourceAccess documentationResource = RodaCoreFactory.getModelService().getDirectAccess(aipLite.get(),
+        RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+      Long counter = FSUtils.countDirectAccessResourceChildren(documentationResource, false);
       return counter > 0;
-    } catch (NotFoundException e) {
+    } catch (NotFoundException | IOException e) {
       return false;
     }
   }
 
   public boolean hasSubmissions(String aipId)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException {
-    StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
-    StoragePath documentationPath = DefaultStoragePath.parse(aipPath, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
     try {
-      Long counter = RodaCoreFactory.getModelService().countResourcesUnderContainer(documentationPath, false);
+      Optional<LiteRODAObject> aipLite = LiteRODAObjectFactory.get(AIP.class, aipId);
+      if (aipLite.isEmpty()) {
+        throw new RequestNotValidException("Could not get LITE from AIP " + aipId);
+      }
+      DirectResourceAccess submissionResource = RodaCoreFactory.getModelService().getDirectAccess(aipLite.get(),
+        RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+      Long counter = FSUtils.countDirectAccessResourceChildren(submissionResource, false);
       return counter > 0;
-    } catch (NotFoundException e) {
+    } catch (NotFoundException | IOException e) {
       return false;
     }
   }

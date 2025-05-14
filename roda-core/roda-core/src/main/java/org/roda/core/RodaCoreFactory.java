@@ -720,7 +720,8 @@ public class RodaCoreFactory {
   private static void instantiateDefaultObjects() {
     if (INSTANTIATE_DEFAULT_RESOURCES) {
       try (
-        CloseableIterable<Resource> resources = model.listResourcesUnderContainer(DefaultStoragePath.parse(""), true)) {
+        CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(DefaultStoragePath.parse(""),
+          true)) {
 
         Iterator<Resource> resourceIterator = resources.iterator();
         boolean hasFileResources = false;

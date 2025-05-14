@@ -81,9 +81,10 @@ import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -437,12 +438,12 @@ public class IndexService {
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    try (CloseableIterable<Resource> actionLogs = model
-      .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), false)) {
+    try (DirectResourceAccess logsContainer = model.getDirectAccess(LogEntry.class);
+      CloseableIterable<DirectResourceAccess> logs = FSUtils.listDirectAccessResourceChildren(logsContainer, false)) {
 
-      for (Resource resource : actionLogs) {
-        if (resource instanceof Binary) {
-          Binary b = (Binary) resource;
+      for (DirectResourceAccess resource : logs) {
+        if (!resource.isDirectory()) {
+          Binary b = model.getBinary(LogEntry.class, resource.getPath().getFileName().toString());
           InputStreamReader reader = new InputStreamReader(b.getContent().createInputStream());
           reindexActionLog(reader);
         }

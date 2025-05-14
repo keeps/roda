@@ -23,11 +23,9 @@ import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 
 /**
@@ -98,12 +96,11 @@ public class DipPackagePlugin extends RodaEntityPackagesPlugin<DIP> {
 
   private void createDIPBundle(ModelService model, DIP dip)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException {
-    StoragePath dipStoragePath = ModelUtils.getDIPStoragePath(dip.getId());
     Path destinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_DIP).resolve(dip.getId());
 
     Path dipFilePath = destinationPath.resolve(RodaConstants.STORAGE_DIP_METADATA_FILENAME);
 
-    model.copy(dipStoragePath, dipFilePath, RodaConstants.STORAGE_DIP_METADATA_FILENAME);
+    model.copyObjectFromContainer(dip, RodaConstants.STORAGE_DIP_METADATA_FILENAME, dipFilePath);
   }
 }
