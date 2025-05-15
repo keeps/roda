@@ -3,6 +3,7 @@ package org.roda.core.storage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -289,6 +290,12 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public List<StoragePath> getShallowFiles(StoragePath storagePath) throws NotFoundException, GenericException {
     registerOperation(storagePath, TransactionalStoragePathOperationLog.OperationType.READ);
     return getStorageService(storagePath).getShallowFiles(storagePath);
+  }
+
+  @Override
+  public Date getCreationDate(StoragePath storagePath) throws GenericException {
+    registerOperation(storagePath, TransactionalStoragePathOperationLog.OperationType.READ);
+    return getStorageService(storagePath).getCreationDate(storagePath);
   }
 
   @Override

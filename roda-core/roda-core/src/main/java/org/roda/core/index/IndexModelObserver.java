@@ -82,7 +82,6 @@ import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -341,12 +340,9 @@ public class IndexModelObserver implements ModelObserver {
 
     FileCollection.Info info = new FileCollection.Info(aip, ancestors);
     try {
-      // TODO: Don't use DirectResourceAccess to get these file attributes
-      final DirectResourceAccess fileResource = model.getDirectAccess(file);
-      file.setCreatedOn(FSUtils.getDateFromDirectResourceAccess(fileResource));
-    } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
-      | IOException e) {
-      LOGGER.error("Could not set the creation date of File");
+      file.setCreatedOn(model.retrieveFileCreationDate(file));
+    } catch (RequestNotValidException | GenericException e) {
+      LOGGER.error("Could not set the creation date of File", e);
     }
     if (FSUtils.isManifestOfExternalFiles(file.getId())) {
       try (CloseableIterable<OptionalWithCause<File>> allExternalFiles = model.listExternalFilesUnder(file)) {
@@ -1039,12 +1035,9 @@ public class IndexModelObserver implements ModelObserver {
       indexPreservationEvent(pm).addTo(ret);
     } else if (PreservationMetadataType.AGENT.equals(type)) {
       try {
-        // TODO: Don't use DirectResourceAccess to get these file attributes
-        final DirectResourceAccess pmResource = model.getDirectAccess(pm);
-        pm.setCreatedOn(FSUtils.getDateFromDirectResourceAccess(pmResource));
-      } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
-        | IOException e) {
-        LOGGER.error("Could not set the creation date of Preservation Agent");
+        pm.setCreatedOn(model.retrievePreservationMetadataCreationDate(pm));
+      } catch (RequestNotValidException | GenericException e) {
+        LOGGER.error("Could not set the creation date of Preservation Agent", e);
       }
       SolrUtils.create2(index, model, (ModelObserver) this, IndexedPreservationAgent.class, pm).addTo(ret);
     }
