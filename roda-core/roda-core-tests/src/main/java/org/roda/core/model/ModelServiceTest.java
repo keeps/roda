@@ -136,8 +136,7 @@ public class ModelServiceTest {
       deployPluginManager, deployDefaultResources, false, ldapUtilityTestHelper.getLdapUtility());
 
     logPath = RodaCoreFactory.getLogPath();
-    // TODO: Inject storage service
-    storage = null;
+    storage = RodaCoreFactory.getStorageService();
     model = RodaCoreFactory.getModelService();
   }
 
