@@ -33,6 +33,7 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
 
 /**
@@ -105,8 +106,7 @@ public class JobPackagePlugin extends RodaEntityPackagesPlugin<Job> {
   }
 
   public void createJobBundle(ModelService model, Job jobToBundle)
-    throws RequestNotValidException,
-    AuthorizationDeniedException, GenericException, AlreadyExistsException {
+    throws RequestNotValidException, AuthorizationDeniedException, GenericException, AlreadyExistsException {
     String jobFile = jobToBundle.getId() + RodaConstants.JOB_FILE_EXTENSION;
 
     Path destinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
@@ -117,8 +117,8 @@ public class JobPackagePlugin extends RodaEntityPackagesPlugin<Job> {
     model.copyObjectFromContainer(Job.class, jobFile, jobPath);
 
     // Job Report
-    StoragePath jobReportsPath = ModelUtils.getJobReportContainerPath();
-    if (model.exists(jobReportsPath)) {
+    DirectResourceAccess jobReportsResource = model.getDirectAccess(Report.class);
+    if (jobReportsResource.exists()) {
       Path jobReportDestinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
         .resolve(RodaConstants.STORAGE_CONTAINER_JOB_REPORT).resolve(jobToBundle.getId());
 

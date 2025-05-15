@@ -20,4 +20,6 @@ public interface DirectResourceAccess extends Closeable {
   Path getPath() throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   boolean isDirectory();
+
+  boolean exists();
 }

@@ -32,7 +32,6 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.TechnicalMetadata;
 import org.roda.core.index.IndexingAdditionalInfo;
@@ -41,7 +40,6 @@ import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -180,15 +178,10 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
       if (file.isReference()) {
         doc.addField(RodaConstants.FILE_REFERENCE_UUID, file.getReferenceUUID());
         doc.addField(RodaConstants.FILE_REFERENCE_URL, file.getReferenceUrl());
-        StoragePath filePath = ModelUtils.getFileStoragePath(file.getAipId(), file.getRepresentationId(),
-          file.getPath(), RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
-        doc.addField(RodaConstants.FILE_REFERENCE_MANIFEST,
-          model.getStoragePathAsString(filePath, false));
+        doc.addField(RodaConstants.FILE_REFERENCE_MANIFEST, model.getObjectPathAsString(file, false));
       }
 
-      StoragePath filePath = ModelUtils.getFileStoragePath(file);
-      doc.addField(RodaConstants.FILE_STORAGEPATH,
-        model.getStoragePathAsString(filePath, false));
+      doc.addField(RodaConstants.FILE_STORAGEPATH, model.getObjectPathAsString(file, false));
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index file storage path", e);
     }
@@ -279,12 +272,12 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
 
     return technicalMetadata;
   }
-  
+
   private String getFileFulltext(ModelService model, File file) {
     String fulltext = "";
     try {
-      Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(),
-        file.getRepresentationId(), file.getPath(), file.getId(), RodaConstants.TIKA_FILE_SUFFIX_FULLTEXT,
+      Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
+        file.getPath(), file.getId(), RodaConstants.TIKA_FILE_SUFFIX_FULLTEXT,
         RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA);
       if (fulltextBinary.getSizeInBytes() < RodaCoreFactory.getRodaConfigurationAsInt(TEN_MB_IN_BYTES,
         "core.index.fulltext_threshold_in_bytes")) {

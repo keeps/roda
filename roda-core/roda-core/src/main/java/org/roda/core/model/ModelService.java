@@ -991,16 +991,7 @@ public interface ModelService extends ModelObservable {
   void moveObject(LiteRODAObject fromPath, LiteRODAObject toPath) throws AuthorizationDeniedException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException;
 
-  @Deprecated
-  void deleteResource(StoragePath path) throws AuthorizationDeniedException, NotFoundException, GenericException;
+  String getObjectPathAsString(IsRODAObject object, boolean skipContainer) throws RequestNotValidException;
 
-  @Deprecated
-  boolean exists(StoragePath storagePath);
-
-  @Deprecated
-  Date getDateFromStoragePath(StoragePath storagePath)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException, IOException;
-
-  @Deprecated
-  String getStoragePathAsString(StoragePath filePath, boolean skipContainer);
+  String getObjectPathAsString(LiteRODAObject object, boolean skipContainer) throws RequestNotValidException, GenericException;
 }

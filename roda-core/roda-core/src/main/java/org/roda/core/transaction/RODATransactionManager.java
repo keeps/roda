@@ -66,8 +66,7 @@ public class RODATransactionManager {
     Plugin<IsRODAObject> plugin) throws RODATransactionException {
     try {
       TransactionContext context = beginTransaction(transactionId, objectsToBeProcessed);
-      plugin.execute(context.indexService(), context.transactionalModelService(), context.transactionalStorageService(),
-        objectsToBeProcessed);
+      plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
       endTransaction(transactionId);
     } catch (Exception e) {
       try {

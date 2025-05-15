@@ -297,7 +297,8 @@ public class IndexModelObserver implements ModelObserver {
 
       RepresentationCollection.Info info = new RepresentationCollection.Info(aip, ancestors, sizeInBytes,
         numberOfDataFiles, numberOfDataFolders, safemode);
-      SolrUtils.create2(index, model, (ModelObserver) this, IndexedRepresentation.class, representation, info).addTo(ret);
+      SolrUtils.create2(index, model, (ModelObserver) this, IndexedRepresentation.class, representation, info)
+        .addTo(ret);
     } catch (IOException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index representation", e);
@@ -363,8 +364,8 @@ public class IndexModelObserver implements ModelObserver {
 
     FileCollection.Info info = new FileCollection.Info(aip, ancestors);
     try {
-      final StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-      file.setCreatedOn(model.getDateFromStoragePath(storagePath));
+      final DirectResourceAccess fileResource = model.getDirectAccess(file);
+      file.setCreatedOn(FSUtils.getDateFromDirectResourceAccess(fileResource));
     } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
       | IOException e) {
       LOGGER.error("Could not set the creation date of File");
@@ -374,7 +375,8 @@ public class IndexModelObserver implements ModelObserver {
         for (OptionalWithCause<File> shallowFile : allExternalFiles) {
           if (shallowFile.isPresent()) {
             shallowFile.get().setInstanceId(aip.getInstanceId());
-            SolrUtils.create2(index, model, (ModelObserver) this, IndexedFile.class, shallowFile.get(), info).addTo(ret);
+            SolrUtils.create2(index, model, (ModelObserver) this, IndexedFile.class, shallowFile.get(), info)
+              .addTo(ret);
           }
         }
         sizeInBytes = getExternalFilesTotalSize(file);
@@ -1060,7 +1062,8 @@ public class IndexModelObserver implements ModelObserver {
     } else if (PreservationMetadataType.AGENT.equals(type)) {
       try {
         final StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(pm);
-        pm.setCreatedOn(model.getDateFromStoragePath(storagePath));
+        final DirectResourceAccess pmResource = model.getDirectAccess(pm);
+        pm.setCreatedOn(FSUtils.getDateFromDirectResourceAccess(pmResource));
       } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
         | IOException e) {
         LOGGER.error("Could not set the creation date of Preservation Agent");
@@ -1135,14 +1138,14 @@ public class IndexModelObserver implements ModelObserver {
         if (!report.isDirectory()) {
           Binary reportBinary = model.getBinary(Report.class, job.getId(), report.getPath().getFileName().toString());
           try (InputStream inputStream = reportBinary.getContent().createInputStream()) {
-              Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
-              jobReportCreatedOrUpdated(objectFromJson, job).addTo(ret);
-            } catch (GenericException | IOException e) {
-              LOGGER.error("Error getting report json from binary", e);
-              ret.add(e);
-            }
+            Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
+            jobReportCreatedOrUpdated(objectFromJson, job).addTo(ret);
+          } catch (GenericException | IOException e) {
+            LOGGER.error("Error getting report json from binary", e);
+            ret.add(e);
           }
         }
+      }
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
       LOGGER.error("Error reindexing job reports", e);
@@ -1444,7 +1447,8 @@ public class IndexModelObserver implements ModelObserver {
   private ReturnWithExceptions<Void, ModelObserver> indexDIPFile(DIP dip, DIPFile file, boolean recursive) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    SolrUtils.create2(index, model, (ModelObserver) this, DIPFile.class, file, new DIPFileCollection.Info(dip)).addTo(ret);
+    SolrUtils.create2(index, model, (ModelObserver) this, DIPFile.class, file, new DIPFileCollection.Info(dip))
+      .addTo(ret);
 
     if (recursive && file.isDirectory() && ret.isEmpty()) {
       try (CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(file, true)) {

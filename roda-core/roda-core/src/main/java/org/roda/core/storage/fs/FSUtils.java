@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -439,14 +440,18 @@ public class FSUtils {
               Path next = listPaths.iterator().next();
               return new DirectResourceAccess() {
                 @Override
-                public Path getPath()
-                  throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+                public Path getPath() {
                   return next;
                 }
 
                 @Override
                 public boolean isDirectory() {
                   return Files.isDirectory(next);
+                }
+
+                @Override
+                public boolean exists() {
+                  return FSUtils.exists(getPath());
                 }
 
                 @Override
@@ -463,6 +468,14 @@ public class FSUtils {
         listPaths.close();
       }
     }
+  }
+
+  public static Date getDateFromDirectResourceAccess(DirectResourceAccess resource)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException, IOException {
+    Path path = resource.getPath();
+    BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+    FileTime fileTime = attr.creationTime();
+    return new Date(fileTime.toMillis());
   }
 
   /**
@@ -498,14 +511,18 @@ public class FSUtils {
     final Path path = resolved;
     return new DirectResourceAccess() {
       @Override
-      public Path getPath()
-        throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+      public Path getPath() {
         return path;
       }
 
       @Override
       public boolean isDirectory() {
         return Files.isDirectory(path);
+      }
+
+      @Override
+      public boolean exists() {
+        return FSUtils.exists(getPath());
       }
 
       @Override

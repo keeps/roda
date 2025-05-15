@@ -127,7 +127,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       try {
         tmpStorageService = model.resolveTemporaryResourceShallow(job.getId(), aip);
         processAIP(index, model, tmpStorageService, report, jobPluginInfo, job, aip, reportItem, reportState);
-      } catch (GenericException e) {
+      } catch (GenericException | RequestNotValidException e) {
         LOGGER.error("Error processing AIP " + aip.getId(), e);
         reportState = PluginState.FAILURE;
         reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
