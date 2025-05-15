@@ -2604,12 +2604,6 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       throw new IllegalArgumentException("Object IDs cannot be null or a empty list");
     }
 
-    if (operation == TransactionalModelOperationLog.OperationType.READ) {
-      // TODO: add a configuration to allow logging the read operation for debugging
-      // purposes
-      return;
-    }
-
     Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, ids);
     if (liteRODAObject.isPresent()) {
       String lite = liteRODAObject.get().getInfo();
