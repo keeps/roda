@@ -105,7 +105,7 @@ public class ValidationUtils {
           fallbackMetadataVersion, properties, username);
         report.setValid(true);
 
-        LOGGER.debug("{} valid for metadata type {}", storagePath, fallbackMetadataType);
+        LOGGER.debug("{} valid for metadata type {}", binary.getStoragePath(), fallbackMetadataType);
 
       } else if (validateDescriptiveMetadata) {
         String metadataType = dm.getType() != null ? dm.getType() : fallbackMetadataType;

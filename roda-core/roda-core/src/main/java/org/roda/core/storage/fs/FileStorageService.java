@@ -634,6 +634,11 @@ public class FileStorageService implements StorageService {
       }
 
       @Override
+      public boolean exists() {
+        return FSUtils.exists(getPath());
+      }
+
+      @Override
       public void close() {
         // nothing to do
       }
@@ -660,6 +665,11 @@ public class FileStorageService implements StorageService {
       @Override
       public boolean isDirectory() {
         return FSUtils.isDirectory(getPath());
+      }
+
+      @Override
+      public boolean exists() {
+        return FSUtils.exists(getPath());
       }
 
       @Override

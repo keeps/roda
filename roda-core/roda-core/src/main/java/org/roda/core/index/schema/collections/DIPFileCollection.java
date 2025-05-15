@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -21,14 +22,12 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,9 +105,8 @@ public class DIPFileCollection extends AbstractSolrCollection<DIPFile, DIPFile> 
 
     // extra-fields
     try {
-      StoragePath filePath = ModelUtils.getDIPFileStoragePath(file);
       doc.addField(RodaConstants.DIPFILE_STORAGE_PATH,
-        RodaCoreFactory.getModelService().getStoragePathAsString(filePath, false));
+        RodaCoreFactory.getModelService().getObjectPathAsString(file, false));
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index DIP file storage path", e);
     }

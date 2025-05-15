@@ -27,6 +27,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -74,12 +75,15 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.entity.transaction.TransactionalModelOperationLog;
+import org.roda.core.index.IndexService;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.transaction.RODATransactionException;
 import org.roda.core.transaction.TransactionLogService;
@@ -1861,6 +1865,274 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public StorageService resolveTemporaryResourceShallow(String jobId, IsRODAObject object, String... pathPartials)
+    throws GenericException, RequestNotValidException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().resolveTemporaryResourceShallow(jobId, object, pathPartials);
+  }
+
+  @Override
+  public StorageService resolveTemporaryResourceShallow(String jobId, StorageService storage, IsRODAObject object,
+    String... pathPartials) throws GenericException, RequestNotValidException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().resolveTemporaryResourceShallow(jobId, storage, object, pathPartials);
+  }
+
+  @Override
+  public StorageService resolveTemporaryResourceShallow(String jobId, LiteRODAObject object, String... pathPartials)
+    throws GenericException, RequestNotValidException {
+    registerOperation(object, TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().resolveTemporaryResourceShallow(jobId, object, pathPartials);
+  }
+
+  @Override
+  public StorageService resolveTemporaryResourceShallow(String jobId, StorageService storage, LiteRODAObject object,
+    String... pathPartials) throws GenericException, RequestNotValidException {
+    registerOperation(object, TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().resolveTemporaryResourceShallow(jobId, storage, object, pathPartials);
+  }
+
+  @Override
+  public Binary getBinary(IsRODAObject object, String... pathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getBinary(object, pathPartials);
+  }
+
+  @Override
+  public Binary getBinary(LiteRODAObject lite, String... pathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getBinary(lite, pathPartials);
+  }
+
+  @Override
+  public <T extends IsRODAObject> Binary getBinary(Class<T> entityClass, String... pathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    registerOperation(entityClass, List.of(), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getBinary(entityClass, pathPartials);
+  }
+
+  @Override
+  public BinaryVersion getBinaryVersion(IsRODAObject object, String version, List<String> pathPartials)
+    throws RequestNotValidException, NotFoundException, GenericException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getBinaryVersion(object, version, pathPartials);
+  }
+
+  @Override
+  public BinaryVersion getBinaryVersion(LiteRODAObject lite, String version, List<String> pathPartials)
+    throws RequestNotValidException, NotFoundException, GenericException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getBinaryVersion(lite, version, pathPartials);
+  }
+
+  @Override
+  public CloseableIterable<BinaryVersion> listBinaryVersions(IsRODAObject object)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().listBinaryVersions(object);
+  }
+
+  @Override
+  public CloseableIterable<BinaryVersion> listBinaryVersions(LiteRODAObject lite)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().listBinaryVersions(lite);
+  }
+
+  @Override
+  public void deleteBinaryVersion(IsRODAObject object, String version)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.DELETE);
+    getModelService().deleteBinaryVersion(object, version);
+  }
+
+  @Override
+  public void deleteBinaryVersion(LiteRODAObject lite, String version)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.DELETE);
+    getModelService().deleteBinaryVersion(lite, version);
+  }
+
+  @Override
+  public Binary updateBinaryContent(IsRODAObject object, ContentPayload payload, boolean asReference,
+    boolean createIfNotExists)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.UPDATE);
+    return getModelService().updateBinaryContent(object, payload, asReference, createIfNotExists);
+  }
+
+  @Override
+  public Binary updateBinaryContent(LiteRODAObject lite, ContentPayload payload, boolean asReference,
+    boolean createIfNotExists)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.UPDATE);
+    return getModelService().updateBinaryContent(lite, payload, asReference, createIfNotExists);
+  }
+
+  @Override
+  public Directory createDirectory(IsRODAObject object, String... pathPartials)
+    throws AuthorizationDeniedException, AlreadyExistsException, GenericException, RequestNotValidException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.UPDATE);
+    return getModelService().createDirectory(object, pathPartials);
+  }
+
+  @Override
+  public Directory createDirectory(LiteRODAObject lite, String... pathPartials)
+    throws AuthorizationDeniedException, AlreadyExistsException, GenericException, RequestNotValidException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.UPDATE);
+    return getModelService().createDirectory(lite, pathPartials);
+  }
+
+  @Override
+  public DirectResourceAccess getDirectAccess(IsRODAObject object, StorageService storage, String... pathPartials)
+    throws RequestNotValidException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getDirectAccess(object, storage, pathPartials);
+  }
+
+  @Override
+  public DirectResourceAccess getDirectAccess(LiteRODAObject lite, StorageService storage, String... pathPartials)
+    throws RequestNotValidException, GenericException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getDirectAccess(lite, storage, pathPartials);
+  }
+
+  @Override
+  public DirectResourceAccess getDirectAccess(IsRODAObject object, String... pathPartials)
+    throws RequestNotValidException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getDirectAccess(object, pathPartials);
+  }
+
+  @Override
+  public DirectResourceAccess getDirectAccess(LiteRODAObject lite, String... pathPartials)
+    throws RequestNotValidException, GenericException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getDirectAccess(lite, pathPartials);
+  }
+
+  @Override
+  public DirectResourceAccess getDirectAccessToVersion(IsRODAObject object, String version, List<String> pathPartials)
+    throws RequestNotValidException, GenericException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getDirectAccessToVersion(object, version, pathPartials);
+  }
+
+  @Override
+  public DirectResourceAccess getDirectAccessToVersion(LiteRODAObject lite, String version, List<String> pathPartials)
+    throws RequestNotValidException, GenericException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getDirectAccessToVersion(lite, version, pathPartials);
+  }
+
+  @Override
+  public <T extends IsRODAObject> DirectResourceAccess getDirectAccess(Class<T> entityClass, String... pathPartials)
+    throws RequestNotValidException {
+    registerOperation(entityClass, List.of(), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getDirectAccess(entityClass, pathPartials);
+  }
+
+  @Override
+  public int importAll(IndexService index, FileStorageService fromStorage, boolean importJobs)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException {
+    return getModelService().importAll(index, fromStorage, importJobs);
+  }
+
+  @Override
+  public void exportAll(StorageService toStorage) {
+    getModelService().exportAll(toStorage);
+  }
+
+  @Override
+  public void importObject(IsRODAObject object, StorageService fromStorage) {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.UPDATE);
+    getModelService().importObject(object, fromStorage);
+  }
+
+  @Override
+  public void exportObject(IsRODAObject object, StorageService toStorage, String... toPathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
+    GenericException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    getModelService().exportObject(object, toStorage, toPathPartials);
+  }
+
+  @Override
+  public void exportObject(LiteRODAObject lite, StorageService toStorage, String... toPathPartials)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.READ);
+    getModelService().exportObject(lite, toStorage, toPathPartials);
+  }
+
+  @Override
+  public <T extends IsRODAObject> void copyObjectFromContainer(Class<T> clazz, String resource, Path toPath)
+    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
+    registerOperation(clazz, List.of(resource), TransactionalModelOperationLog.OperationType.READ);
+    getModelService().copyObjectFromContainer(clazz, resource, toPath);
+  }
+
+  @Override
+  public <T extends IsRODAObject> void copyObjectFromContainer(IsRODAObject object, String resource, Path toPath)
+    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    getModelService().copyObjectFromContainer(object, resource, toPath);
+  }
+
+  @Override
+  public ConsumesOutputStream exportObjectToStream(IsRODAObject object, String... pathPartials)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().exportObjectToStream(object, pathPartials);
+  }
+
+  @Override
+  public ConsumesOutputStream exportObjectToStream(LiteRODAObject lite, String... pathPartials)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().exportObjectToStream(lite, pathPartials);
+  }
+
+  @Override
+  public ConsumesOutputStream exportObjectToStream(IsRODAObject object, String name, boolean addTopDirectory,
+    String... pathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().exportObjectToStream(object, name, addTopDirectory, pathPartials);
+  }
+
+  @Override
+  public ConsumesOutputStream exportObjectToStream(LiteRODAObject lite, String name, boolean addTopDirectory,
+    String... pathPartials)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().exportObjectToStream(lite, name, addTopDirectory, pathPartials);
+  }
+
+  @Override
+  public void moveObject(LiteRODAObject fromPath, LiteRODAObject toPath) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
+    registerOperation(fromPath, TransactionalModelOperationLog.OperationType.UPDATE);
+    getModelService().moveObject(fromPath, toPath);
+  }
+
+  @Override
+  public String getObjectPathAsString(IsRODAObject object, boolean skipContainer) throws RequestNotValidException {
+    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getObjectPathAsString(object, skipContainer);
+  }
+
+  @Override
+  public String getObjectPathAsString(LiteRODAObject lite, boolean skipContainer)
+    throws RequestNotValidException, GenericException {
+    registerOperation(lite, TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().getObjectPathAsString(lite, skipContainer);
+  }
+
+  @Override
   public void addModelObserver(ModelObserver observer) {
     getModelService().addModelObserver(observer);
   }
@@ -2298,6 +2570,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       }
     } else {
       throw new IllegalArgumentException("Cannot register operation for object: " + liteRODAObject);
+    }
+  }
+
+  private void registerOperation(LiteRODAObject lite, TransactionalModelOperationLog.OperationType operation) {
+    String liteInfo = lite.getInfo();
+    try {
+      transactionLogService.registerModelOperation(transaction.getId(), liteInfo, operation);
+    } catch (RODATransactionException e) {
+      throw new IllegalArgumentException("Cannot register operation for object: " + liteInfo, e);
     }
   }
 

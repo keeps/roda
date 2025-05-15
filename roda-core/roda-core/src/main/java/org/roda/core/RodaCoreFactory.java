@@ -1427,6 +1427,10 @@ public class RodaCoreFactory {
     TransferUpdateStatus.getInstance().setUpdatingStatus(folderRelativePath, isUpdating);
   }
 
+  public static StorageService getStorageService() {
+    return storage;
+  }
+
   public static ModelService getModelService() {
     return model;
   }

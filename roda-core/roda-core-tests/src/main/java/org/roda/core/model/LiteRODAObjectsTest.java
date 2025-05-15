@@ -55,7 +55,6 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.EARKSIPPluginsTest;
 import org.roda.core.plugins.base.characterization.PremisSkeletonPlugin;
 import org.roda.core.security.LdapUtilityTestHelper;
@@ -139,7 +138,7 @@ public class LiteRODAObjectsTest {
       new StringContentPayload(""), RodaConstants.ADMIN, true);
     index.commit(IndexedFile.class);
 
-    model.deleteResource(ModelUtils.getFileStoragePath(file));
+    model.deleteFile(file, "", true);
     Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.FILE_HASH));
 
     try {

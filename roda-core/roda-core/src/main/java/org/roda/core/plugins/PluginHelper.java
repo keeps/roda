@@ -91,7 +91,6 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexActionLogPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexDIPPlugin;
@@ -113,6 +112,7 @@ import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
@@ -1163,12 +1163,13 @@ public final class PluginHelper {
     List<LinkingIdentifier> agentIds = new ArrayList<>();
     String agentId = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
       RODAInstanceUtils.getLocalInstanceIdentifier());
-    StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentId, PreservationMetadataType.AGENT);
+    DirectResourceAccess agentResource = model.getDirectAccess(IndexedPreservationAgent.class, agentId,
+      RodaConstants.PREMIS_SUFFIX);
     LinkingIdentifier linkingIdentifierPlugin = new LinkingIdentifier();
     linkingIdentifierPlugin.setValue(agentId);
 
     try {
-      if (!model.exists(agentPath)) {
+      if (agentResource.exists()) {
         PremisV3Utils.createPremisAgentBinary(plugin, model, true);
       }
       agentIds.add(linkingIdentifierPlugin);
@@ -1246,9 +1247,9 @@ public final class PluginHelper {
     IndexService index, List<LinkingIdentifier> agentIds, List<JobUserDetails> jobUserDetails) {
 
     try {
-      StoragePath userAgentPath = ModelUtils.getPreservationMetadataStoragePath(linkingIdentifierAgent.getValue(),
-        PreservationMetadataType.AGENT);
-      if (!model.exists(userAgentPath)) {
+      DirectResourceAccess userAgentResource = model.getDirectAccess(IndexedPreservationAgent.class,
+        linkingIdentifierAgent.getValue(), RodaConstants.PREMIS_SUFFIX);
+      if (userAgentResource.exists()) {
         PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true,
           jobUserDetails);
         if (pm != null) {
