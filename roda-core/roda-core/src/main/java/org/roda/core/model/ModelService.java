@@ -873,4 +873,9 @@ public interface ModelService extends ModelObservable {
 
   void deleteUserAccessKeys(String userId, String updatedBy)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
+
+  Date retrieveFileCreationDate(File file) throws RequestNotValidException, GenericException;
+
+
+  Date retrievePreservationMetadataCreationDate(PreservationMetadata pm) throws RequestNotValidException, GenericException;
 }

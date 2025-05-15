@@ -368,11 +368,9 @@ public class IndexModelObserver implements ModelObserver {
 
     FileCollection.Info info = new FileCollection.Info(aip, ancestors);
     try {
-      final StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-      file.setCreatedOn(getDateFromStoragePath(storagePath));
-    } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
-      | IOException e) {
-      LOGGER.error("Could not set the creation date of File");
+      file.setCreatedOn(model.retrieveFileCreationDate(file));
+    } catch (RequestNotValidException | GenericException e) {
+      LOGGER.error("Could not set the creation date of File", e);
     }
     if (FSUtils.isManifestOfExternalFiles(file.getId())) {
       try (CloseableIterable<OptionalWithCause<File>> allExternalFiles = model.listExternalFilesUnder(file)) {
@@ -1064,24 +1062,14 @@ public class IndexModelObserver implements ModelObserver {
       indexPreservationEvent(pm).addTo(ret);
     } else if (PreservationMetadataType.AGENT.equals(type)) {
       try {
-        final StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(pm);
-        pm.setCreatedOn(getDateFromStoragePath(storagePath));
-      } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
-        | IOException e) {
-        LOGGER.error("Could not set the creation date of Preservation Agent");
+        pm.setCreatedOn(model.retrievePreservationMetadataCreationDate(pm));
+      } catch (RequestNotValidException | GenericException e) {
+        LOGGER.error("Could not set the creation date of Preservation Agent", e);
       }
       SolrUtils.create2(index, model, (ModelObserver) this, IndexedPreservationAgent.class, pm).addTo(ret);
     }
 
     return ret;
-  }
-
-  private Date getDateFromStoragePath(StoragePath storagePath)
-    throws IOException, AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Path path = model.getStorage().getDirectAccess(storagePath).getPath();
-    BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
-    FileTime fileTime = attr.creationTime();
-    return new Date(fileTime.toMillis());
   }
 
   @Override

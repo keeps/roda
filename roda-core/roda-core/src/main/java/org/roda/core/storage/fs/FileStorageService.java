@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -918,5 +920,17 @@ public class FileStorageService implements StorageService {
       }
     }
     return storagePaths;
+  }
+
+  @Override
+  public Date getCreationDate(StoragePath storagePath) throws GenericException {
+    try {
+      Path entityPath = FSUtils.getEntityPath(basePath, storagePath);
+      BasicFileAttributes attr = Files.readAttributes(entityPath, BasicFileAttributes.class);
+      FileTime fileTime = attr.creationTime();
+      return new Date(fileTime.toMillis());
+    } catch (IOException e) {
+      throw new GenericException("Could not get creation date", e);
+    }
   }
 }
