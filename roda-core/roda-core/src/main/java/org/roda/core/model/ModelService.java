@@ -1007,4 +1007,8 @@ public interface ModelService extends ModelObservable {
     throws RequestNotValidException, GenericException;
 
   boolean existsInStorage(LiteRODAObject lite, String... pathPartials) throws RequestNotValidException, GenericException;
+
+  Date retrieveFileCreationDate(File file) throws RequestNotValidException, GenericException;
+
+  Date retrievePreservationMetadataCreationDate(PreservationMetadata pm) throws RequestNotValidException, GenericException;
 }

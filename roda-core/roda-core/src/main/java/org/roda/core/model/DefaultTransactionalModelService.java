@@ -2177,6 +2177,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public Date retrieveFileCreationDate(File file) throws RequestNotValidException, GenericException {
+    return getModelService().retrieveFileCreationDate(file);
+  }
+
+  @Override
+  public Date retrievePreservationMetadataCreationDate(PreservationMetadata pm) throws RequestNotValidException, GenericException {
+    return getModelService().retrievePreservationMetadataCreationDate(pm);
+  }
+
+  @Override
   public void addModelObserver(ModelObserver observer) {
     getModelService().addModelObserver(observer);
   }

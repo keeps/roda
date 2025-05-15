@@ -8,6 +8,7 @@
 package org.roda.core.storage;
 
 import java.nio.file.Path;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -394,4 +395,7 @@ public interface StorageService {
   String getStoragePathAsString(StoragePath storagePath, boolean skipContainer);
 
   List<StoragePath> getShallowFiles(StoragePath storagePath) throws NotFoundException, GenericException;
+
+  Date getCreationDate(StoragePath storagePath) throws GenericException;
+
 }

@@ -8,6 +8,7 @@
 package org.roda.core.storage;
 
 import java.nio.file.Path;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -246,4 +247,8 @@ public class StorageServiceWrapper implements StorageService {
     return storageService.getShallowFiles(storagePath);
   }
 
+  @Override
+  public Date getCreationDate(StoragePath storagePath) throws GenericException {
+    return storageService.getCreationDate(storagePath);
+  }
 }
