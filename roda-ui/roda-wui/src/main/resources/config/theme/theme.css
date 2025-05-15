@@ -187,10 +187,6 @@ h1.title {
   color: black;
 }
 
-.tag-line {
-    text-transform: uppercase;
-}
-
 .hero-tags {
   display: flex;
   flex-flow: wrap;
@@ -418,6 +414,7 @@ a.btn-hero:visited, a.btn-welcome:visited {
 .tag-line {
   padding-bottom: 20px;
   text-transform: uppercase;
+  font-weight: 500;
 }
 
 .primary-text {
