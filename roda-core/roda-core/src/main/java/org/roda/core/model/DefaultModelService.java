@@ -5675,14 +5675,6 @@ public class DefaultModelService implements ModelService {
     };
   }
 
-  @Deprecated
-  @Override
-  public void copy(StoragePath containerPath, Path toPath, String resource)
-    throws AuthorizationDeniedException, AlreadyExistsException, GenericException {
-    StorageService storageService = getStorage();
-    storageService.copy(storageService, containerPath, toPath, resource);
-  }
-
   @Override
   public void moveObject(LiteRODAObject fromObject, LiteRODAObject toObject) throws AuthorizationDeniedException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
@@ -5692,32 +5684,15 @@ public class DefaultModelService implements ModelService {
     storageService.move(storageService, fromPath, toPath);
   }
 
-  @Deprecated
   @Override
-  public void deleteResource(StoragePath path)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    getStorage().deleteResource(path);
+  public String getObjectPathAsString(IsRODAObject object, boolean skipContainer) throws RequestNotValidException {
+    StoragePath objectPath = ModelUtils.getStoragePath(object);
+    return getStorage().getStoragePathAsString(objectPath, skipContainer);
   }
 
-  @Deprecated
   @Override
-  public boolean exists(StoragePath storagePath) {
-    return getStorage().exists(storagePath);
-  }
-
-  @Deprecated
-  @Override
-  public Date getDateFromStoragePath(StoragePath storagePath)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException, IOException {
-    Path path = getStorage().getDirectAccess(storagePath).getPath();
-    BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
-    FileTime fileTime = attr.creationTime();
-    return new Date(fileTime.toMillis());
-  }
-
-  @Deprecated
-  @Override
-  public String getStoragePathAsString(StoragePath filePath, boolean skipContainer) {
-    return getStorage().getStoragePathAsString(filePath, skipContainer);
+  public String getObjectPathAsString(LiteRODAObject lite, boolean skipContainer) throws RequestNotValidException, GenericException {
+    StoragePath objectPath = ModelUtils.getStoragePath(lite);
+    return getStorage().getStoragePathAsString(objectPath, skipContainer);
   }
 }

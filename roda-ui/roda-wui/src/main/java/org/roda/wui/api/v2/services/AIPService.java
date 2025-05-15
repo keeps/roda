@@ -490,10 +490,15 @@ public class AIPService {
         result = HandlebarsUtility.executeHandlebars(rawTemplate, data);
       } else {
         ModelService model = RodaCoreFactory.getModelService();
-        if (model.exists(
-          ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, descriptiveMetadataId + XML_EXT))) {
-
-          Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aipId, representationId,
+        Optional<LiteRODAObject> descriptiveMetadataLite = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId,
+          representationId, descriptiveMetadataId);
+        if (descriptiveMetadataLite.isEmpty()) {
+          throw new RequestNotValidException("Could not get LITE from representation " + representationId + " of AIP "
+            + aipId + " with metadata id" + descriptiveMetadataId);
+        }
+        DirectResourceAccess descriptiveMetadataResource = model.getDirectAccess(descriptiveMetadataLite.get());
+        if (descriptiveMetadataResource.exists()) {
+          Binary binary = model.retrieveDescriptiveMetadataBinary(aipId, representationId,
             descriptiveMetadataId + XML_EXT);
           InputStream inputStream = binary.getContent().createInputStream();
           result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);

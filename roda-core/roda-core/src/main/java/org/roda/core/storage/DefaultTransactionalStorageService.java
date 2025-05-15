@@ -216,6 +216,13 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   @Override
+  public DirectResourceAccess getDirectAccessToVersion(StoragePath storagePath, String version)
+    throws GenericException, RequestNotValidException {
+    registerOperation(storagePath, TransactionalStoragePathOperationLog.OperationType.READ);
+    return getStorageService(storagePath).getDirectAccessToVersion(storagePath, version);
+  }
+
+  @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     registerOperation(storagePath, TransactionalStoragePathOperationLog.OperationType.READ);
@@ -335,7 +342,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     // DO NOTHING
   }
 
-  private void registerOperation(StoragePath storagePath, TransactionalStoragePathOperationLog.OperationType operation) {
+  private void registerOperation(StoragePath storagePath,
+    TransactionalStoragePathOperationLog.OperationType operation) {
     if (!storagePath.isFromAContainer()) {
       LOGGER.info("Registering operation for storage path: {}", storagePath);
       try {
