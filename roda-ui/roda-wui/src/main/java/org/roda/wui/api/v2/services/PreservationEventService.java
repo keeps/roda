@@ -35,6 +35,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.model.RequestContext;
@@ -269,7 +270,9 @@ public class PreservationEventService {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     Binary binary = getPreservationEventBinary(preservationEvent, context);
-    final ConsumesOutputStream stream = new BinaryConsumesOutputStream(binary,
+    DirectResourceAccess resourceAccess = RodaCoreFactory.getModelService().getDirectAccess(preservationEvent);
+
+    final ConsumesOutputStream stream = new BinaryConsumesOutputStream(binary, resourceAccess.getPath(),
       RodaConstants.MEDIA_TYPE_APPLICATION_XML);
     return new StreamResponse(stream);
   }

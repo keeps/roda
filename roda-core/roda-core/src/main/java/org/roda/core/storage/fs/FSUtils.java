@@ -417,57 +417,51 @@ public class FSUtils {
    */
   public static CloseableIterable<DirectResourceAccess> listDirectAccessResourceChildren(DirectResourceAccess resource,
     boolean recursive)
-    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException, IOException {
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
     final CloseableIterable<Path> listPaths = recursive ? FSUtils.recursivelyListPaths(resource.getPath())
       : FSUtils.listPaths(resource.getPath());
-    try {
-      return new CloseableIterable<DirectResourceAccess>() {
-        @Override
-        public void close() throws IOException {
-          listPaths.close();
-        }
-
-        @Override
-        public Iterator<DirectResourceAccess> iterator() {
-          return new Iterator<DirectResourceAccess>() {
-            @Override
-            public boolean hasNext() {
-              return listPaths.iterator().hasNext();
-            }
-
-            @Override
-            public DirectResourceAccess next() {
-              Path next = listPaths.iterator().next();
-              return new DirectResourceAccess() {
-                @Override
-                public Path getPath() {
-                  return next;
-                }
-
-                @Override
-                public boolean isDirectory() {
-                  return Files.isDirectory(next);
-                }
-
-                @Override
-                public boolean exists() {
-                  return FSUtils.exists(getPath());
-                }
-
-                @Override
-                public void close() {
-                  // nothing to do
-                }
-              };
-            }
-          };
-        }
-      };
-    } finally {
-      if (listPaths != null) {
+    return new CloseableIterable<DirectResourceAccess>() {
+      @Override
+      public void close() throws IOException {
         listPaths.close();
       }
-    }
+
+      @Override
+      public Iterator<DirectResourceAccess> iterator() {
+        return new Iterator<DirectResourceAccess>() {
+          @Override
+          public boolean hasNext() {
+            return listPaths.iterator().hasNext();
+          }
+
+          @Override
+          public DirectResourceAccess next() {
+            Path next = listPaths.iterator().next();
+            return new DirectResourceAccess() {
+              @Override
+              public Path getPath() {
+                return next;
+              }
+
+              @Override
+              public boolean isDirectory() {
+                return Files.isDirectory(next);
+              }
+
+              @Override
+              public boolean exists() {
+                return FSUtils.exists(getPath());
+              }
+
+              @Override
+              public void close() {
+                // nothing to do
+              }
+            };
+          }
+        };
+      }
+    };
   }
 
   public static Date getDateFromDirectResourceAccess(DirectResourceAccess resource)
