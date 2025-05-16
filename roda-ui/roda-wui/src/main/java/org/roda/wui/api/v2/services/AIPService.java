@@ -68,7 +68,6 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.TransactionalModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.maintenance.ChangeTypePlugin;
@@ -329,10 +328,11 @@ public class AIPService {
     return metadataInfo;
   }
 
-  public AIP createAIP(RequestContext requestContext, String parentAipId, String type, Permissions permissions) throws GenericException,
-    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
+  public AIP createAIP(RequestContext requestContext, String parentAipId, String type, Permissions permissions)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
     User user = requestContext.getUser();
-    TransactionalModelService model = requestContext.getTransactionalContext().transactionalModelService();
+    ModelService model = requestContext.getModelService();
     return model.createAIP(parentAipId, type, permissions, user.getName());
   }
 
@@ -409,18 +409,19 @@ public class AIPService {
       descriptiveMetadataId);
   }
 
-  public DescriptiveMetadata revertDescriptiveMetadataVersion(User user, String aipId, String descriptiveMetadataId,
-    String versionId)
+  public DescriptiveMetadata revertDescriptiveMetadataVersion(RequestContext requestContext, String aipId,
+    String descriptiveMetadataId, String versionId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    User user = requestContext.getUser();
+    ModelService model = requestContext.getModelService();
 
     Map<String, String> properties = new HashMap<>();
     properties.put(RodaConstants.VERSION_USER, user.getId());
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.REVERTED.toString());
 
-    RodaCoreFactory.getModelService().revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId,
-      properties);
+    model.revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId, properties);
 
-    return RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
+    return model.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
   }
 
   public StreamResponse retrieveAIPPart(String aipId, String part)
@@ -489,8 +490,9 @@ public class AIPService {
 
   public DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String representationId,
     String descriptiveMetadataId, String descriptiveMetadataType, String descriptiveMetadataVersion,
-    ContentPayload descriptiveMetadataPayload, String createdBy, ModelService model) throws GenericException, ValidationException,
-    AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
+    ContentPayload descriptiveMetadataPayload, String createdBy, ModelService model)
+    throws GenericException, ValidationException, AuthorizationDeniedException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException {
 
     ValidationReport report = ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload,
       descriptiveMetadataType, descriptiveMetadataVersion, false);
@@ -499,8 +501,8 @@ public class AIPService {
       throw new ValidationException(report);
     }
 
-    return model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, createdBy);
+    return model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, descriptiveMetadataPayload,
+      descriptiveMetadataType, descriptiveMetadataVersion, createdBy);
   }
 
   public ConfiguredDescriptiveMetadataList retrieveSupportedMetadataTypes(Locale locale) {
@@ -698,16 +700,18 @@ public class AIPService {
       deletedBy);
   }
 
-  public DescriptiveMetadata updateDescriptiveMetadataFile(User user, String aipId,
+  public DescriptiveMetadata updateDescriptiveMetadataFile(RequestContext requestContext, String aipId,
     CreateDescriptiveMetadataRequest request) throws GenericException, AuthorizationDeniedException,
     ValidationException, RequestNotValidException, NotFoundException {
-    return updateDescriptiveMetadataFile(user, aipId, null, request);
+    return updateDescriptiveMetadataFile(requestContext, aipId, null, request);
   }
 
-  public DescriptiveMetadata updateDescriptiveMetadataFile(User user, String aipId, String representationId,
+  public DescriptiveMetadata updateDescriptiveMetadataFile(RequestContext requestContext, String aipId, String representationId,
     CreateDescriptiveMetadataRequest request) throws GenericException, AuthorizationDeniedException,
     ValidationException, RequestNotValidException, NotFoundException {
     Map<String, String> properties = new HashMap<>();
+    User user = requestContext.getUser();
+    ModelService model = requestContext.getModelService();
     properties.put(RodaConstants.VERSION_USER, user.getId());
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
@@ -724,7 +728,7 @@ public class AIPService {
       throw new ValidationException(report);
     }
 
-    return RodaCoreFactory.getModelService().updateDescriptiveMetadata(aipId, representationId, filename,
+    return model.updateDescriptiveMetadata(aipId, representationId, filename,
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, properties, user.getId());
   }
 
@@ -829,17 +833,18 @@ public class AIPService {
     return RodaCoreFactory.getStorageService().listBinaryVersions(storagePath);
   }
 
-  public void deleteDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+  public void deleteDescriptiveMetadataVersion(RequestContext requestContext, String aipId, String descriptiveMetadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    deleteDescriptiveMetadataVersion(aipId, null, descriptiveMetadataId, versionId);
+    deleteDescriptiveMetadataVersion(requestContext, aipId, null, descriptiveMetadataId, versionId);
   }
 
-  public void deleteDescriptiveMetadataVersion(String aipId, String representationId, String descriptiveMetadataId,
+  public void deleteDescriptiveMetadataVersion(RequestContext requestContext, String aipId, String representationId, String descriptiveMetadataId,
     String versionId)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    ModelService modelService = requestContext.getModelService();
     StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
       descriptiveMetadataId);
-    RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
+    modelService.getStorage().deleteBinaryVersion(storagePath, versionId);
   }
 
   public boolean isMetadataSimilar(IndexedAIP aip, String representationId, String metadataId,

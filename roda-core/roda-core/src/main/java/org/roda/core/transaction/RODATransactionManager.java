@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.entity.transaction.TransactionLog;
+import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -24,10 +26,21 @@ public class RODATransactionManager {
   private final TransactionContextFactory transactionContextFactory;
   private final Map<String, TransactionalContext> transactionsContext = new ConcurrentHashMap<>();
 
+  private ModelService mainModelService;
+  private RodaConstants.NodeType nodeType;
+
   public RODATransactionManager(TransactionLogService transactionLogService,
     TransactionContextFactory transactionContextFactory) {
     this.transactionLogService = transactionLogService;
     this.transactionContextFactory = transactionContextFactory;
+  }
+
+  public void setMainModelService(ModelService mainModelService) {
+    this.mainModelService = mainModelService;
+  }
+
+  public void setNodeType(RodaConstants.NodeType nodeType) {
+    this.nodeType = nodeType;
   }
 
   public TransactionalContext beginTransaction() throws RODATransactionException {
@@ -43,7 +56,7 @@ public class RODATransactionManager {
     throws RODATransactionException {
 
     TransactionLog transactionLog = transactionLogService.createTransactionLog(requestType, requestId);
-    TransactionalContext context = transactionContextFactory.create(transactionLog);
+    TransactionalContext context = transactionContextFactory.create(transactionLog, mainModelService);
 
     transactionsContext.put(transactionLog.getId(), context);
     return context;
@@ -66,7 +79,7 @@ public class RODATransactionManager {
     }
 
     transactionsContext.remove(transactionID);
-    transactionLogService.cleanUp(transactionID);
+    //transactionLogService.cleanUp(transactionID);
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTED);
   }
 

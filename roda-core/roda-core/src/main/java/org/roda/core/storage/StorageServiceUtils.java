@@ -58,7 +58,32 @@ public final class StorageServiceUtils {
   public static void moveBetweenStorageServices(StorageService fromService, StoragePath fromStoragePath,
     StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity) throws GenericException,
     RequestNotValidException, NotFoundException, AlreadyExistsException, AuthorizationDeniedException {
-    copyOrMoveBetweenStorageServices(fromService, fromStoragePath, toService, toStoragePath, rootEntity, false);
+    copyOrMoveBetweenStorageServices(fromService, fromStoragePath, toService, toStoragePath, rootEntity, false, false);
+  }
+
+  /**
+   * Synchronize resources from a given storage service/storage path to another
+   *
+   * @param fromService
+   *          source storage service
+   * @param fromStoragePath
+   *          source storage path
+   * @param toService
+   *          destination storage service
+   * @param toStoragePath
+   *          destination storage path
+   * @param rootEntity
+   *          class of the root entity
+   * @throws GenericException
+   * @throws RequestNotValidException
+   * @throws NotFoundException
+   * @throws AlreadyExistsException
+   * @throws AuthorizationDeniedException
+   */
+  public static void syncBetweenStorageServices(StorageService fromService, StoragePath fromStoragePath,
+    StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity) throws GenericException,
+    RequestNotValidException, NotFoundException, AlreadyExistsException, AuthorizationDeniedException {
+    copyOrMoveBetweenStorageServices(fromService, fromStoragePath, toService, toStoragePath, rootEntity, false, true);
   }
 
   /**
@@ -84,11 +109,11 @@ public final class StorageServiceUtils {
   public static void copyBetweenStorageServices(StorageService fromService, StoragePath fromStoragePath,
     StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity) throws GenericException,
     RequestNotValidException, NotFoundException, AlreadyExistsException, AuthorizationDeniedException {
-    copyOrMoveBetweenStorageServices(fromService, fromStoragePath, toService, toStoragePath, rootEntity, true);
+    copyOrMoveBetweenStorageServices(fromService, fromStoragePath, toService, toStoragePath, rootEntity, true, false);
   }
 
   private static void copyOrMoveBetweenStorageServices(StorageService fromService, StoragePath fromStoragePath,
-    StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity, boolean copy)
+    StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity, boolean copy, boolean sync)
     throws GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException,
     AuthorizationDeniedException {
     if (Container.class.isAssignableFrom(rootEntity)) {
@@ -98,7 +123,7 @@ public final class StorageServiceUtils {
         recursive);
       iterateAndCopyOrMoveResources(fromService, fromStoragePath, toService, toStoragePath, childResourcesIterator,
         copy);
-      if (!copy) {
+      if (!copy && !sync) {
         fromService.deleteContainer(fromStoragePath);
       }
     } else if (Directory.class.isAssignableFrom(rootEntity)) {
@@ -108,14 +133,20 @@ public final class StorageServiceUtils {
         recursive);
       iterateAndCopyOrMoveResources(fromService, fromStoragePath, toService, toStoragePath, childResourcesIterator,
         copy);
-      if (!copy) {
+      if (!copy && !sync) {
         fromService.deleteResource(fromStoragePath);
       }
     } else {
       Binary binary = fromService.getBinary(fromStoragePath);
       boolean asReference = false;
-      toService.createBinary(toStoragePath, binary.getContent(), asReference);
-      if (!copy) {
+
+      if (sync) {
+        toService.updateBinaryContent(toStoragePath, binary.getContent(), asReference, true);
+      } else {
+        toService.createBinary(toStoragePath, binary.getContent(), asReference);
+      }
+
+      if (!copy && !sync) {
         fromService.deleteResource(fromStoragePath);
       }
     }
@@ -151,5 +182,4 @@ public final class StorageServiceUtils {
 
     return DefaultStoragePath.parse(toChildAbsolutePath);
   }
-
 }
