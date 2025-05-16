@@ -398,4 +398,6 @@ public interface StorageService {
 
   Date getCreationDate(StoragePath storagePath) throws GenericException;
 
+  void importBinaryVersion(StorageService fromService, StoragePath storagePath, String version)
+          throws AlreadyExistsException, GenericException, RequestNotValidException, AuthorizationDeniedException;
 }

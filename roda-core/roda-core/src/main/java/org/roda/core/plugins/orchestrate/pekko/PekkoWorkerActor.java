@@ -9,11 +9,11 @@ package org.roda.core.plugins.orchestrate.pekko;
 
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.pekko.Messages;
 import org.roda.core.common.pekko.PekkoBaseActor;
 import org.roda.core.common.pekko.messages.plugins.PluginAfterAllExecuteIsReady;
 import org.roda.core.common.pekko.messages.plugins.PluginExecuteIsReady;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -27,9 +27,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginHelper;
-import org.roda.core.transaction.RODATransactionException;
 import org.roda.core.transaction.RODATransactionManager;
-import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,8 +64,10 @@ public class PekkoWorkerActor extends PekkoBaseActor {
     message.logProcessingStarted();
     Plugin<IsRODAObject> plugin = message.getPlugin();
 
+    boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(RodaCoreFactory.getNodeType());
+
     try {
-      if (RODATransactionManager != null) {
+      if (writeIsAllowed && RODATransactionManager != null) {
         RODATransactionManager.runPluginInTransaction(plugin, objectsToBeProcessed);
       } else {
         plugin.execute(index, model, objectsToBeProcessed);
