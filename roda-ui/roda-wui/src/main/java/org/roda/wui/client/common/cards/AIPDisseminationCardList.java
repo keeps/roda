@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -30,7 +31,7 @@ public class AIPDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
   public AIPDisseminationCardList(String aipId) {
     super(messages.someOfAObject(IndexedDIP.class.getName()),
       ConfigurationManager.getString(RodaConstants.UI_ICONS_CLASS, IndexedDIP.class.getSimpleName()), IndexedDIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, aipId)), new CardBuilder<IndexedDIP>() {
+      new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, aipId)), new CardBuilder<IndexedDIP>() {
         @Override
         public ThumbnailCard constructCard(ClientMessages messages, IndexedDIP dip) {
           // Title
@@ -53,7 +54,7 @@ public class AIPDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
           }
 
           ClickHandler thumbnailClickHandler = event -> {
-            HistoryUtils.newHistory(BrowseDIP.RESOLVER, aipId, dip.getId());
+            HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getId());
           };
 
           return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler);

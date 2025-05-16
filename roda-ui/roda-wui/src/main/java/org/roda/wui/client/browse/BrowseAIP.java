@@ -299,7 +299,7 @@ public class BrowseAIP extends Composite {
               IndexedAIP.class);
 
           CompletableFuture<LongResponse> futureDipCount = service.rodaEntityRestService(
-            s -> s.count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, id)), false)),
+            s -> s.count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, id)), false)),
             IndexedDIP.class);
 
           CompletableFuture.allOf(futureChildAipCount, futureDipCount, futureAncestors, futureAncestors,

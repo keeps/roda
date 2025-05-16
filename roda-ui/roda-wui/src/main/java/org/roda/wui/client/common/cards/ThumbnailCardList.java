@@ -2,10 +2,12 @@ package org.roda.wui.client.common.cards;
 
 import java.util.ArrayList;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.wui.client.common.cards.utils.CardBuilder;
 import org.roda.wui.client.common.labels.Header;
@@ -93,7 +95,7 @@ public class ThumbnailCardList<T extends IsIndexed> extends Composite {
     if (resultsFilter != null) {
       this.resultsFilter = resultsFilter;
     }
-    this.findRequest = null;
+    this.findRequest = FindRequest.getBuilder(resultsFilter, true).build();
     this.cardBuilder = cardBuilder;
     this.cards = new ArrayList<>();
 
