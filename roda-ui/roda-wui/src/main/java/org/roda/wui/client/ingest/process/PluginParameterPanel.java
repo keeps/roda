@@ -177,7 +177,7 @@ public class PluginParameterPanel extends Composite {
       createConversionProfileLayout(profiles, value, pluginId);
       innerPanel.add(profiles);
 
-      if (value.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION)) {
+      if (value.equals(ConversionProfileOutcomeType.REPRESENTATION.toString())) {
         // Add fields
         ValueChangeHandler<String> typeChanged = typeChangedEvent -> representationParameter
           .setValue(typeChangedEvent.getValue());
