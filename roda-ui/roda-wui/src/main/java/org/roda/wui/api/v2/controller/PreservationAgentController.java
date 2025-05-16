@@ -108,7 +108,7 @@ public class PreservationAgentController implements PreservationAgentRestService
 
       StreamResponse response = preservationAgentService.retrievePreservationAgentFile(id);
 
-      return ApiUtils.rangeResponse(headers, response.getStream());
+      return ApiUtils.okResponse(response);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);

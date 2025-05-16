@@ -16,6 +16,7 @@ import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.BinaryConsumesOutputStream;
+import org.roda.core.storage.RangeConsumesOutputStream;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRange;
@@ -55,7 +56,7 @@ public class ApiUtils {
   }
 
   public static ResponseEntity<StreamingResponseBody> rangeResponse(HttpHeaders headers,
-    ConsumesOutputStream consumesOutputStream) {
+    RangeConsumesOutputStream consumesOutputStream) {
     final HttpHeaders responseHeaders = new HttpHeaders();
     StreamingResponseBody responseStream;
 
@@ -82,7 +83,7 @@ public class ApiUtils {
     responseHeaders.add(HttpHeaders.CONTENT_RANGE,
       "bytes" + " " + start + "-" + end + "/" + consumesOutputStream.getSize());
 
-    responseStream = os -> ((BinaryConsumesOutputStream) consumesOutputStream).consumeOutputStream(os, start, end);
+    responseStream = os -> (consumesOutputStream).consumeOutputStream(os, start, end);
 
     Date lastModifiedDate = consumesOutputStream.getLastModified();
     if (lastModifiedDate != null) {

@@ -18,10 +18,12 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.LiteRODAObject;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -30,8 +32,6 @@ import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.DirectResourceAccess;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,56 +45,39 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
 
   @Override
   public void migrate(ModelService model) {
-    try (DirectResourceAccess aipsContainer = model.getDirectAccess(AIP.class);
-      CloseableIterable<DirectResourceAccess> aips = FSUtils.listDirectAccessResourceChildren(aipsContainer, false)) {
-
-      for (DirectResourceAccess aip : aips) {
-        String aipId = aip.getPath().getFileName().toString();
-        try (
-          DirectResourceAccess representationsContainer = FSUtils.resolve(aip,
-            RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS);
-          CloseableIterable<DirectResourceAccess> representations = FSUtils
-            .listDirectAccessResourceChildren(representationsContainer, false)) {
-          for (DirectResourceAccess representation : representations) {
-            DirectResourceAccess pmAccess = FSUtils.resolve(representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
-              RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
-            String representationId = representation.getPath().getFileName().toString();
-            try (
-              CloseableIterable<DirectResourceAccess> pms = FSUtils.listDirectAccessResourceChildren(pmAccess, true)) {
-              for (DirectResourceAccess pm : pms) {
-                String pmId = pm.getPath().getFileName().toString().replace(RodaConstants.PREMIS_SUFFIX, "");
-                if (!pm.isDirectory()) {
-                  Optional<LiteRODAObject> pmLite = LiteRODAObjectFactory.get(PreservationMetadata.class, aipId,
-                    representationId, pmId);
-                  if (pmLite.isPresent()) {
-                    if (pm.getPath().getFileName().startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.FILE,
-                      RODAInstanceUtils.getLocalInstanceIdentifier()))) {
-                      Binary pmBinary = model.getBinary(pmLite.get());
-                      migrate(model, pmBinary, pmLite.get(), aipId, representationId);
-                    }
-                  } else {
-                    LOGGER.warn("Could not create LITE from preservation metadata file {}", pm.getPath().getFileName());
-                  }
+    try (CloseableIterable<OptionalWithCause<Representation>> representations = model.list(Representation.class)) {
+      for (OptionalWithCause<Representation> representation : representations) {
+        if (representation.isPresent()) {
+          try (CloseableIterable<OptionalWithCause<PreservationMetadata>> pms = model
+                  .listPreservationMetadata(representation.get().getAipId(), representation.get().getId())) {
+            for (OptionalWithCause<PreservationMetadata> pm : pms) {
+              if (pm.isPresent()) {
+                if (!model.hasDirectory(pm.get()) && pm.get().getId().startsWith(URNUtils
+                        .getPremisPrefix(PreservationMetadataType.FILE, RODAInstanceUtils.getLocalInstanceIdentifier()))) {
+                  Binary pmBinary = model.getBinary(pm.get());
+                  migrate(model, pmBinary, pm.get(), representation.get().getAipId(), representation.get().getId());
                 }
               }
-            } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-              | IOException e) {
-              LOGGER.warn("Could not find preservation metadata files", e);
+              else {
+                LOGGER.debug("Couldn't get preservation metadata", pm.getCause());
+              }
             }
+          } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+                   | IOException e) {
+            LOGGER.warn("Could not find preservation metadata files", e);
           }
-
-        } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-          | IOException e) {
-          LOGGER.warn("Could not find representations", e);
+        }
+        else {
+          LOGGER.warn("Couldn't get representation", representation.getCause());
         }
       }
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-      | IOException e) {
-      LOGGER.warn("Could not find AIPs", e);
+
+    } catch (IOException | RODAException e) {
+      LOGGER.warn("Could not find representations", e);
     }
   }
 
-  private void migrate(ModelService model, Binary binary, LiteRODAObject oldPMLite, String aipId,
+  private void migrate(ModelService model, Binary binary, PreservationMetadata oldPM, String aipId,
     String representationId) {
     try (InputStream inputStream = binary.getContent().createInputStream()) {
       File file = PremisV3Utils.binaryToFile(inputStream);
@@ -110,12 +93,14 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
         }
       }
 
+      Optional<LiteRODAObject> oldPMLite = LiteRODAObjectFactory.get(PreservationMetadata.class, aipId,
+        representationId, oldPM.getId());
       Optional<LiteRODAObject> newPMLite = LiteRODAObjectFactory.get(PreservationMetadata.class, aipId,
         representationId, value);
-      if (newPMLite.isEmpty()) {
-        throw new RequestNotValidException("Could not create LITE for new preservation metadata file " + value);
+      if (oldPMLite.isEmpty() || newPMLite.isEmpty()) {
+        throw new RequestNotValidException("Could not create new LITE for preservation metadata file " + oldPM.getId());
       }
-      model.moveObject(oldPMLite, newPMLite.get());
+      model.moveObject(oldPMLite.get(), newPMLite.get());
 
       ContentPayload newPremis = PremisV3Utils.fileToBinary(file);
       boolean asReference = false;

@@ -177,10 +177,10 @@ public class StorageServiceWrapper implements StorageService {
   }
 
   @Override
-  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource)
+  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource, boolean replaceExisting)
     throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-    storageService.copy(fromService, fromStoragePath, toPath, resource);
+    storageService.copy(fromService, fromStoragePath, toPath, resource, );
   }
 
   @Override

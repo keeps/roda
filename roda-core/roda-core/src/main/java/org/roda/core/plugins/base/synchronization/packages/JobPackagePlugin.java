@@ -23,7 +23,6 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -31,7 +30,6 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
@@ -114,7 +112,7 @@ public class JobPackagePlugin extends RodaEntityPackagesPlugin<Job> {
 
     Path jobPath = destinationPath.resolve(jobFile);
 
-    model.copyObjectFromContainer(Job.class, jobFile, jobPath);
+    model.exportToPath(Job.class, jobFile, , jobPath, );
 
     // Job Report
     DirectResourceAccess jobReportsResource = model.getDirectAccess(Report.class);
@@ -122,7 +120,7 @@ public class JobPackagePlugin extends RodaEntityPackagesPlugin<Job> {
       Path jobReportDestinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
         .resolve(RodaConstants.STORAGE_CONTAINER_JOB_REPORT).resolve(jobToBundle.getId());
 
-      model.copyObjectFromContainer(Report.class, jobToBundle.getId(), jobReportDestinationPath);
+      model.exportToPath(Report.class, jobToBundle.getId(), , jobReportDestinationPath, );
     }
 
     // Job Attachments

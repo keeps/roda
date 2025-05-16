@@ -150,11 +150,11 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
       Path submissionsPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
       Path aipMetadataPath = destinationPath.resolve(RodaConstants.STORAGE_AIP_METADATA_FILENAME);
 
-      model.copyObjectFromContainer(aip, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION, documentationPath);
-      model.copyObjectFromContainer(aip, RodaConstants.STORAGE_DIRECTORY_METADATA, metadataPath);
-      model.copyObjectFromContainer(aip, RodaConstants.STORAGE_DIRECTORY_SCHEMAS, schemasPath);
-      model.copyObjectFromContainer(aip, RodaConstants.STORAGE_DIRECTORY_SUBMISSION, submissionsPath);
-      model.copyObjectFromContainer(aip, RodaConstants.STORAGE_AIP_METADATA_FILENAME, aipMetadataPath);
+      model.exportToPath(aip, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION, , documentationPath, );
+      model.exportToPath(aip, RodaConstants.STORAGE_DIRECTORY_METADATA, , metadataPath, );
+      model.exportToPath(aip, RodaConstants.STORAGE_DIRECTORY_SCHEMAS, , schemasPath, );
+      model.exportToPath(aip, RodaConstants.STORAGE_DIRECTORY_SUBMISSION, , submissionsPath, );
+      model.exportToPath(aip, RodaConstants.STORAGE_AIP_METADATA_FILENAME, , aipMetadataPath, );
 
       for (Representation representation : aip.getRepresentations()) {
         Path repDataPath = Paths.get(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId(),
@@ -164,7 +164,7 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
         Path repMetadataPath = Paths.get(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId(),
           RodaConstants.STORAGE_DIRECTORY_METADATA);
         Path repMetadataDestinationPath = destinationPath.resolve(repMetadataPath);
-        model.copyObjectFromContainer(aip, repMetadataPath.toString(), repMetadataDestinationPath);
+        model.exportToPath(aip, repMetadataPath.toString(), , repMetadataDestinationPath, );
 
         addFilesToBundle(aip, representation, index, repDataDestinationPath);
       }

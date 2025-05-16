@@ -918,6 +918,9 @@ public final class ModelUtils {
     if (object instanceof DIP dip) {
       return getDIPStoragePath(dip.getId());
     }
+    if (object instanceof LogEntry log) {
+      return getLogStoragePath(log.getUUID());
+    }
     throw new RequestNotValidException("Cannot get storage path for entity using only its object: "
       + object.getClass().getSimpleName() + " " + object.getId());
   }
@@ -928,7 +931,10 @@ public final class ModelUtils {
       throw new RequestNotValidException("Couldn't parse Lite " + lite);
     }
     ParsedLite parsedLite = parsedLiteOptional.get();
+    return getStoragePath(parsedLite);
+  }
 
+  public static StoragePath getStoragePath(ParsedLite parsedLite) throws RequestNotValidException, GenericException {
     if (parsedLite instanceof ParsedAIPLite aip) {
       return getAIPStoragePath(aip.getId());
     }
@@ -990,7 +996,7 @@ public final class ModelUtils {
     if (parsedLite instanceof ParsedDIPLite dip) {
       return getDIPStoragePath(dip.getId());
     }
-    throw new RequestNotValidException("Cannot get storage path for entity using only its lite -> " + lite);
+    throw new RequestNotValidException("Cannot get storage path for entity using only its lite -> " + parsedLite);
   }
 
   public static <T extends Serializable> StoragePath getContainerPath(Class<T> clazz) throws RequestNotValidException {
