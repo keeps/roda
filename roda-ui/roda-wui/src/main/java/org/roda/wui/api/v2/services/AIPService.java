@@ -83,7 +83,6 @@ import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.wui.api.v2.utils.ApiUtils;
@@ -115,7 +114,6 @@ public class AIPService {
       throw new RequestNotValidException("Could not retrieve metadata " + metadataId + " lite for AIP " + aipId);
     }
     Binary descriptiveMetadataBinary;
-    DirectResourceAccess descriptiveMetadataDirectAccess;
     if (versionId == null) {
       descriptiveMetadataBinary = modelService.getBinary(liteMetadata.get());
     } else {
@@ -123,9 +121,8 @@ public class AIPService {
       descriptiveMetadataBinary = binaryVersion.getBinary();
     }
 
-    DirectResourceAccess directAccess = modelService.getDirectAccess(liteMetadata.get());
-    return new StreamResponse(new BinaryConsumesOutputStream(descriptiveMetadataBinary, directAccess.getPath(),
-      RodaConstants.MEDIA_TYPE_APPLICATION_XML));
+    return new StreamResponse(
+      new BinaryConsumesOutputStream(descriptiveMetadataBinary, RodaConstants.MEDIA_TYPE_APPLICATION_XML));
   }
 
   public StreamResponse retrieveAIPDescriptiveMetadata(String aipId, String metadataId, String versionId,
@@ -170,19 +167,15 @@ public class AIPService {
         + ", representation " + representationId);
     }
     Binary descriptiveMetadataBinary;
-    DirectResourceAccess descriptiveMetadataAccess;
     if (versionId == null) {
       descriptiveMetadataBinary = modelService.getBinary(liteMetadata.get());
-      descriptiveMetadataAccess = modelService.getDirectAccess(liteMetadata.get());
     } else {
       BinaryVersion binaryVersion = modelService.getBinaryVersion(liteMetadata.get(), versionId, new ArrayList<>());
       descriptiveMetadataBinary = binaryVersion.getBinary();
-      descriptiveMetadataAccess = modelService.getDirectAccessToVersion(liteMetadata.get(), versionId,
-        new ArrayList<>());
     }
 
-    return new StreamResponse(new BinaryConsumesOutputStream(descriptiveMetadataBinary,
-      descriptiveMetadataAccess.getPath(), RodaConstants.MEDIA_TYPE_APPLICATION_XML));
+    return new StreamResponse(
+      new BinaryConsumesOutputStream(descriptiveMetadataBinary, RodaConstants.MEDIA_TYPE_APPLICATION_XML));
   }
 
   public StreamResponse retrieveRepresentationDescriptiveMetadata(String aipId, String representationId,
@@ -351,15 +344,9 @@ public class AIPService {
   public boolean hasDocumentation(String aipId)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     try {
-      Optional<LiteRODAObject> aipLite = LiteRODAObjectFactory.get(AIP.class, aipId);
-      if (aipLite.isEmpty()) {
-        throw new RequestNotValidException("Could not get LITE from AIP " + aipId);
-      }
-      DirectResourceAccess documentationResource = RodaCoreFactory.getModelService().getDirectAccess(aipLite.get(),
-        RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
-      Long counter = FSUtils.countDirectAccessResourceChildren(documentationResource, false);
+      Long counter = RodaCoreFactory.getModelService().countDocumentationFiles(aipId, null);
       return counter > 0;
-    } catch (NotFoundException | IOException e) {
+    } catch (NotFoundException e) {
       return false;
     }
   }
@@ -367,15 +354,9 @@ public class AIPService {
   public boolean hasSubmissions(String aipId)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException {
     try {
-      Optional<LiteRODAObject> aipLite = LiteRODAObjectFactory.get(AIP.class, aipId);
-      if (aipLite.isEmpty()) {
-        throw new RequestNotValidException("Could not get LITE from AIP " + aipId);
-      }
-      DirectResourceAccess submissionResource = RodaCoreFactory.getModelService().getDirectAccess(aipLite.get(),
-        RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
-      Long counter = FSUtils.countDirectAccessResourceChildren(submissionResource, false);
+      Long counter = RodaCoreFactory.getModelService().countSubmissionFiles(aipId);
       return counter > 0;
-    } catch (NotFoundException | IOException e) {
+    } catch (NotFoundException e) {
       return false;
     }
   }
@@ -496,13 +477,10 @@ public class AIPService {
           throw new RequestNotValidException("Could not get LITE from representation " + representationId + " of AIP "
             + aipId + " with metadata id" + descriptiveMetadataId);
         }
-        DirectResourceAccess descriptiveMetadataResource = model.getDirectAccess(descriptiveMetadataLite.get());
-        if (descriptiveMetadataResource.exists()) {
-          Binary binary = model.retrieveDescriptiveMetadataBinary(aipId, representationId,
-            descriptiveMetadataId + XML_EXT);
-          InputStream inputStream = binary.getContent().createInputStream();
-          result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-        }
+        Binary binary = model.retrieveDescriptiveMetadataBinary(aipId, representationId,
+          descriptiveMetadataId + XML_EXT);
+        InputStream inputStream = binary.getContent().createInputStream();
+        result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
       }
     } catch (IOException e) {
       throw new GenericException(e);

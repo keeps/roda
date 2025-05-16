@@ -268,6 +268,9 @@ public interface ModelService extends ModelObservable {
     List<String> directoryPath, String fileId, boolean recursive)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException;
 
+  Long getExternalFilesTotalSize(File file)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException, IOException;
+
   File retrieveFile(String aipId, String representationId, List<String> directoryPath, String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
@@ -550,6 +553,9 @@ public interface ModelService extends ModelObservable {
   Job retrieveJob(String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
+  CloseableIterable<OptionalWithCause<Report>> listJobReports(String jobId)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
+
   void deleteJob(String jobId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
@@ -691,6 +697,15 @@ public interface ModelService extends ModelObservable {
   File createDocumentation(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException;
+
+  Long countDocumentationFiles(String aipId, String representationId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  Long countSubmissionFiles(String aipId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  Long countSchemaFiles(String aipId, String representationId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   Directory getSchemasDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
@@ -932,6 +947,10 @@ public interface ModelService extends ModelObservable {
   Directory createDirectory(LiteRODAObject lite, String... pathPartials)
     throws AuthorizationDeniedException, AlreadyExistsException, GenericException, RequestNotValidException;
 
+  boolean hasDirectory(IsRODAObject object, String... pathPartials) throws RequestNotValidException;
+
+  boolean hasDirectory(LiteRODAObject object, String... pathPartials) throws RequestNotValidException, GenericException;
+
   DirectResourceAccess getDirectAccess(IsRODAObject obj, StorageService storage, String... pathPartials)
     throws RequestNotValidException;
 
@@ -968,10 +987,12 @@ public interface ModelService extends ModelObservable {
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
     NotFoundException;
 
-  <T extends IsRODAObject> void copyObjectFromContainer(Class<T> clazz, String resource, Path toPath)
+  <T extends IsRODAObject> void exportToPath(Class<T> clazz, Path toPath, boolean replaceExisting,
+    String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException;
 
-  <T extends IsRODAObject> void copyObjectFromContainer(IsRODAObject object, String resource, Path toPath)
+  <T extends IsRODAObject> void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting,
+    String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException;
 
   ConsumesOutputStream exportObjectToStream(IsRODAObject object, String... pathPartials)
@@ -993,5 +1014,6 @@ public interface ModelService extends ModelObservable {
 
   String getObjectPathAsString(IsRODAObject object, boolean skipContainer) throws RequestNotValidException;
 
-  String getObjectPathAsString(LiteRODAObject object, boolean skipContainer) throws RequestNotValidException, GenericException;
+  String getObjectPathAsString(LiteRODAObject object, boolean skipContainer)
+    throws RequestNotValidException, GenericException;
 }

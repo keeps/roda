@@ -37,6 +37,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.RangeConsumesOutputStream;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
@@ -108,9 +109,9 @@ public class FilesController implements FileRestService, Exportable {
       IndexedFile file = indexService.retrieve(requestContext, IndexedFile.class, fileUUID, fileFields);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
-      StreamResponse response = filesService.retrieveAIPRepresentationFile(file);
+      RangeConsumesOutputStream stream = filesService.retrieveAIPRepresentationRangeStream(file);
 
-      return ApiUtils.rangeResponse(headers, response.getStream());
+      return ApiUtils.rangeResponse(headers, stream);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -424,7 +425,8 @@ public class FilesController implements FileRestService, Exportable {
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // delegate
-      IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state

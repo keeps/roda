@@ -51,7 +51,6 @@ import org.roda.core.plugins.base.maintenance.AddRepresentationInformationFilter
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
-import org.roda.core.storage.DirectResourceAccess;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.common.model.RequestContext;
@@ -364,9 +363,8 @@ public class RepresentationInformationService {
     if (liteRI.isEmpty()) {
       throw new RequestNotValidException("Could not get representation information lite with id: " + id);
     }
-    DirectResourceAccess riAccess = model.getDirectAccess(liteRI.get());
     Binary riBinary = model.getBinary(liteRI.get());
-    stream = new BinaryConsumesOutputStream(riBinary, riAccess.getPath());
+    stream = new BinaryConsumesOutputStream(riBinary);
     return new StreamResponse(stream);
   }
 

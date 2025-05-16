@@ -195,10 +195,10 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   @Override
-  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource)
+  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource, boolean replaceExisting)
     throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
     copyFromMainStorageService(fromStoragePath);
-    stagingStorageService.copy(fromService, fromStoragePath, toPath, resource);
+    stagingStorageService.copy(fromService, fromStoragePath, toPath, resource, );
   }
 
   @Override

@@ -20,8 +20,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -1346,6 +1344,25 @@ public class DefaultModelService implements ModelService {
     final StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
     final CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(filePath, recursive);
     return ResourceParseUtils.convert(getStorage(), iterable, File.class);
+  }
+
+  @Override
+  public Long getExternalFilesTotalSize(File file)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException, IOException {
+    Long sizeInBytes = 0L;
+    StoragePath storagePath = ModelUtils.getFileStoragePath(file);
+    try (CloseableIterable<Resource> resources = getStorage().listResourcesUnderFile(storagePath, false)) {
+      for (Resource resource : resources) {
+        if (resource instanceof DefaultBinary) {
+          ContentPayload content = ((DefaultBinary) resource).getContent();
+          if (content instanceof JsonContentPayload) {
+            ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
+            sizeInBytes += shallowFile.getSize();
+          }
+        }
+      }
+    }
+    return sizeInBytes;
   }
 
   @Override
@@ -2786,6 +2803,13 @@ public class DefaultModelService implements ModelService {
     return ret;
   }
 
+  public CloseableIterable<OptionalWithCause<Report>> listJobReports(String jobId)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    final CloseableIterable<Resource> resourcesIterable = storage
+      .listResourcesUnderContainer(ModelUtils.getJobReportsStoragePath(jobId), false);
+    return ResourceParseUtils.convert(getStorage(), resourcesIterable, Report.class);
+  }
+
   @Override
   public void deleteJob(String jobId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
@@ -3589,6 +3613,37 @@ public class DefaultModelService implements ModelService {
     StoragePath filePath = ModelUtils.getDocumentationStoragePath(aipId, representationId, directoryPath, fileId);
     final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
     return ResourceParseUtils.convertResourceToFile(createdBinary);
+  }
+
+  @Override
+  public Long countDocumentationFiles(String aipId, String representationId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    Directory documentationDirectory;
+    if (representationId == null) {
+      documentationDirectory = getDocumentationDirectory(aipId);
+    } else {
+      documentationDirectory = getDocumentationDirectory(aipId, representationId);
+    }
+    return getStorage().countResourcesUnderDirectory(documentationDirectory.getStoragePath(), true);
+  }
+
+  @Override
+  public Long countSubmissionFiles(String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    Directory submissionDirectory = getSubmissionDirectory(aipId);
+    return getStorage().countResourcesUnderDirectory(submissionDirectory.getStoragePath(), true);
+  }
+
+  @Override
+  public Long countSchemaFiles(String aipId, String representationId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    Directory schemaDirectory;
+    if (representationId == null) {
+      schemaDirectory = getSchemasDirectory(aipId);
+    } else {
+      schemaDirectory = getSchemasDirectory(aipId, representationId);
+    }
+    return getStorage().countResourcesUnderDirectory(schemaDirectory.getStoragePath(), true);
   }
 
   @Override
@@ -5323,6 +5378,19 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
+  public boolean hasDirectory(IsRODAObject object, String... pathPartials) throws RequestNotValidException {
+    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object), pathPartials);
+    return getStorage().hasDirectory(storagePath);
+  }
+
+  @Override
+  public boolean hasDirectory(LiteRODAObject lite, String... pathPartials)
+    throws RequestNotValidException, GenericException {
+    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(lite), pathPartials);
+    return getStorage().hasDirectory(storagePath);
+  }
+
+  @Override
   public DirectResourceAccess getDirectAccess(IsRODAObject obj, StorageService storage, String... pathPartials)
     throws RequestNotValidException {
     StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(obj), pathPartials);
@@ -5357,8 +5425,8 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public DirectResourceAccess getDirectAccessToVersion(LiteRODAObject lite, String version,
-    List<String> pathPartials) throws RequestNotValidException, GenericException {
+  public DirectResourceAccess getDirectAccessToVersion(LiteRODAObject lite, String version, List<String> pathPartials)
+    throws RequestNotValidException, GenericException {
     StoragePath basePath = ModelUtils.getStoragePath(lite);
     StoragePath fullPath = DefaultStoragePath.parse(basePath, pathPartials.toArray(new String[0]));
     return getStorage().getDirectAccessToVersion(fullPath, version);
@@ -5480,17 +5548,19 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public <T extends IsRODAObject> void copyObjectFromContainer(Class<T> clazz, String resource, Path toPath)
+  public <T extends IsRODAObject> void exportToPath(Class<T> clazz, Path toPath, boolean replaceExisting,
+    String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
-    StoragePath sourceObjectPath = ModelUtils.getContainerPath(clazz);
-    getStorage().copy(getStorage(), sourceObjectPath, toPath, resource);
+    StoragePath sourceObjectPath = DefaultStoragePath.parse(ModelUtils.getContainerPath(clazz), fromPathPartials);
+    getStorage().copy(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
   }
 
   @Override
-  public <T extends IsRODAObject> void copyObjectFromContainer(IsRODAObject object, String resource, Path toPath)
+  public <T extends IsRODAObject> void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting,
+    String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
-    StoragePath sourceObjectPath = ModelUtils.getStoragePath(object);
-    getStorage().copy(getStorage(), sourceObjectPath, toPath, resource);
+    StoragePath sourceObjectPath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object), fromPathPartials);
+    getStorage().copy(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
   }
 
   @Override
@@ -5511,14 +5581,15 @@ public class DefaultModelService implements ModelService {
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
     ConsumesOutputStream stream;
 
-    final DirectResourceAccess directAccess = getDirectAccess(object, pathPartials);
+    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object), pathPartials);
+    final Class<? extends Entity> entity = getStorage().getEntity(storagePath);
 
-    if (directAccess.isDirectory()) {
+    if (entity.equals(Binary.class) || entity.equals(DefaultBinary.class)) {
+      // Send the one file
+      stream = new BinaryConsumesOutputStream(getBinary(object, pathPartials));
+    } else {
       // Send zip with directory contents
       stream = exportObjectToZip(object, name, addTopDirectory, pathPartials);
-    } else {
-      // Send the one file
-      stream = new BinaryConsumesOutputStream(getBinary(object, pathPartials), directAccess.getPath());
     }
     return stream;
   }
@@ -5536,7 +5607,7 @@ public class DefaultModelService implements ModelService {
       stream = exportObjectToZip(lite, name, addTopDirectory, pathPartials);
     } else {
       // Send the one file
-      stream = new BinaryConsumesOutputStream(getBinary(lite, pathPartials), directAccess.getPath());
+      stream = new BinaryConsumesOutputStream(getBinary(lite, pathPartials));
     }
     return stream;
   }
@@ -5675,6 +5746,73 @@ public class DefaultModelService implements ModelService {
     };
   }
 
+  private ConsumesOutputStream exportObjectToZipRangeStream(IsRODAObject object, String name, boolean addTopDirectory,
+    String... pathPartials) throws RequestNotValidException {
+    final StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object), pathPartials);
+    final String fileName = name == null ? storagePath.getName() : name;
+
+    return new ConsumesOutputStream() {
+      @Override
+      public void consumeOutputStream(OutputStream out) throws IOException {
+
+        try (BufferedOutputStream bos = new BufferedOutputStream(out);
+          ZipOutputStream zos = new ZipOutputStream(bos);
+          CloseableIterable<Resource> resources = getStorage().listResourcesUnderDirectory(storagePath, true);) {
+          int basePathSize = storagePath.asList().size();
+
+          for (Resource r : resources) {
+            List<String> pathAsList = r.getStoragePath().asList();
+            List<String> relativePathAsList = pathAsList.subList(basePathSize, pathAsList.size());
+            String entryPath = relativePathAsList.stream().collect(Collectors.joining(ZIP_PATH_DELIMITER));
+            String entryDirectoryPath;
+            if (addTopDirectory) {
+              entryDirectoryPath = storagePath.getName() + ZIP_PATH_DELIMITER + entryPath;
+            } else {
+              entryDirectoryPath = entryPath;
+            }
+            if (r.isDirectory()) {
+              // adding a directory
+              entryDirectoryPath += ZIP_PATH_DELIMITER;
+              zos.putNextEntry(new ZipEntry(entryDirectoryPath));
+              zos.closeEntry();
+            } else {
+              // adding a file
+              ZipEntry entry = new ZipEntry(entryDirectoryPath);
+              zos.putNextEntry(entry);
+              Binary binary = getStorage().getBinary(r.getStoragePath());
+              try (InputStream inputStream = binary.getContent().createInputStream()) {
+                IOUtils.copy(inputStream, zos);
+              }
+              zos.closeEntry();
+            }
+          }
+        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+          throw new IOException(e);
+        }
+      }
+
+      @Override
+      public String getFileName() {
+        return fileName + ZIP_FILE_NAME_EXTENSION;
+      }
+
+      @Override
+      public String getMediaType() {
+        return ZIP_MEDIA_TYPE;
+      }
+
+      @Override
+      public Date getLastModified() {
+        return null;
+      }
+
+      @Override
+      public long getSize() {
+        return -1;
+      }
+    };
+  }
+
   @Override
   public void moveObject(LiteRODAObject fromObject, LiteRODAObject toObject) throws AuthorizationDeniedException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
@@ -5691,7 +5829,8 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public String getObjectPathAsString(LiteRODAObject lite, boolean skipContainer) throws RequestNotValidException, GenericException {
+  public String getObjectPathAsString(LiteRODAObject lite, boolean skipContainer)
+    throws RequestNotValidException, GenericException {
     StoragePath objectPath = ModelUtils.getStoragePath(lite);
     return getStorage().getStoragePathAsString(objectPath, skipContainer);
   }
