@@ -104,6 +104,6 @@ public class PreservationAgentPackagePlugin extends RodaEntityPackagesPlugin<Ind
 
     Path agentPath = destinationPath.resolve(agentFile);
 
-    model.copyObjectFromContainer(IndexedPreservationAgent.class, agentFile, agentPath);
+    model.exportToPath(IndexedPreservationAgent.class, agentFile, , agentPath, );
   }
 }

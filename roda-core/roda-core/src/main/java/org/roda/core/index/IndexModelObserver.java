@@ -50,8 +50,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.ShallowFile;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -83,11 +81,8 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
-import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -308,24 +303,6 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
-  private Long getExternalFilesTotalSize(File file)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
-    Long sizeInBytes = 0L;
-    DirectResourceAccess fileResource = model.getDirectAccess(file);
-    CloseableIterable<DirectResourceAccess> resources = FSUtils.listDirectAccessResourceChildren(fileResource, false);
-    for (DirectResourceAccess resource : resources) {
-      if (!resource.isDirectory()) {
-        Binary binary = model.getBinary(file, resource.getPath().getFileName().toString());
-        ContentPayload content = binary.getContent();
-        if (content instanceof JsonContentPayload) {
-          ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
-          sizeInBytes += shallowFile.getSize();
-        }
-      }
-    }
-    return sizeInBytes;
-  }
-
   private ReturnWithExceptions<Void, ModelObserver> indexRetentionPeriod(final AIP aip, final List<String> ancestors) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
@@ -364,6 +341,7 @@ public class IndexModelObserver implements ModelObserver {
 
     FileCollection.Info info = new FileCollection.Info(aip, ancestors);
     try {
+      // TODO: Don't use DirectResourceAccess to get these file attributes
       final DirectResourceAccess fileResource = model.getDirectAccess(file);
       file.setCreatedOn(FSUtils.getDateFromDirectResourceAccess(fileResource));
     } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
@@ -379,7 +357,7 @@ public class IndexModelObserver implements ModelObserver {
               .addTo(ret);
           }
         }
-        sizeInBytes = getExternalFilesTotalSize(file);
+        sizeInBytes = model.getExternalFilesTotalSize(file);
       } catch (IOException | RequestNotValidException | GenericException | AuthorizationDeniedException
         | NotFoundException e) {
         e.printStackTrace();
@@ -1061,7 +1039,7 @@ public class IndexModelObserver implements ModelObserver {
       indexPreservationEvent(pm).addTo(ret);
     } else if (PreservationMetadataType.AGENT.equals(type)) {
       try {
-        final StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(pm);
+        // TODO: Don't use DirectResourceAccess to get these file attributes
         final DirectResourceAccess pmResource = model.getDirectAccess(pm);
         pm.setCreatedOn(FSUtils.getDateFromDirectResourceAccess(pmResource));
       } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
@@ -1131,19 +1109,22 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> indexJobReports(Job job) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try (DirectResourceAccess jobReportsContainer = model.getDirectAccess(Report.class, job.getId());
-      CloseableIterable<DirectResourceAccess> jobReports = FSUtils.listDirectAccessResourceChildren(jobReportsContainer,
-        false)) {
-      for (DirectResourceAccess report : jobReports) {
-        if (!report.isDirectory()) {
-          Binary reportBinary = model.getBinary(Report.class, job.getId(), report.getPath().getFileName().toString());
-          try (InputStream inputStream = reportBinary.getContent().createInputStream()) {
-            Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
-            jobReportCreatedOrUpdated(objectFromJson, job).addTo(ret);
-          } catch (GenericException | IOException e) {
-            LOGGER.error("Error getting report json from binary", e);
-            ret.add(e);
+    try (CloseableIterable<OptionalWithCause<Report>> jobReports = model.listJobReports(job.getId())) {
+      for (OptionalWithCause<Report> report : jobReports) {
+        if (report.isPresent()) {
+          if (!model.hasDirectory(report.get())) {
+            Binary reportBinary = model.getBinary(report.get());
+            try (InputStream inputStream = reportBinary.getContent().createInputStream()) {
+              Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
+              jobReportCreatedOrUpdated(objectFromJson, job).addTo(ret);
+            } catch (GenericException | IOException e) {
+              LOGGER.error("Error getting report json from binary", e);
+              ret.add(e);
+            }
           }
+        } else {
+          LOGGER.error("Cannot index job report", report.getCause());
+          ret.add(report.getCause());
         }
       }
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException

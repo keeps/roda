@@ -21,14 +21,11 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.storage.StorageService;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -104,6 +101,6 @@ public class RiskIncidencePackagePlugin extends RodaEntityPackagesPlugin<RiskInc
 
     Path incidencePath = destinationPath.resolve(incidenceFile);
 
-    model.copyObjectFromContainer(RiskIncidence.class, incidenceFile, incidencePath);
+    model.exportToPath(RiskIncidence.class, incidenceFile, , incidencePath, );
   }
 }

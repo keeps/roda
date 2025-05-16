@@ -81,10 +81,8 @@ import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,13 +173,13 @@ public class IndexService {
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, User user, boolean justActive, final List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
-    FindRequest findRequest = FindRequest.getBuilder(filter, justActive).withSorter(sorter)
-      .withSublist(sublist).withFacets(facets).withFieldsToReturn(fieldsToReturn).build();
+    FindRequest findRequest = FindRequest.getBuilder(filter, justActive).withSorter(sorter).withSublist(sublist)
+      .withFacets(facets).withFieldsToReturn(fieldsToReturn).build();
     return SolrUtils.find(getSolrClient(), returnClass, findRequest, user);
   }
 
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, FindRequest findRequest, User user)
-      throws GenericException, RequestNotValidException {
+    throws GenericException, RequestNotValidException {
     return SolrUtils.find(getSolrClient(), returnClass, findRequest, user);
   }
 
@@ -206,8 +204,8 @@ public class IndexService {
     return SolrUtils.count(getSolrClient(), returnClass, filter, user, justActive);
   }
 
-  public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn, boolean appendChildren)
-      throws NotFoundException, GenericException {
+  public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn,
+    boolean appendChildren) throws NotFoundException, GenericException {
     return SolrUtils.retrieve(getSolrClient(), returnClass, id, fieldsToReturn, appendChildren);
   }
 
@@ -438,14 +436,16 @@ public class IndexService {
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    try (DirectResourceAccess logsContainer = model.getDirectAccess(LogEntry.class);
-      CloseableIterable<DirectResourceAccess> logs = FSUtils.listDirectAccessResourceChildren(logsContainer, false)) {
-
-      for (DirectResourceAccess resource : logs) {
-        if (!resource.isDirectory()) {
-          Binary b = model.getBinary(LogEntry.class, resource.getPath().getFileName().toString());
-          InputStreamReader reader = new InputStreamReader(b.getContent().createInputStream());
-          reindexActionLog(reader);
+    try (CloseableIterable<OptionalWithCause<LogEntry>> logs = model.listLogEntries()) {
+      for (OptionalWithCause<LogEntry> log : logs) {
+        if (log.isPresent()) {
+          if (!model.hasDirectory(log.get())) {
+            Binary b = model.getBinary(log.get());
+            InputStreamReader reader = new InputStreamReader(b.getContent().createInputStream());
+            reindexActionLog(reader);
+          }
+        } else {
+          LOGGER.error("Cannot log entry", log.getCause());
         }
       }
     } catch (IOException e) {

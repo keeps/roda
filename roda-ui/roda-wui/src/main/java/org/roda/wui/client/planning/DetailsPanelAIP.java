@@ -49,7 +49,7 @@ public class DetailsPanelAIP extends Composite {
     ingestLabel.setVisible(false);
     Map<String, Widget> detailsMap = InfoSliderHelper.getAipInfoDetailsMap(response);
 
-    boolean canAccessJobs = PermissionClientUtils.hasPermissions(RodaConstants.REPOSITORY_PERMISSIONS_JOB_READ);
+    boolean canAccessJobs = PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_JOB);
 
     for (Map.Entry<String, Widget> field : detailsMap.entrySet()) {
       String fieldLabelString = field.getKey();

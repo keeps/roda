@@ -346,7 +346,7 @@ public interface StorageService {
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException;
 
-  void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource)
+  void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource, boolean replaceExisting)
     throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
   /**

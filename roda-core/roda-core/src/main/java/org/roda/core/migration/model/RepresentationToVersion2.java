@@ -8,32 +8,21 @@
 package org.roda.core.migration.model;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Optional;
 
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.LiteRODAObject;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.migration.MigrationAction;
-import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StringContentPayload;
-import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,48 +31,33 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
 
   @Override
   public void migrate(ModelService model) {
-    try (DirectResourceAccess aipsContainer = model.getDirectAccess(AIP.class);
-      CloseableIterable<DirectResourceAccess> aips = FSUtils.listDirectAccessResourceChildren(aipsContainer, false)) {
-      for (DirectResourceAccess aipResource : aips) {
-        try {
-          Optional<LiteRODAObject> aipLite = LiteRODAObjectFactory.get(AIP.class,
-            aipResource.getPath().getFileName().toString());
-          if (aipLite.isPresent()) {
-            Binary aipJson = model.getBinary(aipLite.get(), RodaConstants.STORAGE_AIP_METADATA_FILENAME);
-            InputStream inputStream = aipJson.getContent().createInputStream();
+    try (CloseableIterable<OptionalWithCause<Representation>> representations = model.list(Representation.class)) {
+      for (OptionalWithCause<Representation> representation : representations) {
+        Path representationPath = model.getDirectAccess(representation).getPath();
 
-            AIP aip = JsonUtils.getObjectFromJson(inputStream, AIP.class);
-            for (Representation representation : aip.getRepresentations()) {
-              Path representationPath = model.getDirectAccess(representation).getPath();
+        // TODO: Don't use DirectResourceAccess to get these file attributes
+        BasicFileAttributes attr = Files.readAttributes(representationPath, BasicFileAttributes.class);
+        Date createDate = new Date(attr.creationTime().toMillis());
+        Date updateDate = new Date(attr.lastModifiedTime().toMillis());
 
-              BasicFileAttributes attr = Files.readAttributes(representationPath, BasicFileAttributes.class);
-              Date createDate = new Date(attr.creationTime().toMillis());
-              Date updateDate = new Date(attr.lastModifiedTime().toMillis());
+        representation.setCreatedOn(createDate);
+        representation.setCreatedBy(aip.getCreatedBy());
+        representation.setUpdatedOn(updateDate);
+        representation.setUpdatedBy(aip.getUpdatedBy());
 
-              representation.setCreatedOn(createDate);
-              representation.setCreatedBy(aip.getCreatedBy());
-              representation.setUpdatedOn(updateDate);
-              representation.setUpdatedBy(aip.getUpdatedBy());
-
-              if (representation.isOriginal()) {
-                representation.setRepresentationStates(Arrays.asList(RepresentationState.ORIGINAL));
-              } else {
-                representation.setRepresentationStates(Arrays.asList(RepresentationState.OTHER));
-              }
-            }
-
-            StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromObject(aip));
-            model.updateBinaryContent(aipLite.get(), payload, false, false);
-          } else {
-            LOGGER.warn("Could not create LITE for AIP {}", aipResource.getPath().getFileName());
-          }
-        } catch (IOException e) {
-          LOGGER.warn("Could not get AIP json file of AIP " + aipResource.getPath().getFileName().toString(), e);
+        if (representation.isOriginal()) {
+          representation.setRepresentationStates(Arrays.asList(RepresentationState.ORIGINAL));
+        } else {
+          representation.setRepresentationStates(Arrays.asList(RepresentationState.OTHER));
         }
       }
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-      | IOException e) {
-      LOGGER.warn("Could not find AIPs", e);
+
+      StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromObject(aip));
+      model.updateBinaryContent(aipLite.get(), payload, false, false);
+    } catch (RODAException ex) {
+      throw new RuntimeException(ex);
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
     }
   }
 

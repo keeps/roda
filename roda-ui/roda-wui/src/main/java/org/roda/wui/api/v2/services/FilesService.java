@@ -32,7 +32,6 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -51,6 +50,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
+import org.roda.core.storage.RangeConsumesOutputStream;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.HTMLUtils;
@@ -205,6 +205,23 @@ public class FilesService {
     }
   }
 
+  public RangeConsumesOutputStream retrieveAIPRepresentationRangeStream(IndexedFile indexedFile)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    ModelService model = RodaCoreFactory.getModelService();
+    if (!indexedFile.isDirectory()) {
+      final RangeConsumesOutputStream stream;
+      DirectResourceAccess directFileAccess = model.getDirectAccess(indexedFile);
+      if (indexedFile.getFileFormat() != null && StringUtils.isNotBlank(indexedFile.getFileFormat().getMimeType())) {
+        stream = new RangeConsumesOutputStream(directFileAccess.getPath(), indexedFile.getFileFormat().getMimeType());
+      } else {
+        stream = new RangeConsumesOutputStream(directFileAccess.getPath());
+      }
+      return stream;
+    } else {
+      throw new RequestNotValidException("Range stream for directory unsupported");
+    }
+  }
+
   public StreamResponse retrieveAIPRepresentationFile(IndexedFile indexedFile)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
@@ -215,12 +232,10 @@ public class FilesService {
     if (!indexedFile.isDirectory()) {
       final ConsumesOutputStream stream;
       Binary representationFileBinary = model.getBinary(liteFile.get());
-      DirectResourceAccess directFileAccess = model.getDirectAccess(liteFile.get());
       if (indexedFile.getFileFormat() != null && StringUtils.isNotBlank(indexedFile.getFileFormat().getMimeType())) {
-        stream = new BinaryConsumesOutputStream(representationFileBinary, directFileAccess.getPath(),
-          indexedFile.getFileFormat().getMimeType());
+        stream = new BinaryConsumesOutputStream(representationFileBinary, indexedFile.getFileFormat().getMimeType());
       } else {
-        stream = new BinaryConsumesOutputStream(representationFileBinary, directFileAccess.getPath());
+        stream = new BinaryConsumesOutputStream(representationFileBinary);
       }
       return new StreamResponse(stream);
     } else {
@@ -312,11 +327,7 @@ public class FilesService {
     ModelService model = RodaCoreFactory.getModelService();
     Binary preservationMetadataBinary = model.retrievePreservationFile(file.getAipId(), file.getRepresentationId(),
       file.getAncestorsPath(), file.getId());
-    PreservationMetadata pm = model.retrievePreservationMetadata(file.getAipId(), file.getRepresentationId(),
-      file.getAncestorsPath(), file.getId(), PreservationMetadata.PreservationMetadataType.FILE);
-    DirectResourceAccess directMetadataAccess = model.getDirectAccess(pm);
-    stream = new BinaryConsumesOutputStream(preservationMetadataBinary, directMetadataAccess.getPath(),
-      RodaConstants.MEDIA_TYPE_TEXT_XML);
+    stream = new BinaryConsumesOutputStream(preservationMetadataBinary, RodaConstants.MEDIA_TYPE_TEXT_XML);
 
     ret = new StreamResponse(stream);
 

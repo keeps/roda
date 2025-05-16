@@ -8,11 +8,9 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.StreamResponse;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
-import org.roda.core.storage.DirectResourceAccess;
 import org.springframework.stereotype.Service;
 
 /**
@@ -27,10 +25,8 @@ public class PreservationAgentService {
     ModelService model = RodaCoreFactory.getModelService();
 
     final Binary binary = model.retrievePreservationAgent(id);
-    final DirectResourceAccess agentResource = model.getDirectAccess(IndexedPreservationAgent.class, id,
-      RodaConstants.PREMIS_SUFFIX);
 
-    final ConsumesOutputStream stream = new BinaryConsumesOutputStream(binary, agentResource.getPath(),
+    final ConsumesOutputStream stream = new BinaryConsumesOutputStream(binary,
       RodaConstants.MEDIA_TYPE_APPLICATION_XML);
     return new StreamResponse(stream);
   }

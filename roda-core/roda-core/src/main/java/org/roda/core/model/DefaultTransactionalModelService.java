@@ -2069,17 +2069,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public <T extends IsRODAObject> void copyObjectFromContainer(Class<T> clazz, String resource, Path toPath)
+  public <T extends IsRODAObject> void exportToPath(Class<T> clazz, Path toPath, boolean replaceExisting, String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
-    registerOperation(clazz, List.of(resource), TransactionalModelOperationLog.OperationType.READ);
-    getModelService().copyObjectFromContainer(clazz, resource, toPath);
+    registerOperation(clazz, List.of(fromPathPartials), TransactionalModelOperationLog.OperationType.READ);
+    getModelService().exportToPath(clazz, fromPathPartials, , toPath, );
   }
 
   @Override
-  public <T extends IsRODAObject> void copyObjectFromContainer(IsRODAObject object, String resource, Path toPath)
+  public <T extends IsRODAObject> void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting, String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
     registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
-    getModelService().copyObjectFromContainer(object, resource, toPath);
+    getModelService().exportToPath(object, fromPathPartials, , toPath, );
   }
 
   @Override

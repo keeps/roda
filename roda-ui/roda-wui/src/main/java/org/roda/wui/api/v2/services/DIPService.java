@@ -24,7 +24,6 @@ import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.base.maintenance.UpdatePermissionsPlugin;
-import org.roda.core.storage.DirectResourceAccess;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.springframework.stereotype.Service;
 
@@ -44,11 +43,9 @@ public class DIPService {
     }
 
     ConsumesOutputStream download;
-    DirectResourceAccess dipData = model.getDirectAccess(liteDIP.get(), RodaConstants.STORAGE_DIRECTORY_DATA);
-    if (dipData.isDirectory()) {
+    if (model.hasDirectory(liteDIP.get(), RodaConstants.STORAGE_DIRECTORY_DATA)) {
       download = model.exportObjectToStream(liteDIP.get(), dipUUID, false, RodaConstants.STORAGE_DIRECTORY_DATA);
-    }
-    else {
+    } else {
       download = model.exportObjectToStream(liteDIP.get(), dipUUID, false);
     }
     return new StreamResponse(download);

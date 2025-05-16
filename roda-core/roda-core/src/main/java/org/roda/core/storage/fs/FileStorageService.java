@@ -549,8 +549,8 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource)
-    throws AlreadyExistsException, GenericException {
+  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException {
     Path sourcePath = null;
     if (StringUtils.isNotBlank(resource)) {
       sourcePath = FSUtils.getEntityPath(basePath, fromStoragePath).resolve(resource);
@@ -558,7 +558,7 @@ public class FileStorageService implements StorageService {
       sourcePath = FSUtils.getEntityPath(basePath, fromStoragePath);
     }
     if (FSUtils.exists(sourcePath)) {
-      FSUtils.copy(sourcePath, toPath, false);
+      FSUtils.copy(sourcePath, toPath, replaceExisting);
     }
   }
 

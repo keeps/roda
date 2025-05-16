@@ -181,7 +181,7 @@ public class PreservationEventController implements PreservationEventRestService
       StreamResponse response = preservationEventService.retrievePreservationEventFile(preservationEvent,
         requestContext);
 
-      return ApiUtils.rangeResponse(headers, response.getStream());
+      return ApiUtils.okResponse(response);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
@@ -219,7 +219,8 @@ public class PreservationEventController implements PreservationEventRestService
       StreamResponse response = preservationEventService.retrievePreservationEventDetails(preservationEvent,
         requestContext, locale);
 
-      return ApiUtils.rangeResponse(headers, response.getStream());
+      // Nao precisa de range response
+      return ApiUtils.okResponse(response);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);

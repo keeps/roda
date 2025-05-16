@@ -131,7 +131,7 @@ public class SyncUtils {
 
       for (IsIndexed object : indexedObject) {
         final String filename = object.getId() + fileExtension;
-        model.copyObjectFromContainer(containerClass, filename, destinationPath);
+        model.exportToPath(containerClass, filename, , destinationPath, );
       }
       return true;
     }
