@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 
-@WebServlet(urlPatterns = "/info", loadOnStartup = 1)
 public class RodaWuiServlet extends HttpServlet {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaWuiServlet.class);
   @Serial

@@ -128,16 +128,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public AIP retrieveAIP(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-
     registerOperationForAIP(aipId, TransactionalModelOperationLog.OperationType.READ);
-
-    AIP aip;
-    try {
-      aip = stagingModelService.retrieveAIP(aipId);
-    } catch (NotFoundException e) {
-      aip = mainModelService.retrieveAIP(aipId);
-    }
-    return aip;
+    return getModelService().retrieveAIP(aipId);
   }
 
   @Override
@@ -996,6 +988,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public void addLogEntry(LogEntry logEntry, Path logDirectory, boolean notify)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    // TODO: review this, check the JsonUtils methods to add support to storage
+    // service
     registerOperationForLogEntry(logEntry.getUUID(), TransactionalModelOperationLog.OperationType.CREATE);
     getModelService().addLogEntry(logEntry, logDirectory, notify);
   }
@@ -1510,8 +1504,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     if (representationId == null) {
       registerOperationForAIP(aipId, TransactionalModelOperationLog.OperationType.READ);
-    }
-    else {
+    } else {
       registerOperationForRepresentation(aipId, representationId, TransactionalModelOperationLog.OperationType.READ);
     }
     return getModelService().countDocumentationFiles(aipId, representationId);
@@ -1529,8 +1522,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     if (representationId == null) {
       registerOperationForAIP(aipId, TransactionalModelOperationLog.OperationType.READ);
-    }
-    else {
+    } else {
       registerOperationForRepresentation(aipId, representationId, TransactionalModelOperationLog.OperationType.READ);
     }
     return getModelService().countSchemaFiles(aipId, representationId);
@@ -2182,7 +2174,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public Date retrievePreservationMetadataCreationDate(PreservationMetadata pm) throws RequestNotValidException, GenericException {
+  public Date retrievePreservationMetadataCreationDate(PreservationMetadata pm)
+    throws RequestNotValidException, GenericException {
     return getModelService().retrievePreservationMetadataCreationDate(pm);
   }
 
@@ -2473,12 +2466,12 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   private void registerOperationForAIP(String aipID, TransactionalModelOperationLog.OperationType operation) {
-    acquireLock(AIP.class, aipID);
+    acquireLock(AIP.class, aipID, operation);
     registerOperation(AIP.class, Arrays.asList(aipID), operation);
   }
 
   private void registerOperationForRelatedAIP(String aipID, TransactionalModelOperationLog.OperationType operation) {
-    acquireLock(AIP.class, aipID);
+    acquireLock(AIP.class, aipID, operation);
     if (operation != TransactionalModelOperationLog.OperationType.READ) {
       registerOperation(AIP.class, Arrays.asList(aipID), TransactionalModelOperationLog.OperationType.UPDATE);
     } else {
@@ -2574,7 +2567,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   private void registerOperationForPreservationMetadata(String aipID, String representationId, List<String> path,
     String fileID, String preservationID, TransactionalModelOperationLog.OperationType operation) {
     if (aipID == null) {
-      acquireLock(PreservationMetadata.class, preservationID);
+      acquireLock(PreservationMetadata.class, preservationID, operation);
       registerOperation(PreservationMetadata.class, Arrays.asList(preservationID), operation);
     } else if (representationId == null) {
       registerOperationForRelatedAIP(aipID, operation);
@@ -2599,12 +2592,12 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   private void registerOperationForDIP(String dipID, TransactionalModelOperationLog.OperationType operation) {
-    acquireLock(DIP.class, dipID);
+    acquireLock(DIP.class, dipID, operation);
     registerOperation(LogEntry.class, Arrays.asList(dipID), operation);
   }
 
   private void registerOperationForLogEntry(String logEntryID, TransactionalModelOperationLog.OperationType operation) {
-    acquireLock(LogEntry.class, logEntryID);
+    acquireLock(LogEntry.class, logEntryID, operation);
     registerOperation(LogEntry.class, Arrays.asList(logEntryID), operation);
   }
 
@@ -2612,6 +2605,12 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog.OperationType operation) {
     if (ids == null || ids.isEmpty()) {
       throw new IllegalArgumentException("Object IDs cannot be null or a empty list");
+    }
+
+    if (operation == TransactionalModelOperationLog.OperationType.READ) {
+      // TODO: add a configuration to allow logging the read operation for debugging
+      // purposes
+      return;
     }
 
     Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, ids);
@@ -2637,9 +2636,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     }
   }
 
-  private <T extends IsRODAObject> void acquireLock(Class<T> objectClass, String id) {
+  private <T extends IsRODAObject> void acquireLock(Class<T> objectClass, String id,
+    TransactionalModelOperationLog.OperationType operation) {
     if (id == null) {
       throw new IllegalArgumentException("Object ID cannot be null");
+    }
+
+    if (operation == TransactionalModelOperationLog.OperationType.READ) {
+      // DO NOT acquire lock for READ operation
+      return;
     }
 
     if (!isLockableClass(objectClass)) {
