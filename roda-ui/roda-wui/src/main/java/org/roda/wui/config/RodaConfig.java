@@ -37,16 +37,16 @@ public class RodaConfig {
     return new ServletListenerRegistrationBean<>(new ContextListener());
   }
 
-//  @Bean
-//  public ServletRegistrationBean<HttpServlet> initService() {
-//    ServletRegistrationBean<HttpServlet> bean = new ServletRegistrationBean<>();
-//    final RodaWuiServlet servlet = new RodaWuiServlet();
-//    beanFactory.autowireBean(servlet);
-//    bean.setServlet(servlet);
-//    bean.addUrlMappings("/info");
-//    bean.setLoadOnStartup(1);
-//    return bean;
-//  }
+  @Bean
+  public ServletRegistrationBean<HttpServlet> initService() {
+    ServletRegistrationBean<HttpServlet> bean = new ServletRegistrationBean<>();
+    final RodaWuiServlet servlet = new RodaWuiServlet();
+    beanFactory.autowireBean(servlet);
+    bean.setServlet(servlet);
+    bean.addUrlMappings("/info");
+    bean.setLoadOnStartup(1);
+    return bean;
+  }
 
   @Bean
   public FilterRegistrationBean<OnOffFilter> internalWebAuthFilter() {

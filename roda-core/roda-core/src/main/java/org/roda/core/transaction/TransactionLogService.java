@@ -41,13 +41,13 @@ public class TransactionLogService {
 
   @Transactional
   public void registerStoragePathOperation(String transactionId, StoragePath storagePath,
-    TransactionalStoragePathOperationLog.OperationType operation) throws RODATransactionException {
+                                           TransactionalStoragePathOperationLog.OperationType operation, String version) throws RODATransactionException {
     if (operation == TransactionalStoragePathOperationLog.OperationType.READ) {
       // TODO: add a configuration to allow logging the read operation for debugging purposes
       return;
     }
     TransactionLog transactionLog = getTransactionLogById(transactionId);
-    transactionLog.addStoragePath(storagePath, operation);
+    transactionLog.addStoragePath(storagePath, operation, version);
     transactionLogRepository.save(transactionLog);
   }
 

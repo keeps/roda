@@ -34,16 +34,19 @@ public class TransactionContextFactory {
     this.transactionLogService = transactionLogService;
   }
 
-  public TransactionalContext create(TransactionLog transactionLog) throws RODATransactionException {
-    TransactionalStorageService storageService = createTransactionalStorageService(transactionLog);
-    TransactionalModelService modelService = createTransactionalModelService(storageService, transactionLog);
+  public TransactionalContext create(TransactionLog transactionLog, ModelService mainModelService)
+    throws RODATransactionException {
+    TransactionalStorageService storageService = createTransactionalStorageService(mainModelService.getStorage(),
+      transactionLog);
+    TransactionalModelService modelService = createTransactionalModelService(mainModelService, storageService,
+      transactionLog);
     IndexService indexService = createTransactionalIndexService(modelService);
 
     return new TransactionalContext(transactionLog, storageService, modelService, indexService);
   }
 
-  private TransactionalStorageService createTransactionalStorageService(TransactionLog transactionLog)
-    throws RODATransactionException {
+  private TransactionalStorageService createTransactionalStorageService(StorageService mainStorageService,
+    TransactionLog transactionLog) throws RODATransactionException {
 
     Path stagingStoragePath = Paths.get(configurationManager.getRodaConfiguration()
       .getString(RodaConstants.CORE_STAGING_STORAGE_PATH, configurationManager.getStagingStoragePath().toString()));
@@ -59,7 +62,7 @@ public class TransactionContextFactory {
 
       try {
         StorageService staging = new FileStorageService(transactionalStoragePath, false, null, false);
-        return new DefaultTransactionalStorageService(RodaCoreFactory.getStorageService(), staging, transactionLog,
+        return new DefaultTransactionalStorageService(mainStorageService, staging, transactionLog,
           transactionLogService);
       } catch (GenericException e) {
         throw new RODATransactionException("Error creating staging storage service", e);
@@ -69,12 +72,12 @@ public class TransactionContextFactory {
     }
   }
 
-  private TransactionalModelService createTransactionalModelService(StorageService storageService,
-    TransactionLog transactionLog) {
+  private TransactionalModelService createTransactionalModelService(ModelService mainModelService,
+    StorageService storageService, TransactionLog transactionLog) {
     ModelService stagingModelService = new DefaultModelService(storageService, RodaCoreFactory.getEventsManager(),
       RodaCoreFactory.getNodeType(), RodaCoreFactory.getInstanceId());
 
-    return new DefaultTransactionalModelService(RodaCoreFactory.getModelService(), stagingModelService, transactionLog,
+    return new DefaultTransactionalModelService(mainModelService, stagingModelService, transactionLog,
       transactionLogService);
   }
 

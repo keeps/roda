@@ -41,8 +41,11 @@ public class TransactionalStoragePathOperationLog implements Serializable {
   @JoinColumn(name = "transaction_id", nullable = false)
   private TransactionLog transactionLog;
 
-  @Column(name = "storage_path", length = 255)
+  @Column(name = "storage_path", nullable = false, length = 255)
   private String storagePath;
+
+  @Column(name = "version", length = 255)
+  private String version;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "operation_type", nullable = false, length = 20)
@@ -54,9 +57,10 @@ public class TransactionalStoragePathOperationLog implements Serializable {
   public TransactionalStoragePathOperationLog() {
   }
 
-  public TransactionalStoragePathOperationLog(StoragePath storagePath, OperationType operationType) {
+  public TransactionalStoragePathOperationLog(StoragePath storagePath, OperationType operationType, String version) {
     this.storagePath = storagePath.toString();
     this.operationType = operationType;
+    this.version = version;
     this.createdAt = LocalDateTime.now();
   }
 
@@ -70,6 +74,10 @@ public class TransactionalStoragePathOperationLog implements Serializable {
 
   public OperationType getOperationType() {
     return operationType;
+  }
+
+  public String getVersion() {
+    return version;
   }
 
   @Override

@@ -4944,7 +4944,7 @@ public class DefaultModelService implements ModelService {
 
   @Override
   public Date retrievePreservationMetadataCreationDate(PreservationMetadata pm) throws RequestNotValidException, GenericException {
-    return storage.getCreationDate(ModelUtils.getPreservationEventStoragePath(pm.getFileId()));
+    return storage.getCreationDate(ModelUtils.getPreservationMetadataStoragePath(pm));
   }
 
   // Observable methods

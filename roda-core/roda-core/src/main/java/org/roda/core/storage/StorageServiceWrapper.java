@@ -251,4 +251,11 @@ public class StorageServiceWrapper implements StorageService {
   public Date getCreationDate(StoragePath storagePath) throws GenericException {
     return storageService.getCreationDate(storagePath);
   }
+
+  @Override
+  public void importBinaryVersion(StorageService fromService, StoragePath storagePath, String version)
+    throws AlreadyExistsException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    storageService.importBinaryVersion(fromService, storagePath, version);
+  }
 }

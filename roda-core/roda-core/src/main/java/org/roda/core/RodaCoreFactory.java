@@ -433,6 +433,9 @@ public class RodaCoreFactory {
         instantiateStorageAndModel();
         LOGGER.debug("Finished instantiating storage & model");
 
+        instantiateTransactionManager(nodeType);
+        LOGGER.debug("Finished instantiating transaction manager");
+
         // initialize disposal bin directory
         initializeDisposalBinDirectory();
         LOGGER.debug("Finished instantiating disposal bin directory");
@@ -897,6 +900,21 @@ public class RodaCoreFactory {
       throw new GenericException();
     }
 
+  }
+
+  private static void instantiateTransactionManager(NodeType nodeType) throws GenericException {
+    if(nodeType.equals(NodeType.TEST)) {
+      //TODO: Handle test mode
+      return;
+    }
+    if (SpringContext.isContextInitialized()) {
+      RODATransactionManager = SpringContext.getBean(RODATransactionManager.class);
+      RODATransactionManager.setMainModelService(model);
+      RODATransactionManager.setNodeType(RodaCoreFactory.nodeType);
+    } else {
+      throw new GenericException(
+        "Unable to instantiate RODA transaction manager, because Spring context is not initialized");
+    }
   }
 
   public static RODATransactionManager getTransactionManager() {
@@ -1427,14 +1445,17 @@ public class RodaCoreFactory {
     TransferUpdateStatus.getInstance().setUpdatingStatus(folderRelativePath, isUpdating);
   }
 
+  @Deprecated
   public static StorageService getStorageService() {
     return storage;
   }
 
+  @Deprecated
   public static ModelService getModelService() {
     return model;
   }
 
+  @Deprecated
   public static IndexService getIndexService() {
     return index;
   }
