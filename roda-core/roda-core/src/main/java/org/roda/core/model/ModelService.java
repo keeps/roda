@@ -994,6 +994,9 @@ public interface ModelService extends ModelObservable {
     String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException;
 
+  void exportToPath(LiteRODAObject lite, Path toPath, boolean replaceExisting, String... fromPathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException;
+
   ConsumesOutputStream exportObjectToStream(IsRODAObject object, String... pathPartials)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
@@ -1013,6 +1016,8 @@ public interface ModelService extends ModelObservable {
 
   String getObjectPathAsString(IsRODAObject object, boolean skipContainer) throws RequestNotValidException;
 
-  String getObjectPathAsString(LiteRODAObject object, boolean skipContainer)
+  String getObjectPathAsString(LiteRODAObject lite, boolean skipContainer)
     throws RequestNotValidException, GenericException;
+
+  boolean existsInStorage(LiteRODAObject lite, String... pathPartials) throws RequestNotValidException, GenericException;
 }

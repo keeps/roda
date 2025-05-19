@@ -106,6 +106,6 @@ public class RepositoryEventPackagePlugin extends RodaEntityPackagesPlugin<Index
 
     Path eventPath = destinationPath.resolve(eventFile);
 
-    model.exportToPath(IndexedPreservationEvent.class, eventFile, , eventPath, );
+    model.exportToPath(event, eventPath, false);
   }
 }

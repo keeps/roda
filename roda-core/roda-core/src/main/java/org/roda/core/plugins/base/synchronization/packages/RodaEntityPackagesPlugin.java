@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.base.synchronization.packages;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -168,7 +169,7 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
       outcomeText = "Package created with " + totalCount + " item(s) of entity " + getEntity();
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
     } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException
-      | AlreadyExistsException e) {
+      | AlreadyExistsException | IOException e) {
       LOGGER.error("Error on create package for entity {}", getEntity(), e);
       state = PluginState.FAILURE;
       jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -195,7 +196,7 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
 
   protected abstract void createPackage(IndexService index, ModelService model, IterableIndexResult objectList)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
-    AlreadyExistsException;
+    AlreadyExistsException, IOException;
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {

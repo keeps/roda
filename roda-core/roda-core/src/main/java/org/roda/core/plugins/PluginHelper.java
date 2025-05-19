@@ -112,7 +112,6 @@ import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
@@ -1163,13 +1162,15 @@ public final class PluginHelper {
     List<LinkingIdentifier> agentIds = new ArrayList<>();
     String agentId = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
       RODAInstanceUtils.getLocalInstanceIdentifier());
-    DirectResourceAccess agentResource = model.getDirectAccess(IndexedPreservationAgent.class, agentId,
-      RodaConstants.PREMIS_SUFFIX);
+    Optional<LiteRODAObject> agentLite = LiteRODAObjectFactory.get(PreservationMetadata.class, agentId);
+    if (agentLite.isEmpty()) {
+      throw new RequestNotValidException("Could not get LITE for agent with ID: " + agentId);
+    }
     LinkingIdentifier linkingIdentifierPlugin = new LinkingIdentifier();
     linkingIdentifierPlugin.setValue(agentId);
 
     try {
-      if (agentResource.exists()) {
+      if (model.existsInStorage(agentLite.get())) {
         PremisV3Utils.createPremisAgentBinary(plugin, model, true);
       }
       agentIds.add(linkingIdentifierPlugin);
@@ -1247,9 +1248,13 @@ public final class PluginHelper {
     IndexService index, List<LinkingIdentifier> agentIds, List<JobUserDetails> jobUserDetails) {
 
     try {
-      DirectResourceAccess userAgentResource = model.getDirectAccess(IndexedPreservationAgent.class,
-        linkingIdentifierAgent.getValue(), RodaConstants.PREMIS_SUFFIX);
-      if (userAgentResource.exists()) {
+      Optional<LiteRODAObject> agentLite = LiteRODAObjectFactory.get(IndexedPreservationAgent.class,
+        linkingIdentifierAgent.getValue());
+      if (agentLite.isEmpty()) {
+        throw new RequestNotValidException(
+          "Could not get LITE for agent with ID: " + linkingIdentifierAgent.getValue());
+      }
+      if (model.existsInStorage(agentLite.get())) {
         PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true,
           jobUserDetails);
         if (pm != null) {
