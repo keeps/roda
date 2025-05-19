@@ -101,6 +101,6 @@ public class DipPackagePlugin extends RodaEntityPackagesPlugin<DIP> {
 
     Path dipFilePath = destinationPath.resolve(RodaConstants.STORAGE_DIP_METADATA_FILENAME);
 
-    model.exportToPath(dip, RodaConstants.STORAGE_DIP_METADATA_FILENAME, , dipFilePath, );
+    model.exportToPath(dip, dipFilePath, false, RodaConstants.STORAGE_DIP_METADATA_FILENAME);
   }
 }
