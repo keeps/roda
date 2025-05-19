@@ -1265,7 +1265,7 @@ button:after {
 }
 
 .btn-stamp:after {
-    content: "\e939";
+    content: "\e982";
 }
 
 .btn-book:after {
@@ -1273,7 +1273,7 @@ button:after {
 }
 
 .btn-home:after {
-    content: "\e920";
+    content: "\e88a";
 }
 
 .btn-clear:after {
