@@ -567,6 +567,13 @@
             <version>4.3.0</version>
         </dependency>
 
+        <!-- PDF.JS: https://github.com/webjars/pdf-js/ -->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>pdf-js</artifactId>
+            <version>5.1.91</version>
+        </dependency>
+
         <!-- File upload -->
         <dependency>
             <groupId>org.webjars.bower</groupId>
