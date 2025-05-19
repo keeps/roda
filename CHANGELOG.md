@@ -1,5 +1,14 @@
 # Changelog
 
+## v5.7.5 (19/05/2025)
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.4 (29/04/2025)
 #### Enhancements 
 - Improve support for E-ARK SIP administrative metadata (amdSec) #3380
@@ -410,48 +419,3 @@ Install for demonstration:
 ```
 docker pull ghcr.io/keeps/roda:v4.5.5
 ```
----
-
-## v5.0.0 (13/03/2023)
-### :warning: Breaking Changes
-RODA  5.X will use Apache Solr 9 as indexing system. If you have an existing RODA implementation with Solr 8 you will need to [upgrade the Solr to version 9](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-9.html) and then rebuild all indexes on RODA.
-
-RODA 5.X docker now runs as the user roda (uid: 1000, gid: 1000) to improve security. This may affect you current implementation as it may lack enough permissions to access the storage. To fix, change the owner or permissions of the files and directories in the mapped volumes or binded folders. Alternatively, you can [change the RODA user uid](https://docs.docker.com/compose/compose-file/#user) in docker compose. 
-
----
-
-#### New features:
-
-- Distributed Digital Preservation #1933 #1934 #1935
-- Added authentication via Access Token (for REST-API)
-- Support binaries as a reference (shallow SIP/AIP) #786
-- Adds list of all available plugins (see [RODA Marketplace](https://market.roda-community.org/)) #2323
-- Supports verified plugins #2323
-- New Swedish translation of the Web interface :sweden:
-- Updates to Hungarian translation of the Web interface :hungary:
-
-#### Changes:
-
-- Upgraded from Java 8 to Java 17
-- Upgraded from Apache Solr 8 to Apache Solr 9
-- Upgraded from Apache Tomcat 8.5 to Apache Tomcat 9
-
-#### Security:
-
-- RODA docker now runs as roda (uid: 1000) instead of root
-- (Applicational) Users can now have JWT access tokens to access the REST-API
-- Option to restrict user web authentication to delegated (CAS) or JWT access tokens
-- Several dependency upgrades to fix security vulnerabilities
-- CVE-2016-1000027 (spring-web 5.3.24): RODA does not use the HTTPInvokerServiceExporter or RemoteInvocationSerializingExporter classes, therefore we are [NOT affected](https://github.com/spring-projects/spring-framework/issues/24434#issuecomment-744519525) by this vulnerability 
-- CVE-2022-1471 (snake-yaml 1.33): RODA does not use [empty constructor](https://snyk.io/blog/unsafe-deserialization-snakeyaml-java-cve-2022-1471/) so we are NOT affected by this vulnerability.
-
----
-
-We would like to thank the contributions of:
-- [WhiteRed](https://www.whitered.se/) with the Swedish translation :sweden:
-- Panka Dióssy from the [National Laboratory for Digital Heritage](https://dh-lab.hu/), with updates to the Hungarian translation :hungary:
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
-
