@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -18,12 +19,14 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 
@@ -94,6 +97,11 @@ public class RiskIncidencePackagePlugin extends RodaEntityPackagesPlugin<RiskInc
 
   private void createRiskIncidenceBundle(ModelService model, String incidenceId)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException {
+    Optional<LiteRODAObject> incidenceLite = LiteRODAObjectFactory.get(RiskIncidence.class, incidenceId);
+    if (incidenceLite.isEmpty()) {
+      throw new RequestNotValidException("Could not get LITE for incidence " + incidenceId);
+    }
+
     String incidenceFile = incidenceId + RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
 
     Path destinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
@@ -101,6 +109,6 @@ public class RiskIncidencePackagePlugin extends RodaEntityPackagesPlugin<RiskInc
 
     Path incidencePath = destinationPath.resolve(incidenceFile);
 
-    model.exportToPath(RiskIncidence.class, incidenceFile, , incidencePath, );
+    model.exportToPath(incidenceLite.get(), incidencePath, false);
   }
 }

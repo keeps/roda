@@ -5563,6 +5563,12 @@ public class DefaultModelService implements ModelService {
     getStorage().copy(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
   }
 
+  public void exportToPath(LiteRODAObject lite, Path toPath, boolean replaceExisting, String... fromPathPartials)
+    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
+    StoragePath sourceObjectPath = DefaultStoragePath.parse(ModelUtils.getStoragePath(lite), fromPathPartials);
+    getStorage().copy(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
+  }
+
   @Override
   public ConsumesOutputStream exportObjectToStream(IsRODAObject object, String... objectPathPartials)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
@@ -5833,5 +5839,12 @@ public class DefaultModelService implements ModelService {
     throws RequestNotValidException, GenericException {
     StoragePath objectPath = ModelUtils.getStoragePath(lite);
     return getStorage().getStoragePathAsString(objectPath, skipContainer);
+  }
+
+  @Override
+  public boolean existsInStorage(LiteRODAObject lite, String... pathPartials)
+    throws RequestNotValidException, GenericException {
+    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(lite), pathPartials);
+    return getStorage().exists(storagePath);
   }
 }

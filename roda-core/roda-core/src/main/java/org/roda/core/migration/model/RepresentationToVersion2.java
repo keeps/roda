@@ -15,9 +15,13 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.migration.MigrationAction;
@@ -31,33 +35,37 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
 
   @Override
   public void migrate(ModelService model) {
-    try (CloseableIterable<OptionalWithCause<Representation>> representations = model.list(Representation.class)) {
-      for (OptionalWithCause<Representation> representation : representations) {
-        Path representationPath = model.getDirectAccess(representation).getPath();
+    try (CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs()) {
+      for (OptionalWithCause<AIP> aip : aips) {
+        if (aip.isPresent()) {
+          for (Representation representation : aip.get().getRepresentations()) {
+            Path representationPath = model.getDirectAccess(representation).getPath();
 
-        // TODO: Don't use DirectResourceAccess to get these file attributes
-        BasicFileAttributes attr = Files.readAttributes(representationPath, BasicFileAttributes.class);
-        Date createDate = new Date(attr.creationTime().toMillis());
-        Date updateDate = new Date(attr.lastModifiedTime().toMillis());
+              BasicFileAttributes attr = Files.readAttributes(representationPath, BasicFileAttributes.class);
+              Date createDate = new Date(attr.creationTime().toMillis());
+              Date updateDate = new Date(attr.lastModifiedTime().toMillis());
 
-        representation.setCreatedOn(createDate);
-        representation.setCreatedBy(aip.getCreatedBy());
-        representation.setUpdatedOn(updateDate);
-        representation.setUpdatedBy(aip.getUpdatedBy());
+              representation.setCreatedOn(createDate);
+              representation.setCreatedBy(aip.get().getCreatedBy());
+              representation.setUpdatedOn(updateDate);
+              representation.setUpdatedBy(aip.get().getUpdatedBy());
 
-        if (representation.isOriginal()) {
-          representation.setRepresentationStates(Arrays.asList(RepresentationState.ORIGINAL));
-        } else {
-          representation.setRepresentationStates(Arrays.asList(RepresentationState.OTHER));
+              if (representation.isOriginal()) {
+                representation.setRepresentationStates(Arrays.asList(RepresentationState.ORIGINAL));
+              } else {
+                representation.setRepresentationStates(Arrays.asList(RepresentationState.OTHER));
+              }
+            }
+
+            StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromObject(aip));
+            model.updateBinaryContent(aip.get(), payload, false, false);
+          } else {
+            LOGGER.warn("Could not get list an AIP");
+          }
         }
-      }
-
-      StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromObject(aip));
-      model.updateBinaryContent(aipLite.get(), payload, false, false);
-    } catch (RODAException ex) {
-      throw new RuntimeException(ex);
-    } catch (IOException ex) {
-      throw new RuntimeException(ex);
+      } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+        | IOException e) {
+        LOGGER.warn("Could not find AIPs", e);
     }
   }
 

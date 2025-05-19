@@ -18,6 +18,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteRODAObject;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.migration.MigrationAction;
 import org.roda.core.model.LiteRODAObjectFactory;
@@ -48,20 +49,11 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
 
   @Override
   public void migrate(ModelService model) throws RODAException {
-    try (DirectResourceAccess risksContainer = model.getDirectAccess(Risk.class);
-      CloseableIterable<DirectResourceAccess> risks = FSUtils.listDirectAccessResourceChildren(risksContainer, false)) {
-      for (DirectResourceAccess riskResource : risks) {
-        if (!riskResource.isDirectory()) {
-          String riskId = riskResource.getPath().getFileName().toString().replace(RodaConstants.RISK_FILE_EXTENSION,
-            "");
-          Optional<LiteRODAObject> riskLite = LiteRODAObjectFactory.get(Risk.class, riskId);
-          if (riskLite.isPresent()) {
-            Binary binary = model.getBinary(riskLite.get());
-            migrate(model, binary, riskLite.get());
-          }
-          else {
-            LOGGER.error("Could not migrate risk {} because it could not be made into a Lite", riskId);
-          }
+    try (CloseableIterable<OptionalWithCause<Risk>> risks = model.list(Risk.class)) {
+      for (OptionalWithCause<Risk> risk : risks) {
+        if (!model.hasDirectory(risk.get())) {
+          Binary binary = model.getBinary(risk.get());
+          migrate(model, binary, risk.get());
         }
       }
     } catch (IOException e) {
@@ -69,7 +61,7 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
     }
   }
 
-  private void migrate(ModelService model, Binary binary, LiteRODAObject riskLite) {
+  private void migrate(ModelService model, Binary binary, Risk risk) {
     try (InputStream inputStream = binary.getContent().createInputStream()) {
       JsonNode json = JsonUtils.parseJson(inputStream);
       if (json instanceof ObjectNode) {
@@ -79,7 +71,7 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
         StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromNode(obj));
         boolean asReference = false;
         boolean createIfNotExists = false;
-        model.updateBinaryContent(riskLite, payload, asReference, createIfNotExists);
+        model.updateBinaryContent(risk, payload, asReference, createIfNotExists);
       } else {
         LOGGER.error("Could not migrate risk {} because the JSON is not an object node", binary.getStoragePath());
       }

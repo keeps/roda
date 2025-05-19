@@ -150,11 +150,11 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
       Path submissionsPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
       Path aipMetadataPath = destinationPath.resolve(RodaConstants.STORAGE_AIP_METADATA_FILENAME);
 
-      model.exportToPath(aip, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION, , documentationPath, );
-      model.exportToPath(aip, RodaConstants.STORAGE_DIRECTORY_METADATA, , metadataPath, );
-      model.exportToPath(aip, RodaConstants.STORAGE_DIRECTORY_SCHEMAS, , schemasPath, );
-      model.exportToPath(aip, RodaConstants.STORAGE_DIRECTORY_SUBMISSION, , submissionsPath, );
-      model.exportToPath(aip, RodaConstants.STORAGE_AIP_METADATA_FILENAME, , aipMetadataPath, );
+      model.exportToPath(aip, documentationPath, false, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+      model.exportToPath(aip, metadataPath, false, RodaConstants.STORAGE_DIRECTORY_METADATA);
+      model.exportToPath(aip, schemasPath, false, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+      model.exportToPath(aip, submissionsPath, false, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+      model.exportToPath(aip, aipMetadataPath, false, RodaConstants.STORAGE_AIP_METADATA_FILENAME);
 
       for (Representation representation : aip.getRepresentations()) {
         Path repDataPath = Paths.get(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId(),
@@ -164,7 +164,7 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
         Path repMetadataPath = Paths.get(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId(),
           RodaConstants.STORAGE_DIRECTORY_METADATA);
         Path repMetadataDestinationPath = destinationPath.resolve(repMetadataPath);
-        model.exportToPath(aip, repMetadataPath.toString(), , repMetadataDestinationPath, );
+        model.exportToPath(aip, repMetadataDestinationPath, false, repMetadataPath.toString());
 
         addFilesToBundle(aip, representation, index, repDataDestinationPath);
       }

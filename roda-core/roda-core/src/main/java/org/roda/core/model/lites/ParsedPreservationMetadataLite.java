@@ -35,7 +35,13 @@ public class ParsedPreservationMetadataLite extends ParsedLite {
     super(dmLite.getInfo());
     type = IdUtils.getPreservationTypeFromId(LiteRODAObjectFactory.decodeId(split[split.length - 1]));
     id = LiteRODAObjectFactory.decodeId(split[split.length - 1]);
-    if (split.length == 3) {
+
+    if (split.length == 2) {
+      aipId = null;
+      representationId = null;
+      fileId = null;
+      fileDirectoryPath = null;
+    } else if (split.length == 3) {
       aipId = LiteRODAObjectFactory.decodeId(split[1]);
       representationId = null;
       fileId = null;

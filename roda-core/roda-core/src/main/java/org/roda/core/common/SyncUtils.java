@@ -130,8 +130,7 @@ public class SyncUtils {
       final ModelService model = RodaCoreFactory.getModelService();
 
       for (IsIndexed object : indexedObject) {
-        final String filename = object.getId() + fileExtension;
-        model.exportToPath(containerClass, filename, , destinationPath, );
+        model.exportToPath(object, destinationPath, false);
       }
       return true;
     }
