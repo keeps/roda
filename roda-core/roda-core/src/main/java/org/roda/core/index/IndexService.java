@@ -7,10 +7,8 @@
  */
 package org.roda.core.index;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
@@ -430,42 +428,6 @@ public class IndexService {
       ret = observer.notificationCreatedOrUpdated(notification);
     }
     return ret;
-  }
-
-  public void reindexActionLogs()
-    throws GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-
-    try (CloseableIterable<Resource> logFiles = model.listLogFilesInStorage()) {
-      for (Resource logFile : logFiles) {
-        if (!logFile.isDirectory()) {
-          InputStream inputStream = ((Binary) logFile).getContent().createInputStream();
-          InputStreamReader reader = new InputStreamReader(inputStream);
-          reindexActionLog(reader);
-        }
-      }
-    } catch (IOException e) {
-      throw new GenericException("Error retrieving/processing logs from storage", e);
-    }
-  }
-
-  public void reindexActionLog(InputStreamReader reader) throws GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-
-    String line;
-    BufferedReader br = new BufferedReader(reader);
-    try {
-      while ((line = br.readLine()) != null) {
-        LogEntry entry = JsonUtils.getObjectFromJson(line, LogEntry.class);
-        if (entry != null) {
-          reindexActionLog(entry);
-        }
-      }
-      br.close();
-      reader.close();
-    } catch (IOException e) {
-      throw new GenericException("Error reading log", e);
-    }
   }
 
   public ReturnWithExceptions<Void, ModelObserver> reindexActionLog(LogEntry entry) {

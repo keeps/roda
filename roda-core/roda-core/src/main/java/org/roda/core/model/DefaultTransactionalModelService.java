@@ -1594,8 +1594,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public CloseableIterable<Resource> listLogFilesInStorage() {
-    registerOperation(LogEntry.class, List.of(), TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().listLogFilesInStorage();
+    return mainModelService.listLogFilesInStorage();
   }
 
   @Override
@@ -1960,13 +1959,6 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public <T extends IsRODAObject> Binary getBinary(Class<T> entityClass, String... pathPartials)
-    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    registerOperation(entityClass, List.of(), TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().getBinary(entityClass, pathPartials);
-  }
-
-  @Override
   public BinaryVersion getBinaryVersion(IsRODAObject object, String version, List<String> pathPartials)
     throws RequestNotValidException, NotFoundException, GenericException {
     registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
@@ -2080,27 +2072,6 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public DirectResourceAccess getDirectAccessToVersion(IsRODAObject object, String version, List<String> pathPartials)
-    throws RequestNotValidException, GenericException {
-    registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().getDirectAccessToVersion(object, version, pathPartials);
-  }
-
-  @Override
-  public DirectResourceAccess getDirectAccessToVersion(LiteRODAObject lite, String version, List<String> pathPartials)
-    throws RequestNotValidException, GenericException {
-    registerOperation(lite, TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().getDirectAccessToVersion(lite, version, pathPartials);
-  }
-
-  @Override
-  public <T extends IsRODAObject> DirectResourceAccess getDirectAccess(Class<T> entityClass, String... pathPartials)
-    throws RequestNotValidException {
-    registerOperation(entityClass, List.of(), TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().getDirectAccess(entityClass, pathPartials);
-  }
-
-  @Override
   public int importAll(IndexService index, FileStorageService fromStorage, boolean importJobs)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException {
@@ -2135,14 +2106,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public <T extends IsRODAObject> void exportToPath(Class<T> clazz, Path toPath, boolean replaceExisting, String... fromPathPartials)
-    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
-    registerOperation(clazz, List.of(fromPathPartials), TransactionalModelOperationLog.OperationType.READ);
-    getModelService().exportToPath(clazz, toPath, replaceExisting, fromPathPartials);
-  }
-
-  @Override
-  public <T extends IsRODAObject> void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting, String... fromPathPartials)
+  public void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting, String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
     registerOperation(object.getClass(), List.of(object.getId()), TransactionalModelOperationLog.OperationType.READ);
     getModelService().exportToPath(object, toPath, replaceExisting, fromPathPartials);
