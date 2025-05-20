@@ -915,9 +915,6 @@ public interface ModelService extends ModelObservable {
   Binary getBinary(LiteRODAObject lite, String... pathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
 
-  <T extends IsRODAObject> Binary getBinary(Class<T> entityClass, String... pathPartials)
-    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException;
-
   BinaryVersion getBinaryVersion(IsRODAObject object, String version, List<String> pathPartials)
     throws RequestNotValidException, NotFoundException, GenericException;
 
@@ -965,15 +962,6 @@ public interface ModelService extends ModelObservable {
   DirectResourceAccess getDirectAccess(LiteRODAObject liteObj, String... pathPartials)
     throws RequestNotValidException, GenericException;
 
-  DirectResourceAccess getDirectAccessToVersion(IsRODAObject obj, String version, List<String> pathPartials)
-    throws RequestNotValidException, GenericException;
-
-  DirectResourceAccess getDirectAccessToVersion(LiteRODAObject liteObj, String version, List<String> pathPartials)
-    throws RequestNotValidException, GenericException;
-
-  <T extends IsRODAObject> DirectResourceAccess getDirectAccess(Class<T> entityClass, String... pathPartials)
-    throws RequestNotValidException;
-
   int importAll(IndexService index, final FileStorageService fromStorage, final boolean importJobs)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException;
@@ -990,12 +978,7 @@ public interface ModelService extends ModelObservable {
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
     NotFoundException;
 
-  <T extends IsRODAObject> void exportToPath(Class<T> clazz, Path toPath, boolean replaceExisting,
-    String... fromPathPartials)
-    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException;
-
-  <T extends IsRODAObject> void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting,
-    String... fromPathPartials)
+  void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting, String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException;
 
   void exportToPath(LiteRODAObject lite, Path toPath, boolean replaceExisting, String... fromPathPartials)

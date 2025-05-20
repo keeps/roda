@@ -38,6 +38,7 @@ import org.hamcrest.collection.IsCollectionWithSize;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -47,6 +48,7 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -478,7 +480,7 @@ public class IndexServiceTest {
 
   @Test
   public void testReindexLogEntry()
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException, IOException {
     long number = 10L;
 
     for (int i = 0; i < number; i++) {
@@ -507,7 +509,12 @@ public class IndexServiceTest {
     index.commit(LogEntry.class);
 
     model.findOldLogsAndMoveThemToStorage(logPath, null);
-    index.reindexActionLogs();
+
+    try (CloseableIterable<OptionalWithCause<LogEntry>> logs = model.listLogEntries()) {
+      for (OptionalWithCause<LogEntry> log : logs) {
+        index.reindexActionLog(log.get());
+      }
+    }
 
     index.commit(LogEntry.class);
 
