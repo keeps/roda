@@ -5313,13 +5313,6 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public <T extends IsRODAObject> Binary getBinary(Class<T> entityClass, String... pathPartials)
-    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getContainerPath(entityClass), pathPartials);
-    return getStorage().getBinary(storagePath);
-  }
-
-  @Override
   public BinaryVersion getBinaryVersion(IsRODAObject object, String version, List<String> pathPartials)
     throws RequestNotValidException, NotFoundException, GenericException {
     StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object),
@@ -5430,29 +5423,8 @@ public class DefaultModelService implements ModelService {
     return getDirectAccess(liteObj, getStorage(), pathPartials);
   }
 
-  @Override
-  public DirectResourceAccess getDirectAccessToVersion(IsRODAObject obj, String version, List<String> pathPartials)
-    throws RequestNotValidException, GenericException {
-    StoragePath basePath = ModelUtils.getStoragePath(obj);
-    StoragePath fullPath = DefaultStoragePath.parse(basePath, pathPartials.toArray(new String[0]));
-    return getStorage().getDirectAccessToVersion(fullPath, version);
-  }
-
-  @Override
-  public DirectResourceAccess getDirectAccessToVersion(LiteRODAObject lite, String version, List<String> pathPartials)
-    throws RequestNotValidException, GenericException {
-    StoragePath basePath = ModelUtils.getStoragePath(lite);
-    StoragePath fullPath = DefaultStoragePath.parse(basePath, pathPartials.toArray(new String[0]));
-    return getStorage().getDirectAccessToVersion(fullPath, version);
-  }
-
-  @Override
-  public <T extends IsRODAObject> DirectResourceAccess getDirectAccess(Class<T> entityClass, String... pathPartials)
-    throws RequestNotValidException {
-    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getContainerPath(entityClass), pathPartials);
-    return getStorage().getDirectAccess(storagePath);
-  }
-
+  // TODO: Review these import methods to see if IndexService really needs to be
+  // in Model
   @Override
   public int importAll(IndexService index, final FileStorageService fromStorage, final boolean importJobs)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
@@ -5562,15 +5534,7 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public <T extends IsRODAObject> void exportToPath(Class<T> clazz, Path toPath, boolean replaceExisting,
-    String... fromPathPartials)
-    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
-    StoragePath sourceObjectPath = DefaultStoragePath.parse(ModelUtils.getContainerPath(clazz), fromPathPartials);
-    getStorage().copy(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
-  }
-
-  @Override
-  public <T extends IsRODAObject> void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting,
+  public void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting,
     String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
     StoragePath sourceObjectPath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object), fromPathPartials);
@@ -5702,73 +5666,6 @@ public class DefaultModelService implements ModelService {
   public ConsumesOutputStream exportObjectToZip(LiteRODAObject lite, String name, boolean addTopDirectory,
     String... pathPartials) throws RequestNotValidException, GenericException {
     final StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(lite), pathPartials);
-    final String fileName = name == null ? storagePath.getName() : name;
-
-    return new ConsumesOutputStream() {
-      @Override
-      public void consumeOutputStream(OutputStream out) throws IOException {
-
-        try (BufferedOutputStream bos = new BufferedOutputStream(out);
-          ZipOutputStream zos = new ZipOutputStream(bos);
-          CloseableIterable<Resource> resources = getStorage().listResourcesUnderDirectory(storagePath, true);) {
-          int basePathSize = storagePath.asList().size();
-
-          for (Resource r : resources) {
-            List<String> pathAsList = r.getStoragePath().asList();
-            List<String> relativePathAsList = pathAsList.subList(basePathSize, pathAsList.size());
-            String entryPath = relativePathAsList.stream().collect(Collectors.joining(ZIP_PATH_DELIMITER));
-            String entryDirectoryPath;
-            if (addTopDirectory) {
-              entryDirectoryPath = storagePath.getName() + ZIP_PATH_DELIMITER + entryPath;
-            } else {
-              entryDirectoryPath = entryPath;
-            }
-            if (r.isDirectory()) {
-              // adding a directory
-              entryDirectoryPath += ZIP_PATH_DELIMITER;
-              zos.putNextEntry(new ZipEntry(entryDirectoryPath));
-              zos.closeEntry();
-            } else {
-              // adding a file
-              ZipEntry entry = new ZipEntry(entryDirectoryPath);
-              zos.putNextEntry(entry);
-              Binary binary = getStorage().getBinary(r.getStoragePath());
-              try (InputStream inputStream = binary.getContent().createInputStream()) {
-                IOUtils.copy(inputStream, zos);
-              }
-              zos.closeEntry();
-            }
-          }
-        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-          throw new IOException(e);
-        }
-      }
-
-      @Override
-      public String getFileName() {
-        return fileName + ZIP_FILE_NAME_EXTENSION;
-      }
-
-      @Override
-      public String getMediaType() {
-        return ZIP_MEDIA_TYPE;
-      }
-
-      @Override
-      public Date getLastModified() {
-        return null;
-      }
-
-      @Override
-      public long getSize() {
-        return -1;
-      }
-    };
-  }
-
-  private ConsumesOutputStream exportObjectToZipRangeStream(IsRODAObject object, String name, boolean addTopDirectory,
-    String... pathPartials) throws RequestNotValidException {
-    final StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object), pathPartials);
     final String fileName = name == null ? storagePath.getName() : name;
 
     return new ConsumesOutputStream() {

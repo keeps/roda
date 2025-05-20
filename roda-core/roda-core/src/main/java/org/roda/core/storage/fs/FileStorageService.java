@@ -646,40 +646,6 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public DirectResourceAccess getDirectAccessToVersion(final StoragePath storagePath, String version)
-    throws GenericException, RequestNotValidException {
-    if (historyDataPath == null) {
-      throw new GenericException("Skipping get binary version because no history folder is defined!");
-    }
-    // TODO disable write access to resource
-    // for UNIX programs using user with read-only permissions
-    // for Java programs using SecurityManager and Policy
-    Path versionPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
-
-    return new DirectResourceAccess() {
-      @Override
-      public Path getPath() {
-        return versionPath;
-      }
-
-      @Override
-      public boolean isDirectory() {
-        return FSUtils.isDirectory(getPath());
-      }
-
-      @Override
-      public boolean exists() {
-        return FSUtils.exists(getPath());
-      }
-
-      @Override
-      public void close() throws IOException {
-        // nothing to do
-      }
-    };
-  }
-
-  @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, NotFoundException {
     if (historyDataPath == null) {
