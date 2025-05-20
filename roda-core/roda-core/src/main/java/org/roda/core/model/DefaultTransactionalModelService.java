@@ -82,6 +82,7 @@ import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
@@ -1589,6 +1590,12 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public CloseableIterable<OptionalWithCause<LogEntry>> listLogEntries(int daysToIndex) {
     return getModelService().listLogEntries(daysToIndex);
+  }
+
+  @Override
+  public CloseableIterable<Resource> listLogFilesInStorage() {
+    registerOperation(LogEntry.class, List.of(), TransactionalModelOperationLog.OperationType.READ);
+    return getModelService().listLogFilesInStorage();
   }
 
   @Override

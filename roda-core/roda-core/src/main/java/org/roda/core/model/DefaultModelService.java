@@ -3875,6 +3875,20 @@ public class DefaultModelService implements ModelService {
     return CloseableIterables.concat(inStorage, notStorage);
   }
 
+  @Override
+  public CloseableIterable<Resource> listLogFilesInStorage() {
+    CloseableIterable<Resource> inStorage = null;
+
+    try {
+      inStorage = getStorage()
+        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), false);
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      LOGGER.error("Error getting action log from storage", e);
+    }
+
+    return inStorage;
+  }
+
   private boolean isToIndex(String fileName, int daysToIndex) {
     boolean isToIndex = false;
     String dateFromFileName = fileName.replaceFirst("([0-9]{4}-[0-9]{2}-[0-9]{2}).*", "$1");

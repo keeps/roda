@@ -433,19 +433,15 @@ public class IndexService {
   }
 
   public void reindexActionLogs()
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    try (CloseableIterable<OptionalWithCause<LogEntry>> logs = model.listLogEntries()) {
-      for (OptionalWithCause<LogEntry> log : logs) {
-        if (log.isPresent()) {
-          if (!model.hasDirectory(log.get())) {
-            Binary b = model.getBinary(log.get());
-            InputStreamReader reader = new InputStreamReader(b.getContent().createInputStream());
-            reindexActionLog(reader);
-          }
-        } else {
-          LOGGER.error("Cannot log entry", log.getCause());
+    try (CloseableIterable<Resource> logFiles = model.listLogFilesInStorage()) {
+      for (Resource logFile : logFiles) {
+        if (!logFile.isDirectory()) {
+          InputStream inputStream = ((Binary) logFile).getContent().createInputStream();
+          InputStreamReader reader = new InputStreamReader(inputStream);
+          reindexActionLog(reader);
         }
       }
     } catch (IOException e) {
