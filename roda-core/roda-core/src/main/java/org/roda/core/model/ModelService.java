@@ -75,6 +75,7 @@ import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
 
@@ -731,6 +732,8 @@ public interface ModelService extends ModelObservable {
   CloseableIterable<OptionalWithCause<LogEntry>> listLogEntries();
 
   CloseableIterable<OptionalWithCause<LogEntry>> listLogEntries(int daysToIndex);
+
+  CloseableIterable<Resource> listLogFilesInStorage();
 
   boolean hasObjects(Class<? extends IsRODAObject> objectClass);
 

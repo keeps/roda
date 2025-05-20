@@ -918,9 +918,6 @@ public final class ModelUtils {
     if (object instanceof DIP dip) {
       return getDIPStoragePath(dip.getId());
     }
-    if (object instanceof LogEntry log) {
-      return getLogStoragePath(log.getUUID());
-    }
     throw new RequestNotValidException("Cannot get storage path for entity using only its object: "
       + object.getClass().getSimpleName() + " " + object.getId());
   }
