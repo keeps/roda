@@ -1,56 +1,106 @@
 # Pre-ingest
 
-The pre-ingest process depicts the ability of a Producer to create Submission Information Packages (SIP) containing both data and metadata (in a well-defined structure) in order to submit them to the repository for ingest. The SIPs created are expected to comply to the policies established by (or negotiated with) the repository. 
+The **pre-ingest** phase refers to the preparation activities carried out by a _Producer_ before submitting digital materials to a repository. Its main goal is to ensure that **Submission Information Packages (SIPs)** are created in accordance with the repository's requirements, thereby facilitating a smooth and reliable ingest process.
 
-The pre-ingest process usually comprises some or all of the following activities:
+This phase typically includes the following activities:
 
-## Submission agreement
+## Submission Agreement
 
-This activity consists of the definition of the terms, pre-conditions and requirements for content, and accompanying information (e.g. metadata, documentation, contracts, etc.), to be sent to the repository by the Producer. It is materialised in a written agreement between the Producer and the Repository that specifies the type of content and all the legal and technical requirements that both parties are expected to comply.
+The **Submission Agreement** defines the formal relationship between the _Producer_ and the _Repository_. It establishes:
 
-## Classification plan
+- The types of content to be submitted;
+- The legal, technical, and procedural requirements;
+- The responsibilities of each party;
+- The expected structure and format of the SIPs.
 
-During the signing of the submission agreement, the Producer must have agreed to a base Classification Scheme (or list of Collections) on which she will have explicit authorisation to deposit new information.
+This agreement is typically documented in writing and must be accepted by both parties before content can be submitted.
 
-The base Classification Scheme is usually created by the Repository and can be downloaded in this section in machine readable format. The downloaded file can be loaded into RODA-in to better arrange and prepare Submission Information Packages before transferring them to the repository to be ingested.
+## Content Organisation
 
-[Download classification scheme](/api/v2/classification-plans) (note: downloading the classification scheme requires a RODA instance)
+As part of the submission agreement process, the _Producer_ is usually authorised to deposit content into specific areas of the repository, based on a **classification plan** (e.g. a hierarchical structure used to organise content within the repository).
 
-## Submission Information Packages (SIP)
+The repository provides a base **Classification Scheme** in machine-readable format, which helps Producers prepare their SIPs in line with the repository's internal organisation.
 
-This activity consists of preparing of one or more Submission Information Packages (SIP) according to the technical and non-technical requirements defined on the Submission Agreement. To facilitate the creation of SIPs, Producers may take advantage of the RODA-in tool. 
+This file can be downloaded and imported into **RODA-in**, a tool designed to assist in the preparation and structuring of SIPs.
 
-The tool and its documentation are available at [http://rodain.roda-community.org](http://rodain.roda-community.org).
+📎 [Download classification scheme](/api/v2/classification-plans)
 
+Óptimo. Aqui está a secção revista e integrada no texto anterior, com linguagem clara, alinhada com o OAIS, e actualizada com boas práticas actuais. Inclui agora uma nova subseção sobre ferramentas de linha de comandos e bibliotecas para criação de SIPs:
 
-## Transfer of materials
+## SIP Preparation
 
-This activity consists of the transfer of Submission Information Packages (SIP) from the Producer to the Repository. SIPs are temporarily stored on a quarantine area waiting to be processed by the repository.
+The _Producer_ is responsible for creating one or more **Submission Information Packages (SIPs)**, in accordance with the specifications set out in the submission agreement. Each SIP must:
 
-There are several ways Producers can use to transfer their SIPs to the repository. These include, but are not limited to the following options:
+- Contain all required content and associated metadata;
+- Follow the structural and technical guidelines agreed upon;
+- Be packaged in a format accepted by the repository (e.g. E-ARK, BagIt).
 
-### HTTP transfer
+To support this task, different tools are available depending on the Producer’s workflow preferences:
 
-1. Connect to the repository Web site and use the credentials provided in order to log in.
-2. Access the menu Ingest/Transfer and enter the folder with your username (or create the folder if necessary).
-3. Upload all your SIPs to the new folder.
-4. Inform the Repository that the material is ready to be ingested.
+### RODA-in
 
-### FTP transfer
+For users preferring a graphical interface, **[RODA-in](http://rodain.roda-community.org)** provides a user-friendly way to:
 
-1. Connect to [ftp://address] and use the credentials provided by the Repository in order to log in.
-2. Create a folder to hold the SIPs you which to be part of a single ingest batch (Optional).
-3. Copy all the created SIPs to the new folder.
-4. Inform the Repository that the material is ready to be ingested.
+- Organise content and metadata;
+- Assign collections and categories;
+- Validate package structure;
+- Export SIPs in the appropriate format.
 
-### External media transfer
+### Command-Line Tools and Libraries
 
-1. Save SIPs to an external media (e.g. CD, USB disk, etc.)
-2. Deliver it at the following address: [Repository address]
+For automated or large-scale workflows, several open-source tools and libraries are available to prepare SIPs via command-line or scripting environments:
 
-## Ingest process
+- **[Commons-IP](https://github.com/keeps/commons-ip)** - A Java-based command-line tool and library for creating, validating, and converting OAIS Information Packages. Supports multiple packaging formats including E-ARK (v1, v2.0.4, v2.1.0, v2.2.0), BagIt, and Hungarian type 4 SIP.
 
-After transfer, SIPs will be selected for ingest by the Repository staff. The Ingest process provides services and functions to accept SIPs from Producers and prepare the contents for archival storage and management.
+- **[.NET E-ARK SIP](https://igfej-justica-gov-pt.github.io/dotnet-eark-sip/)** - A CLI tool and .NET library to generate E-ARK compliant SIPs. Ideal for integration with Microsoft-based environments.
 
-Ingest functions include receiving SIPs, performing quality assurance on SIPs, generating an Archival Information Package (AIP) which complies with the Repository's data formatting and documentation standards, extracting Descriptive Information from the AIPs for inclusion in the Repository catalogue, and coordinating updates to Archival Storage and Data Management.
+- **[eArchiving Tool Box (EATB)](https://github.com/E-ARK-Software/eatb)** - A collection of Python-based tools developed under the E-ARK project for the creation of SIPs and other information packages, supporting scripting and batch workflows.
 
+> 🛠️ These tools are recommended for institutions with high volumes of content or complex automation needs.
+
+## Transfer of Materials
+
+Once SIPs are prepared, they must be transferred to the repository. SIPs are first placed in a **quarantine area** where they await validation and processing by the repository.
+
+There are several supported transfer methods:
+
+### HTTP Transfer
+
+1. Log into the repository's web interface using your credentials.
+2. Navigate to **Ingest > Transfer** and access your personal folder (create one if necessary).
+3. Upload your SIPs.
+4. Notify the repository staff that the material is ready for ingest.
+
+### FTP Transfer
+
+1. Connect to the provided FTP server using your credentials.
+2. Optionally create a folder for your ingest batch.
+3. Upload your SIPs.
+4. Notify the repository that the SIPs are available.
+
+### Physical Media Transfer
+
+1. Save the SIPs to a physical medium (e.g. USB drive, external hard disk).
+2. Deliver it to the following address:
+   `[Repository address]`
+
+> ⚠️ Ensure media is labelled clearly and that its integrity is verified before delivery.
+
+## Ingest Process
+
+After transfer, the repository will initiate the **Ingest** process. This process includes the following steps:
+
+- **Receipt and validation** of SIPs;
+- **Quality assurance** to ensure compliance with format and metadata requirements;
+- **Generation of Archival Information Packages (AIPs)** for long-term preservation;
+- **Extraction of Descriptive Information** for indexing and search in the repository's catalogue;
+- **Update of Archival Storage and Data Management** systems.
+
+The ingest process ensures that all content is correctly archived, discoverable, and preserved according to established policies.
+
+## Notes
+
+- The SIP must not include content or metadata outside the agreed scope.
+- The repository may reject SIPs that fail validation during ingest.
+- An email may be issued to notify Producers and repository staff of any ingest process.
+- Contact repository staff for support with RODA-in or transfer issues.
