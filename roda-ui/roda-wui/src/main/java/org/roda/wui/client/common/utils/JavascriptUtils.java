@@ -355,8 +355,8 @@ public class JavascriptUtils {
   }-*/;
 
   public static native JavaScriptObject runImageViewerOn(JavaScriptObject imageContainer, String imageURL) /*-{
-    var container = $wnd.jQuery(imageContainer);
-    var viewer = $wnd.ImageViewer(container);
+    var container = $wnd.document.querySelector(".viewRepresentationImageFilePreview");
+    var viewer = new $wnd.ImageViewer(container);
     viewer.load(imageURL);
     return viewer;
   }-*/;
