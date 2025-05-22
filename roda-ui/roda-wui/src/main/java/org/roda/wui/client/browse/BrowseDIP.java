@@ -10,21 +10,18 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.generics.LongResponse;
-import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexedFileRequest;
 import org.roda.core.data.v2.index.IndexedRepresentationRequest;
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
@@ -38,29 +35,16 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.RepresentationLink;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.common.NavigationToolbarLegacy;
+import org.roda.wui.client.browse.tabs.BrowseDIPTabs;
+import org.roda.wui.client.common.BrowseDIPActionsToolbar;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.actions.DisseminationFileActions;
-import org.roda.wui.client.common.lists.DIPFileList;
-import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
-import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
-import org.roda.wui.client.common.lists.utils.ListBuilder;
-import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.model.BrowseDIPResponse;
-import org.roda.wui.client.common.model.BrowseFileResponse;
-import org.roda.wui.client.common.model.BrowseRepresentationResponse;
-import org.roda.wui.client.common.search.SearchWrapper;
-import org.roda.wui.client.common.slider.Sliders;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.services.AIPRestService;
 import org.roda.wui.client.services.ConfigurationRestService;
-import org.roda.wui.client.services.FileRestService;
-import org.roda.wui.client.services.RepresentationRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -78,8 +62,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -344,10 +326,25 @@ public class BrowseDIP extends Composite {
   AccessibleFocusPanel keyboardFocus;
 
   // interface
-  @UiField
-  FlowPanel center;
+
   @UiField
   FlowPanel container;
+  @UiField
+  NavigationToolbar navigationToolbar;
+  @UiField
+  BrowseDIPActionsToolbar objectToolbar;
+  @UiField
+  BrowseDIPTabs browseTab;
+
+  private Map<Actionable.ActionImpact, Runnable> handlers = new HashMap<>();
+  private AsyncCallback<Actionable.ActionImpact> handler = new NoAsyncCallback<Actionable.ActionImpact>() {
+    @Override
+    public void onSuccess(Actionable.ActionImpact result) {
+      if (handlers.containsKey(result)) {
+        handlers.get(result).run();
+      }
+    }
+  };
 
   public BrowseDIP(Viewers viewers, BrowseDIPResponse response, Services services) {
     // target
@@ -356,31 +353,9 @@ public class BrowseDIP extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    if (dipFile != null) {
-      center.add(new DipFilePreview(viewers, dipFile));
-    } else if (dip.getOpenExternalURL() != null) {
-      center.add(new DipUrlPreview(viewers, dip));
-    } else {
-      final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
-        new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
+    navigationToolbar.withObject(dipFile != null ? dipFile : dip);
 
-      ListBuilder<DIPFile> dipFileListBuilder = new ListBuilder<>(DIPFileList::new,
-        new AsyncTableCellOptions<>(DIPFile.class, "BrowseDIP_dipFiles").withFilter(filter)
-          .withSummary(messages.allOfAObject(DIPFile.class.getName())).bindOpener()
-          .withActionable(DisseminationFileActions.get(dip.getPermissions())));
-
-      SearchWrapper search = new SearchWrapper(false).createListAndSearchPanel(dipFileListBuilder);
-
-      SimplePanel layout = new SimplePanel();
-      layout.add(search);
-      center.add(layout);
-      layout.addStyleName("browseDip-topList");
-    }
-
-    NavigationToolbarLegacy<IsIndexed> bottomNavigationToolbar = new NavigationToolbarLegacy<>();
-    bottomNavigationToolbar.withObject(dipFile != null ? dipFile : dip);
-
-    bottomNavigationToolbar.withActionImpactHandler(Actionable.ActionImpact.DESTROYED, () -> {
+    handlers.put(Actionable.ActionImpact.DESTROYED, () -> {
       if (dipFile == null) {
         // dip was removed
         if (!dip.getFileIds().isEmpty()) {
@@ -395,89 +370,22 @@ public class BrowseDIP extends Composite {
         }
       }
     });
-    bottomNavigationToolbar.withPermissions(dip.getPermissions());
-    bottomNavigationToolbar.updateBreadcrumb(dip, dipFile, response.getDipFileAncestors());
-    bottomNavigationToolbar.setHeader(messages.catalogueDIPTitle());
-    bottomNavigationToolbar.build();
-    container.insert(bottomNavigationToolbar, 0);
+
+    navigationToolbar.withPermissions(dip.getPermissions());
+    navigationToolbar.updateBreadcrumb(response);
+    navigationToolbar.build();
+    container.insert(navigationToolbar, 0);
 
     if (response.getReferred() instanceof IndexedAIP || response.getReferred() instanceof IndexedRepresentation
       || response.getReferred() instanceof IndexedFile) {
-      bottomNavigationToolbar.withAlternativeStyle(true);
-
-      Runnable deleteActionImpactHandler;
-      NavigationToolbarLegacy<IsIndexed> topNavigationToolbar = new NavigationToolbarLegacy<>();
-      ListSelectionUtils.ProcessRelativeItem<IsIndexed> processor;
-      String title;
-
-      if (response.getReferred() instanceof IndexedAIP) {
-        processor = referredObject -> openReferred(referredObject,
-          new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, referredObject.getUUID())), services);
-        title = messages.catalogueItemTitle();
-        deleteActionImpactHandler = () -> {
-          IndexedAIP aip = response.getIndexedAIP();
-          if (StringUtils.isNotBlank(aip.getParentID())) {
-            HistoryUtils.newHistory(BrowseTop.RESOLVER, aip.getParentID());
-          } else {
-            HistoryUtils.newHistory(BrowseTop.RESOLVER);
-          }
-        };
-      } else if (response.getReferred() instanceof IndexedRepresentation) {
-        processor = referredObject -> openReferred(referredObject,
-          new Filter(new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, referredObject.getUUID())),
-          services);
-        title = messages.catalogueRepresentationTitle();
-        deleteActionImpactHandler = () -> {
-          IndexedRepresentation representation = response.getIndexedRepresentation();
-          HistoryUtils.newHistory(BrowseTop.RESOLVER, representation.getAipId());
-        };
-      } else {
-        processor = referredObject -> openReferred(referredObject,
-          new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, referredObject.getUUID())), services);
-        title = messages.catalogueFileTitle();
-        deleteActionImpactHandler = () -> {
-          IndexedFile file = response.getIndexedFile();
-          HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, file.getAipId(), file.getRepresentationId());
-        };
-      }
-
-      topNavigationToolbar.setHeader(title);
-      topNavigationToolbar.withObject(response.getReferred());
-      topNavigationToolbar.withProcessor(processor);
-      topNavigationToolbar.withActionImpactHandler(Actionable.ActionImpact.DESTROYED, deleteActionImpactHandler);
-      topNavigationToolbar.withModifierKeys(true, true, false);
-      topNavigationToolbar.withPermissions(response.getPermissions());
-      topNavigationToolbar.updateBreadcrumb(response);
-      topNavigationToolbar.build();
-      Sliders.createDisseminationSlider(center, topNavigationToolbar.getDisseminationsButton(), response.getReferred(), services);
-      buildInfoSlider(center, topNavigationToolbar.getInfoSidebarButton(), response);
-
-      container.insert(topNavigationToolbar, 0);
+      navigationToolbar.withAlternativeStyle(true);
     }
 
+    objectToolbar.setObjectAndBuild(dip, dip.getPermissions(), handler);
+
+    browseTab.init(viewers, response, handler);
+
     keyboardFocus.setFocus(true);
-  }
-
-  private static <T extends IsIndexed> void openReferred(final T object, Filter filter, Services services) {
-
-    FindRequest findRequest = FindRequest.getBuilder(filter, true)
-      .withSorter(DEFAULT_DIPFILE_SORTER).withSublist(new Sublist(0, 1))
-      .withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID)).build();
-
-    services.dipResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()))
-      .whenComplete((indexedDIPIndexResult, throwable) -> {
-        if (throwable != null) {
-          AsyncCallbackUtils.defaultFailureTreatment(throwable.getCause());
-        } else {
-          if (indexedDIPIndexResult.getTotalCount() > 0) {
-            // open DIP
-            HistoryUtils.openBrowse(indexedDIPIndexResult.getResults().get(0));
-          } else {
-            // open object
-            HistoryUtils.resolve(object);
-          }
-        }
-      });
   }
 
   private static CompletableFuture<IndexResult<DIPFile>> buildCompletableFutureRetrieveDIPFile(String historyDipUUID,
@@ -485,80 +393,13 @@ public class BrowseDIP extends Composite {
     if (historyDipFileUUID != null) {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, historyDipFileUUID));
       Sublist sublist = new Sublist(0, 1);
-      FindRequest findRequest = FindRequest.getBuilder(filter, false).withSublist(sublist)
-        .build();
+      FindRequest findRequest = FindRequest.getBuilder(filter, false).withSublist(sublist).build();
       return services.dipFileResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()));
     } else {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, historyDipUUID));
       Sublist sublist = new Sublist(0, 1);
-      FindRequest findRequest = FindRequest.getBuilder(filter, false).withSublist(sublist)
-        .build();
+      FindRequest findRequest = FindRequest.getBuilder(filter, false).withSublist(sublist).build();
       return services.dipFileResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()));
-    }
-  }
-
-  private void buildInfoSlider(FlowPanel container, FocusPanel toggleButton, BrowseDIPResponse response) {
-    Services services = new Services("Retrieve info slider information", "get");
-
-    if (response.getReferred() instanceof IndexedAIP) {
-      BrowseAIPResponse browseAIPResponse = new BrowseAIPResponse();
-      browseAIPResponse.setIndexedAIP(response.getIndexedAIP());
-
-      services.aipResource(AIPRestService::retrieveAIPRuleProperties).whenComplete((strings, throwable) -> {
-        browseAIPResponse.setRepresentationInformationFields(strings);
-        Sliders.createAipInfoSlider(container, toggleButton, browseAIPResponse);
-      });
-    } else if (response.getReferred() instanceof IndexedRepresentation) {
-      BrowseRepresentationResponse representationResponse = new BrowseRepresentationResponse();
-      representationResponse.setIndexedAIP(response.getIndexedAIP());
-      representationResponse.setIndexedRepresentation(response.getIndexedRepresentation());
-
-      services.representationResource(RepresentationRestService::retrieveRepresentationRuleProperties)
-        .whenComplete((strings, throwable) -> {
-          representationResponse.setRiRules(strings);
-          Sliders.createRepresentationInfoSlider(container, toggleButton, representationResponse);
-        });
-    } else {
-      BrowseFileResponse browseFileResponse = new BrowseFileResponse();
-
-      Filter riskIncidenceFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, response.getIndexedFile().getId()));
-      CountRequest riskIncidenceCountRequest = new CountRequest(riskIncidenceFilter,
-        true);
-      CompletableFuture<LongResponse> riskCounterCompletableFuture = services
-        .rodaEntityRestService(s -> s.count(riskIncidenceCountRequest), RiskIncidence.class)
-        .handle((longResponse, throwable1) -> {
-          if (throwable1 != null) {
-            return new LongResponse(-1L);
-          }
-          return longResponse;
-        });
-
-      Filter preservationEventFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, response.getIndexedFile().getUUID()));
-      CountRequest preservationEventsCountRequest = new CountRequest(preservationEventFilter, true);
-
-      CompletableFuture<LongResponse> preservationCounterCompletableFuture = services
-        .rodaEntityRestService(s -> s.count(preservationEventsCountRequest), IndexedPreservationEvent.class)
-        .handle((longResponse, throwable2) -> {
-          if (throwable2 != null) {
-            return new LongResponse(-1L);
-          }
-          return longResponse;
-        });
-
-      CompletableFuture<List<String>> riRulesCompletableFuture = services
-        .fileResource(FileRestService::retrieveFileRuleProperties);
-
-      CompletableFuture
-        .allOf(riskCounterCompletableFuture, preservationCounterCompletableFuture, riRulesCompletableFuture)
-        .thenApply(v -> {
-          browseFileResponse.setRiskCounterResponse(riskCounterCompletableFuture.join());
-          browseFileResponse.setPreservationCounterResponse(preservationCounterCompletableFuture.join());
-          browseFileResponse.setRepresentationInformationFields(riRulesCompletableFuture.join());
-          return browseFileResponse;
-        }).whenComplete((fileResponse, throwable) -> Sliders.createFileInfoSlider(container, toggleButton,
-          response.getIndexedFile(), fileResponse));
     }
   }
 

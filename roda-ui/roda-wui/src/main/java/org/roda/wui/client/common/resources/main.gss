@@ -8772,6 +8772,8 @@ span.code {
 
 .permissionsTab .row .content {
     min-height: 0;
+    padding: 0!important;
+    width: 100%;
 }
 
 .permissionsTab .panel.permission {

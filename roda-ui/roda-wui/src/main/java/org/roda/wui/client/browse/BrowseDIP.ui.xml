@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:m="urn:import:org.roda.wui.client.main" xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:common="urn:import:org.roda.wui.client.common">
+             xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
+             xmlns:common="urn:import:org.roda.wui.client.common"
+             xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs">
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
-	<wcag:AccessibleFocusPanel ui:field="keyboardFocus">
-		<g:FlowPanel styleName="viewRepresentationFile" ui:field="container">
-			<!-- top navigation toolbar for referrer is inserted here  -->
-			<!-- bottom navigation toolbar for dipfile or dip is inserted here -->
-			<g:FlowPanel addStyleNames="viewRepresentationFile-center" ui:field="center" />
-		</g:FlowPanel>
-	</wcag:AccessibleFocusPanel>
+    <wcag:AccessibleFocusPanel ui:field="keyboardFocus">
+        <g:FlowPanel styleName="viewRepresentationFile" ui:field="container">
+            <common:NavigationToolbar ui:field="navigationToolbar"/>
+            <common:BrowseDIPActionsToolbar ui:field="objectToolbar" label="{messages.catalogueDIPTitle}"/>
+            <!-- top navigation toolbar for referrer is inserted here  -->
+            <!-- bottom navigation toolbar for dipfile or dip is inserted here -->
+            <g:FlowPanel addStyleNames="row full_width skip_padding">
+                <g:FlowPanel addStyleNames="col_12 content">
+                    <tabs:BrowseDIPTabs ui:field="browseTab"/>
+                </g:FlowPanel>
+            </g:FlowPanel>
+            <!--g:FlowPanel addStyleNames="viewRepresentationFile-center" ui:field="center"/-->
+        </g:FlowPanel>
+    </wcag:AccessibleFocusPanel>
 </ui:UiBinder>

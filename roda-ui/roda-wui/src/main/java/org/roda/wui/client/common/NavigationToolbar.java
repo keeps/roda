@@ -217,13 +217,15 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
   public void updateBreadcrumb(BrowseDIPResponse response) {
     if (response.getReferred() instanceof IndexedFile) {
-      breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(response.getIndexedAIP(),
-        response.getIndexedRepresentation(), response.getIndexedFile()));
+      breadcrumb
+        .updatePath(BreadcrumbUtils.getDIPBreadcrumbs(response.getIndexedAIP(), response.getIndexedRepresentation(),
+          response.getIndexedFile(), response.getDip(), response.getDipFile(), response.getDipFileAncestors()));
     } else if (response.getReferred() instanceof IndexedRepresentation) {
-      breadcrumb.updatePath(
-        BreadcrumbUtils.getRepresentationBreadcrumbs(response.getIndexedAIP(), response.getIndexedRepresentation()));
+      breadcrumb.updatePath(BreadcrumbUtils.getDIPBreadcrumbs(response.getIndexedAIP(),
+        response.getIndexedRepresentation(), response.getDip(), response.getDipFile(), response.getDipFileAncestors()));
     } else if (response.getReferred() instanceof IndexedAIP) {
-      breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(response.getIndexedAIP()));
+      breadcrumb.updatePath(BreadcrumbUtils.getDIPBreadcrumbs(response.getIndexedAIP(), response.getDip(),
+        response.getDipFile(), response.getDipFileAncestors()));
     }
   }
 
