@@ -129,7 +129,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public AIP retrieveAIP(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     registerOperationForAIP(aipId, TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrieveAIP(aipId);
+
+    AIP aip;
+    try {
+      aip = stagingModelService.retrieveAIP(aipId);
+    } catch (NotFoundException e) {
+      aip = mainModelService.retrieveAIP(aipId);
+    }
+    return aip;
   }
 
   @Override
@@ -270,7 +277,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId,
       TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
+    Binary binary;
+    try {
+      binary = stagingModelService.retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
+    } catch (NotFoundException e) {
+      binary = mainModelService.retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
+    }
+    return binary;
   }
 
   @Override
@@ -278,7 +291,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
       TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrieveDescriptiveMetadataBinary(aipId, representationId, descriptiveMetadataId);
+    Binary binary;
+    try {
+      binary = stagingModelService.retrieveDescriptiveMetadataBinary(aipId, representationId, descriptiveMetadataId);
+    } catch (NotFoundException e) {
+      binary = mainModelService.retrieveDescriptiveMetadataBinary(aipId, representationId, descriptiveMetadataId);
+    }
+    return binary;
   }
 
   @Override
@@ -286,7 +305,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId,
       TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
+    DescriptiveMetadata descriptiveMetadata;
+    try {
+      descriptiveMetadata = stagingModelService.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
+    } catch (NotFoundException e) {
+      descriptiveMetadata = mainModelService.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
+    }
+    return descriptiveMetadata;
   }
 
   @Override
@@ -295,7 +320,24 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
       TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrieveDescriptiveMetadata(aipId, representationId, descriptiveMetadataId);
+    DescriptiveMetadata descriptiveMetadata;
+    try {
+      descriptiveMetadata = stagingModelService.retrieveDescriptiveMetadata(aipId, representationId,
+        descriptiveMetadataId);
+    } catch (NotFoundException e) {
+      descriptiveMetadata = mainModelService.retrieveDescriptiveMetadata(aipId, representationId,
+        descriptiveMetadataId);
+    }
+    return descriptiveMetadata;
+  }
+
+  @Override
+  public boolean descriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    if (!stagingModelService.descriptiveMetadataExists(aipId, representationId, descriptiveMetadataId)) {
+      return mainModelService.descriptiveMetadataExists(aipId, representationId, descriptiveMetadataId);
+    }
+    return true;
   }
 
   @Override
@@ -564,7 +606,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForFile(aipId, representationId, directoryPath, fileId,
       TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrieveFile(aipId, representationId, directoryPath, fileId);
+    File file;
+    try {
+      file = stagingModelService.retrieveFile(aipId, representationId, directoryPath, fileId);
+    } catch (NotFoundException e) {
+      file = mainModelService.retrieveFile(aipId, representationId, directoryPath, fileId);
+    }
+    return file;
   }
 
   @Override
@@ -733,20 +781,37 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForPreservationMetadata(aipId, representationId,
       TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrievePreservationRepresentation(aipId, representationId);
+    Binary binary;
+    try {
+      binary = stagingModelService.retrievePreservationRepresentation(aipId, representationId);
+    } catch (NotFoundException e) {
+      binary = mainModelService.retrievePreservationRepresentation(aipId, representationId);
+    }
+    return binary;
   }
 
   @Override
   public boolean preservationRepresentationExists(String aipId, String representationId)
     throws RequestNotValidException {
-    return getModelService().preservationRepresentationExists(aipId, representationId);
+    registerOperationForPreservationMetadata(aipId, representationId,
+      TransactionalModelOperationLog.OperationType.READ);
+    if (!stagingModelService.preservationRepresentationExists(aipId, representationId)) {
+      return mainModelService.preservationRepresentationExists(aipId, representationId);
+    }
+    return true;
   }
 
   @Override
   public Binary retrievePreservationFile(File file)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForPreservationMetadata(file, TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrievePreservationFile(file);
+    Binary binary;
+    try {
+      binary = stagingModelService.retrievePreservationFile(file);
+    } catch (NotFoundException e) {
+      binary = mainModelService.retrievePreservationFile(file);
+    }
+    return binary;
   }
 
   @Override
@@ -756,20 +821,35 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       representationId, fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
     registerOperationForPreservationMetadata(aipId, representationId, fileDirectoryPath, fileId, preservationID,
       TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+    Binary binary;
+    try {
+      binary = stagingModelService.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+    } catch (NotFoundException e) {
+      binary = mainModelService.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+    }
+    return binary;
   }
 
   @Override
   public boolean preservationFileExists(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().preservationFileExists(aipId, representationId, fileDirectoryPath, fileId);
+    String fileId) throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    if (!stagingModelService.preservationFileExists(aipId, representationId, fileDirectoryPath, fileId)) {
+      return mainModelService.preservationFileExists(aipId, representationId, fileDirectoryPath, fileId);
+    }
+    return true;
   }
 
   @Override
   public Binary retrieveRepositoryPreservationEvent(String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForPreservationMetadata(fileId, TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrieveRepositoryPreservationEvent(fileId);
+    Binary binary;
+    try {
+      binary = stagingModelService.retrieveRepositoryPreservationEvent(fileId);
+    } catch (NotFoundException e) {
+      binary = mainModelService.retrieveRepositoryPreservationEvent(fileId);
+    }
+    return binary;
   }
 
   @Override
@@ -778,14 +858,26 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForPreservationMetadata(aipId, representationId, filePath, fileId, preservationID,
       TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrievePreservationEvent(aipId, representationId, filePath, fileId, preservationID);
+    Binary binary;
+    try {
+      binary = stagingModelService.retrievePreservationEvent(aipId, representationId, filePath, fileId, preservationID);
+    } catch (NotFoundException e) {
+      binary = mainModelService.retrievePreservationEvent(aipId, representationId, filePath, fileId, preservationID);
+    }
+    return binary;
   }
 
   @Override
   public Binary retrievePreservationAgent(String preservationID)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForPreservationMetadata(preservationID, TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrievePreservationAgent(preservationID);
+    Binary binary;
+    try {
+      binary = stagingModelService.retrievePreservationAgent(preservationID);
+    } catch (NotFoundException e) {
+      binary = mainModelService.retrievePreservationAgent(preservationID);
+    }
+    return binary;
   }
 
   @Override
@@ -919,7 +1011,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public Binary retrieveOtherMetadataBinary(OtherMetadata om)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForOtherMetadata(om.getAipId(), TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrieveOtherMetadataBinary(om);
+    Binary binary;
+    try {
+      binary = stagingModelService.retrieveOtherMetadataBinary(om);
+    } catch (NotFoundException e) {
+      binary = mainModelService.retrieveOtherMetadataBinary(om);
+    }
+    return binary;
   }
 
   @Override
@@ -927,8 +1025,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String fileId, String fileSuffix, String type)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForOtherMetadata(aipId, TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId, fileSuffix,
-      type);
+    Binary binary;
+    try {
+      binary = stagingModelService.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
+        fileSuffix, type);
+    } catch (NotFoundException e) {
+      binary = mainModelService.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
+        fileSuffix, type);
+    }
+    return binary;
   }
 
   @Override
@@ -936,8 +1041,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String fileId, String fileSuffix, String type)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     registerOperationForOtherMetadata(aipId, TransactionalModelOperationLog.OperationType.READ);
-    return getModelService().retrieveOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, fileSuffix,
-      type);
+    OtherMetadata otherMetadata;
+    try {
+      otherMetadata = stagingModelService.retrieveOtherMetadata(aipId, representationId, fileDirectoryPath, fileId,
+        fileSuffix, type);
+    } catch (NotFoundException e) {
+      otherMetadata = mainModelService.retrieveOtherMetadata(aipId, representationId, fileDirectoryPath, fileId,
+        fileSuffix, type);
+    }
+    return otherMetadata;
   }
 
   @Override
@@ -1423,8 +1535,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public DIP retrieveDIP(String dipId) throws GenericException, NotFoundException, AuthorizationDeniedException {
-    DIP dip = getModelService().retrieveDIP(dipId);
-    registerOperationForDIP(dip.getId(), TransactionalModelOperationLog.OperationType.READ);
+    registerOperationForDIP(dipId, TransactionalModelOperationLog.OperationType.READ);
+    DIP dip;
+    try {
+      dip = stagingModelService.retrieveDIP(dipId);
+    } catch (NotFoundException e) {
+      dip = mainModelService.retrieveDIP(dipId);
+    }
     return dip;
   }
 
@@ -1545,6 +1662,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
     return getModelService().createSchema(aipId, representationId, directoryPath, fileId, contentPayload);
+  }
+
+  @Override
+  public boolean schemaExists(String aipId, String representationId, List<String> directoryPath, String fileId)
+    throws RequestNotValidException {
+    if (!stagingModelService.schemaExists(aipId, representationId, directoryPath, fileId)) {
+      return mainModelService.schemaExists(aipId, representationId, directoryPath, fileId);
+    }
+    return true;
   }
 
   @Override

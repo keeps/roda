@@ -730,6 +730,14 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
+  public boolean descriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    StoragePath descriptiveMetadataStoragePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
+      descriptiveMetadataId);
+    return storage.exists(descriptiveMetadataStoragePath);
+  }
+
+  @Override
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
     ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion, String createdBy,
     boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,
@@ -1717,13 +1725,17 @@ public class DefaultModelService implements ModelService {
 
   @Override
   public boolean preservationFileExists(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    String fileId) throws RequestNotValidException, GenericException, AuthorizationDeniedException {
 
-    AIP aip = retrieveAIP(aipId);
-    String identifier = IdUtils.getPreservationFileId(fileId, aip.getInstanceId());
-    StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
-      aipId, representationId, fileDirectoryPath, fileId);
-    return storage.exists(filePath);
+    try {
+      AIP aip = retrieveAIP(aipId);
+      String identifier = IdUtils.getPreservationFileId(fileId, aip.getInstanceId());
+      StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
+        aipId, representationId, fileDirectoryPath, fileId);
+      return storage.exists(filePath);
+    } catch (NotFoundException e) {
+      return false;
+    }
   }
 
   @Override
@@ -2127,10 +2139,16 @@ public class DefaultModelService implements ModelService {
     boolean asReference = false;
     boolean createIfNotExists = true;
 
-    try {
-      storage.createBinary(binaryPath, payload, asReference);
-    } catch (AlreadyExistsException e) {
+    if (storage.exists(binaryPath)) {
       storage.updateBinaryContent(binaryPath, payload, asReference, createIfNotExists);
+    } else {
+      try {
+        storage.createBinary(binaryPath, payload, asReference);
+      } catch (AlreadyExistsException e) {
+        // This should not happen, as it has already been checked if the file exists or
+        // not
+        throw new GenericException("file already exists, but was not found before", e);
+      }
     }
 
     String id = IdUtils.getOtherMetadataId(aipId, representationId, fileDirectoryPath, fileId);
@@ -3670,6 +3688,12 @@ public class DefaultModelService implements ModelService {
     return ResourceParseUtils.convertResourceToFile(createdBinary);
   }
 
+  @Override
+  public boolean schemaExists(String aipId, String representationId, List<String> directoryPath, String fileId) throws RequestNotValidException {
+    StoragePath schemaStoragePath = ModelUtils.getSchemaStoragePath(aipId, representationId, directoryPath, fileId);
+    return storage.exists(schemaStoragePath);
+  }
+
   private CloseableIterable<OptionalWithCause<Representation>> listRepresentations()
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     CloseableIterable<OptionalWithCause<AIP>> aips = listAIPs();
@@ -4943,7 +4967,8 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public Date retrievePreservationMetadataCreationDate(PreservationMetadata pm) throws RequestNotValidException, GenericException {
+  public Date retrievePreservationMetadataCreationDate(PreservationMetadata pm)
+    throws RequestNotValidException, GenericException {
     return storage.getCreationDate(ModelUtils.getPreservationMetadataStoragePath(pm));
   }
 
@@ -5544,8 +5569,7 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting,
-    String... fromPathPartials)
+  public void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting, String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
     StoragePath sourceObjectPath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object), fromPathPartials);
     getStorage().copy(getStorage(), sourceObjectPath, toPath, "", replaceExisting);

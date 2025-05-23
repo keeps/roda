@@ -14,10 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import gov.loc.premis.v3.AgentComplexType;
-import gov.loc.premis.v3.EventComplexType;
-import gov.loc.premis.v3.PremisComplexType;
-import jakarta.xml.bind.JAXBElement;
 import org.apache.commons.io.FilenameUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
@@ -35,19 +31,16 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.ShallowFiles;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.ExternalFileManifestContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
-import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
 import org.roda_project.commons_ip2.model.IPDescriptiveMetadata;
@@ -59,6 +52,10 @@ import org.roda_project.commons_ip2.model.RepresentationStatus;
 import org.roda_project.commons_ip2.model.SIP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import gov.loc.premis.v3.AgentComplexType;
+import gov.loc.premis.v3.EventComplexType;
+import jakarta.xml.bind.JAXBElement;
 
 public class EARKSIP2ToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIP2ToAIPPluginUtils.class);
@@ -171,19 +168,16 @@ public class EARKSIP2ToAIPPluginUtils {
       ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
       String metadataType = dm.getMetadataType().asString();
       String metadataVersion = dm.getMetadataVersion();
-      try {
+
+      if (model.descriptiveMetadataExists(aipId, representationId, descriptiveMetadataId) && update) {
+        Map<String, String> properties = new HashMap<>();
+        properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
+
+        model.updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
+          metadataVersion, properties, username);
+      } else {
         model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
           metadataVersion, username, notify);
-      } catch (AlreadyExistsException e) {
-        if (update) {
-          Map<String, String> properties = new HashMap<>();
-          properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
-
-          model.updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
-            metadataVersion, properties, username);
-        } else {
-          throw e;
-        }
       }
     }
   }
@@ -283,13 +277,11 @@ public class EARKSIP2ToAIPPluginUtils {
       String fileId = schema.getFileName();
       ContentPayload payload = new FSPathContentPayload(schema.getPath());
 
-      try {
-        model.createSchema(aipId, representationId, directoryPath, fileId, payload);
-      } catch (AlreadyExistsException e) {
+      if(model.schemaExists(aipId, representationId, directoryPath, fileId) && update) {
         // Tolerate duplicate schemas when updating
-        if (!update)
-          throw e;
+        return;
       }
+      model.createSchema(aipId, representationId, directoryPath, fileId, payload);
     }
   }
 
@@ -347,7 +339,7 @@ public class EARKSIP2ToAIPPluginUtils {
           hasShallowFile = true;
         } else {
           // this is an empty folder
-          String[] pathPartials = new String[file.getRelativeFolders().size()+1];
+          String[] pathPartials = new String[file.getRelativeFolders().size() + 1];
           pathPartials[0] = RodaConstants.STORAGE_DIRECTORY_DATA;
           for (int i = 0; i < file.getRelativeFolders().size(); i++) {
             pathPartials[i + 1] = file.getRelativeFolders().get(i);

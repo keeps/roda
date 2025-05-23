@@ -162,8 +162,11 @@ public interface ModelService extends ModelObservable {
   DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String representationId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
+  boolean descriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException;
+
   DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId, ContentPayload payload,
-    String descriptiveMetadataType, String descriptiveMetadataVersion, String createdBy, boolean notify)
+                                                String descriptiveMetadataType, String descriptiveMetadataVersion, String createdBy, boolean notify)
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
     NotFoundException;
 
@@ -351,7 +354,7 @@ public interface ModelService extends ModelObservable {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
   boolean preservationFileExists(String aipId, String representationId, List<String> fileDirectoryPath, String fileId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException;
 
   Binary retrieveRepositoryPreservationEvent(String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
@@ -717,6 +720,8 @@ public interface ModelService extends ModelObservable {
   File createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException;
+
+  boolean schemaExists(String aipId, String representationId, List<String> directoryPath, String fileId) throws RequestNotValidException;
 
   <T extends IsRODAObject> Optional<LiteRODAObject> retrieveLiteFromObject(T object);
 

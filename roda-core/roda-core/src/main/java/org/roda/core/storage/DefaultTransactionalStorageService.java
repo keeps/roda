@@ -200,8 +200,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   @Override
-  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
+  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
     registerOperation(fromStoragePath, TransactionalStoragePathOperationLog.OperationType.CREATE);
     copyFromMainStorageService(fromStoragePath);
     stagingStorageService.copy(fromService, fromStoragePath, toPath, resource, replaceExisting);
@@ -351,10 +351,11 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     }
   }
 
-  private void handleDeleteOperation(DefaultStoragePath storagePath, Path path, String version) throws RODATransactionException {
+  private void handleDeleteOperation(DefaultStoragePath storagePath, Path path, String version)
+    throws RODATransactionException {
     if (mainStorageService.exists(storagePath)) {
       try {
-        if(version != null) {
+        if (version != null) {
           mainStorageService.deleteBinaryVersion(storagePath, version);
         } else {
           mainStorageService.deleteResource(storagePath);
@@ -367,18 +368,18 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   private void handleUpdateOperation(DefaultStoragePath storagePath, String version) throws RODATransactionException {
     try {
-      if(version != null) {
+      if (version != null) {
         LOGGER.info("Importing binary version from staging to main storage service: {}", storagePath);
         mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
       } else {
         LOGGER.info("Updating resource from staging to main storage service: {}", storagePath);
         StorageServiceUtils.syncBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
-                storagePath, getEntity(storagePath));
+          storagePath, getEntity(storagePath));
       }
     } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
-             | AuthorizationDeniedException e) {
+      | AuthorizationDeniedException e) {
       throw new RODATransactionException(
-              "Failed to sync storage path from staging to main storage service: " + storagePath, e);
+        "Failed to sync storage path from staging to main storage service: " + storagePath, e);
     }
   }
 
@@ -389,13 +390,20 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
       } else {
         LOGGER.info("Moving resource from staging to main storage service: {}", storagePath);
-        StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
-                storagePath, getEntity(storagePath));
+        Class<? extends Entity> rootEntity = getEntity(storagePath);
+        // TODO: This is necessary to avoid recursive copies, we should handle it better
+        // in StorageServiceUtils
+        if (Directory.class.isAssignableFrom(rootEntity)) {
+          mainStorageService.createDirectory(storagePath);
+        } else {
+          StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
+            storagePath, rootEntity);
+        }
       }
     } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
-             | AuthorizationDeniedException e) {
-      throw new RODATransactionException(
-              "Failed to move storage path from staging to main storage service: " + storagePath, e);
+      | AuthorizationDeniedException e) {
+      throw new RODATransactionException("Failed to move storage path from staging to main storage service: "
+        + storagePath + ". (transactionID:" + transaction.getId() + ")", e);
     }
   }
 
@@ -450,12 +458,12 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   private void registerOperation(StoragePath storagePath,
-                                 TransactionalStoragePathOperationLog.OperationType operation) {
+    TransactionalStoragePathOperationLog.OperationType operation) {
     registerOperation(storagePath, operation, null);
   }
 
-  private void registerOperation(StoragePath storagePath,
-    TransactionalStoragePathOperationLog.OperationType operation, String version) {
+  private void registerOperation(StoragePath storagePath, TransactionalStoragePathOperationLog.OperationType operation,
+    String version) {
     if (storagePath.isFromAContainer()) {
       return;
     }
