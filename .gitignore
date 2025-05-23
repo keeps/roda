@@ -15,3 +15,4 @@ jar_plugins/
 roda-cas/overlays/
 **/.factorypath
 .vscode/
+**/*/*.log
