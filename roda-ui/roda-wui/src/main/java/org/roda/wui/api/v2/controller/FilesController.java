@@ -33,6 +33,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfos;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.model.utils.UserUtility;
@@ -161,7 +162,7 @@ public class FilesController implements FileRestService, Exportable {
   }
 
   @GetMapping(path = "/{id}/metadata/preservation/html", produces = MediaType.TEXT_HTML_VALUE)
-  @Operation(summary = "Retrieves file technical metadata", description = "Retrieves the techinal metadata with the visualization template applied and internationalized", responses = {
+  @Operation(summary = "Retrieves file technical metadata", description = "Retrieves the technical metadata with the visualization template applied and internationalized", responses = {
     @ApiResponse(responseCode = "200", description = "Returns an object ", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
@@ -508,5 +509,64 @@ public class FilesController implements FileRestService, Exportable {
     // delegate
     return ApiUtils.okResponse(
       indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedFile.class));
+  }
+
+  @GetMapping(path = "/{uuid}/metadata/technical/{typeId}/html", produces = MediaType.TEXT_HTML_VALUE)
+  @Operation(summary = "Retrieves technical metadata", description = "Retrieves the technical metadata with the visualization template applied and internationalized", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns an object ", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),})
+  ResponseEntity<StreamingResponseBody> retrieveFileTechnicalMetadataHTML(
+    @Parameter(description = "The file identifier", required = true) @PathVariable(name = "uuid") String fileUUID,
+    @Parameter(description = "The technical metadata type identifier", required = true) @PathVariable(name = "typeId") String typeId,
+    @Parameter(description = "The version identifier") @RequestParam(name = "versionId", required = false) String versionId,
+    @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUUID, List.of());
+
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
+
+      return ApiUtils.okResponse(filesService.retrieveFileTechnicalMetadata(file, typeId, localeString, versionId));
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (NotFoundException | GenericException | RequestNotValidException | TechnicalMetadataNotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileUUID);
+    }
+  }
+
+  @Override
+  public TechnicalMetadataInfos retrieveTechnicalMetadataInfos(String fileUUID, String localeString) {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUUID, List.of());
+
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
+
+      return filesService.retrieveFileTechnicalMetadataInfos(file, localeString);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (NotFoundException | GenericException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileUUID);
+    }
   }
 }

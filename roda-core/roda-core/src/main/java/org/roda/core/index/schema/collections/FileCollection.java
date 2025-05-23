@@ -108,6 +108,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     fields.add(new Field(RodaConstants.FILE_HASH, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.FILE_ANCESTORS, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.FILE_ANCESTORS_PATH, Field.TYPE_STRING).setMultiValued(true));
+    fields.add(new Field(RodaConstants.FILE_TECHNICAL_METADATA_ID, Field.TYPE_STRING).setMultiValued(true));
 
     // AIP
     fields.add(new Field(RodaConstants.INGEST_SIP_IDS, Field.TYPE_STRING).setMultiValued(true));
@@ -305,6 +306,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     String representationUUID = SolrUtils.objectToString(doc.get(RodaConstants.FILE_REPRESENTATION_UUID), null);
     String parentUUID = SolrUtils.objectToString(doc.get(RodaConstants.FILE_PARENT_UUID), null);
     List<String> ancestorsPath = SolrUtils.objectToListString(doc.get(RodaConstants.FILE_ANCESTORS_PATH));
+    List<String> technicalMetadataIds = SolrUtils.objectToListString(doc.get(RodaConstants.FILE_TECHNICAL_METADATA_ID));
 
     String originalName = SolrUtils.objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME), null);
     List<String> hash = SolrUtils.objectToListString(doc.get(RodaConstants.FILE_HASH));
@@ -357,6 +359,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     ret.setRepresentationUUID(representationUUID);
     ret.setPath(path);
     ret.setAncestorsPath(ancestorsPath);
+    ret.setTechnicalMetadataIds(technicalMetadataIds);
     ret.setFileFormat(fileFormat);
     ret.setOriginalName(originalName);
     ret.setSize(size);

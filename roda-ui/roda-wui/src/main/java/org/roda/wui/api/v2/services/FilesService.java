@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -20,6 +22,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.DefaultConsumesOutputStream;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -31,7 +34,11 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadata;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfo;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfos;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -48,9 +55,13 @@ import org.roda.core.plugins.base.maintenance.MovePlugin;
 import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
+import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.RangeConsumesOutputStream;
+import org.roda.core.storage.Directory;
+import org.roda.core.storage.StorageService;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.HTMLUtils;
@@ -332,6 +343,56 @@ public class FilesService {
     ret = new StreamResponse(stream);
 
     return ret;
+  }
+
+  public TechnicalMetadataInfos retrieveFileTechnicalMetadataInfos(IndexedFile file, String localeString)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    TechnicalMetadataInfos technicalMetadataInfos = new TechnicalMetadataInfos();
+
+    ModelService model = RodaCoreFactory.getModelService();
+
+    Locale locale = ServerTools.parseLocale(localeString);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+
+    Representation representation = model.retrieveRepresentation(file.getAipId(), file.getRepresentationId());
+
+    for (TechnicalMetadata technicalMetadata : representation.getTechnicalMetadata()) {
+      String type = technicalMetadata.getType();
+      String label = messages.getTranslation(
+        RodaConstants.I18N_UI_BROWSE_METADATA_TECHNICAL_TYPE_PREFIX + type.toLowerCase(), technicalMetadata.getId());
+      technicalMetadataInfos.addObject(new TechnicalMetadataInfo(type, label));
+    }
+
+    return technicalMetadataInfos;
+  }
+
+  public StreamResponse retrieveFileTechnicalMetadata(IndexedFile file, String type, String versionID,
+    String localeString) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException,
+    GenericException, TechnicalMetadataNotFoundException {
+    ModelService model = RodaCoreFactory.getModelService();
+    String techMDURN = URNUtils.createRodaTechnicalMetadataURN(file.getId(),
+      RODAInstanceUtils.getLocalInstanceIdentifier(), type.toLowerCase());
+    StoragePath metadataPath = ModelUtils.getTechnicalMetadataStoragePath(file.getAipId(), file.getRepresentationId(),
+      Collections.singletonList(type), techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
+    Binary metadataBinary;
+    if (versionID != null) {
+      BinaryVersion binaryVersion = model.getStorage().getBinaryVersion(metadataPath, versionID);
+      metadataBinary = binaryVersion.getBinary();
+    } else {
+      metadataBinary = model.getStorage().getBinary(metadataPath);
+    }
+    String filename = metadataBinary.getStoragePath().getName() + HTML_EXT;
+    String htmlDescriptive = HTMLUtils.technicalMetadataToHtml(metadataBinary, type, versionID,
+      ServerTools.parseLocale(localeString));
+
+    ConsumesOutputStream stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_APPLICATION_XML,
+      out -> {
+        PrintStream printStream = new PrintStream(out);
+        printStream.print(htmlDescriptive);
+        printStream.close();
+      });
+
+    return new StreamResponse(stream);
   }
 
 }
