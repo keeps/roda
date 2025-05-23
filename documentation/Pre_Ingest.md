@@ -25,8 +25,6 @@ This file can be downloaded and imported into **RODA-in**, a tool designed to as
 
 📎 [Download classification scheme](/api/v2/classification-plans)
 
-Óptimo. Aqui está a secção revista e integrada no texto anterior, com linguagem clara, alinhada com o OAIS, e actualizada com boas práticas actuais. Inclui agora uma nova subseção sobre ferramentas de linha de comandos e bibliotecas para criação de SIPs:
-
 ## SIP Preparation
 
 The _Producer_ is responsible for creating one or more **Submission Information Packages (SIPs)**, in accordance with the specifications set out in the submission agreement. Each SIP must:
