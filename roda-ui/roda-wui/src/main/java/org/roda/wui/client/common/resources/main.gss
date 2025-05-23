@@ -5146,7 +5146,7 @@ td.datePickerMonth, td.datePickerYear {
     margin: 40px auto 0;
     max-width: 400px;
     min-width: 300px;
-    background-color: #f9f9f9;
+    background-color: #eee;
     padding: 30px 40px;
     position: relative;
     border-radius: 2px;
