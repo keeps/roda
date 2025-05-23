@@ -119,7 +119,7 @@ public class RODATransactionManager {
     }
 
     transactionsContext.remove(transactionID);
-    transactionLogService.cleanUp(transactionID);
+    //transactionLogService.cleanUp(transactionID);
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLED_BACK);
   }
 }
