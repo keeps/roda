@@ -75,5 +75,15 @@ public class BrowseFileTabs extends Tabs {
         return new DetailsTab(file, browseFileResponse.getRepresentationInformationFields());
       }
     });
+
+    // Technical metadata
+    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.viewTechnicalMetadata()), new TabContentBuilder() {
+      @Override
+      public Widget buildTabWidget() {
+        FileTechnicalMetadataTabs tmdTabs = new FileTechnicalMetadataTabs();
+        tmdTabs.init(file, browseFileResponse.getTechnicalMetadataInfos());
+        return tmdTabs;
+      }
+    });
   }
 }

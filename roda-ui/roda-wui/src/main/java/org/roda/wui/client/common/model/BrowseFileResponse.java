@@ -6,6 +6,7 @@ import java.util.List;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfos;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -18,6 +19,7 @@ public class BrowseFileResponse {
   private LongResponse riskCounterResponse;
   private LongResponse preservationCounterResponse;
   private List<String> representationInformationFields;
+  private TechnicalMetadataInfos technicalMetadataInfos;
 
   public BrowseFileResponse() {
     representationInformationFields = new ArrayList<>();
@@ -69,5 +71,13 @@ public class BrowseFileResponse {
 
   public void setRepresentationInformationFields(List<String> representationInformationFields) {
     this.representationInformationFields = representationInformationFields;
+  }
+
+  public TechnicalMetadataInfos getTechnicalMetadataInfos() {
+    return technicalMetadataInfos;
+  }
+
+  public void setTechnicalMetadataInfos(TechnicalMetadataInfos technicalMetadataInfos) {
+    this.technicalMetadataInfos = technicalMetadataInfos;
   }
 }

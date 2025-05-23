@@ -28,6 +28,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfos;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.tabs.BrowseFileTabs;
 import org.roda.wui.client.common.BrowseFileActionsToolbar;
@@ -166,9 +167,13 @@ public class BrowseFile extends Composite {
             CompletableFuture<List<String>> getRepresentationInformationFields = services
               .fileResource(FileRestService::retrieveFileRuleProperties);
 
+            CompletableFuture<TechnicalMetadataInfos> retrieveTechnicalMetadataCompletableFuture = services
+              .fileResource(s -> s.retrieveTechnicalMetadataInfos(indexedFile.getId(),
+                LocaleInfo.getCurrentLocale().getLocaleName()));
+
             CompletableFuture.allOf(riskCounterCompletableFuture, preservationCounterCompletableFuture,
-              dipCounterCompletableFuture, retrieveAIPCompletableFuture, retrieveRepresentationCompletableFuture)
-              .thenApply(unused -> {
+              dipCounterCompletableFuture, retrieveAIPCompletableFuture, retrieveRepresentationCompletableFuture,
+              retrieveTechnicalMetadataCompletableFuture).thenApply(unused -> {
                 BrowseFileResponse response = new BrowseFileResponse();
                 response.setIndexedAIP(retrieveAIPCompletableFuture.join());
                 response.setIndexedRepresentation(retrieveRepresentationCompletableFuture.join());
@@ -176,6 +181,7 @@ public class BrowseFile extends Composite {
                 response.setDipCounterResponse(dipCounterCompletableFuture.join());
                 response.setPreservationCounterResponse(preservationCounterCompletableFuture.join());
                 response.setRepresentationInformationFields(getRepresentationInformationFields.join());
+                response.setTechnicalMetadataInfos(retrieveTechnicalMetadataCompletableFuture.join());
                 return response;
               }).whenComplete((response, caught) -> {
                 instance = new BrowseFile(viewers, response, indexedFile, services);
@@ -260,7 +266,8 @@ public class BrowseFile extends Composite {
     this.title.setText(indexedFile.getId());
 
     // TOOLBAR
-    this.objectToolbar.setObjectAndBuild(indexedFile, response.getIndexedAIP().getState(), response.getIndexedAIP().getPermissions(), handler);
+    this.objectToolbar.setObjectAndBuild(indexedFile, response.getIndexedAIP().getState(),
+      response.getIndexedAIP().getPermissions(), handler);
 
     // SIDEBAR
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, indexedFile.getUUID()));
