@@ -53,6 +53,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
@@ -863,6 +864,9 @@ public final class ModelUtils {
     if (object instanceof AIP aip) {
       return getAIPStoragePath(aip.getId());
     }
+    if (object instanceof IndexedAIP aip) {
+      return getAIPStoragePath(aip.getId());
+    }
     if (object instanceof Representation representation) {
       return getRepresentationStoragePath(representation.getAipId(), representation.getId());
     }
@@ -874,6 +878,9 @@ public final class ModelUtils {
     }
     if (object instanceof File file) {
       return getFileStoragePath(file);
+    }
+    if (object instanceof IndexedFile file) {
+      return getFileStoragePath(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
     }
     if (object instanceof DIPFile dipFile) {
       return getDIPFileStoragePath(dipFile);
@@ -888,7 +895,13 @@ public final class ModelUtils {
     if (object instanceof IndexedPreservationEvent event) {
       return getPreservationEventStoragePath(event.getFileUUID());
     }
+    if (object instanceof IndexedPreservationAgent agent) {
+      return getPreservationMetadataStoragePath(agent.getId(), PreservationMetadataType.AGENT);
+    }
     if (object instanceof Job job) {
+      return getJobStoragePath(job.getId());
+    }
+    if (object instanceof IndexedJob job) {
       return getJobStoragePath(job.getId());
     }
     if (object instanceof DisposalHold disposalHold) {
