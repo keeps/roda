@@ -36,18 +36,22 @@ public class RequestHandler {
   private HttpServletRequest request;
 
   public <T> T processRequestWithTransaction(RequestProcessor<T> handler) {
-    return processRequest(handler, null, true);
+    return processRequest(handler, null, true, true);
   }
 
   public <T> T processRequest(RequestProcessor<T> handler) {
-    return processRequest(handler, null, false);
+    return processRequest(handler, null, false, true);
   }
 
   public <T> T processRequest(RequestProcessor<T> handler, Class<?> returnClass) {
-    return processRequest(handler, returnClass, false);
+    return processRequest(handler, returnClass, false, true);
   }
 
-  private <T> T processRequest(RequestProcessor<T> processor, Class<?> returnClass, boolean isTransactional) {
+  public <T> T processRequestWithoutCheckRoles(RequestProcessor<T> handler) {
+    return processRequest(handler, null, false, false);
+  }
+
+  private <T> T processRequest(RequestProcessor<T> processor, Class<?> returnClass, boolean isTransactional, boolean checkRoles) {
     RequestControllerAssistant controllerAssistant = new RequestControllerAssistant(processor);
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -56,7 +60,9 @@ public class RequestHandler {
 
     try {
       // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser(), returnClass);
+      if (checkRoles) {
+        controllerAssistant.checkRoles(requestContext.getUser(), returnClass);
+      }
 
       if (isAValidTransactionalContext(isTransactional)) {
         // Init transaction
