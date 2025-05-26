@@ -154,9 +154,7 @@ public final class ZipUtility {
     // Create a buffer for reading the files
     byte[] buffer = new byte[BUFFER_SIZE];
 
-    Iterator<File> iterator = contentAbsoluteFiles.iterator();
-    while (iterator.hasNext()) {
-      File absoluteFile = iterator.next();
+    for (File absoluteFile : contentAbsoluteFiles) {
       String relativeFile = getFilePathRelativeTo(absoluteFile, contentsDir);
 
       FileInputStream inputStream = new FileInputStream(absoluteFile);
@@ -195,83 +193,5 @@ public final class ZipUtility {
    */
   public static String getFilePathRelativeTo(File file, File relativeTo) {
     return relativeTo.getAbsoluteFile().toURI().relativize(file.getAbsoluteFile().toURI()).toString();
-  }
-
-  /**
-   * Adds file / folder to zip output stream. Method works recursively.
-   *
-   * @param zos
-   * @param srcFile
-   */
-  public static void addDirToArchive(ZipOutputStream zos, File srcFile) {
-    File[] files = srcFile.listFiles();
-    for (int i = 0; i < files.length; i++) {
-      // if the file is directory, use recursion
-      if (files[i].isDirectory()) {
-        addDirToArchive(zos, files[i]);
-        continue;
-      }
-      try (FileInputStream fis = new FileInputStream(files[i])) {
-        // create byte buffer
-        byte[] buffer = new byte[1024];
-        zos.putNextEntry(new ZipEntry(files[i].getName()));
-        int length;
-        while ((length = fis.read(buffer)) > 0) {
-          zos.write(buffer, 0, length);
-        }
-        zos.closeEntry();
-      } catch (IOException e) {
-        LOGGER.error("Error adding file/folder to zip", e);
-      }
-    }
-  }
-
-  public static void zip(File directory, ZipOutputStream zout) throws IOException {
-    URI base = directory.toURI();
-    Deque<File> queue = new LinkedList<>();
-    queue.push(directory);
-    try {
-      while (!queue.isEmpty()) {
-        File dir = queue.pop();
-        for (File kid : dir.listFiles()) {
-          String name = base.relativize(kid.toURI()).getPath();
-          if (kid.isDirectory()) {
-            queue.push(kid);
-            name = name.endsWith("/") ? name : name + "/";
-            zout.putNextEntry(new ZipEntry(name));
-          } else {
-            zout.putNextEntry(new ZipEntry(name));
-            copy(kid, zout);
-            zout.closeEntry();
-          }
-        }
-      }
-    } finally {
-      zout.close();
-    }
-  }
-
-  private static void copy(InputStream in, OutputStream out) throws IOException {
-    byte[] buffer = new byte[1024];
-    while (true) {
-      int readCount = in.read(buffer);
-      if (readCount < 0) {
-        break;
-      }
-      out.write(buffer, 0, readCount);
-    }
-  }
-
-  private static void copy(File file, OutputStream out) throws IOException {
-    InputStream in = new FileInputStream(file);
-    try {
-      copy(in, out);
-    } finally {
-      in.close();
-    }
-  }
-
-  public static List<File> extractFilesFromInputStream(InputStream inputStream, Path outputDir) throws IOException {
-    return extractFilesFromInputStream(inputStream, outputDir.toFile(), false);
   }
 }
