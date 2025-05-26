@@ -9,35 +9,31 @@ package org.roda.core.util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * 20160824 hsilva: I think someone, outside RODA code base, is using this
@@ -52,168 +48,106 @@ public final class RESTClientUtility {
     // do nothing
   }
 
-  public static <T extends Serializable> T sendPostRequest(T element, Class<T> elementClass, String url,
-    String resource, String username, String password) throws RODAException {
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-    String basicAuthToken = new String(Base64.encode((username + ":" + password).getBytes()));
-    HttpPost httpPost = new HttpPost(url + resource);
-    httpPost.setHeader("Authorization", "Basic " + basicAuthToken);
-    httpPost.addHeader("content-type", "application/json");
-    httpPost.addHeader("Accept", "application/json");
-
-    try {
-      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(element)));
-      HttpResponse response;
-      response = httpClient.execute(httpPost);
-      HttpEntity responseEntity = response.getEntity();
-
-      int responseStatusCode = response.getStatusLine().getStatusCode();
-      if (responseStatusCode == 201) {
-        return JsonUtils.getObjectFromJson(responseEntity.getContent(), elementClass);
-      } else {
-        throw new RODAException("POST request response status code: " + responseStatusCode);
-      }
-    } catch (IOException e) {
-      throw new RODAException("Error sending POST request", e);
-    }
-  }
-
-  public static <T extends Serializable> T sendPostRequestWithoutBody(Class<T> elementClass, String url, String resource,
-    AccessToken accessToken) throws GenericException {
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-    HttpPost httpPost = new HttpPost(url + resource);
-    httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
-    httpPost.addHeader("content-type", "application/json");
-    httpPost.addHeader("Accept", "application/json");
-
-    try {
-      HttpResponse response;
-      response = httpClient.execute(httpPost);
-      HttpEntity responseEntity = response.getEntity();
-      int responseStatusCode = response.getStatusLine().getStatusCode();
-
-      if (responseStatusCode == 201) {
-        if (elementClass != null) {
-          return JsonUtils.getObjectFromJson(responseEntity.getContent(), elementClass);
-        } else {
-          return null;
-        }
-      } else {
-        throw new GenericException("POST request response status code: " + responseStatusCode);
-      }
-    } catch (IOException e) {
-      throw new GenericException("Error sending POST request", e);
-    }
-  }
-
-  public static <T extends Serializable> T sendPostRequest(Object element, Class<T> elementClass, String url,
+  public static <T extends Serializable> T sendPostRequestWithoutBodyHttp5(Class<T> elementClass, String url,
     String resource, AccessToken accessToken) throws GenericException {
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-    HttpPost httpPost = new HttpPost(url + resource);
-    httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
-    httpPost.addHeader("content-type", "application/json");
-    httpPost.addHeader("Accept", "application/json");
+    try (final CloseableHttpClient httpclient = HttpClients.createDefault()) {
+      HttpPost httpPost = new HttpPost(url + resource);
+      httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
+      httpPost.addHeader("content-type", "application/json");
+      httpPost.addHeader("Accept", "application/json");
 
-    try {
-      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(element)));
-      HttpResponse response;
-      response = httpClient.execute(httpPost);
-      HttpEntity responseEntity = response.getEntity();
+      Result result = httpclient.execute(httpPost, response -> new Result(response.getCode(),
+        EntityUtils.toString(response.getEntity(), Charset.defaultCharset())));
 
-      int responseStatusCode = response.getStatusLine().getStatusCode();
-      if (responseStatusCode == 201) {
+      if (result.statusCode == 201) {
         if (elementClass != null) {
-          return JsonUtils.getObjectFromJson(responseEntity.getContent(), elementClass);
+          return JsonUtils.getObjectFromJson(result.content, elementClass);
         } else {
           return null;
         }
       } else {
-        throw new GenericException("POST request response status code: " + responseStatusCode);
+        throw new GenericException("POST request response status code: " + result.statusCode);
       }
     } catch (IOException e) {
       throw new GenericException("Error sending POST request", e);
     }
   }
 
-  public static int sendPostRequestWithCompressedFile(String url, String resource, Path path, AccessToken accessToken)
-    throws RODAException, IOException {
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+  public static <T extends Serializable> T sendPostRequestHttpClient5(Object element, Class<T> elementClass, String url,
+    String resource, AccessToken accessToken) throws GenericException {
+    try (final CloseableHttpClient httpclient = HttpClients.createDefault()) {
+      HttpPost httpPost = new HttpPost(url + resource);
+      httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
+      httpPost.addHeader("content-type", "application/json");
+      httpPost.addHeader("Accept", "application/json");
 
-    HttpPost httpPost = new HttpPost(url + resource);
-    httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
+      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(element)));
 
-    InputStream inputStream = Files.newInputStream(path.toFile().toPath());
-    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-    builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-    builder.addBinaryBody(RodaConstants.API_QUERY_KEY_FILE, inputStream, ContentType.create("application/zip"),
-      path.getFileName().toString());
+      Result result = httpclient.execute(httpPost, response -> new Result(response.getCode(),
+        EntityUtils.toString(response.getEntity(), Charset.defaultCharset())));
 
-    HttpEntity entity = builder.build();
-
-    try {
-      httpPost.setEntity(entity);
-      HttpResponse response = httpClient.execute(httpPost);
-
-      return response.getStatusLine().getStatusCode();
-
-    } catch (IOException e) {
-      throw new RODAException("Error sending POST request", e);
-    }
-  }
-
-  public static JsonNode sendPostRequest(String url, String resource, Object object) throws GenericException {
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-    HttpPost httpPost = new HttpPost(url + resource);
-    httpPost.addHeader("content-type", "application/json");
-    httpPost.addHeader("Accept", "application/json");
-
-    try {
-      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(object)));
-      HttpResponse response;
-      response = httpClient.execute(httpPost);
-      HttpEntity responseEntity = response.getEntity();
-
-      int responseStatusCode = response.getStatusLine().getStatusCode();
-      if (responseStatusCode == 200) {
-        String json = EntityUtils.toString(responseEntity, StandardCharsets.UTF_8);
-        return JsonUtils.parseJson(json);
+      if (result.statusCode == 201) {
+        if (elementClass != null) {
+          return JsonUtils.getObjectFromJson(result.content, elementClass);
+        } else {
+          return null;
+        }
       } else {
-        throw new GenericException("POST request response status code: " + responseStatusCode);
+        throw new GenericException("POST request response status code: " + result.statusCode);
       }
     } catch (IOException e) {
       throw new GenericException("Error sending POST request", e);
     }
   }
 
-  public static int sendPostRequestWithFile(String url, String resource, String username, SecureString password,
-    Path file) throws RODAException, FileNotFoundException {
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-    HttpPost httpPost = new HttpPost(url + resource);
-    SecureString basicAuth = new SecureString(ArrayUtils.addAll((username + ":").toCharArray(), password.getChars()));
-    SecureString basicAuthToken = new SecureString(
-      Base64.encode(StandardCharsets.UTF_8.encode(CharBuffer.wrap(basicAuth)).array()));
+  public static int sendPostRequestWithCompressedFileHttp5(String url, String resource, Path path,
+    AccessToken accessToken) throws RODAException {
+    try (final CloseableHttpClient httpclient = HttpClients.createDefault()) {
+      HttpPost httpPost = new HttpPost(url + resource);
+      httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
 
-    httpPost.setHeader("Authorization", "Basic " + basicAuthToken.toString());
+      InputStream inputStream = Files.newInputStream(path.toFile().toPath());
+      MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+      builder.setMode(HttpMultipartMode.STRICT);
+      builder.addBinaryBody(RodaConstants.API_QUERY_KEY_FILE, inputStream, ContentType.create("application/zip"),
+        path.getFileName().toString());
+      httpPost.setEntity(builder.build());
 
-    File fileToUpload = new File(FilenameUtils.normalize(file.toString()));
-    InputStream inputStream = new FileInputStream(fileToUpload);
-    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-    builder.addBinaryBody(RodaConstants.API_QUERY_KEY_FILE, inputStream, ContentType.DEFAULT_BINARY,
-      fileToUpload.getName());
+      Result result = httpclient.execute(httpPost, response -> new Result(response.getCode(), null));
 
-    HttpEntity multipart = builder.build();
-
-    try {
-      httpPost.setEntity(multipart);
-      HttpResponse response = httpClient.execute(httpPost);
-
-      return response.getStatusLine().getStatusCode();
-
+      return result.statusCode;
     } catch (IOException e) {
       throw new RODAException("Error sending POST request", e);
-    } finally {
-      basicAuth.close();
-      basicAuthToken.close();
     }
+  }
+
+  public static int sendPostRequestWithFileHttp5(String url, String resource, String username, SecureString password,
+    Path file) throws RODAException {
+    try (final CloseableHttpClient httpclient = HttpClients.createDefault()) {
+      HttpPost httpPost = new HttpPost(url + resource);
+      try (
+        SecureString basicAuth = new SecureString(
+          ArrayUtils.addAll((username + ":").toCharArray(), password.getChars()));
+        SecureString basicAuthToken = new SecureString(
+          Base64.encode(StandardCharsets.UTF_8.encode(CharBuffer.wrap(basicAuth)).array()))) {
+
+        httpPost.setHeader("Authorization", "Basic " + basicAuthToken);
+        File fileToUpload = new File(FilenameUtils.normalize(file.toString()));
+        InputStream inputStream = new FileInputStream(fileToUpload);
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.addBinaryBody(RodaConstants.API_QUERY_KEY_FILE, inputStream, ContentType.DEFAULT_BINARY,
+          fileToUpload.getName());
+        httpPost.setEntity(builder.build());
+
+        Result result = httpclient.execute(httpPost, response -> new Result(response.getCode(), null));
+
+        return result.statusCode;
+      }
+    } catch (IOException e) {
+      throw new RODAException("Error sending POST request", e);
+    }
+  }
+
+  private record Result(int statusCode, String content) {
   }
 }

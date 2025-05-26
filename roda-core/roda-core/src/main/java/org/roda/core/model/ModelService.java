@@ -2201,7 +2201,7 @@ public class ModelService extends ModelObservable {
         RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_PRIMARY_PASS, "").toCharArray())) {
       for (Path path : directoryStream) {
         if (!path.equals(currentLogFile)) {
-          int httpExitCode = RESTClientUtility.sendPostRequestWithFile(url, resource, username, password, path);
+          int httpExitCode = RESTClientUtility.sendPostRequestWithFileHttp5(url, resource, username, password, path);
           if (httpExitCode == RodaConstants.HTTP_RESPONSE_CODE_CREATED) {
             LOGGER.info("The action log file ({}) was moved to Master successfully!", path);
             Files.delete(path);

@@ -149,7 +149,7 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
         AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
         String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V2_DISTRIBUTED_INSTANCE + RodaConstants.API_SEP
           + localInstance.getId() + RodaConstants.API_SEP + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER;
-        RESTClientUtility.sendPostRequestWithoutBody(null, localInstance.getCentralInstanceURL(), resource,
+        RESTClientUtility.sendPostRequestWithoutBodyHttp5(null, localInstance.getCentralInstanceURL(), resource,
           accessToken);
         localInstance.setIsSubscribed(true);
         localInstance.setStatus(SynchronizingStatus.ACTIVE);
