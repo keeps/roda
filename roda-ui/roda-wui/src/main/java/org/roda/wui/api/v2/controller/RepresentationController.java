@@ -45,6 +45,7 @@ import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.RepresentationRestService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.I18nUtility;
+import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.slf4j.Logger;
@@ -72,6 +73,8 @@ public class RepresentationController implements RepresentationRestService, Expo
   private IndexService indexService;
   @Autowired
   private RepresentationService representationService;
+  @Autowired
+  private RequestHandler requestHandler;
 
   @Override
   public IndexedRepresentation findByUuid(String uuid, String localeString) {
@@ -104,290 +107,208 @@ public class RepresentationController implements RepresentationRestService, Expo
   @Override
   public IndexedRepresentation retrieveIndexedRepresentationViaRequest(
     @RequestBody IndexedRepresentationRequest indexedRepresentationRequest) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<IndexedRepresentation>() {
+      @Override
+      public IndexedRepresentation process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM,
+          indexedRepresentationRequest.getAipId(), RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM,
+          indexedRepresentationRequest.getRepresentationId());
+        List<String> representationFieldsToReturn = new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID,
+          RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+        IndexedRepresentation representation = requestContext.getIndexService().retrieve(IndexedRepresentation.class,
+          IdUtils.getRepresentationId(indexedRepresentationRequest.getAipId(),
+            indexedRepresentationRequest.getRepresentationId()),
+          representationFieldsToReturn);
 
-      // delegate
-      List<String> representationFieldsToReturn = new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID,
-        RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
+        // check object permissions
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), representation);
 
-      IndexedRepresentation representation = RodaCoreFactory.getIndexService().retrieve(IndexedRepresentation.class,
-        IdUtils.getRepresentationId(indexedRepresentationRequest.getAipId(),
-          indexedRepresentationRequest.getRepresentationId()),
-        representationFieldsToReturn);
+        RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
 
-      // check object permissions
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), representation);
+        if (RODAInstanceUtils.isConfiguredAsDistributedMode()
+          && RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
+          boolean isLocalInstance = representation.getInstanceId()
+            .equals(RODAInstanceUtils.getLocalInstanceIdentifier());
+          representationService.retrieveDistributedInstanceName(representation.getInstanceId(), isLocalInstance)
+            .ifPresent(representation::setInstanceName);
+          representation.setLocalInstance(isLocalInstance);
+        }
 
-      RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
-
-      if (RODAInstanceUtils.isConfiguredAsDistributedMode()
-        && RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
-        boolean isLocalInstance = representation.getInstanceId().equals(RODAInstanceUtils.getLocalInstanceIdentifier());
-        representationService.retrieveDistributedInstanceName(representation.getInstanceId(), isLocalInstance)
-          .ifPresent(representation::setInstanceName);
-        representation.setLocalInstance(isLocalInstance);
+        return representation;
       }
-
-      return representation;
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (NotFoundException | GenericException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_AIP_ID_PARAM,
-        indexedRepresentationRequest.getAipId(), RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM,
-        indexedRepresentationRequest.getRepresentationId());
-    }
+    });
   }
 
   @Override
   public Representation getRepresentation(String aipId, String representationId) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Representation>() {
+      @Override
+      public Representation process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        IndexedRepresentation representation = findByUuid(representationId, null);
+        controllerAssistant.setRelatedObjectId(aipId);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+          RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), representation);
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // delegate
-      IndexedRepresentation representation = findByUuid(representationId, null);
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), representation);
-
-      return representationService.retrieveAIPRepresentation(representation);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RequestNotValidException | NotFoundException | GenericException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
-        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
-    }
+        return representationService.retrieveAIPRepresentation(requestContext, representation);
+      }
+    });
   }
 
   @Override
   public Representation createRepresentation(String aipId, String type, String details) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Representation>() {
+      @Override
+      public Representation process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        String representationId = IdUtils.createUUID();
+        controllerAssistant.setRelatedObjectId(aipId);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+          RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_TYPE_PARAM, type,
+          RodaConstants.CONTROLLER_DETAILS_PARAM, details);
 
-    String representationId = IdUtils.createUUID();
+        IndexedAIP aip = requestContext.getIndexService().retrieve(IndexedAIP.class, aipId,
+          RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+        // check state
+        controllerAssistant.checkAIPState(aip);
 
-      IndexedAIP aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
-        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
+        // check if AIP is in a disposal confirmation
+        controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
 
-      // check state
-      controllerAssistant.checkAIPState(aip);
-
-      // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
-
-      // delegate
-      return representationService.createRepresentation(requestContext.getUser(), aipId, representationId, type,
-        details);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
-        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_TYPE_PARAM, type,
-        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
-    }
+        // delegate
+        return representationService.createRepresentation(requestContext, aipId, representationId, type, details);
+      }
+    });
   }
 
   @Override
   public RepresentationTypeOptions getRepresentationTypeOptions(String localeString) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<RepresentationTypeOptions>() {
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+      @Override
+      public RepresentationTypeOptions process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        List<String> types = new ArrayList<>();
+        boolean isControlled = RodaCoreFactory.getRodaConfiguration()
+          .getBoolean("core.representation_type.controlled_vocabulary", false);
 
-      List<String> types = new ArrayList<>();
-      boolean isControlled = RodaCoreFactory.getRodaConfiguration()
-        .getBoolean("core.representation_type.controlled_vocabulary", false);
+        if (isControlled) {
+          types = RodaCoreFactory.getRodaConfigurationAsList("core.representation_type.value");
+        } else {
+          Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_TYPE));
+          FindRequest findRequest = FindRequest.getBuilder(Filter.ALL, false).withSublist(Sublist.NONE)
+            .withFacets(facets).withExportFacets(false).withSorter(Sorter.NONE).withFieldsToReturn(new ArrayList<>())
+            .build();
 
-      if (isControlled) {
-        types = RodaCoreFactory.getRodaConfigurationAsList("core.representation_type.value");
-      } else {
-        Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_TYPE));
-        FindRequest findRequest = FindRequest.getBuilder(Filter.ALL, false).withSublist(Sublist.NONE).withFacets(facets)
-          .withExportFacets(false).withSorter(Sorter.NONE).withFieldsToReturn(new ArrayList<>()).build();
+          IndexResult<IndexedRepresentation> result = I18nUtility.translate(
+            requestContext.getIndexService().find(IndexedRepresentation.class, findRequest, requestContext.getUser()),
+            IndexedRepresentation.class, localeString);
 
-        IndexResult<IndexedRepresentation> result = I18nUtility.translate(
-          RodaCoreFactory.getIndexService().find(IndexedRepresentation.class, findRequest, requestContext.getUser()),
-          IndexedRepresentation.class, localeString);
+          List<FacetFieldResult> facetResults = result.getFacetResults();
+          for (FacetValue facetValue : facetResults.getFirst().getValues()) {
+            types.add(facetValue.getValue());
+          }
 
-        List<FacetFieldResult> facetResults = result.getFacetResults();
-        for (FacetValue facetValue : facetResults.getFirst().getValues()) {
-          types.add(facetValue.getValue());
+          if (!types.contains("MIXED")) {
+            types.add("MIXED");
+          }
         }
 
-        if (!types.contains("MIXED")) {
-          types.add("MIXED");
-        }
+        return new RepresentationTypeOptions(isControlled, types);
       }
-
-      return new RepresentationTypeOptions(isControlled, types);
-    } catch (RequestNotValidException | GenericException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } finally {
-      controllerAssistant.registerAction(requestContext, state);
-    }
+    });
   }
 
   @Override
   public Job changeRepresentationType(@RequestBody ChangeTypeRequest changeRepresentationTypeRequest) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      SelectedItems<IndexedRepresentation> indexedRepresentationSelectedItems = CommonServicesUtils
-        .convertSelectedItems(changeRepresentationTypeRequest.getItems(), IndexedRepresentation.class);
-
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentationSelectedItems);
-
-      return representationService.changeRepresentationType(requestContext.getUser(),
-        indexedRepresentationSelectedItems, changeRepresentationTypeRequest.getType(),
-        changeRepresentationTypeRequest.getDetails());
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (NotFoundException | GenericException | RequestNotValidException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        changeRepresentationTypeRequest.getItems(), RodaConstants.CONTROLLER_TYPE_PARAM,
-        changeRepresentationTypeRequest.getType(), RodaConstants.CONTROLLER_DETAILS_PARAM,
-        changeRepresentationTypeRequest.getDetails());
-    }
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        SelectedItems<IndexedRepresentation> indexedRepresentationSelectedItems = CommonServicesUtils
+          .convertSelectedItems(changeRepresentationTypeRequest.getItems(), IndexedRepresentation.class);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM,
+          changeRepresentationTypeRequest.getItems(), RodaConstants.CONTROLLER_TYPE_PARAM,
+          changeRepresentationTypeRequest.getType(), RodaConstants.CONTROLLER_DETAILS_PARAM,
+          changeRepresentationTypeRequest.getDetails());
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentationSelectedItems);
+        return representationService.changeRepresentationType(requestContext.getUser(),
+          indexedRepresentationSelectedItems, changeRepresentationTypeRequest.getType(),
+          changeRepresentationTypeRequest.getDetails());
+      }
+    });
   }
 
   @Override
   public Job deleteRepresentation(@RequestBody SelectedItemsRequest items, String details) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      SelectedItems<IndexedRepresentation> indexedRepresentationSelectedItems = CommonServicesUtils
-        .convertSelectedItems(items, IndexedRepresentation.class);
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentationSelectedItems);
-      return representationService.deleteRepresentation(requestContext.getUser(), indexedRepresentationSelectedItems,
-        details);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
-        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
-    }
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        SelectedItems<IndexedRepresentation> indexedRepresentationSelectedItems = CommonServicesUtils
+          .convertSelectedItems(items, IndexedRepresentation.class);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, items,
+          RodaConstants.CONTROLLER_DETAILS_PARAM, details);
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentationSelectedItems);
+        return representationService.deleteRepresentation(requestContext.getUser(), indexedRepresentationSelectedItems,
+          details);
+      }
+    });
   }
 
   @Override
   public Job changeRepresentationStatus(
     @RequestBody ChangeRepresentationStatesRequest changeRepresentationStatesRequest) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM,
+          RodaConstants.CONTROLLER_SELECTED_PARAM, changeRepresentationStatesRequest.getItems(),
+          RodaConstants.CONTROLLER_STATES_PARAM, changeRepresentationStatesRequest.getNewStates(),
+          RodaConstants.CONTROLLER_DETAILS_PARAM, changeRepresentationStatesRequest.getDetails());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+        SelectedItems<IndexedRepresentation> indexedRepresentationSelectedItems = CommonServicesUtils
+          .convertSelectedItems(changeRepresentationStatesRequest.getItems(), IndexedRepresentation.class);
 
-      // check user object permissions
-      SelectedItems<IndexedRepresentation> indexedRepresentationSelectedItems = CommonServicesUtils
-        .convertSelectedItems(changeRepresentationStatesRequest.getItems(), IndexedRepresentation.class);
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentationSelectedItems);
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentationSelectedItems);
 
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedRepresentationSelectedItems);
-      return representationService.changeRepresentationStatus(requestContext.getUser(),
-        indexedRepresentationSelectedItems, changeRepresentationStatesRequest.getNewStates(),
-        changeRepresentationStatesRequest.getDetails());
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RequestNotValidException | NotFoundException | GenericException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM,
-        RodaConstants.CONTROLLER_SELECTED_PARAM, changeRepresentationStatesRequest.getItems(),
-        RodaConstants.CONTROLLER_STATES_PARAM, changeRepresentationStatesRequest.getNewStates(),
-        RodaConstants.CONTROLLER_DETAILS_PARAM, changeRepresentationStatesRequest.getDetails());
-    }
+        return representationService.changeRepresentationStatus(requestContext.getUser(),
+          indexedRepresentationSelectedItems, changeRepresentationStatesRequest.getNewStates(),
+          changeRepresentationStatesRequest.getDetails());
+      }
+    });
   }
 
   @Override
   public Job createFormatIdentificationJob(@RequestBody SelectedItemsRequest items) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // delegate
-      SelectedItems<IndexedRepresentation> indexedRepresentationSelectedItems = CommonServicesUtils
-        .convertSelectedItems(items, IndexedRepresentation.class);
-      return representationService.createFormatIdentificationJob(requestContext.getUser(),
-        indexedRepresentationSelectedItems);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items);
-    }
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, items);
+        SelectedItems<IndexedRepresentation> indexedRepresentationSelectedItems = CommonServicesUtils
+          .convertSelectedItems(items, IndexedRepresentation.class);
+        return representationService.createFormatIdentificationJob(requestContext.getUser(),
+          indexedRepresentationSelectedItems);
+      }
+    });
   }
 
   @Override
   public List<String> retrieveRepresentationRuleProperties() {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    try {
-      // delegate
-      return representationService.getConfigurationRepresentationRules(requestContext.getUser());
-    } finally {
-      controllerAssistant.registerAction(requestContext, LogEntryState.SUCCESS);
-    }
+    return requestHandler.processRequestWithoutCheckRoles(new RequestHandler.RequestProcessor<List<String>>() {
+      @Override
+      public List<String> process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        return representationService.getConfigurationRepresentationRules(requestContext.getUser());
+      }
+    });
   }
 
   @Override
