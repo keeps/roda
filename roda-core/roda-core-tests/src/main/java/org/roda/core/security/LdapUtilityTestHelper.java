@@ -59,7 +59,7 @@ public class LdapUtilityTestHelper {
 
     ldapUtility = new LdapUtility(ldapTemplate, ldapUserRepository, ldapGroupRepository, ldapRoleRepository);
 
-    LOGGER.info("LDAP server running at: " + contextSource.getUrls()[0]);
+    LOGGER.info("LDAP server running at: {}", contextSource.getUrls()[0]);
   }
 
   public void shutdown() {
