@@ -4,6 +4,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.roda.core.data.v2.ip.StoragePath;
 
@@ -12,7 +13,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -29,26 +29,22 @@ public class TransactionalStoragePathOperationLog implements Serializable {
   @Serial
   private static final long serialVersionUID = -359012958079838014L;
 
-  public enum OperationType {
-    CREATE, UPDATE, DELETE, READ
-  }
-
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @GeneratedValue
+  private UUID id;
 
   @ManyToOne
   @JoinColumn(name = "transaction_id", nullable = false)
   private TransactionLog transactionLog;
 
-  @Column(name = "storage_path", nullable = false, length = 255)
+  @Column(name = "storage_path", nullable = false, columnDefinition = "text")
   private String storagePath;
 
-  @Column(name = "version", length = 255)
+  @Column(name = "version")
   private String version;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "operation_type", nullable = false, length = 20)
+  @Column(name = "operation_type", nullable = false)
   private OperationType operationType;
 
   @Column(name = "created_at", nullable = false)
@@ -82,8 +78,10 @@ public class TransactionalStoragePathOperationLog implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
     TransactionalStoragePathOperationLog that = (TransactionalStoragePathOperationLog) o;
     return Objects.equals(id, that.id);
   }

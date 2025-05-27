@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.roda.core.data.v2.ip.StoragePath;
 
@@ -14,10 +15,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import org.roda.core.util.IdUtils;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -38,18 +39,19 @@ public class TransactionLog implements Serializable {
   }
 
   @Id
-  private String id;
+  @GeneratedValue
+  private UUID id;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 15)
+  @Column(nullable = false)
   private TransactionStatus status;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "request_type", nullable = false, length = 15)
+  @Column(name = "request_type", nullable = false)
   private TransactionRequestType requestType;
 
-  @Column(name = "request_id", length = 36)
-  private String requestId;
+  @Column(name = "request_id")
+  private UUID requestId;
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
 
@@ -60,24 +62,24 @@ public class TransactionLog implements Serializable {
   private List<TransactionalStoragePathOperationLog> storagePathsOperations = new ArrayList<>();
 
   @OneToMany(mappedBy = "transactionLog", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<TransactionalModelOperationLog> modelOperations = new ArrayList<>();;
+  private List<TransactionalModelOperationLog> modelOperations = new ArrayList<>();
 
   public TransactionLog() {
 
   }
-  public TransactionLog(TransactionRequestType requestType, String requestId) {
-    this.id = IdUtils.createUUID();
+
+  public TransactionLog(TransactionRequestType requestType, UUID requestId) {
     this.createdAt = LocalDateTime.now();
     this.status = TransactionStatus.PENDING;
     this.requestType = requestType;
     this.requestId = requestId;
   }
 
-  public String getId() {
+  public UUID getId() {
     return id;
   }
 
-  public String getRequestId() {
+  public UUID getRequestId() {
     return requestId;
   }
 
@@ -98,9 +100,11 @@ public class TransactionLog implements Serializable {
     return storagePathsOperations;
   }
 
-  public void addStoragePath(StoragePath storagePath, TransactionalStoragePathOperationLog.OperationType operation, String version) {
+  public void addStoragePath(StoragePath storagePath, OperationType operation,
+    String version) {
     if (storagePath != null) {
-      TransactionalStoragePathOperationLog transactionalStoragePathOperationLog = new TransactionalStoragePathOperationLog(storagePath, operation, version);
+      TransactionalStoragePathOperationLog transactionalStoragePathOperationLog = new TransactionalStoragePathOperationLog(
+        storagePath, operation, version);
       transactionalStoragePathOperationLog.setTransactionLog(this);
       storagePathsOperations.add(transactionalStoragePathOperationLog);
     }
@@ -110,9 +114,10 @@ public class TransactionLog implements Serializable {
     return modelOperations;
   }
 
-  public void addModelOperation(String liteObject, TransactionalModelOperationLog.OperationType operationType) {
+  public void addModelOperation(String liteObject, OperationType operationType) {
     if (liteObject != null) {
-      TransactionalModelOperationLog transactionalModelOperationLog = new TransactionalModelOperationLog(liteObject, operationType);
+      TransactionalModelOperationLog transactionalModelOperationLog = new TransactionalModelOperationLog(liteObject,
+        operationType);
       transactionalModelOperationLog.setTransactionLog(this);
       modelOperations.add(transactionalModelOperationLog);
     }
@@ -120,8 +125,10 @@ public class TransactionLog implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
     TransactionLog that = (TransactionLog) o;
     return Objects.equals(id, that.id);
   }

@@ -51,7 +51,7 @@ public class TransactionContextFactory {
     Path stagingStoragePath = Paths.get(configurationManager.getRodaConfiguration()
       .getString(RodaConstants.CORE_STAGING_STORAGE_PATH, configurationManager.getStagingStoragePath().toString()));
 
-    Path transactionalStoragePath = stagingStoragePath.resolve(transactionLog.getId());
+    Path transactionalStoragePath = stagingStoragePath.resolve(transactionLog.getId().toString());
 
     RodaConstants.StorageType storageType = RodaConstants.StorageType
       .valueOf(configurationManager.getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE,
