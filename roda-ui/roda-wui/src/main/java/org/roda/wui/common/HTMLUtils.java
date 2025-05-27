@@ -12,7 +12,6 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -54,8 +53,14 @@ public final class HTMLUtils {
     final Locale locale) throws GenericException, TechnicalMetadataNotFoundException {
     Map<String, String> translations = getTranslations(metadataType, metadataVersion, locale);
 
-    String lowerCaseMetadataTypeWithVersion = metadataType.toLowerCase() + RodaConstants.METADATA_VERSION_SEPARATOR
-      + metadataVersion;
+    String lowerCaseMetadataTypeWithVersion;
+
+    if (metadataVersion != null) {
+      lowerCaseMetadataTypeWithVersion = metadataType.toLowerCase() + RodaConstants.METADATA_VERSION_SEPARATOR
+        + metadataVersion;
+    } else {
+      lowerCaseMetadataTypeWithVersion = metadataType.toLowerCase();
+    }
 
     if ((RodaCoreFactory.getConfigurationFileAsStream(
       RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH + lowerCaseMetadataTypeWithVersion + ".xslt")) == null) {

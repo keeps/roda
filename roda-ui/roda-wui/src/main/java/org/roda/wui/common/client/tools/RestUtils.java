@@ -180,7 +180,7 @@ public class RestUtils {
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_REST_V2_FILES_TECHNICAL_METADATA_TYPE_HTML);
+      .append(RodaConstants.API_REST_V2_FILES_TECHNICAL_METADATA_TYPE_HTML).append(RodaConstants.API_SEP);
 
     // type id
     b.append(typeId);
@@ -221,6 +221,21 @@ public class RestUtils {
     // base uri
     b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileId)).append(RodaConstants.API_SEP)
       .append(RodaConstants.API_REST_V2_FILES_TECHNICAL_METADATA_DOWNLOAD);
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
+  public static SafeUri createTechnicalMetadataDownloadUri(String fileUUID, String metadataType, String versionId) {
+    // /api/v2/files/{fileUUID}/metadata/technical/{typeId}/download?versionId={versionId}
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileUUID)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.API_REST_V2_FILES_TECHNICAL_METADATA_TYPE_HTML).append(RodaConstants.API_SEP)
+      .append((URL.encodeQueryString(metadataType))).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
+    if (versionId != null) {
+      b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_VERSION_ID)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(versionId));
+    }
 
     return UriUtils.fromSafeConstant(b.toString());
   }

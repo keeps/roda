@@ -533,7 +533,7 @@ public class FilesController implements FileRestService, Exportable {
 
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
-      return ApiUtils.okResponse(filesService.retrieveFileTechnicalMetadata(file, typeId, localeString, versionId));
+      return ApiUtils.okResponse(filesService.retrieveFileTechnicalMetadataHTML(file, typeId, versionId, localeString));
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -563,6 +563,45 @@ public class FilesController implements FileRestService, Exportable {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
     } catch (NotFoundException | GenericException | RequestNotValidException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileUUID);
+    }
+  }
+
+  @GetMapping(path = "/{uuid}/metadata/technical/{typeId}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @Operation(summary = "Download technical metadata file", description = "Download the techinal metadata file", responses = {
+    @ApiResponse(responseCode = "200", description = "Returns an object ", content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),})
+  ResponseEntity<StreamingResponseBody> retrieveTechnicalMetadataFile(
+    @Parameter(description = "The File identifier", required = true) @PathVariable(name = "uuid") String fileUUID,
+    @Parameter(description = "The technical metadata type identifier", required = true) @PathVariable(name = "typeId") String typeId,
+    @Parameter(description = "The version identifier") @RequestParam(name = "versionId", required = false) String versionId) {
+
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      // check object permissions
+      IndexedFile indexedFile = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUUID,
+        RodaConstants.FILE_FIELDS_TO_RETURN);
+
+      controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedFile);
+
+      // delegate
+      StreamResponse streamResponse = filesService.retrieveFileTechnicalMetadata(indexedFile, typeId, versionId);
+      return ApiUtils.okResponse(streamResponse);
+    } catch (AuthorizationDeniedException e) {
+      state = LogEntryState.UNAUTHORIZED;
+      throw new RESTException(e);
+    } catch (RequestNotValidException | GenericException | NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {

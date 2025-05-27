@@ -1,16 +1,10 @@
 package org.roda.wui.client.browse.tabs;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfo;
 import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfos;
-import org.roda.wui.client.browse.DescriptiveMetadataHistory;
-import org.roda.wui.client.browse.EditDescriptiveMetadata;
 import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.PermissionClientUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -71,9 +65,9 @@ public class FileTechnicalMetadataTabs extends Tabs {
               descriptiveMetadataToolbar.addAction(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent event) {
-                  // TODO aflores: make a proper download URL for the correct metadata type
                   Window.Location
-                    .assign(RestUtils.createTechnicalMetadataDownloadUri(file.getId()).asString());
+                    .assign(RestUtils.createTechnicalMetadataDownloadUri(file.getUUID(), metadataInfo.getTypeId(), null)
+                      .asString());
                 }
               }, messages.downloadButton(), "btn-download");
               // HTML

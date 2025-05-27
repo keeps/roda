@@ -168,7 +168,7 @@ public class BrowseFile extends Composite {
               .fileResource(FileRestService::retrieveFileRuleProperties);
 
             CompletableFuture<TechnicalMetadataInfos> retrieveTechnicalMetadataCompletableFuture = services
-              .fileResource(s -> s.retrieveTechnicalMetadataInfos(indexedFile.getId(),
+              .fileResource(s -> s.retrieveTechnicalMetadataInfos(indexedFile.getUUID(),
                 LocaleInfo.getCurrentLocale().getLocaleName()));
 
             CompletableFuture.allOf(riskCounterCompletableFuture, preservationCounterCompletableFuture,

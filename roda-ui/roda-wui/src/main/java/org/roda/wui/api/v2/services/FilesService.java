@@ -366,7 +366,7 @@ public class FilesService {
     return technicalMetadataInfos;
   }
 
-  public StreamResponse retrieveFileTechnicalMetadata(IndexedFile file, String type, String versionID,
+  public StreamResponse retrieveFileTechnicalMetadataHTML(IndexedFile file, String type, String versionID,
     String localeString) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException,
     GenericException, TechnicalMetadataNotFoundException {
     ModelService model = RodaCoreFactory.getModelService();
@@ -393,6 +393,30 @@ public class FilesService {
       });
 
     return new StreamResponse(stream);
+  }
+
+  public StreamResponse retrieveFileTechnicalMetadata(IndexedFile file, String type, String versionID)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
+    final ConsumesOutputStream stream;
+    StreamResponse ret;
+    ModelService model = RodaCoreFactory.getModelService();
+    String techMDURN = URNUtils.createRodaTechnicalMetadataURN(file.getId(),
+      RODAInstanceUtils.getLocalInstanceIdentifier(), type.toLowerCase());
+    StoragePath metadataPath = ModelUtils.getTechnicalMetadataStoragePath(file.getAipId(), file.getRepresentationId(),
+      Collections.singletonList(type), techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
+    Binary metadataBinary;
+    if (versionID != null) {
+      BinaryVersion binaryVersion = model.getStorage().getBinaryVersion(metadataPath, versionID);
+      metadataBinary = binaryVersion.getBinary();
+    } else {
+      metadataBinary = model.getStorage().getBinary(metadataPath);
+    }
+    stream = new BinaryConsumesOutputStream(metadataBinary, RodaConstants.MEDIA_TYPE_TEXT_XML);
+
+    ret = new StreamResponse(stream);
+
+    return ret;
   }
 
 }
