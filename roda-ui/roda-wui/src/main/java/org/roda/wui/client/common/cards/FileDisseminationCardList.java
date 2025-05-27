@@ -53,7 +53,7 @@ public class FileDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
           }
 
           ClickHandler thumbnailClickHandler = event -> {
-            HistoryUtils.newHistory(BrowseDIP.RESOLVER, aipId, representationId, fileId, dip.getId());
+            HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getId());
           };
 
           return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler);

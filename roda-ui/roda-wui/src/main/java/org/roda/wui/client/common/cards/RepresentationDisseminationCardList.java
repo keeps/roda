@@ -54,7 +54,7 @@ public class RepresentationDisseminationCardList extends ThumbnailCardList<Index
           }
 
           ClickHandler thumbnailClickHandler = event -> {
-            HistoryUtils.newHistory(BrowseDIP.RESOLVER, aipId, representationId, dip.getId());
+            HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getId());
           };
 
           return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler);

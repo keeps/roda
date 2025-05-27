@@ -844,6 +844,7 @@ pre code {
 .form-checkbox-job {
 	margin-right: 1em;
 	display: inline-block;
+	width: 200px;
 }
 
 .form-checkbox {
