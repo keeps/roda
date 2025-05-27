@@ -38,6 +38,7 @@ services:
       - clam_data:/var/lib/clamav
       # Mapping $HOME/.roda to enable usage with spring-boot mode
       - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
+      - $HOME/.roda/data/staging-storage:$HOME/.roda/data/staging-storage:ro
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp
 
@@ -96,7 +97,7 @@ services:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 
   postgres:
-    image: postgres:15
+    image: postgres:17
     restart: unless-stopped
     environment:
       POSTGRES_USER: admin

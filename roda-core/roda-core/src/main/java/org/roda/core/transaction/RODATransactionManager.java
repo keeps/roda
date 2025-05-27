@@ -2,9 +2,9 @@ package org.roda.core.transaction;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -24,7 +24,7 @@ public class RODATransactionManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(RODATransactionManager.class);
   private final TransactionLogService transactionLogService;
   private final TransactionContextFactory transactionContextFactory;
-  private final Map<String, TransactionalContext> transactionsContext = new ConcurrentHashMap<>();
+  private final Map<UUID, TransactionalContext> transactionsContext = new ConcurrentHashMap<>();
 
   private ModelService mainModelService;
   private RodaConstants.NodeType nodeType;
@@ -49,10 +49,10 @@ public class RODATransactionManager {
 
   public TransactionalContext beginTransaction(TransactionLog.TransactionRequestType requestType)
     throws RODATransactionException {
-    return this.beginTransaction(requestType, IdUtils.createUUID());
+    return this.beginTransaction(requestType, UUID.randomUUID());
   }
 
-  public TransactionalContext beginTransaction(TransactionLog.TransactionRequestType requestType, String requestId)
+  public TransactionalContext beginTransaction(TransactionLog.TransactionRequestType requestType, UUID requestId)
     throws RODATransactionException {
 
     TransactionLog transactionLog = transactionLogService.createTransactionLog(requestType, requestId);
@@ -62,7 +62,7 @@ public class RODATransactionManager {
     return context;
   }
 
-  public void endTransaction(String transactionID) throws RODATransactionException {
+  public void endTransaction(UUID transactionID) throws RODATransactionException {
 
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTING);
     TransactionalContext context = transactionsContext.get(transactionID);
@@ -79,7 +79,7 @@ public class RODATransactionManager {
     }
 
     transactionsContext.remove(transactionID);
-    //transactionLogService.cleanUp(transactionID);
+    // transactionLogService.cleanUp(transactionID);
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTED);
   }
 
@@ -89,8 +89,9 @@ public class RODATransactionManager {
       IdUtils.createUUID());
     plugin.getParameterValues().put(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID, requestUUID);
 
-    TransactionalContext context = beginTransaction(TransactionLog.TransactionRequestType.JOB, requestUUID);
-    String transactionId = context.transactionLog().getId();
+    TransactionalContext context = beginTransaction(TransactionLog.TransactionRequestType.JOB,
+      UUID.fromString(requestUUID));
+    UUID transactionId = context.transactionLog().getId();
     try {
       plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
       endTransaction(transactionId);
@@ -104,7 +105,7 @@ public class RODATransactionManager {
     }
   }
 
-  public void rollbackTransaction(String transactionID) throws RODATransactionException {
+  public void rollbackTransaction(UUID transactionID) throws RODATransactionException {
     TransactionalContext context = transactionsContext.get(transactionID);
     if (context == null) {
       throw new RODATransactionException("No transaction context found for ID: " + transactionID);
@@ -119,7 +120,7 @@ public class RODATransactionManager {
     }
 
     transactionsContext.remove(transactionID);
-    //transactionLogService.cleanUp(transactionID);
+    // transactionLogService.cleanUp(transactionID);
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLED_BACK);
   }
 }
