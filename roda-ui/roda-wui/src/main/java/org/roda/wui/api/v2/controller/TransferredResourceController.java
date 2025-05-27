@@ -50,7 +50,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -120,7 +119,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
   @Override
   public TransferredResource getResource(String resourceId) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, TransferredResource.class, resourceId, new ArrayList<>());
+    return indexService.retrieve(TransferredResource.class, resourceId, new ArrayList<>());
   }
 
   @Override
@@ -232,7 +231,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      TransferredResource transferredResource = indexService.retrieve(requestContext, TransferredResource.class, uuid,
+      TransferredResource transferredResource = indexService.retrieve(TransferredResource.class, uuid,
         new ArrayList<>());
 
       StreamResponse streamResponse = transferredResourceService.createStreamResponse(transferredResource);
@@ -301,13 +300,13 @@ public class TransferredResourceController implements TransferredResourceRestSer
   @Override
   public TransferredResource findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, TransferredResource.class, uuid, new ArrayList<>());
+    return indexService.retrieve(TransferredResource.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<TransferredResource> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(TransferredResource.class, findRequest, localeString, requestContext);
+    return indexService.find(TransferredResource.class, findRequest, localeString);
   }
 
   @Override
@@ -315,7 +314,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(),
       RodaConstants.PERMISSION_METHOD_FIND_TRANSFERRED_RESOURCE)) {
-      return new LongResponse(indexService.count(TransferredResource.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(TransferredResource.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -324,7 +323,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, TransferredResource.class, requestContext);
+    return indexService.suggest(suggestRequest, TransferredResource.class);
   }
 
   @Override
@@ -332,6 +331,6 @@ public class TransferredResourceController implements TransferredResourceRestSer
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, TransferredResource.class, requestContext));
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, TransferredResource.class));
   }
 }

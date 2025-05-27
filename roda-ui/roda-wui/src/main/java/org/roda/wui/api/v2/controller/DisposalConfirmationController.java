@@ -70,20 +70,20 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   @Override
   public DisposalConfirmation findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, DisposalConfirmation.class, uuid, new ArrayList<>());
+    return indexService.retrieve(DisposalConfirmation.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<DisposalConfirmation> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(DisposalConfirmation.class, findRequest, localeString, requestContext);
+    return indexService.find(DisposalConfirmation.class, findRequest, localeString);
   }
 
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_DIP)) {
-      return new LongResponse(indexService.count(DisposalConfirmation.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(DisposalConfirmation.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -92,7 +92,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, DisposalConfirmation.class, requestContext);
+    return indexService.suggest(suggestRequest, DisposalConfirmation.class);
   }
 
   @GetMapping(path = "/{id}/report/html", produces = MediaType.TEXT_HTML_VALUE)
@@ -305,6 +305,6 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
-      DisposalConfirmation.class, requestContext));
+      DisposalConfirmation.class));
   }
 }

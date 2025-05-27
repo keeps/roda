@@ -321,8 +321,8 @@ public class RepresentationInformationService {
 
     FindRequest findRequest = FindRequest.getBuilder(filter, true).withFieldsToReturn(fieldsToReturn).withChildren(true)
       .build();
-    IndexResult<RepresentationInformation> indexResult = indexService.find(RepresentationInformation.class, findRequest,
-      requestContext);
+    IndexResult<RepresentationInformation> indexResult = indexService.find(RepresentationInformation.class, findRequest
+    );
 
     indexResult.getResults()
       .forEach(ri -> ri.getRelations().stream().filter(p -> p.getLink().equals(fetched.getId())).forEach(riRelation -> {

@@ -70,20 +70,20 @@ public class AuditLogController implements AuditLogRestService, Exportable {
       RodaConstants.LOG_DATETIME, RodaConstants.LOG_RELATED_OBJECT_ID, RodaConstants.LOG_USERNAME,
       RodaConstants.LOG_PARAMETERS, RodaConstants.LOG_STATE, RodaConstants.LOG_REQUEST_HEADER_UUID,
       RodaConstants.LOG_REQUEST_HEADER_REASON, RodaConstants.LOG_REQUEST_HEADER_TYPE);
-    return indexService.retrieve(requestContext, LogEntry.class, uuid, fieldsToReturn);
+    return indexService.retrieve(LogEntry.class, uuid, fieldsToReturn);
   }
 
   @Override
   public IndexResult<LogEntry> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(LogEntry.class, findRequest, localeString, requestContext);
+    return indexService.find(LogEntry.class, findRequest, localeString);
   }
 
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_LOG_ENTRY)) {
-      return new LongResponse(indexService.count(LogEntry.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(LogEntry.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -92,7 +92,7 @@ public class AuditLogController implements AuditLogRestService, Exportable {
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, LogEntry.class, requestContext);
+    return indexService.suggest(suggestRequest, LogEntry.class);
   }
 
   @PostMapping(path = "/import", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -132,6 +132,6 @@ public class AuditLogController implements AuditLogRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, LogEntry.class, requestContext));
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, LogEntry.class));
   }
 }

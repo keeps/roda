@@ -81,7 +81,7 @@ public class RepresentationInformationController implements RepresentationInform
   @Override
   public RepresentationInformation findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    RepresentationInformation retrieve = indexService.retrieve(requestContext, RepresentationInformation.class, uuid,
+    RepresentationInformation retrieve = indexService.retrieve(RepresentationInformation.class, uuid,
       new ArrayList<>(), true);
 
     retrieve.setFamilyI18n(
@@ -97,7 +97,7 @@ public class RepresentationInformationController implements RepresentationInform
   public IndexResult<RepresentationInformation> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     IndexResult<RepresentationInformation> representationInformationIndexResult = indexService
-      .find(RepresentationInformation.class, findRequest, localeString, requestContext);
+      .find(RepresentationInformation.class, findRequest, localeString);
 
     for (RepresentationInformation representationInformation : representationInformationIndexResult.getResults()) {
       representationInformation.setFamilyI18n(translationService.getTranslation(localeString,
@@ -112,7 +112,7 @@ public class RepresentationInformationController implements RepresentationInform
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(),
       RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION)) {
-      return new LongResponse(indexService.count(RepresentationInformation.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(RepresentationInformation.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -121,7 +121,7 @@ public class RepresentationInformationController implements RepresentationInform
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, RepresentationInformation.class, requestContext);
+    return indexService.suggest(suggestRequest, RepresentationInformation.class);
   }
 
   @Override
@@ -375,6 +375,6 @@ public class RepresentationInformationController implements RepresentationInform
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
-      RepresentationInformation.class, requestContext));
+      RepresentationInformation.class));
   }
 }

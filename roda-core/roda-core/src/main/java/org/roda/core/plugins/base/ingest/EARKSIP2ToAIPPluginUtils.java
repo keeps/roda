@@ -168,16 +168,19 @@ public class EARKSIP2ToAIPPluginUtils {
       ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
       String metadataType = dm.getMetadataType().asString();
       String metadataVersion = dm.getMetadataVersion();
-
-      if (model.descriptiveMetadataExists(aipId, representationId, descriptiveMetadataId) && update) {
-        Map<String, String> properties = new HashMap<>();
-        properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
-
-        model.updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
-          metadataVersion, properties, username);
-      } else {
+      try {
         model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
           metadataVersion, username, notify);
+      } catch (AlreadyExistsException e) {
+        if (update) {
+          Map<String, String> properties = new HashMap<>();
+          properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
+
+          model.updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
+            metadataVersion, properties, username);
+        } else {
+          throw e;
+        }
       }
     }
   }
@@ -277,11 +280,13 @@ public class EARKSIP2ToAIPPluginUtils {
       String fileId = schema.getFileName();
       ContentPayload payload = new FSPathContentPayload(schema.getPath());
 
-      if(model.schemaExists(aipId, representationId, directoryPath, fileId) && update) {
+      try {
+        model.createSchema(aipId, representationId, directoryPath, fileId, payload);
+      } catch (AlreadyExistsException e) {
         // Tolerate duplicate schemas when updating
-        return;
+        if (!update)
+          throw e;
       }
-      model.createSchema(aipId, representationId, directoryPath, fileId, payload);
     }
   }
 

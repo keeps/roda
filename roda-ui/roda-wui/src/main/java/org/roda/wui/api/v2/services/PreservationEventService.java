@@ -115,7 +115,7 @@ public class PreservationEventService {
         .getBuilder(new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, uuid)), false)
         .withFieldsToReturn(aipFields).withSublist(new Sublist(0, 1)).build();
 
-      IndexResult<IndexedAIP> indexedAIPIndexResult = indexService.find(IndexedAIP.class, findRequest, context);
+      IndexResult<IndexedAIP> indexedAIPIndexResult = indexService.find(IndexedAIP.class, findRequest);
       if (indexedAIPIndexResult.getTotalCount() == 1) {
         map.put(idValue, indexedAIPIndexResult.getResults().getFirst());
       }
@@ -139,7 +139,7 @@ public class PreservationEventService {
         .withFieldsToReturn(representationFields).withSublist(new Sublist(0, 1)).build();
 
       IndexResult<IndexedRepresentation> indexedRepresentationIndexResult = indexService
-        .find(IndexedRepresentation.class, findRequest, context);
+        .find(IndexedRepresentation.class, findRequest);
       if (indexedRepresentationIndexResult.getTotalCount() == 1) {
         map.put(idValue, indexedRepresentationIndexResult.getResults().getFirst());
       }
@@ -165,7 +165,7 @@ public class PreservationEventService {
       .getBuilder(new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, uuid)), false)
       .withFieldsToReturn(fileFields).withSublist(new Sublist(0, 1)).build();
 
-    IndexResult<IndexedFile> indexedFileIndexResult = indexService.find(IndexedFile.class, findRequest, context);
+    IndexResult<IndexedFile> indexedFileIndexResult = indexService.find(IndexedFile.class, findRequest);
 
     if (indexedFileIndexResult.getTotalCount() == 1) {
       map.put(idValue, indexedFileIndexResult.getResults().getFirst());
@@ -188,7 +188,7 @@ public class PreservationEventService {
         .withFieldsToReturn(resourceFields).withSublist(new Sublist(0, 1)).build();
 
       IndexResult<TransferredResource> transferredResourceIndexResult = indexService.find(TransferredResource.class,
-        findRequest, context);
+        findRequest);
 
       if (transferredResourceIndexResult.getTotalCount() == 1) {
         map.put(idValue, transferredResourceIndexResult.getResults().getFirst());
@@ -223,7 +223,7 @@ public class PreservationEventService {
     for (LinkingAgentIdentifierComplexType linkingAgentIdentifierComplexType : eventComplexType
       .getLinkingAgentIdentifier()) {
 
-      IndexedPreservationAgent agent = indexService.retrieve(context, IndexedPreservationAgent.class,
+      IndexedPreservationAgent agent = indexService.retrieve(IndexedPreservationAgent.class,
         linkingAgentIdentifierComplexType.getLinkingAgentIdentifierValue(), agentFields);
       agents.add(agent);
 
@@ -246,13 +246,13 @@ public class PreservationEventService {
       List<String> directoryFilePath = null;
 
       if (preservationEvent.getRepresentationUUID() != null) {
-        IndexedRepresentation representation = indexService.retrieve(context, IndexedRepresentation.class,
+        IndexedRepresentation representation = indexService.retrieve(IndexedRepresentation.class,
           preservationEvent.getRepresentationUUID(), new ArrayList<>());
         representationId = representation.getId();
       }
 
       if (preservationEvent.getFileUUID() != null) {
-        IndexedFile file = indexService.retrieve(context, IndexedFile.class, preservationEvent.getFileUUID(),
+        IndexedFile file = indexService.retrieve(IndexedFile.class, preservationEvent.getFileUUID(),
           new ArrayList<>());
         fileId = file.getId();
         directoryFilePath = file.getPath();

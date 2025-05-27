@@ -63,20 +63,20 @@ public class RiskIncidenceController implements RiskIncidenceRestService, Export
       RodaConstants.RISK_INCIDENCE_DETECTED_BY, RodaConstants.RISK_INCIDENCE_DETECTED_ON,
       RodaConstants.RISK_INCIDENCE_MITIGATED_ON, RodaConstants.RISK_INCIDENCE_MITIGATED_BY,
       RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION);
-    return indexService.retrieve(requestContext, RiskIncidence.class, uuid, fieldsToReturn);
+    return indexService.retrieve(RiskIncidence.class, uuid, fieldsToReturn);
   }
 
   @Override
   public IndexResult<RiskIncidence> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(RiskIncidence.class, findRequest, localeString, requestContext);
+    return indexService.find(RiskIncidence.class, findRequest, localeString);
   }
 
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_RISK_INCIDENCE)) {
-      return new LongResponse(indexService.count(RiskIncidence.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(RiskIncidence.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -85,7 +85,7 @@ public class RiskIncidenceController implements RiskIncidenceRestService, Export
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, RiskIncidence.class, requestContext);
+    return indexService.suggest(suggestRequest, RiskIncidence.class);
   }
 
   @Override
@@ -155,6 +155,6 @@ public class RiskIncidenceController implements RiskIncidenceRestService, Export
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, RiskIncidence.class, requestContext));
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, RiskIncidence.class));
   }
 }

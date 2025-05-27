@@ -40,20 +40,20 @@ public class JobReportController implements JobReportRestService, Exportable {
   @Override
   public IndexedReport findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, IndexedReport.class, uuid, new ArrayList<>());
+    return indexService.retrieve(IndexedReport.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedReport> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedReport.class, findRequest, localeString, requestContext);
+    return indexService.find(IndexedReport.class, findRequest, localeString);
   }
 
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_JOB_REPORT)) {
-      return new LongResponse(indexService.count(IndexedReport.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(IndexedReport.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -62,7 +62,7 @@ public class JobReportController implements JobReportRestService, Exportable {
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, IndexedReport.class, requestContext);
+    return indexService.suggest(suggestRequest, IndexedReport.class);
   }
 
   @Override
@@ -70,6 +70,6 @@ public class JobReportController implements JobReportRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedReport.class, requestContext));
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedReport.class));
   }
 }

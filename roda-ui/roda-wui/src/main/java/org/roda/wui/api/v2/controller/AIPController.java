@@ -117,7 +117,7 @@ public class AIPController implements AIPRestService, Exportable {
   public IndexedAIP findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
-    IndexedAIP retrieve = indexService.retrieve(requestContext, IndexedAIP.class, uuid, new ArrayList<>());
+    IndexedAIP retrieve = indexService.retrieve(IndexedAIP.class, uuid, new ArrayList<>());
 
     RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
 
@@ -135,7 +135,7 @@ public class AIPController implements AIPRestService, Exportable {
   @Override
   public IndexResult<IndexedAIP> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedAIP.class, findRequest, localeString, requestContext);
+    return indexService.find(IndexedAIP.class, findRequest, localeString);
   }
 
   @Override
@@ -143,7 +143,7 @@ public class AIPController implements AIPRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
-      return new LongResponse(indexService.count(IndexedAIP.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(IndexedAIP.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -152,7 +152,7 @@ public class AIPController implements AIPRestService, Exportable {
   @Override
   public List<String> suggest(@RequestBody SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, IndexedAIP.class, requestContext);
+    return indexService.suggest(suggestRequest, IndexedAIP.class);
   }
 
   @GetMapping(path = "/{id}/representations/{representation-id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -761,7 +761,7 @@ public class AIPController implements AIPRestService, Exportable {
 
         // If the bundle has values from the form, we need to update the XML by
         // applying the values of the form to the raw template
-        IndexedAIP aip = indexService.retrieve(requestContext, IndexedAIP.class, aipId,
+        IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId,
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         // check object permissions
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
@@ -896,7 +896,7 @@ public class AIPController implements AIPRestService, Exportable {
           RodaConstants.CONTROLLER_TYPE_PARAM, type);
         Permissions permissions = new Permissions();
 
-        IndexedAIP parentSDO = indexService.retrieve(requestContext, IndexedAIP.class, parentId,
+        IndexedAIP parentSDO = indexService.retrieve(IndexedAIP.class, parentId,
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), parentSDO);
 
@@ -994,7 +994,7 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), selectedItems);
 
       if (moveRequest.getParentId() != null) {
-        IndexedAIP parentAip = indexService.retrieve(requestContext, IndexedAIP.class, moveRequest.getParentId(),
+        IndexedAIP parentAip = indexService.retrieve(IndexedAIP.class, moveRequest.getParentId(),
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
 
         // check state
@@ -1246,7 +1246,7 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // Check object permissions
-      IndexedAIP aip = indexService.retrieve(requestContext, IndexedAIP.class, aipId,
+      IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId,
         RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
@@ -1283,7 +1283,7 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // Check object permissions
-      IndexedAIP aip = indexService.retrieve(requestContext, IndexedAIP.class, aipId,
+      IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId,
         RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
@@ -1320,7 +1320,7 @@ public class AIPController implements AIPRestService, Exportable {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
           RodaConstants.CONTROLLER_METADATA_ID_PARAM, content.getId());
         // check object permissions
-        IndexedAIP aip = indexService.retrieve(requestContext, IndexedAIP.class, aipId,
+        IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId,
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
@@ -1348,7 +1348,7 @@ public class AIPController implements AIPRestService, Exportable {
           RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
           RodaConstants.CONTROLLER_METADATA_ID_PARAM, content.getId());
         // check object permissions
-        IndexedAIP aip = indexService.retrieve(requestContext, IndexedAIP.class, aipId,
+        IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId,
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
@@ -1548,7 +1548,7 @@ public class AIPController implements AIPRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedAIP.class, requestContext));
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedAIP.class));
   }
 
   @Override
