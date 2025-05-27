@@ -1,19 +1,18 @@
 package org.roda.wui.common.model;
 
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.transaction.TransactionalContext;
-
 
 public class RequestContext {
 
   private User user;
   private RequestHeaders request;
   private ModelService modelService;
-
+  private IndexService indexService;
 
   public RequestContext() {
-    //empty constructor
+    // empty constructor
   }
 
   public User getUser() {
@@ -38,5 +37,17 @@ public class RequestContext {
 
   public void setModelService(ModelService modelService) {
     this.modelService = modelService;
+  }
+
+  public void setRequest(RequestHeaders request) {
+    this.request = request;
+  }
+
+  public IndexService getIndexService() {
+    return indexService;
+  }
+
+  public void setIndexService(IndexService indexService) {
+    this.indexService = indexService;
   }
 }

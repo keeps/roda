@@ -349,20 +349,20 @@ public class JobsController implements JobsRestService, Exportable {
   @Override
   public IndexedJob findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, IndexedJob.class, uuid, new ArrayList<>());
+    return indexService.retrieve(IndexedJob.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedJob> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedJob.class, findRequest, localeString, requestContext);
+    return indexService.find(IndexedJob.class, findRequest, localeString);
   }
 
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_JOB)) {
-      return new LongResponse(indexService.count(IndexedJob.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(IndexedJob.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -371,7 +371,7 @@ public class JobsController implements JobsRestService, Exportable {
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, IndexedJob.class, requestContext);
+    return indexService.suggest(suggestRequest, IndexedJob.class);
   }
 
   @Override
@@ -379,6 +379,6 @@ public class JobsController implements JobsRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedJob.class, requestContext));
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedJob.class));
   }
 }

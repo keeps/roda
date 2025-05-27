@@ -60,6 +60,7 @@ public class RequestHandler {
         // Init transaction
         transactionalContext = transactionManager.beginTransaction(TransactionLog.TransactionRequestType.API);
         requestContext.setModelService(transactionalContext.transactionalModelService());
+        requestContext.setIndexService(transactionalContext.indexService());
         // execute the request
         T result = processor.process(requestContext, controllerAssistant);
 
@@ -68,6 +69,7 @@ public class RequestHandler {
         return result;
       } else {
         requestContext.setModelService(RodaCoreFactory.getModelService());
+        requestContext.setIndexService(RodaCoreFactory.getIndexService());
         return processor.process(requestContext, controllerAssistant);
       }
     } catch (AuthorizationDeniedException e) {

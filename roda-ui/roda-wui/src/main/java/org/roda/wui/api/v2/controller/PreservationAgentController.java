@@ -65,20 +65,20 @@ public class PreservationAgentController implements PreservationAgentRestService
       RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
       RodaConstants.PRESERVATION_AGENT_VERSION, RodaConstants.PRESERVATION_AGENT_NOTE,
       RodaConstants.PRESERVATION_AGENT_EXTENSION);
-    return indexService.retrieve(requestContext, IndexedPreservationAgent.class, uuid, fieldsToReturn);
+    return indexService.retrieve(IndexedPreservationAgent.class, uuid, fieldsToReturn);
   }
 
   @Override
   public IndexResult<IndexedPreservationAgent> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedPreservationAgent.class, findRequest, localeString, requestContext);
+    return indexService.find(IndexedPreservationAgent.class, findRequest, localeString);
   }
 
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_PRESERVATION_AGENT)) {
-      return new LongResponse(indexService.count(IndexedPreservationAgent.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(IndexedPreservationAgent.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -87,7 +87,7 @@ public class PreservationAgentController implements PreservationAgentRestService
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, IndexedPreservationAgent.class, requestContext);
+    return indexService.suggest(suggestRequest, IndexedPreservationAgent.class);
   }
 
   @GetMapping(path = "/{id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -124,6 +124,6 @@ public class PreservationAgentController implements PreservationAgentRestService
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
-      IndexedPreservationAgent.class, requestContext));
+      IndexedPreservationAgent.class));
   }
 }

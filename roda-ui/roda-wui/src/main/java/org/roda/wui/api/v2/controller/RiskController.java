@@ -74,7 +74,7 @@ public class RiskController implements RiskRestService, Exportable {
       RodaConstants.RISK_MITIGATION_STRATEGY, RodaConstants.RISK_MITIGATION_OWNER,
       RodaConstants.RISK_MITIGATION_OWNER_TYPE, RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE,
       RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE);
-    IndexedRisk retrieve = indexService.retrieve(requestContext, IndexedRisk.class, uuid, fieldsToReturn);
+    IndexedRisk retrieve = indexService.retrieve(IndexedRisk.class, uuid, fieldsToReturn);
     try {
       retrieve.setHasVersions(riskService.hasRiskVersions(uuid));
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
@@ -86,14 +86,14 @@ public class RiskController implements RiskRestService, Exportable {
   @Override
   public IndexResult<IndexedRisk> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedRisk.class, findRequest, localeString, requestContext);
+    return indexService.find(IndexedRisk.class, findRequest, localeString);
   }
 
   @Override
   public LongResponse count(CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_RISK)) {
-      return new LongResponse(indexService.count(IndexedRisk.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(IndexedRisk.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -102,7 +102,7 @@ public class RiskController implements RiskRestService, Exportable {
   @Override
   public List<String> suggest(@RequestBody SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, IndexedRisk.class, requestContext);
+    return indexService.suggest(suggestRequest, IndexedRisk.class);
   }
 
   public Job deleteRisk(@RequestBody SelectedItemsRequest selected) {
@@ -341,6 +341,6 @@ public class RiskController implements RiskRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedRisk.class, requestContext));
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedRisk.class));
   }
 }

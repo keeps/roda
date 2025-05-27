@@ -803,20 +803,20 @@ public class MembersController implements MembersRestService, Exportable {
   @Override
   public RodaPrincipal findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, RodaPrincipal.class, uuid, new ArrayList<>());
+    return indexService.retrieve(RodaPrincipal.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<RODAMember> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(RODAMember.class, findRequest, localeString, requestContext);
+    return indexService.find(RODAMember.class, findRequest, localeString);
   }
 
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_RODA_MEMBER)) {
-      return new LongResponse(indexService.count(RODAMember.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(RODAMember.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -825,7 +825,7 @@ public class MembersController implements MembersRestService, Exportable {
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, RODAMember.class, requestContext);
+    return indexService.suggest(suggestRequest, RODAMember.class);
   }
 
   @Override
@@ -833,6 +833,6 @@ public class MembersController implements MembersRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, RODAMember.class, requestContext));
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, RODAMember.class));
   }
 }

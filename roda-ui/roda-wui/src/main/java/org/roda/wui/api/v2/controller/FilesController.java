@@ -106,7 +106,7 @@ public class FilesController implements FileRestService, Exportable {
       controllerAssistant.checkRoles(requestContext.getUser());
       List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
       fileFields.add(RodaConstants.FILE_ISDIRECTORY);
-      IndexedFile file = indexService.retrieve(requestContext, IndexedFile.class, fileUUID, fileFields);
+      IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
       RangeConsumesOutputStream stream = filesService.retrieveAIPRepresentationRangeStream(file);
@@ -141,7 +141,7 @@ public class FilesController implements FileRestService, Exportable {
       controllerAssistant.checkRoles(requestContext.getUser());
       List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
       fileFields.add(RodaConstants.FILE_ISDIRECTORY);
-      IndexedFile file = indexService.retrieve(requestContext, IndexedFile.class, fileUUID, fileFields);
+      IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
       StreamResponse response = filesService.retrieveAIPRepresentationFile(file);
@@ -236,20 +236,20 @@ public class FilesController implements FileRestService, Exportable {
   @Override
   public IndexedFile findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, IndexedFile.class, uuid, new ArrayList<>());
+    return indexService.retrieve(IndexedFile.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedFile> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedFile.class, findRequest, localeString, requestContext);
+    return indexService.find(IndexedFile.class, findRequest, localeString);
   }
 
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
-      return new LongResponse(indexService.count(IndexedFile.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(IndexedFile.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -258,7 +258,7 @@ public class FilesController implements FileRestService, Exportable {
   @Override
   public List<String> suggest(@RequestBody SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, IndexedFile.class, requestContext);
+    return indexService.suggest(suggestRequest, IndexedFile.class);
   }
 
   @Override
@@ -266,7 +266,7 @@ public class FilesController implements FileRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     String uuid = IdUtils.getFileId(indexedFileRequest.getAipId(), indexedFileRequest.getRepresentationId(),
       indexedFileRequest.getDirectoryPaths(), indexedFileRequest.getFileId());
-    IndexedFile retrieve = indexService.retrieve(requestContext, IndexedFile.class, uuid, new ArrayList<>());
+    IndexedFile retrieve = indexService.retrieve(IndexedFile.class, uuid, new ArrayList<>());
 
     if (retrieve.isReference()) {
       retrieve.setAvailable(filesService.isShallowFileAvailable(retrieve));
@@ -507,6 +507,6 @@ public class FilesController implements FileRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedFile.class, requestContext));
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedFile.class));
   }
 }

@@ -76,20 +76,20 @@ public class RepresentationController implements RepresentationRestService, Expo
   @Override
   public IndexedRepresentation findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, IndexedRepresentation.class, uuid, new ArrayList<>());
+    return indexService.retrieve(IndexedRepresentation.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedRepresentation> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedRepresentation.class, findRequest, localeString, requestContext);
+    return indexService.find(IndexedRepresentation.class, findRequest, localeString);
   }
 
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
-      return new LongResponse(indexService.count(IndexedRepresentation.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(IndexedRepresentation.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -98,7 +98,7 @@ public class RepresentationController implements RepresentationRestService, Expo
   @Override
   public List<String> suggest(@RequestBody SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, IndexedRepresentation.class, requestContext);
+    return indexService.suggest(suggestRequest, IndexedRepresentation.class);
   }
 
   @Override
@@ -394,7 +394,7 @@ public class RepresentationController implements RepresentationRestService, Expo
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
-      IndexedRepresentation.class, requestContext));
+    return ApiUtils
+      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedRepresentation.class));
   }
 }

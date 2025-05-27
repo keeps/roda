@@ -38,7 +38,7 @@ mvn -pl roda-ui/roda-wui -am gwt:compile -Pdebug-main -Dscope.gwt-dev=compile
 mvn install -Pcore -DskipTests
 
 # Start up dependencies (Solr, Zookeeper, Siegfried, ClamAV)
-mkdir -p $HOME/.roda/data/storage
+mkdir -p $HOME/.roda/data/{storage,staging-storage}
 docker compose -f deploys/standalone/docker-compose-dev.yaml up -d
 
 # Open WUI in Spring boot

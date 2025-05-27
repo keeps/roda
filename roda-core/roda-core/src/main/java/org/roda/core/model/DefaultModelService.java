@@ -730,7 +730,7 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public boolean descriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
+  public boolean checkIfDescriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     StoragePath descriptiveMetadataStoragePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
       descriptiveMetadataId);
@@ -3689,7 +3689,7 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public boolean schemaExists(String aipId, String representationId, List<String> directoryPath, String fileId) throws RequestNotValidException {
+  public boolean checkIfSchemaExists(String aipId, String representationId, List<String> directoryPath, String fileId) throws RequestNotValidException {
     StoragePath schemaStoragePath = ModelUtils.getSchemaStoragePath(aipId, representationId, directoryPath, fileId);
     return storage.exists(schemaStoragePath);
   }

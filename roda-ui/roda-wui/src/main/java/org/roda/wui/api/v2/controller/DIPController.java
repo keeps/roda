@@ -67,13 +67,13 @@ public class DIPController implements DIPRestService, Exportable {
   @Override
   public IndexedDIP findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, IndexedDIP.class, uuid, new ArrayList<>());
+    return indexService.retrieve(IndexedDIP.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedDIP> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(IndexedDIP.class, findRequest, localeString, requestContext);
+    return indexService.find(IndexedDIP.class, findRequest, localeString);
   }
 
   @Override
@@ -81,7 +81,7 @@ public class DIPController implements DIPRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_DIP)) {
-      return new LongResponse(indexService.count(IndexedDIP.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(IndexedDIP.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -90,7 +90,7 @@ public class DIPController implements DIPRestService, Exportable {
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, IndexedDIP.class, requestContext);
+    return indexService.suggest(suggestRequest, IndexedDIP.class);
   }
 
   @GetMapping(path = "{uuid}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -107,7 +107,7 @@ public class DIPController implements DIPRestService, Exportable {
     try {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
-      IndexedDIP dip = indexService.retrieve(requestContext, IndexedDIP.class, dipUUID, new ArrayList<>());
+      IndexedDIP dip = indexService.retrieve(IndexedDIP.class, dipUUID, new ArrayList<>());
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), dip);
 
       return ApiUtils.okResponse(dipService.createStreamResponse(dip.getUUID()));
@@ -177,6 +177,6 @@ public class DIPController implements DIPRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedDIP.class, requestContext));
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedDIP.class));
   }
 }

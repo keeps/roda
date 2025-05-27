@@ -332,12 +332,21 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public boolean descriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
+  public boolean checkIfDescriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    if (!stagingModelService.descriptiveMetadataExists(aipId, representationId, descriptiveMetadataId)) {
-      return mainModelService.descriptiveMetadataExists(aipId, representationId, descriptiveMetadataId);
+    if (!stagingModelService.checkIfDescriptiveMetadataExists(aipId, representationId, descriptiveMetadataId)) {
+      return mainModelService.checkIfDescriptiveMetadataExists(aipId, representationId, descriptiveMetadataId);
     }
     return true;
+  }
+
+  private void checkIfDescriptiveMetadataExistsAndThrowException(String aipId, String representationId,
+                                                                 String descriptiveMetadataId)
+    throws AlreadyExistsException, AuthorizationDeniedException, RequestNotValidException, GenericException {
+    if (checkIfDescriptiveMetadataExists(aipId, representationId, descriptiveMetadataId)) {
+      throw new AlreadyExistsException("Descriptive metadata with ID '" + descriptiveMetadataId
+        + "' already exists for AIP '" + aipId + "' and representation '" + representationId + "'.");
+    }
   }
 
   @Override
@@ -345,6 +354,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion, String createdBy,
     boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
+
+    checkIfDescriptiveMetadataExistsAndThrowException(aipId, null, descriptiveMetadataId);
+
     registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId,
       TransactionalModelOperationLog.OperationType.CREATE);
     return getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType,
@@ -356,6 +368,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion, String createdBy)
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
     NotFoundException {
+
+    checkIfDescriptiveMetadataExistsAndThrowException(aipId, null, descriptiveMetadataId);
+
     registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId,
       TransactionalModelOperationLog.OperationType.CREATE);
     return getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType,
@@ -367,6 +382,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String descriptiveMetadataId, ContentPayload payload, String descriptiveMetadataType,
     String descriptiveMetadataVersion, String createdBy) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+
+    checkIfDescriptiveMetadataExistsAndThrowException(aipId, representationId, descriptiveMetadataId);
+
     registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
       TransactionalModelOperationLog.OperationType.CREATE);
     return getModelService().createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload,
@@ -378,6 +396,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String descriptiveMetadataId, ContentPayload payload, String descriptiveMetadataType,
     String descriptiveMetadataVersion, String createdBy, boolean notify) throws RequestNotValidException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+
+    checkIfDescriptiveMetadataExistsAndThrowException(aipId, representationId, descriptiveMetadataId);
+
     registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
       TransactionalModelOperationLog.OperationType.CREATE);
     return getModelService().createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload,
@@ -1658,19 +1679,32 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public File createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
-    ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, NotFoundException {
-    return getModelService().createSchema(aipId, representationId, directoryPath, fileId, contentPayload);
+  public boolean checkIfSchemaExists(String aipId, String representationId, List<String> directoryPath, String fileId)
+          throws RequestNotValidException {
+    if (!stagingModelService.checkIfSchemaExists(aipId, representationId, directoryPath, fileId)) {
+      return mainModelService.checkIfSchemaExists(aipId, representationId, directoryPath, fileId);
+    }
+    return true;
+  }
+
+  private void checkIfSchemaExistsAndThrowException(String aipId, String representationId, List<String> directoryPath, String fileId)
+          throws AlreadyExistsException, RequestNotValidException {
+    if (checkIfSchemaExists(aipId, representationId, directoryPath, fileId)) {
+      throw new AlreadyExistsException(
+        "Schema with id '" + fileId + "' already exists in AIP '" + aipId + "' and representation '"
+          + representationId + "'.");
+    }
   }
 
   @Override
-  public boolean schemaExists(String aipId, String representationId, List<String> directoryPath, String fileId)
-    throws RequestNotValidException {
-    if (!stagingModelService.schemaExists(aipId, representationId, directoryPath, fileId)) {
-      return mainModelService.schemaExists(aipId, representationId, directoryPath, fileId);
-    }
-    return true;
+  public File createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
+    ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
+
+    checkIfSchemaExistsAndThrowException(aipId, representationId, directoryPath, fileId);
+
+    registerOperationForFile(aipId, representationId, directoryPath, fileId, TransactionalModelOperationLog.OperationType.CREATE);
+    return getModelService().createSchema(aipId, representationId, directoryPath, fileId, contentPayload);
   }
 
   @Override

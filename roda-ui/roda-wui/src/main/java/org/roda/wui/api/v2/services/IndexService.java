@@ -6,8 +6,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.StreamResponse;
@@ -18,13 +16,11 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.v2.controller.RequestHandler;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.stream.FacetsCSVOutputStream;
 import org.roda.wui.api.v2.stream.ResultsCSVOutputStream;
-import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
@@ -38,39 +34,27 @@ public class IndexService {
   @Autowired
   private RequestHandler requestHandler;
 
-  public <T extends IsIndexed> List<String> suggest(SuggestRequest suggestRequest, Class<T> classToReturn,
-    RequestContext requestContext) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    LogEntryState state = LogEntryState.SUCCESS;
+  public <T extends IsIndexed> List<String> suggest(SuggestRequest suggestRequest, Class<T> classToReturn) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<List<String>>() {
+      @Override
+      public List<String> process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_CLASS_PARAM, classToReturn,
+          RodaConstants.CONTROLLER_FIELD_PARAM, suggestRequest.getField(), RodaConstants.CONTROLLER_QUERY_PARAM,
+          suggestRequest.getQuery());
+        boolean justActive = true;
+        return requestContext.getIndexService().suggest(classToReturn, suggestRequest.getField(),
+          suggestRequest.getQuery(), requestContext.getUser(), suggestRequest.isAllowPartial(), justActive);
+      }
+    }, classToReturn);
+  }
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser(), classToReturn);
-
-      boolean justActive = true;
-      return RodaCoreFactory.getIndexService().suggest(classToReturn, suggestRequest.getField(),
-        suggestRequest.getQuery(), requestContext.getUser(), suggestRequest.isAllowPartial(), justActive);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (GenericException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_CLASS_PARAM, classToReturn,
-        RodaConstants.CONTROLLER_FIELD_PARAM, suggestRequest.getField(), RodaConstants.CONTROLLER_QUERY_PARAM,
-        suggestRequest.getQuery());
-    }
+  public <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final FindRequest findRequest) {
+    return find(classToReturn, findRequest, null);
   }
 
   public <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final FindRequest findRequest,
-    RequestContext context) {
-    return find(classToReturn, findRequest, null, context);
-  }
-
-  public <T extends IsIndexed> IndexResult<T> find(final Class<T> classToReturn, final FindRequest findRequest,
-    String locale, RequestContext context) {
+    String locale) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<IndexResult<T>>() {
       @Override
       public IndexResult<T> process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
@@ -78,15 +62,14 @@ public class IndexService {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_CLASS_PARAM, classToReturn.getSimpleName(),
           RodaConstants.CONTROLLER_FILTER_PARAM, findRequest.getFilter(), RodaConstants.CONTROLLER_SORTER_PARAM,
           findRequest.getSorter(), RodaConstants.CONTROLLER_SUBLIST_PARAM, findRequest.getSublist());
-        // check user permissions
-        controllerAssistant.checkRoles(context.getUser(), classToReturn);
 
         if (findRequest.getFilter() == null || findRequest.getFilter().getParameters().isEmpty()) {
           return new IndexResult<>();
         }
 
         // delegate
-        IndexResult<T> result = RodaCoreFactory.getIndexService().find(classToReturn, findRequest, context.getUser());
+        IndexResult<T> result = requestContext.getIndexService().find(classToReturn, findRequest,
+          requestContext.getUser());
 
         if (locale == null) {
           return result;
@@ -97,8 +80,7 @@ public class IndexService {
     }, classToReturn);
   }
 
-  public <T extends IsIndexed> StreamResponse exportToCSV(User user, String findRequestString, Class<T> returnClass,
-    RequestContext requestContext) {
+  public <T extends IsIndexed> StreamResponse exportToCSV(User user, String findRequestString, Class<T> returnClass) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<StreamResponse>() {
       @Override
       public StreamResponse process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
@@ -116,7 +98,7 @@ public class IndexService {
         }
 
         if (findRequest.isExportFacets()) {
-          IndexResult<T> result = RodaCoreFactory.getIndexService().find(returnClass, findRequest.getFilter(),
+          IndexResult<T> result = requestContext.getIndexService().find(returnClass, findRequest.getFilter(),
             Sorter.NONE, Sublist.NONE, findRequest.getFacets(), user, findRequest.isOnlyActive(),
             findRequest.getFieldsToReturn());
 
@@ -124,7 +106,7 @@ public class IndexService {
             new FacetsCSVOutputStream(result.getFacetResults(), findRequest.getFilename(), csvDelimiter))
             .toStreamResponse();
         } else {
-          IndexResult<T> result = RodaCoreFactory.getIndexService().find(returnClass, findRequest.getFilter(),
+          IndexResult<T> result = requestContext.getIndexService().find(returnClass, findRequest.getFilter(),
             findRequest.getSorter(), findRequest.getSublist(), findRequest.getFacets(), user,
             findRequest.isOnlyActive(), findRequest.getFieldsToReturn());
 
@@ -135,8 +117,8 @@ public class IndexService {
     });
   }
 
-  public <T extends IsIndexed> T retrieve(RequestContext context, Class<T> returnClass, String id,
-    List<String> fieldsToReturn, boolean appendChildren) {
+  public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn,
+    boolean appendChildren) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<T>() {
       @Override
       public T process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
@@ -144,29 +126,28 @@ public class IndexService {
         controllerAssistant.setRelatedObjectId(id);
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_CLASS_PARAM, returnClass.getSimpleName());
         // delegate
-        final T ret = RodaCoreFactory.getIndexService().retrieve(returnClass, id, fieldsToReturn, appendChildren);
+        final T ret = requestContext.getIndexService().retrieve(returnClass, id, fieldsToReturn, appendChildren);
 
         // checking object permissions
-        controllerAssistant.checkObjectPermissions(context.getUser(), ret, returnClass);
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), ret, returnClass);
 
         return ret;
       }
     }, returnClass);
   }
 
-  public <T extends IsIndexed> T retrieve(RequestContext context, Class<T> returnClass, String id,
-    List<String> fieldsToReturn) {
-    return retrieve(context, returnClass, id, fieldsToReturn, false);
+  public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn) {
+    return retrieve(returnClass, id, fieldsToReturn, false);
   }
 
-  public <T extends IsIndexed> Long count(Class<T> returnClass, CountRequest request, RequestContext context) {
+  public <T extends IsIndexed> Long count(Class<T> returnClass, CountRequest request) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<Long>() {
       @Override
       public Long process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_CLASS_PARAM, returnClass.getSimpleName(),
           RodaConstants.CONTROLLER_FILTER_PARAM, request.getFilter().toString());
-        return RodaCoreFactory.getIndexService().count(returnClass, request.getFilter(), context.getUser(),
+        return requestContext.getIndexService().count(returnClass, request.getFilter(), requestContext.getUser(),
           request.isOnlyActive());
       }
     }, returnClass);

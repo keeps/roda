@@ -40,13 +40,13 @@ public class DIPFileController implements DIPFileRestService, Exportable {
   @Override
   public DIPFile findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, DIPFile.class, uuid, new ArrayList<>());
+    return indexService.retrieve(DIPFile.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<DIPFile> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(DIPFile.class, findRequest, localeString, requestContext);
+    return indexService.find(DIPFile.class, findRequest, localeString);
   }
 
   @Override
@@ -54,7 +54,7 @@ public class DIPFileController implements DIPFileRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
-      return new LongResponse(indexService.count(DIPFile.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(DIPFile.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -63,7 +63,7 @@ public class DIPFileController implements DIPFileRestService, Exportable {
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.suggest(suggestRequest, DIPFile.class, requestContext);
+    return indexService.suggest(suggestRequest, DIPFile.class);
   }
 
   @Override
@@ -71,6 +71,6 @@ public class DIPFileController implements DIPFileRestService, Exportable {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils
-      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, DIPFile.class, requestContext));
+      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, DIPFile.class));
   }
 }

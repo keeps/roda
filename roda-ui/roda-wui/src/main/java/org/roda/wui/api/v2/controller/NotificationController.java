@@ -52,7 +52,7 @@ public class NotificationController implements NotificationRestService, Exportab
   @Override
   public Notification getNotification(String notificationId) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, Notification.class, notificationId, new ArrayList<>());
+    return indexService.retrieve(Notification.class, notificationId, new ArrayList<>());
   }
 
   @Override
@@ -84,20 +84,20 @@ public class NotificationController implements NotificationRestService, Exportab
   @Override
   public Notification findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.retrieve(requestContext, Notification.class, uuid, new ArrayList<>());
+    return indexService.retrieve(Notification.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<Notification> find(@RequestBody FindRequest findRequest, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    return indexService.find(Notification.class, findRequest, localeString, requestContext);
+    return indexService.find(Notification.class, findRequest, localeString);
   }
 
   @Override
   public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_NOTIFICATION)) {
-      return new LongResponse(indexService.count(Notification.class, countRequest, requestContext));
+      return new LongResponse(indexService.count(Notification.class, countRequest));
     } else {
       return new LongResponse(-1L);
     }
@@ -114,6 +114,6 @@ public class NotificationController implements NotificationRestService, Exportab
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, Notification.class, requestContext));
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, Notification.class));
   }
 }
