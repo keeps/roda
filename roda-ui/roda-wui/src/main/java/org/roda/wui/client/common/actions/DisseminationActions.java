@@ -75,6 +75,12 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   }
 
   @Override
+  public CanActResult userCanAct(Action<IndexedDIP> action) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
+
+  @Override
   public CanActResult userCanAct(Action<IndexedDIP> action, IndexedDIP dip) {
     return new CanActResult(hasPermissions(action, dip.getPermissions()), CanActResult.Reason.USER,
       messages.reasonUserLacksPermission());
@@ -224,7 +230,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
     // MANAGEMENT
     ActionableGroup<IndexedDIP> managementGroup = new ActionableGroup<>(
-      messages.viewRepresentationFileDisseminationTitle());
+      messages.viewRepresentationFileDisseminationTitle(), "btn-edit");
     managementGroup.addButton(messages.downloadButton(), DisseminationAction.DOWNLOAD, ActionImpact.NONE,
       "btn-download");
     managementGroup.addButton(messages.removeButton(), DisseminationAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
