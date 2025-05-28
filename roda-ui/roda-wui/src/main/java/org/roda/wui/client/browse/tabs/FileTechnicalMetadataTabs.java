@@ -42,7 +42,6 @@ public class FileTechnicalMetadataTabs extends Tabs {
       // Create Toolbar
       FlowPanel cardHeader = new FlowPanel();
       cardHeader.setStyleName("cardHeader");
-      String safeMetadataID = SafeHtmlUtils.htmlEscape(metadataInfo.getTypeId());
       ActionsToolbar descriptiveMetadataToolbar = new ActionsToolbar();
       descriptiveMetadataToolbar.setLabelVisible(false);
       descriptiveMetadataToolbar.setTagsVisible(false);
