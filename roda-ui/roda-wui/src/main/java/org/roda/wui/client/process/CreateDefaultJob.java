@@ -215,7 +215,7 @@ public class CreateDefaultJob extends Composite {
     name.setText(messages.processNewDefaultName(new Date()));
     workflowOptions.setPlugins(plugins);
     configurePlugins();
-    workflowCategoryList.addStyleName("form-listbox-job");
+    workflowCategoryList.addStyleName("form-listbox-job roda6Card");
   }
 
   private void configureOrchestration() {
