@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
@@ -72,7 +73,19 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   }
 
   @Override
+  public CanActResult userCanAct(Action<DIPFile> action) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
+
+  @Override
   public CanActResult userCanAct(Action<DIPFile> action, DIPFile dipFile) {
+    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+      messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<DIPFile> action, SelectedItems<DIPFile> dipFiles) {
     return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
       messages.reasonUserLacksPermission());
   }
