@@ -59,8 +59,6 @@ import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.RangeConsumesOutputStream;
-import org.roda.core.storage.Directory;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
@@ -370,16 +368,19 @@ public class FilesService {
     String localeString) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException,
     GenericException, TechnicalMetadataNotFoundException {
     ModelService model = RodaCoreFactory.getModelService();
+    Representation representation = model.retrieveRepresentation(file.getAipId(), file.getRepresentationId());
     String techMDURN = URNUtils.createRodaTechnicalMetadataURN(file.getId(),
       RODAInstanceUtils.getLocalInstanceIdentifier(), type.toLowerCase());
-    StoragePath metadataPath = ModelUtils.getTechnicalMetadataStoragePath(file.getAipId(), file.getRepresentationId(),
-      Collections.singletonList(type), techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
     Binary metadataBinary;
     if (versionID != null) {
-      BinaryVersion binaryVersion = model.getStorage().getBinaryVersion(metadataPath, versionID);
+      BinaryVersion binaryVersion = model.getBinaryVersion(representation, versionID,
+        List.of(RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_TECHNICAL, type,
+          techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION));
       metadataBinary = binaryVersion.getBinary();
     } else {
-      metadataBinary = model.getStorage().getBinary(metadataPath);
+      metadataBinary = model.getBinary(representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
+        RodaConstants.STORAGE_DIRECTORY_TECHNICAL, type,
+        techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
     }
     String filename = metadataBinary.getStoragePath().getName() + HTML_EXT;
     String htmlDescriptive = HTMLUtils.technicalMetadataToHtml(metadataBinary, type, versionID,
@@ -401,16 +402,19 @@ public class FilesService {
     final ConsumesOutputStream stream;
     StreamResponse ret;
     ModelService model = RodaCoreFactory.getModelService();
+    Representation representation = model.retrieveRepresentation(file.getAipId(), file.getRepresentationId());
     String techMDURN = URNUtils.createRodaTechnicalMetadataURN(file.getId(),
       RODAInstanceUtils.getLocalInstanceIdentifier(), type.toLowerCase());
-    StoragePath metadataPath = ModelUtils.getTechnicalMetadataStoragePath(file.getAipId(), file.getRepresentationId(),
-      Collections.singletonList(type), techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
     Binary metadataBinary;
     if (versionID != null) {
-      BinaryVersion binaryVersion = model.getStorage().getBinaryVersion(metadataPath, versionID);
+      BinaryVersion binaryVersion = model.getBinaryVersion(representation, versionID,
+        List.of(RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_TECHNICAL, type,
+          techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION));
       metadataBinary = binaryVersion.getBinary();
     } else {
-      metadataBinary = model.getStorage().getBinary(metadataPath);
+      metadataBinary = model.getBinary(representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
+        RodaConstants.STORAGE_DIRECTORY_TECHNICAL, type,
+        techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
     }
     stream = new BinaryConsumesOutputStream(metadataBinary, RodaConstants.MEDIA_TYPE_TEXT_XML);
 

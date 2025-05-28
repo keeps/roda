@@ -195,7 +195,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
 
     Long sizeInBytes = 0L;
 
-    SolrUtils.indexRepresentationTechnicalMetadata(RodaCoreFactory.getModelService(),
+    SolrUtils.indexRepresentationTechnicalMetadata(model,
       getRepresentationTechnicalMetadata(((Info) info).aip, file.getRepresentationId()), fileId, doc);
 
     // Add information from PREMIS
