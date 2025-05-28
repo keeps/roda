@@ -515,10 +515,10 @@ div.inline {
 
 .browse_aip .row .content .lowerContent .card {
     background-color: transparent;
-}creature
+}
 
 .browse_aip .row .content .lowerContent .card .searchWrapper .sidebar-facet-label.fade-out:after {
-        background: linear-gradient(-90deg, COLOR_GREY_BGDARKER 30%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(-90deg, COLOR_GREY_BGDARKER 30%, rgba(255, 255, 255, 0) 100%);
 }
 
 .descriptiveMetadataCard {
@@ -834,6 +834,10 @@ pre code {
     border-radius: 1px;
     box-sizing: border-box;
     margin-bottom: 5px;
+}
+
+.form-listbox-job.roda6Card {
+	display:block;
 }
 
 .form-listbox-job {

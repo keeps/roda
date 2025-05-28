@@ -196,7 +196,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
     name.setText(messages.processNewDefaultName(new Date()));
     workflowOptions.setPlugins(plugins);
     configurePlugins(selected.getSelectedClass());
-    workflowCategoryList.addStyleName("form-listbox-job");
+    workflowCategoryList.addStyleName("form-listbox-job roda6Card");
   }
 
   private void configureOrchestration() {
