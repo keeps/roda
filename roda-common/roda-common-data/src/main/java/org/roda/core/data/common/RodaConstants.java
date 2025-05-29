@@ -102,6 +102,7 @@ public final class RodaConstants {
   public static final String CROSSWALKS_DISSEMINATION_OTHER_PATH = "crosswalks/other/";
   public static final String UI_BROWSER_METADATA_DESCRIPTIVE_TYPES = "ui.browser.metadata.descriptive.types";
   public static final String I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX = "ui.browse.metadata.descriptive.type.";
+  public static final String I18N_UI_BROWSE_METADATA_TECHNICAL_TYPE_PREFIX = "ui.browse.metadata.technical.type.";
   public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX = "crosswalks.dissemination.html.";
   public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX_EVENT = "crosswalks.dissemination.html.event.";
   public static final String I18N_UI_FACETS_PREFIX = "ui.facets";
@@ -360,6 +361,8 @@ public final class RodaConstants {
 
   // files
   public static final String API_REST_V2_FILES = "api/v2/files/";
+  public static final String API_REST_V2_FILES_TECHNICAL_METADATA_TYPE_HTML = "metadata/technical";
+  public static final String API_REST_V2_FILES_TECHNICAL_METADATA_TYPE_HTML_SUFFIX = "/html";
   public static final String API_REST_V2_FILES_TECHNICAL_METADATA_HTML = "metadata/preservation/html";
   public static final String API_REST_V2_FILES_TECHNICAL_METADATA_DOWNLOAD = "metadata/preservation/download";
 
@@ -444,6 +447,7 @@ public final class RodaConstants {
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_CSV = "csv";
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_JSONP = "jsonp";
   public static final String API_QUERY_KEY_LANG = "lang";
+  public static final String API_QUERY_KEY_VERSION_ID = "versionId";
   public static final String API_QUERY_VALUE_LANG_DEFAULT = RodaConstants.API_QUERY_VALUE_LANG_PT_PT;
   public static final String API_QUERY_VALUE_LANG_PT_PT = "pt_PT";
   public static final String API_QUERY_VALUE_LANG_EN_US = "en_US";
@@ -1490,6 +1494,7 @@ public final class RodaConstants {
 
   public static final String FILE_PATH = "path";
   public static final String FILE_ANCESTORS_PATH = "ancestorsPath";
+  public static final String FILE_TECHNICAL_METADATA_ID = "technicalMetadataId";
   public static final String FILE_PARENT_UUID = "parentUUID";
   public static final String FILE_AIP_ID = "aipId";
   public static final String FILE_FORMAT_MIMETYPE = "formatMimetype";

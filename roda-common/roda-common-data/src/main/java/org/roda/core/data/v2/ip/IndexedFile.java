@@ -35,6 +35,7 @@ public class IndexedFile
   private String representationUUID;
   private List<String> path;
   private List<String> ancestorsPath;
+  private List<String> technicalMetadataIds;
   private String id;
   private String referenceUUID;
   private String referenceURL;
@@ -69,9 +70,9 @@ public class IndexedFile
   }
 
   public IndexedFile(String uuid, String parentUUID, String aipId, String representationId, String representationUUID,
-    List<String> path, List<String> ancestorsPath, String id, String referenceUUID, String referenceURL,
-    String referenceManifest, FileFormat fileFormat, String originalName, long size, boolean isDirectory,
-    boolean isReference, String creatingApplicationName, String creatingApplicationVersion,
+    List<String> path, List<String> ancestorsPath, List<String> technicalMetadataIds, String id, String referenceUUID,
+    String referenceURL, String referenceManifest, FileFormat fileFormat, String originalName, long size,
+    boolean isDirectory, boolean isReference, String creatingApplicationName, String creatingApplicationVersion,
     String dateCreatedByApplication, List<String> hash, String storagePath, List<String> ancestors,
     Map<String, List<String>> otherProperties, String instanceId, String instanceName) {
     this.uuid = uuid;
@@ -82,6 +83,7 @@ public class IndexedFile
     this.representationUUID = representationUUID;
     this.path = path;
     this.ancestorsPath = ancestorsPath;
+    this.technicalMetadataIds = technicalMetadataIds;
     this.id = id;
 
     this.referenceUUID = referenceUUID;
@@ -288,6 +290,14 @@ public class IndexedFile
 
   public void setAncestorsPath(List<String> ancestorsPath) {
     this.ancestorsPath = ancestorsPath;
+  }
+
+  public List<String> getTechnicalMetadataIds() {
+    return technicalMetadataIds;
+  }
+
+  public void setTechnicalMetadataIds(List<String> technicalMetadataIds) {
+    this.technicalMetadataIds = technicalMetadataIds;
   }
 
   public Map<String, Object> getFields() {
