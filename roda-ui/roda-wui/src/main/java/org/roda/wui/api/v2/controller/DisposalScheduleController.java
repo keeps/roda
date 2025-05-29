@@ -7,7 +7,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
@@ -18,6 +17,7 @@ import org.roda.wui.api.v2.services.DisposalScheduleService;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.DisposalScheduleRestService;
 import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,182 +40,135 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
   @Autowired
   DisposalScheduleService disposalScheduleService;
 
+  @Autowired
+  RequestHandler requestHandler;
+
   @Override
   public DisposalSchedules listDisposalSchedules() {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<DisposalSchedules>() {
+      @Override
+      public DisposalSchedules process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      return disposalScheduleService.getDisposalSchedules();
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException | IOException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state);
-    }
+        return disposalScheduleService.getDisposalSchedules(requestContext.getModelService());
+      }
+    });
   }
 
   @Override
   public DisposalSchedule retrieveDisposalSchedule(String id) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest((new RequestHandler.RequestProcessor<DisposalSchedule>() {
+      @Override
+      public DisposalSchedule process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        controllerAssistant.setRelatedObjectId(id);
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      return disposalScheduleService.retrieveDisposalSchedule(id);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.DISPOSAL_SCHEDULE_ID, id);
-    }
+        // delegate action to service
+        return disposalScheduleService.retrieveDisposalSchedule(requestContext.getModelService(), id);
+      }
+    }));
   }
 
   @Override
   public DisposalSchedule createDisposalSchedule(@RequestBody DisposalSchedule schedule) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<DisposalSchedule>() {
+      @Override
+      public DisposalSchedule process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_PARAM, schedule);
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+        // sanitize the input
+        String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(schedule));
+        DisposalSchedule sanitizedSchedule = JsonUtils.getObjectFromJson(sanitize, DisposalSchedule.class);
 
-      // sanitize the input
-      String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(schedule));
-      schedule = JsonUtils.getObjectFromJson(sanitize, DisposalSchedule.class);
+        // validate disposal schedule
+        disposalScheduleService.validateDisposalSchedule(sanitizedSchedule);
 
-      // validate disposal schedule
-      disposalScheduleService.validateDisposalSchedule(schedule);
-
-      return disposalScheduleService.createDisposalSchedule(schedule, requestContext.getUser());
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_PARAM,
-        schedule);
-    }
+        return disposalScheduleService.createDisposalSchedule(sanitizedSchedule, requestContext);
+      }
+    });
   }
 
   @Override
   public DisposalSchedule updateDisposalSchedule(@RequestBody DisposalSchedule schedule) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<DisposalSchedule>() {
+      @Override
+      public DisposalSchedule process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_PARAM, schedule);
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-      // sanitize the input
-      String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(schedule));
-      schedule = JsonUtils.getObjectFromJson(sanitize, DisposalSchedule.class);
+        // sanitize the input
+        String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(schedule));
+        DisposalSchedule sanitizedSchedule = JsonUtils.getObjectFromJson(sanitize, DisposalSchedule.class);
 
-      // validate disposal schedule
-      disposalScheduleService.validateDisposalScheduleWhenUpdating(schedule);
+        // validate disposal schedule
+        disposalScheduleService.validateDisposalScheduleWhenUpdating(sanitizedSchedule);
 
-      // delegate action to service
-      return disposalScheduleService.updateDisposalSchedule(schedule, requestContext.getUser());
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, schedule.getId(), state,
-        RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_PARAM, schedule);
-    }
+        // delegate action to service
+        return disposalScheduleService.updateDisposalSchedule(sanitizedSchedule, requestContext);
+      }
+    });
   }
 
   @Override
   public Void deleteDisposalSchedule(String id) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Void>() {
+      @Override
+      public Void process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(id);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM, id);
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+        // delegate action to service
+        disposalScheduleService.deleteDisposalSchedule(id, requestContext.getModelService());
 
-      // delegate action to service
-      disposalScheduleService.deleteDisposalSchedule(id);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM,
-        id);
-    }
-    return null;
+        return null;
+      }
+    });
   }
 
   @Override
   public Job associatedDisposalSchedule(@RequestBody SelectedItemsRequest selectedItems, String disposalScheduleId) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems,
+          RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM, disposalScheduleId);
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // delegate
-      return disposalScheduleService.associateDisposalSchedule(requestContext.getUser(),
-        CommonServicesUtils.convertSelectedItems(selectedItems, IndexedAIP.class), disposalScheduleId);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems,
-        RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM, disposalScheduleId);
-    }
+        // delegate
+        return disposalScheduleService.associateDisposalSchedule(requestContext.getUser(),
+          CommonServicesUtils.convertSelectedItems(selectedItems, IndexedAIP.class), disposalScheduleId);
+      }
+    });
   }
 
   @Override
   public Job disassociatedDisposalSchedule(@RequestBody SelectedItemsRequest selectedItems) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // delegate
-      return disposalScheduleService.disassociateDisposalSchedule(requestContext.getUser(),
-        CommonServicesUtils.convertSelectedItems(selectedItems, IndexedAIP.class));
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
-    }
+        // delegate
+        return disposalScheduleService.disassociateDisposalSchedule(requestContext.getUser(),
+          CommonServicesUtils.convertSelectedItems(selectedItems, IndexedAIP.class));
+      }
+    });
   }
 }

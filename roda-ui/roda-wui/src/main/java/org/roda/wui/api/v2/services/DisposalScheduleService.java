@@ -18,10 +18,12 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.base.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.model.RequestContext;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -35,25 +37,25 @@ import java.util.Map;
 @Service
 public class DisposalScheduleService {
 
-  public DisposalSchedules getDisposalSchedules()
+  public DisposalSchedules getDisposalSchedules(ModelService model)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
-    return RodaCoreFactory.getModelService().listDisposalSchedules();
+    return model.listDisposalSchedules();
   }
 
-  public DisposalSchedule retrieveDisposalSchedule(String id)
+  public DisposalSchedule retrieveDisposalSchedule(ModelService model, String id)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    return RodaCoreFactory.getModelService().retrieveDisposalSchedule(id);
+    return model.retrieveDisposalSchedule(id);
   }
 
-  public DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule, User user)
+  public DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule, RequestContext requestContext)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, IllegalOperationException,
     GenericException {
-    return RodaCoreFactory.getModelService().updateDisposalSchedule(schedule, user.getName());
+    return requestContext.getModelService().updateDisposalSchedule(schedule, requestContext.getUser().getName());
   }
 
-  public void deleteDisposalSchedule(String disposalScheduleId) throws GenericException, RequestNotValidException,
+  public void deleteDisposalSchedule(String disposalScheduleId, ModelService model) throws GenericException, RequestNotValidException,
     NotFoundException, AuthorizationDeniedException, IllegalOperationException {
-    RodaCoreFactory.getModelService().deleteDisposalSchedule(disposalScheduleId);
+    model.deleteDisposalSchedule(disposalScheduleId);
   }
 
   public Job associateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId)
@@ -164,8 +166,10 @@ public class DisposalScheduleService {
     }
   }
 
-  public DisposalSchedule createDisposalSchedule(DisposalSchedule disposalSchedule, User user) throws GenericException,
-    AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().createDisposalSchedule(disposalSchedule, user.getName());
+  public DisposalSchedule createDisposalSchedule(DisposalSchedule disposalSchedule, RequestContext requestContext)
+    throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
+    RequestNotValidException {
+    return requestContext.getModelService().createDisposalSchedule(disposalSchedule,
+      requestContext.getUser().getName());
   }
 }
