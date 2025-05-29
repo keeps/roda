@@ -1516,7 +1516,12 @@ public class SolrUtils {
     // guarding against repeated fields
     Set<String> usedNonRepeatableFields = new HashSet<>();
 
+    // technical metadata ids
+    ArrayList<String> techMdIds = new ArrayList<>();
+
     for (TechnicalMetadata techMd : technicalMetadatum) {
+      techMdIds.add(techMd.getType().toLowerCase());
+
       String urn = URNUtils.createRodaTechnicalMetadataURN(fileId, RODAInstanceUtils.getLocalInstanceIdentifier(),
         techMd.getType().toLowerCase());
 
@@ -1544,6 +1549,8 @@ public class SolrUtils {
         LOGGER.error("Error processing technical metadata: {}", techMd, e);
       }
     }
+
+    doc.addField(RodaConstants.FILE_TECHNICAL_METADATA_ID, techMdIds);
   }
 
   public static void indexDescriptiveMetadataFields(ModelService model, String aipId, String representationId,

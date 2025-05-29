@@ -171,6 +171,36 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
+  public static SafeUri createTechnicalMetadataHTMLUri(String fileId, String typeId) {
+    return createTechnicalMetadataHTMLUri(fileId, typeId, null);
+  }
+
+  public static SafeUri createTechnicalMetadataHTMLUri(String fileId, String typeId, String versionId) {
+    // /api/v2/files/{fileId}/metadata/technical/{typeId}/html?lang={lang}&versionId={versionId}
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileId)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.API_REST_V2_FILES_TECHNICAL_METADATA_TYPE_HTML).append(RodaConstants.API_SEP);
+
+    // type id
+    b.append(typeId);
+
+    // html suffix
+    b.append(RodaConstants.API_REST_V2_FILES_TECHNICAL_METADATA_TYPE_HTML_SUFFIX);
+
+    // locale
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+
+    // version id
+    if (versionId != null) {
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_VERSION_ID)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
+    }
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
   public static SafeUri createTechnicalMetadataHTMLUri(String fileId) {
     // /api/v2/files/{fileId}/metadata/preservation/html?lang={lang}
     StringBuilder b = new StringBuilder();
@@ -191,6 +221,21 @@ public class RestUtils {
     // base uri
     b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileId)).append(RodaConstants.API_SEP)
       .append(RodaConstants.API_REST_V2_FILES_TECHNICAL_METADATA_DOWNLOAD);
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
+  public static SafeUri createTechnicalMetadataDownloadUri(String fileUUID, String metadataType, String versionId) {
+    // /api/v2/files/{fileUUID}/metadata/technical/{typeId}/download?versionId={versionId}
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileUUID)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.API_REST_V2_FILES_TECHNICAL_METADATA_TYPE_HTML).append(RodaConstants.API_SEP)
+      .append((URL.encodeQueryString(metadataType))).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
+    if (versionId != null) {
+      b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_VERSION_ID)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(versionId));
+    }
 
     return UriUtils.fromSafeConstant(b.toString());
   }
@@ -411,7 +456,6 @@ public class RestUtils {
     // api/v2/jobs/{id}/attachment/{attachment-id}
     return UriUtils.fromSafeConstant(RodaConstants.API_REST_V2_JOBS + jobId + "/attachment/" + attachmentId);
   }
-
 
   public static SafeUri createJobReportsHTMLUri(String jobId) {
     // api/v2/jobs/{id}/reports
