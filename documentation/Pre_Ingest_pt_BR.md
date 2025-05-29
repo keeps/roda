@@ -1,56 +1,104 @@
 # Como é que a informação é guardada no RODA?
 
-O processo de pré-ingestão oferece a capacidade de criar Pacotes de Informação de Submissão (SIP), contendo da dos e metadados (numa estrutura bem definida), a fim de submetê-los ao repositório para serem ingeridos. Os SIPs criados devem cumprir co m as políticas estabelecidas (ou negociados com) o repositório. O processo de pré-ingestão geralmente compreende algumas ou todas das seguintes atividades:
+A fase de **pré-ingestão** refere-se às atividades de preparação realizadas por um _Produtor_ antes da submissão de materiais digitais no repositório. O seu principal objetivo é garantir que os **Pacotes de Informação de Submissão (SIPs)** sejam criados de acordo com os requisitos do repositório, facilitando assim o processo de ingestão.
 
-Acordo de aquisição
+Esta fase incluí, tipicamente, as seguintes atividades:
 
-## Esta atividade consiste na definição dos termos, pré-condições e requisitos que o Produtor deverá cumprir antes de submeter dados ao repositório. Parte desta atividade consiste na criação de um plano de classificação de base onde o produtor poderá depositar os seus itens de informação. Esta atividade consiste na assinatura de um contrato entre o Produtor e o Repositório. Este contrato especifica o tipo de conteúdo e todos os requisitos legais e técnicos que ambas os outorgantes deverão assegurar.
+## Acordo de aquisição
 
-Plano de classificação
+O **Acordo de aquisição** define a relação formal entre o _Produtor_ e o _Repositório_. Estabelecendo:
 
-## Durante a assinatura do contrato de submissão, o produtor deve concordar com um esquema de classificação base (ou lista de coleções) no qual terá autorização explícita para depositar novas informações.
+- O tipo de conteúdo a ser submetido;
+- Requisitos legais, técnicos e procedimentais;
+- As reponsabilidades de cada parte;
+- A estrutura e formato esperado dos SIPs.
 
-O esquema de classificação básico é geralmente criado pelo Repositório e pode ser descarregado nesta seção num formato legível por máquina. O ficheiro descarregado pode ser carregado no [RODA-in](http://rodain.roda-community.org) para uma melhor organização e preparação dos SIPs, antes de transferi-los para o repositório a ser ingerido.
+Este acordo é um documento tipicamente escrito e deve ser aceite por ambas as partes antes do conteúdo ser submetido.
 
-[Descarregar o esquema de classificação](/api/v1/classification_plans) (nota: apenas é possível descarregar o esquema de classificãção a partir do RODA)
+## Organização de Conteúdos
 
-[Descarregar esquema de classificação](/api/v2/classification-plans) (nota: descarregar o esquema de classificação requer uma instância do RODA)
+Como parte do acordo de aquisição, o _Produtor_ é usualmente autorizado a depositar conteúdo numa área específica do repositório, com base no **plano de classificação** (uma estrutura hierárquica que é usada para organizar o conteúdo dentro do repositório)
 
-## Esta atividade consiste na preparação de 1 ou mais Pacotes de Informação de Submissão (SIP) compatíveis com os requisitos técnicos e não técnicos definidos no Acordo de Aquisição. Para facilitar a criação destes pacotes os produtores poderão utilizar a ferramenta RODA-in. Esta ferramenta e a sua documentação pode ser descarregada em [http://rodain.roda-community.org](http://rodain.roda-community.org "rodain").
+O repositório oferece um **Plano de Classificação** base em formato máquina que facilita aos Produtores alinharem os seus SIPs com a organização interna do repositório.
 
-[Descarregar RODA-in](http://rodain.roda-community.org)
+O ficheiro pode ser descarregado e importado para o **RODA-in**, uma ferramenta desenha para ajudar na preparação e estruturação dos SIPs.
 
-Transferência de materiais
+📎 [Descarregar o plano de classificação](/api/v2/classification-plans)
 
+## Preparação do SIP
 
-## Esta atividade consiste na transferência dos Pacotes de Informação de Submissão (SIP) do Produtor para o Repositório. Os SIPs serão temporariamente guardados numa área de transferência do lado do servidor para serem posteriormente ingeridos.
+O _Produtor_ é reponsável por criar um ou mais **Pacotes de Informação de Submissão (SIPs)**, de acordo com o especificado no acordo de aquisição. Cada SIP deve: 
 
-O Produtor pode enviar os seus SIPs para o repositório de várias formas. Estas incluem, mas não estão limitadas, às seguintes opções:
+- Conter todo o conteúdo exigido e os metadados associados;
+- Seguir as diretrizes estruturais e técnicas acordadas;
+- Estar empacotado num formato aceite pelo repositório (por exemplo, E-ARK, BagIt).
 
-Transferência por FTP
+Para apoiar esta tarefa, estão disponíveis diferentes ferramentas consoante as preferências de fluxo de trabalho do Produtor:
 
-### Ligue-se a [ftp://address] e utilize as credenciais fornecidas pelo Arquivo para se autenticar.
+### RODA-in
 
-1. Crie uma pasta para acomodar os SIPs que pretende incorporar de uma só vez (opcional).
-2. Copiar todos os SIPs para a nova pasta.
-3. Informe o Repositório de que o material está pronto para ser ingerido.
-4. O processo de ingestão inclui a verificação da conformidade dos SIPs, a criação de Pacotes de Informação de Arquivo (AIP), e a extração e indexação de metainformação descritiva para suportar atividades de pesquisa.
+Para os utilizadores que preferem uma interface gráfica, o **[RODA-in](http://rodain.roda-community.org)** oferece uma forma intuitiva de:
 
-### Gravar SIPs para um dispositivo de armazenamento amovível (e.g. CD, USB disk, etc.)
+- Organizar conteúdos e metadados;
+- Atribuir coleções e categorias;
+- Validar a estrutura do pacote;
+- Exportar os SIPs no formato apropriado.
 
-1. Envie o dispositivo de armazenamento para o seguinte endereço postal: [morada]
-2. Processo de ingestão
-3. Após a transferência, os SIPs serão selecionados pelo Arquivo. O processo de ingestão disponibiliza funções para validar, aceitar ou rejeitar os SIPs com base nas políticas de ingestão estabelecidas.
-4. O processo de ingestão inclui a verificação da conformidade dos SIPs, a criação de Pacotes de Informação de Arquivo (AIP), e a extração e indexação de metainformação descritiva para suportar atividades de pesquisa.
+### Ferramentas e bibliotecas de linha de comandos
 
-### Processo de ingestão
+Para fluxos de trabalho automatizados ou de grande escala, estão disponíveis várias ferramentas e bibliotecas de código aberto para preparar SIPs através da linha de comandos ou ambientes de scripting:
 
-1. Save SIPs to an external media (e.g. CD, USB disk, etc.)
-2. Deliver it at the following address: [Repository address]
+- **[Commons-IP](https://github.com/keeps/commons-ip)** - Uma ferramenta e biblioteca baseada em Java para criar, validar e converter Pacotes de Informação OAIS. Suporta múltiplos formatos de empacotamento, incluindo E-ARK (v1, v2.0.4, v2.1.0, v2.2.0), BagIt e SIP do tipo húngaro 4.
 
-## Estado da ingestão
+- **[.NET E-ARK SIP](https://igfej-justica-gov-pt.github.io/dotnet-eark-sip/)** - Uma ferramenta de linha de comandos e uma biblioteca .NET para gerar SIPs compatíveis com o E-ARK. Ideal para integração com ambientes baseados em Microsoft.
 
-After transfer, SIPs will be selected for ingest by the Repository staff. The Ingest process provides services and functions to accept SIPs from Producers and prepare the contents for archival storage and management.
+- **[eArchiving Tool Box (EATB)](https://github.com/E-ARK-Software/eatb)** - Uma coleção de ferramentas baseadas em Python desenvolvidas no âmbito do projeto E-ARK para a criação de SIPs e outros pacotes de informação, com suporte para scripting e fluxos de trabalho em lote.
 
-Ingest functions include receiving SIPs, performing quality assurance on SIPs, generating an Archival Information Package (AIP) which complies with the Repository's data formatting and documentation standards, extracting Descriptive Information from the AIPs for inclusion in the Repository catalogue, and coordinating updates to Archival Storage and Data Management.
+> 🛠️ Estas ferramentas são recomendadas para instituições com grandes volumes de conteúdo ou necessidades complexas de automação.
 
+## Transferência de Materiais
+
+Depois de preparados, os SIPs devem ser transferidos para o repositório. Os SIPs são inicialmente colocados numa **zona de quarentena**, onde aguardam validação e processamento por parte do repositório.
+
+Existem vários métodos de transferência suportados:
+
+### Transferência por HTTP
+
+1. Inicie sessão na interface web do repositório usando as suas credenciais.
+2. Aceda a **Ingestão > Transferência** e entre na sua pasta pessoal (crie uma, se necessário).
+3. "Carregue os seus SIPs."
+4. Notifique a equipa do repositório de que o material está pronto para ingestão.
+
+### Transferência por FTP
+
+1. Ligue-se ao servidor FTP fornecido usando as suas credenciais.
+2. Opcionalmente, crie uma pasta para o seu lote de ingestão.
+3. "Carregue os seus SIPs."
+4. Notifique o repositório de que os SIPs estão disponíveis.
+
+### Transferência por Suporte Físico
+
+1. Guarde os SIPs num suporte físico (por exemplo, pen USB, disco rígido externo).
+2. Entregue-o na seguinte morada:
+   `[Morada do repositório]`
+
+> ⚠️ Certifique-se de que o suporte está devidamente identificado e que a sua integridade foi verificada antes da entrega.
+
+## Processo de Ingestão
+
+Após a transferência, o repositório iniciará o processo de **Ingestão**. Este processo inclui os seguintes passos:
+
+- **Receção e validação** dos SIPs;
+- **Controlo de qualidade** para garantir a conformidade com os requisitos de formato e metadados;
+- **Geração dos Pacotes de Informação Arquivística (AIPs)** para preservação a longo prazo;
+- **Extração da Informação Descritiva** para indexação e pesquisa no catálogo do repositório;
+- **Atualização dos sistemas de Armazenamento Arquivístico e Gestão de Dados**.
+
+O processo de ingestão garante que todo o conteúdo é corretamente arquivado, disponível para descoberta e preservado de acordo com as políticas estabelecidas.
+
+## Notas
+
+- O SIP não deve incluir conteúdo ou metadados fora do âmbito acordado.
+- O repositório pode rejeitar os SIPs que não cumpram a validação durante a ingestão.
+- Pode ser enviado um email para notificar os Produtores e a equipa do repositório sobre qualquer processo de ingestão.
+- Contacte a equipa do repositório para obter apoio em questões relacionadas com o RODA-in ou transferências.
