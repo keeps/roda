@@ -100,8 +100,7 @@ public class TransactionLog implements Serializable {
     return storagePathsOperations;
   }
 
-  public void addStoragePath(StoragePath storagePath, OperationType operation,
-    String version) {
+  public void addStoragePath(StoragePath storagePath, OperationType operation, String version) {
     if (storagePath != null) {
       TransactionalStoragePathOperationLog transactionalStoragePathOperationLog = new TransactionalStoragePathOperationLog(
         storagePath, operation, version);
@@ -114,13 +113,15 @@ public class TransactionLog implements Serializable {
     return modelOperations;
   }
 
-  public void addModelOperation(String liteObject, OperationType operationType) {
+  public TransactionalModelOperationLog addModelOperation(String liteObject, OperationType operationType) {
     if (liteObject != null) {
       TransactionalModelOperationLog transactionalModelOperationLog = new TransactionalModelOperationLog(liteObject,
         operationType);
       transactionalModelOperationLog.setTransactionLog(this);
       modelOperations.add(transactionalModelOperationLog);
+      return transactionalModelOperationLog;
     }
+    return null;
   }
 
   @Override
