@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.disposal.rule;
 
+import java.io.Serial;
 import java.util.Date;
 import java.util.Objects;
 
@@ -25,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRule> {
 
   private static final int VERSION = 1;
+  @Serial
   private static final long serialVersionUID = 6903251340335265336L;
 
   private String id;

@@ -26,6 +26,7 @@ import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -230,6 +231,8 @@ public final class LiteRODAObjectFactory {
       ret = create(PreservationMetadata.class, ids.size(), ids);
     } else if (objectClass == DisposalHold.class) {
       ret = create(DisposalHold.class, ids.size(), ids);
+    } else if (objectClass == DisposalRule.class) {
+      ret = create(DisposalRule.class, ids.size(), ids);
     } else if (objectClass == DisposalSchedule.class) {
       ret = create(DisposalSchedule.class, ids.size(), ids);
     }
