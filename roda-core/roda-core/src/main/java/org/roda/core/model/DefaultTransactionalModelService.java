@@ -1553,6 +1553,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     DIP dip = getModelService().retrieveDIP(dipId);
     registerOperationForDIP(dip.getId(), OperationType.DELETE);
     getModelService().deleteDIP(dipId);
+    throw new GenericException("Test rollback");
   }
 
   @Override
@@ -2754,7 +2755,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   private void registerOperationForDIP(String dipID, OperationType operation) {
     acquireLock(DIP.class, dipID, operation);
-    registerOperation(LogEntry.class, Arrays.asList(dipID), operation);
+    registerOperation(DIP.class, Arrays.asList(dipID), operation);
   }
 
   private void registerOperationForLogEntry(String logEntryID, OperationType operation) {
@@ -2863,6 +2864,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
           handleRepresentationRollback(representation, modelOperation);
         } else if (rodaObject instanceof File file) {
           handleFileRollback(file, modelOperation);
+        } else if (rodaObject instanceof DIP dip) {
+          handleDIPRollback(dip, modelOperation);
         } else {
           LOGGER.warn("Cannot rollback operation for class: {} with ID: {}", rodaObject.getClass().getSimpleName(),
             rodaObject.getId());
@@ -2905,6 +2908,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     } else if (modelOperation.getOperationType() != OperationType.READ) {
       LOGGER.debug("Rollback File update/delete for File: {}", file.getId());
       mainModelService.notifyFileUpdated(file);
+    }
+  }
+
+  private void handleDIPRollback(DIP dip, TransactionalModelOperationLog modelOperation) {
+    if (modelOperation.getOperationType() == OperationType.CREATE) {
+      LOGGER.debug("Rollback DIP creation for DIP: {}", dip.getId());
+      stagingModelService.notifyDIPDeleted(dip.getId(), true);
+    } else if (modelOperation.getOperationType() != OperationType.READ) {
+      LOGGER.debug("Rollback DIP update/delete for DIP: {}", dip.getId());
+      mainModelService.notifyDIPUpdated(dip, true);
     }
   }
 }
