@@ -6,8 +6,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.roda.core.data.v2.ip.StoragePath;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -53,8 +51,8 @@ public class TransactionalStoragePathOperationLog implements Serializable {
   public TransactionalStoragePathOperationLog() {
   }
 
-  public TransactionalStoragePathOperationLog(StoragePath storagePath, OperationType operationType, String version) {
-    this.storagePath = storagePath.toString();
+  public TransactionalStoragePathOperationLog(String storagePath, OperationType operationType, String version) {
+    this.storagePath = storagePath;
     this.operationType = operationType;
     this.version = version;
     this.createdAt = LocalDateTime.now();

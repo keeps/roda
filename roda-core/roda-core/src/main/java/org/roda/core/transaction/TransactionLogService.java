@@ -3,7 +3,6 @@ package org.roda.core.transaction;
 import java.util.List;
 import java.util.UUID;
 
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.entity.transaction.OperationState;
 import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionLog;
@@ -52,7 +51,7 @@ public class TransactionLogService {
   }
 
   @Transactional
-  public void registerStoragePathOperation(UUID transactionId, StoragePath storagePath, OperationType operation,
+  public void registerStoragePathOperation(UUID transactionId, String storagePath, OperationType operation,
     String version) throws RODATransactionException {
     if (operation == OperationType.READ) {
       // TODO: add a configuration to allow logging the read operation for debugging

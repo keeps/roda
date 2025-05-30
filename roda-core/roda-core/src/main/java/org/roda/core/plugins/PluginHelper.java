@@ -1170,7 +1170,7 @@ public final class PluginHelper {
     linkingIdentifierPlugin.setValue(agentId);
 
     try {
-      if (model.existsInStorage(agentLite.get())) {
+      if (!model.existsInStorage(agentLite.get())) {
         PremisV3Utils.createPremisAgentBinary(plugin, model, true);
       }
       agentIds.add(linkingIdentifierPlugin);
