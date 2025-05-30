@@ -107,6 +107,7 @@ public class EditDisposalHold extends Composite {
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     if (disposalHoldDataPanel.isChanged() && disposalHoldDataPanel.isValid()) {
+
       DisposalHold disposalHoldUpdated = disposalHoldDataPanel.getDisposalHold();
       disposalHold.setTitle(disposalHoldUpdated.getTitle());
       disposalHold.setMandate(disposalHoldUpdated.getMandate());

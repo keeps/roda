@@ -17,16 +17,19 @@ import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHolds;
 import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
 import org.roda.core.data.v2.ip.disposalhold.LiftDisposalHoldRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.disposal.hold.ApplyDisposalHoldToAIPPlugin;
 import org.roda.core.plugins.base.disposal.hold.DisassociateDisposalHoldFromAIPPlugin;
 import org.roda.core.plugins.base.disposal.hold.LiftDisposalHoldPlugin;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.model.RequestContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -35,29 +38,29 @@ import org.springframework.stereotype.Service;
 @Service
 public class DisposalHoldService {
 
-  public DisposalHolds getDisposalHolds()
+  public DisposalHolds getDisposalHolds(ModelService model)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
-    return RodaCoreFactory.getModelService().listDisposalHolds();
+    return model.listDisposalHolds();
   }
 
-  public DisposalHold updateDisposalHold(DisposalHold hold, User user, String details)
+  public DisposalHold updateDisposalHold(DisposalHold hold, String details, RequestContext context)
     throws AuthorizationDeniedException,
     RequestNotValidException, NotFoundException, IllegalOperationException, GenericException {
-    return RodaCoreFactory.getModelService().updateDisposalHold(hold, user.getName(), details);
+    return context.getModelService().updateDisposalHold(hold, context.getUser().getName(), details);
   }
 
-  public DisposalHold createDisposalHold(DisposalHold disposalHold, User user) throws GenericException,
+  public DisposalHold createDisposalHold(DisposalHold disposalHold, RequestContext context) throws GenericException,
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().createDisposalHold(disposalHold, user.getName());
+    return context.getModelService().createDisposalHold(disposalHold, context.getUser().getName());
   }
 
-  public DisposalHold retrieveDisposalHold(String id)
+  public DisposalHold retrieveDisposalHold(String id, ModelService model)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    return RodaCoreFactory.getModelService().retrieveDisposalHold(id);
+    return model.retrieveDisposalHold(id);
   }
 
-  public DisposalTransitiveHoldsAIPMetadata listTransitiveDisposalHolds(String aipId) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    return RodaCoreFactory.getModelService().listTransitiveDisposalHolds(aipId);
+  public DisposalTransitiveHoldsAIPMetadata listTransitiveDisposalHolds(String aipId, ModelService model) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    return model.listTransitiveDisposalHolds(aipId);
   }
 
   public void validateDisposalHold(DisposalHold disposalHold) throws DisposalHoldNotValidException {
@@ -76,15 +79,13 @@ public class DisposalHoldService {
       ApplyDisposalHoldToAIPPlugin.class, user, pluginParameters, "Could not execute apply disposal hold action");
   }
 
-  public Job liftDisposalHold(User user, LiftDisposalHoldRequest request, String disposalHoldId)
+  public Job liftDisposalHold(User user, String disposalHoldId, String details)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, request.getDetails());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
 
-    SelectedItems<IndexedAIP> items = CommonServicesUtils.convertSelectedItems(request.getSelectedItems(),
-      IndexedAIP.class);
-    return CommonServicesUtils.createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldPlugin.class,
+    return CommonServicesUtils.createAndExecuteInternalJob("Lift disposal hold", SelectedItemsNone.create(), LiftDisposalHoldPlugin.class,
       user, pluginParameters, "Could not execute lift disposal hold action");
   }
 

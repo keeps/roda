@@ -75,7 +75,6 @@ public class AuditLogController implements AuditLogRestService, Exportable {
 
   @Override
   public IndexResult<LogEntry> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(LogEntry.class, findRequest, localeString);
   }
 
@@ -91,7 +90,6 @@ public class AuditLogController implements AuditLogRestService, Exportable {
 
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, LogEntry.class);
   }
 

@@ -174,7 +174,7 @@ public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
 
     ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
     managementGroup.addButton(messages.disassociateDisposalHoldButton(), DisposalHoldAction.DISASSOCIATE,
-      ActionImpact.UPDATED, "btn-unlock");
+      ActionImpact.UPDATED, "btn-lift-hold");
 
     disposalHoldActionableBundle.addGroup(managementGroup);
     return disposalHoldActionableBundle;
@@ -183,7 +183,7 @@ public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
   public enum DisposalHoldAction implements Action<IndexedAIP> {
     DISASSOCIATE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD);
 
-    private List<String> methods;
+    private final List<String> methods;
 
     DisposalHoldAction(String... methods) {
       this.methods = Arrays.asList(methods);

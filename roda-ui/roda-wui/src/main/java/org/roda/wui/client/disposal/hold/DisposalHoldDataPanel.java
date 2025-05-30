@@ -10,6 +10,8 @@ package org.roda.wui.client.disposal.hold;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 
 import com.google.gwt.core.client.GWT;
@@ -30,6 +32,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.disposal.schedule.DisposalScheduleDataPanel;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -61,12 +64,28 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
     this.editMode = editMode;
     errors.setVisible(false);
 
-    ChangeHandler changeHandler = event -> DisposalHoldDataPanel.this.onChange();
+    ChangeHandler changeHandler = new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        DisposalHoldDataPanel.this.onChange();
+      }
+    };
 
-    KeyUpHandler keyUpHandler = event -> DisposalHoldDataPanel.this.onChange();
+    KeyUpHandler keyUpHandler = new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent keyUpEvent) {
+        DisposalHoldDataPanel.this.onChange();
+      }
+    };
 
     title.addChangeHandler(changeHandler);
     title.addKeyUpHandler(keyUpHandler);
+    description.addChangeHandler(changeHandler);
+    description.addKeyUpHandler(keyUpHandler);
+    mandate.addChangeHandler(changeHandler);
+    mandate.addKeyUpHandler(keyUpHandler);
+    notes.addChangeHandler(changeHandler);
+    notes.addKeyUpHandler(keyUpHandler);
 
     if (editMode) {
       setDisposalHold(disposalHold);
