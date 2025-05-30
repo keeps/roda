@@ -461,7 +461,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
     LOGGER.debug("Registering operation for storage path: {}", storagePath);
     try {
-      transactionLogService.registerStoragePathOperation(transaction.getId(), storagePath, operation, version);
+      String storagePathAsString = stagingStorageService.getStoragePathAsString(storagePath, false);
+      transactionLogService.registerStoragePathOperation(transaction.getId(), storagePathAsString, operation, version);
     } catch (RODATransactionException e) {
       LOGGER.error("Failed to register operation for storage path: {}", storagePath, e);
     }

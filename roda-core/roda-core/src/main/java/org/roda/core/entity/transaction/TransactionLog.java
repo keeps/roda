@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.roda.core.data.v2.ip.StoragePath;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -100,7 +98,7 @@ public class TransactionLog implements Serializable {
     return storagePathsOperations;
   }
 
-  public void addStoragePath(StoragePath storagePath, OperationType operation, String version) {
+  public void addStoragePath(String storagePath, OperationType operation, String version) {
     if (storagePath != null) {
       TransactionalStoragePathOperationLog transactionalStoragePathOperationLog = new TransactionalStoragePathOperationLog(
         storagePath, operation, version);
