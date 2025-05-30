@@ -74,13 +74,13 @@ public interface DisposalHoldRestService extends DirectRestService {
     @Parameter(description = "Disposal hold id", required = true) @PathVariable(name = "id") String disposalHoldId,
     @Parameter(name = "override", description = "Lift all disposal holds associated and apply the selected disposal hold") @RequestParam(name = "override", required = false, defaultValue = "false") boolean override);
 
-  @RequestMapping(method = RequestMethod.PUT, path = "/{id}/lift", produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(method = RequestMethod.POST, path = "/{id}/lift", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Lift specific disposal hold", responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = DisposalHold.class))),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Disposal hold not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  DisposalHold liftDisposalHold(
+  Job liftDisposalHold(
     @Parameter(description = "Disposal hold id", required = true) @PathVariable(name = "id") String id,
     @Parameter(description = "Outcome details", required = true) @RequestParam(name = "details", required = false, defaultValue = "") String details);
 

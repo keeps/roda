@@ -159,8 +159,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 
