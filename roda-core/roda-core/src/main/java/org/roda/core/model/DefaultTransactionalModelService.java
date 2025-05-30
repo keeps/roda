@@ -276,8 +276,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public Binary retrieveDescriptiveMetadataBinary(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId,
-      OperationType.READ);
+    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId, OperationType.READ);
     Binary binary;
     try {
       binary = stagingModelService.retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
@@ -290,8 +289,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public Binary retrieveDescriptiveMetadataBinary(String aipId, String representationId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      OperationType.READ);
+    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, OperationType.READ);
     Binary binary;
     try {
       binary = stagingModelService.retrieveDescriptiveMetadataBinary(aipId, representationId, descriptiveMetadataId);
@@ -304,8 +302,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId,
-      OperationType.READ);
+    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId, OperationType.READ);
     DescriptiveMetadata descriptiveMetadata;
     try {
       descriptiveMetadata = stagingModelService.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
@@ -319,8 +316,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String representationId,
     String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      OperationType.READ);
+    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, OperationType.READ);
     DescriptiveMetadata descriptiveMetadata;
     try {
       descriptiveMetadata = stagingModelService.retrieveDescriptiveMetadata(aipId, representationId,
@@ -358,8 +354,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
     checkIfDescriptiveMetadataExistsAndThrowException(aipId, null, descriptiveMetadataId);
 
-    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId,
-      OperationType.CREATE);
+    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId, OperationType.CREATE);
     return getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType,
       descriptiveMetadataVersion, createdBy, notify);
   }
@@ -372,8 +367,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
     checkIfDescriptiveMetadataExistsAndThrowException(aipId, null, descriptiveMetadataId);
 
-    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId,
-      OperationType.CREATE);
+    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId, OperationType.CREATE);
     return getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType,
       descriptiveMetadataVersion, createdBy);
   }
@@ -386,8 +380,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
     checkIfDescriptiveMetadataExistsAndThrowException(aipId, representationId, descriptiveMetadataId);
 
-    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      OperationType.CREATE);
+    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, OperationType.CREATE);
     return getModelService().createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload,
       descriptiveMetadataType, descriptiveMetadataVersion, createdBy);
   }
@@ -400,8 +393,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
     checkIfDescriptiveMetadataExistsAndThrowException(aipId, representationId, descriptiveMetadataId);
 
-    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      OperationType.CREATE);
+    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, OperationType.CREATE);
     return getModelService().createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload,
       descriptiveMetadataType, descriptiveMetadataVersion, createdBy, notify);
   }
@@ -411,8 +403,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType, String descriptiveMetadataVersion,
     Map<String, String> properties, String updatedBy)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId,
-      OperationType.UPDATE);
+    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId, OperationType.UPDATE);
     return getModelService().updateDescriptiveMetadata(aipId, descriptiveMetadataId, descriptiveMetadataPayload,
       descriptiveMetadataType, descriptiveMetadataVersion, properties, updatedBy);
   }
@@ -422,8 +413,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String descriptiveMetadataId, ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType,
     String descriptiveMetadataVersion, Map<String, String> properties, String updatedBy)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      OperationType.UPDATE);
+    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, OperationType.UPDATE);
     return getModelService().updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, properties, updatedBy);
   }
@@ -431,8 +421,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public void deleteDescriptiveMetadata(String aipId, String descriptiveMetadataId, String deletedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId,
-      OperationType.DELETE);
+    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId, OperationType.DELETE);
     getModelService().deleteDescriptiveMetadata(aipId, descriptiveMetadataId, deletedBy);
   }
 
@@ -440,8 +429,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public void deleteDescriptiveMetadata(String aipId, String representationId, String descriptiveMetadataId,
     String deletedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      OperationType.DELETE);
+    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, OperationType.DELETE);
     getModelService().deleteDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, deletedBy);
   }
 
@@ -449,8 +437,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(String aipId, String representationId,
     String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      OperationType.READ);
+    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, OperationType.READ);
     return getModelService().listDescriptiveMetadataVersions(aipId, representationId, descriptiveMetadataId);
   }
 
@@ -458,8 +445,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public BinaryVersion revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
     Map<String, String> properties)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId,
-      OperationType.UPDATE);
+    registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId, OperationType.UPDATE);
     return getModelService().revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId, properties);
   }
 
@@ -467,8 +453,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public BinaryVersion revertDescriptiveMetadataVersion(String aipId, String representationId,
     String descriptiveMetadataId, String versionId, Map<String, String> properties)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      OperationType.UPDATE);
+    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, OperationType.UPDATE);
     return getModelService().revertDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId, versionId,
       properties);
   }
@@ -538,8 +523,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public Representation updateRepresentationInfo(Representation representation) throws GenericException {
-    registerOperationForRepresentation(representation.getAipId(), representation.getId(),
-      OperationType.UPDATE);
+    registerOperationForRepresentation(representation.getAipId(), representation.getId(), OperationType.UPDATE);
     return getModelService().updateRepresentationInfo(representation);
   }
 
@@ -601,8 +585,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public CloseableIterable<OptionalWithCause<File>> listFilesUnder(File f, boolean recursive)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    registerOperationForFile(f.getAipId(), f.getRepresentationId(), f.getPath(), f.getId(),
-      OperationType.READ);
+    registerOperationForFile(f.getAipId(), f.getRepresentationId(), f.getPath(), f.getId(), OperationType.READ);
     return getModelService().listFilesUnder(f, recursive);
   }
 
@@ -610,8 +593,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public CloseableIterable<OptionalWithCause<File>> listFilesUnder(String aipId, String representationId,
     List<String> directoryPath, String fileId, boolean recursive)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    registerOperationForFile(aipId, representationId, directoryPath, fileId,
-      OperationType.READ);
+    registerOperationForFile(aipId, representationId, directoryPath, fileId, OperationType.READ);
     return getModelService().listFilesUnder(aipId, representationId, directoryPath, fileId, recursive);
   }
 
@@ -626,8 +608,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public File retrieveFile(String aipId, String representationId, List<String> directoryPath, String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForFile(aipId, representationId, directoryPath, fileId,
-      OperationType.READ);
+    registerOperationForFile(aipId, representationId, directoryPath, fileId, OperationType.READ);
     File file;
     try {
       file = stagingModelService.retrieveFile(aipId, representationId, directoryPath, fileId);
@@ -641,8 +622,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, String createdBy) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
-    registerOperationForFile(aipId, representationId, directoryPath, fileId,
-      OperationType.CREATE);
+    registerOperationForFile(aipId, representationId, directoryPath, fileId, OperationType.CREATE);
     return getModelService().createFile(aipId, representationId, directoryPath, fileId, contentPayload, createdBy);
   }
 
@@ -650,8 +630,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, String createdBy, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
-    registerOperationForFile(aipId, representationId, directoryPath, fileId,
-      OperationType.CREATE);
+    registerOperationForFile(aipId, representationId, directoryPath, fileId, OperationType.CREATE);
     return getModelService().createFile(aipId, representationId, directoryPath, fileId, contentPayload, createdBy,
       notify);
   }
@@ -660,8 +639,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     String dirName, String createdBy, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
-    registerOperationForFile(aipId, representationId, directoryPath, fileId,
-      OperationType.CREATE);
+    registerOperationForFile(aipId, representationId, directoryPath, fileId, OperationType.CREATE);
     return getModelService().createFile(aipId, representationId, directoryPath, fileId, dirName, createdBy, notify);
   }
 
@@ -669,8 +647,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public File updateFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, boolean createIfNotExists, String updatedBy, boolean notify)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForFile(aipId, representationId, directoryPath, fileId,
-      OperationType.UPDATE);
+    registerOperationForFile(aipId, representationId, directoryPath, fileId, OperationType.UPDATE);
     return getModelService().updateFile(aipId, representationId, directoryPath, fileId, contentPayload,
       createIfNotExists, updatedBy, notify);
   }
@@ -687,8 +664,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public void deleteFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     String deletedBy, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    registerOperationForFile(aipId, representationId, directoryPath, fileId,
-      OperationType.DELETE);
+    registerOperationForFile(aipId, representationId, directoryPath, fileId, OperationType.DELETE);
     getModelService().deleteFile(aipId, representationId, directoryPath, fileId, deletedBy, notify);
   }
 
@@ -714,8 +690,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     RequestNotValidException, AuthorizationDeniedException {
     registerOperationForFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
       OperationType.UPDATE);
-    registerOperationForFile(newAipId, newRepresentationId, newDirectoryPath, newId,
-      OperationType.UPDATE);
+    registerOperationForFile(newAipId, newRepresentationId, newDirectoryPath, newId, OperationType.UPDATE);
     return getModelService().moveFile(file, newAipId, newRepresentationId, newDirectoryPath, newId, reindexResources);
   }
 
@@ -801,8 +776,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public Binary retrievePreservationRepresentation(String aipId, String representationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForPreservationMetadata(aipId, representationId,
-      OperationType.READ);
+    registerOperationForPreservationMetadata(aipId, representationId, OperationType.READ);
     Binary binary;
     try {
       binary = stagingModelService.retrievePreservationRepresentation(aipId, representationId);
@@ -815,8 +789,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public boolean preservationRepresentationExists(String aipId, String representationId)
     throws RequestNotValidException {
-    registerOperationForPreservationMetadata(aipId, representationId,
-      OperationType.READ);
+    registerOperationForPreservationMetadata(aipId, representationId, OperationType.READ);
     if (!stagingModelService.preservationRepresentationExists(aipId, representationId)) {
       return mainModelService.preservationRepresentationExists(aipId, representationId);
     }
@@ -992,8 +965,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public void deletePreservationMetadata(PreservationMetadata.PreservationMetadataType type, String aipId,
     String representationId, String id, List<String> filePath, boolean notify)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    registerOperationForPreservationMetadata(aipId, representationId, filePath, null, id,
-      OperationType.DELETE);
+    registerOperationForPreservationMetadata(aipId, representationId, filePath, null, id, OperationType.DELETE);
     getModelService().deletePreservationMetadata(type, aipId, representationId, id, filePath, notify);
   }
 
@@ -1703,8 +1675,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
     checkIfSchemaExistsAndThrowException(aipId, representationId, directoryPath, fileId);
 
-    registerOperationForFile(aipId, representationId, directoryPath, fileId,
-      OperationType.CREATE);
+    registerOperationForFile(aipId, representationId, directoryPath, fileId, OperationType.CREATE);
     return getModelService().createSchema(aipId, representationId, directoryPath, fileId, contentPayload);
   }
 
@@ -1885,7 +1856,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public DisposalSchedules listDisposalSchedules()
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
-    return getModelService().listDisposalSchedules();
+
+    return mainModelService.listDisposalSchedules();
   }
 
   @Override
@@ -1982,7 +1954,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public DisposalRules listDisposalRules()
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
-    return getModelService().listDisposalRules();
+    return mainModelService.listDisposalRules();
   }
 
   @Override
@@ -2651,8 +2623,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     }
   }
 
-  private void registerOperationForRepresentation(String aipID, String representationId,
-    OperationType operation) {
+  private void registerOperationForRepresentation(String aipID, String representationId, OperationType operation) {
     registerOperationForRelatedAIP(aipID, operation);
     registerOperation(Representation.class, Arrays.asList(aipID, representationId), operation);
   }
@@ -2668,8 +2639,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     registerOperation(File.class, list, operation);
   }
 
-  private void registerOperationForEvent(PreservationMetadata event,
-    OperationType operation) {
+  private void registerOperationForEvent(PreservationMetadata event, OperationType operation) {
     if (event == null) {
       throw new IllegalArgumentException("Event cannot be null");
     }
@@ -2686,8 +2656,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     }
   }
 
-  private void registerOperationForPreservationMetadata(String preservationID,
-    OperationType operation) {
+  private void registerOperationForPreservationMetadata(String preservationID, OperationType operation) {
     registerOperationForPreservationMetadata(null, null, null, null, preservationID, operation);
   }
 
@@ -2707,8 +2676,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     registerOperationForPreservationMetadata(aipId, representationId, null, null, preservationID, operationType);
   }
 
-  private void registerOperationForPreservationMetadata(File file,
-    OperationType operationType) {
+  private void registerOperationForPreservationMetadata(File file, OperationType operationType) {
     String preservationID = IdUtils.getPreservationId(PreservationMetadata.PreservationMetadataType.FILE,
       file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
       RODAInstanceUtils.getLocalInstanceIdentifier());
@@ -2716,8 +2684,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       preservationID, operationType);
   }
 
-  private void registerOperationForPreservationMetadata(PreservationMetadata pm,
-    OperationType operationType) {
+  private void registerOperationForPreservationMetadata(PreservationMetadata pm, OperationType operationType) {
     if (pm == null) {
       throw new IllegalArgumentException("PreservationMetadata cannot be null");
     }
@@ -2797,8 +2764,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     }
   }
 
-  private <T extends IsRODAObject> void acquireLock(Class<T> objectClass, String id,
-    OperationType operation) {
+  private <T extends IsRODAObject> void acquireLock(Class<T> objectClass, String id, OperationType operation) {
     if (id == null) {
       throw new IllegalArgumentException("Object ID cannot be null");
     }

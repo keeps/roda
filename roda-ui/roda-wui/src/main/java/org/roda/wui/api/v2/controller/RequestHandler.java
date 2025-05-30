@@ -21,6 +21,8 @@ import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.io.IOException;
+
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
@@ -75,7 +77,7 @@ public class RequestHandler {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (RODAException | IOException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -100,6 +102,6 @@ public class RequestHandler {
 
   public interface RequestProcessor<T> {
     T process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
-      throws RODAException, RESTException;
+            throws RODAException, RESTException, IOException;
   }
 }

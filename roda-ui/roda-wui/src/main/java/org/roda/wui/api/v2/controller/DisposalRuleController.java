@@ -3,20 +3,17 @@ package org.roda.wui.api.v2.controller;
 import java.io.IOException;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.DisposalRuleService;
 import org.roda.wui.client.services.DisposalRuleRestService;
-import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
-import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,156 +36,117 @@ public class DisposalRuleController implements DisposalRuleRestService {
   @Autowired
   DisposalRuleService disposalRuleService;
 
+  @Autowired
+  RequestHandler requestHandler;
+
   @Override
   public DisposalRules listDisposalRules() {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<DisposalRules>() {
+      @Override
+      public DisposalRules process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      return disposalRuleService.listDisposalRules();
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException | IOException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state);
-    }
-  }
-
-  @Override
-  public DisposalRule updateDisposalRule(@RequestBody DisposalRule disposalRule) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // sanitize the input
-      String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(disposalRule));
-      disposalRule = JsonUtils.getObjectFromJson(sanitize, DisposalRule.class);
-
-      // delegate action to service
-      return disposalRuleService.updateDisposalRule(disposalRule, requestContext.getUser());
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, disposalRule.getId(), state,
-        RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM, disposalRule);
-    }
-  }
-
-  @Override
-  public DisposalRule createDisposalRule(@RequestBody DisposalRule disposalRule) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // sanitize the input
-      String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(disposalRule));
-      disposalRule = JsonUtils.getObjectFromJson(sanitize, DisposalRule.class);
-
-      // validate disposal rule
-      controllerAssistant.checkRoles(requestContext.getUser(), DisposalSchedule.class);
-      disposalRuleService.validateDisposalRule(disposalRule);
-
-      return disposalRuleService.createDisposalRule(disposalRule, requestContext.getUser());
-    } catch (RODAException | IOException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM,
-        disposalRule);
-    }
+        return disposalRuleService.listDisposalRules(requestContext.getModelService());
+      }
+    });
   }
 
   @Override
   public DisposalRule retrieveDisposalRule(String id) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<DisposalRule>() {
+      @Override
+      public DisposalRule process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        // check user permissions
+        controllerAssistant.setRelatedObjectId(id);
+        controllerAssistant.setParameters(RodaConstants.DISPOSAL_RULE_ID, id);
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+        return disposalRuleService.retrieveDisposalHold(id, requestContext.getModelService());
+      }
+    });
+  }
 
-      return disposalRuleService.retrieveDisposalHold(id);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.DISPOSAL_RULE_ID, id);
-    }
+  @Override
+  public DisposalRule createDisposalRule(@RequestBody DisposalRule disposalRule) {
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<DisposalRule>() {
+      @Override
+      public DisposalRule process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM, disposalRule);
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
+
+        // sanitize the input
+        String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(disposalRule));
+        DisposalRule sanitizedDisposalRule = JsonUtils.getObjectFromJson(sanitize, DisposalRule.class);
+
+        // validate disposal rule
+        disposalRuleService.validateDisposalRule(sanitizedDisposalRule, requestContext.getModelService());
+
+        return disposalRuleService.createDisposalRule(sanitizedDisposalRule, requestContext);
+      }
+    });
+  }
+
+  @Override
+  public DisposalRule updateDisposalRule(@RequestBody DisposalRule disposalRule) {
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<DisposalRule>() {
+      @Override
+      public DisposalRule process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        controllerAssistant.setRelatedObjectId(disposalRule.getId());
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM, disposalRule);
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
+
+        // sanitize the input
+        String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(disposalRule));
+        DisposalRule sanitizedDisposalRule = JsonUtils.getObjectFromJson(sanitize, DisposalRule.class);
+
+        // validate disposal rule
+        disposalRuleService.validateDisposalRule(sanitizedDisposalRule, requestContext.getModelService());
+
+        // delegate action to service
+        return disposalRuleService.updateDisposalRule(sanitizedDisposalRule, requestContext);
+      }
+    });
   }
 
   @Override
   public Void deleteDisposalRule(String id) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Void>() {
+      @Override
+      public Void process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        controllerAssistant.setRelatedObjectId(id);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_RULE_ID_PARAM, id);
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // delegate
-      disposalRuleService.deleteDisposalRule(id, requestContext.getUser());
-      return null;
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException | IOException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, id, state,
-        RodaConstants.CONTROLLER_DISPOSAL_RULE_ID_PARAM, id);
-    }
+        // delegate
+        disposalRuleService.deleteDisposalRule(id, requestContext);
+        return null;
+      }
+    });
   }
 
   @Override
   public Job applyDisposalRules(boolean overrideManualAssociations) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_RULE_OVERRIDE_MANUAL_PARAM,
+          Boolean.toString(overrideManualAssociations));
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-      // delegate
-      return disposalRuleService.applyDisposalRules(requestContext.getUser(), overrideManualAssociations);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state,
-        RodaConstants.CONTROLLER_DISPOSAL_RULE_OVERRIDE_MANUAL_PARAM, overrideManualAssociations);
-    }
+        // delegate action to service
+        return disposalRuleService.applyDisposalRules(requestContext.getUser(), overrideManualAssociations);
+      }
+    });
   }
 }
