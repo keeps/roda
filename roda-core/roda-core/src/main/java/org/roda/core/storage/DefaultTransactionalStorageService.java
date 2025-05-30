@@ -918,6 +918,9 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   private StorageService getStorageService(StoragePath storagePath) {
+    if (storagePath.isFromAContainer()) {
+      return mainStorageService;
+    }
     if (stagingStorageService.exists(storagePath)) {
       return stagingStorageService;
     } else {

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -25,9 +24,11 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.model.RequestContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -36,29 +37,29 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DisposalRuleService {
-  public DisposalRules listDisposalRules()
+  public DisposalRules listDisposalRules(ModelService model)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
-    return RodaCoreFactory.getModelService().listDisposalRules();
+    return model.listDisposalRules();
   }
 
-  public DisposalRule updateDisposalRule(DisposalRule disposalRule, User user)
+  public DisposalRule updateDisposalRule(DisposalRule disposalRule, RequestContext context)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().updateDisposalRule(disposalRule, user.getName());
+    return context.getModelService().updateDisposalRule(disposalRule, context.getUser().getName());
   }
 
-  public DisposalRule createDisposalRule(DisposalRule disposalRule, User user) throws GenericException,
+  public DisposalRule createDisposalRule(DisposalRule disposalRule, RequestContext context) throws GenericException,
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().createDisposalRule(disposalRule, user.getName());
+    return context.getModelService().createDisposalRule(disposalRule, context.getUser().getName());
   }
 
-  public DisposalRule retrieveDisposalHold(String id)
+  public DisposalRule retrieveDisposalHold(String id, ModelService model)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    return RodaCoreFactory.getModelService().retrieveDisposalRule(id);
+    return model.retrieveDisposalRule(id);
   }
 
-  public void deleteDisposalRule(String id, User user)
+  public void deleteDisposalRule(String id, RequestContext context)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, IOException {
-    RodaCoreFactory.getModelService().deleteDisposalRule(id, user.getName());
+    context.getModelService().deleteDisposalRule(id, context.getUser().getName());
   }
 
   public Job applyDisposalRules(User user, boolean overrideManualAssociations)
@@ -73,9 +74,9 @@ public class DisposalRuleService {
       ApplyDisposalRulesPlugin.class, user, pluginParameters, "Could not execute apply disposal rules to repository");
   }
 
-  public void validateDisposalRule(DisposalRule disposalRule)
+  public void validateDisposalRule(DisposalRule disposalRule, ModelService model)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
-    DisposalSchedules disposalSchedules = RodaCoreFactory.getModelService().listDisposalSchedules();
+    DisposalSchedules disposalSchedules = model.listDisposalSchedules();
 
     if (StringUtils.isBlank(disposalRule.getTitle())) {
       throw new DisposalRuleNotValidException("The disposal rule title is mandatory");
