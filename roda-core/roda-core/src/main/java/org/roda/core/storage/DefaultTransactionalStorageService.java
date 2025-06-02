@@ -174,13 +174,16 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
     boolean createIfNotExists)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    registerOperation(storagePath, OperationType.UPDATE);
 
-    if (!createIfNotExists && !stagingStorageService.exists(storagePath) && !mainStorageService.exists(storagePath)) {
-      throw new NotFoundException("Storage path does not exist: " + storagePath);
+    if (mainStorageService.exists(storagePath) || stagingStorageService.exists(storagePath)) {
+      registerOperation(storagePath, OperationType.UPDATE);
+      return stagingStorageService.updateBinaryContent(storagePath, payload, asReference, true);
+    } else if (createIfNotExists) {
+      registerOperation(storagePath, OperationType.CREATE);
+      return stagingStorageService.updateBinaryContent(storagePath, payload, asReference, true);
     }
 
-    return stagingStorageService.updateBinaryContent(storagePath, payload, asReference, createIfNotExists);
+    throw new NotFoundException("Storage path does not exist: " + storagePath);
   }
 
   @Override
@@ -200,8 +203,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
-    registerOperation(toStoragePath, OperationType.CREATE);
-    copyFromMainStorageService(fromStoragePath);
+    registerOperation(toStoragePath, OperationType.COPY);
+    copyToStagingStorageService(fromService, fromStoragePath);
     stagingStorageService.copy(fromService, fromStoragePath, toStoragePath);
   }
 
@@ -209,7 +212,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
     registerOperation(fromStoragePath, OperationType.CREATE);
-    copyFromMainStorageService(fromStoragePath);
+    copyToStagingStorageService(fromService, fromStoragePath);
     stagingStorageService.copy(fromService, fromStoragePath, toPath, resource, replaceExisting);
   }
 
@@ -218,7 +221,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
     registerOperation(fromStoragePath, OperationType.UPDATE);
-    copyFromMainStorageService(fromStoragePath);
+    copyToStagingStorageService(fromService, fromStoragePath);
     stagingStorageService.move(fromService, fromStoragePath, toStoragePath);
   }
 
@@ -262,7 +265,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     // Need to copy the resource from main storage to staging storage for internal
     // check
-    copyFromMainStorageService(storagePath);
+    copyToStagingStorageService(mainStorageService, storagePath);
     BinaryVersion binaryVersion = stagingStorageService.createBinaryVersion(storagePath, properties);
     registerOperation(storagePath, OperationType.CREATE, binaryVersion.getId());
     return binaryVersion;
@@ -273,13 +276,13 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     throws NotFoundException, RequestNotValidException, GenericException, AuthorizationDeniedException {
     registerOperation(storagePath, OperationType.UPDATE);
     registerOperation(storagePath, OperationType.UPDATE, version);
-    copyFromMainStorageService(storagePath);
+    copyToStagingStorageService(mainStorageService, storagePath);
     try {
       importBinaryVersion(mainStorageService, storagePath, version);
+      stagingStorageService.revertBinaryVersion(storagePath, version);
     } catch (AlreadyExistsException e) {
       throw new GenericException("Failed to import binary version", e);
     }
-    stagingStorageService.revertBinaryVersion(storagePath, version);
   }
 
   @Override
@@ -287,13 +290,13 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     // TODO: NOT WORKING
     registerOperation(storagePath, OperationType.DELETE, version);
-    copyFromMainStorageService(storagePath);
+    copyToStagingStorageService(mainStorageService, storagePath);
     try {
       importBinaryVersion(mainStorageService, storagePath, version);
+      stagingStorageService.deleteBinaryVersion(storagePath, version);
     } catch (AlreadyExistsException e) {
       throw new GenericException("Failed to import binary version", e);
     }
-    stagingStorageService.deleteBinaryVersion(storagePath, version);
   }
 
   @Override
@@ -337,24 +340,24 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       DefaultStoragePath storagePath = null;
       try {
         storagePath = DefaultStoragePath.parse(parts);
+
+        OperationType operationType = storagePathLog.getOperationType();
+        String version = storagePathLog.getVersion();
+
+        if (operationType == OperationType.DELETE) {
+          handleDeleteOperation(storagePath, path, version);
+        } else if (operationType == OperationType.UPDATE) {
+          handleUpdateOperation(storagePath, version);
+        } else if (operationType == OperationType.CREATE) {
+          handleCreateOperation(storagePath, version);
+        } else if (operationType == OperationType.COPY) {
+          handleCopyOperation(storagePath, version);
+        } else {
+          // TODO: READ
+          LOGGER.debug("Skipping read operation for storage path: {}", storagePathLog.getStoragePath());
+        }
       } catch (RequestNotValidException e) {
         throw new RODATransactionException("Failed to parse storage path: " + path, e);
-      }
-
-      OperationType operationType = storagePathLog.getOperationType();
-      String version = storagePathLog.getVersion();
-
-      if (operationType == OperationType.DELETE) {
-        handleDeleteOperation(storagePath, path, version);
-      } else if (operationType == OperationType.UPDATE) {
-        handleUpdateOperation(storagePath, version);
-      } else if (operationType == OperationType.CREATE) {
-        handleCreateOperation(storagePath, version);
-      } else if (operationType == OperationType.COPY) {
-        handleCopyOperation(storagePath, version);
-      } else {
-        // TODO: READ
-        LOGGER.debug("Skipping read operation for storage path: {}", storagePathLog.getStoragePath());
       }
     }
   }
@@ -424,7 +427,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         LOGGER.info("Moving resource from staging to main storage service: {}", storagePath);
         Class<? extends Entity> rootEntity = getEntity(storagePath);
         StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
-            storagePath, rootEntity);
+          storagePath, rootEntity);
       }
     } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
       | AuthorizationDeniedException e) {
@@ -487,7 +490,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         StoragePath resourceStoragePath = resource.getStoragePath();
         if (!storagePathsOperations.contains(resourceStoragePath.toString())) {
           StoragePath parsedPath = DefaultStoragePath.parse(resourceStoragePath);
-          copyFromMainStorageService(parsedPath);
+          copyToStagingStorageService(mainStorageService, parsedPath);
         }
       }
 
@@ -496,10 +499,10 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     }
   }
 
-  private void copyFromMainStorageService(StoragePath storagePath) {
+  private void copyToStagingStorageService(StorageService fromStorage, StoragePath storagePath) {
     try {
-      StorageServiceUtils.copyBetweenStorageServices(mainStorageService, storagePath, stagingStorageService,
-        storagePath, getEntity(storagePath));
+      StorageServiceUtils.copyBetweenStorageServices(fromStorage, storagePath, stagingStorageService,
+        storagePath, fromStorage.getEntity(storagePath));
     } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException
       | GenericException e) {
       // Do nothing
