@@ -1,5 +1,6 @@
 package org.roda.core.model;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hamcrest.Matchers;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -39,7 +41,10 @@ import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StorageServiceUtils;
+import org.roda.core.storage.StorageTestUtils;
 import org.roda.core.storage.TransactionalStorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.transaction.RODATransactionManager;
 import org.roda.core.transaction.TransactionalContext;
@@ -52,6 +57,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
+import org.testng.AssertJUnit;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -106,13 +112,15 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
     logPath = RodaCoreFactory.getLogPath();
     storage = RodaCoreFactory.getStorageService();
     model = RodaCoreFactory.getModelService();
+
+    transactionManager.setMainModelService(model);
   }
 
   @AfterClass
   public void cleanup() throws NotFoundException, GenericException, IOException {
     ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
-    // FSUtils.deletePath(basePath);
+    FSUtils.deletePath(basePath);
   }
 
   @Test
@@ -280,5 +288,75 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
       "Missing files in the staging area: " + stagingAipStoragePathList);
 
     transactionManager.endTransaction(context.transactionLog().getId());
+  }
+
+  @Test
+  public void testListTransactionalResourcesUnderContainer() throws RODAException {
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    StoragePath directoryStoragePath1 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    StoragePath directoryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+
+    storage.createContainer(containerStoragePath);
+    storage.createDirectory(directoryStoragePath1);
+    storage.createDirectory(directoryStoragePath2);
+
+    TransactionalContext context = transactionManager.beginTransaction();
+    TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+    transactionalStorage.createContainer(containerStoragePath);
+    transactionalStorage.createDirectory(directoryStoragePath1);
+
+    for (Resource resource : storage.listResourcesUnderContainer(containerStoragePath, true)) {
+      System.out.println("Resource in storage: " + resource.getStoragePath());
+    }
+
+    for (Resource resource : transactionalStorage.listResourcesUnderContainer(containerStoragePath, true)) {
+      System.out.println("Resource in transactionalStorage: " + resource.getStoragePath());
+    }
+
+    for (Resource resource : StorageServiceUtils.listTransactionalResourcesUnderContainer(transactionalStorage, storage, containerStoragePath, true)) {
+      System.out.println("Resource in both storage: " + resource.getStoragePath());
+    }
+
+    CloseableIterable<Resource> resources = StorageServiceUtils.listTransactionalResourcesUnderContainer(transactionalStorage, storage, containerStoragePath, true);
+    AssertJUnit.assertNotNull(resources);
+    assertThat(resources, Matchers.<Resource> iterableWithSize(2));
+  }
+
+  @Test
+  public void testListTransactionalResourcesUnderDirectory() throws RODAException {
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    StoragePath subDirectoryStoragePath1 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    StoragePath subDirectoryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    StoragePath subDirectoryStoragePath3 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+
+
+    storage.createContainer(containerStoragePath);
+    storage.createDirectory(directoryStoragePath);
+    storage.createDirectory(subDirectoryStoragePath1);
+    storage.createDirectory(subDirectoryStoragePath2);
+
+    TransactionalContext context = transactionManager.beginTransaction();
+    TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+    transactionalStorage.createContainer(containerStoragePath);
+    transactionalStorage.createDirectory(directoryStoragePath);
+    transactionalStorage.createDirectory(subDirectoryStoragePath1);
+    transactionalStorage.createDirectory(subDirectoryStoragePath3);
+
+    for (Resource resource : storage.listResourcesUnderDirectory(directoryStoragePath, true)) {
+      System.out.println("Resource in storage: " + resource.getStoragePath());
+    }
+
+    for (Resource resource : transactionalStorage.listResourcesUnderDirectory(directoryStoragePath, true)) {
+      System.out.println("Resource in transactionalStorage: " + resource.getStoragePath());
+    }
+
+    for (Resource resource : StorageServiceUtils.listTransactionalResourcesUnderDirectory(transactionalStorage, storage, directoryStoragePath, true)) {
+      System.out.println("Resource in both storage: " + resource.getStoragePath());
+    }
+
+    CloseableIterable<Resource> resources = StorageServiceUtils.listTransactionalResourcesUnderDirectory(transactionalStorage, storage, directoryStoragePath, true);
+    AssertJUnit.assertNotNull(resources);
+    assertThat(resources, Matchers.<Resource> iterableWithSize(2));
   }
 }
