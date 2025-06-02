@@ -1,10 +1,10 @@
 package org.roda.wui.api.v2.controller;
 
+import java.io.IOException;
+
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.transaction.RODATransactionException;
@@ -75,7 +75,7 @@ public class RequestHandler {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (RODAException e) {
+    } catch (RODAException | IOException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
@@ -100,6 +100,6 @@ public class RequestHandler {
 
   public interface RequestProcessor<T> {
     T process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
-      throws RODAException, RESTException;
+      throws RODAException, RESTException, IOException;
   }
 }

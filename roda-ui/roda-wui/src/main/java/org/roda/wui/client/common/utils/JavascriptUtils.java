@@ -17,21 +17,22 @@ public class JavascriptUtils {
   }
 
   public static native JavaScriptObject durationInYMD(String futureDate) /*-{
-      var todayDate = $wnd.moment().startOf('day');
-      var disposalDate = $wnd.moment(futureDate).startOf('day');
+    console.log("Calculating duration in YMD for date: " + futureDate);
+      var todayDate = $wnd.luxon.DateTime.now();
+      var disposalDate = $wnd.luxon.DateTime.fromISO(futureDate);
 
-      var differenceInYears = Math.abs(todayDate.diff(disposalDate, 'years'));
+      var differenceInYears = Math.abs(todayDate.diff(disposalDate, 'years').years);
 
       if (differenceInYears < 1) {
-          var differenceInMonths = Math.abs(todayDate.diff(disposalDate, 'months'));
+          var differenceInMonths = Math.abs(todayDate.diff(disposalDate, 'months').months);
           if (differenceInMonths < 1) {
-              var differenceInDays = Math.abs(todayDate.diff(disposalDate, 'days'));
-                  return { "diff": differenceInDays, "unit": "days" };
+              var differenceInDays = Math.abs(todayDate.diff(disposalDate, 'days').days);
+                  return { "diff": Math.floor(differenceInDays), "unit": "days" };
           } else {
-              return { "diff": differenceInMonths, "unit": "months" };
+              return { "diff": Math.floor(differenceInMonths), "unit": "months" };
           }
       } else {
-          return { "diff": differenceInYears, "unit": "years" };
+          return { "diff": Math.floor(differenceInYears), "unit": "years" };
       }
   }-*/;
 
