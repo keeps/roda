@@ -10,7 +10,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateRequest;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
@@ -31,6 +30,7 @@ import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.DisposalConfirmationRestService;
 import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,15 +67,16 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   @Autowired
   IndexService indexService;
 
+  @Autowired
+  RequestHandler requestHandler;
+
   @Override
   public DisposalConfirmation findByUuid(String uuid, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(DisposalConfirmation.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<DisposalConfirmation> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(DisposalConfirmation.class, findRequest, localeString);
   }
 
@@ -91,7 +92,6 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
 
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, DisposalConfirmation.class);
   }
 
@@ -104,55 +104,38 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
   public ResponseEntity<StreamingResponseBody> retrieveDisposalConfirmationReport(
     @Parameter(description = "The ID of the disposal confirmation", required = true) @PathVariable(name = "id") String disposalConfirmationId,
     @Parameter(description = "Use a print-friendly layout", schema = @Schema(defaultValue = "false", implementation = Boolean.class)) @RequestParam(name = "to-print", defaultValue = "false", required = false) boolean toPrint) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM,
+          disposalConfirmationId, "printLayout", toPrint);
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-      // delegate
-      StreamResponse disposalConfirmationReport = disposalConfirmationService
-        .createDisposalConfirmationReport(disposalConfirmationId, toPrint);
-
-      return ApiUtils.okResponse(disposalConfirmationReport, null);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException | IOException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM,
-        disposalConfirmationId, "printLayout", toPrint);
-    }
+        // delegate and return
+        return ApiUtils.okResponse(
+          disposalConfirmationService.createDisposalConfirmationReport(disposalConfirmationId, toPrint), null);
+      }
+    });
   }
 
   @Override
   public Job destroyRecordsInDisposalConfirmation(@RequestBody SelectedItemsRequest selectedItems) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // delegate
-      return disposalConfirmationService.destroyRecordsInDisposalConfirmation(requestContext.getUser(),
-        CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
-    }
+        // delegate
+        return disposalConfirmationService.destroyRecordsInDisposalConfirmation(requestContext.getUser(),
+          CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
+      }
+    });
   }
 
   @Override
@@ -192,32 +175,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
 
       // delegate
       return disposalConfirmationService.restoreRecordsInDisposalConfirmation(requestContext.getUser(),
-          CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (GenericException | NotFoundException | RequestNotValidException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
-    }
-  }
-
-  @Override
-  public Job recoverDisposalConfirmation(@RequestBody SelectedItemsRequest selectedItems) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // delegate
-      return disposalConfirmationService.recoverDisposalConfirmationExecutionFailed(requestContext.getUser(),
-          CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
+        CommonServicesUtils.convertSelectedItems(selectedItems, DisposalConfirmation.class));
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -257,54 +215,41 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
 
   @Override
   public Job createDisposalConfirmation(@RequestBody DisposalConfirmationCreateRequest createRequest) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM,
+          createRequest.getForm(), RodaConstants.CONTROLLER_SELECTED_ITEMS_PARAM, createRequest.getSelectedItems(),
+          "title", createRequest.getTitle());
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-      // delegate
-      return disposalConfirmationService.createDisposalConfirmation(requestContext.getUser(), createRequest);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state,
-        RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM, createRequest.getForm(),
-        RodaConstants.CONTROLLER_SELECTED_ITEMS_PARAM, createRequest.getSelectedItems(), "title",
-        createRequest.getTitle());
-    }
+        // delegate
+        return disposalConfirmationService.createDisposalConfirmation(requestContext.getUser(), createRequest);
+      }
+    });
   }
 
   @Override
   public DisposalConfirmationForm retrieveDisposalConfirmationForm() {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<DisposalConfirmationForm>() {
+      @Override
+      public DisposalConfirmationForm process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
+        // check user permissions
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      return disposalConfirmationService.retrieveDisposalConfirmationExtraBundle();
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } finally {
-      controllerAssistant.registerAction(requestContext, state);
-    }
+        return disposalConfirmationService.retrieveDisposalConfirmationExtraBundle();
+      }
+    });
   }
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
-      DisposalConfirmation.class));
+    return ApiUtils
+      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, DisposalConfirmation.class));
   }
 }

@@ -41,7 +41,6 @@ import org.roda.core.plugins.base.disposal.confirmation.CreateDisposalConfirmati
 import org.roda.core.plugins.base.disposal.confirmation.DeleteDisposalConfirmationPlugin;
 import org.roda.core.plugins.base.disposal.confirmation.DestroyRecordsPlugin;
 import org.roda.core.plugins.base.disposal.confirmation.PermanentlyDeleteRecordsPlugin;
-import org.roda.core.plugins.base.disposal.confirmation.RecoverDisposalConfirmationExecutionFailedPlugin;
 import org.roda.core.plugins.base.disposal.confirmation.RestoreRecordsPlugin;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.fs.FSUtils;
@@ -100,13 +99,6 @@ public class DisposalConfirmationService {
     return CommonServicesUtils.createAndExecuteInternalJob("Restore destroyed records from disposal bin", selectedItems,
       RestoreRecordsPlugin.class, user, Collections.emptyMap(),
       "Could not execute restoration of destroyed records from disposal bin action");
-  }
-
-  public Job recoverDisposalConfirmationExecutionFailed(User user, SelectedItems<DisposalConfirmation> selectedItems)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    return CommonServicesUtils.createAndExecuteInternalJob("Recovers disposal confirmation from a failure state",
-      selectedItems, RecoverDisposalConfirmationExecutionFailedPlugin.class, user, Collections.emptyMap(),
-      "Could not execute recover the disposal confirmation from a previous faulty state");
   }
 
   public Job deleteDisposalConfirmation(User user, SelectedItems<DisposalConfirmation> selectedItems, String details)
