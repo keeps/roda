@@ -247,7 +247,6 @@ public final class StorageServiceUtils {
               if (seenPaths.contains(path)) {
                 continue;
               }
-              seenPaths.add(path);
               nextItem = res;
               return;
             }

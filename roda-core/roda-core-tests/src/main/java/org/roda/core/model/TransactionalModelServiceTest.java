@@ -292,18 +292,27 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
 
   @Test
   public void testListTransactionalResourcesUnderContainer() throws RODAException {
-    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    StoragePath directoryStoragePath1 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    StoragePath directoryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-
-    storage.createContainer(containerStoragePath);
-    storage.createDirectory(directoryStoragePath1);
-    storage.createDirectory(directoryStoragePath2);
-
     TransactionalContext context = transactionManager.beginTransaction();
     TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+
+    // Create a common container in both storage and transactional storage
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(containerStoragePath);
     transactionalStorage.createContainer(containerStoragePath);
+
+    // Create directories in both storage and transactional storage, this should be listed once
+    StoragePath directoryStoragePath1 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage.createDirectory(directoryStoragePath1);
     transactionalStorage.createDirectory(directoryStoragePath1);
+
+    // Create directory in storage only
+    StoragePath directoryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage.createDirectory(directoryStoragePath2);
+
+    // Create directory in transactional storage only
+    StoragePath directoryStoragePath3 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    transactionalStorage.createDirectory(directoryStoragePath3);
+
 
     for (Resource resource : storage.listResourcesUnderContainer(containerStoragePath, true)) {
       System.out.println("Resource in storage: " + resource.getStoragePath());
@@ -319,28 +328,33 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
 
     CloseableIterable<Resource> resources = StorageServiceUtils.listTransactionalResourcesUnderContainer(transactionalStorage, storage, containerStoragePath, true);
     AssertJUnit.assertNotNull(resources);
-    assertThat(resources, Matchers.<Resource> iterableWithSize(2));
+    assertThat(resources, Matchers.<Resource> iterableWithSize(3));
   }
 
   @Test
   public void testListTransactionalResourcesUnderDirectory() throws RODAException {
-    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    StoragePath subDirectoryStoragePath1 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
-    StoragePath subDirectoryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
-    StoragePath subDirectoryStoragePath3 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
-
-
-    storage.createContainer(containerStoragePath);
-    storage.createDirectory(directoryStoragePath);
-    storage.createDirectory(subDirectoryStoragePath1);
-    storage.createDirectory(subDirectoryStoragePath2);
-
     TransactionalContext context = transactionManager.beginTransaction();
     TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+
+    // Create a common container and directories in both storage and transactional storage
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage.createContainer(containerStoragePath);
+    storage.createDirectory(directoryStoragePath);
     transactionalStorage.createContainer(containerStoragePath);
     transactionalStorage.createDirectory(directoryStoragePath);
+
+    // Create a subdirectory in both storage and transactional storage, this should be listed once
+    StoragePath subDirectoryStoragePath1 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    storage.createDirectory(subDirectoryStoragePath1);
     transactionalStorage.createDirectory(subDirectoryStoragePath1);
+
+    // Create a subdirectory in storage only
+    StoragePath subDirectoryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    storage.createDirectory(subDirectoryStoragePath2);
+
+    // Create a subdirectory in transactional storage only
+    StoragePath subDirectoryStoragePath3 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
     transactionalStorage.createDirectory(subDirectoryStoragePath3);
 
     for (Resource resource : storage.listResourcesUnderDirectory(directoryStoragePath, true)) {
@@ -357,6 +371,6 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
 
     CloseableIterable<Resource> resources = StorageServiceUtils.listTransactionalResourcesUnderDirectory(transactionalStorage, storage, directoryStoragePath, true);
     AssertJUnit.assertNotNull(resources);
-    assertThat(resources, Matchers.<Resource> iterableWithSize(2));
+    assertThat(resources, Matchers.<Resource> iterableWithSize(3));
   }
 }
