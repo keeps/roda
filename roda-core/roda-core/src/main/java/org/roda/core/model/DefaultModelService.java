@@ -1771,10 +1771,10 @@ public class DefaultModelService implements ModelService {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     String urn = URNUtils.createRodaTechnicalMetadataURN(fileId, RODAInstanceUtils.getLocalInstanceIdentifier(),
-            metadataType.toLowerCase());
+      metadataType.toLowerCase());
 
     StoragePath binaryPath = ModelUtils.getTechnicalMetadataStoragePath(aipId, representationId,
-            Collections.singletonList(metadataType), urn);
+      Collections.singletonList(metadataType), urn);
     storage.createBinary(binaryPath, payload, false);
     TechnicalMetadata techMd = new TechnicalMetadata(metadataType, aipId, representationId, metadataType);
 
@@ -2271,7 +2271,7 @@ public class DefaultModelService implements ModelService {
    *********************/
 
   @Override
-  public void importLogEntries(InputStream inputStream, String filename) throws AuthorizationDeniedException,
+  public List<LogEntry> importLogEntries(InputStream inputStream, String filename) throws AuthorizationDeniedException,
     GenericException, AlreadyExistsException, RequestNotValidException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
@@ -2282,6 +2282,7 @@ public class DefaultModelService implements ModelService {
 
     Path tempDir = null;
     try {
+      List<LogEntry> importedLogs = new ArrayList<>();
       tempDir = Files.createTempDirectory(new Date().getTime() + "");
       Path path = tempDir.resolve(filename);
       IOUtils.copyLarge(inputStream, Files.newOutputStream(path));
@@ -2289,12 +2290,16 @@ public class DefaultModelService implements ModelService {
       for (OptionalWithCause<LogEntry> optionalLogEntry : new LogEntryFileSystemIterable(tempDir)) {
         // index
         if (optionalLogEntry.isPresent()) {
+          importedLogs.add(optionalLogEntry.get());
           notifyLogEntryCreated(optionalLogEntry.get()).failOnError();
         }
       }
 
       // store
       storage.createBinary(logPath, new FSPathContentPayload(path), false);
+
+      // return
+      return importedLogs;
     } catch (IOException e) {
       throw new GenericException(e);
     } finally {
@@ -3105,9 +3110,9 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public BinaryVersion retrieveVersion(String id, String versionId)
+  public BinaryVersion retrieveVersion(String riskId, String versionId)
     throws RequestNotValidException, GenericException, NotFoundException {
-    StoragePath binaryPath = ModelUtils.getRiskStoragePath(id);
+    StoragePath binaryPath = ModelUtils.getRiskStoragePath(riskId);
     return storage.getBinaryVersion(binaryPath, versionId);
   }
 
@@ -3689,7 +3694,8 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public boolean checkIfSchemaExists(String aipId, String representationId, List<String> directoryPath, String fileId) throws RequestNotValidException {
+  public boolean checkIfSchemaExists(String aipId, String representationId, List<String> directoryPath, String fileId)
+    throws RequestNotValidException {
     StoragePath schemaStoragePath = ModelUtils.getSchemaStoragePath(aipId, representationId, directoryPath, fileId);
     return storage.exists(schemaStoragePath);
   }

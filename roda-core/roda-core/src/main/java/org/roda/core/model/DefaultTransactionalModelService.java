@@ -79,6 +79,7 @@ import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.entity.transaction.TransactionalModelOperationLog;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.iterables.LogEntryFileSystemIterable;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
@@ -1899,9 +1900,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public void importLogEntries(InputStream inputStream, String filename) throws AuthorizationDeniedException,
+  public List<LogEntry> importLogEntries(InputStream inputStream, String filename) throws AuthorizationDeniedException,
     GenericException, AlreadyExistsException, RequestNotValidException, NotFoundException {
-    getModelService().importLogEntries(inputStream, filename);
+    List<LogEntry> ret = getModelService().importLogEntries(inputStream, filename);
+    for (LogEntry log : ret) {
+      TransactionalModelOperationLog operationLog = registerOperationForLogEntry(log.getUUID(), OperationType.CREATE);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
+    return ret;
   }
 
   @Override
@@ -1936,14 +1942,40 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public void findOldLogsAndSendThemToMaster(Path logDirectory, Path currentLogFile) {
-    getModelService().findOldLogsAndSendThemToMaster(logDirectory, currentLogFile);
+  public void findOldLogsAndSendThemToMaster(Path logDirectory, Path currentLogFile) throws IOException {
+    List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
+    try (LogEntryFileSystemIterable logEntries = new LogEntryFileSystemIterable(logDirectory)) {
+      for (OptionalWithCause<LogEntry> logEntry : logEntries) {
+        if (logEntry.isPresent()) {
+          operationLogs.add(registerOperationForLogEntry(logEntry.get().getId(), OperationType.CREATE));
+        }
+      }
+      getModelService().findOldLogsAndSendThemToMaster(logDirectory, currentLogFile);
+    } catch (IOException e) {
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public void findOldLogsAndMoveThemToStorage(Path logDirectory, Path currentLogFile)
-    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    getModelService().findOldLogsAndMoveThemToStorage(logDirectory, currentLogFile);
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, IOException {
+    List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
+    try (LogEntryFileSystemIterable logEntries = new LogEntryFileSystemIterable(logDirectory)) {
+      for (OptionalWithCause<LogEntry> logEntry : logEntries) {
+        if (logEntry.isPresent()) {
+          operationLogs.add(registerOperationForLogEntry(logEntry.get().getId(), OperationType.CREATE));
+        }
+      }
+      getModelService().findOldLogsAndMoveThemToStorage(logDirectory, currentLogFile);
+    } catch (IOException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
@@ -2112,19 +2144,41 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public void createJob(Job job)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    mainModelService.createJob(job);
+    TransactionalModelOperationLog operationLog = registerOperationForJob(job.getId(), OperationType.CREATE);
+    try {
+      mainModelService.createJob(job);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void createOrUpdateJob(Job job)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    mainModelService.createOrUpdateJob(job);
+    TransactionalModelOperationLog operationLog = registerOperationForJob(job.getId(), OperationType.UPDATE);
+    try {
+      mainModelService.createOrUpdateJob(job);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Job retrieveJob(String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return mainModelService.retrieveJob(jobId);
+    TransactionalModelOperationLog operationLog = registerOperationForJob(jobId, OperationType.READ);
+    try {
+      Job ret = mainModelService.retrieveJob(jobId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
@@ -2148,37 +2202,79 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public void deleteJob(String jobId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    mainModelService.deleteJob(jobId);
+    TransactionalModelOperationLog operationLog = registerOperationForJob(jobId, OperationType.DELETE);
+    try {
+      mainModelService.deleteJob(jobId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Report retrieveJobReport(String jobId, String jobReportId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return mainModelService.retrieveJobReport(jobId, jobReportId);
+    TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobId, jobReportId, OperationType.READ);
+    try {
+      Report ret = mainModelService.retrieveJobReport(jobId, jobReportId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Report retrieveJobReport(String jobId, String sourceObjectId, String outcomeObjectId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return mainModelService.retrieveJobReport(jobId, sourceObjectId, outcomeObjectId);
+    Report ret = mainModelService.retrieveJobReport(jobId, sourceObjectId, outcomeObjectId);
+    TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobId, ret.getId(), OperationType.READ);
+    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    return ret;
   }
 
   @Override
   public void createOrUpdateJobReport(Report jobReport, Job cachedJob)
     throws GenericException, AuthorizationDeniedException {
-    mainModelService.createOrUpdateJobReport(jobReport, cachedJob);
+    TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobReport.getJobId(), jobReport.getId(),
+      OperationType.UPDATE);
+    try {
+      mainModelService.createOrUpdateJobReport(jobReport, cachedJob);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void createOrUpdateJobReport(Report jobReport, IndexedJob indexJob)
     throws GenericException, AuthorizationDeniedException {
-    mainModelService.createOrUpdateJobReport(jobReport, indexJob);
+    TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobReport.getJobId(), jobReport.getId(),
+      OperationType.UPDATE);
+    try {
+      mainModelService.createOrUpdateJobReport(jobReport, indexJob);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void deleteJobReport(String jobId, String jobReportId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    mainModelService.deleteJobReport(jobId, jobReportId);
+    TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobId, jobReportId,
+      OperationType.DELETE);
+    try {
+      mainModelService.deleteJobReport(jobId, jobReportId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
@@ -2223,139 +2319,332 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public void deleteTransferredResource(TransferredResource transferredResource)
     throws GenericException, AuthorizationDeniedException {
-    getModelService().deleteTransferredResource(transferredResource);
+    TransactionalModelOperationLog operationLog = registerOperationForTransferredResource(
+      transferredResource.getFullPath(), OperationType.DELETE);
+    try {
+      getModelService().deleteTransferredResource(transferredResource);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Job updateJobInstanceId(Job job)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    return mainModelService.updateJobInstanceId(job);
+    TransactionalModelOperationLog operationLog = registerOperationForJob(job.getId(), OperationType.UPDATE);
+    try {
+      Job ret = mainModelService.updateJobInstanceId(job);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Risk createRisk(Risk risk, boolean commit) throws GenericException, AuthorizationDeniedException {
-    return getModelService().createRisk(risk, commit);
+    TransactionalModelOperationLog operationLog = registerOperationForRisk(risk.getId(), OperationType.CREATE);
+    try {
+      Risk ret = getModelService().createRisk(risk, commit);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Risk updateRiskInstanceId(Risk risk, boolean commit) throws GenericException, AuthorizationDeniedException {
-    return getModelService().updateRiskInstanceId(risk, commit);
+    TransactionalModelOperationLog operationLog = registerOperationForRisk(risk.getId(), OperationType.UPDATE);
+    try {
+      Risk ret = getModelService().updateRiskInstanceId(risk, commit);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Risk updateRisk(Risk risk, Map<String, String> properties, boolean commit, int incidences)
     throws GenericException, AuthorizationDeniedException {
-    return getModelService().updateRisk(risk, properties, commit, incidences);
+    TransactionalModelOperationLog operationLog = registerOperationForRisk(risk.getId(), OperationType.UPDATE);
+    try {
+      Risk ret = getModelService().updateRisk(risk, properties, commit, incidences);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void deleteRisk(String riskId, boolean commit)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-    getModelService().deleteRisk(riskId, commit);
+    TransactionalModelOperationLog operationLog = registerOperationForRisk(riskId, OperationType.DELETE);
+    try {
+      getModelService().deleteRisk(riskId, commit);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Risk retrieveRisk(String riskId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().retrieveRisk(riskId);
+    TransactionalModelOperationLog operationLog = registerOperationForRisk(riskId, OperationType.READ);
+    try {
+      Risk ret = getModelService().retrieveRisk(riskId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
-  public BinaryVersion retrieveVersion(String id, String versionId)
+  public BinaryVersion retrieveVersion(String riskId, String versionId)
     throws RequestNotValidException, GenericException, NotFoundException {
-    return getModelService().retrieveVersion(id, versionId);
+    TransactionalModelOperationLog operationLog = registerOperationForRisk(riskId, OperationType.READ);
+    try {
+      BinaryVersion ret = getModelService().retrieveVersion(riskId, versionId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | NotFoundException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public BinaryVersion revertRiskVersion(String riskId, String versionId, Map<String, String> properties,
     boolean commit, int incidences)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().revertRiskVersion(riskId, versionId, properties, commit, incidences);
+    TransactionalModelOperationLog operationLog = registerOperationForRisk(riskId, OperationType.UPDATE);
+    try {
+      BinaryVersion ret = getModelService().revertRiskVersion(riskId, versionId, properties, commit, incidences);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public RiskIncidence createRiskIncidence(RiskIncidence riskIncidence, boolean commit)
     throws AlreadyExistsException, NotFoundException, AuthorizationDeniedException, GenericException {
-    return getModelService().createRiskIncidence(riskIncidence, commit);
+    TransactionalModelOperationLog operationLog = registerOperationForRiskIncidence(riskIncidence.getId(),
+      OperationType.CREATE);
+    try {
+      RiskIncidence ret = getModelService().createRiskIncidence(riskIncidence, commit);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (AlreadyExistsException | NotFoundException | AuthorizationDeniedException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public RiskIncidence updateRiskIncidenceInstanceId(RiskIncidence riskIncidence, boolean commit)
     throws GenericException, AuthorizationDeniedException {
-    return getModelService().updateRiskIncidenceInstanceId(riskIncidence, commit);
+    TransactionalModelOperationLog operationLog = registerOperationForRiskIncidence(riskIncidence.getId(),
+      OperationType.UPDATE);
+    try {
+      RiskIncidence ret = getModelService().updateRiskIncidenceInstanceId(riskIncidence, commit);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public RiskIncidence updateRiskIncidence(RiskIncidence riskIncidence, boolean commit)
     throws GenericException, AuthorizationDeniedException {
-    return getModelService().updateRiskIncidence(riskIncidence, commit);
+    TransactionalModelOperationLog operationLog = registerOperationForRiskIncidence(riskIncidence.getId(),
+      OperationType.UPDATE);
+    try {
+      RiskIncidence ret = getModelService().updateRiskIncidence(riskIncidence, commit);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void deleteRiskIncidence(String riskIncidenceId, boolean commit)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-    getModelService().deleteRiskIncidence(riskIncidenceId, commit);
+    TransactionalModelOperationLog operationLog = registerOperationForRiskIncidence(riskIncidenceId,
+      OperationType.DELETE);
+    try {
+      getModelService().deleteRiskIncidence(riskIncidenceId, commit);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public RiskIncidence retrieveRiskIncidence(String incidenceId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().retrieveRiskIncidence(incidenceId);
+    TransactionalModelOperationLog operationLog = registerOperationForRiskIncidence(incidenceId, OperationType.READ);
+    try {
+      RiskIncidence ret = getModelService().retrieveRiskIncidence(incidenceId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Notification createNotification(Notification notification, NotificationProcessor processor)
     throws GenericException, AuthorizationDeniedException {
-    return getModelService().createNotification(notification, processor);
+    TransactionalModelOperationLog operationLog = registerOperationForNotification(notification.getId(),
+      OperationType.CREATE);
+    try {
+      Notification ret = getModelService().createNotification(notification, processor);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Notification updateNotificationInstanceId(Notification notification)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().updateNotificationInstanceId(notification);
+    TransactionalModelOperationLog operationLog = registerOperationForNotification(notification.getId(),
+      OperationType.UPDATE);
+    try {
+      Notification ret = getModelService().updateNotificationInstanceId(notification);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Notification updateNotification(Notification notification)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().updateNotification(notification);
+    TransactionalModelOperationLog operationLog = registerOperationForNotification(notification.getId(),
+      OperationType.UPDATE);
+    try {
+      Notification ret = getModelService().updateNotification(notification);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void deleteNotification(String notificationId)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
-    getModelService().deleteNotification(notificationId);
+    TransactionalModelOperationLog operationLog = registerOperationForNotification(notificationId,
+      OperationType.DELETE);
+    try {
+      getModelService().deleteNotification(notificationId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Notification retrieveNotification(String notificationId)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().retrieveNotification(notificationId);
+    TransactionalModelOperationLog operationLog = registerOperationForNotification(notificationId, OperationType.READ);
+    try {
+      Notification notification = getModelService().retrieveNotification(notificationId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return notification;
+    } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Notification acknowledgeNotification(String notificationId, String token)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().acknowledgeNotification(notificationId, token);
+    TransactionalModelOperationLog operationLog = registerOperationForNotification(notificationId,
+      OperationType.UPDATE);
+    try {
+      Notification notification = getModelService().acknowledgeNotification(notificationId, token);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return notification;
+    } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public CloseableIterable<OptionalWithCause<DIPFile>> listDIPFilesUnder(DIPFile f, boolean recursive)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    return getModelService().listDIPFilesUnder(f, recursive);
+    TransactionalModelOperationLog operationLog = registerOperationForDIPFile(f.getDipId(), f.getPath(), f.getId(),
+      OperationType.READ);
+    try {
+      CloseableIterable<OptionalWithCause<DIPFile>> ret = getModelService().listDIPFilesUnder(f, recursive);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public CloseableIterable<OptionalWithCause<DIPFile>> listDIPFilesUnder(String dipId, List<String> directoryPath,
     String fileId, boolean recursive)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    return getModelService().listDIPFilesUnder(dipId, directoryPath, fileId, recursive);
+    TransactionalModelOperationLog operationLog = registerOperationForDIPFile(dipId, directoryPath, fileId,
+      OperationType.READ);
+    try {
+      CloseableIterable<OptionalWithCause<DIPFile>> ret = getModelService().listDIPFilesUnder(dipId, directoryPath,
+        fileId, recursive);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public CloseableIterable<OptionalWithCause<DIPFile>> listDIPFilesUnder(String dipId, boolean recursive)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    return getModelService().listDIPFilesUnder(dipId, recursive);
+    TransactionalModelOperationLog operationLog = registerOperationForDIP(dipId, OperationType.READ);
+    try {
+      CloseableIterable<OptionalWithCause<DIPFile>> ret = getModelService().listDIPFilesUnder(dipId, recursive);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
@@ -2427,71 +2716,184 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public DIPFile createDIPFile(String dipId, List<String> directoryPath, String fileId, long size,
     ContentPayload contentPayload, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
-    return getModelService().createDIPFile(dipId, directoryPath, fileId, size, contentPayload, notify);
+    TransactionalModelOperationLog operationLog = registerOperationForDIPFile(dipId, directoryPath, fileId,
+      OperationType.CREATE);
+    try {
+      DIPFile ret = getModelService().createDIPFile(dipId, directoryPath, fileId, size, contentPayload, notify);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException
+      | NotFoundException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public DIPFile createDIPFile(String dipId, List<String> directoryPath, String fileId, String dirName, boolean notify)
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
-    return getModelService().createDIPFile(dipId, directoryPath, fileId, dirName, notify);
+    TransactionalModelOperationLog operationLog = registerOperationForDIPFile(dipId, directoryPath, fileId,
+      OperationType.CREATE);
+    try {
+      DIPFile ret = getModelService().createDIPFile(dipId, directoryPath, fileId, dirName, notify);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public DIPFile updateDIPFile(String dipId, List<String> directoryPath, String oldFileId, String fileId, long size,
     ContentPayload contentPayload, boolean createIfNotExists, boolean notify) throws RequestNotValidException,
     GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
-    return getModelService().updateDIPFile(dipId, directoryPath, oldFileId, fileId, size, contentPayload,
-      createIfNotExists, notify);
+    TransactionalModelOperationLog operationLog = registerOperationForDIPFile(dipId, directoryPath, oldFileId,
+      OperationType.UPDATE);
+    try {
+      DIPFile ret = getModelService().updateDIPFile(dipId, directoryPath, oldFileId, fileId, size, contentPayload,
+        createIfNotExists, notify);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+      | AlreadyExistsException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void deleteDIPFile(String dipId, List<String> directoryPath, String fileId, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    getModelService().deleteDIPFile(dipId, directoryPath, fileId, notify);
+    TransactionalModelOperationLog operationLog = registerOperationForDIPFile(dipId, directoryPath, fileId,
+      OperationType.DELETE);
+    try {
+      getModelService().deleteDIPFile(dipId, directoryPath, fileId, notify);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public DIPFile retrieveDIPFile(String dipId, List<String> directoryPath, String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return getModelService().retrieveDIPFile(dipId, directoryPath, fileId);
+    TransactionalModelOperationLog operationLog = registerOperationForDIPFile(dipId, directoryPath, fileId,
+      OperationType.READ);
+    try {
+      DIPFile ret = getModelService().retrieveDIPFile(dipId, directoryPath, fileId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Directory getSubmissionDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    return getModelService().getSubmissionDirectory(aipId);
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
+    try {
+      Directory ret = getModelService().getSubmissionDirectory(aipId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void createSubmission(StorageService submissionStorage, StoragePath submissionStoragePath, String aipId)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
-    getModelService().createSubmission(submissionStorage, submissionStoragePath, aipId);
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.UPDATE);
+    try {
+      getModelService().createSubmission(submissionStorage, submissionStoragePath, aipId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (AlreadyExistsException | GenericException | RequestNotValidException | NotFoundException
+      | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void createSubmission(Path submissionPath, String aipId) throws AlreadyExistsException, GenericException,
     RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    getModelService().createSubmission(submissionPath, aipId);
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.UPDATE);
+    try {
+      getModelService().createSubmission(submissionPath, aipId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (AlreadyExistsException | GenericException | RequestNotValidException | NotFoundException
+      | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Directory getDocumentationDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    return getModelService().getDocumentationDirectory(aipId);
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
+    try {
+      Directory ret = getModelService().getDocumentationDirectory(aipId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Directory getDocumentationDirectory(String aipId, String representationId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    return getModelService().getDocumentationDirectory(aipId, representationId);
+    List<TransactionalModelOperationLog> operationLogs;
+    if (representationId != null) {
+      operationLogs = registerOperationForRepresentation(aipId, representationId, OperationType.READ);
+    } else {
+      operationLogs = List.of(registerOperationForAIP(aipId, OperationType.READ));
+    }
+    try {
+      Directory ret = getModelService().getDocumentationDirectory(aipId, representationId);
+      for (TransactionalModelOperationLog operation : operationLogs) {
+        updateOperationState(operation.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      for (TransactionalModelOperationLog operation : operationLogs) {
+        updateOperationState(operation.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public File createDocumentation(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
-    return getModelService().createDocumentation(aipId, representationId, directoryPath, fileId, contentPayload);
+    List<TransactionalModelOperationLog> operationLogs;
+    if (representationId != null) {
+      operationLogs = registerOperationForRepresentation(aipId, representationId, OperationType.READ);
+    } else {
+      operationLogs = List.of(registerOperationForAIP(aipId, OperationType.READ));
+    }
+    try {
+      File ret = getModelService().createDocumentation(aipId, representationId, directoryPath, fileId, contentPayload);
+      for (TransactionalModelOperationLog operation : operationLogs) {
+        updateOperationState(operation.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+      | AlreadyExistsException e) {
+      for (TransactionalModelOperationLog operation : operationLogs) {
+        updateOperationState(operation.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
@@ -2557,13 +2959,38 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public Directory getSchemasDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    return getModelService().getSchemasDirectory(aipId);
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
+    try {
+      Directory ret = getModelService().getSchemasDirectory(aipId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Directory getSchemasDirectory(String aipId, String representationId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    return getModelService().getSchemasDirectory(aipId, representationId);
+    List<TransactionalModelOperationLog> operationLogs;
+    if (representationId == null) {
+      operationLogs = List.of(registerOperationForAIP(aipId, OperationType.READ));
+    } else {
+      operationLogs = registerOperationForRepresentation(aipId, representationId, OperationType.READ);
+    }
+    try {
+      Directory ret = getModelService().getSchemasDirectory(aipId, representationId);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
@@ -2609,22 +3036,32 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public <T extends IsRODAObject> Optional<LiteRODAObject> retrieveLiteFromObject(T object) {
-    return getModelService().retrieveLiteFromObject(object);
+    TransactionalModelOperationLog operationLog = registerOperation(object, OperationType.READ);
+    Optional<LiteRODAObject> ret = getModelService().retrieveLiteFromObject(object);
+    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    return ret;
   }
 
   @Override
   public <T extends IsModelObject> OptionalWithCause<T> retrieveObjectFromLite(LiteRODAObject liteRODAObject) {
-    return getModelService().retrieveObjectFromLite(liteRODAObject);
+    TransactionalModelOperationLog operationLog = registerOperation(liteRODAObject, OperationType.READ);
+    OptionalWithCause<T> ret = getModelService().retrieveObjectFromLite(liteRODAObject);
+    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    return ret;
   }
 
   @Override
   public TransferredResource retrieveTransferredResource(String fullPath) {
-    return getModelService().retrieveTransferredResource(fullPath);
+    TransactionalModelOperationLog operationLog = registerOperationForTransferredResource(fullPath, OperationType.READ);
+    TransferredResource ret = getModelService().retrieveTransferredResource(fullPath);
+    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    return ret;
   }
 
   @Override
   public <T extends IsRODAObject> CloseableIterable<OptionalWithCause<T>> list(Class<T> objectClass)
     throws RODAException {
+
     return getModelService().list(objectClass);
   }
 
@@ -3981,6 +4418,52 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   private TransactionalModelOperationLog registerOperationForLogEntry(String logEntryID, OperationType operation) {
     acquireLock(LogEntry.class, logEntryID, operation);
     return registerOperation(LogEntry.class, Arrays.asList(logEntryID), operation);
+  }
+
+  private TransactionalModelOperationLog registerOperationForJob(String jobID, OperationType operation) {
+    return registerOperation(Job.class, Arrays.asList(jobID), operation);
+  }
+
+  private TransactionalModelOperationLog registerOperationForJobReport(String jobID, String jobReportID,
+    OperationType operation) {
+    return registerOperation(Report.class, Arrays.asList(jobReportID), operation);
+  }
+
+  private TransactionalModelOperationLog registerOperationForTransferredResource(String fullPath,
+    OperationType operation) {
+    return registerOperation(TransferredResource.class, Arrays.asList(fullPath), operation);
+  }
+
+  private TransactionalModelOperationLog registerOperationForRisk(String riskID, OperationType operation) {
+    return registerOperation(Risk.class, Arrays.asList(riskID), operation);
+  }
+
+  private TransactionalModelOperationLog registerOperationForRiskIncidence(String incidenceID,
+    OperationType operation) {
+    return registerOperation(RiskIncidence.class, Arrays.asList(incidenceID), operation);
+  }
+
+  private TransactionalModelOperationLog registerOperationForNotification(String notificationID,
+    OperationType operation) {
+    return registerOperation(Notification.class, Arrays.asList(notificationID), operation);
+  }
+
+  private TransactionalModelOperationLog registerOperationForDIPFile(String dipID, List<String> path, String id,
+    OperationType operation) {
+    List<String> ids = new ArrayList<>();
+    ids.add(dipID);
+    ids.addAll(path);
+    ids.add(id);
+    return registerOperation(DIPFile.class, ids, operation);
+  }
+
+  private <T extends IsRODAObject> TransactionalModelOperationLog registerOperation(T object, OperationType operation) {
+    Optional<LiteRODAObject> objectLite = LiteRODAObjectFactory.get(object);
+    if (objectLite.isEmpty()) {
+      throw new IllegalArgumentException("Cannot register operation for object: " + object);
+    } else {
+      return registerOperation(objectLite.get(), operation);
+    }
   }
 
   private <T extends IsRODAObject> TransactionalModelOperationLog registerOperation(Class<T> objectClass,
