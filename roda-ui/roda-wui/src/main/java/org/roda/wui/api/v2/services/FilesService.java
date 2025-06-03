@@ -63,6 +63,7 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.HTMLUtils;
+import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,11 +121,13 @@ public class FilesService {
       DeleteRODAObjectPlugin.class, user, pluginParameters, "Could not execute file delete action");
   }
 
-  public Job moveFiles(User user, MoveFilesRequest request)
+  public Job moveFiles(RequestContext requestContext, MoveFilesRequest request)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    User user = requestContext.getUser();
+    IndexService indexService = requestContext.getIndexService();
     IndexedFile fileToMove = null;
     if (request.getFileUUIDtoMove() != null) {
-      fileToMove = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, request.getFileUUIDtoMove(),
+      fileToMove = indexService.retrieve(IndexedFile.class, request.getFileUUIDtoMove(),
         RodaConstants.FILE_FIELDS_TO_RETURN);
     }
 

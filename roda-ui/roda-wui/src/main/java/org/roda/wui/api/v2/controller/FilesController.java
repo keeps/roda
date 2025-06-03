@@ -50,6 +50,7 @@ import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.FileRestService;
 import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,9 @@ public class FilesController implements FileRestService, Exportable {
 
   @Autowired
   private IndexService indexService;
+
+  @Autowired
+  private RequestHandler requestHandler;
 
   @RequestMapping(path = "{uuid}/preview", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   @Operation(summary = "Previews a file", description = "Previews a particular file using streaming capabilities", responses = {
@@ -290,61 +294,40 @@ public class FilesController implements FileRestService, Exportable {
 
   @Override
   public Job moveFileToFolder(@RequestBody MoveFilesRequest moveFilesRequest) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(moveFilesRequest.getAipId());
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, moveFilesRequest.getAipId(),
+          RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, moveFilesRequest.getRepresentationId(),
+          RodaConstants.CONTROLLER_FILES_PARAM, moveFilesRequest.getItemsToMove(), RodaConstants.CONTROLLER_FILE_PARAM,
+          moveFilesRequest.getFileUUIDtoMove(), RodaConstants.CONTROLLER_DETAILS_PARAM, moveFilesRequest.getDetails());
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), moveFilesRequest.getItemsToMove());
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), moveFilesRequest.getItemsToMove());
+        IndexedAIP destinationAIP = requestContext.getIndexService().retrieve(IndexedAIP.class,
+          moveFilesRequest.getAipId(), RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), destinationAIP);
 
-      IndexedAIP destinationAIP = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class,
-        moveFilesRequest.getAipId(), RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), destinationAIP);
-
-      // delegate
-      return filesService.moveFiles(requestContext.getUser(), moveFilesRequest);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RequestNotValidException | NotFoundException | GenericException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, moveFilesRequest.getAipId(), state,
-        RodaConstants.CONTROLLER_AIP_ID_PARAM, moveFilesRequest.getAipId(),
-        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, moveFilesRequest.getRepresentationId(),
-        RodaConstants.CONTROLLER_FILES_PARAM, moveFilesRequest.getItemsToMove(), RodaConstants.CONTROLLER_FILE_PARAM,
-        moveFilesRequest.getFileUUIDtoMove(), RodaConstants.CONTROLLER_DETAILS_PARAM, moveFilesRequest.getDetails());
-    }
+        // delegate
+        return filesService.moveFiles(requestContext, moveFilesRequest);
+      }
+    });
   }
 
   @Override
   public Job deleteFiles(@RequestBody DeleteRequest deleteRequest) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(),
-        CommonServicesUtils.convertSelectedItems(deleteRequest.getItemsToDelete(), IndexedFile.class));
-
-      return filesService.deleteFiles(requestContext.getUser(), deleteRequest);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RequestNotValidException | NotFoundException | GenericException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM,
-        deleteRequest.getItemsToDelete(), RodaConstants.CONTROLLER_DETAILS_PARAM, deleteRequest.getDetails());
-    }
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, deleteRequest.getItemsToDelete(),
+          RodaConstants.CONTROLLER_DETAILS_PARAM, deleteRequest.getDetails());
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+          CommonServicesUtils.convertSelectedItems(deleteRequest.getItemsToDelete(), IndexedFile.class));
+        return filesService.deleteFiles(requestContext.getUser(), deleteRequest);
+      }
+    });
   }
 
   @Override
