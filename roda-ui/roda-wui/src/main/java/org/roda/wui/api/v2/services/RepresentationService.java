@@ -251,9 +251,10 @@ public class RepresentationService {
     return descriptiveMetadataInfos;
   }
 
-  public Optional<String> retrieveDistributedInstanceName(String instanceId, boolean isLocalInstance) {
+  public Optional<String> retrieveDistributedInstanceName(RequestContext requestContext, String instanceId,
+    boolean isLocalInstance) {
     try {
-      ModelService model = RodaCoreFactory.getModelService();
+      ModelService model = requestContext.getModelService();
       RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
 
       if (RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
