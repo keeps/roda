@@ -1464,10 +1464,26 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public boolean preservationFileExists(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    if (!stagingModelService.preservationFileExists(aipId, representationId, fileDirectoryPath, fileId)) {
-      return mainModelService.preservationFileExists(aipId, representationId, fileDirectoryPath, fileId);
+    List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(aipId,
+      representationId, fileDirectoryPath, fileId, PreservationMetadata.PreservationMetadataType.FILE,
+      OperationType.READ);
+    try {
+      boolean ret;
+      if (!stagingModelService.preservationFileExists(aipId, representationId, fileDirectoryPath, fileId)) {
+        ret = mainModelService.preservationFileExists(aipId, representationId, fileDirectoryPath, fileId);
+      } else {
+        ret = true;
+      }
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
     }
-    return true;
   }
 
   @Override
@@ -1564,8 +1580,21 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public void createTechnicalMetadata(String aipId, String representationId, String metadataType, String fileId,
     ContentPayload payload, String createdBy, boolean notify) throws AuthorizationDeniedException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
-    getModelService().createTechnicalMetadata(aipId, representationId, metadataType, fileId, payload, createdBy,
-      notify);
+    List<TransactionalModelOperationLog> operationLogs = registerOperationForRepresentation(aipId, representationId,
+      OperationType.CREATE);
+    try {
+      getModelService().createTechnicalMetadata(aipId, representationId, metadataType, fileId, payload, createdBy,
+        notify);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+    } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException
+      | GenericException e) {
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
@@ -2101,10 +2130,19 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public CloseableIterable<OptionalWithCause<Report>> listJobReports(String jobId)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    // TODO: This registerOperation is here despite doing nothing because it's a
-    // READ operation
-    registerOperation(Job.class, List.of(jobId), OperationType.READ);
-    return getModelService().listJobReports(jobId);
+    TransactionalModelOperationLog operationLog = registerOperation(Job.class, List.of(jobId), OperationType.READ);
+    try {
+      CloseableIterable<OptionalWithCause<Report>> ret = getModelService().listJobReports(jobId);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
@@ -2459,30 +2497,61 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public Long countDocumentationFiles(String aipId, String representationId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    List<TransactionalModelOperationLog> operationLogs;
     if (representationId == null) {
-      registerOperationForAIP(aipId, OperationType.READ);
+      operationLogs = List.of(registerOperationForAIP(aipId, OperationType.READ));
     } else {
-      registerOperationForRepresentation(aipId, representationId, OperationType.READ);
+      operationLogs = registerOperationForRepresentation(aipId, representationId, OperationType.READ);
     }
-    return getModelService().countDocumentationFiles(aipId, representationId);
+    try {
+      Long ret = getModelService().countDocumentationFiles(aipId, representationId);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public Long countSubmissionFiles(String aipId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    registerOperationForAIP(aipId, OperationType.READ);
-    return getModelService().countSubmissionFiles(aipId);
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
+    try {
+      Long ret = getModelService().countSubmissionFiles(aipId);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Long countSchemaFiles(String aipId, String representationId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    List<TransactionalModelOperationLog> operationLogs;
     if (representationId == null) {
-      registerOperationForAIP(aipId, OperationType.READ);
+      operationLogs = List.of(registerOperationForAIP(aipId, OperationType.READ));
     } else {
-      registerOperationForRepresentation(aipId, representationId, OperationType.READ);
+      operationLogs = registerOperationForRepresentation(aipId, representationId, OperationType.READ);
     }
-    return getModelService().countSchemaFiles(aipId, representationId);
+    try {
+      Long ret = getModelService().countSchemaFiles(aipId, representationId);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
@@ -2521,8 +2590,21 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
     checkIfSchemaExistsAndThrowException(aipId, representationId, directoryPath, fileId);
 
-    registerOperationForFile(aipId, representationId, directoryPath, fileId, OperationType.CREATE);
-    return getModelService().createSchema(aipId, representationId, directoryPath, fileId, contentPayload);
+    List<TransactionalModelOperationLog> operationLog = registerOperationForFile(aipId, representationId, directoryPath,
+      fileId, OperationType.CREATE);
+    try {
+      File ret = getModelService().createSchema(aipId, representationId, directoryPath, fileId, contentPayload);
+      for (TransactionalModelOperationLog log : operationLog) {
+        updateOperationState(log.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException
+      | NotFoundException e) {
+      for (TransactionalModelOperationLog log : operationLog) {
+        updateOperationState(log.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
@@ -2889,156 +2971,353 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public StorageService resolveTemporaryResourceShallow(String jobId, IsRODAObject object, String... pathPartials)
     throws GenericException, RequestNotValidException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    return getModelService().resolveTemporaryResourceShallow(jobId, object, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      StorageService ret = getModelService().resolveTemporaryResourceShallow(jobId, object, pathPartials);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (GenericException | RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public StorageService resolveTemporaryResourceShallow(String jobId, StorageService storage, IsRODAObject object,
     String... pathPartials) throws GenericException, RequestNotValidException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    return getModelService().resolveTemporaryResourceShallow(jobId, storage, object, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      StorageService ret = getModelService().resolveTemporaryResourceShallow(jobId, storage, object, pathPartials);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (GenericException | RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public StorageService resolveTemporaryResourceShallow(String jobId, LiteRODAObject object, String... pathPartials)
     throws GenericException, RequestNotValidException {
-    registerOperation(object, OperationType.READ);
-    return getModelService().resolveTemporaryResourceShallow(jobId, object, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object, OperationType.READ);
+    try {
+      StorageService ret = getModelService().resolveTemporaryResourceShallow(jobId, object, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | RequestNotValidException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public StorageService resolveTemporaryResourceShallow(String jobId, StorageService storage, LiteRODAObject object,
     String... pathPartials) throws GenericException, RequestNotValidException {
-    registerOperation(object, OperationType.READ);
-    return getModelService().resolveTemporaryResourceShallow(jobId, storage, object, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object, OperationType.READ);
+    try {
+      StorageService ret = getModelService().resolveTemporaryResourceShallow(jobId, storage, object, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | RequestNotValidException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Binary getBinary(IsRODAObject object, String... pathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    return getModelService().getBinary(object, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      Binary ret = getModelService().getBinary(object, pathPartials);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public Binary getBinary(LiteRODAObject lite, String... pathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    registerOperation(lite, OperationType.READ);
-    return getModelService().getBinary(lite, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      Binary ret = getModelService().getBinary(lite, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public BinaryVersion getBinaryVersion(IsRODAObject object, String version, List<String> pathPartials)
     throws RequestNotValidException, NotFoundException, GenericException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    return getModelService().getBinaryVersion(object, version, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      BinaryVersion ret = getModelService().getBinaryVersion(object, version, pathPartials);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public BinaryVersion getBinaryVersion(LiteRODAObject lite, String version, List<String> pathPartials)
     throws RequestNotValidException, NotFoundException, GenericException {
-    registerOperation(lite, OperationType.READ);
-    return getModelService().getBinaryVersion(lite, version, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      BinaryVersion ret = getModelService().getBinaryVersion(lite, version, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(IsRODAObject object)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    return getModelService().listBinaryVersions(object);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      CloseableIterable<BinaryVersion> ret = getModelService().listBinaryVersions(object);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+
+    } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(LiteRODAObject lite)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    registerOperation(lite, OperationType.READ);
-    return getModelService().listBinaryVersions(lite);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      CloseableIterable<BinaryVersion> ret = getModelService().listBinaryVersions(lite);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void deleteBinaryVersion(IsRODAObject object, String version)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.DELETE);
-    getModelService().deleteBinaryVersion(object, version);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.DELETE);
+    try {
+      getModelService().deleteBinaryVersion(object, version);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void deleteBinaryVersion(LiteRODAObject lite, String version)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    registerOperation(lite, OperationType.DELETE);
-    getModelService().deleteBinaryVersion(lite, version);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.DELETE);
+    try {
+      getModelService().deleteBinaryVersion(lite, version);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Binary updateBinaryContent(IsRODAObject object, ContentPayload payload, boolean asReference,
     boolean createIfNotExists)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.UPDATE);
-    return getModelService().updateBinaryContent(object, payload, asReference, createIfNotExists);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.UPDATE);
+    try {
+      Binary ret = getModelService().updateBinaryContent(object, payload, asReference, createIfNotExists);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Binary updateBinaryContent(LiteRODAObject lite, ContentPayload payload, boolean asReference,
     boolean createIfNotExists)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    registerOperation(lite, OperationType.UPDATE);
-    return getModelService().updateBinaryContent(lite, payload, asReference, createIfNotExists);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.UPDATE);
+    try {
+      Binary ret = getModelService().updateBinaryContent(lite, payload, asReference, createIfNotExists);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Directory createDirectory(IsRODAObject object, String... pathPartials)
     throws AuthorizationDeniedException, AlreadyExistsException, GenericException, RequestNotValidException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.UPDATE);
-    return getModelService().createDirectory(object, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.UPDATE);
+    try {
+      Directory ret = getModelService().createDirectory(object, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (AuthorizationDeniedException | AlreadyExistsException | GenericException | RequestNotValidException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public Directory createDirectory(LiteRODAObject lite, String... pathPartials)
     throws AuthorizationDeniedException, AlreadyExistsException, GenericException, RequestNotValidException {
-    registerOperation(lite, OperationType.UPDATE);
-    return getModelService().createDirectory(lite, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.UPDATE);
+    try {
+      Directory ret = getModelService().createDirectory(lite, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (AuthorizationDeniedException | AlreadyExistsException | GenericException | RequestNotValidException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public boolean hasDirectory(IsRODAObject object, String... pathPartials) throws RequestNotValidException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    return getModelService().hasDirectory(object, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      boolean ret = getModelService().hasDirectory(object, pathPartials);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public boolean hasDirectory(LiteRODAObject lite, String... pathPartials)
     throws RequestNotValidException, GenericException {
-    registerOperation(lite, OperationType.READ);
-    return getModelService().hasDirectory(lite, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      boolean ret = getModelService().hasDirectory(lite, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public DirectResourceAccess getDirectAccess(IsRODAObject object, StorageService storage, String... pathPartials)
     throws RequestNotValidException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    return getModelService().getDirectAccess(object, storage, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      DirectResourceAccess ret = getModelService().getDirectAccess(object, storage, pathPartials);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public DirectResourceAccess getDirectAccess(LiteRODAObject lite, StorageService storage, String... pathPartials)
     throws RequestNotValidException, GenericException {
-    registerOperation(lite, OperationType.READ);
-    return getModelService().getDirectAccess(lite, storage, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      DirectResourceAccess ret = getModelService().getDirectAccess(lite, storage, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public DirectResourceAccess getDirectAccess(IsRODAObject object, String... pathPartials)
     throws RequestNotValidException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    return getModelService().getDirectAccess(object, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      DirectResourceAccess ret = getModelService().getDirectAccess(object, pathPartials);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public DirectResourceAccess getDirectAccess(LiteRODAObject lite, String... pathPartials)
     throws RequestNotValidException, GenericException {
-    registerOperation(lite, OperationType.READ);
-    return getModelService().getDirectAccess(lite, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      DirectResourceAccess ret = getModelService().getDirectAccess(lite, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+
+    } catch (RequestNotValidException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
@@ -3055,95 +3334,205 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public void importObject(IsRODAObject object, StorageService fromStorage) {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.UPDATE);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.UPDATE);
     getModelService().importObject(object, fromStorage);
+    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
   }
 
   @Override
   public void exportObject(IsRODAObject object, StorageService toStorage, String... toPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
     GenericException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    getModelService().exportObject(object, toStorage, toPathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      getModelService().exportObject(object, toStorage, toPathPartials);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+    } catch (RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException | NotFoundException
+      | GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
+
   }
 
   @Override
   public void exportObject(LiteRODAObject lite, StorageService toStorage, String... toPathPartials)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
     NotFoundException {
-    registerOperation(lite, OperationType.READ);
-    getModelService().exportObject(lite, toStorage, toPathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      getModelService().exportObject(lite, toStorage, toPathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | AlreadyExistsException
+      | NotFoundException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting, String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    getModelService().exportToPath(object, toPath, replaceExisting, fromPathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      getModelService().exportToPath(object, toPath, replaceExisting, fromPathPartials);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+    } catch (RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException | GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public void exportToPath(LiteRODAObject lite, Path toPath, boolean replaceExisting, String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
-    registerOperation(lite, OperationType.READ);
-    getModelService().exportToPath(lite, toPath, replaceExisting, fromPathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      getModelService().exportToPath(lite, toPath, replaceExisting, fromPathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public ConsumesOutputStream exportObjectToStream(IsRODAObject object, String... pathPartials)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    return getModelService().exportObjectToStream(object, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      ConsumesOutputStream ret = getModelService().exportObjectToStream(object, pathPartials);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public ConsumesOutputStream exportObjectToStream(LiteRODAObject lite, String... pathPartials)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    registerOperation(lite, OperationType.READ);
-    return getModelService().exportObjectToStream(lite, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      ConsumesOutputStream ret = getModelService().exportObjectToStream(lite, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public ConsumesOutputStream exportObjectToStream(IsRODAObject object, String name, boolean addTopDirectory,
     String... pathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    return getModelService().exportObjectToStream(object, name, addTopDirectory, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      ConsumesOutputStream ret = getModelService().exportObjectToStream(object, name, addTopDirectory, pathPartials);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public ConsumesOutputStream exportObjectToStream(LiteRODAObject lite, String name, boolean addTopDirectory,
     String... pathPartials)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    registerOperation(lite, OperationType.READ);
-    return getModelService().exportObjectToStream(lite, name, addTopDirectory, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      ConsumesOutputStream ret = getModelService().exportObjectToStream(lite, name, addTopDirectory, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public void moveObject(LiteRODAObject fromPath, LiteRODAObject toPath) throws AuthorizationDeniedException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
-    registerOperation(fromPath, OperationType.UPDATE);
-    getModelService().moveObject(fromPath, toPath);
+    TransactionalModelOperationLog operationLog = registerOperation(fromPath, OperationType.UPDATE);
+    try {
+      getModelService().moveObject(fromPath, toPath);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException
+      | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public String getObjectPathAsString(IsRODAObject object, boolean skipContainer) throws RequestNotValidException {
-    registerOperation(object.getClass(), List.of(object.getId()), OperationType.READ);
-    return getModelService().getObjectPathAsString(object, skipContainer);
+    TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
+      OperationType.READ);
+    try {
+      String ret = getModelService().getObjectPathAsString(object, skipContainer);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public String getObjectPathAsString(LiteRODAObject lite, boolean skipContainer)
     throws RequestNotValidException, GenericException {
-    registerOperation(lite, OperationType.READ);
-    return getModelService().getObjectPathAsString(lite, skipContainer);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      String ret = getModelService().getObjectPathAsString(lite, skipContainer);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public boolean existsInStorage(LiteRODAObject lite, String... pathPartials)
     throws RequestNotValidException, GenericException {
-    registerOperation(lite, OperationType.READ);
-    return getModelService().existsInStorage(lite, pathPartials);
+    TransactionalModelOperationLog operationLog = registerOperation(lite, OperationType.READ);
+    try {
+      boolean ret = getModelService().existsInStorage(lite, pathPartials);
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException e) {
+      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override

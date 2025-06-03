@@ -64,6 +64,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.entity.transaction.TransactionalModelOperationLog;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.lites.ParsedAIPLite;
 import org.roda.core.model.lites.ParsedDIPFileLite;
