@@ -122,7 +122,7 @@
         <java_version>21</java_version>
         <gwt.version>2.12.2</gwt.version>
         <cas.client.version>4.0.4</cas.client.version>
-        <swagger.version>2.2.30</swagger.version>
+        <swagger.version>2.2.31</swagger.version>
         <jackson.version>2.19.0</jackson.version>
         <spring.version>6.2.7</spring.version>
         <solr.version>9.8.1</solr.version>
