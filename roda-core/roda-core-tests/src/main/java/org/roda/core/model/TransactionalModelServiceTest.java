@@ -38,7 +38,10 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.security.LdapUtilityTestHelper;
+import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.RandomMockContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceUtils;
@@ -372,5 +375,32 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
     CloseableIterable<Resource> resources = StorageServiceUtils.listTransactionalResourcesUnderDirectory(transactionalStorage, storage, directoryStoragePath, true);
     AssertJUnit.assertNotNull(resources);
     assertThat(resources, Matchers.<Resource> iterableWithSize(3));
+  }
+
+  @Test
+  public void testGetBinary() throws RODAException {
+    // create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(containerStoragePath);
+
+    // 1) create binary
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage.createBinary(binaryStoragePath, payload, false);
+
+    // 2) get binary using transactional methods
+    TransactionalContext context = transactionManager.beginTransaction();
+    TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+
+    Binary binary = transactionalStorage.getBinary(binaryStoragePath);
+    AssertJUnit.assertNotNull(binary);
+
+    // 3) create the same binary again in the transactional storage
+    transactionalStorage.createBinary(binaryStoragePath, payload, false);
+
+    // 4) get binary again using transactional methods
+    Binary transactionalBinary = transactionalStorage.getBinary(binaryStoragePath);
+    AssertJUnit.assertNotNull(transactionalBinary);
+
   }
 }

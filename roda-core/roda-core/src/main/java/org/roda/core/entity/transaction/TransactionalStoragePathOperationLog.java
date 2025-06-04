@@ -74,6 +74,10 @@ public class TransactionalStoragePathOperationLog implements Serializable {
     return version;
   }
 
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)

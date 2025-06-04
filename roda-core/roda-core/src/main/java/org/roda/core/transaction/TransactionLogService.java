@@ -1,6 +1,8 @@
 package org.roda.core.transaction;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.roda.core.entity.transaction.OperationState;
@@ -10,6 +12,7 @@ import org.roda.core.entity.transaction.TransactionalModelOperationLog;
 import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
 import org.roda.core.repository.transaction.TransactionLogRepository;
 import org.roda.core.repository.transaction.TransactionalModelOperationLogRepository;
+import org.roda.core.repository.transaction.TransactionalStoragePathRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,8 @@ public class TransactionLogService {
   private TransactionLogRepository transactionLogRepository;
   @Autowired
   private TransactionalModelOperationLogRepository transactionalModelOperationLogRepository;
+  @Autowired
+  private TransactionalStoragePathRepository transactionalStoragePathRepository;
 
   @Transactional
   public TransactionLog createTransactionLog(TransactionLog.TransactionRequestType requestType, UUID requestId) {
@@ -67,6 +72,20 @@ public class TransactionLogService {
   public List<TransactionalStoragePathOperationLog> getStoragePathsOperations(UUID transactionId)
     throws RODATransactionException {
     return getTransactionLogById(transactionId).getStoragePathsOperations();
+  }
+
+  @Transactional
+  public Optional<TransactionalStoragePathOperationLog> getLastStoragePathOperation(UUID transactionId,
+    String storagePath) throws RODATransactionException {
+    TransactionLog transactionLog = getTransactionLogById(transactionId);
+    return transactionalStoragePathRepository.findByTransactionLogAndStoragePath(transactionLog, storagePath).stream()
+      .filter(operationLog -> isMutatingOperation(operationLog.getOperationType()))
+      .max(Comparator.comparing(TransactionalStoragePathOperationLog::getCreatedAt));
+  }
+
+  private boolean isMutatingOperation(OperationType operationType) {
+    return operationType == OperationType.CREATE || operationType == OperationType.UPDATE
+      || operationType == OperationType.DELETE;
   }
 
   @Transactional

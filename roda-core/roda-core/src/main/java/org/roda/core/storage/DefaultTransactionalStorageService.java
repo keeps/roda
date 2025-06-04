@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -160,8 +161,9 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   @Override
   public Binary getBinary(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
     registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).getBinary(storagePath);
+    return getEffectiveStorageService(storagePath).getBinary(storagePath);
   }
 
   @Override
@@ -501,8 +503,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   private void copyToStagingStorageService(StorageService fromStorage, StoragePath storagePath) {
     try {
-      StorageServiceUtils.copyBetweenStorageServices(fromStorage, storagePath, stagingStorageService,
-        storagePath, fromStorage.getEntity(storagePath));
+      StorageServiceUtils.copyBetweenStorageServices(fromStorage, storagePath, stagingStorageService, storagePath,
+        fromStorage.getEntity(storagePath));
     } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException
       | GenericException e) {
       // Do nothing
@@ -542,6 +544,26 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       return stagingStorageService;
     } else {
       return mainStorageService;
+    }
+  }
+
+  private StorageService getEffectiveStorageService(StoragePath storagePath)
+    throws NotFoundException, GenericException {
+    String storagePathAsString = stagingStorageService.getStoragePathAsString(storagePath, false);
+    try {
+      Optional<TransactionalStoragePathOperationLog> storagePathOperation = transactionLogService
+        .getLastStoragePathOperation(transaction.getId(), storagePathAsString);
+      if (storagePathOperation.isPresent()) {
+        return switch (storagePathOperation.get().getOperationType()) {
+          case DELETE -> throw new NotFoundException("Resource was deleted in this transaction.");
+          case CREATE, UPDATE, COPY -> stagingStorageService;
+          default ->
+            throw new GenericException("Unexpected operation type: " + storagePathOperation.get().getOperationType());
+        };
+      }
+      return mainStorageService;
+    } catch (RODATransactionException e) {
+      throw new GenericException("Failed to get effective storage service for storage path: " + storagePath, e);
     }
   }
 }
