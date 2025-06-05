@@ -908,6 +908,9 @@ public final class ModelUtils {
     if (object instanceof DisposalHold disposalHold) {
       return getDisposalHoldStoragePath(disposalHold.getId());
     }
+    if (object instanceof DisposalConfirmation disposalConfirmation) {
+      return getDisposalConfirmationStoragePath(disposalConfirmation.getId());
+    }
     if (object instanceof DistributedInstance distributedInstance) {
       return getDistributedInstanceStoragePath(distributedInstance.getId());
     }

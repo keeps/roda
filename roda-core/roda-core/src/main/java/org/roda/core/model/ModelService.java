@@ -162,9 +162,6 @@ public interface ModelService extends ModelObservable {
   DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String representationId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
-  boolean checkIfDescriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException;
-
   DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId, ContentPayload payload,
     String descriptiveMetadataType, String descriptiveMetadataVersion, String createdBy, boolean notify)
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,

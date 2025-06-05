@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -355,6 +356,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<TransactionalModelOperationLog> operationLogs = registerOperationForDescriptiveMetadata(aipId, null,
       descriptiveMetadataId, OperationType.READ);
+
     try {
       Binary binary;
       try {
@@ -379,6 +381,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<TransactionalModelOperationLog> operationLogs = registerOperationForDescriptiveMetadata(aipId,
       representationId, descriptiveMetadataId, OperationType.READ);
+
     try {
       Binary binary;
       try {
@@ -403,6 +406,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<TransactionalModelOperationLog> operationLogs = registerOperationForDescriptiveMetadata(aipId, null,
       descriptiveMetadataId, OperationType.READ);
+
     try {
       DescriptiveMetadata descriptiveMetadata;
       try {
@@ -426,8 +430,10 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String representationId,
     String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
     List<TransactionalModelOperationLog> operationLogs = registerOperationForDescriptiveMetadata(aipId,
       representationId, descriptiveMetadataId, OperationType.READ);
+
     try {
       DescriptiveMetadata descriptiveMetadata;
       try {
@@ -449,21 +455,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     }
   }
 
-  @Override
-  public boolean checkIfDescriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    if (!stagingModelService.checkIfDescriptiveMetadataExists(aipId, representationId, descriptiveMetadataId)) {
-      return mainModelService.checkIfDescriptiveMetadataExists(aipId, representationId, descriptiveMetadataId);
-    }
-    return true;
-  }
-
-  private void checkIfDescriptiveMetadataExistsAndThrowException(String aipId, String representationId,
-    String descriptiveMetadataId)
-    throws AlreadyExistsException, AuthorizationDeniedException, RequestNotValidException, GenericException {
-    if (checkIfDescriptiveMetadataExists(aipId, representationId, descriptiveMetadataId)) {
-      throw new AlreadyExistsException("Descriptive metadata with ID '" + descriptiveMetadataId
-        + "' already exists for AIP '" + aipId + "' and representation '" + representationId + "'.");
+  private <T extends IsRODAObject> void checkIfEntityExistsAndThrowException(Class<T> objectClass, String... ids)
+    throws AlreadyExistsException, RequestNotValidException, GenericException {
+    String[] filteredIds = Arrays.stream(ids).filter(Objects::nonNull).toArray(String[]::new);
+    Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, filteredIds);
+    if (liteRODAObject.isPresent()) {
+      if (existsInStorage(liteRODAObject.get())) {
+        throw new AlreadyExistsException(" Entity '" + liteRODAObject.get() + "' already exists in the storage");
+      }
     }
   }
 
@@ -473,7 +472,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
 
-    checkIfDescriptiveMetadataExistsAndThrowException(aipId, null, descriptiveMetadataId);
+    checkIfEntityExistsAndThrowException(DescriptiveMetadata.class, aipId, descriptiveMetadataId);
 
     List<TransactionalModelOperationLog> operationLogs = registerOperationForDescriptiveMetadata(aipId, null,
       descriptiveMetadataId, OperationType.CREATE);
@@ -500,7 +499,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
     NotFoundException {
 
-    checkIfDescriptiveMetadataExistsAndThrowException(aipId, null, descriptiveMetadataId);
+    checkIfEntityExistsAndThrowException(DescriptiveMetadata.class, aipId, descriptiveMetadataId);
 
     List<TransactionalModelOperationLog> operationLogs = registerOperationForDescriptiveMetadata(aipId, null,
       descriptiveMetadataId, OperationType.CREATE);
@@ -526,7 +525,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String descriptiveMetadataVersion, String createdBy) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
 
-    checkIfDescriptiveMetadataExistsAndThrowException(aipId, representationId, descriptiveMetadataId);
+    checkIfEntityExistsAndThrowException(DescriptiveMetadata.class, aipId, representationId, descriptiveMetadataId);
 
     List<TransactionalModelOperationLog> operationLogs = registerOperationForDescriptiveMetadata(aipId,
       representationId, descriptiveMetadataId, OperationType.CREATE);
@@ -552,7 +551,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String descriptiveMetadataVersion, String createdBy, boolean notify) throws RequestNotValidException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
 
-    checkIfDescriptiveMetadataExistsAndThrowException(aipId, representationId, descriptiveMetadataId);
+    checkIfEntityExistsAndThrowException(DescriptiveMetadata.class, aipId, representationId, descriptiveMetadataId);
 
     List<TransactionalModelOperationLog> operationLogs = registerOperationForDescriptiveMetadata(aipId,
       representationId, descriptiveMetadataId, OperationType.CREATE);
@@ -577,6 +576,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType, String descriptiveMetadataVersion,
     Map<String, String> properties, String updatedBy)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
     List<TransactionalModelOperationLog> operationLogs = registerOperationForDescriptiveMetadata(aipId, null,
       descriptiveMetadataId, OperationType.UPDATE);
     try {
@@ -1222,18 +1222,27 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public File renameFolder(File folder, String newName, boolean reindexResources) throws AlreadyExistsException,
     GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+
     List<TransactionalModelOperationLog> operationLogs = registerOperationForFile(folder.getAipId(),
-      folder.getRepresentationId(), folder.getPath(), folder.getId(), OperationType.UPDATE);
+      folder.getRepresentationId(), folder.getPath(), folder.getId(), OperationType.DELETE);
+    List<TransactionalModelOperationLog> renameOperationLogs = registerOperationForFile(folder.getAipId(),
+      folder.getRepresentationId(), folder.getPath(), newName, OperationType.CREATE);
     try {
       File ret = getModelService().renameFolder(folder, newName, reindexResources);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
         updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      for (TransactionalModelOperationLog renameOperationLog : renameOperationLogs) {
+        updateOperationState(renameOperationLog.getId(), OperationState.SUCCESS);
       }
       return ret;
     } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException
       | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
         updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      for (TransactionalModelOperationLog renameOperationLog : renameOperationLogs) {
+        updateOperationState(renameOperationLog.getId(), OperationState.FAILURE);
       }
       throw e;
     }
@@ -1243,8 +1252,11 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public File moveFile(File file, String newAipId, String newRepresentationId, List<String> newDirectoryPath,
     String newId, boolean reindexResources) throws AlreadyExistsException, GenericException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException {
+
     List<TransactionalModelOperationLog> operationLogs = registerOperationForFile(file.getAipId(),
-      file.getRepresentationId(), file.getPath(), file.getId(), OperationType.UPDATE);
+      file.getRepresentationId(), file.getPath(), file.getId(), OperationType.DELETE);
+    List<TransactionalModelOperationLog> moveOperationLogs = registerOperationForFile(newAipId, newRepresentationId,
+      newDirectoryPath, newId, OperationType.CREATE);
     operationLogs
       .addAll(registerOperationForFile(newAipId, newRepresentationId, newDirectoryPath, newId, OperationType.UPDATE));
     try {
@@ -1253,11 +1265,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       for (TransactionalModelOperationLog operationLog : operationLogs) {
         updateOperationState(operationLog.getId(), OperationState.SUCCESS);
       }
+      for (TransactionalModelOperationLog moveOperationLog : moveOperationLogs) {
+        updateOperationState(moveOperationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException
       | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
         updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      for (TransactionalModelOperationLog moveOperationLog : moveOperationLogs) {
+        updateOperationState(moveOperationLog.getId(), OperationState.FAILURE);
       }
       throw e;
     }
@@ -1567,6 +1585,10 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String aipId, String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload,
     String username, boolean notify) throws GenericException, NotFoundException, RequestNotValidException,
     AuthorizationDeniedException, AlreadyExistsException {
+
+    checkIfEntityExistsAndThrowException(PreservationMetadata.class, aipId, IdUtils.getPreservationId(type, aipId,
+      representationId, fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier()));
+
     PreservationMetadata preservationMetadata = getModelService().createPreservationMetadata(type, aipId,
       representationId, fileDirectoryPath, fileId, payload, username, notify);
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(preservationMetadata,
@@ -1603,6 +1625,10 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String aipId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, String username,
     boolean notify) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException {
+
+    checkIfEntityExistsAndThrowException(PreservationMetadata.class, aipId, IdUtils.getPreservationId(type, aipId, null,
+      fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier()));
+
     PreservationMetadata preservationMetadata = getModelService().createPreservationMetadata(type, aipId,
       fileDirectoryPath, fileId, payload, username, notify);
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(preservationMetadata,
@@ -1618,6 +1644,10 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String aipId, String representationId, ContentPayload payload, String username, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException {
+
+    checkIfEntityExistsAndThrowException(PreservationMetadata.class, aipId, representationId, IdUtils
+      .getPreservationId(type, aipId, representationId, null, null, RODAInstanceUtils.getLocalInstanceIdentifier()));
+
     PreservationMetadata preservationMetadata = getModelService().createPreservationMetadata(type, aipId,
       representationId, payload, username, notify);
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(preservationMetadata,
@@ -1632,6 +1662,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public PreservationMetadata createPreservationMetadata(PreservationMetadata.PreservationMetadataType type, String id,
     ContentPayload payload, boolean notify) throws GenericException, NotFoundException, RequestNotValidException,
     AuthorizationDeniedException, AlreadyExistsException {
+
+    checkIfEntityExistsAndThrowException(PreservationMetadata.class, id);
+
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(id,
       OperationType.CREATE);
     try {
@@ -1654,6 +1687,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String aipId, String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload,
     String createdBy, boolean notify) throws GenericException, NotFoundException, RequestNotValidException,
     AuthorizationDeniedException, AlreadyExistsException {
+
+    checkIfEntityExistsAndThrowException(PreservationMetadata.class, id);
+
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(aipId,
       representationId, fileDirectoryPath, fileId, id, OperationType.CREATE);
     try {
@@ -4450,16 +4486,24 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public void moveObject(LiteRODAObject fromPath, LiteRODAObject toPath) throws AuthorizationDeniedException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
-    TransactionalModelOperationLog operationLog = registerOperation(fromPath.getInfo(), OperationType.UPDATE);
+
+    TransactionalModelOperationLog operationLog = registerOperation(fromPath.getInfo(), OperationType.DELETE);
+    TransactionalModelOperationLog moveOperationLog = registerOperation(toPath.getInfo(), OperationType.CREATE);
     try {
       getModelService().moveObject(fromPath, toPath);
       if (operationLog != null) {
         updateOperationState(operationLog.getId(), OperationState.SUCCESS);
       }
+      if (moveOperationLog != null) {
+        updateOperationState(moveOperationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException
       | GenericException e) {
       if (operationLog != null) {
         updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      if (moveOperationLog != null) {
+        updateOperationState(moveOperationLog.getId(), OperationState.FAILURE);
       }
       throw e;
     }
