@@ -730,14 +730,6 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public boolean checkIfDescriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    StoragePath descriptiveMetadataStoragePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
-      descriptiveMetadataId);
-    return storage.exists(descriptiveMetadataStoragePath);
-  }
-
-  @Override
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
     ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion, String createdBy,
     boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,

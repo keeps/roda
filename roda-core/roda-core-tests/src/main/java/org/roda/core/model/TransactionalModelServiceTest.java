@@ -403,4 +403,65 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
     AssertJUnit.assertNotNull(transactionalBinary);
 
   }
+
+  @Test
+  public void testTransactionalCopy() throws RODAException {
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(containerStoragePath);
+
+    final StoragePath targetContainerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(targetContainerStoragePath);
+
+    System.out.println("Copying from " + containerStoragePath + " to " + targetContainerStoragePath);
+
+    // 1) create folders
+    final StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final StoragePath subDirectoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    storage.createDirectory(directoryStoragePath);
+    storage.createDirectory(subDirectoryStoragePath);
+
+    // 2) create binary
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(subDirectoryStoragePath);
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage.createBinary(binaryStoragePath, payload, false);
+
+    TransactionalContext context = transactionManager.beginTransaction();
+    TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+
+    transactionalStorage.copy(storage, directoryStoragePath, targetContainerStoragePath);
+    transactionManager.endTransaction(context.transactionLog().getId());
+  }
+
+  @Test
+  public void testTransactionalMove() throws RODAException {
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(containerStoragePath);
+
+    final StoragePath targetContainerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(targetContainerStoragePath);
+
+    // 1) create folders
+    final StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final StoragePath subDirectoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    storage.createDirectory(directoryStoragePath);
+    storage.createDirectory(subDirectoryStoragePath);
+
+    // 2) create binary
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(subDirectoryStoragePath);
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage.createBinary(binaryStoragePath, payload, false);
+
+    TransactionalContext context = transactionManager.beginTransaction();
+    TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+
+    transactionalStorage.move(storage, directoryStoragePath, targetContainerStoragePath);
+    System.out.println("Moving from " + directoryStoragePath.asList() + " to " + targetContainerStoragePath.asList());
+    transactionManager.endTransaction(context.transactionLog().getId());
+    try {
+      storage.getDirectory(directoryStoragePath);
+      Assert.fail("Should have thrown NotFoundException");
+    } catch (NotFoundException e) {
+      // do nothing
+    }
+  }
 }
