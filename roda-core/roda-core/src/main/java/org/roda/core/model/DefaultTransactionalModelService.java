@@ -660,7 +660,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     String dirName, String createdBy, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
-    registerOperationForFile(aipId, representationId, directoryPath, fileId,
+    registerOperationForFile(aipId, representationId, directoryPath, fileId, dirName,
       OperationType.CREATE);
     return getModelService().createFile(aipId, representationId, directoryPath, fileId, dirName, createdBy, notify);
   }
@@ -2658,13 +2658,24 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   private void registerOperationForFile(String aipID, String representationId, List<String> path, String fileID,
+                                        OperationType operation) {
+    registerOperationForFile(aipID, representationId, path, fileID, null, operation);
+  }
+  private void registerOperationForFile(String aipID, String representationId, List<String> path, String fileID, String folderName,
     OperationType operation) {
     registerOperationForRelatedAIP(aipID, operation);
     List<String> list = new ArrayList<>();
     list.add(aipID);
     list.add(representationId);
-    list.addAll(path);
-    list.add(fileID);
+    if (path != null) {
+      list.addAll(path);
+    }
+    if (fileID != null) {
+      list.add(fileID);
+    }
+    if(folderName != null) {
+      list.add(folderName);
+    }
     registerOperation(File.class, list, operation);
   }
 

@@ -74,13 +74,14 @@ public class FilesService {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilesService.class);
   private static final String HTML_EXT = ".html";
 
-  public IndexedFile renameFolder(User user, IndexedFile indexedFolder, String newName, String details)
+  public IndexedFile renameFolder(RequestContext requestContext, IndexedFile indexedFolder, String newName, String details)
     throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
     AuthorizationDeniedException {
     String eventDescription = "The process of updating an object of the repository.";
 
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
+    User user = requestContext.getUser();
+    ModelService model = requestContext.getModelService();
+    IndexService index = requestContext.getIndexService();
     String oldName = indexedFolder.getId();
 
     try {
@@ -177,13 +178,14 @@ public class FilesService {
     }
   }
 
-  public IndexedFile createFolder(User user, IndexedRepresentation indexedRepresentation, CreateFolderRequest request)
+  public IndexedFile createFolder(RequestContext requestContext, IndexedRepresentation indexedRepresentation, CreateFolderRequest request)
     throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
     AuthorizationDeniedException {
     String eventDescription = "The process of creating an object of the repository.";
 
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
+    User user = requestContext.getUser();
+    ModelService model = requestContext.getModelService();
+    IndexService index = requestContext.getIndexService();
     File newFolder;
 
     String folderUUID = request.getFolderUUID();
