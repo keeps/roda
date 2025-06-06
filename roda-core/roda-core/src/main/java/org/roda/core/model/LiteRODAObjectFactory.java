@@ -25,6 +25,7 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -184,6 +185,8 @@ public final class LiteRODAObjectFactory {
       ret = get(DisposalConfirmation.class, Arrays.asList(o.getId()), false);
     } else if (object instanceof IndexedPreservationAgent) {
       ret = getIndexedPreservationAgent(object);
+    } else if (object instanceof DisposalHold) {
+      ret = get(DisposalHold.class, Arrays.asList(object.getId()), false);
     }
 
     if (!ret.isPresent()) {
@@ -224,6 +227,8 @@ public final class LiteRODAObjectFactory {
       ret = create(PreservationMetadata.class, ids.size(), ids);
     } else if (objectClass == IndexedPreservationAgent.class) {
       ret = create(PreservationMetadata.class, ids.size(), ids);
+    } else if (objectClass == DisposalHold.class) {
+      ret = create(DisposalHold.class, ids.size(), ids);
     }
 
     if (logIfReturningEmpty && !ret.isPresent()) {
@@ -332,8 +337,7 @@ public final class LiteRODAObjectFactory {
           Class<T> casted = (Class<T>) clazz;
           ret = casted;
         } else {
-          return OptionalWithCause.empty(new GenericException(
-                  className + " is not a subtype of IsRODAObject"));
+          return OptionalWithCause.empty(new GenericException(className + " is not a subtype of IsRODAObject"));
         }
       } catch (Exception e) {
         return OptionalWithCause.empty(new GenericException("Failed to load class: " + className, e));
