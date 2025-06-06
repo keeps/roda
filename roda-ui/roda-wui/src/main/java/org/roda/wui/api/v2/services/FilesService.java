@@ -74,8 +74,8 @@ public class FilesService {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilesService.class);
   private static final String HTML_EXT = ".html";
 
-  public IndexedFile renameFolder(RequestContext requestContext, IndexedFile indexedFolder, String newName, String details)
-    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+  public IndexedFile renameFolder(RequestContext requestContext, IndexedFile indexedFolder, String newName,
+    String details) throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
     AuthorizationDeniedException {
     String eventDescription = "The process of updating an object of the repository.";
 
@@ -147,12 +147,13 @@ public class FilesService {
       user, pluginParameters, "Could not execute move job");
   }
 
-  public File createFile(User user, String aipId, String representationId, List<String> directoryPath, String fileId,
-    ContentPayload content, String details) throws GenericException, AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, AlreadyExistsException {
+  public File createFile(RequestContext requestContext, String aipId, String representationId,
+    List<String> directoryPath, String fileId, ContentPayload content, String details) throws GenericException,
+    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
     String eventDescription = "The process of creating an object of the repository.";
 
-    ModelService model = RodaCoreFactory.getModelService();
+    User user = requestContext.getUser();
+    ModelService model = requestContext.getModelService();
 
     try {
       File file = model.createFile(aipId, representationId, directoryPath, fileId, content, user.getId());
@@ -165,8 +166,7 @@ public class FilesService {
       model.createEvent(aipId, representationId, null, null, RodaConstants.PreservationEventType.CREATION,
         eventDescription, null, targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
 
-      RodaCoreFactory.getIndexService().commit(IndexedFile.class);
-
+      requestContext.getIndexService().commit(IndexedFile.class);
       return file;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | AlreadyExistsException e) {
@@ -178,9 +178,9 @@ public class FilesService {
     }
   }
 
-  public IndexedFile createFolder(RequestContext requestContext, IndexedRepresentation indexedRepresentation, CreateFolderRequest request)
-    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
-    AuthorizationDeniedException {
+  public IndexedFile createFolder(RequestContext requestContext, IndexedRepresentation indexedRepresentation,
+    CreateFolderRequest request) throws GenericException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException, AuthorizationDeniedException {
     String eventDescription = "The process of creating an object of the repository.";
 
     User user = requestContext.getUser();
