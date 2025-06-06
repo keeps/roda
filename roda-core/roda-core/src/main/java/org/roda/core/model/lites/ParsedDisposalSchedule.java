@@ -15,15 +15,15 @@ import org.roda.core.model.ModelService;
  *
  * @author Alexandre Flores <aflores@keep.pt>
  */
-public class ParsedDisposalHoldLite extends ParsedLite {
+public class ParsedDisposalSchedule extends ParsedLite {
 
   @Serial
-  private static final long serialVersionUID = 3362226310625819853L;
+  private static final long serialVersionUID = -4791935164573515146L;
 
   private final String id;
 
-  public ParsedDisposalHoldLite(LiteRODAObject disposalHoldLite, String[] split) throws GenericException {
-    super(disposalHoldLite.getInfo());
+  public ParsedDisposalSchedule(LiteRODAObject disposalScheduleLite, String[] split) throws GenericException {
+    super(disposalScheduleLite.getInfo());
     id = LiteRODAObjectFactory.decodeId(split[1]);
   }
 
@@ -34,6 +34,6 @@ public class ParsedDisposalHoldLite extends ParsedLite {
   @Override
   public IsRODAObject toRODAObject(ModelService model)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    return model.retrieveDisposalHold(id);
+    return model.retrieveDisposalSchedule(id);
   }
 }
