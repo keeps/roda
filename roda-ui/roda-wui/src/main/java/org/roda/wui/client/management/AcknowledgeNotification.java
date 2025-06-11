@@ -13,6 +13,7 @@ package org.roda.wui.client.management;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.v2.notifications.NotificationAcknowledgeRequest;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -79,6 +80,7 @@ public class AcknowledgeNotification extends Composite {
       request.setToken(ackToken);
       services.notificationResource(s -> s.acknowledgeNotification(request)).whenComplete((s, throwable) -> {
         if (throwable != null) {
+          GWT.log("HREE!!!");
           callback.onFailure(throwable);
         } else {
           callback.onSuccess(acknowledgeBody);
