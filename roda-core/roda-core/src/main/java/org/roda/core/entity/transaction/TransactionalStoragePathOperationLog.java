@@ -45,8 +45,15 @@ public class TransactionalStoragePathOperationLog implements Serializable {
   @Column(name = "operation_type", nullable = false)
   private OperationType operationType;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "operation_state", nullable = false)
+  private OperationState operationState;
+
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
+
+  @Column(name = "updated_at")
+  private LocalDateTime updatedAt;
 
   public TransactionalStoragePathOperationLog() {
   }
@@ -54,8 +61,14 @@ public class TransactionalStoragePathOperationLog implements Serializable {
   public TransactionalStoragePathOperationLog(String storagePath, OperationType operationType, String version) {
     this.storagePath = storagePath;
     this.operationType = operationType;
+    this.operationState = OperationState.RUNNING;
     this.version = version;
     this.createdAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  public UUID getId() {
+    return id;
   }
 
   public String getStoragePath() {
@@ -76,6 +89,15 @@ public class TransactionalStoragePathOperationLog implements Serializable {
 
   public LocalDateTime getCreatedAt() {
     return createdAt;
+  }
+
+  public OperationState getOperationState() {
+    return operationState;
+  }
+
+  public void setOperationState(OperationState operationState) {
+    this.updatedAt = LocalDateTime.now();
+    this.operationState = operationState;
   }
 
   @Override

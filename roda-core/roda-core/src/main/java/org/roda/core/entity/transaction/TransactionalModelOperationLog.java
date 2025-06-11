@@ -58,6 +58,7 @@ public class TransactionalModelOperationLog implements Serializable {
     this.operationType = operationType;
     this.operationState = OperationState.RUNNING;
     this.createdAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
   }
 
   public UUID getId() {

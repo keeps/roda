@@ -98,13 +98,16 @@ public class TransactionLog implements Serializable {
     return storagePathsOperations;
   }
 
-  public void addStoragePath(String storagePath, OperationType operation, String version) {
+  public TransactionalStoragePathOperationLog addStoragePath(String storagePath, OperationType operation,
+    String version) {
     if (storagePath != null) {
       TransactionalStoragePathOperationLog transactionalStoragePathOperationLog = new TransactionalStoragePathOperationLog(
         storagePath, operation, version);
       transactionalStoragePathOperationLog.setTransactionLog(this);
       storagePathsOperations.add(transactionalStoragePathOperationLog);
+      return transactionalStoragePathOperationLog;
     }
+    return null;
   }
 
   public List<TransactionalModelOperationLog> getModelOperations() {
