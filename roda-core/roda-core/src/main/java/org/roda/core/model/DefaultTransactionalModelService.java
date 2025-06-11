@@ -141,10 +141,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       } catch (NotFoundException e) {
         aip = mainModelService.retrieveAIP(aipId);
       }
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return aip;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -156,11 +160,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.CREATE);
     try {
       AIP ret = getModelService().createAIP(aipId, sourceStorage, sourcePath, notify, createdBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | AlreadyExistsException
       | NotFoundException | ValidationException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -172,7 +180,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     AIP aip = getModelService().createAIP(parentId, type, permissions, ingestSIPIds, ingestJobId, notify, createdBy,
       isGhost);
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
     return aip;
   }
 
@@ -182,7 +192,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     AuthorizationDeniedException {
     AIP aip = getModelService().createAIP(parentId, type, permissions, createdBy);
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
     return aip;
   }
 
@@ -192,7 +204,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     AuthorizationDeniedException {
     AIP aip = getModelService().createAIP(state, parentId, type, permissions, createdBy);
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
     return aip;
   }
 
@@ -202,7 +216,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     AuthorizationDeniedException {
     AIP aip = getModelService().createAIP(state, parentId, type, permissions, notify, createdBy);
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
     return aip;
   }
 
@@ -213,7 +229,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     AIP aip = getModelService().createAIP(state, parentId, type, permissions, ingestSIPUUID, ingestSIPIds, ingestJobId,
       notify, createdBy);
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
     return aip;
   }
 
@@ -223,7 +241,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     NotFoundException, ValidationException {
     AIP aip = getModelService().createAIP(aipId, sourceStorage, sourcePath, createdBy);
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
     return aip;
   }
 
@@ -246,11 +266,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.UPDATE);
     try {
       AIP ret = getModelService().updateAIP(aipId, sourceStorage, sourcePath, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | AlreadyExistsException | ValidationException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -261,10 +285,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.DELETE);
     try {
       AIP ret = getModelService().destroyAIP(aip, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (AuthorizationDeniedException | GenericException | NotFoundException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -275,10 +303,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.UPDATE);
     try {
       AIP ret = getModelService().updateAIP(aip, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -289,10 +321,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.UPDATE);
     try {
       AIP ret = getModelService().updateAIPState(aip, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -303,10 +339,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.UPDATE);
     try {
       AIP ret = getModelService().updateAIPInstanceId(aip, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -317,10 +357,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.UPDATE);
     try {
       AIP ret = getModelService().moveAIP(aipId, parentId, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -331,9 +375,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.DELETE);
     try {
       getModelService().deleteAIP(aipId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -344,9 +392,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.UPDATE);
     try {
       getModelService().changeAIPType(aipId, type, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -365,12 +417,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         binary = mainModelService.retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -390,12 +446,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         binary = mainModelService.retrieveDescriptiveMetadataBinary(aipId, representationId, descriptiveMetadataId);
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -415,12 +475,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         descriptiveMetadata = mainModelService.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return descriptiveMetadata;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -444,12 +508,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
           descriptiveMetadataId);
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return descriptiveMetadata;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -480,14 +548,18 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       DescriptiveMetadata ret = getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId, payload,
         descriptiveMetadataType, descriptiveMetadataVersion, createdBy, notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
 
     } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException
       | NotFoundException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -507,13 +579,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       DescriptiveMetadata ret = getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId, payload,
         descriptiveMetadataType, descriptiveMetadataVersion, createdBy);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException
       | NotFoundException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -533,13 +609,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       DescriptiveMetadata ret = getModelService().createDescriptiveMetadata(aipId, representationId,
         descriptiveMetadataId, payload, descriptiveMetadataType, descriptiveMetadataVersion, createdBy);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException
       | NotFoundException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -559,13 +639,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       DescriptiveMetadata ret = getModelService().createDescriptiveMetadata(aipId, representationId,
         descriptiveMetadataId, payload, descriptiveMetadataType, descriptiveMetadataVersion, createdBy, notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException
       | NotFoundException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -583,12 +667,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       DescriptiveMetadata ret = getModelService().updateDescriptiveMetadata(aipId, descriptiveMetadataId,
         descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, properties, updatedBy);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -612,11 +700,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       getModelService().deleteDescriptiveMetadata(aipId, descriptiveMetadataId, deletedBy);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -631,11 +723,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       getModelService().deleteDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, deletedBy);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -651,12 +747,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       CloseableIterable<BinaryVersion> ret = getModelService().listDescriptiveMetadataVersions(aipId, representationId,
         descriptiveMetadataId);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -672,12 +772,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       BinaryVersion ret = getModelService().revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId,
         properties);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -693,12 +797,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       BinaryVersion ret = getModelService().revertDescriptiveMetadataVersion(aipId, representationId,
         descriptiveMetadataId, versionId, properties);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -718,10 +826,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       CloseableIterable<OptionalWithCause<DescriptiveMetadata>> ret = getModelService().listDescriptiveMetadata(aipId,
         includeRepresentations);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -736,12 +848,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       CloseableIterable<OptionalWithCause<DescriptiveMetadata>> ret = getModelService().listDescriptiveMetadata(aipId,
         representationId);
       for (TransactionalModelOperationLog log : operationLog) {
-        updateOperationState(log.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(log.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog log : operationLog) {
-        updateOperationState(log.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(log.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -761,12 +877,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         representation = mainModelService.retrieveRepresentation(aipId, representationId);
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return representation;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -782,13 +902,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       Representation ret = getModelService().createRepresentation(aipId, representationId, original, type, notify,
         createdBy, representationState);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
       | AlreadyExistsException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -804,13 +928,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       Representation ret = getModelService().createRepresentation(aipId, representationId, original, type, notify,
         createdBy);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
       | AlreadyExistsException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -827,13 +955,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       Representation ret = getModelService().createRepresentation(aipId, representationId, original, type,
         sourceStorage, sourcePath, justData, createdBy);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
       | AlreadyExistsException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -846,12 +978,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       Representation ret = getModelService().updateRepresentationInfo(representation);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (GenericException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -865,12 +1001,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       getModelService().changeRepresentationType(aipId, representationId, type, updatedBy);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
 
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -886,11 +1026,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       getModelService().changeRepresentationShallowFileFlag(aipId, representationId, hasShallowFiles, updatedBy,
         notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
     } catch (AuthorizationDeniedException | GenericException | NotFoundException | RequestNotValidException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -905,11 +1049,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       getModelService().changeRepresentationStates(aipId, representationId, newStates, updatedBy);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -925,13 +1073,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       Representation ret = getModelService().updateRepresentation(aipId, representationId, original, type,
         sourceStorage, sourcePath, updatedBy);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -945,11 +1097,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       getModelService().deleteRepresentation(aipId, representationId, username);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -965,12 +1121,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       CloseableIterable<OptionalWithCause<File>> ret = getModelService().listFilesUnder(aipId, representationId,
         recursive);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -984,12 +1144,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       CloseableIterable<OptionalWithCause<File>> ret = getModelService().listExternalFilesUnder(file);
       for (TransactionalModelOperationLog log : operationLog) {
-        updateOperationState(log.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(log.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog log : operationLog) {
-        updateOperationState(log.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(log.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1003,12 +1167,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       CloseableIterable<OptionalWithCause<File>> ret = getModelService().listFilesUnder(f, recursive);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1024,12 +1192,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       CloseableIterable<OptionalWithCause<File>> ret = getModelService().listFilesUnder(aipId, representationId,
         directoryPath, fileId, recursive);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1043,13 +1215,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       Long ret = getModelService().getExternalFilesTotalSize(file);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
       | IOException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1069,12 +1245,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         file = mainModelService.retrieveFile(aipId, representationId, directoryPath, fileId);
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return file;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1090,13 +1270,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       File ret = getModelService().createFile(aipId, representationId, directoryPath, fileId, contentPayload,
         createdBy);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException
       | NotFoundException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1112,13 +1296,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       File ret = getModelService().createFile(aipId, representationId, directoryPath, fileId, contentPayload, createdBy,
         notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException
       | NotFoundException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1134,13 +1322,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       File ret = getModelService().createFile(aipId, representationId, directoryPath, fileId, dirName, createdBy,
         notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException
       | NotFoundException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1156,12 +1348,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       File ret = getModelService().updateFile(aipId, representationId, directoryPath, fileId, contentPayload,
         createIfNotExists, updatedBy, notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1176,7 +1372,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       return getModelService().updateFile(file, contentPayload, createIfNotExists, updatedBy, notify);
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1191,11 +1389,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       getModelService().deleteFile(aipId, representationId, directoryPath, fileId, deletedBy, notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1209,11 +1411,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       getModelService().deleteFile(file, deletedBy, notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1230,19 +1436,27 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       File ret = getModelService().renameFolder(folder, newName, reindexResources);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       for (TransactionalModelOperationLog renameOperationLog : renameOperationLogs) {
-        updateOperationState(renameOperationLog.getId(), OperationState.SUCCESS);
+        if (renameOperationLog != null) {
+          updateOperationState(renameOperationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException
       | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       for (TransactionalModelOperationLog renameOperationLog : renameOperationLogs) {
-        updateOperationState(renameOperationLog.getId(), OperationState.FAILURE);
+        if (renameOperationLog != null) {
+          updateOperationState(renameOperationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1263,19 +1477,27 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       File ret = getModelService().moveFile(file, newAipId, newRepresentationId, newDirectoryPath, newId,
         reindexResources);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       for (TransactionalModelOperationLog moveOperationLog : moveOperationLogs) {
-        updateOperationState(moveOperationLog.getId(), OperationState.SUCCESS);
+        if (moveOperationLog != null) {
+          updateOperationState(moveOperationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException
       | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       for (TransactionalModelOperationLog moveOperationLog : moveOperationLogs) {
-        updateOperationState(moveOperationLog.getId(), OperationState.FAILURE);
+        if (moveOperationLog != null) {
+          updateOperationState(moveOperationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1289,7 +1511,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       outcomeText, outcomeDetail, agentName, notify);
     List<TransactionalModelOperationLog> operationLogs = registerOperationForEvent(event, OperationType.CREATE);
     for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return event;
   }
@@ -1302,7 +1526,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       outcomeState, outcomeText, outcomeDetail, agentName, notify);
     List<TransactionalModelOperationLog> operationLogs = registerOperationForEvent(event, OperationType.CREATE);
     for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return event;
   }
@@ -1315,7 +1541,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       eventType, eventDescription, outcomeState, outcomeText, outcomeDetail, agentName, notify);
     List<TransactionalModelOperationLog> operationLogs = registerOperationForEvent(event, OperationType.UPDATE);
     for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return event;
   }
@@ -1329,7 +1557,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       eventDescription, sources, targets, outcomeState, outcomeText, outcomeDetail, agentName, notify);
     List<TransactionalModelOperationLog> operationLogs = registerOperationForEvent(event, OperationType.CREATE);
     for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return event;
   }
@@ -1343,7 +1573,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       eventDescription, sources, targets, outcomeState, outcomeText, outcomeDetail, agentName, agentRole, notify);
     List<TransactionalModelOperationLog> operationLogs = registerOperationForEvent(event, OperationType.CREATE);
     for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return event;
   }
@@ -1358,7 +1590,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       eventDescription, sources, targets, outcomeState, outcomeDetail, outcomeExtension, agentIds, username, notify);
     List<TransactionalModelOperationLog> operationLogs = registerOperationForEvent(event, OperationType.CREATE);
     for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return event;
   }
@@ -1369,7 +1603,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(id,
       OperationType.READ);
     for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return getModelService().retrievePreservationMetadata(id, type);
   }
@@ -1380,7 +1616,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(aipId,
       representationId, fileDirectoryPath, fileId, type, OperationType.READ);
     for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return getModelService().retrievePreservationMetadata(aipId, representationId, fileDirectoryPath, fileId, type);
   }
@@ -1400,7 +1638,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1419,12 +1659,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         ret = true;
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1443,12 +1687,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         binary = mainModelService.retrievePreservationFile(file);
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1469,12 +1717,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         binary = mainModelService.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1494,12 +1746,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         ret = true;
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1518,12 +1774,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         binary = mainModelService.retrieveRepositoryPreservationEvent(fileId);
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1545,12 +1805,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         binary = mainModelService.retrievePreservationEvent(aipId, representationId, filePath, fileId, preservationID);
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1569,12 +1833,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         binary = mainModelService.retrievePreservationAgent(preservationID);
       }
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1594,7 +1862,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(preservationMetadata,
       OperationType.CREATE);
     for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return preservationMetadata;
   }
@@ -1609,12 +1879,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       getModelService().createTechnicalMetadata(aipId, representationId, metadataType, fileId, payload, createdBy,
         notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
     } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException
       | GenericException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1634,7 +1908,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(preservationMetadata,
       OperationType.CREATE);
     for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return preservationMetadata;
   }
@@ -1653,7 +1929,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(preservationMetadata,
       OperationType.CREATE);
     for (TransactionalModelOperationLog operationLog : operationLogs) {
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return preservationMetadata;
   }
@@ -1670,13 +1948,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       PreservationMetadata ret = getModelService().createPreservationMetadata(type, id, payload, notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException
       | AlreadyExistsException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1696,13 +1978,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       PreservationMetadata ret = getModelService().createPreservationMetadata(type, id, aipId, representationId,
         fileDirectoryPath, fileId, payload, createdBy, notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException
       | AlreadyExistsException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1717,12 +2003,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       PreservationMetadata ret = getModelService().updatePreservationMetadata(type, id, payload, notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1739,12 +2029,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       PreservationMetadata ret = getModelService().updatePreservationMetadata(id, type, aipId, representationId,
         fileDirectoryPath, fileId, payload, updatedBy, notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1758,11 +2052,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       getModelService().deletePreservationMetadata(pm, notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1777,12 +2075,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       getModelService().deletePreservationMetadata(type, aipId, representationId, id, filePath, notify);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -1831,10 +2133,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       } catch (NotFoundException e) {
         binary = mainModelService.retrieveOtherMetadataBinary(om);
       }
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -1853,10 +2159,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         binary = mainModelService.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
           fileSuffix, type);
       }
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -1865,7 +2175,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public OtherMetadata retrieveOtherMetadata(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId, String fileSuffix, String type)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    TransactionalModelOperationLog operationLogs = registerOperationForOtherMetadata(aipId, OperationType.READ);
+    TransactionalModelOperationLog operationLog = registerOperationForOtherMetadata(aipId, OperationType.READ);
     try {
       OtherMetadata otherMetadata;
       try {
@@ -1875,10 +2185,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         otherMetadata = mainModelService.retrieveOtherMetadata(aipId, representationId, fileDirectoryPath, fileId,
           fileSuffix, type);
       }
-      updateOperationState(operationLogs.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return otherMetadata;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLogs.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -1892,10 +2206,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       OtherMetadata ret = getModelService().createOrUpdateOtherMetadata(aipId, representationId, fileDirectoryPath,
         fileId, fileSuffix, type, payload, username, notify);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -1908,9 +2226,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       getModelService().deleteOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, fileSuffix, type,
         username);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -1941,7 +2263,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<LogEntry> ret = getModelService().importLogEntries(inputStream, filename);
     for (LogEntry log : ret) {
       TransactionalModelOperationLog operationLog = registerOperationForLogEntry(log.getUUID(), OperationType.CREATE);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     }
     return ret;
   }
@@ -1955,9 +2279,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       getModelService().addLogEntry(logEntry, logDirectory, notify);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -1969,10 +2297,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       getModelService().addLogEntry(logEntry, logDirectory);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
 
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -1989,7 +2321,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       getModelService().findOldLogsAndSendThemToMaster(logDirectory, currentLogFile);
     } catch (IOException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -2008,7 +2342,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       getModelService().findOldLogsAndMoveThemToStorage(logDirectory, currentLogFile);
     } catch (IOException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -2183,9 +2519,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForJob(job.getId(), OperationType.CREATE);
     try {
       mainModelService.createJob(job);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2196,9 +2536,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForJob(job.getId(), OperationType.UPDATE);
     try {
       mainModelService.createOrUpdateJob(job);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2209,10 +2553,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForJob(jobId, OperationType.READ);
     try {
       Job ret = mainModelService.retrieveJob(jobId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2241,9 +2589,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForJob(jobId, OperationType.DELETE);
     try {
       mainModelService.deleteJob(jobId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2254,10 +2606,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobId, jobReportId, OperationType.READ);
     try {
       Report ret = mainModelService.retrieveJobReport(jobId, jobReportId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2267,7 +2623,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Report ret = mainModelService.retrieveJobReport(jobId, sourceObjectId, outcomeObjectId);
     TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobId, ret.getId(), OperationType.READ);
-    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
     return ret;
   }
 
@@ -2278,9 +2636,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       mainModelService.createOrUpdateJobReport(jobReport, cachedJob);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2292,9 +2654,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       mainModelService.createOrUpdateJobReport(jobReport, indexJob);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2306,9 +2672,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.DELETE);
     try {
       mainModelService.deleteJobReport(jobId, jobReportId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2319,9 +2689,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.UPDATE);
     try {
       getModelService().updateAIPPermissions(aipId, permissions, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2332,9 +2706,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.UPDATE);
     try {
       getModelService().updateAIPPermissions(aip, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2345,9 +2723,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForDIP(dip.getId(), OperationType.UPDATE);
     try {
       getModelService().updateDIPPermissions(dip);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2359,9 +2741,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       transferredResource.getFullPath(), OperationType.DELETE);
     try {
       getModelService().deleteTransferredResource(transferredResource);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2372,10 +2758,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForJob(job.getId(), OperationType.UPDATE);
     try {
       Job ret = mainModelService.updateJobInstanceId(job);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2385,10 +2775,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForRisk(risk.getId(), OperationType.CREATE);
     try {
       Risk ret = getModelService().createRisk(risk, commit);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2398,10 +2792,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForRisk(risk.getId(), OperationType.UPDATE);
     try {
       Risk ret = getModelService().updateRiskInstanceId(risk, commit);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2412,10 +2810,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForRisk(risk.getId(), OperationType.UPDATE);
     try {
       Risk ret = getModelService().updateRisk(risk, properties, commit, incidences);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2426,9 +2828,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForRisk(riskId, OperationType.DELETE);
     try {
       getModelService().deleteRisk(riskId, commit);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2439,10 +2845,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForRisk(riskId, OperationType.READ);
     try {
       Risk ret = getModelService().retrieveRisk(riskId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2453,10 +2863,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForRisk(riskId, OperationType.READ);
     try {
       BinaryVersion ret = getModelService().retrieveVersion(riskId, versionId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2468,10 +2882,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForRisk(riskId, OperationType.UPDATE);
     try {
       BinaryVersion ret = getModelService().revertRiskVersion(riskId, versionId, properties, commit, incidences);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2483,10 +2901,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       RiskIncidence ret = getModelService().createRiskIncidence(riskIncidence, commit);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (AlreadyExistsException | NotFoundException | AuthorizationDeniedException | GenericException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2498,10 +2920,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       RiskIncidence ret = getModelService().updateRiskIncidenceInstanceId(riskIncidence, commit);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2513,10 +2939,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       RiskIncidence ret = getModelService().updateRiskIncidence(riskIncidence, commit);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2528,9 +2958,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.DELETE);
     try {
       getModelService().deleteRiskIncidence(riskIncidenceId, commit);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2541,10 +2975,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForRiskIncidence(incidenceId, OperationType.READ);
     try {
       RiskIncidence ret = getModelService().retrieveRiskIncidence(incidenceId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2556,10 +2994,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       Notification ret = getModelService().createNotification(notification, processor);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2571,10 +3013,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       Notification ret = getModelService().updateNotificationInstanceId(notification);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2586,10 +3032,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       Notification ret = getModelService().updateNotification(notification);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2601,9 +3051,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.DELETE);
     try {
       getModelService().deleteNotification(notificationId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2614,10 +3068,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForNotification(notificationId, OperationType.READ);
     try {
       Notification notification = getModelService().retrieveNotification(notificationId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return notification;
     } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2629,10 +3087,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       Notification notification = getModelService().acknowledgeNotification(notificationId, token);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return notification;
     } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2644,10 +3106,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.READ);
     try {
       CloseableIterable<OptionalWithCause<DIPFile>> ret = getModelService().listDIPFilesUnder(f, recursive);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2661,10 +3127,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       CloseableIterable<OptionalWithCause<DIPFile>> ret = getModelService().listDIPFilesUnder(dipId, directoryPath,
         fileId, recursive);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2675,10 +3145,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForDIP(dipId, OperationType.READ);
     try {
       CloseableIterable<OptionalWithCause<DIPFile>> ret = getModelService().listDIPFilesUnder(dipId, recursive);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2689,9 +3163,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForDIP(dip.getId(), OperationType.UPDATE);
     try {
       getModelService().updateDIPInstanceId(dip);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2701,10 +3179,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForDIP(dip.getId(), OperationType.CREATE);
     try {
       DIP ret = getModelService().createDIP(dip, notify);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2714,10 +3196,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForDIP(dip.getId(), OperationType.UPDATE);
     try {
       DIP ret = getModelService().updateDIP(dip);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2726,7 +3212,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public void deleteDIP(String dipId) throws GenericException, NotFoundException, AuthorizationDeniedException {
     DIP dip = getModelService().retrieveDIP(dipId);
     TransactionalModelOperationLog operationLog = registerOperationForDIP(dip.getId(), OperationType.DELETE);
-    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
     getModelService().deleteDIP(dipId);
   }
 
@@ -2740,10 +3228,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       } catch (NotFoundException e) {
         dip = mainModelService.retrieveDIP(dipId);
       }
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return dip;
     } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2756,11 +3248,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       DIPFile ret = getModelService().createDIPFile(dipId, directoryPath, fileId, size, contentPayload, notify);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException
       | NotFoundException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2772,10 +3268,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       DIPFile ret = getModelService().createDIPFile(dipId, directoryPath, fileId, dirName, notify);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2789,11 +3289,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       DIPFile ret = getModelService().updateDIPFile(dipId, directoryPath, oldFileId, fileId, size, contentPayload,
         createIfNotExists, notify);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
       | AlreadyExistsException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2805,9 +3309,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.DELETE);
     try {
       getModelService().deleteDIPFile(dipId, directoryPath, fileId, notify);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2819,10 +3327,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.READ);
     try {
       DIPFile ret = getModelService().retrieveDIPFile(dipId, directoryPath, fileId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2833,10 +3345,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
     try {
       Directory ret = getModelService().getSubmissionDirectory(aipId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2848,10 +3364,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.UPDATE);
     try {
       getModelService().createSubmission(submissionStorage, submissionStoragePath, aipId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (AlreadyExistsException | GenericException | RequestNotValidException | NotFoundException
       | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2862,10 +3382,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.UPDATE);
     try {
       getModelService().createSubmission(submissionPath, aipId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (AlreadyExistsException | GenericException | RequestNotValidException | NotFoundException
       | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2876,10 +3400,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
     try {
       Directory ret = getModelService().getDocumentationDirectory(aipId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2895,13 +3423,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     }
     try {
       Directory ret = getModelService().getDocumentationDirectory(aipId, representationId);
-      for (TransactionalModelOperationLog operation : operationLogs) {
-        updateOperationState(operation.getId(), OperationState.SUCCESS);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      for (TransactionalModelOperationLog operation : operationLogs) {
-        updateOperationState(operation.getId(), OperationState.FAILURE);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -2919,14 +3451,18 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     }
     try {
       File ret = getModelService().createDocumentation(aipId, representationId, directoryPath, fileId, contentPayload);
-      for (TransactionalModelOperationLog operation : operationLogs) {
-        updateOperationState(operation.getId(), OperationState.SUCCESS);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | AlreadyExistsException e) {
-      for (TransactionalModelOperationLog operation : operationLogs) {
-        updateOperationState(operation.getId(), OperationState.FAILURE);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -2944,12 +3480,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       Long ret = getModelService().countDocumentationFiles(aipId, representationId);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -2961,10 +3501,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
     try {
       Long ret = getModelService().countSubmissionFiles(aipId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -2981,12 +3525,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       Long ret = getModelService().countSchemaFiles(aipId, representationId);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -2998,10 +3546,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
     try {
       Directory ret = getModelService().getSchemasDirectory(aipId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3018,12 +3570,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       Directory ret = getModelService().getSchemasDirectory(aipId, representationId);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -3058,13 +3614,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       File ret = getModelService().createSchema(aipId, representationId, directoryPath, fileId, contentPayload);
       for (TransactionalModelOperationLog log : operationLog) {
-        updateOperationState(log.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(log.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException | AlreadyExistsException | AuthorizationDeniedException
       | NotFoundException e) {
       for (TransactionalModelOperationLog log : operationLog) {
-        updateOperationState(log.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(log.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -3074,7 +3634,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public <T extends IsRODAObject> Optional<LiteRODAObject> retrieveLiteFromObject(T object) {
     TransactionalModelOperationLog operationLog = registerOperation(object, OperationType.READ);
     Optional<LiteRODAObject> ret = getModelService().retrieveLiteFromObject(object);
-    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
     return ret;
   }
 
@@ -3092,7 +3654,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public TransferredResource retrieveTransferredResource(String fullPath) {
     TransactionalModelOperationLog operationLog = registerOperationForTransferredResource(fullPath, OperationType.READ);
     TransferredResource ret = getModelService().retrieveTransferredResource(fullPath);
-    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
     return ret;
   }
 
@@ -3196,10 +3760,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       RepresentationInformation ret = getModelService().createRepresentationInformation(ri, createdBy, commit);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3211,10 +3779,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       RepresentationInformation ret = getModelService().updateRepresentationInformation(ri, updatedBy, commit);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3228,10 +3800,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       RepresentationInformation ret = getModelService().updateRepresentationInformationInstanceId(ri, updatedBy,
         notify);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3243,9 +3819,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       representationInformationId, OperationType.DELETE);
     try {
       getModelService().deleteRepresentationInformation(representationInformationId, commit);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3257,10 +3837,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       representationInformationId, OperationType.READ);
     try {
       RepresentationInformation ret = getModelService().retrieveRepresentationInformation(representationInformationId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3271,10 +3855,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForDisposalHold(disposalHoldId, OperationType.READ);
     try {
       DisposalHold ret = getModelService().retrieveDisposalHold(disposalHoldId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3286,11 +3874,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       DisposalHold ret = getModelService().createDisposalHold(disposalHold, createdBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | AlreadyExistsException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3303,11 +3895,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       DisposalHold ret = getModelService().updateDisposalHoldFirstUseDate(disposalHold, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | IllegalOperationException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3320,11 +3916,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       DisposalHold ret = getModelService().updateDisposalHold(disposalHold, updatedBy, details);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | IllegalOperationException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3337,11 +3937,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       DisposalHold ret = getModelService().updateDisposalHold(disposalHold, updatedBy, updateFirstUseDate, details);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | IllegalOperationException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3353,10 +3957,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.DELETE);
     try {
       getModelService().deleteDisposalHold(disposalHoldId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | IllegalOperationException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3389,13 +3997,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       DisposalAIPMetadata ret = getModelService().createDisposalHoldAssociation(aipId, disposalHoldId, associatedOn,
         associatedBy);
-      for (TransactionalModelOperationLog operation : operationLogs) {
-        updateOperationState(operation.getId(), OperationState.SUCCESS);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (AuthorizationDeniedException | GenericException | NotFoundException | RequestNotValidException e) {
-      for (TransactionalModelOperationLog operation : operationLogs) {
-        updateOperationState(operation.getId(), OperationState.FAILURE);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -3411,13 +4023,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       for (DisposalHold hold : ret) {
         operationLogs.add(registerOperationForDisposalHold(hold.getId(), OperationType.READ));
       }
-      for (TransactionalModelOperationLog operation : operationLogs) {
-        updateOperationState(operation.getId(), OperationState.SUCCESS);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
-      for (TransactionalModelOperationLog operation : operationLogs) {
-        updateOperationState(operation.getId(), OperationState.FAILURE);
+      for (TransactionalModelOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -3429,10 +4045,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
     try {
       boolean ret = getModelService().onDisposalHold(aipId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3446,12 +4066,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       boolean ret = getModelService().isAIPOnDirectHold(aipId, holdId);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -3465,11 +4089,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       DisposalSchedule ret = getModelService().createDisposalSchedule(disposalSchedule, createdBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException
       | AlreadyExistsException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3482,11 +4110,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       DisposalSchedule ret = getModelService().updateDisposalSchedule(disposalSchedule, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException
       | IllegalOperationException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3498,10 +4130,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.READ);
     try {
       DisposalSchedule ret = getModelService().retrieveDisposalSchedule(disposalScheduleId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3532,10 +4168,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.DELETE);
     try {
       getModelService().deleteDisposalSchedule(disposalScheduleId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IllegalOperationException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3547,10 +4187,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.READ);
     try {
       DisposalConfirmation ret = getModelService().retrieveDisposalConfirmation(disposalConfirmationId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3562,9 +4206,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.READ);
     try {
       getModelService().addDisposalHoldEntry(disposalConfirmationId, disposalHold);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3576,9 +4224,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.READ);
     try {
       getModelService().addDisposalHoldTransitiveEntry(disposalConfirmationId, transitiveDisposalHold);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (RequestNotValidException | GenericException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3590,9 +4242,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       getModelService().addDisposalScheduleEntry(disposalConfirmationId, disposalSchedule);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (RequestNotValidException | GenericException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3604,9 +4260,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       getModelService().addAIPEntry(disposalConfirmationId, entry);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (RequestNotValidException | GenericException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3618,10 +4278,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       DisposalConfirmation ret = getModelService().updateDisposalConfirmation(disposalConfirmation);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3634,11 +4298,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       DisposalConfirmation ret = getModelService().createDisposalConfirmation(disposalConfirmation, createdBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | AlreadyExistsException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3650,10 +4318,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.DELETE);
     try {
       getModelService().deleteDisposalConfirmation(disposalConfirmationId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | IllegalOperationException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
 
@@ -3665,10 +4337,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
     try {
       DisposalHoldsAIPMetadata ret = getModelService().listDisposalHoldsAssociation(aipId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3679,10 +4355,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
     try {
       DisposalTransitiveHoldsAIPMetadata ret = getModelService().listTransitiveDisposalHolds(aipId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3694,11 +4374,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       DisposalRule ret = getModelService().createDisposalRule(disposalRule, createdBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
       | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3710,10 +4394,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       DisposalRule ret = getModelService().updateDisposalRule(disposalRule, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3725,10 +4413,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.DELETE);
     try {
       getModelService().deleteDisposalRule(disposalRuleId, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | IOException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3739,10 +4431,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperationForDisposalRule(disposalRuleId, OperationType.READ);
     try {
       DisposalRule ret = getModelService().retrieveDisposalRule(disposalRuleId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3773,11 +4469,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.CREATE);
     try {
       DistributedInstance ret = getModelService().createDistributedInstance(distributedInstance, createdBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException
       | NotFoundException | IllegalOperationException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3808,10 +4508,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.READ);
     try {
       DistributedInstance ret = getModelService().retrieveDistributedInstance(distributedInstanceId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3823,9 +4527,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.DELETE);
     try {
       getModelService().deleteDistributedInstance(distributedInstanceId);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -3837,10 +4545,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       DistributedInstance ret = getModelService().updateDistributedInstance(distributedInstance, updatedBy);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -4091,9 +4803,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.DELETE);
     try {
       getModelService().deleteBinaryVersion(object, version);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
     } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -4123,10 +4839,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       Binary ret = getModelService().updateBinaryContent(object, payload, asReference, createIfNotExists);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -4157,10 +4877,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.UPDATE);
     try {
       Directory ret = getModelService().createDirectory(object, pathPartials);
-      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
       return ret;
     } catch (AuthorizationDeniedException | AlreadyExistsException | GenericException | RequestNotValidException e) {
-      updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -4329,7 +5053,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     TransactionalModelOperationLog operationLog = registerOperation(object.getClass(), List.of(object.getId()),
       OperationType.UPDATE);
     getModelService().importObject(object, fromStorage);
-    updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
   }
 
   @Override
@@ -4570,12 +5296,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       Date ret = getModelService().retrieveFileCreationDate(file);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
@@ -4589,12 +5319,16 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     try {
       Date ret = getModelService().retrievePreservationMetadataCreationDate(pm);
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
       }
       return ret;
     } catch (RequestNotValidException | GenericException e) {
       for (TransactionalModelOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
       }
       throw e;
     }
