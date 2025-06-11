@@ -16,4 +16,5 @@ public interface TransactionalStoragePathRepository extends JpaRepository<Transa
     // find All By transaction id and storage path
     List<TransactionalStoragePathOperationLog> findByTransactionLogAndStoragePath(TransactionLog transactionLog, String storagePath);
 
+    List<TransactionalStoragePathOperationLog> findByTransactionLogOrderByUpdatedAt(TransactionLog transactionLog);
 }

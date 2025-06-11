@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -420,7 +421,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
-    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(stagingStorageService,
+    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(fromService, fromStoragePath,
       toStoragePath, OperationType.CREATE);
     try {
       stagingStorageService.copy(fromService, fromStoragePath, toStoragePath);
@@ -443,8 +444,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   @Override
   public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
-    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(stagingStorageService, toPath,
-      OperationType.CREATE);
+    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(fromService, fromStoragePath,
+      toPath, OperationType.CREATE);
     try {
       stagingStorageService.copy(fromService, fromStoragePath, toPath, resource, replaceExisting);
       for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
@@ -467,9 +468,9 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
-    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(stagingStorageService,
+    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(fromService, fromStoragePath,
       toStoragePath, OperationType.CREATE);
-    operationLogs.addAll(registerOperationForCopy(mainStorageService, fromStoragePath, OperationType.DELETE));
+    operationLogs.addAll(registerOperationForCopy(fromService, fromStoragePath, fromStoragePath, OperationType.DELETE));
     try {
       stagingStorageService.copy(fromService, fromStoragePath, toStoragePath);
       for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
@@ -836,35 +837,42 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     // DO NOTHING
   }
 
-  private List<TransactionalStoragePathOperationLog> registerOperationForCopy(StorageService toService, Path toPath,
-    OperationType operation)
+  private List<TransactionalStoragePathOperationLog> registerOperationForCopy(StorageService fromService,
+    StoragePath fromStoragePath, Path toPath, OperationType operation)
     throws AuthorizationDeniedException, GenericException {
     try {
       List<String> pathParts = new ArrayList<>();
       for (Path part : toPath) {
         pathParts.add(part.toString());
       }
-      return registerOperationForCopy(toService, DefaultStoragePath.parse(pathParts), operation);
+      return registerOperationForCopy(fromService, fromStoragePath, DefaultStoragePath.parse(pathParts), operation);
     } catch (RequestNotValidException e) {
       throw new GenericException("Failed to register operation for copy: " + toPath, e);
     }
 
   }
 
-  private List<TransactionalStoragePathOperationLog> registerOperationForCopy(StorageService toService,
-    StoragePath toStoragePath, OperationType operation)
+  private List<TransactionalStoragePathOperationLog> registerOperationForCopy(StorageService fromService,
+    StoragePath fromStoragePath, StoragePath toStoragePath, OperationType operation)
     throws AuthorizationDeniedException, GenericException {
     List<TransactionalStoragePathOperationLog> ret = new ArrayList<>(
       List.of(registerOperation(toStoragePath, operation)));
-    try (CloseableIterable<Resource> listResourcesUnderDirectory = toService.listResourcesUnderDirectory(toStoragePath,
-      true)) {
+    try (CloseableIterable<Resource> listResourcesUnderDirectory = fromService
+      .listResourcesUnderDirectory(fromStoragePath, true)) {
       if (listResourcesUnderDirectory == null) {
         return ret;
       }
+
+      String fromStoragePathAsString = getStoragePathAsString(fromStoragePath, false);
+      String toStoragePathAsString = getStoragePathAsString(toStoragePath, false);
+
       // register operation for each resource under the storage path
       for (Resource resource : listResourcesUnderDirectory) {
         StoragePath resourceStoragePath = resource.getStoragePath();
-        ret.add(registerOperation(resourceStoragePath, operation));
+        String destinationStoragePathAsString = getStoragePathAsString(resourceStoragePath, false)
+          .replace(fromStoragePathAsString, toStoragePathAsString);
+        Arrays.asList(Paths.get(destinationStoragePathAsString));
+        ret.add(registerOperation(destinationStoragePathAsString, operation, null));
       }
     } catch (NotFoundException | RequestNotValidException | IOException e) {
       throw new GenericException("Failed to register operation for copy: " + toStoragePath, e);
@@ -886,13 +894,18 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       return null;
     }
 
-    LOGGER.debug("Registering operation for storage path: {}", storagePath);
+    String storagePathAsString = stagingStorageService.getStoragePathAsString(storagePath, false);
+    return registerOperation(storagePathAsString, operation, version);
+  }
+
+  private TransactionalStoragePathOperationLog registerOperation(String storagePathAsString, OperationType operation,
+    String version) {
+    LOGGER.debug("Registering operation for storage path: {}", storagePathAsString);
     try {
-      String storagePathAsString = stagingStorageService.getStoragePathAsString(storagePath, false);
       return transactionLogService.registerStoragePathOperation(transaction.getId(), storagePathAsString, operation,
         version);
     } catch (RODATransactionException e) {
-      throw new IllegalArgumentException("Cannot register operation for storagePath: " + storagePath, e);
+      throw new IllegalArgumentException("Cannot register operation for storagePath: " + storagePathAsString, e);
     }
   }
 

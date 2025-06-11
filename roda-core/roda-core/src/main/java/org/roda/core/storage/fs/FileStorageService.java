@@ -969,8 +969,10 @@ public class FileStorageService implements StorageService {
     Path targetDataPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
     FSUtils.copy(sourceDataPath, targetDataPath, true);
 
-    Path sourceMetadataPath = FSUtils.getBinaryHistoryMetadataPath(storageService.getHistoryDataPath(), storageService.getHistoryMetadataPath(), sourceDataPath);
-    Path targetMetadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath, targetDataPath);
+    Path sourceMetadataPath = FSUtils.getBinaryHistoryMetadataPath(storageService.getHistoryDataPath(),
+      storageService.getHistoryMetadataPath(), sourceDataPath);
+    Path targetMetadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath,
+      targetDataPath);
     FSUtils.copy(sourceMetadataPath, targetMetadataPath, true);
   }
 }
