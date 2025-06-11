@@ -3,14 +3,12 @@ package org.roda.wui.api.v2.controller;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Metrics;
-import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.MetricsService;
-import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
-import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,27 +31,27 @@ public class MetricsController {
 
   @Autowired
   MetricsService metricsService;
+
   @Autowired
   private HttpServletRequest request;
+
+  @Autowired
+  private RequestHandler requestHandler;
 
   @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get RODA metrics", description = "Gets a list of RODA metrics", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Metrics.class)))})
   public Metrics getMetrics(@RequestParam(RodaConstants.API_METRICS_TO_OBTAIN) final List<String> metricsToObtain) {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      controllerAssistant.checkRoles(requestContext.getUser());
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Metrics>() {
+      @Override
+      public Metrics process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_REQUEST_METRICS_PARAM, metricsToObtain);
+        controllerAssistant.checkRoles(requestContext.getUser());
 
-      return metricsService.getMetrics(metricsToObtain);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } finally {
-      controllerAssistant.registerAction(requestContext, state,
-        RodaConstants.CONTROLLER_REQUEST_METRICS_PARAM, metricsToObtain);
-    }
+        return metricsService.getMetrics(metricsToObtain);
+      }
+    });
   }
 }
