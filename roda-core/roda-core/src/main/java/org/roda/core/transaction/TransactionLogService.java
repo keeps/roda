@@ -47,6 +47,12 @@ public class TransactionLogService {
       .orElseThrow(() -> new RODATransactionException("Model operation log not found for ID: " + operationId));
   }
 
+  private TransactionalStoragePathOperationLog getTransactionalStoragePathOperationLogById(UUID operationId)
+    throws RODATransactionException {
+    return transactionalStoragePathRepository.findById(operationId)
+      .orElseThrow(() -> new RODATransactionException("Storage path operation log not found for ID: " + operationId));
+  }
+
   @Transactional
   public void changeStatus(UUID transactionId, TransactionLog.TransactionStatus status)
     throws RODATransactionException {
@@ -56,16 +62,25 @@ public class TransactionLogService {
   }
 
   @Transactional
-  public void registerStoragePathOperation(UUID transactionId, String storagePath, OperationType operation,
+  public TransactionalStoragePathOperationLog registerStoragePathOperation(UUID transactionId, String storagePath,
+    OperationType operation,
     String version) throws RODATransactionException {
     if (operation == OperationType.READ) {
       // TODO: add a configuration to allow logging the read operation for debugging
       // purposes
-      return;
+      return null;
     }
     TransactionLog transactionLog = getTransactionLogById(transactionId);
-    transactionLog.addStoragePath(storagePath, operation, version);
-    transactionLogRepository.save(transactionLog);
+    TransactionalStoragePathOperationLog operationLog = transactionLog.addStoragePath(storagePath, operation, version);
+    operationLog.setTransactionLog(transactionLog);
+    return transactionalStoragePathRepository.save(operationLog);
+  }
+
+  @Transactional
+  public void updateStoragePathOperationState(UUID operationId, OperationState state) throws RODATransactionException {
+    TransactionalStoragePathOperationLog operationLog = getTransactionalStoragePathOperationLogById(operationId);
+    operationLog.setOperationState(state);
+    transactionalStoragePathRepository.save(operationLog);
   }
 
   @Transactional
