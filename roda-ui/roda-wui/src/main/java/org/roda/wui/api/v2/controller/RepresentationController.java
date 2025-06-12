@@ -131,7 +131,8 @@ public class RepresentationController implements RepresentationRestService, Expo
           && RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
           boolean isLocalInstance = representation.getInstanceId()
             .equals(RODAInstanceUtils.getLocalInstanceIdentifier());
-          representationService.retrieveDistributedInstanceName(representation.getInstanceId(), isLocalInstance)
+          representationService
+            .retrieveDistributedInstanceName(requestContext, representation.getInstanceId(), isLocalInstance)
             .ifPresent(representation::setInstanceName);
           representation.setLocalInstance(isLocalInstance);
         }
