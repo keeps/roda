@@ -1022,7 +1022,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String dirName, String createdBy, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     List<TransactionalModelOperationLog> operationLogs = registerOperationForFile(aipId, representationId,
-      directoryPath, fileId, OperationType.CREATE);
+      directoryPath, fileId, dirName, OperationType.CREATE);
     try {
       File ret = getModelService().createFile(aipId, representationId, directoryPath, fileId, dirName, createdBy,
         notify);
