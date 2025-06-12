@@ -379,12 +379,18 @@ public class DefaultModelService implements ModelService {
 
   @Override
   public AIP createAIP(String parentId, String type, Permissions permissions, List<String> ingestSIPIds,
-    String ingestJobId, boolean notify, String createdBy, boolean isGhost) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
+    String ingestJobId, boolean notify, String createdBy, boolean isGhost, String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     AIPState state = AIPState.ACTIVE;
-    Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    Directory directory;
+    if (aipId != null) {
+      directory = storage.createDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId));
+    } else {
+      directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    }
     String id = directory.getStoragePath().getName();
 
     User user = this.retrieveUser(createdBy);
@@ -416,29 +422,35 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public AIP createAIP(String parentId, String type, Permissions permissions, String createdBy)
+  public AIP createAIP(String parentId, String type, Permissions permissions, String createdBy, String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
     AIPState state = AIPState.ACTIVE;
     boolean notify = true;
-    return createAIP(state, parentId, type, permissions, notify, createdBy);
+    return createAIP(state, parentId, type, permissions, notify, createdBy, aipId);
   }
 
   @Override
-  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy,
+    String aipId) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
     boolean notify = true;
-    return createAIP(state, parentId, type, permissions, notify, createdBy);
+    return createAIP(state, parentId, type, permissions, notify, createdBy, aipId);
   }
 
   @Override
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify,
-    String createdBy) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException {
+    String createdBy, String aipId) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    Directory directory;
+    if (aipId != null) {
+      directory = storage.createDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId));
+    } else {
+      directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    }
+
     String id = directory.getStoragePath().getName();
 
     User user = this.retrieveUser(createdBy);
@@ -465,11 +477,18 @@ public class DefaultModelService implements ModelService {
 
   @Override
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String ingestSIPUUID,
-    List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
+    List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy, String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    Directory directory;
+    if (aipId != null) {
+      directory = storage.createDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId));
+    } else {
+      directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    }
+
     String id = directory.getStoragePath().getName();
 
     User user = this.retrieveUser(createdBy);

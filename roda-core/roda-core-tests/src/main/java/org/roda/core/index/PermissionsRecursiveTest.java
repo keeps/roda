@@ -89,10 +89,10 @@ public class PermissionsRecursiveTest {
 
   @Test
   public void testUpdatePermissionsRecursively() throws RODAException {
-    AIP parent = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN);
-    AIP firstChild = model.createAIP(parent.getId(), "", new Permissions(), RodaConstants.ADMIN);
-    AIP otherChild = model.createAIP(parent.getId(), "", new Permissions(), RodaConstants.ADMIN);
-    model.createAIP(otherChild.getId(), "", new Permissions(), RodaConstants.ADMIN);
+    AIP parent = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN, null);
+    AIP firstChild = model.createAIP(parent.getId(), "", new Permissions(), RodaConstants.ADMIN, null);
+    AIP otherChild = model.createAIP(parent.getId(), "", new Permissions(), RodaConstants.ADMIN, null);
+    model.createAIP(otherChild.getId(), "", new Permissions(), RodaConstants.ADMIN, null);
 
     User user = new User();
     user.setId("rodauser");

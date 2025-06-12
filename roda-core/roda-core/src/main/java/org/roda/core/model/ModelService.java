@@ -96,24 +96,25 @@ public interface ModelService extends ModelObservable {
     NotFoundException, ValidationException;
 
   AIP createAIP(String parentId, String type, Permissions permissions, List<String> ingestSIPIds, String ingestJobId,
-    boolean notify, String createdBy, boolean isGhost) throws RequestNotValidException, NotFoundException,
+    boolean notify, String createdBy, boolean isGhost, String aipId) throws RequestNotValidException, NotFoundException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException;
 
-  AIP createAIP(String parentId, String type, Permissions permissions, String createdBy)
+  AIP createAIP(String parentId, String type, Permissions permissions, String createdBy, String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException;
 
-  AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy)
+  AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy, String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException;
 
-  AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify, String createdBy)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+  AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify, String createdBy,
+    String aipId) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException;
 
   AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String ingestSIPUUID,
-    List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException;
+    List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy, String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException;
 
   AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, String createdBy)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,

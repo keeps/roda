@@ -127,7 +127,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
       final AIP aip = model.createAIP(state, computedSearchScope.orElse(null), aipType, permissions,
         transferredResource.getUUID(), Arrays.asList(transferredResource.getName()), job.getId(), false,
-        job.getUsername());
+        job.getUsername(), null);
 
       PluginHelper.createSubmission(model, createSubmission, transferredResourcePath, aip.getId());
 

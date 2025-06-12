@@ -76,7 +76,7 @@ public class EARKSIP2ToAIPPluginUtils {
     String aipType = getType(sip);
 
     AIP aip = model.createAIP(state, parentId.orElse(null), aipType, permissions, ingestSIPUUID, ingestSIPIds,
-      ingestJobId, notify, username);
+      ingestJobId, notify, username, null);
 
     PluginHelper.acquireObjectLock(aip, plugin);
 

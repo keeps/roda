@@ -134,12 +134,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.READ);
     try {
-      AIP aip;
-      try {
-        aip = stagingModelService.retrieveAIP(aipId);
-      } catch (NotFoundException e) {
-        aip = mainModelService.retrieveAIP(aipId);
-      }
+      AIP aip = stagingModelService.retrieveAIP(aipId);
       updateOperationState(operationLog, OperationState.SUCCESS);
       return aip;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
@@ -166,64 +161,117 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public AIP createAIP(String parentId, String type, Permissions permissions, List<String> ingestSIPIds,
-    String ingestJobId, boolean notify, String createdBy, boolean isGhost) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
-    AIP aip = getModelService().createAIP(parentId, type, permissions, ingestSIPIds, ingestJobId, notify, createdBy,
-      isGhost);
-    TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog, OperationState.SUCCESS);
-    return aip;
+    String ingestJobId, boolean notify, String createdBy, boolean isGhost, String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
+    if (aipId == null) {
+      aipId = IdUtils.createUUID();
+    }
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.CREATE);
+    try {
+      AIP ret = getModelService().createAIP(parentId, type, permissions, ingestSIPIds, ingestJobId, notify, createdBy,
+        isGhost, aipId);
+      updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
+      | AuthorizationDeniedException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
-  public AIP createAIP(String parentId, String type, Permissions permissions, String createdBy)
+  public AIP createAIP(String parentId, String type, Permissions permissions, String createdBy, String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
-    AIP aip = getModelService().createAIP(parentId, type, permissions, createdBy);
-    TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog, OperationState.SUCCESS);
-    return aip;
+    if (aipId == null) {
+      aipId = IdUtils.createUUID();
+    }
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.CREATE);
+    try {
+      AIP ret = getModelService().createAIP(parentId, type, permissions, createdBy, aipId);
+      updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
+      | AuthorizationDeniedException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
-  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy,
+    String aipId) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
-    AIP aip = getModelService().createAIP(state, parentId, type, permissions, createdBy);
-    TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog, OperationState.SUCCESS);
-    return aip;
+    if (aipId == null) {
+      aipId = IdUtils.createUUID();
+    }
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.CREATE);
+    try {
+      AIP ret = getModelService().createAIP(state, parentId, type, permissions, createdBy, aipId);
+      updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
+      | AuthorizationDeniedException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify,
-    String createdBy) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException {
-    AIP aip = getModelService().createAIP(state, parentId, type, permissions, notify, createdBy);
-    TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog, OperationState.SUCCESS);
-    return aip;
+    String createdBy, String aipId) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException {
+    if (aipId == null) {
+      aipId = IdUtils.createUUID();
+    }
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.CREATE);
+    try {
+      AIP ret = getModelService().createAIP(state, parentId, type, permissions, notify, createdBy, aipId);
+      updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
+      | AuthorizationDeniedException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String ingestSIPUUID,
-    List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
-    AIP aip = getModelService().createAIP(state, parentId, type, permissions, ingestSIPUUID, ingestSIPIds, ingestJobId,
-      notify, createdBy);
-    TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog, OperationState.SUCCESS);
-    return aip;
+    List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy, String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
+    if (aipId == null) {
+      aipId = IdUtils.createUUID();
+    }
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.CREATE);
+    try {
+      AIP ret = getModelService().createAIP(state, parentId, type, permissions, ingestSIPUUID, ingestSIPIds,
+        ingestJobId, notify, createdBy, aipId);
+      updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
+      | AuthorizationDeniedException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
   public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, String createdBy)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
     NotFoundException, ValidationException {
-    AIP aip = getModelService().createAIP(aipId, sourceStorage, sourcePath, createdBy);
-    TransactionalModelOperationLog operationLog = registerOperationForAIP(aip.getId(), OperationType.CREATE);
-    updateOperationState(operationLog, OperationState.SUCCESS);
-    return aip;
+    TransactionalModelOperationLog operationLog = registerOperationForAIP(aipId, OperationType.CREATE);
+    try {
+      AIP ret = getModelService().createAIP(aipId, sourceStorage, sourcePath, createdBy);
+      updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | AlreadyExistsException
+      | NotFoundException | ValidationException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override
@@ -357,12 +405,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       descriptiveMetadataId, OperationType.READ);
 
     try {
-      Binary binary;
-      try {
-        binary = stagingModelService.retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
-      } catch (NotFoundException e) {
-        binary = mainModelService.retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
-      }
+      Binary binary = stagingModelService.retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
       updateOperationState(operationLogs, OperationState.SUCCESS);
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -378,12 +421,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       representationId, descriptiveMetadataId, OperationType.READ);
 
     try {
-      Binary binary;
-      try {
-        binary = stagingModelService.retrieveDescriptiveMetadataBinary(aipId, representationId, descriptiveMetadataId);
-      } catch (NotFoundException e) {
-        binary = mainModelService.retrieveDescriptiveMetadataBinary(aipId, representationId, descriptiveMetadataId);
-      }
+      Binary binary = stagingModelService.retrieveDescriptiveMetadataBinary(aipId, representationId,
+        descriptiveMetadataId);
       updateOperationState(operationLogs, OperationState.SUCCESS);
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -399,12 +438,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       descriptiveMetadataId, OperationType.READ);
 
     try {
-      DescriptiveMetadata descriptiveMetadata;
-      try {
-        descriptiveMetadata = stagingModelService.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
-      } catch (NotFoundException e) {
-        descriptiveMetadata = mainModelService.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
-      }
+      DescriptiveMetadata descriptiveMetadata = stagingModelService.retrieveDescriptiveMetadata(aipId,
+        descriptiveMetadataId);
       updateOperationState(operationLogs, OperationState.SUCCESS);
       return descriptiveMetadata;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -422,14 +457,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       representationId, descriptiveMetadataId, OperationType.READ);
 
     try {
-      DescriptiveMetadata descriptiveMetadata;
-      try {
-        descriptiveMetadata = stagingModelService.retrieveDescriptiveMetadata(aipId, representationId,
-          descriptiveMetadataId);
-      } catch (NotFoundException e) {
-        descriptiveMetadata = mainModelService.retrieveDescriptiveMetadata(aipId, representationId,
-          descriptiveMetadataId);
-      }
+      DescriptiveMetadata descriptiveMetadata = stagingModelService.retrieveDescriptiveMetadata(aipId, representationId,
+        descriptiveMetadataId);
       updateOperationState(operationLogs, OperationState.SUCCESS);
       return descriptiveMetadata;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -697,12 +726,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       OperationType.READ);
 
     try {
-      Representation representation;
-      try {
-        representation = stagingModelService.retrieveRepresentation(aipId, representationId);
-      } catch (NotFoundException e) {
-        representation = mainModelService.retrieveRepresentation(aipId, representationId);
-      }
+      Representation representation = stagingModelService.retrieveRepresentation(aipId, representationId);
       updateOperationState(operationLogs, OperationState.SUCCESS);
       return representation;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -948,13 +972,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForFile(aipId, representationId,
       directoryPath, fileId, OperationType.READ);
     try {
-      File file;
-
-      try {
-        file = stagingModelService.retrieveFile(aipId, representationId, directoryPath, fileId);
-      } catch (NotFoundException e) {
-        file = mainModelService.retrieveFile(aipId, representationId, directoryPath, fileId);
-      }
+      File file = stagingModelService.retrieveFile(aipId, representationId, directoryPath, fileId);
       updateOperationState(operationLogs, OperationState.SUCCESS);
       return file;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -1224,12 +1242,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(aipId,
       representationId, OperationType.READ);
     try {
-      Binary binary;
-      try {
-        binary = stagingModelService.retrievePreservationRepresentation(aipId, representationId);
-      } catch (NotFoundException e) {
-        binary = mainModelService.retrievePreservationRepresentation(aipId, representationId);
-      }
+      Binary binary = stagingModelService.retrievePreservationRepresentation(aipId, representationId);
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       updateOperationState(operationLogs, OperationState.FAILURE);
@@ -1263,12 +1276,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(file,
       OperationType.READ);
     try {
-      Binary binary;
-      try {
-        binary = stagingModelService.retrievePreservationFile(file);
-      } catch (NotFoundException e) {
-        binary = mainModelService.retrievePreservationFile(file);
-      }
+      Binary binary = stagingModelService.retrievePreservationFile(file);
       updateOperationState(operationLogs, OperationState.SUCCESS);
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -1285,12 +1293,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(aipId,
       representationId, fileDirectoryPath, fileId, preservationID, OperationType.READ);
     try {
-      Binary binary;
-      try {
-        binary = stagingModelService.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
-      } catch (NotFoundException e) {
-        binary = mainModelService.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
-      }
+      Binary binary = stagingModelService.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
       updateOperationState(operationLogs, OperationState.SUCCESS);
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -1326,12 +1329,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(fileId,
       OperationType.READ);
     try {
-      Binary binary;
-      try {
-        binary = stagingModelService.retrieveRepositoryPreservationEvent(fileId);
-      } catch (NotFoundException e) {
-        binary = mainModelService.retrieveRepositoryPreservationEvent(fileId);
-      }
+      Binary binary = stagingModelService.retrieveRepositoryPreservationEvent(fileId);
       updateOperationState(operationLogs, OperationState.SUCCESS);
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -1348,13 +1346,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(aipId,
       representationId, filePath, fileId, preservationID, OperationType.READ);
     try {
-      Binary binary;
-      try {
-        binary = stagingModelService.retrievePreservationEvent(aipId, representationId, filePath, fileId,
-          preservationID);
-      } catch (NotFoundException e) {
-        binary = mainModelService.retrievePreservationEvent(aipId, representationId, filePath, fileId, preservationID);
-      }
+      Binary binary = stagingModelService.retrievePreservationEvent(aipId, representationId, filePath, fileId,
+        preservationID);
       updateOperationState(operationLogs, OperationState.SUCCESS);
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -1369,12 +1362,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     List<TransactionalModelOperationLog> operationLogs = registerOperationForPreservationMetadata(preservationID,
       OperationType.READ);
     try {
-      Binary binary;
-      try {
-        binary = stagingModelService.retrievePreservationAgent(preservationID);
-      } catch (NotFoundException e) {
-        binary = mainModelService.retrievePreservationAgent(preservationID);
-      }
+      Binary binary = stagingModelService.retrievePreservationAgent(preservationID);
       updateOperationState(operationLogs, OperationState.SUCCESS);
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -1594,12 +1582,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     TransactionalModelOperationLog operationLog = registerOperationForOtherMetadata(om.getAipId(), OperationType.READ);
     try {
-      Binary binary;
-      try {
-        binary = stagingModelService.retrieveOtherMetadataBinary(om);
-      } catch (NotFoundException e) {
-        binary = mainModelService.retrieveOtherMetadataBinary(om);
-      }
+      Binary binary = stagingModelService.retrieveOtherMetadataBinary(om);
       updateOperationState(operationLog, OperationState.SUCCESS);
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -1614,14 +1597,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     TransactionalModelOperationLog operationLog = registerOperationForOtherMetadata(aipId, OperationType.READ);
     try {
-      Binary binary;
-      try {
-        binary = stagingModelService.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
-          fileSuffix, type);
-      } catch (NotFoundException e) {
-        binary = mainModelService.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
-          fileSuffix, type);
-      }
+      Binary binary = stagingModelService.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath,
+        fileId, fileSuffix, type);
       updateOperationState(operationLog, OperationState.SUCCESS);
       return binary;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -1636,14 +1613,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     TransactionalModelOperationLog operationLog = registerOperationForOtherMetadata(aipId, OperationType.READ);
     try {
-      OtherMetadata otherMetadata;
-      try {
-        otherMetadata = stagingModelService.retrieveOtherMetadata(aipId, representationId, fileDirectoryPath, fileId,
-          fileSuffix, type);
-      } catch (NotFoundException e) {
-        otherMetadata = mainModelService.retrieveOtherMetadata(aipId, representationId, fileDirectoryPath, fileId,
-          fileSuffix, type);
-      }
+      OtherMetadata otherMetadata = stagingModelService.retrieveOtherMetadata(aipId, representationId,
+        fileDirectoryPath, fileId, fileSuffix, type);
       updateOperationState(operationLog, OperationState.SUCCESS);
       return otherMetadata;
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
@@ -2495,12 +2466,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public DIP retrieveDIP(String dipId) throws GenericException, NotFoundException, AuthorizationDeniedException {
     TransactionalModelOperationLog operationLog = registerOperationForDIP(dipId, OperationType.READ);
     try {
-      DIP dip;
-      try {
-        dip = stagingModelService.retrieveDIP(dipId);
-      } catch (NotFoundException e) {
-        dip = mainModelService.retrieveDIP(dipId);
-      }
+      DIP dip = stagingModelService.retrieveDIP(dipId);
       updateOperationState(operationLog, OperationState.SUCCESS);
       return dip;
     } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {

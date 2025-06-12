@@ -56,7 +56,7 @@ public class BagitToAIPPluginUtils {
     boolean notify = false;
 
     AIP aip = model.createAIP(state, computedParentId.orElse(null), aipType, permissions, ingestSIPUUID, ingestSIPIds,
-      ingestJobId, notify, createdBy);
+      ingestJobId, notify, createdBy, null);
 
     model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION,
       createdBy, notify);
