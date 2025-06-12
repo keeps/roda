@@ -169,7 +169,7 @@ public class PluginReportContentTest {
   @Test
   public void ingestCorporaTest() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
-    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
+    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR, null);
 
     TransferredResource transferredResource = createCorpora();
     Assert.assertNotNull(transferredResource);
@@ -196,7 +196,7 @@ public class PluginReportContentTest {
 
   @Test
   public void siegfriedCorporaTestAIP() throws RODAException {
-    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
+    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR, null);
 
     TransferredResource transferredResource = createCorpora();
     Assert.assertNotNull(transferredResource);
@@ -228,7 +228,7 @@ public class PluginReportContentTest {
 
   @Test
   public void siegfriedCorporaTestRepresentation() throws RODAException {
-    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
+    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR, null);
 
     TransferredResource transferredResource = createCorpora();
     AssertJUnit.assertNotNull(transferredResource);
@@ -263,7 +263,7 @@ public class PluginReportContentTest {
 
   @Test
   public void siegfriedCorporaTestFile() throws RODAException {
-    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
+    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR, null);
 
     TransferredResource transferredResource = createCorpora();
     Assert.assertNotNull(transferredResource);

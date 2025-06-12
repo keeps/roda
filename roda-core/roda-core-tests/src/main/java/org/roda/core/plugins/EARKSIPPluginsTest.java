@@ -122,7 +122,7 @@ public class EARKSIPPluginsTest {
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN);
+    AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN, null);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -151,7 +151,7 @@ public class EARKSIPPluginsTest {
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, IOException, IsStillUpdatingException {
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN);
+    AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN, null);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -330,7 +330,7 @@ public class EARKSIPPluginsTest {
   private void ingestCorporaAncestors() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, IOException, IsStillUpdatingException {
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN);
+    AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN, null);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
