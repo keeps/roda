@@ -5,11 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.index.CountRequest;
@@ -17,7 +13,6 @@ import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
@@ -25,7 +20,7 @@ import org.roda.wui.api.v2.services.AuditLogService;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.client.services.AuditLogRestService;
-import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,9 +56,11 @@ public class AuditLogController implements AuditLogRestService, Exportable {
   @Autowired
   AuditLogService auditLogService;
 
+  @Autowired
+  RequestHandler requestHandler;
+
   @Override
   public LogEntry findByUuid(String uuid, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.LOG_ID,
       RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD, RodaConstants.LOG_ADDRESS,
       RodaConstants.LOG_DATETIME, RodaConstants.LOG_RELATED_OBJECT_ID, RodaConstants.LOG_USERNAME,
@@ -74,7 +71,6 @@ public class AuditLogController implements AuditLogRestService, Exportable {
 
   @Override
   public IndexResult<LogEntry> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(LogEntry.class, findRequest, localeString);
   }
 
@@ -90,7 +86,6 @@ public class AuditLogController implements AuditLogRestService, Exportable {
 
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, LogEntry.class);
   }
 
@@ -101,28 +96,19 @@ public class AuditLogController implements AuditLogRestService, Exportable {
     @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   public StringResponse importLogEntry(
     @Parameter(content = @Content(mediaType = "multipart/form-data", schema = @Schema(implementation = MultipartFile.class)), description = "Multipart file") @RequestPart(value = "file") MultipartFile resource) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    LogEntryState state = LogEntryState.SUCCESS;
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    String filename = resource.getOriginalFilename();
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<StringResponse>() {
+      @Override
+      public StringResponse process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        String filename = resource.getOriginalFilename();
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILENAME_PARAM, filename);
+        // delegate
+        auditLogService.importLogEntries(requestContext.getModelService(), resource.getInputStream(), filename);
 
-      // delegate
-      auditLogService.importLogEntries(resource.getInputStream(), filename);
-
-      return new StringResponse("Audit logs successfully imported");
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (GenericException | AlreadyExistsException | RequestNotValidException | NotFoundException | IOException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_FILENAME_PARAM, filename);
-    }
+        return new StringResponse("Audit logs successfully imported");
+      }
+    });
   }
 
   @Override
