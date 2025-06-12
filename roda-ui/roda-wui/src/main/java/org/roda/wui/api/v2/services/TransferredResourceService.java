@@ -36,6 +36,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.IndexService;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.base.maintenance.MovePlugin;
 import org.roda.core.util.IdUtils;
@@ -50,18 +51,18 @@ public class TransferredResourceService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourceService.class);
 
-  public List<TransferredResource> retrieveSelectedTransferredResource(SelectedItems<TransferredResource> selected)
+  public List<TransferredResource> retrieveSelectedTransferredResource(IndexService index, SelectedItems<TransferredResource> selected)
     throws GenericException, RequestNotValidException {
     switch (selected) {
       case SelectedItemsList<TransferredResource> selectedList -> {
         Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
-        IndexResult<TransferredResource> results = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+        IndexResult<TransferredResource> results = index.find(TransferredResource.class,
           filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()), new ArrayList<>());
         return results.getResults();
       }
       case SelectedItemsFilter<TransferredResource> selectedFilter -> {
-        Long counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, selectedFilter.getFilter());
-        IndexResult<TransferredResource> results = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+        Long counter = index.count(TransferredResource.class, selectedFilter.getFilter());
+        IndexResult<TransferredResource> results = index.find(TransferredResource.class,
           selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter.intValue()), new ArrayList<>());
         return results.getResults();
       }
@@ -78,14 +79,14 @@ public class TransferredResourceService {
       "Could not execute delete transferred resources action");
   }
 
-  public String renameTransferredResource(String transferredResourceId, String newName, Boolean replaceExisting)
+  public String renameTransferredResource(IndexService index, String transferredResourceId, String newName, Boolean replaceExisting)
     throws GenericException, RequestNotValidException, AlreadyExistsException, IsStillUpdatingException,
     NotFoundException, AuthorizationDeniedException {
     List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH,
       RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID);
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, transferredResourceId));
-    IndexResult<TransferredResource> resources = RodaCoreFactory.getIndexService().find(TransferredResource.class,
+    IndexResult<TransferredResource> resources = index.find(TransferredResource.class,
       filter, Sorter.NONE, new Sublist(0, 1), resourceFields);
 
     if (!resources.getResults().isEmpty()) {
@@ -102,12 +103,12 @@ public class TransferredResourceService {
     RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(folderRelativePath, waitToFinish);
   }
 
-  public TransferredResource reindexTransferredResource(String path)
+  public TransferredResource reindexTransferredResource(IndexService indexService, String path)
     throws IsStillUpdatingException, NotFoundException, GenericException, AuthorizationDeniedException {
     TransferredResourcesScanner scanner = RodaCoreFactory.getTransferredResourcesScanner();
     Optional<String> normalizedPath = scanner.updateTransferredResources(Optional.ofNullable(path), true);
     if (normalizedPath.isPresent()) {
-      return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class,
+      return indexService.retrieve(TransferredResource.class,
         IdUtils.getTransferredResourceUUID(normalizedPath.get()), Collections.emptyList());
     } else {
       return null;
