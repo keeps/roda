@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -36,7 +37,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.DefaultConsumesOutputStream;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -107,9 +107,10 @@ public class AIPService {
   private static final String HTML_EXT = ".html";
   private static final String XML_EXT = ".xml";
 
-  public StreamResponse downloadAIPDescriptiveMetadata(String aipId, String metadataId, String versionId)
+  public StreamResponse downloadAIPDescriptiveMetadata(RequestContext requestContext, String aipId, String metadataId,
+    String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    ModelService modelService = RodaCoreFactory.getModelService();
+    ModelService modelService = requestContext.getModelService();
     Optional<LiteRODAObject> liteMetadata = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId, metadataId);
     if (liteMetadata.isEmpty()) {
       throw new RequestNotValidException("Could not retrieve metadata " + metadataId + " lite for AIP " + aipId);
@@ -126,10 +127,10 @@ public class AIPService {
       new BinaryConsumesOutputStream(descriptiveMetadataBinary, RodaConstants.MEDIA_TYPE_APPLICATION_XML));
   }
 
-  public StreamResponse retrieveAIPDescriptiveMetadata(String aipId, String metadataId, String versionId,
-    String localeString)
+  public StreamResponse retrieveAIPDescriptiveMetadata(RequestContext requestContext, String aipId, String metadataId,
+    String versionId, String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = requestContext.getModelService();
     Binary descriptiveMetadataBinary;
     if (versionId != null) {
       Optional<LiteRODAObject> liteDM = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId, metadataId);
@@ -157,10 +158,9 @@ public class AIPService {
     return new StreamResponse(stream);
   }
 
-  public StreamResponse downloadRepresentationDescriptiveMetadata(String aipId, String representationId,
-    String metadataId, String versionId)
+  public StreamResponse downloadRepresentationDescriptiveMetadata(ModelService modelService, String aipId,
+    String representationId, String metadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    ModelService modelService = RodaCoreFactory.getModelService();
     Optional<LiteRODAObject> liteMetadata = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId,
       representationId, metadataId);
     if (liteMetadata.isEmpty()) {
@@ -179,10 +179,9 @@ public class AIPService {
       new BinaryConsumesOutputStream(descriptiveMetadataBinary, RodaConstants.MEDIA_TYPE_APPLICATION_XML));
   }
 
-  public StreamResponse retrieveRepresentationDescriptiveMetadata(String aipId, String representationId,
-    String metadataId, String versionId, String localeString)
+  public StreamResponse retrieveRepresentationDescriptiveMetadata(ModelService model, String aipId,
+    String representationId, String metadataId, String versionId, String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    ModelService model = RodaCoreFactory.getModelService();
     Binary descriptiveMetadataBinary;
     if (versionId != null) {
       Optional<LiteRODAObject> liteDM = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId, representationId,
@@ -212,8 +211,8 @@ public class AIPService {
     return new StreamResponse(stream);
   }
 
-  public List<IndexedAIP> getAncestors(IndexedAIP indexedAIP, User user) throws GenericException {
-    return RodaCoreFactory.getIndexService().retrieveAncestors(indexedAIP, user, new ArrayList<>());
+  public List<IndexedAIP> getAncestors(IndexedAIP indexedAIP, RequestContext requestContext) throws GenericException {
+    return requestContext.getIndexService().retrieveAncestors(indexedAIP, requestContext.getUser(), new ArrayList<>());
   }
 
   public Job deleteAIP(User user, SelectedItems<IndexedAIP> selected, String details)
@@ -224,34 +223,20 @@ public class AIPService {
       pluginParameters, "Could not execute AIP delete action");
   }
 
-  public List<IndexedAIP> retrieveAncestors(IndexedAIP aip, User user, List<String> fieldsToReturn)
-    throws GenericException {
-    return RodaCoreFactory.getIndexService().retrieveAncestors(aip, user, fieldsToReturn);
-  }
-
-  public List<String> getRepresentationInformation(User user) {
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION)) {
-      return RodaCoreFactory.getRodaConfigurationAsList("ui.ri.rule.AIP").stream()
-        .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS)).toList();
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  public DescriptiveMetadataInfos retrieveDescriptiveMetadataList(User user, String aipId, final Locale locale)
+  public DescriptiveMetadataInfos retrieveDescriptiveMetadataList(RequestContext context, String aipId,
+    final Locale locale)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_LIST_AIP_DESCRIPTIVE_METADATA)) {
-      return retrieveDescriptiveMetadataInfos(aipId, null, locale);
+    if (UserUtility.hasPermissions(context.getUser(), RodaConstants.PERMISSION_METHOD_LIST_AIP_DESCRIPTIVE_METADATA)) {
+      return retrieveDescriptiveMetadataInfos(context.getModelService(), aipId, null, locale);
 
     }
     return new DescriptiveMetadataInfos();
   }
 
-  private DescriptiveMetadataInfos retrieveDescriptiveMetadataInfos(String aipId, String representationId,
-    final Locale locale)
+  private DescriptiveMetadataInfos retrieveDescriptiveMetadataInfos(ModelService model, String aipId,
+    String representationId, final Locale locale)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     DescriptiveMetadataInfos result = new DescriptiveMetadataInfos();
-    ModelService model = RodaCoreFactory.getModelService();
     List<DescriptiveMetadata> listDescriptiveMetadataBinaries;
     if (representationId != null) {
       listDescriptiveMetadataBinaries = model.retrieveRepresentation(aipId, representationId).getDescriptiveMetadata();
@@ -265,7 +250,8 @@ public class AIPService {
       List<DescriptiveMetadata> orderedMetadata = orderDescriptiveMetadata(listDescriptiveMetadataBinaries);
 
       for (DescriptiveMetadata descriptiveMetadata : orderedMetadata) {
-        DescriptiveMetadataInfo dmis = retrieveDescriptiveMetadataInfo(aipId, representationId, descriptiveMetadata,
+        DescriptiveMetadataInfo dmis = retrieveDescriptiveMetadataInfo(model, aipId, representationId,
+          descriptiveMetadata,
           locale);
 
         descriptiveMetadataList.add(dmis);
@@ -300,9 +286,9 @@ public class AIPService {
     return orderedMetadata;
   }
 
-  private DescriptiveMetadataInfo retrieveDescriptiveMetadataInfo(String aipId, String representationId,
+  private DescriptiveMetadataInfo retrieveDescriptiveMetadataInfo(ModelService model, String aipId,
+    String representationId,
     DescriptiveMetadata descriptiveMetadata, final Locale locale) {
-    ModelService model = RodaCoreFactory.getModelService();
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     DescriptiveMetadataInfo metadataInfo = new DescriptiveMetadataInfo();
     metadataInfo.setId(descriptiveMetadata.getId());
@@ -344,20 +330,20 @@ public class AIPService {
     return model.createAIP(parentAipId, type, permissions, user.getName(), null);
   }
 
-  public boolean hasDocumentation(String aipId)
+  public boolean hasDocumentation(ModelService model, String aipId)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     try {
-      Long counter = RodaCoreFactory.getModelService().countDocumentationFiles(aipId, null);
+      Long counter = model.countDocumentationFiles(aipId, null);
       return counter > 0;
     } catch (NotFoundException e) {
       return false;
     }
   }
 
-  public boolean hasSubmissions(String aipId)
+  public boolean hasSubmissions(ModelService model, String aipId)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException {
     try {
-      Long counter = RodaCoreFactory.getModelService().countSubmissionFiles(aipId);
+      Long counter = model.countSubmissionFiles(aipId);
       return counter > 0;
     } catch (NotFoundException e) {
       return false;
@@ -391,27 +377,28 @@ public class AIPService {
       pluginParameters, "Could not execute move job");
   }
 
-  public StreamResponse retrieveAIP(String aipId)
+  public StreamResponse retrieveAIP(RequestContext requestContext, String aipId)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Optional<LiteRODAObject> liteAIP = LiteRODAObjectFactory.get(AIP.class, aipId);
     if (liteAIP.isEmpty()) {
       throw new RequestNotValidException("Could not retrieve AIP " + aipId + " lite");
     }
-    return ApiUtils.download(liteAIP.get());
+    return ApiUtils.download(requestContext, liteAIP.get());
   }
 
-  public DescriptiveMetadata revertDescriptiveMetadataVersion(User user, String aipId, String representationId,
+  public DescriptiveMetadata revertDescriptiveMetadataVersion(RequestContext context, String aipId,
+    String representationId,
     String descriptiveMetadataId, String versionId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
 
     Map<String, String> properties = new HashMap<>();
-    properties.put(RodaConstants.VERSION_USER, user.getId());
+    properties.put(RodaConstants.VERSION_USER, context.getUser().getId());
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.REVERTED.toString());
 
-    RodaCoreFactory.getModelService().revertDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId,
+    context.getModelService().revertDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId,
       versionId, properties);
 
-    return RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aipId, representationId,
+    return context.getModelService().retrieveDescriptiveMetadata(aipId, representationId,
       descriptiveMetadataId);
   }
 
@@ -430,7 +417,7 @@ public class AIPService {
     return model.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
   }
 
-  public StreamResponse retrieveAIPPart(String aipId, String part)
+  public StreamResponse retrieveAIPPart(RequestContext requestContext, String aipId, String part)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     Optional<LiteRODAObject> liteAIP = LiteRODAObjectFactory.get(AIP.class, aipId);
     if (liteAIP.isEmpty()) {
@@ -440,14 +427,14 @@ public class AIPService {
     if (part.equals(RodaConstants.STORAGE_DIRECTORY_SUBMISSION)
       || part.equals(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION)
       || part.equals(RodaConstants.STORAGE_DIRECTORY_SCHEMAS)) {
-      return ApiUtils.download(liteAIP.get(), part);
+      return ApiUtils.download(requestContext, liteAIP.get(), part);
     }
 
     throw new GenericException("Unsupported part: " + part);
   }
 
-  public String retrieveDescriptiveMetadataPreview(String aipId, String representationId, String descriptiveMetadataId,
-    Set<MetadataValue> values)
+  public String retrieveDescriptiveMetadataPreview(ModelService model, String aipId, String representationId,
+    String descriptiveMetadataId, Set<MetadataValue> values)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     String rawTemplate;
 
@@ -474,7 +461,6 @@ public class AIPService {
 
         result = HandlebarsUtility.executeHandlebars(rawTemplate, data);
       } else {
-        ModelService model = RodaCoreFactory.getModelService();
         Optional<LiteRODAObject> descriptiveMetadataLite = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId,
           representationId, descriptiveMetadataId);
         if (descriptiveMetadataLite.isEmpty()) {
@@ -535,7 +521,7 @@ public class AIPService {
     return supportedMetadata;
   }
 
-  public SupportedMetadataValue retrieveSupportedMetadata(User user, IndexedAIP aip,
+  public SupportedMetadataValue retrieveSupportedMetadata(RequestContext context, IndexedAIP aip,
     IndexedRepresentation representation, String descriptiveMetadataId, Locale locale)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
@@ -550,10 +536,11 @@ public class AIPService {
         return new SupportedMetadataValue(values);
       }
 
-      if (checkIfDescriptiveMetadataExists(aip, representation, descriptiveMetadataId + XML_EXT)) {
+      if (checkIfDescriptiveMetadataExists(context.getModelService(), aip, representation,
+        descriptiveMetadataId + XML_EXT)) {
         template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         String representationId = representation != null ? representation.getId() : null;
-        Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(),
+        Binary binary = context.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(),
           representationId, descriptiveMetadataId + XML_EXT);
         String xml = IOUtils.toString(binary.getContent().createInputStream(), StandardCharsets.UTF_8);
 
@@ -562,7 +549,8 @@ public class AIPService {
         return new SupportedMetadataValue(result);
       } else {
         template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
-        Set<MetadataValue> result = getDefaultDescriptiveMetadataValues(template, aip, representation, user, locale,
+        Set<MetadataValue> result = getDefaultDescriptiveMetadataValues(template, aip, representation,
+          context.getUser(), locale,
           messages);
         return new SupportedMetadataValue(result);
       }
@@ -573,18 +561,19 @@ public class AIPService {
     return new SupportedMetadataValue(values);
   }
 
-  private boolean checkIfDescriptiveMetadataExists(IndexedAIP aip, IndexedRepresentation representation,
+  private boolean checkIfDescriptiveMetadataExists(ModelService model, IndexedAIP aip,
+    IndexedRepresentation representation,
     String descriptiveMetadataId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     if (representation != null) {
-      Representation modelRepresentation = RodaCoreFactory.getModelService().retrieveRepresentation(aip.getId(),
+      Representation modelRepresentation = model.retrieveRepresentation(aip.getId(),
         representation.getId());
       if (!modelRepresentation.getDescriptiveMetadata().isEmpty()) {
         return modelRepresentation.getDescriptiveMetadata().stream()
           .anyMatch(dm -> dm.getId().equals(descriptiveMetadataId));
       }
     } else {
-      AIP aipModel = RodaCoreFactory.getModelService().retrieveAIP(aip.getId());
+      AIP aipModel = model.retrieveAIP(aip.getId());
       if (!aipModel.getDescriptiveMetadata().isEmpty()) {
         return aipModel.getDescriptiveMetadata().stream().anyMatch(dm -> dm.getId().equals(descriptiveMetadataId));
       }
@@ -624,12 +613,12 @@ public class AIPService {
   }
 
   // Get preservation metadata
-  public StreamResponse retrievePreservationMetadata(String aipId)
+  public StreamResponse retrievePreservationMetadata(RequestContext requestContext, String aipId)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
-    try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationFiles = RodaCoreFactory
-      .getModelService().listPreservationMetadata(aipId, true)) {
-      ModelService model = RodaCoreFactory.getModelService();
+    try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationFiles = requestContext.getModelService()
+      .listPreservationMetadata(aipId, true)) {
+      ModelService model = requestContext.getModelService();
       List<ZipEntryInfo> zipEntries = new ArrayList<>();
       Map<String, ZipEntryInfo> agents = new HashMap<>();
 
@@ -651,9 +640,7 @@ public class AIPService {
                   if (!agents.containsKey(agentID)) {
                     StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentID,
                       PreservationMetadata.PreservationMetadataType.AGENT);
-                    String pmURN = URNUtils
-                      .createRodaPreservationURN(PreservationMetadata.PreservationMetadataType.AGENT, agentID);
-                    Optional<LiteRODAObject> pmLite = LiteRODAObjectFactory.get(PreservationMetadata.class, pmURN);
+                    Optional<LiteRODAObject> pmLite = LiteRODAObjectFactory.get(PreservationMetadata.class, agentID);
                     if (pmLite.isPresent()) {
                       Binary agentBinary = model.getBinary(pmLite.get());
 
@@ -700,16 +687,15 @@ public class AIPService {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, request.getDetails());
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, eventDescription);
 
-    return CommonServicesUtils.createAndExecuteInternalJob("Update AIP permissions recursively",
+    return CommonServicesUtils.createAndExecuteInternalJob("Update AIP permissions",
       CommonServicesUtils.convertSelectedItems(request.getItemsToUpdate(), IndexedAIP.class),
-      UpdatePermissionsPlugin.class, user, pluginParameters, "Could not execute AIP permissions recursively action");
+      UpdatePermissionsPlugin.class, user, pluginParameters, "Could not execute AIP permissions action");
   }
 
-  public void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId,
-    String deletedBy)
+  public void deleteDescriptiveMetadataFile(ModelService model, String aipId, String representationId,
+    String descriptiveMetadataId, String deletedBy)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    RodaCoreFactory.getModelService().deleteDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      deletedBy);
+    model.deleteDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, deletedBy);
   }
 
   public DescriptiveMetadata updateDescriptiveMetadataFile(RequestContext requestContext, String aipId,
@@ -775,25 +761,26 @@ public class AIPService {
     }
   }
 
-  public DescriptiveMetadataVersions retrieveDescriptiveMetadataVersions(IndexedAIP aip, String metadataId,
-    String localeString)
+  public DescriptiveMetadataVersions retrieveDescriptiveMetadataVersions(ModelService model, IndexedAIP aip,
+    String metadataId, String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    return retrieveDescriptiveMetadataVersions(aip, null, metadataId, localeString);
+    return retrieveDescriptiveMetadataVersions(model, aip, null, metadataId, localeString);
   }
 
-  public DescriptiveMetadataVersions retrieveDescriptiveMetadataVersions(IndexedAIP aip, String representationId,
-    String metadataId, String localeString)
+  public DescriptiveMetadataVersions retrieveDescriptiveMetadataVersions(ModelService model, IndexedAIP aip,
+    String representationId, String metadataId, String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     DescriptiveMetadataVersions versions = new DescriptiveMetadataVersions();
     List<ResourceVersion> versionResponses = new ArrayList<>();
     Locale locale = ServerTools.parseLocale(localeString);
 
-    DescriptiveMetadata descriptiveMetadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aip.getId(),
-      representationId, metadataId);
-    DescriptiveMetadataInfo descriptiveMetadataInfo = retrieveDescriptiveMetadataInfo(aip.getId(), representationId,
+    DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aip.getId(), representationId,
+      metadataId);
+    DescriptiveMetadataInfo descriptiveMetadataInfo = retrieveDescriptiveMetadataInfo(model, aip.getId(),
+      representationId,
       descriptiveMetadata, locale);
 
-    try (CloseableIterable<BinaryVersion> binaryVersions = listDescriptiveMetadataVersions(aip.getId(),
+    try (CloseableIterable<BinaryVersion> binaryVersions = listDescriptiveMetadataVersions(model, aip.getId(),
       representationId, metadataId)) {
       for (BinaryVersion binaryVersion : binaryVersions) {
         versionResponses.add(
@@ -837,7 +824,8 @@ public class AIPService {
     return result;
   }
 
-  private CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(String aipId, String representationId,
+  private CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(ModelService model, String aipId,
+    String representationId,
     String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Optional<LiteRODAObject> liteDM = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId, representationId,
@@ -846,7 +834,7 @@ public class AIPService {
       throw new RequestNotValidException("Could not get LITE from representation " + representationId + " of AIP "
         + aipId + " with metadata id" + descriptiveMetadataId);
     }
-    return RodaCoreFactory.getModelService().listBinaryVersions(liteDM.get());
+    return model.listBinaryVersions(liteDM.get());
   }
 
   public void deleteDescriptiveMetadataVersion(RequestContext requestContext, String aipId,
@@ -868,20 +856,19 @@ public class AIPService {
     modelService.deleteBinaryVersion(liteDM.get(), versionId);
   }
 
-  public boolean isMetadataSimilar(IndexedAIP aip, String representationId, String metadataId,
+  public boolean isMetadataSimilar(ModelService model, IndexedAIP aip, String representationId, String metadataId,
     SelectedType selectedType)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     boolean isSimilar = false;
 
     try {
-      Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), representationId,
-        metadataId + XML_EXT);
+      Binary binary = model.retrieveDescriptiveMetadataBinary(aip.getId(), representationId, metadataId + XML_EXT);
       InputStream inputStream = binary.getContent().createInputStream();
       String xml = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-      String selectedTypeTemplate = retrieveDescriptiveMetadataPreview(aip.getId(), representationId,
+      String selectedTypeTemplate = retrieveDescriptiveMetadataPreview(model, aip.getId(), representationId,
         selectedType.getMetadataId(), selectedType.getValue());
 
-      if (selectedTypeTemplate != "") {
+      if (!Objects.equals(selectedTypeTemplate, "")) {
         Diff diff = DiffBuilder.compare(xml).withTest(selectedTypeTemplate).ignoreComments().ignoreWhitespace()
           .checkForIdentical().checkForSimilar().withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
           .withNodeFilter(node -> !node.getNodeName().equals("schemaLocation")).build();

@@ -352,12 +352,17 @@ public final class RodaConstants {
   public static final String API_REST_V2_DOWNLOAD_HANDLER = "/download";
   public static final String API_REST_V2_PREVIEW_HANDLER = "/preview";
   public static final String API_REST_V2_REPRESENTATION_OTHER_METADATA = "/other-metadata";
+    public static final String API_REST_V2_REPRESENTATION_BINARY = "/binary";
 
   // aips
   public static final String API_REST_V2_AIPS = "api/v2/aips/";
 
   // representations
-  public static final String API_REST_V2_REPRESENTATIONS = "api/v2/representations";
+  public static final String API_REST_V2_REPRESENTATIONS_ENDPOINT = "api/v2/representations";
+  public static final String API_REST_V2_SUB_RESOURCE_REPRESENTATIONS = "representations";
+  public static final String API_REST_V2_SUB_RESOURCE_METADATA = "metadata";
+  public static final String API_REST_V2_SUB_RESOURCE_DESCRIPTIVE = "descriptive";
+  public static final String API_REST_V2_SUB_RESOURCE_DOWNLOAD = "download";
 
   // files
   public static final String API_REST_V2_FILES = "api/v2/files/";

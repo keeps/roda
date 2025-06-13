@@ -11,6 +11,7 @@ import java.util.MissingResourceException;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.coyote.Request;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -106,9 +107,9 @@ public class RepresentationService {
     return model.retrieveRepresentation(aipId, representationId);
   }
 
-  public StreamResponse retrieveAIPRepresentationBinary(IndexedRepresentation representation)
+  public StreamResponse retrieveAIPRepresentationBinary(RequestContext requestContext, IndexedRepresentation representation)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return ApiUtils.download(representation);
+    return ApiUtils.download(requestContext, representation);
   }
 
   public Representation createRepresentation(RequestContext requestContext, String aipId, String representationId,
@@ -223,19 +224,19 @@ public class RepresentationService {
     return new StreamResponse(stream);
   }
 
-  public StreamResponse retrieveAIPRepresentationOtherMetadata(IndexedRepresentation representation)
+  public StreamResponse retrieveAIPRepresentationOtherMetadata(RequestContext requestContext, IndexedRepresentation representation)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return ApiUtils.download(representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
+    return ApiUtils.download(requestContext, representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
       RodaConstants.STORAGE_DIRECTORY_OTHER);
   }
 
-  public DescriptiveMetadataInfos getDescriptiveMetadata(IndexedRepresentation indexedRepresentation,
+  public DescriptiveMetadataInfos getDescriptiveMetadata(RequestContext requestContext, IndexedRepresentation indexedRepresentation,
     String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Locale locale = ServerTools.parseLocale(localeString);
     DescriptiveMetadataInfos descriptiveMetadataInfos = new DescriptiveMetadataInfos();
 
-    Representation representation = RodaCoreFactory.getModelService()
+    Representation representation = requestContext.getModelService()
       .retrieveRepresentation(indexedRepresentation.getAipId(), indexedRepresentation.getId());
 
     // Can be null when the AIP is a ghost

@@ -57,11 +57,11 @@ public class RestUtils {
 
   public static SafeUri createRepresentationDownloadUri(String aipId, String representationId) {
 
-    // api/v2/representations/{aip_id}/{representation_id}/binary
+    // api/v2/{aip_id}/representations/{representation_id}/binary
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_REPRESENTATIONS).append(RodaConstants.API_SEP)
-      .append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_SEP).append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
       .append(URL.encodeQueryString(representationId)).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
 
     return UriUtils.fromSafeConstant(b.toString());
@@ -69,13 +69,13 @@ public class RestUtils {
 
   public static SafeUri createRepresentationOtherMetadataDownloadUri(String aipId, String representationId) {
 
-    // api/v2/representations/{aip_id}/{representation_id}/other-metadata/binary
+    // api/v2/aip/{aip_id}/representations/{representation_id}/other-metadata/binary
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_REPRESENTATIONS).append(RodaConstants.API_SEP)
-      .append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_SEP).append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
       .append(URL.encodeQueryString(representationId)).append(RodaConstants.API_REST_V2_REPRESENTATION_OTHER_METADATA)
-      .append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
+      .append(RodaConstants.API_REST_V2_REPRESENTATION_BINARY);
 
     // locale
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_LANG)
@@ -257,20 +257,17 @@ public class RestUtils {
 
   public static SafeUri createRepresentationDescriptiveMetadataDownloadUri(String aipId, String representationId,
     String descId, String versionId) {
-    // api/v1/representations/{aip_id}/{representation_id}/descriptive_metadata/{descId}?acceptFormat=xml&version_id={versionId}
+    // api/v2/aips/{aip_id}/representations/{representation_id}/metadata/descriptive/{descriptive_metadata_id}/download
+
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_DESCRIPTIVE_METADATA).append(RodaConstants.API_SEP).append(descId);
-    // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+    b.append(RodaConstants.API_REST_V2_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.API_REST_V2_SUB_RESOURCE_REPRESENTATIONS).append(RodaConstants.API_SEP)
 
-    if (versionId != null) {
-      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION_ID)
-        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
-    }
+      .append(UriUtils.encode(representationId)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.API_REST_V2_SUB_RESOURCE_METADATA).append(RodaConstants.API_SEP)
+      .append(RodaConstants.API_REST_V2_SUB_RESOURCE_DESCRIPTIVE).append(RodaConstants.API_SEP).append(descId)
+      .append(RodaConstants.API_SEP).append(RodaConstants.API_REST_V2_SUB_RESOURCE_DOWNLOAD);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
@@ -527,7 +524,7 @@ public class RestUtils {
       case "org.roda.core.data.v2.ip.IndexedAIP":
         return RodaConstants.API_REST_V2_AIPS;
       case "org.roda.core.data.v2.ip.IndexedRepresentation":
-        return RodaConstants.API_REST_V2_REPRESENTATIONS;
+        return RodaConstants.API_REST_V2_REPRESENTATIONS_ENDPOINT;
       case "org.roda.core.data.v2.jobs.IndexedJob":
         return RodaConstants.API_REST_V2_JOBS;
       case "org.roda.core.data.v2.ip.TransferredResource":

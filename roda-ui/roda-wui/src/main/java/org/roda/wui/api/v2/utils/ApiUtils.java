@@ -17,6 +17,7 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.RangeConsumesOutputStream;
+import org.roda.wui.common.model.RequestContext;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRange;
@@ -96,28 +97,28 @@ public class ApiUtils {
     return new ResponseEntity<>(responseStream, responseHeaders, HttpStatus.PARTIAL_CONTENT);
   }
 
-  public static StreamResponse download(IsRODAObject object, String... pathPartials)
+  public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String... pathPartials)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return download(object, null, false, pathPartials);
+    return download(requestContext, object, null, false, pathPartials);
   }
 
-  public static StreamResponse download(LiteRODAObject lite, String... pathPartials)
+  public static StreamResponse download(RequestContext requestContext, LiteRODAObject lite, String... pathPartials)
           throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return download(lite, null, false, pathPartials);
+    return download(requestContext,lite, null, false, pathPartials);
   }
 
-  public static StreamResponse download(IsRODAObject object, String fileName, boolean addTopDirectory,
+  public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String fileName, boolean addTopDirectory,
     String... pathPartials)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = requestContext.getModelService();
     ConsumesOutputStream download = model.exportObjectToStream(object, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
   }
 
-  public static StreamResponse download(LiteRODAObject lite, String fileName, boolean addTopDirectory,
+  public static StreamResponse download(RequestContext requestContext, LiteRODAObject lite, String fileName, boolean addTopDirectory,
                                         String... pathPartials)
           throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = requestContext.getModelService();
     ConsumesOutputStream download = model.exportObjectToStream(lite, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
   }
