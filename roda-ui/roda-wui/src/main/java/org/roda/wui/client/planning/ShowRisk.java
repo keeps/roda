@@ -12,7 +12,9 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.wui.client.browse.EditDescriptiveMetadata;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
@@ -126,8 +128,10 @@ public class ShowRisk extends Composite {
       services
         .rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0), LocaleInfo.getCurrentLocale().getLocaleName()),
           IndexedRisk.class)
-        .whenComplete((indexedRisk, throwable) -> {
+        .thenCompose(indexedRisk -> services.riskResource(s -> s.retrieveRiskVersions(historyTokens.get(0)))
+        .whenComplete((result, throwable) -> {
           if (throwable == null) {
+            indexedRisk.setHasVersions(!result.getVersions().isEmpty());
             instance = new ShowRisk(indexedRisk);
             RiskActions riskActions = RiskActions.get();
             if (indexedRisk.hasVersions()) {
@@ -140,7 +144,7 @@ public class ShowRisk extends Composite {
           } else {
             callback.onFailure(throwable);
           }
-        });
+        }));
     } else {
       HistoryUtils.newHistory(RiskRegister.RESOLVER);
       callback.onSuccess(null);
