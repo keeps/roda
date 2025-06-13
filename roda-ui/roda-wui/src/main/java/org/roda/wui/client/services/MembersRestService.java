@@ -7,6 +7,7 @@ import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.accessKey.CreateAccessKeyRequest;
 import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.notifications.Notification;
@@ -22,7 +23,6 @@ import org.roda.core.data.v2.user.requests.RegisterUserRequest;
 import org.roda.core.data.v2.user.requests.ResetPasswordRequest;
 import org.roda.core.data.v2.user.requests.UpdateUserRequest;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
-import org.roda.wui.api.v2.model.GenericOkResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -153,17 +153,17 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
 
   @RequestMapping(path = "/users/recover", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Recover login", description = "Sends an email to recover login", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GenericOkResponse.class))),
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StringResponse.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  String recoverLogin(@Parameter(description = "User email") @RequestParam(name = "email") String email,
-    @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
-    @Parameter(description = "captcha") @RequestParam(required = false, name = "captcha") String captcha);
+  StringResponse recoverLogin(@Parameter(description = "User email") @RequestParam(name = "email") String email,
+                              @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
+                              @Parameter(description = "captcha") @RequestParam(required = false, name = "captcha") String captcha);
 
   @RequestMapping(path = "/users/{id}/confirm", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Confirm user email", description = "Confirms a user email", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GenericOkResponse.class))),
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StringResponse.class))),
     @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  String confirmUserEmail(@Parameter(description = "User identifier") @PathVariable(name = "id") String username,
+  StringResponse confirmUserEmail(@Parameter(description = "User identifier") @PathVariable(name = "id") String username,
     @Parameter(description = "token") @RequestParam(required = false, name = "token") String token);
 
   @RequestMapping(path = "/token", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

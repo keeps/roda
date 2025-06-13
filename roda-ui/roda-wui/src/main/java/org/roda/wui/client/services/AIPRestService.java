@@ -5,6 +5,7 @@ import java.util.List;
 import org.roda.core.data.v2.aip.AssessmentRequest;
 import org.roda.core.data.v2.aip.MoveRequest;
 import org.roda.core.data.v2.generics.DeleteRequest;
+import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.generics.UpdatePermissionsRequest;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -21,7 +22,6 @@ import org.roda.core.data.v2.ip.metadata.TypeOptionsInfo;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
-import org.roda.wui.api.v2.model.GenericOkResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -205,9 +205,9 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
 
   @RequestMapping(path = "/{id}/lock/release", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get AIP lock", description = "Get the aip lock", responses = {
-    @ApiResponse(responseCode = "200", description = "Lock released", content = @Content(schema = @Schema(implementation = GenericOkResponse.class))),
+    @ApiResponse(responseCode = "200", description = "Lock released", content = @Content(schema = @Schema(implementation = StringResponse.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  String releaseAIPLock(@PathVariable(name = "id") String aipId);
+  StringResponse releaseAIPLock(@PathVariable(name = "id") String aipId);
 
   @RequestMapping(path = "/{id}/documentation", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get AIP documentation", description = "Queries if there are documentation associated with the AIP", responses = {
@@ -357,7 +357,6 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  AIP getModelAIP(
-    @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String id);
+  AIP getModelAIP(@Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String id);
 
 }

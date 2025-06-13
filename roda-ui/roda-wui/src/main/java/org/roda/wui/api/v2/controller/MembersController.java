@@ -27,7 +27,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
@@ -35,6 +34,7 @@ import org.roda.core.data.v2.accessKey.CreateAccessKeyRequest;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
+import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
@@ -57,7 +57,6 @@ import org.roda.core.data.v2.user.requests.ResetPasswordRequest;
 import org.roda.core.data.v2.user.requests.UpdateUserRequest;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.v2.exceptions.RESTException;
-import org.roda.wui.api.v2.model.GenericOkResponse;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.MembersService;
 import org.roda.wui.api.v2.utils.ApiUtils;
@@ -656,21 +655,20 @@ public class MembersController implements MembersRestService, Exportable {
   }
 
   @Override
-  public String recoverLogin(String email, String localeString, String captcha) {
+  public StringResponse recoverLogin(String email, String localeString, String captcha) {
 
     try {
       membersService.recoverLoginCheckCaptcha(captcha);
       membersService.requestPasswordReset(request.getRequestURL().toString().split("/api")[0], email, localeString,
         request.getRemoteAddr(), true);
-      return JsonUtils.getJsonFromObject(new GenericOkResponse("Recover email sent to " + email),
-        GenericOkResponse.class);
+      return new StringResponse("Recover email sent to " + email);
     } catch (RODAException e) {
       throw new RESTException(e);
     }
   }
 
   @Override
-  public String confirmUserEmail(String username, String token) {
+  public StringResponse confirmUserEmail(String username, String token) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     User user = null;
@@ -678,8 +676,7 @@ public class MembersController implements MembersRestService, Exportable {
       user = membersService.confirmUserEmail(username, null, token);
       // 20180112 hsilva: need to set ip address for registering the action
       user.setIpAddress(request.getRemoteAddr());
-      return JsonUtils.getJsonFromObject(new GenericOkResponse("User " + username + " email confirmed"),
-        GenericOkResponse.class);
+      return new StringResponse("User " + username + " email confirmed");
     } catch (RODAException e) {
       throw new RESTException(e);
     } finally {
@@ -832,7 +829,6 @@ public class MembersController implements MembersRestService, Exportable {
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, RODAMember.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, RODAMember.class));
   }
 }

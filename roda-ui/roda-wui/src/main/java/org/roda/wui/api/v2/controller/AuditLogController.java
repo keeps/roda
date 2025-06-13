@@ -10,8 +10,8 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
@@ -21,7 +21,6 @@ import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
-import org.roda.wui.api.v2.model.GenericOkResponse;
 import org.roda.wui.api.v2.services.AuditLogService;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.utils.ApiUtils;
@@ -97,10 +96,10 @@ public class AuditLogController implements AuditLogRestService, Exportable {
 
   @PostMapping(path = "/import", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Import audit logs from replica instances to the primary", description = "In order to synchronized the audit logs between all RODA instances it is necessary that read-only RODA's send their logs to the read-write RODA.", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = MultipartFile.class))), responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GenericOkResponse.class))),
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StringResponse.class))),
     @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  public String importLogEntry(
+  public StringResponse importLogEntry(
     @Parameter(content = @Content(mediaType = "multipart/form-data", schema = @Schema(implementation = MultipartFile.class)), description = "Multipart file") @RequestPart(value = "file") MultipartFile resource) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
@@ -114,8 +113,7 @@ public class AuditLogController implements AuditLogRestService, Exportable {
       // delegate
       auditLogService.importLogEntries(resource.getInputStream(), filename);
 
-      return JsonUtils.getJsonFromObject(new GenericOkResponse("Audit logs successfully imported"),
-        GenericOkResponse.class);
+      return new StringResponse("Audit logs successfully imported");
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
@@ -131,7 +129,6 @@ public class AuditLogController implements AuditLogRestService, Exportable {
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, LogEntry.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, LogEntry.class));
   }
 }

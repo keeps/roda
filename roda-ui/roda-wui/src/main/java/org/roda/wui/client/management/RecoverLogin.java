@@ -10,22 +10,9 @@
  */
 package org.roda.wui.client.management;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
-import config.i18n.client.ClientMessages;
+import java.util.Arrays;
+import java.util.List;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
@@ -42,8 +29,23 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
-import java.util.Arrays;
-import java.util.List;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -147,7 +149,8 @@ public class RecoverLogin extends Composite {
   }
 
   private void validateEmailField() {
-    if (!email.getText().isEmpty() && email.getText().matches("^[_A-Za-z0-9-%+]+(\\.[_A-Za-z0-9-%+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z0-9-]+)$")) {
+    if (!email.getText().isEmpty() && email.getText()
+      .matches("^[_A-Za-z0-9-%+]+(\\.[_A-Za-z0-9-%+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z0-9-]+)$")) {
       email.removeStyleName("isWrong");
       emailError.setVisible(false);
     } else {
@@ -167,7 +170,8 @@ public class RecoverLogin extends Composite {
     boolean valid = true;
 
     // Check if the email field is empty
-    if (email.getText().isEmpty() || !email.getText().matches("^[_A-Za-z0-9-%+]+(\\.[_A-Za-z0-9-%+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z0-9-]+)$")) {
+    if (email.getText().isEmpty() || !email.getText()
+      .matches("^[_A-Za-z0-9-%+]+(\\.[_A-Za-z0-9-%+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z0-9-]+)$")) {
       valid = false;
       email.addStyleName("isWrong");
       emailError.setText(messages.emailNotValid());
@@ -207,13 +211,16 @@ public class RecoverLogin extends Composite {
         recaptchaResponse = null;
       }
       Services services = new Services("Recover login", "recover");
-      services.membersResource(s -> s.recoverLogin(email.getValue(), LocaleInfo.getCurrentLocale().getLocaleName(), recaptchaResponse)).whenComplete((res, error) -> {
-        if (error == null) {
-          showRecoverLoginMessage();
-        } else {
-          errorMessage(error);
-        }
-      });
+      services
+        .membersResource(
+          s -> s.recoverLogin(email.getValue(), LocaleInfo.getCurrentLocale().getLocaleName(), recaptchaResponse))
+        .whenComplete((res, error) -> {
+          if (error == null) {
+            showRecoverLoginMessage();
+          } else {
+            errorMessage(error);
+          }
+        });
     }
   }
 
@@ -231,18 +238,18 @@ public class RecoverLogin extends Composite {
 
   private void showRecoverLoginMessage() {
     Dialogs.showInformationDialog(messages.recoverLoginSuccessDialogTitle(),
-            messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(), false,
-            new AsyncCallback<Void>() {
+      messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(), false,
+      new AsyncCallback<Void>() {
 
-              @Override
-              public void onFailure(Throwable caught) {
-                HistoryUtils.newHistory(Login.RESOLVER);
-              }
+        @Override
+        public void onFailure(Throwable caught) {
+          HistoryUtils.newHistory(Login.RESOLVER);
+        }
 
-              @Override
-              public void onSuccess(Void result) {
-                HistoryUtils.newHistory(Login.RESOLVER);
-              }
-            });
+        @Override
+        public void onSuccess(Void result) {
+          HistoryUtils.newHistory(Login.RESOLVER);
+        }
+      });
   }
 }

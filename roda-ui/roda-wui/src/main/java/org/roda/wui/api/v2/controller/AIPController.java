@@ -14,12 +14,12 @@ import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.aip.AssessmentRequest;
 import org.roda.core.data.v2.aip.MoveRequest;
 import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.LongResponse;
+import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.generics.UpdatePermissionsRequest;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
@@ -60,7 +60,6 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
-import org.roda.wui.api.v2.model.GenericOkResponse;
 import org.roda.wui.api.v2.services.AIPService;
 import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.RepresentationService;
@@ -761,8 +760,7 @@ public class AIPController implements AIPRestService, Exportable {
 
         // If the bundle has values from the form, we need to update the XML by
         // applying the values of the form to the raw template
-        IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId,
-          RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+        IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         // check object permissions
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
@@ -1222,7 +1220,7 @@ public class AIPController implements AIPRestService, Exportable {
   }
 
   @Override
-  public String releaseAIPLock(String aipId) {
+  public StringResponse releaseAIPLock(String aipId) {
     boolean lockEnabled = RodaCoreFactory.getRodaConfiguration().getBoolean("core.aip.lockToEdit", false);
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
 
@@ -1231,8 +1229,7 @@ public class AIPController implements AIPRestService, Exportable {
       PluginHelper.releaseObjectLock(aipId, user.getUUID());
     }
 
-    return JsonUtils.getJsonFromObject(new GenericOkResponse("Lock for AIP " + aipId + " released"),
-      GenericOkResponse.class);
+    return new StringResponse("Lock for AIP " + aipId + " released");
   }
 
   @Override
@@ -1246,8 +1243,7 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // Check object permissions
-      IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId,
-        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
@@ -1283,8 +1279,7 @@ public class AIPController implements AIPRestService, Exportable {
       controllerAssistant.checkRoles(requestContext.getUser());
 
       // Check object permissions
-      IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId,
-        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
       // check state
@@ -1320,8 +1315,7 @@ public class AIPController implements AIPRestService, Exportable {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
           RodaConstants.CONTROLLER_METADATA_ID_PARAM, content.getId());
         // check object permissions
-        IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId,
-          RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+        IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
         // check state
@@ -1348,8 +1342,7 @@ public class AIPController implements AIPRestService, Exportable {
           RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
           RodaConstants.CONTROLLER_METADATA_ID_PARAM, content.getId());
         // check object permissions
-        IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId,
-          RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+        IndexedAIP aip = indexService.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
         // check state
@@ -1547,8 +1540,7 @@ public class AIPController implements AIPRestService, Exportable {
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedAIP.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedAIP.class));
   }
 
   @Override
