@@ -25,6 +25,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.base.maintenance.UpdatePermissionsPlugin;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
+import org.roda.wui.common.model.RequestContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,9 +34,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class DIPService {
 
-  public StreamResponse createStreamResponse(String dipUUID)
+  public StreamResponse createStreamResponse(RequestContext requestContext, String dipUUID)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = requestContext.getModelService();
 
     Optional<LiteRODAObject> liteDIP = LiteRODAObjectFactory.get(DIP.class, dipUUID);
     if (liteDIP.isEmpty()) {
