@@ -7,11 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.CountRequest;
@@ -74,13 +70,7 @@ public class RiskController implements RiskRestService, Exportable {
       RodaConstants.RISK_MITIGATION_STRATEGY, RodaConstants.RISK_MITIGATION_OWNER,
       RodaConstants.RISK_MITIGATION_OWNER_TYPE, RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE,
       RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE);
-    IndexedRisk retrieve = indexService.retrieve(IndexedRisk.class, uuid, fieldsToReturn);
-    try {
-      retrieve.setHasVersions(riskService.hasRiskVersions(uuid));
-    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-      throw new RESTException(e);
-    }
-    return retrieve;
+    return indexService.retrieve(IndexedRisk.class, uuid, fieldsToReturn);
   }
 
   @Override
@@ -103,6 +93,7 @@ public class RiskController implements RiskRestService, Exportable {
     return indexService.suggest(suggestRequest, IndexedRisk.class);
   }
 
+  @Override
   public Job deleteRisk(@RequestBody SelectedItemsRequest selected) {
     return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
       @Override
@@ -200,7 +191,7 @@ public class RiskController implements RiskRestService, Exportable {
           Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_INCIDENCES_COUNT));
         incidences = indexedRisk.getIncidencesCount();
 
-        return riskService.revertRiskVersion(id, versionId, properties, incidences);
+        return riskService.revertRiskVersion(requestContext.getModelService(), id, versionId, properties, incidences);
       }
     });
   }

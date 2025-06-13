@@ -30,8 +30,6 @@ import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.model.RequestContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,12 +37,11 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RiskService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RiskService.class);
-
-  public Risk revertRiskVersion(String riskId, String versionId, Map<String, String> properties, int incidences)
+  public Risk revertRiskVersion(ModelService modelService, String riskId, String versionId,
+    Map<String, String> properties, int incidences)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().revertRiskVersion(riskId, versionId, properties, false, incidences);
-    return RodaCoreFactory.getModelService().retrieveRisk(riskId);
+      modelService.revertRiskVersion(riskId, versionId, properties, false, incidences);
+      return modelService.retrieveRisk(riskId);
   }
 
   public void deleteRiskVersion(ModelService model, String riskId, String versionId)
@@ -91,13 +88,13 @@ public class RiskService {
       Collections.emptyMap(), "Could not execute risk delete action");
   }
 
-  public boolean hasRiskVersions(String riskId)
+  public boolean hasRiskVersions(String riskId, ModelService modelService)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Optional<LiteRODAObject> liteRisk = LiteRODAObjectFactory.get(Risk.class, riskId);
     if (liteRisk.isEmpty()) {
       throw new RequestNotValidException("Could not get LITE for Risk " + riskId);
     }
-    try (CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getModelService()
+    try (CloseableIterable<BinaryVersion> iterable = modelService
       .listBinaryVersions(liteRisk.get())) {
       return iterable.iterator().hasNext();
     } catch (IOException e) {
