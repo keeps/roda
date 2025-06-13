@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.LongResponse;
@@ -14,7 +12,6 @@ import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.api.incidences.UpdateRiskIncidences;
 import org.roda.core.model.utils.UserUtility;
@@ -24,7 +21,6 @@ import org.roda.wui.api.v2.services.RiskIncidenceService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.RiskIncidenceRestService;
-import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
@@ -116,22 +112,16 @@ public class RiskIncidenceController implements RiskIncidenceRestService, Export
 
   @Override
   public RiskIncidence updateRiskIncidence(@RequestBody RiskIncidence incidence) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      controllerAssistant.checkRoles(requestContext.getUser());
-      return riskIncidenceService.updateRiskIncidence(incidence);
-    } catch (AuthorizationDeniedException | GenericException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, incidence.getId(), state,
-        RodaConstants.CONTROLLER_INCIDENCE_PARAM, incidence);
-    }
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<RiskIncidence>() {
+      @Override
+      public RiskIncidence process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(incidence.getId());
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_INCIDENCE_PARAM, incidence);
+        return riskIncidenceService.updateRiskIncidence(requestContext.getModelService(), incidence);
+      }
+    });
   }
 
   @Override
