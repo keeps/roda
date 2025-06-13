@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
@@ -20,8 +16,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationEventsLinkingObjects;
-import org.roda.core.data.v2.log.LogEntryState;
-import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.storage.Binary;
 import org.roda.wui.api.v2.exceptions.RESTException;
@@ -30,7 +24,7 @@ import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.services.PreservationEventService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.client.services.PreservationEventRestService;
-import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,15 +63,16 @@ public class PreservationEventController implements PreservationEventRestService
   @Autowired
   PreservationEventService preservationEventService;
 
+  @Autowired
+  RequestHandler requestHandler;
+
   @Override
   public IndexedPreservationEvent findByUuid(String uuid, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(IndexedPreservationEvent.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedPreservationEvent> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(IndexedPreservationEvent.class, findRequest, localeString);
   }
 
@@ -93,66 +88,43 @@ public class PreservationEventController implements PreservationEventRestService
 
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, IndexedPreservationEvent.class);
   }
 
   @Override
   public List<IndexedPreservationAgent> getPreservationAgents(String id) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<List<IndexedPreservationAgent>>() {
+      @Override
+      public List<IndexedPreservationAgent> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(id);
+        preservationEventService.setIndexService(indexService);
+        IndexedPreservationEvent preservationEvent = findByUuid(id, "en");
 
-    preservationEventService.setIndexService(indexService);
-    IndexedPreservationEvent preservationEvent = findByUuid(id, "en");
-
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      Binary preservationEventBinary = preservationEventService.getPreservationEventBinary(preservationEvent,
-        requestContext);
-      return preservationEventService.getAgentsFromPreservationEventBinary(preservationEventBinary,
-        requestContext);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RequestNotValidException | NotFoundException | GenericException | ValidationException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, id, state);
-    }
+        Binary preservationEventBinary = preservationEventService.getPreservationEventBinary(preservationEvent,
+          requestContext);
+        return preservationEventService.getAgentsFromPreservationEventBinary(preservationEventBinary, requestContext);
+      }
+    });
   }
 
   @Override
   public PreservationEventsLinkingObjects getLinkingIdentifierObjects(String id) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<PreservationEventsLinkingObjects>() {
+      @Override
+      public PreservationEventsLinkingObjects process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(id);
 
-    preservationEventService.setIndexService(indexService);
-    IndexedPreservationEvent preservationEvent = findByUuid(id, "en");
+        preservationEventService.setIndexService(indexService);
+        IndexedPreservationEvent preservationEvent = findByUuid(id, "en");
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      Binary preservationEventBinary = preservationEventService.getPreservationEventBinary(preservationEvent,
-        requestContext);
-      return preservationEventService.getLinkingObjectsFromPreservationEventBinary(preservationEventBinary,
-        requestContext);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RequestNotValidException | NotFoundException | GenericException | ValidationException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, id, state);
-    }
+        Binary preservationEventBinary = preservationEventService.getPreservationEventBinary(preservationEvent,
+          requestContext);
+        return preservationEventService.getLinkingObjectsFromPreservationEventBinary(preservationEventBinary,
+          requestContext);
+      }
+    });
   }
 
   @GetMapping(path = "/{id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -163,33 +135,27 @@ public class PreservationEventController implements PreservationEventRestService
   public ResponseEntity<StreamingResponseBody> downloadPreservationEvent(
     @Parameter(description = "The id of the preservation event", required = true) @PathVariable(name = "id") String id,
     @RequestHeader HttpHeaders headers) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-      IndexedPreservationEvent preservationEvent = indexService.retrieve(
-              IndexedPreservationEvent.class, id, new ArrayList<>());
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(id);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM, id);
+        IndexedPreservationEvent preservationEvent = indexService.retrieve(IndexedPreservationEvent.class, id,
+          new ArrayList<>());
 
-      if (preservationEvent.getAipID() != null) {
-        controllerAssistant.checkObjectPermissions(requestContext.getUser(),
-          SelectedItemsList.create(IndexedAIP.class, preservationEvent.getAipID()));
+        if (preservationEvent.getAipID() != null) {
+          controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+            SelectedItemsList.create(IndexedAIP.class, preservationEvent.getAipID()));
+        }
+
+        StreamResponse response = preservationEventService.retrievePreservationEventFile(preservationEvent,
+          requestContext);
+
+        return ApiUtils.okResponse(response);
       }
-
-      StreamResponse response = preservationEventService.retrievePreservationEventFile(preservationEvent,
-        requestContext);
-
-      return ApiUtils.okResponse(response);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, id, state,
-        RodaConstants.CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM, id);
-    }
+    });
   }
 
   @GetMapping(path = "/{id}/details/html", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -201,41 +167,34 @@ public class PreservationEventController implements PreservationEventRestService
     @Parameter(description = "The id of the preservation event", required = true) @PathVariable(name = "id") String id,
     @Parameter(description = "language", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String locale,
     @RequestHeader HttpHeaders headers) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-      IndexedPreservationEvent preservationEvent = indexService.retrieve(
-              IndexedPreservationEvent.class, id, new ArrayList<>());
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(id);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM, id);
+        IndexedPreservationEvent preservationEvent = indexService.retrieve(IndexedPreservationEvent.class, id,
+          new ArrayList<>());
 
-      if (preservationEvent.getAipID() != null) {
-        controllerAssistant.checkObjectPermissions(requestContext.getUser(),
-          SelectedItemsList.create(IndexedAIP.class, preservationEvent.getAipID()));
+        if (preservationEvent.getAipID() != null) {
+          controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+            SelectedItemsList.create(IndexedAIP.class, preservationEvent.getAipID()));
+        }
+
+        StreamResponse response = preservationEventService.retrievePreservationEventDetails(preservationEvent,
+          requestContext, locale);
+
+        return ApiUtils.okResponse(response);
       }
-
-      StreamResponse response = preservationEventService.retrievePreservationEventDetails(preservationEvent,
-        requestContext, locale);
-
-      // Nao precisa de range response
-      return ApiUtils.okResponse(response);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, id, state,
-        RodaConstants.CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM, id);
-    }
+    });
   }
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
-      IndexedPreservationEvent.class));
+    return ApiUtils.okResponse(
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedPreservationEvent.class));
   }
 }

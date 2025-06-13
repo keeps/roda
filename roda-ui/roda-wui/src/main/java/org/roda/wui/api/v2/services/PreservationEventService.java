@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -235,7 +234,7 @@ public class PreservationEventService {
   public Binary getPreservationEventBinary(IndexedPreservationEvent preservationEvent, RequestContext context)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
 
-    ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = context.getModelService();
     Binary binary;
 
     if (preservationEvent.getObjectClass().equals(IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY)) {
