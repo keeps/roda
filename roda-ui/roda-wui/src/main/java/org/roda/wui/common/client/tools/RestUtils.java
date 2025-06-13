@@ -57,11 +57,11 @@ public class RestUtils {
 
   public static SafeUri createRepresentationDownloadUri(String aipId, String representationId) {
 
-    // api/v2/representations/{aip_id}/{representation_id}/binary
+    // api/v2/{aip_id}/representations/{representation_id}/binary
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_REPRESENTATIONS).append(RodaConstants.API_SEP)
-      .append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_SEP).append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
       .append(URL.encodeQueryString(representationId)).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
 
     return UriUtils.fromSafeConstant(b.toString());
@@ -69,11 +69,11 @@ public class RestUtils {
 
   public static SafeUri createRepresentationOtherMetadataDownloadUri(String aipId, String representationId) {
 
-    // api/v2/representations/{aip_id}/{representation_id}/other-metadata/binary
+    // api/v2/aip/{aip_id}/representations/{representation_id}/other-metadata/download
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_REPRESENTATIONS).append(RodaConstants.API_SEP)
-      .append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+    b.append(RodaConstants.API_REST_V2_AIPS).append(RodaConstants.API_SEP).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_SEP).append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
       .append(URL.encodeQueryString(representationId)).append(RodaConstants.API_REST_V2_REPRESENTATION_OTHER_METADATA)
       .append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
 

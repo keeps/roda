@@ -11,6 +11,7 @@ import java.util.MissingResourceException;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.coyote.Request;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -47,6 +48,7 @@ import org.roda.core.storage.Binary;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.HTMLUtils;
+import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,9 +106,9 @@ public class RepresentationService {
     return model.retrieveRepresentation(aipId, representationId);
   }
 
-  public StreamResponse retrieveAIPRepresentationBinary(IndexedRepresentation representation)
+  public StreamResponse retrieveAIPRepresentationBinary(RequestContext requestContext, IndexedRepresentation representation)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return ApiUtils.download(representation);
+    return ApiUtils.download(requestContext, representation);
   }
 
   public Representation createRepresentation(User user, String aipId, String representationId, String type,
@@ -219,9 +221,9 @@ public class RepresentationService {
     return new StreamResponse(stream);
   }
 
-  public StreamResponse retrieveAIPRepresentationOtherMetadata(IndexedRepresentation representation)
+  public StreamResponse retrieveAIPRepresentationOtherMetadata(RequestContext requestContext, IndexedRepresentation representation)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return ApiUtils.download(representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
+    return ApiUtils.download(requestContext, representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
       RodaConstants.STORAGE_DIRECTORY_OTHER);
   }
 

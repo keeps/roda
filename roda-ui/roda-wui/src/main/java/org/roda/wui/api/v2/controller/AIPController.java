@@ -163,33 +163,29 @@ public class AIPController implements AIPRestService, Exportable {
     @Parameter(description = "The ID of the existing aip", required = true) @PathVariable(name = "id") String aipId,
     @Parameter(description = "The ID of the existing representation", required = true) @PathVariable(name = "representation-id") String representationId,
     @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-      // delegate
-      String indexedRepresentationId = IdUtils.getRepresentationId(aipId, representationId);
-      IndexedRepresentation representation = RodaCoreFactory.getIndexService().retrieve(IndexedRepresentation.class,
-        indexedRepresentationId, new ArrayList<>());
+        String indexedRepresentationId = IdUtils.getRepresentationId(aipId, representationId);
 
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), representation);
-      StreamResponse streamResponse = representationService.retrieveAIPRepresentationBinary(representation);
+        IndexedRepresentation representation = requestContext.getIndexService().retrieve(IndexedRepresentation.class,
+          indexedRepresentationId, new ArrayList<>());
 
-      return ApiUtils.okResponse(streamResponse);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (GenericException | NotFoundException | RequestNotValidException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
-        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
-    }
+        controllerAssistant.setRelatedObjectId(aipId);
+
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+          RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
+
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), representation);
+
+        StreamResponse streamResponse = representationService.retrieveAIPRepresentationBinary(requestContext,
+          representation);
+
+        return ApiUtils.okResponse(streamResponse);
+      }
+    });
   }
 
   @GetMapping(path = "/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID
@@ -202,33 +198,31 @@ public class AIPController implements AIPRestService, Exportable {
     @Parameter(description = "The ID of the existing aip", required = true) @PathVariable(name = RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @Parameter(description = "The ID of the existing representation", required = true) @PathVariable(name = RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
 
-    LogEntryState state = LogEntryState.SUCCESS;
+        String indexedRepresentationId = IdUtils.getRepresentationId(aipId, representationId);
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-      // delegate
-      String indexedRepresentationId = IdUtils.getRepresentationId(aipId, representationId);
-      IndexedRepresentation representation = RodaCoreFactory.getIndexService().retrieve(IndexedRepresentation.class,
-        indexedRepresentationId, new ArrayList<>());
+        IndexedRepresentation representation = requestContext.getIndexService().retrieve(IndexedRepresentation.class,
+          indexedRepresentationId, new ArrayList<>());
 
-      controllerAssistant.checkObjectPermissions(requestContext.getUser(), representation);
+        controllerAssistant.setRelatedObjectId(aipId);
 
-      StreamResponse streamResponse = representationService.retrieveAIPRepresentationOtherMetadata(representation);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+          RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
 
-      return ApiUtils.okResponse(streamResponse, null);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
-        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
-    }
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), representation);
+
+        StreamResponse streamResponse = representationService.retrieveAIPRepresentationOtherMetadata(requestContext,
+          representation);
+
+        return ApiUtils.okResponse(streamResponse, null);
+      }
+    });
   }
+
 
   @Override
   public List<IndexedAIP> getAncestors(String id) {
