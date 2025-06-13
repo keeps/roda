@@ -1124,12 +1124,8 @@ button:after {
     content: "\e73c";
 }
 
-.btn-unlock:after {
-    content: "\e932";
-}
-
 .btn-lift-hold:after {
-    content: "\e931";
+    content: "\e898";
 }
 
 .btn-edit + .btn-edit {
