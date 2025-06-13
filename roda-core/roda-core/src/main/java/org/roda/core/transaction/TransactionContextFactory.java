@@ -45,7 +45,7 @@ public class TransactionContextFactory {
     return new TransactionalContext(transactionLog, storageService, modelService, indexService);
   }
 
-  private TransactionalStorageService createTransactionalStorageService(StorageService mainStorageService,
+  public TransactionalStorageService createTransactionalStorageService(StorageService mainStorageService,
     TransactionLog transactionLog) throws RODATransactionException {
 
     Path stagingStoragePath = Paths.get(configurationManager.getRodaConfiguration()
