@@ -13,6 +13,8 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.storage.StorageService;
+import org.roda.core.storage.TransactionalStorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +61,17 @@ public class RODATransactionManager {
 
     TransactionLog transactionLog = transactionLogService.createTransactionLog(requestType, requestId);
     TransactionalContext context = transactionContextFactory.create(transactionLog, mainModelService);
+
+    transactionsContext.put(transactionLog.getId(), context);
+    return context;
+  }
+
+  public TransactionalContext beginTestTransaction(StorageService mainStorage) throws RODATransactionException {
+    TransactionLog transactionLog = transactionLogService
+      .createTransactionLog(TransactionLog.TransactionRequestType.NON_DEFINED, UUID.randomUUID());
+    TransactionalStorageService transactionalStorageService = transactionContextFactory
+      .createTransactionalStorageService(mainStorage, transactionLog);
+    TransactionalContext context = new TransactionalContext(transactionLog, transactionalStorageService, null, null);
 
     transactionsContext.put(transactionLog.getId(), context);
     return context;
