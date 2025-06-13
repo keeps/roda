@@ -582,11 +582,17 @@ public class FileStorageService implements StorageService {
   @Override
   public Class<? extends Entity> getEntity(StoragePath storagePath) throws NotFoundException {
     Path entity = FSUtils.getEntityPath(basePath, storagePath);
-    if (FSUtils.exists(entity)) {
-      return getEntityClass(storagePath, entity);
-    } else {
-      return getEntityExternalFile(storagePath);
+    if (!FSUtils.exists(entity)) {
+      try {
+        ShallowFile shallowFile = FSUtils.isResourcePresentOnManifestFile(entity);
+        if (shallowFile != null) {
+          return getEntityExternalFile(storagePath);
+        }
+      } catch (GenericException e) {
+        throw new NotFoundException("Entity was not found: " + storagePath, e);
+      }
     }
+    return getEntityClass(storagePath, entity);
   }
 
   public Class<? extends Entity> getEntityExternalFile(StoragePath storagePath) throws NotFoundException {

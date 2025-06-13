@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -26,7 +25,9 @@ import org.roda.core.entity.transaction.OperationState;
 import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
+import org.roda.core.transaction.ConsolidatedOperation;
 import org.roda.core.transaction.RODATransactionException;
+import org.roda.core.transaction.TransactionLogConsolidator;
 import org.roda.core.transaction.TransactionLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -686,35 +687,37 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   @Override
   public void commit() throws RODATransactionException {
-    for (TransactionalStoragePathOperationLog storagePathLog : getStoragePathsOperations(transaction)) {
-      Path path = Paths.get(storagePathLog.getStoragePath());
-      List<String> parts = StreamSupport.stream(path.spliterator(), false).map(Path::toString)
-        .collect(Collectors.toList());
-      DefaultStoragePath storagePath = null;
-      try {
-        storagePath = DefaultStoragePath.parse(parts);
+    try {
+      Map<StoragePath, List<ConsolidatedOperation>> consolidatedOperations = TransactionLogConsolidator
+        .consolidateLogs(transactionLogService.getStoragePathsOperations(transaction.getId()));
+      for (Map.Entry<StoragePath, List<ConsolidatedOperation>> consolidatedOperation : consolidatedOperations
+        .entrySet()) {
+        StoragePath storagePath = consolidatedOperation.getKey();
+        List<ConsolidatedOperation> operations = consolidatedOperation.getValue();
 
-        OperationType operationType = storagePathLog.getOperationType();
-        String version = storagePathLog.getVersion();
+        for (ConsolidatedOperation operation : operations) {
+          OperationType operationType = operation.operationType();
+          String version = operation.version();
 
-        if (operationType == OperationType.DELETE) {
-          handleDeleteOperation(storagePath, path, version);
-        } else if (operationType == OperationType.UPDATE) {
-          handleUpdateOperation(storagePath, version);
-        } else if (operationType == OperationType.CREATE) {
-          handleCreateOperation(storagePath, version);
-        } else {
-          // TODO: READ
-          LOGGER.debug("Skipping read operation for storage path: {}", storagePathLog.getStoragePath());
+          if (operationType == OperationType.DELETE) {
+            handleDeleteOperation(storagePath, version);
+          } else if (operationType == OperationType.UPDATE) {
+            handleUpdateOperation(storagePath, version);
+          } else if (operationType == OperationType.CREATE) {
+            handleCreateOperation(storagePath, version);
+          } else if (operationType == OperationType.READ) {
+            // TODO: READ
+            LOGGER.debug("Skipping read operation for storage path: {}", storagePath);
+          }
         }
-      } catch (RequestNotValidException e) {
-        throw new RODATransactionException("Failed to parse storage path: " + path, e);
+
       }
+    } catch (RequestNotValidException e) {
+      throw new RODATransactionException("Failed to consolidate transaction logs", e);
     }
   }
 
-  private void handleDeleteOperation(DefaultStoragePath storagePath, Path path, String version)
-    throws RODATransactionException {
+  private void handleDeleteOperation(StoragePath storagePath, String version) throws RODATransactionException {
     if (mainStorageService.exists(storagePath)) {
       try {
         if (version != null) {
@@ -723,12 +726,12 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
           mainStorageService.deleteResource(storagePath);
         }
       } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
-        throw new RODATransactionException("Failed to delete storage path at " + path, e);
+        throw new RODATransactionException("Failed to delete storage path at " + storagePath, e);
       }
     }
   }
 
-  private void handleUpdateOperation(DefaultStoragePath storagePath, String version) throws RODATransactionException {
+  private void handleUpdateOperation(StoragePath storagePath, String version) throws RODATransactionException {
     try {
       if (version != null) {
         LOGGER.info("Importing binary version from staging to main storage service: {}", storagePath);
@@ -745,7 +748,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     }
   }
 
-  private void handleCreateOperation(DefaultStoragePath storagePath, String version) throws RODATransactionException {
+  private void handleCreateOperation(StoragePath storagePath, String version) throws RODATransactionException {
     try {
       if (version != null) {
         LOGGER.info("Creating binary version from staging to main storage service: {}", storagePath);
@@ -767,29 +770,6 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       throw new RODATransactionException("Failed to copy storage path from staging to main storage service: "
         + storagePath + ". (transactionID:" + transaction.getId() + ")", e);
     }
-  }
-
-  private void handleCopyOperation(DefaultStoragePath storagePath, String version) throws RODATransactionException {
-    try {
-      if (version != null) {
-        LOGGER.info("Creating binary version from staging to main storage service: {}", storagePath);
-        mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
-      } else {
-        LOGGER.info("Moving resource from staging to main storage service: {}", storagePath);
-        Class<? extends Entity> rootEntity = getEntity(storagePath);
-        StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
-          storagePath, rootEntity);
-      }
-    } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
-      | AuthorizationDeniedException e) {
-      throw new RODATransactionException("Failed to copy storage path from staging to main storage service: "
-        + storagePath + ". (transactionID:" + transaction.getId() + ")", e);
-    }
-  }
-
-  private List<TransactionalStoragePathOperationLog> getStoragePathsOperations(TransactionLog transaction)
-    throws RODATransactionException {
-    return transactionLogService.getStoragePathsOperations(transaction.getId());
   }
 
   private void copyMissingResourcesToStagingStorage(StoragePath storagePath)
