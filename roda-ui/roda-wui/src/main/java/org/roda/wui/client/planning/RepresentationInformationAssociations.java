@@ -98,7 +98,8 @@ public class RepresentationInformationAssociations extends Composite {
     ListBuilder<RepresentationInformation> representationInformationAssociationsListBuilder = new ListBuilder<>(
       () -> new RepresentationInformationList(),
       new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationAssociations_RI")
-        .bindOpener().withActionable(RepresentationInformationActions.getForAssociation(filter)).withFilter(filter)
+        .bindOpener().withActionable(RepresentationInformationActions.getForAssociation(filter)).withActionWhitelist(List.of(RepresentationInformationActions.RepresentationInformationAction.ASSOCIATE_WITH_EXISTING,
+                              RepresentationInformationActions.RepresentationInformationAction.ASSOCIATE_WITH_NEW)).withFilter(filter)
         .withRedirectOnSingleResult(true)
         .withSearchPlaceholder(messages.representationInformationRegisterSearchPlaceHolder()));
 
