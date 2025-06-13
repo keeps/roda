@@ -769,24 +769,6 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     }
   }
 
-  private void handleCopyOperation(DefaultStoragePath storagePath, String version) throws RODATransactionException {
-    try {
-      if (version != null) {
-        LOGGER.info("Creating binary version from staging to main storage service: {}", storagePath);
-        mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
-      } else {
-        LOGGER.info("Moving resource from staging to main storage service: {}", storagePath);
-        Class<? extends Entity> rootEntity = getEntity(storagePath);
-        StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
-          storagePath, rootEntity);
-      }
-    } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
-      | AuthorizationDeniedException e) {
-      throw new RODATransactionException("Failed to copy storage path from staging to main storage service: "
-        + storagePath + ". (transactionID:" + transaction.getId() + ")", e);
-    }
-  }
-
   private List<TransactionalStoragePathOperationLog> getStoragePathsOperations(TransactionLog transaction)
     throws RODATransactionException {
     return transactionLogService.getStoragePathsOperations(transaction.getId());

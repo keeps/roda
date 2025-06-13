@@ -476,4 +476,35 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
       // do nothing
     }
   }
+
+  @Test
+  public void testTransactionalDeleteAfterCopy() throws RODAException {
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(containerStoragePath);
+
+    final StoragePath targetContainerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(targetContainerStoragePath);
+
+    // 1) create folders
+    final StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final StoragePath subDirectoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    storage.createDirectory(directoryStoragePath);
+    storage.createDirectory(subDirectoryStoragePath);
+
+    final StoragePath targetDirectoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(targetContainerStoragePath);
+    System.out.println("Copying from " + directoryStoragePath + " to " + targetDirectoryStoragePath);
+
+
+    // 2) create binary
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(subDirectoryStoragePath);
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage.createBinary(binaryStoragePath, payload, false);
+
+    TransactionalContext context = transactionManager.beginTransaction();
+    TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+
+    transactionalStorage.copy(storage, directoryStoragePath, targetDirectoryStoragePath);
+    transactionalStorage.deleteResource(targetDirectoryStoragePath);
+    transactionManager.endTransaction(context.transactionLog().getId());
+  }
 }

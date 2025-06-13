@@ -5,11 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.roda.core.entity.transaction.OperationState;
-import org.roda.core.entity.transaction.OperationType;
-import org.roda.core.entity.transaction.TransactionLog;
-import org.roda.core.entity.transaction.TransactionalModelOperationLog;
-import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
+import org.roda.core.entity.transaction.*;
 import org.roda.core.repository.transaction.TransactionLogRepository;
 import org.roda.core.repository.transaction.TransactionalModelOperationLogRepository;
 import org.roda.core.repository.transaction.TransactionalStoragePathRepository;
@@ -63,8 +59,7 @@ public class TransactionLogService {
 
   @Transactional
   public TransactionalStoragePathOperationLog registerStoragePathOperation(UUID transactionId, String storagePath,
-    OperationType operation,
-    String version) throws RODATransactionException {
+    OperationType operation, String version) throws RODATransactionException {
     if (operation == OperationType.READ) {
       // TODO: add a configuration to allow logging the read operation for debugging
       // purposes
@@ -87,16 +82,18 @@ public class TransactionLogService {
   public List<TransactionalStoragePathOperationLog> getStoragePathsOperations(UUID transactionId)
     throws RODATransactionException {
     TransactionLog transactionLog = getTransactionLogById(transactionId);
-    return transactionalStoragePathRepository.findByTransactionLogOrderByUpdatedAt(transactionLog);
+    return transactionalStoragePathRepository.findByTransactionLogOrderByUpdatedAt(transactionLog,
+      OperationState.SUCCESS);
   }
 
   @Transactional
   public Optional<TransactionalStoragePathOperationLog> getLastStoragePathOperation(UUID transactionId,
     String storagePath) throws RODATransactionException {
     TransactionLog transactionLog = getTransactionLogById(transactionId);
-    return transactionalStoragePathRepository.findByTransactionLogAndStoragePath(transactionLog, storagePath).stream()
+    return transactionalStoragePathRepository
+      .findByTransactionLogAndStoragePath(transactionLog, OperationState.SUCCESS, storagePath).stream()
       .filter(operationLog -> isMutatingOperation(operationLog.getOperationType()))
-      .max(Comparator.comparing(TransactionalStoragePathOperationLog::getCreatedAt));
+      .max(Comparator.comparing(TransactionalStoragePathOperationLog::getUpdatedAt));
   }
 
   private boolean isMutatingOperation(OperationType operationType) {
