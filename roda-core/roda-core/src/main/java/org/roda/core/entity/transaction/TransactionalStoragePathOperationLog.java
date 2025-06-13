@@ -6,8 +6,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.roda.core.data.v2.ip.StoragePath;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -47,17 +45,30 @@ public class TransactionalStoragePathOperationLog implements Serializable {
   @Column(name = "operation_type", nullable = false)
   private OperationType operationType;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "operation_state", nullable = false)
+  private OperationState operationState;
+
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
+
+  @Column(name = "updated_at")
+  private LocalDateTime updatedAt;
 
   public TransactionalStoragePathOperationLog() {
   }
 
-  public TransactionalStoragePathOperationLog(StoragePath storagePath, OperationType operationType, String version) {
-    this.storagePath = storagePath.toString();
+  public TransactionalStoragePathOperationLog(String storagePath, OperationType operationType, String version) {
+    this.storagePath = storagePath;
     this.operationType = operationType;
+    this.operationState = OperationState.RUNNING;
     this.version = version;
     this.createdAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  public UUID getId() {
+    return id;
   }
 
   public String getStoragePath() {
@@ -74,6 +85,19 @@ public class TransactionalStoragePathOperationLog implements Serializable {
 
   public String getVersion() {
     return version;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public OperationState getOperationState() {
+    return operationState;
+  }
+
+  public void setOperationState(OperationState operationState) {
+    this.updatedAt = LocalDateTime.now();
+    this.operationState = operationState;
   }
 
   @Override

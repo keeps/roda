@@ -96,24 +96,25 @@ public interface ModelService extends ModelObservable {
     NotFoundException, ValidationException;
 
   AIP createAIP(String parentId, String type, Permissions permissions, List<String> ingestSIPIds, String ingestJobId,
-    boolean notify, String createdBy, boolean isGhost) throws RequestNotValidException, NotFoundException,
+    boolean notify, String createdBy, boolean isGhost, String aipId) throws RequestNotValidException, NotFoundException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException;
 
-  AIP createAIP(String parentId, String type, Permissions permissions, String createdBy)
+  AIP createAIP(String parentId, String type, Permissions permissions, String createdBy, String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException;
 
-  AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy)
+  AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy, String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException;
 
-  AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify, String createdBy)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+  AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify, String createdBy,
+    String aipId) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException;
 
   AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String ingestSIPUUID,
-    List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException;
+    List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy, String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException;
 
   AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, String createdBy)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
@@ -162,11 +163,8 @@ public interface ModelService extends ModelObservable {
   DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String representationId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
-  boolean checkIfDescriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException;
-
   DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId, ContentPayload payload,
-                                                String descriptiveMetadataType, String descriptiveMetadataVersion, String createdBy, boolean notify)
+    String descriptiveMetadataType, String descriptiveMetadataVersion, String createdBy, boolean notify)
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
     NotFoundException;
 
@@ -456,8 +454,8 @@ public interface ModelService extends ModelObservable {
     List<String> filePath, String fileId, String type)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
 
-  void importLogEntries(InputStream inputStream, String filename) throws AuthorizationDeniedException, GenericException,
-    AlreadyExistsException, RequestNotValidException, NotFoundException;
+  List<LogEntry> importLogEntries(InputStream inputStream, String filename) throws AuthorizationDeniedException,
+    GenericException, AlreadyExistsException, RequestNotValidException, NotFoundException;
 
   void addLogEntry(LogEntry logEntry, Path logDirectory, boolean notify)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
@@ -465,10 +463,10 @@ public interface ModelService extends ModelObservable {
   void addLogEntry(LogEntry logEntry, Path logDirectory)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
-  void findOldLogsAndSendThemToMaster(Path logDirectory, Path currentLogFile);
+  void findOldLogsAndSendThemToMaster(Path logDirectory, Path currentLogFile) throws IOException;
 
   void findOldLogsAndMoveThemToStorage(Path logDirectory, Path currentLogFile)
-    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException;
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, IOException;
 
   User retrieveAuthenticatedUser(String name, String password) throws GenericException, AuthenticationDeniedException;
 
@@ -605,7 +603,7 @@ public interface ModelService extends ModelObservable {
   Risk retrieveRisk(String riskId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
-  BinaryVersion retrieveVersion(String id, String versionId)
+  BinaryVersion retrieveVersion(String riskId, String versionId)
     throws RequestNotValidException, GenericException, NotFoundException;
 
   BinaryVersion revertRiskVersion(String riskId, String versionId, Map<String, String> properties, boolean commit,
@@ -721,7 +719,8 @@ public interface ModelService extends ModelObservable {
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException;
 
-  boolean checkIfSchemaExists(String aipId, String representationId, List<String> directoryPath, String fileId) throws RequestNotValidException;
+  boolean checkIfSchemaExists(String aipId, String representationId, List<String> directoryPath, String fileId)
+    throws RequestNotValidException;
 
   <T extends IsRODAObject> Optional<LiteRODAObject> retrieveLiteFromObject(T object);
 
@@ -1011,9 +1010,11 @@ public interface ModelService extends ModelObservable {
   String getObjectPathAsString(LiteRODAObject lite, boolean skipContainer)
     throws RequestNotValidException, GenericException;
 
-  boolean existsInStorage(LiteRODAObject lite, String... pathPartials) throws RequestNotValidException, GenericException;
+  boolean existsInStorage(LiteRODAObject lite, String... pathPartials)
+    throws RequestNotValidException, GenericException;
 
   Date retrieveFileCreationDate(File file) throws RequestNotValidException, GenericException;
 
-  Date retrievePreservationMetadataCreationDate(PreservationMetadata pm) throws RequestNotValidException, GenericException;
+  Date retrievePreservationMetadataCreationDate(PreservationMetadata pm)
+    throws RequestNotValidException, GenericException;
 }

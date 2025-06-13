@@ -7,9 +7,13 @@
  */
 package org.roda.core.storage;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -181,5 +185,101 @@ public final class StorageServiceUtils {
     toChildAbsolutePath.addAll(fromChildRelativePath);
 
     return DefaultStoragePath.parse(toChildAbsolutePath);
+  }
+
+  public static CloseableIterable<Resource> listTransactionalResourcesUnderContainer(
+    StorageService stagingStorageService, StorageService mainStorageService, StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    CloseableIterable<Resource> stagingResources = stagingStorageService.listResourcesUnderContainer(storagePath,
+      recursive);
+    CloseableIterable<Resource> mainResources = mainStorageService.listResourcesUnderContainer(storagePath, recursive);
+    return listTransactionalResourcesUnder(stagingResources, mainResources);
+  }
+
+  public static CloseableIterable<Resource> listTransactionalResourcesUnderDirectory(
+    StorageService stagingStorageService, StorageService mainStorageService, StoragePath storagePath, boolean recursive)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    CloseableIterable<Resource> stagingResources;
+    CloseableIterable<Resource> mainResources;
+
+    if (stagingStorageService.exists(storagePath)) {
+      stagingResources = stagingStorageService.listResourcesUnderDirectory(storagePath, recursive);
+    } else {
+      stagingResources = new EmptyClosableIterable<>();
+    }
+
+    if (mainStorageService.exists(storagePath)) {
+      mainResources = mainStorageService.listResourcesUnderDirectory(storagePath, recursive);
+    } else {
+      mainResources = new EmptyClosableIterable<>();
+    }
+
+    return listTransactionalResourcesUnder(stagingResources, mainResources);
+  }
+
+  private static CloseableIterable<Resource> listTransactionalResourcesUnder(
+    CloseableIterable<Resource> stagingResources, CloseableIterable<Resource> mainResources) {
+
+    return new CloseableIterable<Resource>() {
+      @Override
+      public void close() throws IOException {
+        stagingResources.close();
+        mainResources.close();
+      }
+
+      @Override
+      public Iterator<Resource> iterator() {
+        return new Iterator<Resource>() {
+          private final Iterator<Resource> stagingIterator = stagingResources.iterator();
+          private final Iterator<Resource> mainIterator = mainResources.iterator();
+          private final Set<StoragePath> seenPaths = new HashSet<>();
+          private Resource nextItem = null;
+
+          {
+            advance();
+          }
+
+          private void advance() {
+            nextItem = null;
+
+            // Consume staging first
+            while (stagingIterator.hasNext()) {
+              Resource res = stagingIterator.next();
+              StoragePath path = res.getStoragePath();
+              if (seenPaths.add(path)) {
+                nextItem = res;
+                return;
+              }
+            }
+
+            // Then consume main lazily, skipping seen paths
+            while (mainIterator.hasNext()) {
+              Resource res = mainIterator.next();
+              StoragePath path = res.getStoragePath();
+              if (seenPaths.contains(path)) {
+                continue;
+              }
+              nextItem = res;
+              return;
+            }
+          }
+
+          @Override
+          public boolean hasNext() {
+            return nextItem != null;
+          }
+
+          @Override
+          public Resource next() {
+            if (nextItem == null) {
+              throw new NoSuchElementException();
+            }
+            Resource current = nextItem;
+            advance();
+            return current;
+          }
+        };
+      }
+    };
   }
 }

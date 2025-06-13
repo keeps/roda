@@ -403,6 +403,20 @@ public class FSUtils {
     return storagePath.asString(SEPARATOR, SEPARATOR_REGEX, SEPARATOR_REPLACEMENT, skipContainer);
   }
 
+  public static StoragePath getStoragePathFromString(String stringStoragePath) throws RequestNotValidException {
+    if (StringUtils.isBlank(stringStoragePath)) {
+      return DefaultStoragePath.empty();
+    }
+    List<String> pathPartials = new ArrayList<>();
+    String[] parts = stringStoragePath.split(SEPARATOR_REGEX);
+    for (String part : parts) {
+      if (StringUtils.isNotBlank(part)) {
+        pathPartials.add(decodePathPartial(part));
+      }
+    }
+    return DefaultStoragePath.parse(pathPartials);
+  }
+
   /**
    * Lists direct access resources under a direct access resource
    * 

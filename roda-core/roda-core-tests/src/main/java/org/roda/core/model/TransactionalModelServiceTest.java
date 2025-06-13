@@ -1,5 +1,6 @@
 package org.roda.core.model;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hamcrest.Matchers;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -36,10 +38,16 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.security.LdapUtilityTestHelper;
+import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.RandomMockContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StorageServiceUtils;
+import org.roda.core.storage.StorageTestUtils;
 import org.roda.core.storage.TransactionalStorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.transaction.RODATransactionManager;
 import org.roda.core.transaction.TransactionalContext;
@@ -52,6 +60,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
+import org.testng.AssertJUnit;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -106,13 +115,15 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
     logPath = RodaCoreFactory.getLogPath();
     storage = RodaCoreFactory.getStorageService();
     model = RodaCoreFactory.getModelService();
+
+    transactionManager.setMainModelService(model);
   }
 
   @AfterClass
   public void cleanup() throws NotFoundException, GenericException, IOException {
     ldapUtilityTestHelper.shutdown();
     RodaCoreFactory.shutdown();
-    // FSUtils.deletePath(basePath);
+    FSUtils.deletePath(basePath);
   }
 
   @Test
@@ -280,5 +291,189 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
       "Missing files in the staging area: " + stagingAipStoragePathList);
 
     transactionManager.endTransaction(context.transactionLog().getId());
+  }
+
+  @Test
+  public void testListTransactionalResourcesUnderContainer() throws RODAException {
+    TransactionalContext context = transactionManager.beginTransaction();
+    TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+
+    // Create a common container in both storage and transactional storage
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(containerStoragePath);
+    transactionalStorage.createContainer(containerStoragePath);
+
+    // Create directories in both storage and transactional storage, this should be listed once
+    StoragePath directoryStoragePath1 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage.createDirectory(directoryStoragePath1);
+    transactionalStorage.createDirectory(directoryStoragePath1);
+
+    // Create directory in storage only
+    StoragePath directoryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage.createDirectory(directoryStoragePath2);
+
+    // Create directory in transactional storage only
+    StoragePath directoryStoragePath3 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    transactionalStorage.createDirectory(directoryStoragePath3);
+
+
+    for (Resource resource : storage.listResourcesUnderContainer(containerStoragePath, true)) {
+      System.out.println("Resource in storage: " + resource.getStoragePath());
+    }
+
+    for (Resource resource : transactionalStorage.listResourcesUnderContainer(containerStoragePath, true)) {
+      System.out.println("Resource in transactionalStorage: " + resource.getStoragePath());
+    }
+
+    for (Resource resource : StorageServiceUtils.listTransactionalResourcesUnderContainer(transactionalStorage, storage, containerStoragePath, true)) {
+      System.out.println("Resource in both storage: " + resource.getStoragePath());
+    }
+
+    CloseableIterable<Resource> resources = StorageServiceUtils.listTransactionalResourcesUnderContainer(transactionalStorage, storage, containerStoragePath, true);
+    AssertJUnit.assertNotNull(resources);
+    assertThat(resources, Matchers.<Resource> iterableWithSize(3));
+  }
+
+  @Test
+  public void testListTransactionalResourcesUnderDirectory() throws RODAException {
+    TransactionalContext context = transactionManager.beginTransaction();
+    TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+
+    // Create a common container and directories in both storage and transactional storage
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage.createContainer(containerStoragePath);
+    storage.createDirectory(directoryStoragePath);
+    transactionalStorage.createContainer(containerStoragePath);
+    transactionalStorage.createDirectory(directoryStoragePath);
+
+    // Create a subdirectory in both storage and transactional storage, this should be listed once
+    StoragePath subDirectoryStoragePath1 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    storage.createDirectory(subDirectoryStoragePath1);
+    transactionalStorage.createDirectory(subDirectoryStoragePath1);
+
+    // Create a subdirectory in storage only
+    StoragePath subDirectoryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    storage.createDirectory(subDirectoryStoragePath2);
+
+    // Create a subdirectory in transactional storage only
+    StoragePath subDirectoryStoragePath3 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    transactionalStorage.createDirectory(subDirectoryStoragePath3);
+
+    for (Resource resource : storage.listResourcesUnderDirectory(directoryStoragePath, true)) {
+      System.out.println("Resource in storage: " + resource.getStoragePath());
+    }
+
+    for (Resource resource : transactionalStorage.listResourcesUnderDirectory(directoryStoragePath, true)) {
+      System.out.println("Resource in transactionalStorage: " + resource.getStoragePath());
+    }
+
+    for (Resource resource : StorageServiceUtils.listTransactionalResourcesUnderDirectory(transactionalStorage, storage, directoryStoragePath, true)) {
+      System.out.println("Resource in both storage: " + resource.getStoragePath());
+    }
+
+    CloseableIterable<Resource> resources = StorageServiceUtils.listTransactionalResourcesUnderDirectory(transactionalStorage, storage, directoryStoragePath, true);
+    AssertJUnit.assertNotNull(resources);
+    assertThat(resources, Matchers.<Resource> iterableWithSize(3));
+  }
+
+  @Test
+  public void testGetBinary() throws RODAException {
+    // create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(containerStoragePath);
+
+    // 1) create binary
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage.createBinary(binaryStoragePath, payload, false);
+
+    // 2) get binary using transactional methods
+    TransactionalContext context = transactionManager.beginTransaction();
+    TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+
+    Binary binary = transactionalStorage.getBinary(binaryStoragePath);
+    AssertJUnit.assertNotNull(binary);
+
+    // 3) create the same binary again in the transactional storage
+    transactionalStorage.createBinary(binaryStoragePath, payload, false);
+
+    // 4) get binary again using transactional methods
+    Binary transactionalBinary = transactionalStorage.getBinary(binaryStoragePath);
+    AssertJUnit.assertNotNull(transactionalBinary);
+
+  }
+
+  @Test
+  public void testTransactionalCopy() throws RODAException {
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(containerStoragePath);
+
+    final StoragePath targetContainerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(targetContainerStoragePath);
+
+    // 1) create folders
+    final StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final StoragePath subDirectoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    storage.createDirectory(directoryStoragePath);
+    storage.createDirectory(subDirectoryStoragePath);
+
+    final StoragePath targetDirectoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(targetContainerStoragePath);
+    System.out.println("Copying from " + directoryStoragePath + " to " + targetDirectoryStoragePath);
+    
+
+    // 2) create binary
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(subDirectoryStoragePath);
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage.createBinary(binaryStoragePath, payload, false);
+
+    TransactionalContext context = transactionManager.beginTransaction();
+    TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+
+    transactionalStorage.copy(storage, directoryStoragePath, targetDirectoryStoragePath);
+    transactionManager.endTransaction(context.transactionLog().getId());
+
+    List<StoragePath> storagePathsUnderDirectory = new ArrayList<>();
+    for (Resource resource : storage.listResourcesUnderContainer(targetContainerStoragePath, true)) {
+        storagePathsUnderDirectory.add(resource.getStoragePath());
+    }
+    // check if the directory was copied
+    AssertJUnit.assertTrue("Directory should be copied to target container",
+      storagePathsUnderDirectory.contains(targetDirectoryStoragePath));
+  }
+
+  @Test
+  public void testTransactionalMove() throws RODAException {
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(containerStoragePath);
+
+    final StoragePath targetContainerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage.createContainer(targetContainerStoragePath);
+
+    // 1) create folders
+    final StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final StoragePath subDirectoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    storage.createDirectory(directoryStoragePath);
+    storage.createDirectory(subDirectoryStoragePath);
+
+    final StoragePath targetDirectoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(targetContainerStoragePath);
+
+    // 2) create binary
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(subDirectoryStoragePath);
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage.createBinary(binaryStoragePath, payload, false);
+
+    TransactionalContext context = transactionManager.beginTransaction();
+    TransactionalStorageService transactionalStorage = context.transactionalStorageService();
+
+    transactionalStorage.move(storage, directoryStoragePath, targetDirectoryStoragePath);
+    System.out.println("Moving from " + directoryStoragePath.asList() + " to " + targetDirectoryStoragePath.asList());
+    transactionManager.endTransaction(context.transactionLog().getId());
+    try {
+      storage.getDirectory(directoryStoragePath);
+      Assert.fail("Should have thrown NotFoundException");
+    } catch (NotFoundException e) {
+      // do nothing
+    }
   }
 }

@@ -40,8 +40,15 @@ public class TransactionalModelOperationLog implements Serializable {
   @Column(name = "operation_type", nullable = false)
   private OperationType operationType;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "operation_state", nullable = false)
+  private OperationState operationState;
+
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
+
+  @Column(name = "updated_at")
+  private LocalDateTime updatedAt;
 
   public TransactionalModelOperationLog() {
   }
@@ -49,7 +56,13 @@ public class TransactionalModelOperationLog implements Serializable {
   public TransactionalModelOperationLog(String liteObject, OperationType operationType) {
     this.liteObject = liteObject;
     this.operationType = operationType;
+    this.operationState = OperationState.RUNNING;
     this.createdAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  public UUID getId() {
+    return id;
   }
 
   public String getLiteObject() {
@@ -62,6 +75,15 @@ public class TransactionalModelOperationLog implements Serializable {
 
   public OperationType getOperationType() {
     return operationType;
+  }
+
+  public OperationState getOperationState() {
+    return operationState;
+  }
+
+  public void setOperationState(OperationState operationState) {
+    this.updatedAt = LocalDateTime.now();
+    this.operationState = operationState;
   }
 
   @Override

@@ -379,12 +379,18 @@ public class DefaultModelService implements ModelService {
 
   @Override
   public AIP createAIP(String parentId, String type, Permissions permissions, List<String> ingestSIPIds,
-    String ingestJobId, boolean notify, String createdBy, boolean isGhost) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
+    String ingestJobId, boolean notify, String createdBy, boolean isGhost, String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     AIPState state = AIPState.ACTIVE;
-    Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    Directory directory;
+    if (aipId != null) {
+      directory = storage.createDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId));
+    } else {
+      directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    }
     String id = directory.getStoragePath().getName();
 
     User user = this.retrieveUser(createdBy);
@@ -416,29 +422,35 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public AIP createAIP(String parentId, String type, Permissions permissions, String createdBy)
+  public AIP createAIP(String parentId, String type, Permissions permissions, String createdBy, String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
     AIPState state = AIPState.ACTIVE;
     boolean notify = true;
-    return createAIP(state, parentId, type, permissions, notify, createdBy);
+    return createAIP(state, parentId, type, permissions, notify, createdBy, aipId);
   }
 
   @Override
-  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String createdBy,
+    String aipId) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
     boolean notify = true;
-    return createAIP(state, parentId, type, permissions, notify, createdBy);
+    return createAIP(state, parentId, type, permissions, notify, createdBy, aipId);
   }
 
   @Override
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify,
-    String createdBy) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException {
+    String createdBy, String aipId) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    Directory directory;
+    if (aipId != null) {
+      directory = storage.createDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId));
+    } else {
+      directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    }
+
     String id = directory.getStoragePath().getName();
 
     User user = this.retrieveUser(createdBy);
@@ -465,11 +477,18 @@ public class DefaultModelService implements ModelService {
 
   @Override
   public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String ingestSIPUUID,
-    List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
+    List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy, String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    Directory directory;
+    if (aipId != null) {
+      directory = storage.createDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId));
+    } else {
+      directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+    }
+
     String id = directory.getStoragePath().getName();
 
     User user = this.retrieveUser(createdBy);
@@ -727,14 +746,6 @@ public class DefaultModelService implements ModelService {
     }
 
     return ret;
-  }
-
-  @Override
-  public boolean checkIfDescriptiveMetadataExists(String aipId, String representationId, String descriptiveMetadataId)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    StoragePath descriptiveMetadataStoragePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
-      descriptiveMetadataId);
-    return storage.exists(descriptiveMetadataStoragePath);
   }
 
   @Override
@@ -1771,10 +1782,10 @@ public class DefaultModelService implements ModelService {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     String urn = URNUtils.createRodaTechnicalMetadataURN(fileId, RODAInstanceUtils.getLocalInstanceIdentifier(),
-            metadataType.toLowerCase());
+      metadataType.toLowerCase());
 
     StoragePath binaryPath = ModelUtils.getTechnicalMetadataStoragePath(aipId, representationId,
-            Collections.singletonList(metadataType), urn);
+      Collections.singletonList(metadataType), urn);
     storage.createBinary(binaryPath, payload, false);
     TechnicalMetadata techMd = new TechnicalMetadata(metadataType, aipId, representationId, metadataType);
 
@@ -2271,7 +2282,7 @@ public class DefaultModelService implements ModelService {
    *********************/
 
   @Override
-  public void importLogEntries(InputStream inputStream, String filename) throws AuthorizationDeniedException,
+  public List<LogEntry> importLogEntries(InputStream inputStream, String filename) throws AuthorizationDeniedException,
     GenericException, AlreadyExistsException, RequestNotValidException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
@@ -2282,6 +2293,7 @@ public class DefaultModelService implements ModelService {
 
     Path tempDir = null;
     try {
+      List<LogEntry> importedLogs = new ArrayList<>();
       tempDir = Files.createTempDirectory(new Date().getTime() + "");
       Path path = tempDir.resolve(filename);
       IOUtils.copyLarge(inputStream, Files.newOutputStream(path));
@@ -2289,12 +2301,16 @@ public class DefaultModelService implements ModelService {
       for (OptionalWithCause<LogEntry> optionalLogEntry : new LogEntryFileSystemIterable(tempDir)) {
         // index
         if (optionalLogEntry.isPresent()) {
+          importedLogs.add(optionalLogEntry.get());
           notifyLogEntryCreated(optionalLogEntry.get()).failOnError();
         }
       }
 
       // store
       storage.createBinary(logPath, new FSPathContentPayload(path), false);
+
+      // return
+      return importedLogs;
     } catch (IOException e) {
       throw new GenericException(e);
     } finally {
@@ -3105,9 +3121,9 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public BinaryVersion retrieveVersion(String id, String versionId)
+  public BinaryVersion retrieveVersion(String riskId, String versionId)
     throws RequestNotValidException, GenericException, NotFoundException {
-    StoragePath binaryPath = ModelUtils.getRiskStoragePath(id);
+    StoragePath binaryPath = ModelUtils.getRiskStoragePath(riskId);
     return storage.getBinaryVersion(binaryPath, versionId);
   }
 
@@ -3689,7 +3705,8 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public boolean checkIfSchemaExists(String aipId, String representationId, List<String> directoryPath, String fileId) throws RequestNotValidException {
+  public boolean checkIfSchemaExists(String aipId, String representationId, List<String> directoryPath, String fileId)
+    throws RequestNotValidException {
     StoragePath schemaStoragePath = ModelUtils.getSchemaStoragePath(aipId, representationId, directoryPath, fileId);
     return storage.exists(schemaStoragePath);
   }

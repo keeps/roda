@@ -82,7 +82,7 @@ public class MovePluginTest {
     AlreadyExistsException, AuthorizationDeniedException {
 
     // create AIP and rep
-    AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN);
+    AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN, null);
     Representation representation = model.createRepresentation(aip.getId(), IdUtils.createUUID(), true, "", true,
       RodaConstants.ADMIN);
 

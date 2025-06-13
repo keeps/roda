@@ -64,6 +64,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.entity.transaction.TransactionalModelOperationLog;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.lites.ParsedAIPLite;
 import org.roda.core.model.lites.ParsedDIPFileLite;
@@ -906,6 +907,9 @@ public final class ModelUtils {
     }
     if (object instanceof DisposalHold disposalHold) {
       return getDisposalHoldStoragePath(disposalHold.getId());
+    }
+    if (object instanceof DisposalConfirmation disposalConfirmation) {
+      return getDisposalConfirmationStoragePath(disposalConfirmation.getId());
     }
     if (object instanceof DistributedInstance distributedInstance) {
       return getDistributedInstanceStoragePath(distributedInstance.getId());

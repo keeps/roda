@@ -25,11 +25,11 @@ import org.roda.core.data.v2.risks.RiskMitigationTerms;
 import org.roda.core.data.v2.risks.RiskVersions;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.LiteRODAObjectFactory;
+import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.roda.wui.common.model.RequestContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -37,26 +37,25 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RiskService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RiskService.class);
-
-  public Risk revertRiskVersion(String riskId, String versionId, Map<String, String> properties, int incidences)
+  public Risk revertRiskVersion(ModelService modelService, String riskId, String versionId,
+    Map<String, String> properties, int incidences)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().revertRiskVersion(riskId, versionId, properties, false, incidences);
-    return RodaCoreFactory.getModelService().retrieveRisk(riskId);
+      modelService.revertRiskVersion(riskId, versionId, properties, false, incidences);
+      return modelService.retrieveRisk(riskId);
   }
 
-  public void deleteRiskVersion(String riskId, String versionId)
+  public void deleteRiskVersion(ModelService model, String riskId, String versionId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     Optional<LiteRODAObject> liteRisk = LiteRODAObjectFactory.get(Risk.class, riskId);
     if (liteRisk.isEmpty()) {
       throw new RequestNotValidException("Could not get LITE for Risk " + riskId);
     }
-    RodaCoreFactory.getModelService().deleteBinaryVersion(liteRisk.get(), versionId);
+    model.deleteBinaryVersion(liteRisk.get(), versionId);
   }
 
-  public Risk retrieveRiskVersion(String riskId, String selectedVersion)
+  public Risk retrieveRiskVersion(ModelService model, String riskId, String selectedVersion)
     throws RequestNotValidException, GenericException, NotFoundException {
-    BinaryVersion bv = RodaCoreFactory.getModelService().retrieveVersion(riskId, selectedVersion);
+    BinaryVersion bv = model.retrieveVersion(riskId, selectedVersion);
     try {
       return JsonUtils.getObjectFromJson(bv.getBinary().getContent().createInputStream(), Risk.class);
     } catch (IOException e) {
@@ -64,7 +63,7 @@ public class RiskService {
     }
   }
 
-  public RiskVersions retrieveRiskVersions(String riskId)
+  public RiskVersions retrieveRiskVersions(ModelService model, String riskId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Optional<LiteRODAObject> liteRisk = LiteRODAObjectFactory.get(Risk.class, riskId);
     if (liteRisk.isEmpty()) {
@@ -72,9 +71,7 @@ public class RiskService {
     }
     RiskVersions versions = new RiskVersions();
 
-    try (CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getModelService()
-      .listBinaryVersions(liteRisk.get())) {
-
+    try (CloseableIterable<BinaryVersion> iterable = model.listBinaryVersions(liteRisk.get())) {
       for (BinaryVersion bv : iterable) {
         versions.addObject(new ResourceVersion(bv.getId(), bv.getCreatedDate(), bv.getProperties()));
       }
@@ -91,13 +88,13 @@ public class RiskService {
       Collections.emptyMap(), "Could not execute risk delete action");
   }
 
-  public boolean hasRiskVersions(String riskId)
+  public boolean hasRiskVersions(String riskId, ModelService modelService)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Optional<LiteRODAObject> liteRisk = LiteRODAObjectFactory.get(Risk.class, riskId);
     if (liteRisk.isEmpty()) {
       throw new RequestNotValidException("Could not get LITE for Risk " + riskId);
     }
-    try (CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getModelService()
+    try (CloseableIterable<BinaryVersion> iterable = modelService
       .listBinaryVersions(liteRisk.get())) {
       return iterable.iterator().hasNext();
     } catch (IOException e) {
@@ -105,16 +102,17 @@ public class RiskService {
     }
   }
 
-  public Risk createRisk(Risk risk, User user, boolean commit) throws GenericException, AuthorizationDeniedException {
-    risk.setCreatedBy(user.getName());
-    risk.setUpdatedBy(user.getName());
-    return RodaCoreFactory.getModelService().createRisk(risk, commit);
+  public Risk createRisk(Risk risk, RequestContext requestContext, boolean commit)
+    throws GenericException, AuthorizationDeniedException {
+    risk.setCreatedBy(requestContext.getUser().getName());
+    risk.setUpdatedBy(requestContext.getUser().getName());
+    return requestContext.getModelService().createRisk(risk, commit);
   }
 
-  public Risk updateRisk(Risk risk, User user, Map<String, String> properties, boolean commit, int incidences)
-    throws GenericException, AuthorizationDeniedException {
-    risk.setUpdatedBy(user.getName());
-    return RodaCoreFactory.getModelService().updateRisk(risk, properties, commit, incidences);
+  public Risk updateRisk(Risk risk, RequestContext requestContext, Map<String, String> properties, boolean commit,
+    int incidences) throws GenericException, AuthorizationDeniedException {
+    risk.setUpdatedBy(requestContext.getUser().getName());
+    return requestContext.getModelService().updateRisk(risk, properties, commit, incidences);
   }
 
   public RiskMitigationTerms retrieveFromConfigurationMitigationTerms(IndexedRisk indexedRisk) {

@@ -11,11 +11,12 @@ import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.HasId;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -32,6 +33,7 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.LiteRODAObjectFactory;
@@ -101,6 +103,12 @@ public abstract class ParsedLite extends LiteRODAObject {
           ret = new ParsedDisposalConfirmationLite(liteRODAObject, split);
         } else if (DisposalHold.class.getName().equals(clazz)) {
           ret = new ParsedDisposalHoldLite(liteRODAObject, split);
+        } else if (DisposalSchedule.class.getName().equals(clazz)) {
+          ret = new ParsedDisposalSchedule(liteRODAObject, split);
+        } else if (DisposalRule.class.getName().equals(clazz)) {
+          ret = new ParsedDisposalRule(liteRODAObject, split);
+        } else if (DistributedInstance.class.getName().equals(clazz)) {
+          ret = new ParsedDistributedInstance(liteRODAObject, split);
         }
       }
     } catch (GenericException e) {

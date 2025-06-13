@@ -341,7 +341,7 @@ public class AIPService {
     AlreadyExistsException {
     User user = requestContext.getUser();
     ModelService model = requestContext.getModelService();
-    return model.createAIP(parentAipId, type, permissions, user.getName());
+    return model.createAIP(parentAipId, type, permissions, user.getName(), null);
   }
 
   public boolean hasDocumentation(String aipId)

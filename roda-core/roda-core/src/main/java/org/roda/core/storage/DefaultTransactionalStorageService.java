@@ -3,10 +3,14 @@ package org.roda.core.storage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -18,6 +22,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.entity.transaction.OperationState;
 import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
@@ -48,8 +53,25 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   @Override
   public boolean exists(StoragePath storagePath) {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).exists(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      boolean ret = getEffectiveStorageService(storagePath).exists(storagePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (NotFoundException e) {
+      boolean ret = false;
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      return ret;
+    } catch (GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
@@ -61,128 +83,332 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   @Override
   public Container createContainer(StoragePath storagePath)
     throws GenericException, AlreadyExistsException, AuthorizationDeniedException, RequestNotValidException {
-    registerOperation(storagePath, OperationType.CREATE);
-    return stagingStorageService.createContainer(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.CREATE);
+    try {
+      Container ret = stagingStorageService.createContainer(storagePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (AlreadyExistsException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public Container getContainer(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).getContainer(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      Container ret = getStorageService(storagePath).getContainer(storagePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (NotFoundException | GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public void deleteContainer(StoragePath storagePath)
     throws NotFoundException, GenericException, AuthorizationDeniedException {
-    registerOperation(storagePath, OperationType.DELETE);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.DELETE);
     // TODO: What to do in this case?
-    stagingStorageService.deleteContainer(storagePath);
+    try {
+      stagingStorageService.deleteContainer(storagePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).listResourcesUnderContainer(storagePath, recursive);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      CloseableIterable<Resource> ret = StorageServiceUtils
+        .listTransactionalResourcesUnderContainer(stagingStorageService, mainStorageService, storagePath, recursive);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public Long countResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).countResourcesUnderContainer(storagePath, recursive);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      Long ret = getStorageService(storagePath).countResourcesUnderContainer(storagePath, recursive);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public Directory createDirectory(StoragePath storagePath)
     throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
-    registerOperation(storagePath, OperationType.CREATE);
-    return stagingStorageService.createDirectory(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.CREATE);
+    try {
+      Directory ret = stagingStorageService.createDirectory(storagePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (AlreadyExistsException | GenericException | AuthorizationDeniedException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public Directory createRandomDirectory(StoragePath parentStoragePath) throws RequestNotValidException,
     GenericException, NotFoundException, AlreadyExistsException, AuthorizationDeniedException {
-    registerOperation(parentStoragePath, OperationType.CREATE);
-    return stagingStorageService.createRandomDirectory(parentStoragePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(parentStoragePath, OperationType.CREATE);
+    try {
+      Directory ret = stagingStorageService.createRandomDirectory(parentStoragePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException
+      | AuthorizationDeniedException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public Directory getDirectory(StoragePath storagePath)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).getDirectory(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      Directory ret = getStorageService(storagePath).getDirectory(storagePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public boolean hasDirectory(StoragePath storagePath) {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).hasDirectory(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    boolean ret = getStorageService(storagePath).hasDirectory(storagePath);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
+    return ret;
   }
 
   @Override
   public CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).listResourcesUnderDirectory(storagePath, recursive);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      CloseableIterable<Resource> ret = StorageServiceUtils
+        .listTransactionalResourcesUnderDirectory(stagingStorageService, mainStorageService, storagePath, recursive);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public CloseableIterable<Resource> listResourcesUnderFile(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).listResourcesUnderFile(storagePath, recursive);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      CloseableIterable<Resource> ret = getStorageService(storagePath).listResourcesUnderFile(storagePath, recursive);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).countResourcesUnderDirectory(storagePath, recursive);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      Long ret = getStorageService(storagePath).countResourcesUnderDirectory(storagePath, recursive);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
     throws GenericException, AlreadyExistsException, RequestNotValidException, AuthorizationDeniedException,
     NotFoundException {
-    registerOperation(storagePath, OperationType.CREATE);
-    return stagingStorageService.createBinary(storagePath, payload, asReference);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.CREATE);
+    try {
+      Binary ret = stagingStorageService.createBinary(storagePath, payload, asReference);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (AlreadyExistsException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | NotFoundException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    registerOperation(parentStoragePath, OperationType.CREATE);
-    return stagingStorageService.createRandomBinary(parentStoragePath, payload, asReference);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(parentStoragePath, OperationType.CREATE);
+    try {
+      Binary ret = stagingStorageService.createRandomBinary(parentStoragePath, payload, asReference);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public Binary getBinary(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).getBinary(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      Binary ret = getEffectiveStorageService(storagePath).getBinary(storagePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public boolean hasBinary(StoragePath storagePath) {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).hasBinary(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    boolean ret = getStorageService(storagePath).hasBinary(storagePath);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
+    return ret;
   }
 
   @Override
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
     boolean createIfNotExists)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    registerOperation(storagePath, OperationType.UPDATE);
-    return stagingStorageService.updateBinaryContent(storagePath, payload, asReference, createIfNotExists);
+    if (mainStorageService.exists(storagePath) || stagingStorageService.exists(storagePath)) {
+      TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.UPDATE);
+      try {
+        Binary ret = stagingStorageService.updateBinaryContent(storagePath, payload, asReference, true);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
+        return ret;
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
+        throw e;
+      }
+    } else if (createIfNotExists) {
+      TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.CREATE);
+      try {
+        Binary ret = stagingStorageService.updateBinaryContent(storagePath, payload, asReference, true);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
+        return ret;
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
+        throw e;
+      }
+    }
+    throw new NotFoundException("Storage path does not exist: " + storagePath);
   }
 
   @Override
   public void deleteResource(StoragePath storagePath)
     throws NotFoundException, GenericException, AuthorizationDeniedException {
-    registerOperation(storagePath, OperationType.DELETE);
-    stagingStorageService.deleteResource(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.DELETE);
+    try {
+      stagingStorageService.deleteResource(storagePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
+
   }
 
   @Override
@@ -195,45 +421,106 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
-    registerOperation(toStoragePath, OperationType.CREATE);
-    copyFromMainStorageService(fromStoragePath);
-    stagingStorageService.copy(fromService, fromStoragePath, toStoragePath);
+    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(fromService, fromStoragePath,
+      toStoragePath, OperationType.CREATE);
+    try {
+      stagingStorageService.copy(fromService, fromStoragePath, toStoragePath);
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
+      }
+    } catch (AlreadyExistsException | GenericException | RequestNotValidException | NotFoundException
+      | AuthorizationDeniedException e) {
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
+      }
+      throw e;
+    }
   }
 
   @Override
   public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
-    registerOperation(fromStoragePath, OperationType.CREATE);
-    copyFromMainStorageService(fromStoragePath);
-    stagingStorageService.copy(fromService, fromStoragePath, toPath, resource, replaceExisting);
+    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(fromService, fromStoragePath,
+      toPath, OperationType.CREATE);
+    try {
+      stagingStorageService.copy(fromService, fromStoragePath, toPath, resource, replaceExisting);
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
+      }
+    } catch (AlreadyExistsException | GenericException | AuthorizationDeniedException e) {
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
+      }
+      throw e;
+    }
+
   }
 
   @Override
   public void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
-    registerOperation(fromStoragePath, OperationType.UPDATE);
-    copyFromMainStorageService(fromStoragePath);
-    stagingStorageService.move(fromService, fromStoragePath, toStoragePath);
+    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(fromService, fromStoragePath,
+      toStoragePath, OperationType.CREATE);
+    operationLogs.addAll(registerOperationForCopy(fromService, fromStoragePath, fromStoragePath, OperationType.DELETE));
+    try {
+      stagingStorageService.copy(fromService, fromStoragePath, toStoragePath);
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
+      }
+    } catch (AlreadyExistsException | GenericException | RequestNotValidException | NotFoundException
+      | AuthorizationDeniedException e) {
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
+      }
+      throw e;
+    }
+
   }
 
   @Override
   public DirectResourceAccess getDirectAccess(StoragePath storagePath) {
-    registerOperation(storagePath, OperationType.READ);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
     try {
       if (storagePath.isFromAContainer()) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
         throw new IllegalArgumentException("Cannot get direct access to a container: " + storagePath);
       }
 
       // check if transaction has any changes below the storagePath, if not use
       // mainStorageService.getDirectAccess
       if (!transactionLogService.hasModificationsUnderStoragePath(transaction.getId(), storagePath.toString())) {
-        return mainStorageService.getDirectAccess(storagePath);
+        DirectResourceAccess ret = mainStorageService.getDirectAccess(storagePath);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
+        return ret;
       }
       // Prepare the staging storage area to be used
       copyMissingResourcesToStagingStorage(storagePath);
-      return stagingStorageService.getDirectAccess(storagePath);
+      DirectResourceAccess ret = stagingStorageService.getDirectAccess(storagePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
     } catch (RODATransactionException | RequestNotValidException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
       throw new RuntimeException(e);
     }
   }
@@ -241,15 +528,37 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).listBinaryVersions(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      CloseableIterable<BinaryVersion> ret = getStorageService(storagePath).listBinaryVersions(storagePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
   public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
     throws RequestNotValidException, NotFoundException, GenericException {
-    registerOperation(storagePath, OperationType.READ, version);
-    return getStorageService(storagePath).getBinaryVersion(storagePath, version);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ, version);
+    try {
+      BinaryVersion ret = getStorageService(storagePath).getBinaryVersion(storagePath, version);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (RequestNotValidException | NotFoundException | GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
@@ -257,64 +566,116 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     // Need to copy the resource from main storage to staging storage for internal
     // check
-    copyFromMainStorageService(storagePath);
+    copyToStagingStorageService(mainStorageService, storagePath);
     BinaryVersion binaryVersion = stagingStorageService.createBinaryVersion(storagePath, properties);
-    registerOperation(storagePath, OperationType.CREATE, binaryVersion.getId());
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.CREATE,
+      binaryVersion.getId());
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
     return binaryVersion;
   }
 
   @Override
   public void revertBinaryVersion(StoragePath storagePath, String version)
     throws NotFoundException, RequestNotValidException, GenericException, AuthorizationDeniedException {
-    registerOperation(storagePath, OperationType.UPDATE);
-    registerOperation(storagePath, OperationType.UPDATE, version);
-    copyFromMainStorageService(storagePath);
+    List<TransactionalStoragePathOperationLog> operationLogs = new ArrayList<>(
+      List.of(registerOperation(storagePath, OperationType.UPDATE)));
+    operationLogs.add(registerOperation(storagePath, OperationType.UPDATE, version));
+    copyToStagingStorageService(mainStorageService, storagePath);
     try {
       importBinaryVersion(mainStorageService, storagePath, version);
+      try {
+        stagingStorageService.revertBinaryVersion(storagePath, version);
+        for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+          if (operationLog != null) {
+            updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+          }
+        }
+      } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+        for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+          if (operationLog != null) {
+            updateOperationState(operationLog.getId(), OperationState.FAILURE);
+          }
+        }
+        throw e;
+      }
     } catch (AlreadyExistsException e) {
       throw new GenericException("Failed to import binary version", e);
     }
-    stagingStorageService.revertBinaryVersion(storagePath, version);
   }
 
   @Override
   public void deleteBinaryVersion(StoragePath storagePath, String version)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     // TODO: NOT WORKING
-    registerOperation(storagePath, OperationType.DELETE, version);
-    copyFromMainStorageService(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.DELETE, version);
+    copyToStagingStorageService(mainStorageService, storagePath);
     try {
       importBinaryVersion(mainStorageService, storagePath, version);
+      try {
+        stagingStorageService.deleteBinaryVersion(storagePath, version);
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+        }
+      } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+        if (operationLog != null) {
+          updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        }
+        throw e;
+      }
     } catch (AlreadyExistsException e) {
       throw new GenericException("Failed to import binary version", e);
     }
-    stagingStorageService.deleteBinaryVersion(storagePath, version);
   }
 
   @Override
   public String getStoragePathAsString(StoragePath storagePath, boolean skipStoragePathContainer,
     StoragePath anotherStoragePath, boolean skipAnotherStoragePathContainer) {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).getStoragePathAsString(storagePath, skipStoragePathContainer,
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    String ret = getStorageService(storagePath).getStoragePathAsString(storagePath, skipStoragePathContainer,
       anotherStoragePath, skipAnotherStoragePathContainer);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
+    return ret;
   }
 
   @Override
   public String getStoragePathAsString(StoragePath storagePath, boolean skipContainer) {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).getStoragePathAsString(storagePath, skipContainer);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    String ret = getStorageService(storagePath).getStoragePathAsString(storagePath, skipContainer);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
+    return ret;
   }
 
   @Override
   public List<StoragePath> getShallowFiles(StoragePath storagePath) throws NotFoundException, GenericException {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).getShallowFiles(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    List<StoragePath> ret = getStorageService(storagePath).getShallowFiles(storagePath);
+    if (operationLog != null) {
+      updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+    }
+    return ret;
   }
 
   @Override
   public Date getCreationDate(StoragePath storagePath) throws GenericException {
-    registerOperation(storagePath, OperationType.READ);
-    return getStorageService(storagePath).getCreationDate(storagePath);
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      Date ret = getStorageService(storagePath).getCreationDate(storagePath);
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
+      }
+      return ret;
+    } catch (GenericException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw e;
+    }
   }
 
   @Override
@@ -332,22 +693,22 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       DefaultStoragePath storagePath = null;
       try {
         storagePath = DefaultStoragePath.parse(parts);
+
+        OperationType operationType = storagePathLog.getOperationType();
+        String version = storagePathLog.getVersion();
+
+        if (operationType == OperationType.DELETE) {
+          handleDeleteOperation(storagePath, path, version);
+        } else if (operationType == OperationType.UPDATE) {
+          handleUpdateOperation(storagePath, version);
+        } else if (operationType == OperationType.CREATE) {
+          handleCreateOperation(storagePath, version);
+        } else {
+          // TODO: READ
+          LOGGER.debug("Skipping read operation for storage path: {}", storagePathLog.getStoragePath());
+        }
       } catch (RequestNotValidException e) {
         throw new RODATransactionException("Failed to parse storage path: " + path, e);
-      }
-
-      OperationType operationType = storagePathLog.getOperationType();
-      String version = storagePathLog.getVersion();
-
-      if (operationType == OperationType.DELETE) {
-        handleDeleteOperation(storagePath, path, version);
-      } else if (operationType == OperationType.UPDATE) {
-        handleCreateOrUpdateOperation(storagePath, version);
-      } else if (operationType == OperationType.CREATE) {
-        handleCreateOrUpdateOperation(storagePath, version);
-      } else {
-        // TODO: READ
-        LOGGER.debug("Skipping read operation for storage path: {}", storagePathLog.getStoragePath());
       }
     }
   }
@@ -367,16 +728,28 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     }
   }
 
-  private void handleCreateOrUpdateOperation(DefaultStoragePath storagePath, String version)
-    throws RODATransactionException {
+  private void handleUpdateOperation(DefaultStoragePath storagePath, String version) throws RODATransactionException {
+    try {
+      if (version != null) {
+        LOGGER.info("Importing binary version from staging to main storage service: {}", storagePath);
+        mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
+      } else {
+        LOGGER.info("Updating resource from staging to main storage service: {}", storagePath);
+        StorageServiceUtils.syncBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
+          storagePath, getEntity(storagePath));
+      }
+    } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
+      | AuthorizationDeniedException e) {
+      throw new RODATransactionException(
+        "Failed to sync storage path from staging to main storage service: " + storagePath, e);
+    }
+  }
+
+  private void handleCreateOperation(DefaultStoragePath storagePath, String version) throws RODATransactionException {
     try {
       if (version != null) {
         LOGGER.info("Creating binary version from staging to main storage service: {}", storagePath);
         mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
-      } else if (mainStorageService.exists(storagePath)) {
-        LOGGER.info("Updating resource from staging to main storage service: {}", storagePath);
-        StorageServiceUtils.syncBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
-          storagePath, getEntity(storagePath));
       } else {
         LOGGER.info("Moving resource from staging to main storage service: {}", storagePath);
         Class<? extends Entity> rootEntity = getEntity(storagePath);
@@ -391,7 +764,25 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       }
     } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
       | AuthorizationDeniedException e) {
-      throw new RODATransactionException("Failed to move/sync storage path from staging to main storage service: "
+      throw new RODATransactionException("Failed to copy storage path from staging to main storage service: "
+        + storagePath + ". (transactionID:" + transaction.getId() + ")", e);
+    }
+  }
+
+  private void handleCopyOperation(DefaultStoragePath storagePath, String version) throws RODATransactionException {
+    try {
+      if (version != null) {
+        LOGGER.info("Creating binary version from staging to main storage service: {}", storagePath);
+        mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
+      } else {
+        LOGGER.info("Moving resource from staging to main storage service: {}", storagePath);
+        Class<? extends Entity> rootEntity = getEntity(storagePath);
+        StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
+          storagePath, rootEntity);
+      }
+    } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
+      | AuthorizationDeniedException e) {
+      throw new RODATransactionException("Failed to copy storage path from staging to main storage service: "
         + storagePath + ". (transactionID:" + transaction.getId() + ")", e);
     }
   }
@@ -421,7 +812,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         StoragePath resourceStoragePath = resource.getStoragePath();
         if (!storagePathsOperations.contains(resourceStoragePath.toString())) {
           StoragePath parsedPath = DefaultStoragePath.parse(resourceStoragePath);
-          copyFromMainStorageService(parsedPath);
+          copyToStagingStorageService(mainStorageService, parsedPath);
         }
       }
 
@@ -430,10 +821,10 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     }
   }
 
-  private void copyFromMainStorageService(StoragePath storagePath) {
+  private void copyToStagingStorageService(StorageService fromStorage, StoragePath storagePath) {
     try {
-      StorageServiceUtils.copyBetweenStorageServices(mainStorageService, storagePath, stagingStorageService,
-        storagePath, getEntity(storagePath));
+      StorageServiceUtils.copyBetweenStorageServices(fromStorage, storagePath, stagingStorageService, storagePath,
+        fromStorage.getEntity(storagePath));
     } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException
       | GenericException e) {
       // Do nothing
@@ -446,24 +837,83 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     // DO NOTHING
   }
 
-  private void registerOperation(StoragePath storagePath, OperationType operation) {
-    registerOperation(storagePath, operation, null);
+  private List<TransactionalStoragePathOperationLog> registerOperationForCopy(StorageService fromService,
+    StoragePath fromStoragePath, Path toPath, OperationType operation)
+    throws AuthorizationDeniedException, GenericException {
+    try {
+      List<String> pathParts = new ArrayList<>();
+      for (Path part : toPath) {
+        pathParts.add(part.toString());
+      }
+      return registerOperationForCopy(fromService, fromStoragePath, DefaultStoragePath.parse(pathParts), operation);
+    } catch (RequestNotValidException e) {
+      throw new GenericException("Failed to register operation for copy: " + toPath, e);
+    }
+
   }
 
-  private void registerOperation(StoragePath storagePath, OperationType operation, String version) {
+  private List<TransactionalStoragePathOperationLog> registerOperationForCopy(StorageService fromService,
+    StoragePath fromStoragePath, StoragePath toStoragePath, OperationType operation)
+    throws AuthorizationDeniedException, GenericException {
+    List<TransactionalStoragePathOperationLog> ret = new ArrayList<>(
+      List.of(registerOperation(toStoragePath, operation)));
+    try (CloseableIterable<Resource> listResourcesUnderDirectory = fromService
+      .listResourcesUnderDirectory(fromStoragePath, true)) {
+      if (listResourcesUnderDirectory == null) {
+        return ret;
+      }
+
+      String fromStoragePathAsString = getStoragePathAsString(fromStoragePath, false);
+      String toStoragePathAsString = getStoragePathAsString(toStoragePath, false);
+
+      // register operation for each resource under the storage path
+      for (Resource resource : listResourcesUnderDirectory) {
+        StoragePath resourceStoragePath = resource.getStoragePath();
+        String destinationStoragePathAsString = getStoragePathAsString(resourceStoragePath, false)
+          .replace(fromStoragePathAsString, toStoragePathAsString);
+        Arrays.asList(Paths.get(destinationStoragePathAsString));
+        ret.add(registerOperation(destinationStoragePathAsString, operation, null));
+      }
+    } catch (NotFoundException | RequestNotValidException | IOException e) {
+      throw new GenericException("Failed to register operation for copy: " + toStoragePath, e);
+    }
+    return ret;
+  }
+
+  private TransactionalStoragePathOperationLog registerOperation(StoragePath storagePath, OperationType operation) {
+    return registerOperation(storagePath, operation, null);
+  }
+
+  private TransactionalStoragePathOperationLog registerOperation(StoragePath storagePath, OperationType operation,
+    String version) {
     if (storagePath.isFromAContainer()) {
-      return;
+      return null;
     }
 
     if (storagePath.getName().equals(RodaConstants.STORAGE_DIRECTORY_AGENTS)) {
-      return;
+      return null;
     }
 
-    LOGGER.debug("Registering operation for storage path: {}", storagePath);
+    String storagePathAsString = stagingStorageService.getStoragePathAsString(storagePath, false);
+    return registerOperation(storagePathAsString, operation, version);
+  }
+
+  private TransactionalStoragePathOperationLog registerOperation(String storagePathAsString, OperationType operation,
+    String version) {
+    LOGGER.debug("Registering operation for storage path: {}", storagePathAsString);
     try {
-      transactionLogService.registerStoragePathOperation(transaction.getId(), storagePath, operation, version);
+      return transactionLogService.registerStoragePathOperation(transaction.getId(), storagePathAsString, operation,
+        version);
     } catch (RODATransactionException e) {
-      LOGGER.error("Failed to register operation for storage path: {}", storagePath, e);
+      throw new IllegalArgumentException("Cannot register operation for storagePath: " + storagePathAsString, e);
+    }
+  }
+
+  public void updateOperationState(UUID operationUUID, OperationState state) {
+    try {
+      transactionLogService.updateStoragePathOperationState(operationUUID, state);
+    } catch (RODATransactionException e) {
+      throw new IllegalArgumentException("Cannot update operation state: " + operationUUID, e);
     }
   }
 
@@ -472,6 +922,26 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       return stagingStorageService;
     } else {
       return mainStorageService;
+    }
+  }
+
+  private StorageService getEffectiveStorageService(StoragePath storagePath)
+    throws NotFoundException, GenericException {
+    String storagePathAsString = stagingStorageService.getStoragePathAsString(storagePath, false);
+    try {
+      Optional<TransactionalStoragePathOperationLog> storagePathOperation = transactionLogService
+        .getLastStoragePathOperation(transaction.getId(), storagePathAsString);
+      if (storagePathOperation.isPresent()) {
+        return switch (storagePathOperation.get().getOperationType()) {
+          case DELETE -> throw new NotFoundException("Resource was deleted in this transaction.");
+          case CREATE, UPDATE -> stagingStorageService;
+          default ->
+            throw new GenericException("Unexpected operation type: " + storagePathOperation.get().getOperationType());
+        };
+      }
+      return mainStorageService;
+    } catch (RODATransactionException e) {
+      throw new GenericException("Failed to get effective storage service for storage path: " + storagePath, e);
     }
   }
 }

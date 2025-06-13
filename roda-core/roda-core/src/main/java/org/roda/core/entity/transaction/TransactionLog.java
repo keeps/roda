@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.roda.core.data.v2.ip.StoragePath;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -100,27 +98,31 @@ public class TransactionLog implements Serializable {
     return storagePathsOperations;
   }
 
-  public void addStoragePath(StoragePath storagePath, OperationType operation,
+  public TransactionalStoragePathOperationLog addStoragePath(String storagePath, OperationType operation,
     String version) {
     if (storagePath != null) {
       TransactionalStoragePathOperationLog transactionalStoragePathOperationLog = new TransactionalStoragePathOperationLog(
         storagePath, operation, version);
       transactionalStoragePathOperationLog.setTransactionLog(this);
       storagePathsOperations.add(transactionalStoragePathOperationLog);
+      return transactionalStoragePathOperationLog;
     }
+    return null;
   }
 
   public List<TransactionalModelOperationLog> getModelOperations() {
     return modelOperations;
   }
 
-  public void addModelOperation(String liteObject, OperationType operationType) {
+  public TransactionalModelOperationLog addModelOperation(String liteObject, OperationType operationType) {
     if (liteObject != null) {
       TransactionalModelOperationLog transactionalModelOperationLog = new TransactionalModelOperationLog(liteObject,
         operationType);
       transactionalModelOperationLog.setTransactionLog(this);
       modelOperations.add(transactionalModelOperationLog);
+      return transactionalModelOperationLog;
     }
+    return null;
   }
 
   @Override
