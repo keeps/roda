@@ -193,11 +193,12 @@ public class FileStorageService implements StorageService {
   @Override
   public void deleteContainer(StoragePath storagePath) throws NotFoundException, GenericException {
     Path containerPath = FSUtils.getEntityPath(basePath, storagePath);
-    trash(containerPath);
+    if (FSUtils.exists(containerPath)) {
+      trash(containerPath);
 
-    // cleanup history
-    deleteAllBinaryVersionsUnder(storagePath);
-
+      // cleanup history
+      deleteAllBinaryVersionsUnder(storagePath);
+    }
   }
 
   private void trash(Path fromPath) throws GenericException, NotFoundException {
@@ -475,6 +476,7 @@ public class FileStorageService implements StorageService {
         throw new GenericException("Looking for a binary but found something else");
       } else {
         try {
+          Files.createDirectories(binaryPath.getParent());
           payload.writeToPath(binaryPath);
         } catch (IOException e) {
           throw new GenericException("Could not update binary content", e);
@@ -969,8 +971,10 @@ public class FileStorageService implements StorageService {
     Path targetDataPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
     FSUtils.copy(sourceDataPath, targetDataPath, true);
 
-    Path sourceMetadataPath = FSUtils.getBinaryHistoryMetadataPath(storageService.getHistoryDataPath(), storageService.getHistoryMetadataPath(), sourceDataPath);
-    Path targetMetadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath, targetDataPath);
+    Path sourceMetadataPath = FSUtils.getBinaryHistoryMetadataPath(storageService.getHistoryDataPath(),
+      storageService.getHistoryMetadataPath(), sourceDataPath);
+    Path targetMetadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath,
+      targetDataPath);
     FSUtils.copy(sourceMetadataPath, targetMetadataPath, true);
   }
 }

@@ -62,7 +62,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     } catch (NotFoundException e) {
       boolean ret = false;
       if (operationLog != null) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+        updateOperationState(operationLog.getId(), OperationState.SUCCESS);
       }
       return ret;
     } catch (GenericException e) {
@@ -837,8 +837,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   private List<TransactionalStoragePathOperationLog> registerOperationForCopy(StorageService toService, Path toPath,
-    OperationType operation)
-    throws AuthorizationDeniedException, GenericException {
+    OperationType operation) throws AuthorizationDeniedException, GenericException {
     try {
       List<String> pathParts = new ArrayList<>();
       for (Path part : toPath) {
@@ -852,8 +851,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   private List<TransactionalStoragePathOperationLog> registerOperationForCopy(StorageService toService,
-    StoragePath toStoragePath, OperationType operation)
-    throws AuthorizationDeniedException, GenericException {
+    StoragePath toStoragePath, OperationType operation) throws AuthorizationDeniedException, GenericException {
     List<TransactionalStoragePathOperationLog> ret = new ArrayList<>(
       List.of(registerOperation(toStoragePath, operation)));
     try (CloseableIterable<Resource> listResourcesUnderDirectory = toService.listResourcesUnderDirectory(toStoragePath,
@@ -878,10 +876,6 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   private TransactionalStoragePathOperationLog registerOperation(StoragePath storagePath, OperationType operation,
     String version) {
-    if (storagePath.isFromAContainer()) {
-      return null;
-    }
-
     if (storagePath.getName().equals(RodaConstants.STORAGE_DIRECTORY_AGENTS)) {
       return null;
     }

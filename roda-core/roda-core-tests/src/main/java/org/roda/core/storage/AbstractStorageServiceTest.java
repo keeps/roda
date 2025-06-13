@@ -29,6 +29,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.config.TestConfig;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
@@ -37,6 +38,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.fs.FSUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
@@ -53,7 +56,8 @@ import org.testng.annotations.Test;
  */
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
-public abstract class AbstractStorageServiceTest<T extends StorageService> {
+@SpringBootTest(classes = {TestConfig.class})
+public abstract class AbstractStorageServiceTest<T extends StorageService> extends AbstractTestNGSpringContextTests {
 
   /**
    * Get current instance of storage.
@@ -537,7 +541,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     final Binary binaryCreated = getStorage().getBinary(binaryStoragePath);
     assertNotNull(binaryCreated);
 
-    final Path original = Files.createTempFile(FilenameUtils.normalize(binaryCreated.getStoragePath().getName()), ".tmp");
+    final Path original = Files.createTempFile(FilenameUtils.normalize(binaryCreated.getStoragePath().getName()),
+      ".tmp");
     binaryCreated.getContent().writeToPath(original);
 
     // 1) update binary content
@@ -911,7 +916,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // 6) list binary versions
     CloseableIterable<BinaryVersion> binaryVersions = getStorage().listBinaryVersions(binaryStoragePath);
     List<BinaryVersion> reusableBinaryVersions = new ArrayList<>();
-    //Iterables.addAll(reusableBinaryVersions, binaryVersions);
+    // Iterables.addAll(reusableBinaryVersions, binaryVersions);
 
     binaryVersions.forEach(reusableBinaryVersions::add);
 
