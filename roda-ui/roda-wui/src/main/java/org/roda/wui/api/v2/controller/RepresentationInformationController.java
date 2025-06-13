@@ -7,10 +7,7 @@ import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.generics.LongResponse;
@@ -21,7 +18,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationCreateRequest;
 import org.roda.core.data.v2.ri.RepresentationInformationCustomForm;
@@ -38,7 +34,7 @@ import org.roda.wui.api.v2.services.TranslationService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.RepresentationInformationRestService;
-import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,11 +74,14 @@ public class RepresentationInformationController implements RepresentationInform
   @Autowired
   TranslationService translationService;
 
+  @Autowired
+  RequestHandler requestHandler;
+
   @Override
   public RepresentationInformation findByUuid(String uuid, String localeString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    RepresentationInformation retrieve = indexService.retrieve(RepresentationInformation.class, uuid,
-      new ArrayList<>(), true);
+    RepresentationInformation retrieve = indexService.retrieve(RepresentationInformation.class, uuid, new ArrayList<>(),
+      true);
 
     retrieve.setFamilyI18n(
       translationService.getTranslation(localeString, "ri.family." + retrieve.getFamily(), retrieve.getFamily()));
@@ -95,7 +94,6 @@ public class RepresentationInformationController implements RepresentationInform
 
   @Override
   public IndexResult<RepresentationInformation> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     IndexResult<RepresentationInformation> representationInformationIndexResult = indexService
       .find(RepresentationInformation.class, findRequest, localeString);
 
@@ -120,224 +118,159 @@ public class RepresentationInformationController implements RepresentationInform
 
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, RepresentationInformation.class);
   }
 
   @Override
   public RepresentationInformation createRepresentationInformation(
     @RequestBody RepresentationInformationCreateRequest createRequest) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      controllerAssistant.checkRoles(requestContext.getUser());
+    return requestHandler
+      .processRequestWithTransaction(new RequestHandler.RequestProcessor<RepresentationInformation>() {
+        @Override
+        public RepresentationInformation process(RequestContext requestContext,
+          RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+          controllerAssistant.setParameters("representation_information_creation_request", createRequest);
+          // sanitize the input
+          String riSanitized = JsonSanitizer
+            .sanitize(JsonUtils.getJsonFromObject(createRequest.getRepresentationInformation()));
+          RepresentationInformation ri = JsonUtils.getObjectFromJson(riSanitized, RepresentationInformation.class);
 
-      // sanitize the input
-      String riSanitized = JsonSanitizer
-        .sanitize(JsonUtils.getJsonFromObject(createRequest.getRepresentationInformation()));
-      RepresentationInformation ri = JsonUtils.getObjectFromJson(riSanitized, RepresentationInformation.class);
+          String formSanitized = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(createRequest.getForm()));
+          RepresentationInformationCustomForm form = JsonUtils.getObjectFromJson(formSanitized,
+            RepresentationInformationCustomForm.class);
 
-      String formSanitized = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(createRequest.getForm()));
-      RepresentationInformationCustomForm form = JsonUtils.getObjectFromJson(formSanitized,
-        RepresentationInformationCustomForm.class);
+          // validate representation information
+          representationInformationService.validateRepresentationInformation(ri);
 
-      // validate representation information
-      representationInformationService.validateRepresentationInformation(ri);
-
-      // delegate
-      return representationInformationService.createRepresentationInformation(ri, form, requestContext.getUser(), true);
-
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (GenericException | NotFoundException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, "representation_information_creation_request",
-        createRequest);
-    }
+          // delegate
+          return representationInformationService.createRepresentationInformation(ri, form, requestContext, true);
+        }
+      });
   }
 
   @Override
   public RepresentationInformation updateRepresentationInformation(
     @RequestBody RepresentationInformationCreateRequest updateRequest) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+    return requestHandler
+      .processRequestWithTransaction(new RequestHandler.RequestProcessor<RepresentationInformation>() {
+        @Override
+        public RepresentationInformation process(RequestContext requestContext,
+          RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+          controllerAssistant.setParameters("representation_information_update_request", updateRequest);
+          // sanitize the input
+          String riSanitized = JsonSanitizer
+            .sanitize(JsonUtils.getJsonFromObject(updateRequest.getRepresentationInformation()));
+          RepresentationInformation ri = JsonUtils.getObjectFromJson(riSanitized, RepresentationInformation.class);
 
-      // sanitize the input
-      String riSanitized = JsonSanitizer
-        .sanitize(JsonUtils.getJsonFromObject(updateRequest.getRepresentationInformation()));
-      RepresentationInformation ri = JsonUtils.getObjectFromJson(riSanitized, RepresentationInformation.class);
+          String formSanitized = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(updateRequest.getForm()));
+          RepresentationInformationCustomForm form = JsonUtils.getObjectFromJson(formSanitized,
+            RepresentationInformationCustomForm.class);
 
-      String formSanitized = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(updateRequest.getForm()));
-      RepresentationInformationCustomForm form = JsonUtils.getObjectFromJson(formSanitized,
-        RepresentationInformationCustomForm.class);
+          // validate representation information
+          representationInformationService.validateRepresentationInformation(ri);
 
-      // validate representation information
-      representationInformationService.validateRepresentationInformation(ri);
-
-      // delegate
-      return representationInformationService.updateRepresentationInformation(ri, form, requestContext.getUser(), true);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (NotFoundException | GenericException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, "representation_information_update_request",
-        updateRequest);
-    }
+          // delegate
+          return representationInformationService.updateRepresentationInformation(ri, form, requestContext, true);
+        }
+      });
   }
 
   @Override
   public RepresentationInformationFamily retrieveRepresentationInformationFamily(String id, String localeString) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // delegate
-      return representationInformationService.retrieveRepresentationInformationFamily(id, localeString);
-    } catch (NotFoundException | GenericException | RequestNotValidException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state,
-        RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM, id);
-    }
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<RepresentationInformationFamily>() {
+      @Override
+      public RepresentationInformationFamily process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM, id);
+        return representationInformationService
+          .retrieveRepresentationInformationFamily(requestContext.getModelService(), id, localeString);
+      }
+    });
   }
 
   @Override
   public RepresentationInformationFamily retrieveRepresentationInformationFamilyConfigurations(String familyType,
     String localeString) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      // delegate
-      return representationInformationService.retrieveRepresentationInformationFamilyConfigurations(familyType,
-        localeString);
-    } catch (NotFoundException | GenericException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state);
-    }
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<RepresentationInformationFamily>() {
+      @Override
+      public RepresentationInformationFamily process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        // delegate
+        return representationInformationService.retrieveRepresentationInformationFamilyConfigurations(familyType,
+          localeString);
+      }
+    });
   }
 
   @Override
   public RepresentationInformationFamilyOptions retrieveRepresentationInformationFamilyOptions(String localeString) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      List<String> families = RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family");
-      Map<String, String> familyAndTranslation = new HashMap<>();
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<RepresentationInformationFamilyOptions>() {
+      @Override
+      public RepresentationInformationFamilyOptions process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        List<String> families = RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family");
+        Map<String, String> familyAndTranslation = new HashMap<>();
 
-      for (String family : families) {
-        familyAndTranslation.put(family, translationService.getTranslation(localeString, "ri.family." + family));
+        for (String family : families) {
+          familyAndTranslation.put(family, translationService.getTranslation(localeString, "ri.family." + family));
+        }
+
+        RepresentationInformationFamilyOptions options = new RepresentationInformationFamilyOptions();
+        options.setOptions(familyAndTranslation);
+
+        return options;
       }
-
-      RepresentationInformationFamilyOptions options = new RepresentationInformationFamilyOptions();
-      options.setOptions(familyAndTranslation);
-
-      return options;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state);
-    }
+    });
   }
 
   @Override
   public RepresentationInformationRelationOptions retrieveRepresentationInformationRelationOptions(
     String localeString) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
-    try {
-      return representationInformationService.retrieveRelationTypeTranslations(localeString);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state);
-    }
+
+    return requestHandler
+      .processRequest(new RequestHandler.RequestProcessor<RepresentationInformationRelationOptions>() {
+        @Override
+        public RepresentationInformationRelationOptions process(RequestContext requestContext,
+          RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+          return representationInformationService.retrieveRelationTypeTranslations(localeString);
+        }
+      });
   }
 
   @Override
   public Job deleteMultipleRepresentationInformation(@RequestBody SelectedItemsRequest selectedItems) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      SelectedItems<RepresentationInformation> representationInformationSelectedItems = CommonServicesUtils
-        .convertSelectedItems(selectedItems, RepresentationInformation.class);
-      return representationInformationService
-        .deleteRepresentationInformationByJob(representationInformationSelectedItems, requestContext.getUser());
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RequestNotValidException | NotFoundException | GenericException e) {
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
-    }
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
+        SelectedItems<RepresentationInformation> representationInformationSelectedItems = CommonServicesUtils
+          .convertSelectedItems(selectedItems, RepresentationInformation.class);
+        return representationInformationService
+          .deleteRepresentationInformationByJob(representationInformationSelectedItems, requestContext.getUser());
+      }
+    });
   }
 
   @Override
   public Job addFilterToRepresentationInformation(
     @RequestBody RepresentationInformationFilterRequest representationInformationFilterRequest) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
-
-      return representationInformationService.updateRepresentationInformationListWithFilter(
-        representationInformationFilterRequest, requestContext.getUser());
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RequestNotValidException | NotFoundException | GenericException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, state, "filter_request",
-        representationInformationFilterRequest);
-    }
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException {
+        controllerAssistant.setParameters("filter_request", representationInformationFilterRequest);
+        return representationInformationService.updateRepresentationInformationListWithFilter(
+          representationInformationFilterRequest, requestContext.getUser());
+      }
+    });
   }
 
   @GetMapping(path = "{id}/download", produces = MediaType.APPLICATION_XML_VALUE)
@@ -346,35 +279,26 @@ public class RepresentationInformationController implements RepresentationInform
     @ApiResponse(responseCode = "404", description = "Representation information not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   public ResponseEntity<StreamingResponseBody> downloadRepresentationInformation(
     @Parameter(description = "The representation information identifier") @PathVariable(name = "id") String id) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(id);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, id);
+        StreamResponse streamResponse = representationInformationService
+          .downloadRepresentationInformation(requestContext.getModelService(), id);
 
-      StreamResponse streamResponse = representationInformationService.downloadRepresentationInformation(id);
-
-      return ApiUtils.okResponse(streamResponse, null);
-    } catch (AuthorizationDeniedException e) {
-      state = LogEntryState.UNAUTHORIZED;
-      throw new RESTException(e);
-    } catch (RequestNotValidException | NotFoundException | GenericException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM,
-        id);
-    }
+        return ApiUtils.okResponse(streamResponse, null);
+      }
+    });
   }
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
-      RepresentationInformation.class));
+    return ApiUtils.okResponse(
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, RepresentationInformation.class));
   }
 }

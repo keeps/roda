@@ -99,21 +99,23 @@ public class RepresentationInformationService {
   }
 
   public RepresentationInformation createRepresentationInformation(RepresentationInformation ri,
-    RepresentationInformationCustomForm form, User user, boolean commit)
+    RepresentationInformationCustomForm form, RequestContext requestContext, boolean commit)
     throws GenericException, AuthorizationDeniedException, NotFoundException {
     if (form != null) {
       ri.setExtras(getRepresentationInformationExtra(form, ri.getFamily()));
     }
-    return RodaCoreFactory.getModelService().createRepresentationInformation(ri, user.getName(), commit);
+    return requestContext.getModelService().createRepresentationInformation(ri, requestContext.getUser().getName(),
+      commit);
   }
 
   public RepresentationInformation updateRepresentationInformation(RepresentationInformation ri,
-    RepresentationInformationCustomForm form, User user, boolean commit)
+    RepresentationInformationCustomForm form, RequestContext requestContext, boolean commit)
     throws NotFoundException, AuthorizationDeniedException, GenericException {
     if (form != null) {
       ri.setExtras(getRepresentationInformationExtra(form, ri.getFamily()));
     }
-    return RodaCoreFactory.getModelService().updateRepresentationInformation(ri, user.getName(), commit);
+    return requestContext.getModelService().updateRepresentationInformation(ri, requestContext.getUser().getName(),
+      commit);
   }
 
   private String getRepresentationInformationExtra(RepresentationInformationCustomForm form, String family)
@@ -163,15 +165,14 @@ public class RepresentationInformationService {
     return representationInformationFamily;
   }
 
-  public RepresentationInformationFamily retrieveRepresentationInformationFamily(String representationInformationId,
-    String localeString)
+  public RepresentationInformationFamily retrieveRepresentationInformationFamily(ModelService model,
+    String representationInformationId, String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Locale locale = ServerTools.parseLocale(localeString);
     List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = retrieveSupportedMetadataTypes(
       RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family"), locale);
 
-    RepresentationInformation ri = RodaCoreFactory.getModelService()
-      .retrieveRepresentationInformation(representationInformationId);
+    RepresentationInformation ri = model.retrieveRepresentationInformation(representationInformationId);
 
     SupportedMetadataTypeBundle searchResult = supportedMetadataTypeBundles.stream()
       .filter(p -> p.getType().equals(ri.getFamily())).findFirst().orElseThrow(() -> new NotFoundException(
@@ -321,8 +322,8 @@ public class RepresentationInformationService {
 
     FindRequest findRequest = FindRequest.getBuilder(filter, true).withFieldsToReturn(fieldsToReturn).withChildren(true)
       .build();
-    IndexResult<RepresentationInformation> indexResult = indexService.find(RepresentationInformation.class, findRequest
-    );
+    IndexResult<RepresentationInformation> indexResult = indexService.find(RepresentationInformation.class,
+      findRequest);
 
     indexResult.getResults()
       .forEach(ri -> ri.getRelations().stream().filter(p -> p.getLink().equals(fetched.getId())).forEach(riRelation -> {
@@ -353,12 +354,11 @@ public class RepresentationInformationService {
         relationType.toLowerCase(), RodaConstants.SEARCH_FIELD_I18N));
   }
 
-  public StreamResponse downloadRepresentationInformation(String id)
+  public StreamResponse downloadRepresentationInformation(ModelService model, String id)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
 
     final ConsumesOutputStream stream;
 
-    ModelService model = RodaCoreFactory.getModelService();
     Optional<LiteRODAObject> liteRI = LiteRODAObjectFactory.get(RepresentationInformation.class, id);
     if (liteRI.isEmpty()) {
       throw new RequestNotValidException("Could not get representation information lite with id: " + id);
