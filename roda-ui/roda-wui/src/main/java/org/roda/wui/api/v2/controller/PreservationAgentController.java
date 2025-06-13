@@ -21,6 +21,7 @@ import org.roda.wui.api.v2.services.PreservationAgentService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.client.services.PreservationAgentRestService;
 import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,9 +59,11 @@ public class PreservationAgentController implements PreservationAgentRestService
   @Autowired
   PreservationAgentService preservationAgentService;
 
+  @Autowired
+  RequestHandler requestHandler;
+
   @Override
   public IndexedPreservationAgent findByUuid(String uuid, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.PRESERVATION_AGENT_ID,
       RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
       RodaConstants.PRESERVATION_AGENT_VERSION, RodaConstants.PRESERVATION_AGENT_NOTE,
@@ -70,7 +73,6 @@ public class PreservationAgentController implements PreservationAgentRestService
 
   @Override
   public IndexResult<IndexedPreservationAgent> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(IndexedPreservationAgent.class, findRequest, localeString);
   }
 
@@ -86,7 +88,6 @@ public class PreservationAgentController implements PreservationAgentRestService
 
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, IndexedPreservationAgent.class);
   }
 
@@ -98,32 +99,24 @@ public class PreservationAgentController implements PreservationAgentRestService
   public ResponseEntity<StreamingResponseBody> downloadPreservationAgent(
     @Parameter(description = "The id of the preservation agent", required = true) @PathVariable(name = "id") String id,
     @RequestHeader HttpHeaders headers) {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
-    LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
-      // check user permissions
-      controllerAssistant.checkRoles(requestContext.getUser());
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        controllerAssistant.setRelatedObjectId(id);
+        StreamResponse response = preservationAgentService.retrievePreservationAgentFile(id);
 
-      StreamResponse response = preservationAgentService.retrievePreservationAgentFile(id);
-
-      return ApiUtils.okResponse(response);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw new RESTException(e);
-    } finally {
-      // register action
-      controllerAssistant.registerAction(requestContext, id, state, RodaConstants.CONTROLLER_AGENT_ID_PARAM,
-        id);
-    }
+        return ApiUtils.okResponse(response);
+      }
+    });
   }
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString,
-      IndexedPreservationAgent.class));
+    return ApiUtils.okResponse(
+      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedPreservationAgent.class));
   }
 }
