@@ -91,6 +91,10 @@ public class TransactionalStoragePathOperationLog implements Serializable {
     return createdAt;
   }
 
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
   public OperationState getOperationState() {
     return operationState;
   }
