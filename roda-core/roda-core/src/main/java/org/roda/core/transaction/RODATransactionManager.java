@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -93,8 +95,12 @@ public class RODATransactionManager {
       UUID.fromString(requestUUID));
     UUID transactionId = context.transactionLog().getId();
     try {
-      plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
-      endTransaction(transactionId);
+      Report report = plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
+      if (report.getPluginState().equals(PluginState.FAILURE)) {
+        rollbackTransaction(transactionId);
+      } else {
+        endTransaction(transactionId);
+      }
     } catch (Exception e) {
       try {
         rollbackTransaction(transactionId);

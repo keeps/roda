@@ -36,6 +36,7 @@ import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginHelper;
@@ -47,6 +48,7 @@ import org.roda.core.storage.Binary;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.HTMLUtils;
+import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,11 +98,11 @@ public class RepresentationService {
     return info;
   }
 
-  public Representation retrieveAIPRepresentation(IndexedRepresentation representation)
+  public Representation retrieveAIPRepresentation(RequestContext requestContext, IndexedRepresentation representation)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    ModelService model = requestContext.getModelService();
     String aipId = representation.getAipId();
     String representationId = representation.getId();
-    ModelService model = RodaCoreFactory.getModelService();
     return model.retrieveRepresentation(aipId, representationId);
   }
 
@@ -109,12 +111,14 @@ public class RepresentationService {
     return ApiUtils.download(representation);
   }
 
-  public Representation createRepresentation(User user, String aipId, String representationId, String type,
-    String details) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
-    AlreadyExistsException {
+  public Representation createRepresentation(RequestContext requestContext, String aipId, String representationId,
+    String type, String details) throws GenericException, AuthorizationDeniedException, RequestNotValidException,
+    NotFoundException, AlreadyExistsException {
     String eventDescription = "The process of creating an object of the repository.";
 
-    ModelService model = RodaCoreFactory.getModelService();
+    User user = requestContext.getUser();
+    ModelService model = requestContext.getModelService();
+    IndexService index = requestContext.getIndexService();
 
     try {
       Representation representation = model.createRepresentation(aipId, representationId, true, type, true,
@@ -128,7 +132,7 @@ public class RepresentationService {
       model.createEvent(aipId, null, null, null, RodaConstants.PreservationEventType.CREATION, eventDescription, null,
         targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
 
-      RodaCoreFactory.getIndexService().commit(IndexedRepresentation.class);
+      index.commit(IndexedRepresentation.class);
       return representation;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | AlreadyExistsException e) {
@@ -247,9 +251,10 @@ public class RepresentationService {
     return descriptiveMetadataInfos;
   }
 
-  public Optional<String> retrieveDistributedInstanceName(String instanceId, boolean isLocalInstance) {
+  public Optional<String> retrieveDistributedInstanceName(RequestContext requestContext, String instanceId,
+    boolean isLocalInstance) {
     try {
-      ModelService model = RodaCoreFactory.getModelService();
+      ModelService model = requestContext.getModelService();
       RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
 
       if (RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {

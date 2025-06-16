@@ -63,6 +63,7 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.HTMLUtils;
+import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,13 +74,14 @@ public class FilesService {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilesService.class);
   private static final String HTML_EXT = ".html";
 
-  public IndexedFile renameFolder(User user, IndexedFile indexedFolder, String newName, String details)
-    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+  public IndexedFile renameFolder(RequestContext requestContext, IndexedFile indexedFolder, String newName,
+    String details) throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
     AuthorizationDeniedException {
     String eventDescription = "The process of updating an object of the repository.";
 
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
+    User user = requestContext.getUser();
+    ModelService model = requestContext.getModelService();
+    IndexService index = requestContext.getIndexService();
     String oldName = indexedFolder.getId();
 
     try {
@@ -120,11 +122,13 @@ public class FilesService {
       DeleteRODAObjectPlugin.class, user, pluginParameters, "Could not execute file delete action");
   }
 
-  public Job moveFiles(User user, MoveFilesRequest request)
+  public Job moveFiles(RequestContext requestContext, MoveFilesRequest request)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    User user = requestContext.getUser();
+    IndexService indexService = requestContext.getIndexService();
     IndexedFile fileToMove = null;
     if (request.getFileUUIDtoMove() != null) {
-      fileToMove = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, request.getFileUUIDtoMove(),
+      fileToMove = indexService.retrieve(IndexedFile.class, request.getFileUUIDtoMove(),
         RodaConstants.FILE_FIELDS_TO_RETURN);
     }
 
@@ -143,12 +147,13 @@ public class FilesService {
       user, pluginParameters, "Could not execute move job");
   }
 
-  public File createFile(User user, String aipId, String representationId, List<String> directoryPath, String fileId,
-    ContentPayload content, String details) throws GenericException, AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, AlreadyExistsException {
+  public File createFile(RequestContext requestContext, String aipId, String representationId,
+    List<String> directoryPath, String fileId, ContentPayload content, String details) throws GenericException,
+    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
     String eventDescription = "The process of creating an object of the repository.";
 
-    ModelService model = RodaCoreFactory.getModelService();
+    User user = requestContext.getUser();
+    ModelService model = requestContext.getModelService();
 
     try {
       File file = model.createFile(aipId, representationId, directoryPath, fileId, content, user.getId());
@@ -161,8 +166,7 @@ public class FilesService {
       model.createEvent(aipId, representationId, null, null, RodaConstants.PreservationEventType.CREATION,
         eventDescription, null, targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
 
-      RodaCoreFactory.getIndexService().commit(IndexedFile.class);
-
+      requestContext.getIndexService().commit(IndexedFile.class);
       return file;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | AlreadyExistsException e) {
@@ -174,13 +178,14 @@ public class FilesService {
     }
   }
 
-  public IndexedFile createFolder(User user, IndexedRepresentation indexedRepresentation, CreateFolderRequest request)
-    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
-    AuthorizationDeniedException {
+  public IndexedFile createFolder(RequestContext requestContext, IndexedRepresentation indexedRepresentation,
+    CreateFolderRequest request) throws GenericException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException, AuthorizationDeniedException {
     String eventDescription = "The process of creating an object of the repository.";
 
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
+    User user = requestContext.getUser();
+    ModelService model = requestContext.getModelService();
+    IndexService index = requestContext.getIndexService();
     File newFolder;
 
     String folderUUID = request.getFolderUUID();
@@ -214,9 +219,10 @@ public class FilesService {
     }
   }
 
-  public RangeConsumesOutputStream retrieveAIPRepresentationRangeStream(IndexedFile indexedFile)
+  public RangeConsumesOutputStream retrieveAIPRepresentationRangeStream(RequestContext requestContext,
+    IndexedFile indexedFile)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = requestContext.getModelService();
     if (!indexedFile.isDirectory()) {
       final RangeConsumesOutputStream stream;
       DirectResourceAccess directFileAccess = model.getDirectAccess(indexedFile);
@@ -231,9 +237,9 @@ public class FilesService {
     }
   }
 
-  public StreamResponse retrieveAIPRepresentationFile(IndexedFile indexedFile)
+  public StreamResponse retrieveAIPRepresentationFile(RequestContext requestContext, IndexedFile indexedFile)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = requestContext.getModelService();
     Optional<LiteRODAObject> liteFile = LiteRODAObjectFactory.get(File.class, indexedFile.getId());
     if (liteFile.isEmpty()) {
       throw new RequestNotValidException("Couldn't retrieve file with id: " + indexedFile.getId());
@@ -253,9 +259,10 @@ public class FilesService {
     }
   }
 
-  public Optional<String> retrieveDistributedInstanceName(String instanceId, boolean isLocalInstance) {
+  public Optional<String> retrieveDistributedInstanceName(RequestContext requestContext, String instanceId,
+    boolean isLocalInstance) {
     try {
-      ModelService model = RodaCoreFactory.getModelService();
+      ModelService model = requestContext.getModelService();
       RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
 
       if (RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
@@ -299,13 +306,14 @@ public class FilesService {
     }
   }
 
-  public StreamResponse retrieveFilePreservationHTML(IndexedFile file, String language) throws GenericException,
-    RequestNotValidException, NotFoundException, AuthorizationDeniedException, TechnicalMetadataNotFoundException {
+  public StreamResponse retrieveFilePreservationHTML(RequestContext requestContext, IndexedFile file, String language)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+    TechnicalMetadataNotFoundException {
 
     final String filename;
     final ConsumesOutputStream stream;
     StreamResponse ret;
-    ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = requestContext.getModelService();
     Binary preservationMetadataBinary = model.retrievePreservationFile(file.getAipId(), file.getRepresentationId(),
       file.getAncestorsPath(), file.getId());
     filename = preservationMetadataBinary.getStoragePath().getName() + HTML_EXT;
@@ -328,12 +336,13 @@ public class FilesService {
     return ret;
   }
 
-  public StreamResponse retrieveFilePreservationFile(IndexedFile file) throws GenericException,
-    RequestNotValidException, NotFoundException, AuthorizationDeniedException, TechnicalMetadataNotFoundException {
+  public StreamResponse retrieveFilePreservationFile(RequestContext requestContext, IndexedFile file)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+    TechnicalMetadataNotFoundException {
 
     final ConsumesOutputStream stream;
     StreamResponse ret;
-    ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = requestContext.getModelService();
     Binary preservationMetadataBinary = model.retrievePreservationFile(file.getAipId(), file.getRepresentationId(),
       file.getAncestorsPath(), file.getId());
     stream = new BinaryConsumesOutputStream(preservationMetadataBinary, RodaConstants.MEDIA_TYPE_TEXT_XML);
@@ -343,11 +352,12 @@ public class FilesService {
     return ret;
   }
 
-  public TechnicalMetadataInfos retrieveFileTechnicalMetadataInfos(IndexedFile file, String localeString)
+  public TechnicalMetadataInfos retrieveFileTechnicalMetadataInfos(RequestContext requestContext, IndexedFile file,
+    String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     TechnicalMetadataInfos technicalMetadataInfos = new TechnicalMetadataInfos();
 
-    ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = requestContext.getModelService();
 
     Locale locale = ServerTools.parseLocale(localeString);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
@@ -364,10 +374,10 @@ public class FilesService {
     return technicalMetadataInfos;
   }
 
-  public StreamResponse retrieveFileTechnicalMetadataHTML(IndexedFile file, String type, String versionID,
-    String localeString) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException,
-    GenericException, TechnicalMetadataNotFoundException {
-    ModelService model = RodaCoreFactory.getModelService();
+  public StreamResponse retrieveFileTechnicalMetadataHTML(RequestContext requestContext, IndexedFile file, String type,
+    String versionID, String localeString) throws RequestNotValidException, AuthorizationDeniedException,
+    NotFoundException, GenericException, TechnicalMetadataNotFoundException {
+    ModelService model = requestContext.getModelService();
     Representation representation = model.retrieveRepresentation(file.getAipId(), file.getRepresentationId());
     String techMDURN = URNUtils.createRodaTechnicalMetadataURN(file.getId(),
       RODAInstanceUtils.getLocalInstanceIdentifier(), type.toLowerCase());
@@ -396,12 +406,13 @@ public class FilesService {
     return new StreamResponse(stream);
   }
 
-  public StreamResponse retrieveFileTechnicalMetadata(IndexedFile file, String type, String versionID)
+  public StreamResponse retrieveFileTechnicalMetadata(RequestContext requestContext, IndexedFile file, String type,
+    String versionID)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     final ConsumesOutputStream stream;
     StreamResponse ret;
-    ModelService model = RodaCoreFactory.getModelService();
+    ModelService model = requestContext.getModelService();
     Representation representation = model.retrieveRepresentation(file.getAipId(), file.getRepresentationId());
     String techMDURN = URNUtils.createRodaTechnicalMetadataURN(file.getId(),
       RODAInstanceUtils.getLocalInstanceIdentifier(), type.toLowerCase());
