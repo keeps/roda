@@ -18,11 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.pekko.Messages;
 import org.roda.core.common.pekko.messages.jobs.JobPartialUpdate;
+import org.roda.core.components.JobInformationComponent;
+import org.roda.core.config.SpringContext;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -58,6 +61,7 @@ import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.entity.job.JobInformationEntity;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -101,13 +105,13 @@ public final class JobsHelper {
       defaultMaxNumberOfLimitedJobsInParallel);
   }
 
-  public static void setNumberOfJobsWorkers(int numberOfJobWorkers) {
-    RodaCoreFactory.getRodaConfiguration().setProperty(NUMBER_OF_JOB_WORKERS_PROPERTY, numberOfJobWorkers);
-  }
-
   public static int getNumberOfJobsWorkers() {
     int defaultNumberOfJobsWorkers = Runtime.getRuntime().availableProcessors();
     return RodaCoreFactory.getRodaConfiguration().getInt(NUMBER_OF_JOB_WORKERS_PROPERTY, defaultNumberOfJobsWorkers);
+  }
+
+  public static void setNumberOfJobsWorkers(int numberOfJobWorkers) {
+    RodaCoreFactory.getRodaConfiguration().setProperty(NUMBER_OF_JOB_WORKERS_PROPERTY, numberOfJobWorkers);
   }
 
   public static int getNumberOfLimitedJobsWorkers() {
@@ -122,13 +126,13 @@ public final class JobsHelper {
     return RodaCoreFactory.getRodaConfiguration().getInt(BLOCK_SIZE_PROPERTY, DEFAULT_BLOCK_SIZE);
   }
 
+  public static void setBlockSize(int blockSize) {
+    RodaCoreFactory.getRodaConfiguration().setProperty(BLOCK_SIZE_PROPERTY, blockSize);
+  }
+
   public static <T extends IsRODAObject> int getBlockSize(Plugin<T> plugin) {
     return RodaCoreFactory.getRodaConfiguration().getInt(BLOCK_SIZE_PROPERTY + "." + plugin.getClass().getName(),
       RodaCoreFactory.getRodaConfiguration().getInt(BLOCK_SIZE_PROPERTY, DEFAULT_BLOCK_SIZE));
-  }
-
-  public static void setBlockSize(int blockSize) {
-    RodaCoreFactory.getRodaConfiguration().setProperty(BLOCK_SIZE_PROPERTY, blockSize);
   }
 
   public static int getSyncTimeout() {
@@ -226,10 +230,36 @@ public final class JobsHelper {
       Job job = PluginHelper.getJob(plugin, model);
       job = setJobCounters(job, jobPluginInfo);
 
+      JobInformationEntity jobInformation = setJobInformationCounters(jobPluginInfo);
+      jobInformation.setJobId(UUID.fromString(job.getId()));
+
+      JobInformationComponent bean = SpringContext.getBean(JobInformationComponent.class);
+      bean.saveJobInformation(jobInformation);
+
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Unable to get or update Job from model", e);
     }
+  }
+
+  private static JobInformationEntity setJobInformationCounters(JobPluginInfo jobPluginInfo) {
+    JobInformationEntity jobInformation = new JobInformationEntity();
+    jobInformation.setCompletionPercentage(jobPluginInfo.getCompletionPercentage());
+    jobInformation.setSourceObjectsCount(jobPluginInfo.getSourceObjectsCount());
+    jobInformation.setSourceObjectsBeingProcessed(jobPluginInfo.getSourceObjectsBeingProcessed());
+    jobInformation
+      .setSourceObjectsProcessedWithPartialSuccess(jobPluginInfo.getSourceObjectsProcessedWithPartialSuccess());
+    jobInformation.setSourceObjectsProcessedWithSuccess(jobPluginInfo.getSourceObjectsProcessedWithSuccess());
+    jobInformation.setSourceObjectsProcessedWithFailure(jobPluginInfo.getSourceObjectsProcessedWithFailure());
+    jobInformation.setSourceObjectsProcessedWithSkipped(jobPluginInfo.getSourceObjectsProcessedWithSkipped());
+    jobInformation.setSourceObjectsWaitingToBeProcessed(
+      jobPluginInfo.getSourceObjectsCount() - jobPluginInfo.getSourceObjectsBeingProcessed()
+        - jobPluginInfo.getSourceObjectsProcessedWithFailure() - jobPluginInfo.getSourceObjectsProcessedWithSuccess()
+        - jobPluginInfo.getSourceObjectsProcessedWithPartialSuccess()
+        - jobPluginInfo.getSourceObjectsProcessedWithSkipped());
+    jobInformation.setOutcomeObjectsWithManualIntervention(jobPluginInfo.getOutcomeObjectsWithManualIntervention());
+
+    return jobInformation;
   }
 
   private static Job setJobCounters(Job job, JobPluginInfo jobPluginInfo) {

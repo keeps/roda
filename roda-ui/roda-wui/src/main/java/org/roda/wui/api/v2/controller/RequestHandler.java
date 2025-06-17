@@ -1,10 +1,10 @@
 package org.roda.wui.api.v2.controller;
 
+import java.io.IOException;
+
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.transaction.RODATransactionException;
@@ -20,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
-
-import java.io.IOException;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -51,7 +49,8 @@ public class RequestHandler {
     return processRequest(handler, null, false, false);
   }
 
-  private <T> T processRequest(RequestProcessor<T> processor, Class<?> returnClass, boolean isTransactional, boolean checkRoles) {
+  private <T> T processRequest(RequestProcessor<T> processor, Class<?> returnClass, boolean isTransactional,
+    boolean checkRoles) {
     RequestControllerAssistant controllerAssistant = new RequestControllerAssistant(processor);
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -108,6 +107,6 @@ public class RequestHandler {
 
   public interface RequestProcessor<T> {
     T process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
-            throws RODAException, RESTException, IOException;
+      throws RODAException, RESTException, IOException;
   }
 }
