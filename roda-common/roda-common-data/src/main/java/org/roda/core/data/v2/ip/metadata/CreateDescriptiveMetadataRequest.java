@@ -2,9 +2,7 @@ package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Set;
 
-import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.ip.Permissions;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -39,7 +37,8 @@ public abstract class CreateDescriptiveMetadataRequest implements Serializable {
     // empty constructor
   }
 
-  protected CreateDescriptiveMetadataRequest(String id, String filename, String type, String version, boolean similar, Permissions permissions) {
+  protected CreateDescriptiveMetadataRequest(String id, String filename, String type, String version, boolean similar,
+    Permissions permissions) {
     this.id = id;
     this.filename = filename;
     this.type = type;
