@@ -50,14 +50,6 @@ public interface DisposalConfirmationRestService extends RODAEntityRestService<D
   Job restoreDisposalConfirmation(
     @Parameter(description = "Selected disposal confirmations", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selectedItems);
 
-  @RequestMapping(method = RequestMethod.POST, path = "/recover", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Recovers disposal confirmations", description = "Creates an internal job to recover the disposal confirmations", responses = {
-    @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class))),
-    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
-    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Job recoverDisposalConfirmation(
-    @Parameter(description = "Selected disposal confirmations", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selectedItems);
-
   @RequestMapping(method = RequestMethod.POST, path = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Deletes disposal rule", description = "Creates an internal job to delete the disposal confirmations", responses = {
     @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class))),
