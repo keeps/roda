@@ -714,7 +714,7 @@ pre code {
 }
 
 .error:before {
-    content: '\f071';
+    content: '\e002';
     @mixin fontawesome();
 
     padding-left: 5px;
@@ -1096,20 +1096,19 @@ button:after {
 }
 
 .btn-top:after {
-    content: "\e92f";
+    content: "\eacf";
 }
 
-
 .btn-up:after {
-    content: "\e92d";
+    content: "\eae6";
 }
 
 .btn-down:after {
-    content: "\e913";
+    content: "\e313";
 }
 
 .btn-bottom:after {
-    content: "\e92e";
+    content: "\ead0";
 }
 
 .btn-envelope:after {
@@ -1193,7 +1192,7 @@ button:after {
 }
 
 .btn-preview:after {
-  content: "\e938";
+  content: "\e8f4";
 }
 
 .btn-th-list:after {
@@ -1205,11 +1204,11 @@ button:after {
 }
 
 .btn-chevron-left:after {
-    content: "\e92b";
+    content: "\e5cb";
 }
 
 .btn-chevron-right:after {
-    content: "\e92c";
+    content: "\e5cc";
 }
 
 .btn-stop:after{
