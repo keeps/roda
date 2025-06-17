@@ -27,7 +27,6 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.services.Services;
@@ -135,10 +134,6 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
       DisposalConfirmationActionsUtils.permanentlyDeleteDisposalConfirmationReport(object, callback);
     } else if (DisposalConfirmationReportAction.RESTORE_FROM_BIN.equals(action)) {
       DisposalConfirmationActionsUtils.restoreDestroyedRecord(object, callback);
-    } else if (DisposalConfirmationReportAction.RE_EXECUTE.equals(action)) {
-      reExecuteDisposalConfirmation(object, callback);
-    } else if (DisposalConfirmationReportAction.RECOVER_STATE.equals(action)) {
-      recoverDisposalConfirmationExecutionFailed(object, callback);
     } else if (DisposalConfirmationReportAction.PRINT.equals(action)) {
       retrieveDisposalConfirmationReportForPrint(object, callback);
     } else {
@@ -173,50 +168,6 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     } catch (RequestException e) {
       callback.onFailure(e);
     }
-  }
-
-  private void reExecuteDisposalConfirmation(DisposalConfirmation confirmation, AsyncCallback<ActionImpact> callback) {
-
-  }
-
-  private void recoverDisposalConfirmationExecutionFailed(DisposalConfirmation confirmation,
-    AsyncCallback<ActionImpact> callback) {
-    Dialogs.showConfirmDialog(messages.recoverDestroyedRecordsConfirmDialogTitle(),
-      messages.recoverDestroyedRecordsConfirmDialogMessage(), messages.dialogNo(), messages.dialogYes(),
-      new ActionNoAsyncCallback<Boolean>(callback) {
-        @Override
-        public void onSuccess(Boolean result) {
-          if (result) {
-            Services services = new Services("Recovers disposal confirmation", "recover");
-            services
-              .disposalConfirmationResource(s -> s.recoverDisposalConfirmation(
-                new SelectedItemsListRequest(Collections.singletonList(confirmation.getUUID()))))
-              .whenComplete((job, throwable) -> {
-                if (throwable != null) {
-                  callback.onFailure(throwable);
-                } else {
-                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      Toast.showInfo(messages.recoverDestroyedRecordsSuccessTitle(),
-                        messages.recoverDestroyedRecordsSuccessMessage());
-                      doActionCallbackUpdated();
-                      HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
-                    }
-
-                    @Override
-                    public void onSuccess(final Void nothing) {
-                      doActionCallbackUpdated();
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                    }
-                  });
-                }
-              });
-          } else {
-            doActionCallbackNone();
-          }
-        }
-      });
   }
 
   private void deleteDisposalConfirmationReport(DisposalConfirmation report, AsyncCallback<ActionImpact> callback) {
