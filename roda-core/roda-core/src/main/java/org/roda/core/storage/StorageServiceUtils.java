@@ -190,10 +190,22 @@ public final class StorageServiceUtils {
   public static CloseableIterable<Resource> listTransactionalResourcesUnderContainer(
     StorageService stagingStorageService, StorageService mainStorageService, StoragePath storagePath, boolean recursive)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    CloseableIterable<Resource> stagingResources = stagingStorageService.listResourcesUnderContainer(storagePath,
-      recursive);
-    CloseableIterable<Resource> mainResources = mainStorageService.listResourcesUnderContainer(storagePath, recursive);
-    return listTransactionalResourcesUnder(stagingResources, mainResources);
+    if (stagingStorageService.exists(storagePath)) {
+      CloseableIterable<Resource> stagingResources = stagingStorageService.listResourcesUnderContainer(storagePath,
+        recursive);
+      if (mainStorageService.exists(storagePath)) {
+        CloseableIterable<Resource> mainResources = mainStorageService.listResourcesUnderContainer(storagePath,
+          recursive);
+        return listTransactionalResourcesUnder(stagingResources, mainResources);
+      } else {
+        return stagingResources;
+      }
+    } else if (mainStorageService.exists(storagePath)) {
+      return mainStorageService.listResourcesUnderContainer(storagePath, recursive);
+    }
+    else {
+      throw new NotFoundException("Container not found: " + storagePath);
+    }
   }
 
   public static CloseableIterable<Resource> listTransactionalResourcesUnderDirectory(
