@@ -3,31 +3,18 @@ package org.roda.core.storage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.entity.transaction.OperationState;
 import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
-import org.roda.core.transaction.ConsolidatedOperation;
-import org.roda.core.transaction.RODATransactionException;
-import org.roda.core.transaction.TransactionLogConsolidator;
-import org.roda.core.transaction.TransactionLogService;
+import org.roda.core.transaction.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +29,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   private StorageService mainStorageService;
   private TransactionLog transaction;
   private final TransactionLogService transactionLogService;
+  private boolean isInitialized = false;
 
   public DefaultTransactionalStorageService(StorageService mainStorageService, StorageService stagingStorageService,
     TransactionLog transaction, TransactionLogService transactionLogService) {
@@ -49,6 +37,10 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     this.stagingStorageService = stagingStorageService;
     this.transaction = transaction;
     this.transactionLogService = transactionLogService;
+  }
+
+  public void setInitialized(boolean initialized) {
+    isInitialized = initialized;
   }
 
   @Override
@@ -121,14 +113,24 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
     try {
-      CloseableIterable<Resource> ret = StorageServiceUtils
-        .listTransactionalResourcesUnderContainer(stagingStorageService, mainStorageService, storagePath, recursive);
+      HashSet<StoragePath> deletedStoragePaths = new HashSet<>();
+      List<TransactionalStoragePathOperationLog> deletedStoragePathOperations = transactionLogService
+        .getStoragePathsOperations(transaction.getId(), OperationType.DELETE);
+      for (TransactionalStoragePathOperationLog deletedStoragePathOperation : deletedStoragePathOperations) {
+        deletedStoragePaths.add(DefaultStoragePath.parse(deletedStoragePathOperation.getStoragePath()));
+      }
+      CloseableIterable<Resource> ret = StorageServiceUtils.listTransactionalResourcesUnderContainer(
+        stagingStorageService, mainStorageService, storagePath, deletedStoragePaths, recursive);
       updateOperationState(operationLog, OperationState.SUCCESS);
       return ret;
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
+    } catch (RODATransactionException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      throw new GenericException("Failed to retrieve storage paths operations from database", e);
     }
+
   }
 
   @Override
@@ -201,13 +203,22 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
     try {
-      CloseableIterable<Resource> ret = StorageServiceUtils
-        .listTransactionalResourcesUnderDirectory(stagingStorageService, mainStorageService, storagePath, recursive);
+      HashSet<StoragePath> deletedStoragePaths = new HashSet<>();
+      List<TransactionalStoragePathOperationLog> deletedStoragePathOperations = transactionLogService
+        .getStoragePathsOperations(transaction.getId(), OperationType.DELETE);
+      for (TransactionalStoragePathOperationLog deletedStoragePathOperation : deletedStoragePathOperations) {
+        deletedStoragePaths.add(DefaultStoragePath.parse(deletedStoragePathOperation.getStoragePath()));
+      }
+      CloseableIterable<Resource> ret = StorageServiceUtils.listTransactionalResourcesUnderDirectory(
+        stagingStorageService, mainStorageService, storagePath, deletedStoragePaths, recursive);
       updateOperationState(operationLog, OperationState.SUCCESS);
       return ret;
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
+    } catch (RODATransactionException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      throw new GenericException("Failed to retrieve storage paths operations from database", e);
     }
   }
 
@@ -423,6 +434,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       return ret;
     } catch (RODATransactionException | RequestNotValidException e) {
       updateOperationState(operationLog, OperationState.FAILURE);
+      // TODO: Handle this exception properly
       throw new RuntimeException(e);
     }
   }
@@ -561,16 +573,16 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   @Override
   public void commit() throws RODATransactionException {
     try {
-      Map<StoragePath, List<ConsolidatedOperation>> consolidatedOperations = TransactionLogConsolidator
+      Map<StoragePathVersion, List<ConsolidatedOperation>> consolidatedOperations = TransactionLogConsolidator
         .consolidateLogs(transactionLogService.getStoragePathsOperations(transaction.getId()));
-      for (Map.Entry<StoragePath, List<ConsolidatedOperation>> consolidatedOperation : consolidatedOperations
+      for (Map.Entry<StoragePathVersion, List<ConsolidatedOperation>> consolidatedOperation : consolidatedOperations
         .entrySet()) {
-        StoragePath storagePath = consolidatedOperation.getKey();
+        StoragePath storagePath = consolidatedOperation.getKey().storagePath();
+        String version = consolidatedOperation.getKey().version();
         List<ConsolidatedOperation> operations = consolidatedOperation.getValue();
 
         for (ConsolidatedOperation operation : operations) {
           OperationType operationType = operation.operationType();
-          String version = operation.version();
 
           if (operationType == OperationType.DELETE) {
             handleDeleteOperation(storagePath, version);
@@ -739,6 +751,10 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   private TransactionalStoragePathOperationLog registerOperation(StoragePath storagePath, OperationType operation,
     String version) {
+    if (!isInitialized) {
+      return null;
+    }
+
     if (storagePath.getName().equals(RodaConstants.STORAGE_DIRECTORY_AGENTS)) {
       return null;
     }

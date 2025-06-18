@@ -13,6 +13,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.storage.DefaultTransactionalStorageService;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.TransactionalStorageService;
 import org.roda.core.util.IdUtils;
@@ -72,6 +73,7 @@ public class RODATransactionManager {
     TransactionalStorageService transactionalStorageService = transactionContextFactory
       .createTransactionalStorageService(mainStorage, transactionLog);
     TransactionalContext context = new TransactionalContext(transactionLog, transactionalStorageService, null, null);
+    ((DefaultTransactionalStorageService) transactionalStorageService).setInitialized(true);
 
     transactionsContext.put(transactionLog.getId(), context);
     return context;

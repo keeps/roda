@@ -76,6 +76,7 @@ public class TransactionContextFactory {
     StorageService storageService, TransactionLog transactionLog) {
     ModelService stagingModelService = new DefaultModelService(storageService, RodaCoreFactory.getEventsManager(),
       RodaCoreFactory.getNodeType(), RodaCoreFactory.getInstanceId());
+    ((DefaultTransactionalStorageService) storageService).setInitialized(true);
 
     return new DefaultTransactionalModelService(mainModelService, stagingModelService, transactionLog,
       transactionLogService);

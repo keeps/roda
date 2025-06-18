@@ -142,7 +142,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
 
   @Override
   public Void refreshTransferResource(String transferredResourceRelativePath) {
-    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Void>() {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Void>() {
       @Override
       public Void process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException {
