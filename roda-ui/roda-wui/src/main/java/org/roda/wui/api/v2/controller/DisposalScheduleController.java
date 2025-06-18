@@ -1,31 +1,27 @@
 package org.roda.wui.api.v2.controller;
 
-import com.google.json.JsonSanitizer;
-import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
+
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.DisposalScheduleService;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.DisposalScheduleRestService;
-import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
-import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
+import com.google.json.JsonSanitizer;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -33,9 +29,6 @@ import java.io.IOException;
 @RestController
 @RequestMapping(path = "/api/v2/disposal/schedules")
 public class DisposalScheduleController implements DisposalScheduleRestService {
-
-  @Autowired
-  HttpServletRequest request;
 
   @Autowired
   DisposalScheduleService disposalScheduleService;
@@ -49,8 +42,6 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       @Override
       public DisposalSchedules process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException, IOException {
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         return disposalScheduleService.getDisposalSchedules(requestContext.getModelService());
       }
@@ -64,8 +55,6 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
       public DisposalSchedule process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException, IOException {
         controllerAssistant.setRelatedObjectId(id);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // delegate action to service
         return disposalScheduleService.retrieveDisposalSchedule(requestContext.getModelService(), id);
@@ -75,13 +64,11 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
 
   @Override
   public DisposalSchedule createDisposalSchedule(@RequestBody DisposalSchedule schedule) {
-    return requestHandler.processRequest(new RequestHandler.RequestProcessor<DisposalSchedule>() {
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<DisposalSchedule>() {
       @Override
       public DisposalSchedule process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_PARAM, schedule);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // sanitize the input
         String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(schedule));
@@ -97,13 +84,11 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
 
   @Override
   public DisposalSchedule updateDisposalSchedule(@RequestBody DisposalSchedule schedule) {
-    return requestHandler.processRequest(new RequestHandler.RequestProcessor<DisposalSchedule>() {
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<DisposalSchedule>() {
       @Override
       public DisposalSchedule process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_PARAM, schedule);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // sanitize the input
         String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(schedule));
@@ -120,14 +105,12 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
 
   @Override
   public Void deleteDisposalSchedule(String id) {
-    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Void>() {
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Void>() {
       @Override
       public Void process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException {
         controllerAssistant.setRelatedObjectId(id);
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM, id);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // delegate action to service
         disposalScheduleService.deleteDisposalSchedule(id, requestContext.getModelService());
@@ -139,14 +122,12 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
 
   @Override
   public Job associatedDisposalSchedule(@RequestBody SelectedItemsRequest selectedItems, String disposalScheduleId) {
-    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
       @Override
       public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException, IOException {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems,
           RodaConstants.CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM, disposalScheduleId);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // delegate
         return disposalScheduleService.associateDisposalSchedule(requestContext.getUser(),
@@ -157,13 +138,11 @@ public class DisposalScheduleController implements DisposalScheduleRestService {
 
   @Override
   public Job disassociatedDisposalSchedule(@RequestBody SelectedItemsRequest selectedItems) {
-    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
       @Override
       public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // delegate
         return disposalScheduleService.disassociateDisposalSchedule(requestContext.getUser(),

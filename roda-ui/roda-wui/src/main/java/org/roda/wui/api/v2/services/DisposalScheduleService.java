@@ -1,6 +1,10 @@
 package org.roda.wui.api.v2.services;
 
-import org.roda.core.RodaCoreFactory;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -25,11 +29,6 @@ import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.model.RequestContext;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
