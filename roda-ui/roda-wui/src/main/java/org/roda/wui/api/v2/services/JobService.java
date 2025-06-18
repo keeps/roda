@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.StreamResponse;
@@ -32,6 +33,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.jobs.CreateJobRequest;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
@@ -69,13 +71,26 @@ public class JobService {
     String command = RodaCoreFactory.getRodaConfiguration().getString("ui.createJob.curl");
     if (command != null) {
       command = command.replace("{{jsonObject}}",
-        StringEscapeUtils.escapeJava(JsonUtils.getJsonFromObject(job, JobMixIn.class)));
+        StringEscapeUtils.escapeJava(JsonUtils.getJsonFromObject(transformJobToCreateJobRequest(job), JobMixIn.class)));
 
       command = command.replace("{{RODA_CONTEXT_PATH}}", StringEscapeUtils.escapeJava(path));
       return command;
     } else {
       return "";
     }
+  }
+
+  private CreateJobRequest transformJobToCreateJobRequest(Job job) {
+    CreateJobRequest createJobRequest = new CreateJobRequest();
+    createJobRequest.setName(job.getName());
+    createJobRequest.setPlugin(job.getPlugin());
+    createJobRequest.setPluginParameters(job.getPluginParameters());
+    createJobRequest.setSourceObjects(SelectedItemsUtils.convertToRESTRequest(job.getSourceObjects()));
+    createJobRequest.setSourceObjectsClass(job.getSourceObjects().getSelectedClass());
+    createJobRequest.setPriority(job.getPriority().toString());
+    createJobRequest.setParallelism(job.getParallelism().toString());
+
+    return createJobRequest;
   }
 
   public Job createJob(Job job, boolean async) throws NotFoundException, GenericException, JobAlreadyStartedException,
