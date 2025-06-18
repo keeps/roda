@@ -9,13 +9,7 @@ import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.file.CreateFolderRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
@@ -35,7 +29,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfos;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.RangeConsumesOutputStream;
@@ -49,7 +42,6 @@ import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.FileRestService;
-import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
@@ -82,17 +74,18 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping(path = "/api/v2/files")
 public class FilesController implements FileRestService, Exportable {
-  @Autowired
-  private HttpServletRequest request;
 
   @Autowired
-  private FilesService filesService;
+  HttpServletRequest request;
 
   @Autowired
-  private IndexService indexService;
+  FilesService filesService;
 
   @Autowired
-  private RequestHandler requestHandler;
+  IndexService indexService;
+
+  @Autowired
+  RequestHandler requestHandler;
 
   @RequestMapping(path = "{uuid}/preview", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   @Operation(summary = "Previews a file", description = "Previews a particular file using streaming capabilities", responses = {
@@ -199,13 +192,11 @@ public class FilesController implements FileRestService, Exportable {
 
   @Override
   public IndexedFile findByUuid(String uuid, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(IndexedFile.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedFile> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(IndexedFile.class, findRequest, localeString);
   }
 
@@ -221,7 +212,6 @@ public class FilesController implements FileRestService, Exportable {
 
   @Override
   public List<String> suggest(@RequestBody SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, IndexedFile.class);
   }
 
