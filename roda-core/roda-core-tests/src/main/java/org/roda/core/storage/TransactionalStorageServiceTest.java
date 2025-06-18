@@ -631,6 +631,11 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     final ContentPayload payload = new RandomMockContentPayload();
     mainStorage.createBinary(binaryStoragePath, payload, false);
 
+    // 2.2) create a second binary with main storage
+    final StoragePath binaryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload2 = new RandomMockContentPayload();
+    mainStorage.createBinary(binaryStoragePath2, payload2, false);
+
     // 3.1) start first transaction
     TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
     StorageService storage1 = context1.transactionalStorageService();
@@ -649,6 +654,9 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     storage2.deleteResource(binaryStoragePath);
     // 4.3) list resources using same transaction from delete
     resources = storage2.listResourcesUnderContainer(containerStoragePath, false);
+    for (Resource resource1 : resources) {
+      LOGGER.info("Resource: {}", resource1.getStoragePath());
+    }
     try {
       // 4.4) assert that there isn't a resource
       resources.iterator().next();
@@ -679,6 +687,11 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     final ContentPayload payload = new RandomMockContentPayload();
     mainStorage.createBinary(binaryStoragePath, payload, false);
 
+    // 2.2) create a second binary with main storage
+    final StoragePath binaryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    final ContentPayload payload2 = new RandomMockContentPayload();
+    mainStorage.createBinary(binaryStoragePath2, payload2, false);
+
     // 3.1) start first transaction
     TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
     StorageService storage1 = context1.transactionalStorageService();
@@ -697,6 +710,9 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     storage2.deleteResource(binaryStoragePath);
     // 4.3) list resources using same transaction from delete
     resources = storage2.listResourcesUnderDirectory(directoryStoragePath, false);
+    for (Resource resource1 : resources) {
+        LOGGER.info("Resource: {}", resource1.getStoragePath());
+    }
     try {
       // 4.4) assert that there isn't a resource
       resources.iterator().next();

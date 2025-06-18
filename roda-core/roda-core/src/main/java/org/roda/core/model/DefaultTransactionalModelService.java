@@ -3,31 +3,14 @@ package org.roda.core.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.notifications.NotificationProcessor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthenticationDeniedException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IllegalOperationException;
-import org.roda.core.data.exceptions.InvalidTokenException;
-import org.roda.core.data.exceptions.LockingException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
@@ -46,20 +29,8 @@ import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.ip.metadata.OtherMetadata;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.metadata.*;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -81,13 +52,7 @@ import org.roda.core.entity.transaction.TransactionalModelOperationLog;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.iterables.LogEntryFileSystemIterable;
 import org.roda.core.plugins.PluginHelper;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.BinaryVersion;
-import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.DirectResourceAccess;
-import org.roda.core.storage.Directory;
-import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageService;
+import org.roda.core.storage.*;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.transaction.RODATransactionException;
@@ -591,9 +556,19 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String descriptiveMetadataId, ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType,
     String descriptiveMetadataVersion, Map<String, String> properties, String updatedBy)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, OperationType.UPDATE);
-    return getModelService().updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, properties, updatedBy);
+    List<TransactionalModelOperationLog> operationLogs = registerOperationForDescriptiveMetadata(aipId,
+      representationId, descriptiveMetadataId, OperationType.UPDATE);
+
+    try {
+      DescriptiveMetadata ret = getModelService().updateDescriptiveMetadata(aipId, representationId,
+        descriptiveMetadataId, descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion,
+        properties, updatedBy);
+      updateOperationState(operationLogs, OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      updateOperationState(operationLogs, OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override

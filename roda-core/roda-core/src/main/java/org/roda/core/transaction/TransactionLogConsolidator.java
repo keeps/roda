@@ -3,18 +3,11 @@ package org.roda.core.transaction;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.entity.transaction.OperationState;
 import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
@@ -23,8 +16,10 @@ import org.roda.core.storage.DefaultStoragePath;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  *
- *         Utility class for consolidating transaction logs related to storage
- *         path operations.
+ *         Utility class responsible for consolidating logs of storage path
+ *         operations performed as part of transactions. It processes and
+ *         simplifies sequences of operations while preserving meaningful state
+ *         transitions.
  */
 public class TransactionLogConsolidator {
 
@@ -42,11 +37,12 @@ public class TransactionLogConsolidator {
    *           if any storage path in the logs cannot be parsed or is otherwise
    *           invalid
    */
-  public static Map<StoragePath, List<ConsolidatedOperation>> consolidateLogs(
+  public static Map<StoragePathVersion, List<ConsolidatedOperation>> consolidateLogs(
     List<TransactionalStoragePathOperationLog> transactionsLogs) throws RequestNotValidException {
-    Map<StoragePath, List<ConsolidatedOperation>> groupByStoragePath = groupByStoragePath(transactionsLogs);
-    Map<StoragePath, List<ConsolidatedOperation>> consolidateTransaction = consolidateTransaction(groupByStoragePath);
-    Set<StoragePath> deletePaths = findDeletePaths(consolidateTransaction);
+    Map<StoragePathVersion, List<ConsolidatedOperation>> groupByStoragePath = groupByStoragePath(transactionsLogs);
+    Map<StoragePathVersion, List<ConsolidatedOperation>> consolidateTransaction = consolidateTransaction(
+      groupByStoragePath);
+    Set<StoragePathVersion> deletePaths = findDeletePaths(consolidateTransaction);
     removeChildrenOfDeleted(consolidateTransaction, deletePaths);
     return consolidateTransaction;
   }
@@ -61,9 +57,9 @@ public class TransactionLogConsolidator {
    * @throws RequestNotValidException
    *           if the storage path cannot be parsed
    */
-  private static Map<StoragePath, List<ConsolidatedOperation>> groupByStoragePath(
+  private static Map<StoragePathVersion, List<ConsolidatedOperation>> groupByStoragePath(
     List<TransactionalStoragePathOperationLog> logs) throws RequestNotValidException {
-    Map<StoragePath, List<ConsolidatedOperation>> map = new LinkedHashMap<StoragePath, List<ConsolidatedOperation>>();
+    Map<StoragePathVersion, List<ConsolidatedOperation>> map = new LinkedHashMap<>();
     for (TransactionalStoragePathOperationLog log : logs) {
       if (log.getOperationState() == OperationState.SUCCESS) {
         OperationType operationType = log.getOperationType();
@@ -74,8 +70,9 @@ public class TransactionLogConsolidator {
           .parse(StreamSupport.stream(Paths.get(log.getStoragePath()).spliterator(), false).map(Path::toString)
             .collect(Collectors.toList()));
 
-        map.computeIfAbsent(storagePath, k -> new ArrayList<>())
-          .add(new ConsolidatedOperation(operationType, version, updatedAt));
+        StoragePathVersion storagePathVersion = new StoragePathVersion(storagePath, version);
+        map.computeIfAbsent(storagePathVersion, k -> new ArrayList<>())
+          .add(new ConsolidatedOperation(operationType, updatedAt));
       }
     }
     return map;
@@ -92,9 +89,9 @@ public class TransactionLogConsolidator {
    * @return a new map with the same keys, but with refined and consolidated
    *         operations
    */
-  private static Map<StoragePath, List<ConsolidatedOperation>> consolidateTransaction(
-    Map<StoragePath, List<ConsolidatedOperation>> grouped) {
-    Map<StoragePath, List<ConsolidatedOperation>> consolidate = new LinkedHashMap<>();
+  private static Map<StoragePathVersion, List<ConsolidatedOperation>> consolidateTransaction(
+    Map<StoragePathVersion, List<ConsolidatedOperation>> grouped) {
+    Map<StoragePathVersion, List<ConsolidatedOperation>> consolidate = new LinkedHashMap<>();
     for (var entry : grouped.entrySet()) {
       consolidate.put(entry.getKey(), consolidateTransaction(entry.getValue()));
     }
@@ -123,7 +120,6 @@ public class TransactionLogConsolidator {
 
     for (ConsolidatedOperation consolidatedOperation : consolidatedOperations) {
       OperationType op = consolidatedOperation.operationType();
-      String version = consolidatedOperation.version();
       LocalDateTime updatedAt = consolidatedOperation.updatedAt();
       switch (op) {
         case READ:
@@ -131,7 +127,7 @@ public class TransactionLogConsolidator {
 
         case CREATE:
           if (result.isEmpty() || result.getLast().operationType() != OperationType.CREATE) {
-            result.add(new ConsolidatedOperation(OperationType.CREATE, version, updatedAt));
+            result.add(new ConsolidatedOperation(OperationType.CREATE, updatedAt));
           }
           break;
 
@@ -142,11 +138,11 @@ public class TransactionLogConsolidator {
               break;
             }
           }
-          result.add(new ConsolidatedOperation(OperationType.UPDATE, version, updatedAt));
+          result.add(new ConsolidatedOperation(OperationType.UPDATE, updatedAt));
           break;
 
         case DELETE:
-          result.add(new ConsolidatedOperation(OperationType.DELETE, version, updatedAt));
+          result.add(new ConsolidatedOperation(OperationType.DELETE, updatedAt));
           break;
       }
     }
@@ -191,8 +187,8 @@ public class TransactionLogConsolidator {
    *          a map of storage paths and their refined operations
    * @return a set of storage paths marked for deletion
    */
-  private static Set<StoragePath> findDeletePaths(Map<StoragePath, List<ConsolidatedOperation>> refined) {
-    Set<StoragePath> set = new HashSet<>();
+  private static Set<StoragePathVersion> findDeletePaths(Map<StoragePathVersion, List<ConsolidatedOperation>> refined) {
+    Set<StoragePathVersion> set = new HashSet<>();
     refined.forEach((key, consolidateOperations) -> {
       if (!consolidateOperations.isEmpty()) {
         ConsolidatedOperation consolidatedOperation = consolidateOperations.getLast();
@@ -205,31 +201,6 @@ public class TransactionLogConsolidator {
   }
 
   /**
-   * Removes storage paths that are descendants of paths marked for deletion.
-   *
-   * @param refined
-   *          the map of refined storage paths and their operations
-   * @param deletePaths
-   *          the set of paths that are deleted
-   */
-  // private static void removeChildrenOfDeleted(Map<StoragePath,
-  // List<ConsolidatedOperation>> refined,
-  // Set<StoragePath> deletePaths) {
-  // refined.entrySet().removeIf(entry -> {
-  // StoragePath storagePath = entry.getKey();
-  // List<ConsolidatedOperation> consolidateOperations = entry.getValue();
-  // if (!consolidateOperations.isEmpty()) {
-  // ConsolidatedOperation consolidatedOperation =
-  // consolidateOperations.getLast();
-  // if (consolidatedOperation.operationType() != OperationType.DELETE) {
-  // return deletePaths.stream().anyMatch(del -> isAncestor(del, storagePath));
-  // }
-  // }
-  // return false;
-  // });
-  // }
-
-  /**
    * Removes storage paths that are descendants of paths marked for deletion only
    * if the DELETE operation on the ancestor occurred after the child's last
    * operation.
@@ -239,11 +210,11 @@ public class TransactionLogConsolidator {
    * @param deletePaths
    *          the set of paths that are deleted
    */
-  private static void removeChildrenOfDeleted(Map<StoragePath, List<ConsolidatedOperation>> refined,
-    Set<StoragePath> deletePaths) {
+  private static void removeChildrenOfDeleted(Map<StoragePathVersion, List<ConsolidatedOperation>> refined,
+    Set<StoragePathVersion> deletePaths) {
 
-    Map<StoragePath, LocalDateTime> deleteTimes = new HashMap<>();
-    for (StoragePath deletePath : deletePaths) {
+    Map<StoragePathVersion, LocalDateTime> deleteTimes = new HashMap<>();
+    for (StoragePathVersion deletePath : deletePaths) {
       List<ConsolidatedOperation> ops = refined.get(deletePath);
       if (ops != null && !ops.isEmpty()) {
         LocalDateTime deleteTime = ops.getLast().updatedAt();
@@ -252,7 +223,7 @@ public class TransactionLogConsolidator {
     }
 
     refined.entrySet().removeIf(entry -> {
-      StoragePath storagePath = entry.getKey();
+      StoragePathVersion storagePathVersion = entry.getKey();
       List<ConsolidatedOperation> ops = entry.getValue();
       if (ops.isEmpty())
         return false;
@@ -263,7 +234,7 @@ public class TransactionLogConsolidator {
         LocalDateTime lastOpTime = lastOp.updatedAt();
 
         return deleteTimes.entrySet().stream()
-          .anyMatch(del -> isAncestor(del.getKey(), storagePath) && del.getValue().isAfter(lastOpTime));
+          .anyMatch(del -> isAncestor(del.getKey(), storagePathVersion) && del.getValue().isAfter(lastOpTime));
       }
       return false;
     });
@@ -279,12 +250,19 @@ public class TransactionLogConsolidator {
    *          the path to be checked
    * @return true if ancestor is a prefix of child, false otherwise
    */
-  private static boolean isAncestor(StoragePath ancestor, StoragePath child) {
+  private static boolean isAncestor(StoragePathVersion ancestor, StoragePathVersion child) {
     if (ancestor == null || child == null) {
       return false;
     }
-    List<String> directoryPath = ancestor.asList();
-    List<String> childPath = child.asList();
+    String ancestorVersion = ancestor.version();
+    String childVersion = child.version();
+
+    if (!Objects.equals(ancestorVersion, childVersion)) {
+      return false;
+    }
+
+    List<String> directoryPath = ancestor.storagePath().asList();
+    List<String> childPath = child.storagePath().asList();
     if (directoryPath.size() >= childPath.size()) {
       return false;
     }

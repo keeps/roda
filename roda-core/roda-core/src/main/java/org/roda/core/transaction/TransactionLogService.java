@@ -87,6 +87,14 @@ public class TransactionLogService {
   }
 
   @Transactional
+  public List<TransactionalStoragePathOperationLog> getStoragePathsOperations(UUID transactionId,
+    OperationType operationType) throws RODATransactionException {
+    TransactionLog transactionLog = getTransactionLogById(transactionId);
+    return transactionalStoragePathRepository.findByTransactionLogAndOperationType(transactionLog, operationType,
+      OperationState.SUCCESS);
+  }
+
+  @Transactional
   public Optional<TransactionalStoragePathOperationLog> getLastStoragePathOperation(UUID transactionId,
     String storagePath) throws RODATransactionException {
     TransactionLog transactionLog = getTransactionLogById(transactionId);

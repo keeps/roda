@@ -14,7 +14,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.hamcrest.Matchers;
 import org.roda.core.CorporaConstants;
@@ -35,9 +34,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.entity.transaction.OperationState;
-import org.roda.core.entity.transaction.OperationType;
-import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.orchestrate.JobsHelper;
@@ -53,9 +49,7 @@ import org.roda.core.storage.StorageTestUtils;
 import org.roda.core.storage.TransactionalStorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
-import org.roda.core.transaction.ConsolidatedOperation;
 import org.roda.core.transaction.RODATransactionManager;
-import org.roda.core.transaction.TransactionLogConsolidator;
 import org.roda.core.transaction.TransactionLogService;
 import org.roda.core.transaction.TransactionalContext;
 import org.roda.core.util.IdUtils;
@@ -332,16 +326,6 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
     for (Resource resource : transactionalStorage.listResourcesUnderContainer(containerStoragePath, true)) {
       System.out.println("Resource in transactionalStorage: " + resource.getStoragePath());
     }
-
-    for (Resource resource : StorageServiceUtils.listTransactionalResourcesUnderContainer(transactionalStorage, storage,
-      containerStoragePath, true)) {
-      System.out.println("Resource in both storage: " + resource.getStoragePath());
-    }
-
-    CloseableIterable<Resource> resources = StorageServiceUtils
-      .listTransactionalResourcesUnderContainer(transactionalStorage, storage, containerStoragePath, true);
-    AssertJUnit.assertNotNull(resources);
-    assertThat(resources, Matchers.<Resource> iterableWithSize(3));
   }
 
   @Test
@@ -349,8 +333,6 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
     TransactionalContext context = transactionManager.beginTransaction();
     TransactionalStorageService transactionalStorage = context.transactionalStorageService();
 
-    // Create a common container and directories in both storage and transactional
-    // storage
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
     storage.createContainer(containerStoragePath);
@@ -382,16 +364,6 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
     for (Resource resource : transactionalStorage.listResourcesUnderDirectory(directoryStoragePath, true)) {
       System.out.println("Resource in transactionalStorage: " + resource.getStoragePath());
     }
-
-    for (Resource resource : StorageServiceUtils.listTransactionalResourcesUnderDirectory(transactionalStorage, storage,
-      directoryStoragePath, true)) {
-      System.out.println("Resource in both storage: " + resource.getStoragePath());
-    }
-
-    CloseableIterable<Resource> resources = StorageServiceUtils
-      .listTransactionalResourcesUnderDirectory(transactionalStorage, storage, directoryStoragePath, true);
-    AssertJUnit.assertNotNull(resources);
-    assertThat(resources, Matchers.<Resource> iterableWithSize(3));
   }
 
   @Test
