@@ -39,13 +39,11 @@ public class DIPFileController implements DIPFileRestService, Exportable {
 
   @Override
   public DIPFile findByUuid(String uuid, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(DIPFile.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<DIPFile> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(DIPFile.class, findRequest, localeString);
   }
 
@@ -62,7 +60,6 @@ public class DIPFileController implements DIPFileRestService, Exportable {
 
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, DIPFile.class);
   }
 
@@ -70,7 +67,6 @@ public class DIPFileController implements DIPFileRestService, Exportable {
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils
-      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, DIPFile.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, DIPFile.class));
   }
 }
