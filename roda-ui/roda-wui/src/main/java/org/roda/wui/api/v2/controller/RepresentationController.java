@@ -6,11 +6,7 @@ import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.CountRequest;
@@ -30,7 +26,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.representation.ChangeRepresentationStatesRequest;
 import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.core.data.v2.representation.RepresentationTypeOptions;
@@ -43,13 +38,10 @@ import org.roda.wui.api.v2.services.RepresentationService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.RepresentationRestService;
-import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,7 +58,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping(path = "/api/v2/representations")
 public class RepresentationController implements RepresentationRestService, Exportable {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RepresentationController.class);
+
   @Autowired
   private HttpServletRequest request;
   @Autowired
@@ -78,13 +70,11 @@ public class RepresentationController implements RepresentationRestService, Expo
 
   @Override
   public IndexedRepresentation findByUuid(String uuid, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(IndexedRepresentation.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedRepresentation> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(IndexedRepresentation.class, findRequest, localeString);
   }
 
@@ -100,7 +90,6 @@ public class RepresentationController implements RepresentationRestService, Expo
 
   @Override
   public List<String> suggest(@RequestBody SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, IndexedRepresentation.class);
   }
 

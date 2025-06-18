@@ -1,6 +1,5 @@
 package org.roda.wui.api.v2.services;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.MissingResourceException;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.coyote.Request;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -22,8 +20,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ConsumesOutputStream;
-import org.roda.core.data.v2.DefaultConsumesOutputStream;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -45,10 +41,8 @@ import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.base.maintenance.ChangeRepresentationStatusPlugin;
 import org.roda.core.plugins.base.maintenance.ChangeTypePlugin;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
-import org.roda.core.storage.Binary;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
-import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
@@ -61,11 +55,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class RepresentationService {
   private static final Logger LOGGER = LoggerFactory.getLogger(RepresentationService.class);
-  private static final String HTML_EXT = ".html";
 
-  private static DescriptiveMetadataInfo retrieveDescriptiveMetadataBundle(String aipId, String representationId,
+  private static DescriptiveMetadataInfo retrieveDescriptiveMetadataBundle(ModelService model,
     DescriptiveMetadata descriptiveMetadata, final Locale locale) {
-    ModelService model = RodaCoreFactory.getModelService();
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     DescriptiveMetadataInfo info = new DescriptiveMetadataInfo();
     info.setId(descriptiveMetadata.getId());
@@ -107,7 +99,8 @@ public class RepresentationService {
     return model.retrieveRepresentation(aipId, representationId);
   }
 
-  public StreamResponse retrieveAIPRepresentationBinary(RequestContext requestContext, IndexedRepresentation representation)
+  public StreamResponse retrieveAIPRepresentationBinary(RequestContext requestContext,
+    IndexedRepresentation representation)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     return ApiUtils.download(requestContext, representation);
   }
@@ -203,35 +196,15 @@ public class RepresentationService {
     return orderedMetadata;
   }
 
-  public StreamResponse retrieveRepresentationDescriptiveMetadata(String aipId, String representationId,
-    String metadataId, String localeString)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    ModelService modelService = RodaCoreFactory.getModelService();
-    Binary descriptiveMetadataBinary = modelService.retrieveDescriptiveMetadataBinary(aipId, representationId,
-      metadataId);
-    String filename = descriptiveMetadataBinary.getStoragePath().getName() + HTML_EXT;
-    DescriptiveMetadata descriptiveMetadata = modelService.retrieveDescriptiveMetadata(aipId, representationId,
-      metadataId);
-    String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
-      descriptiveMetadata.getType(), descriptiveMetadata.getVersion(), ServerTools.parseLocale(localeString));
-
-    ConsumesOutputStream stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_TEXT_HTML, out -> {
-      PrintStream printStream = new PrintStream(out);
-      printStream.print(htmlDescriptive);
-      printStream.close();
-    });
-
-    return new StreamResponse(stream);
-  }
-
-  public StreamResponse retrieveAIPRepresentationOtherMetadata(RequestContext requestContext, IndexedRepresentation representation)
+  public StreamResponse retrieveAIPRepresentationOtherMetadata(RequestContext requestContext,
+    IndexedRepresentation representation)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     return ApiUtils.download(requestContext, representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
       RodaConstants.STORAGE_DIRECTORY_OTHER);
   }
 
-  public DescriptiveMetadataInfos getDescriptiveMetadata(RequestContext requestContext, IndexedRepresentation indexedRepresentation,
-    String localeString)
+  public DescriptiveMetadataInfos getDescriptiveMetadata(RequestContext requestContext,
+    IndexedRepresentation indexedRepresentation, String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Locale locale = ServerTools.parseLocale(localeString);
     DescriptiveMetadataInfos descriptiveMetadataInfos = new DescriptiveMetadataInfos();
@@ -244,8 +217,8 @@ public class RepresentationService {
       List<DescriptiveMetadata> orderedMetadata = orderDescriptiveMetadata(representation.getDescriptiveMetadata());
 
       for (DescriptiveMetadata descriptiveMetadata : orderedMetadata) {
-        descriptiveMetadataInfos.addObject(retrieveDescriptiveMetadataBundle(representation.getAipId(),
-          representation.getId(), descriptiveMetadata, locale));
+        descriptiveMetadataInfos
+          .addObject(retrieveDescriptiveMetadataBundle(requestContext.getModelService(), descriptiveMetadata, locale));
       }
     }
 
