@@ -22,16 +22,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "/api/v2/classification-plans")
 @Tag(name = ClassificationPlanController.SWAGGER_ENDPOINT)
 public class ClassificationPlanController {
   public static final String SWAGGER_ENDPOINT = "Classification plan";
-
-  @Autowired
-  HttpServletRequest request;
 
   @Autowired
   ClassificationPlanService classificationPlanService;
@@ -41,7 +37,7 @@ public class ClassificationPlanController {
 
   @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Retrieves the classification plan from Catalogue", responses = {
-          @ApiResponse(responseCode = "200", description = "OK")})
+    @ApiResponse(responseCode = "200", description = "OK")})
   public ResponseEntity<StreamingResponseBody> getClassificationPlan(
     @Parameter(description = "Choose file name", schema = @Schema(defaultValue = "plan.json")) @RequestParam(value = "filename", defaultValue = "plan.json", required = false) String filename) {
 
