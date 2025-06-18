@@ -1,6 +1,5 @@
 package org.roda.wui.api.v2.services;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -19,10 +18,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class PreservationAgentService {
 
-  public StreamResponse retrievePreservationAgentFile(String id)
+  public StreamResponse retrievePreservationAgentFile(ModelService model, String id)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-
-    ModelService model = RodaCoreFactory.getModelService();
 
     final Binary binary = model.retrievePreservationAgent(id);
 
