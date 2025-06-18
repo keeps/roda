@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -20,7 +19,6 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
-import org.roda.core.data.v2.ip.disposalhold.LiftDisposalHoldRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;

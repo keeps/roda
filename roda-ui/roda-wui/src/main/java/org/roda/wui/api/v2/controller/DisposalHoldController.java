@@ -27,17 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.json.JsonSanitizer;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 @RestController
 @RequestMapping(path = "/api/v2/disposal/holds")
 public class DisposalHoldController implements DisposalHoldRestService {
-
-  @Autowired
-  HttpServletRequest request;
 
   @Autowired
   DisposalHoldService disposalHoldService;
@@ -51,9 +46,6 @@ public class DisposalHoldController implements DisposalHoldRestService {
       @Override
       public DisposalHolds process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException, IOException {
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
-
         return disposalHoldService.getDisposalHolds(requestContext.getModelService());
       }
     });
@@ -67,8 +59,6 @@ public class DisposalHoldController implements DisposalHoldRestService {
         throws RODAException, RESTException, IOException {
         controllerAssistant.setRelatedObjectId(id);
         controllerAssistant.setParameters(RodaConstants.DISPOSAL_HOLD_ID, id);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         return disposalHoldService.retrieveDisposalHold(id, requestContext.getModelService());
       }
@@ -82,8 +72,6 @@ public class DisposalHoldController implements DisposalHoldRestService {
       public DisposalHold process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException, IOException {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM, hold);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // sanitize the input
         String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(hold));
@@ -106,8 +94,6 @@ public class DisposalHoldController implements DisposalHoldRestService {
         controllerAssistant.setRelatedObjectId(updateDisposalHoldRequest.getDisposalHold().getId());
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM,
           updateDisposalHoldRequest.getDisposalHold());
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // sanitize the input
         String sanitize = JsonSanitizer
@@ -131,8 +117,6 @@ public class DisposalHoldController implements DisposalHoldRestService {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, items,
           RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
           RodaConstants.CONTROLLER_DISPOSAL_HOLD_OVERRIDE_PARAM, override);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // delegate
         return disposalHoldService.applyDisposalHold(requestContext.getUser(),
@@ -149,8 +133,6 @@ public class DisposalHoldController implements DisposalHoldRestService {
         throws RODAException, RESTException {
         controllerAssistant.setRelatedObjectId(id);
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, id);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // delegate
         return disposalHoldService.liftDisposalHold(requestContext.getUser(), id, details);
@@ -170,8 +152,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
           disassociateDisposalHoldRequest.getSelectedItems(), RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM,
           disposalHoldId, RodaConstants.CONTROLLER_DISPOSAL_HOLD_DISASSOCIATE_ALL,
           disassociateDisposalHoldRequest.getClear());
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
+
         // delegate
         return disposalHoldService.disassociateDisposalHold(requestContext.getUser(), disassociateDisposalHoldRequest,
           disposalHoldId);
@@ -185,8 +166,6 @@ public class DisposalHoldController implements DisposalHoldRestService {
       @Override
       public DisposalTransitiveHoldsAIPMetadata process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
         return disposalHoldService.listTransitiveDisposalHolds(aipId, requestContext.getModelService());
       }
     });
@@ -198,8 +177,7 @@ public class DisposalHoldController implements DisposalHoldRestService {
       @Override
       public DisposalHoldsAIPMetadata process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
+
         return requestContext.getModelService().listDisposalHoldsAssociation(aipId);
       }
     });
