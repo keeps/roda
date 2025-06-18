@@ -39,13 +39,11 @@ public class JobReportController implements JobReportRestService, Exportable {
 
   @Override
   public IndexedReport findByUuid(String uuid, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(IndexedReport.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedReport> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(IndexedReport.class, findRequest, localeString);
   }
 
@@ -61,15 +59,13 @@ public class JobReportController implements JobReportRestService, Exportable {
 
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, IndexedReport.class);
   }
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedReport.class));
+      indexService.exportToCSV(findRequestString, IndexedReport.class));
   }
 }

@@ -76,13 +76,13 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(path = "/api/v2/jobs")
 public class JobsController implements JobsRestService, Exportable {
   @Autowired
-  private HttpServletRequest request;
+  HttpServletRequest request;
 
   @Autowired
-  private JobService jobService;
+  JobService jobService;
 
   @Autowired
-  private IndexService indexService;
+  IndexService indexService;
 
   @Override
   public Job getJobFromModel(String jobId) {
@@ -125,7 +125,8 @@ public class JobsController implements JobsRestService, Exportable {
       if (!(jobRequest.getSourceObjects() instanceof SelectedItemsNoneRequest)) {
         sourceObjectsClass = SelectedItemsUtils.parseClass(jobRequest.getSourceObjectsClass());
       }
-      SelectedItems<?> sourceObjects = CommonServicesUtils.convertSelectedItems(jobRequest.getSourceObjects(), sourceObjectsClass);
+      SelectedItems<?> sourceObjects = CommonServicesUtils.convertSelectedItems(jobRequest.getSourceObjects(),
+        sourceObjectsClass);
       Job job = JobUtils.createJob(jobRequest.getName(), JobPriority.valueOf(jobRequest.getPriority()),
         JobParallelism.valueOf(jobRequest.getParallelism()), sourceObjects, jobRequest.getPlugin(),
         jobRequest.getPluginParameters());
@@ -348,13 +349,11 @@ public class JobsController implements JobsRestService, Exportable {
 
   @Override
   public IndexedJob findByUuid(String uuid, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(IndexedJob.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedJob> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(IndexedJob.class, findRequest, localeString);
   }
 
@@ -370,15 +369,12 @@ public class JobsController implements JobsRestService, Exportable {
 
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, IndexedJob.class);
   }
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedJob.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, IndexedJob.class));
   }
 }

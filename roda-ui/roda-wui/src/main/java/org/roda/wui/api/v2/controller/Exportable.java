@@ -1,6 +1,5 @@
 package org.roda.wui.api.v2.controller;
 
-import org.roda.core.data.v2.index.FindRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -112,9 +112,8 @@ public class PreservationAgentController implements PreservationAgentRestService
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedPreservationAgent.class));
+      indexService.exportToCSV(findRequestString, IndexedPreservationAgent.class));
   }
 }

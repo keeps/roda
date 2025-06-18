@@ -303,9 +303,8 @@ public class RepresentationController implements RepresentationRestService, Expo
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils
-      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedRepresentation.class));
+      .okResponse(indexService.exportToCSV(findRequestString, IndexedRepresentation.class));
   }
 }

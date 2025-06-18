@@ -405,10 +405,9 @@ public class FilesController implements FileRestService, Exportable {
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils
-      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedFile.class));
+      .okResponse(indexService.exportToCSV(findRequestString, IndexedFile.class));
   }
 
   @GetMapping(path = "/{uuid}/metadata/technical/{typeId}/html", produces = MediaType.TEXT_HTML_VALUE)

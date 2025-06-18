@@ -80,7 +80,7 @@ public class IndexService {
     }, classToReturn);
   }
 
-  public <T extends IsIndexed> StreamResponse exportToCSV(User user, String findRequestString, Class<T> returnClass) {
+  public <T extends IsIndexed> StreamResponse exportToCSV(String findRequestString, Class<T> returnClass) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<StreamResponse>() {
       @Override
       public StreamResponse process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
@@ -99,7 +99,7 @@ public class IndexService {
 
         if (findRequest.isExportFacets()) {
           IndexResult<T> result = requestContext.getIndexService().find(returnClass, findRequest.getFilter(),
-            Sorter.NONE, Sublist.NONE, findRequest.getFacets(), user, findRequest.isOnlyActive(),
+            Sorter.NONE, Sublist.NONE, findRequest.getFacets(), requestContext.getUser(), findRequest.isOnlyActive(),
             findRequest.getFieldsToReturn());
 
           return new RodaStreamingOutput(
@@ -107,7 +107,7 @@ public class IndexService {
             .toStreamResponse();
         } else {
           IndexResult<T> result = requestContext.getIndexService().find(returnClass, findRequest.getFilter(),
-            findRequest.getSorter(), findRequest.getSublist(), findRequest.getFacets(), user,
+            findRequest.getSorter(), findRequest.getSublist(), findRequest.getFacets(), requestContext.getUser(),
             findRequest.isOnlyActive(), findRequest.getFieldsToReturn());
 
           return new RodaStreamingOutput(new ResultsCSVOutputStream<>(result, findRequest.getFilename(), csvDelimiter))

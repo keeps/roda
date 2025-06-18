@@ -126,9 +126,8 @@ public class RiskIncidenceController implements RiskIncidenceRestService, Export
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, RiskIncidence.class));
+      indexService.exportToCSV(findRequestString, RiskIncidence.class));
   }
 }
