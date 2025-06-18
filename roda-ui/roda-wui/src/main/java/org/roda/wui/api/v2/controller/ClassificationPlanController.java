@@ -47,7 +47,7 @@ public class ClassificationPlanController {
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
         // delegate
         ConsumesOutputStream consumesOutputStream = classificationPlanService
-          .retrieveClassificationPlan(requestContext.getUser(), filename);
+          .retrieveClassificationPlan(requestContext, filename);
         return ApiUtils.okResponse(new StreamResponse(consumesOutputStream), null);
       }
     });
