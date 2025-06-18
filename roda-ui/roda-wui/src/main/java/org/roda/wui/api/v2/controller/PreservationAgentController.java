@@ -105,7 +105,7 @@ public class PreservationAgentController implements PreservationAgentRestService
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
         controllerAssistant.setRelatedObjectId(id);
-        StreamResponse response = preservationAgentService.retrievePreservationAgentFile(id);
+        StreamResponse response = preservationAgentService.retrievePreservationAgentFile(requestContext.getModelService(), id);
 
         return ApiUtils.okResponse(response);
       }
