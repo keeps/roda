@@ -22,7 +22,6 @@ import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.DIPRestService;
-import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.utils.RequestUtils;
@@ -52,26 +51,24 @@ import jakarta.servlet.http.HttpServletRequest;
 public class DIPController implements DIPRestService, Exportable {
 
   @Autowired
-  private HttpServletRequest request;
+  HttpServletRequest request;
 
   @Autowired
-  private IndexService indexService;
+  IndexService indexService;
 
   @Autowired
-  private DIPService dipService;
+  DIPService dipService;
 
   @Autowired
-  private RequestHandler requestHandler;
+  RequestHandler requestHandler;
 
   @Override
   public IndexedDIP findByUuid(String uuid, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(IndexedDIP.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<IndexedDIP> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(IndexedDIP.class, findRequest, localeString);
   }
 
@@ -88,7 +85,6 @@ public class DIPController implements DIPRestService, Exportable {
 
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, IndexedDIP.class);
   }
 
@@ -104,15 +100,15 @@ public class DIPController implements DIPRestService, Exportable {
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
 
-          IndexedDIP dip = indexService.retrieve(IndexedDIP.class, dipUUID, new ArrayList<>());
+        IndexedDIP dip = indexService.retrieve(IndexedDIP.class, dipUUID, new ArrayList<>());
 
-          controllerAssistant.checkObjectPermissions(requestContext.getUser(), dip);
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), dip);
 
-          controllerAssistant.setParameters(RodaConstants.CONTROLLER_DIP_UUID_PARAM, dipUUID);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DIP_UUID_PARAM, dipUUID);
 
-          return ApiUtils.okResponse(dipService.createStreamResponse(requestContext, dip.getUUID()));
-        }
-      });
+        return ApiUtils.okResponse(dipService.createStreamResponse(requestContext, dip.getUUID()));
+      }
+    });
   }
 
   @Override
@@ -123,6 +119,10 @@ public class DIPController implements DIPRestService, Exportable {
         throws RODAException, RESTException {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM, deleteRequest.getItemsToDelete(),
           RodaConstants.CONTROLLER_DETAILS_PARAM, deleteRequest.getDetails());
+
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+          CommonServicesUtils.convertSelectedItems(deleteRequest.getItemsToDelete(), IndexedDIP.class));
+
         return dipService.deleteDIPsJob(deleteRequest, requestContext.getUser());
       }
     });
@@ -152,7 +152,6 @@ public class DIPController implements DIPRestService, Exportable {
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedDIP.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedDIP.class));
   }
 }
