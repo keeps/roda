@@ -7,6 +7,7 @@ import java.util.List;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
+import org.roda.core.data.v2.jobs.Job;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -22,6 +23,7 @@ public class BrowseAIPResponse implements Serializable {
   private DescriptiveMetadataInfos descriptiveMetadataInfos;
   private LongResponse childAipsCount;
   private LongResponse dipCount;
+  private List<Job> ingestJobs;
 
   public BrowseAIPResponse() {
     // empty constructor
@@ -73,5 +75,13 @@ public class BrowseAIPResponse implements Serializable {
 
   public void setDipCount(LongResponse dipCount) {
     this.dipCount = dipCount;
+  }
+
+  public List<Job> getIngestJobs() {
+    return ingestJobs;
+  }
+
+  public void setIngestJobs(List<Job> jobs) {
+    this.ingestJobs = jobs;
   }
 }
