@@ -205,29 +205,28 @@ public class InfoSliderHelper {
       values.put(messages.sipId(), sipIds);
     }
 
-    if (StringUtils.isNotBlank(aip.getIngestJobId())) {
-      Anchor anchor = new Anchor();
-      anchor.setText(aip.getIngestJobId());
-      anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, aip.getIngestJobId(),
-        RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
 
-      values.put(messages.processIdTitle(), anchor);
-    }
-
-    if (!aip.getIngestUpdateJobIds().isEmpty()) {
+    if (!response.getIngestJobs().isEmpty()) {
       FlowPanel jobIdsList = new FlowPanel();
       jobIdsList.addStyleName("slider-info-entry-value-aip-ingest-jobs");
 
-      for (String updateJobId : aip.getIngestUpdateJobIds()) {
-        Anchor anchor = new Anchor();
-        anchor.setText(updateJobId);
-        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, updateJobId,
-          RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
-        jobIdsList.add(anchor);
-      }
 
-      values.put(messages.updateProcessIdTitle(), jobIdsList);
+      response.getIngestJobs().forEach(job -> {
+        Anchor jobIdentifier = new Anchor();
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+          jobIdentifier.setHTML(b.appendEscaped(job.getName()).appendHtmlConstant(" <span class='details-date'>")
+            .appendHtmlConstant(Humanize.formatDateTime(job.getStartDate())).appendHtmlConstant("</span>")
+            .toSafeHtml());
+        jobIdentifier.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, job.getId(),
+          RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
+        jobIdentifier.setStyleName("value");
+        jobIdentifier.addStyleName("details-anchor");
+        jobIdsList.add(jobIdentifier);
+
+      });
+      values.put(messages.processIdTitle(), jobIdsList);
     }
+
 
     return values;
   }
