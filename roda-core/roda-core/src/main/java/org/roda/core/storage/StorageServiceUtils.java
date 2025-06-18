@@ -188,7 +188,7 @@ public final class StorageServiceUtils {
       if (mainStorageService.exists(storagePath)) {
         CloseableIterable<Resource> mainResources = mainStorageService.listResourcesUnderContainer(storagePath,
           recursive);
-        return listTransactionalResourcesUnder(stagingResources, mainResources);
+        return listTransactionalResourcesUnder(stagingResources, mainResources, deletedStoragePaths);
       } else {
         return stagingResources;
       }

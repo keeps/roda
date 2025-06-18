@@ -3,13 +3,7 @@ package org.roda.core.storage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.roda.core.common.iterables.CloseableIterable;
@@ -131,9 +125,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
     } catch (RODATransactionException e) {
-      if (operationLog != null) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
-      }
+      updateOperationState(operationLog, OperationState.FAILURE);
       throw new GenericException("Failed to retrieve storage paths operations from database", e);
     }
 
@@ -223,9 +215,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
     } catch (RODATransactionException e) {
-      if (operationLog != null) {
-        updateOperationState(operationLog.getId(), OperationState.FAILURE);
-      }
+      updateOperationState(operationLog, OperationState.FAILURE);
       throw new GenericException("Failed to retrieve storage paths operations from database", e);
     }
   }
