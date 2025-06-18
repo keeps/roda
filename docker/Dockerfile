@@ -1,48 +1,26 @@
 FROM eclipse-temurin:21-jre-jammy
 LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 
-# Install dependencies
+# Install dependencies & Remove python dependency
 RUN set -ex; \
     apt-get -qq update && \
-    apt-get -qq -y install software-properties-common; \
-    apt-get -qq -y --no-install-recommends install clamdscan rsync jq && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Remove python dependency
-RUN \
+    apt-get -qq -y install software-properties-common && \
+    apt-get -qq -y --no-install-recommends install clamdscan jq rsync && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
 	DEBIAN_FRONTEND=noninteractive \
-	apt-get autoremove -y --purge *python*
+	apt-get autoremove -y --purge "*python*"
 
 COPY ./docker-files/clamd.conf /etc/clamav/clamd.conf
 
-# setup remove old ROOT folder from tomcat
-#RUN set -ex; \
-#    rm -rf /usr/local/tomcat/webapps/ROOT
-
-# Install web application
+# Copy the Roda WUI WAR file
 COPY ./target/roda-wui-*.war  /KEEPS/bin/
-
-# Fix configuration & do some final cleanup
-#RUN mkdir -p /usr/local/tomcat/conf/Catalina/localhost
-#RUN chmod -R a+rwx /usr/local/tomcat/conf/Catalina
-
-#RUN set -ex; \
-#    unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
-#    sed -i -e 's/^core.plugins.internal.virus_check.clamav/#&/' -e 's/^core.tools.siegfried.mode/#&/' config/roda-core.properties && \
-#    echo "\n" >> config/roda-core.properties && \
-#    echo "core.plugins.internal.virus_check.clamav.bin = /usr/bin/clamdscan" >> config/roda-core.properties && \
-#    echo "core.plugins.internal.virus_check.clamav.params = -m --fdpass" >> config/roda-core.properties && \
-#    echo "core.plugins.internal.virus_check.clamav.get_version = clamdscan --version" >> config/roda-core.properties && \
-#    echo "core.tools.siegfried.mode = server" >> config/roda-core.properties && \
-#    zip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties ; \
-#    apt-get remove -y curl zip && apt-get clean && apt-get autoremove ; \
-#    rm -rf /var/lib/apt/lists/*
 
 ENV RODA_HOME=/roda \
     LDAP_SERVER_URL=ldap://openldap \
     LDAP_SERVER_PORT=1389 \
     SIEGFRIED_MODE=server \
     SIEGFRIED_SERVER_URL=http://siegfried:5138 \
+    SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/roda_core_db \
     RODA_USER="roda" \
     RODA_UID="1000" \
     RODA_GROUP="roda" \
