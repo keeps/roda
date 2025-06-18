@@ -133,4 +133,15 @@ public class TransactionLogConsolidatorTest extends AbstractTestNGSpringContextT
     assertEquals(OperationType.CREATE, abcdOps.getFirst().operationType());
   }
 
+  @Test
+  public void testMoveOperationShouldHaveCreateAndDeleteOperationsAfterConsolidation() throws RODAException {
+    List<TransactionalStoragePathOperationLog> logs = List.of(
+      buildLog("a/b/c/d.txt", OperationType.CREATE, OperationState.SUCCESS, null),
+      buildLog("a/b/d.txt", OperationType.DELETE, OperationState.SUCCESS, null));
+
+    Map<StoragePath, List<ConsolidatedOperation>> result = TransactionLogConsolidator.consolidateLogs(logs);
+
+    assertEquals(2, result.size());
+  }
+
 }

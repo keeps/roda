@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.entity.transaction.OperationState;
+import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,8 @@ public interface TransactionalStoragePathRepository extends JpaRepository<Transa
   @Query("SELECT o FROM TransactionalStoragePathOperationLog o WHERE o.transactionLog = :transactionLog AND o.operationState = :operationState ORDER BY o.updatedAt")
   List<TransactionalStoragePathOperationLog> findByTransactionLogOrderByUpdatedAt(
     @Param("transactionLog") TransactionLog transactionLog, @Param("operationState") OperationState operationState);
+
+  @Query("SELECT o FROM TransactionalStoragePathOperationLog o WHERE o.transactionLog = :transactionLog AND o.operationState = :operationState AND o.operationType = :operationType ORDER BY o.updatedAt")
+  List<TransactionalStoragePathOperationLog> findByTransactionLogAndOperationType(
+          @Param("transactionLog") TransactionLog transactionLog, @Param("operationType") OperationType operationType, @Param("operationState") OperationState operationState);
 }

@@ -14,11 +14,7 @@ import java.util.stream.Collectors;
 
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.entity.transaction.OperationState;
 import org.roda.core.entity.transaction.OperationType;
@@ -121,14 +117,26 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
     try {
-      CloseableIterable<Resource> ret = StorageServiceUtils
-        .listTransactionalResourcesUnderContainer(stagingStorageService, mainStorageService, storagePath, recursive);
+      HashSet<StoragePath> deletedStoragePaths = new HashSet<>();
+      List<TransactionalStoragePathOperationLog> deletedStoragePathOperations = transactionLogService
+        .getStoragePathsOperations(transaction.getId(), OperationType.DELETE);
+      for (TransactionalStoragePathOperationLog deletedStoragePathOperation : deletedStoragePathOperations) {
+        deletedStoragePaths.add(DefaultStoragePath.parse(deletedStoragePathOperation.getStoragePath()));
+      }
+      CloseableIterable<Resource> ret = StorageServiceUtils.listTransactionalResourcesUnderContainer(
+        stagingStorageService, mainStorageService, storagePath, deletedStoragePaths, recursive);
       updateOperationState(operationLog, OperationState.SUCCESS);
       return ret;
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
+    } catch (RODATransactionException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw new GenericException("Failed to retrieve storage paths operations from database", e);
     }
+
   }
 
   @Override
@@ -201,13 +209,24 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
     try {
-      CloseableIterable<Resource> ret = StorageServiceUtils
-        .listTransactionalResourcesUnderDirectory(stagingStorageService, mainStorageService, storagePath, recursive);
+      HashSet<StoragePath> deletedStoragePaths = new HashSet<>();
+      List<TransactionalStoragePathOperationLog> deletedStoragePathOperations = transactionLogService
+        .getStoragePathsOperations(transaction.getId(), OperationType.DELETE);
+      for (TransactionalStoragePathOperationLog deletedStoragePathOperation : deletedStoragePathOperations) {
+        deletedStoragePaths.add(DefaultStoragePath.parse(deletedStoragePathOperation.getStoragePath()));
+      }
+      CloseableIterable<Resource> ret = StorageServiceUtils.listTransactionalResourcesUnderDirectory(
+        stagingStorageService, mainStorageService, storagePath, deletedStoragePaths, recursive);
       updateOperationState(operationLog, OperationState.SUCCESS);
       return ret;
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
+    } catch (RODATransactionException e) {
+      if (operationLog != null) {
+        updateOperationState(operationLog.getId(), OperationState.FAILURE);
+      }
+      throw new GenericException("Failed to retrieve storage paths operations from database", e);
     }
   }
 
@@ -423,6 +442,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       return ret;
     } catch (RODATransactionException | RequestNotValidException e) {
       updateOperationState(operationLog, OperationState.FAILURE);
+      // TODO: Handle this exception properly
       throw new RuntimeException(e);
     }
   }

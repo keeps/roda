@@ -8,20 +8,11 @@
 package org.roda.core.storage;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.ip.StoragePath;
 
 /**
@@ -188,8 +179,9 @@ public final class StorageServiceUtils {
   }
 
   public static CloseableIterable<Resource> listTransactionalResourcesUnderContainer(
-    StorageService stagingStorageService, StorageService mainStorageService, StoragePath storagePath, boolean recursive)
+    StorageService stagingStorageService, StorageService mainStorageService, StoragePath storagePath, HashSet<StoragePath> deletedStoragePaths, boolean recursive)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+
     if (stagingStorageService.exists(storagePath)) {
       CloseableIterable<Resource> stagingResources = stagingStorageService.listResourcesUnderContainer(storagePath,
         recursive);
@@ -209,7 +201,8 @@ public final class StorageServiceUtils {
   }
 
   public static CloseableIterable<Resource> listTransactionalResourcesUnderDirectory(
-    StorageService stagingStorageService, StorageService mainStorageService, StoragePath storagePath, boolean recursive)
+    StorageService stagingStorageService, StorageService mainStorageService, StoragePath storagePath,
+    HashSet<StoragePath> deletedStoragePaths, boolean recursive)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     CloseableIterable<Resource> stagingResources;
     CloseableIterable<Resource> mainResources;
@@ -226,11 +219,12 @@ public final class StorageServiceUtils {
       mainResources = new EmptyClosableIterable<>();
     }
 
-    return listTransactionalResourcesUnder(stagingResources, mainResources);
+    return listTransactionalResourcesUnder(stagingResources, mainResources, deletedStoragePaths);
   }
 
   private static CloseableIterable<Resource> listTransactionalResourcesUnder(
-    CloseableIterable<Resource> stagingResources, CloseableIterable<Resource> mainResources) {
+    CloseableIterable<Resource> stagingResources, CloseableIterable<Resource> mainResources,
+    HashSet<StoragePath> deletedStoragePaths) {
 
     return new CloseableIterable<Resource>() {
       @Override
@@ -244,7 +238,7 @@ public final class StorageServiceUtils {
         return new Iterator<Resource>() {
           private final Iterator<Resource> stagingIterator = stagingResources.iterator();
           private final Iterator<Resource> mainIterator = mainResources.iterator();
-          private final Set<StoragePath> seenPaths = new HashSet<>();
+          private final Set<StoragePath> seenPaths = new HashSet<>(deletedStoragePaths);
           private Resource nextItem = null;
 
           {
