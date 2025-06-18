@@ -7,7 +7,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.DisposalRuleService;
@@ -21,17 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.json.JsonSanitizer;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 @RestController
 @RequestMapping(path = "/api/v2/disposal/rules")
 public class DisposalRuleController implements DisposalRuleRestService {
-
-  @Autowired
-  HttpServletRequest request;
 
   @Autowired
   DisposalRuleService disposalRuleService;
@@ -45,9 +39,6 @@ public class DisposalRuleController implements DisposalRuleRestService {
       @Override
       public DisposalRules process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException, IOException {
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
-
         return disposalRuleService.listDisposalRules(requestContext.getModelService());
       }
     });
@@ -62,7 +53,6 @@ public class DisposalRuleController implements DisposalRuleRestService {
         // check user permissions
         controllerAssistant.setRelatedObjectId(id);
         controllerAssistant.setParameters(RodaConstants.DISPOSAL_RULE_ID, id);
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         return disposalRuleService.retrieveDisposalHold(id, requestContext.getModelService());
       }
@@ -76,8 +66,6 @@ public class DisposalRuleController implements DisposalRuleRestService {
       public DisposalRule process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException, IOException {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM, disposalRule);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // sanitize the input
         String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(disposalRule));
@@ -99,8 +87,6 @@ public class DisposalRuleController implements DisposalRuleRestService {
         throws RODAException, RESTException, IOException {
         controllerAssistant.setRelatedObjectId(disposalRule.getId());
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM, disposalRule);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // sanitize the input
         String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(disposalRule));
@@ -123,8 +109,6 @@ public class DisposalRuleController implements DisposalRuleRestService {
         throws RODAException, RESTException, IOException {
         controllerAssistant.setRelatedObjectId(id);
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_RULE_ID_PARAM, id);
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // delegate
         disposalRuleService.deleteDisposalRule(id, requestContext);
@@ -141,8 +125,6 @@ public class DisposalRuleController implements DisposalRuleRestService {
         throws RODAException, RESTException, IOException {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_DISPOSAL_RULE_OVERRIDE_MANUAL_PARAM,
           Boolean.toString(overrideManualAssociations));
-        // check user permissions
-        controllerAssistant.checkRoles(requestContext.getUser());
 
         // delegate action to service
         return disposalRuleService.applyDisposalRules(requestContext.getUser(), overrideManualAssociations);
