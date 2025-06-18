@@ -283,8 +283,8 @@ public class TransactionLogConsolidator {
     if (ancestor == null || child == null) {
       return false;
     }
-    List<String> directoryPath = ancestor.getDirectoryPath();
-    List<String> childPath = child.getDirectoryPath();
+    List<String> directoryPath = ancestor.asList();
+    List<String> childPath = child.asList();
     if (directoryPath.size() >= childPath.size()) {
       return false;
     }

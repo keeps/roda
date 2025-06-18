@@ -591,16 +591,14 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   private void handleDeleteOperation(StoragePath storagePath, String version) throws RODATransactionException {
-    if (mainStorageService.exists(storagePath)) {
-      try {
-        if (version != null) {
-          mainStorageService.deleteBinaryVersion(storagePath, version);
-        } else {
-          mainStorageService.deleteResource(storagePath);
-        }
-      } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
-        throw new RODATransactionException("Failed to delete storage path at " + storagePath, e);
+    try {
+      if (version != null) {
+        mainStorageService.deleteBinaryVersion(storagePath, version);
+      } else {
+        mainStorageService.deleteResource(storagePath);
       }
+    } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
+      throw new RODATransactionException("Failed to delete storage path at " + storagePath, e);
     }
   }
 
@@ -628,7 +626,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
       } else {
         LOGGER.info("Moving resource from staging to main storage service: {}", storagePath);
-        Class<? extends Entity> rootEntity = getEntity(storagePath);
+        Class<? extends Entity> rootEntity = stagingStorageService.getEntity(storagePath);
         // TODO: This is necessary to avoid recursive copies, we should handle it better
         // in StorageServiceUtils
         if (Container.class.isAssignableFrom(rootEntity)) {

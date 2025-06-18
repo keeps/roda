@@ -590,6 +590,9 @@ public class FileStorageService implements StorageService {
         if (shallowFile != null) {
           return getEntityExternalFile(storagePath);
         }
+        else {
+          throw new NotFoundException("Entity was not found: " + storagePath);
+        }
       } catch (GenericException e) {
         throw new NotFoundException("Entity was not found: " + storagePath, e);
       }
