@@ -65,8 +65,7 @@ public class DIPFileController implements DIPFileRestService, Exportable {
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, DIPFile.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, DIPFile.class));
   }
 }

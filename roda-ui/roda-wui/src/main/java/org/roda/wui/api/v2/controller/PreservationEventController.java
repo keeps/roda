@@ -192,9 +192,8 @@ public class PreservationEventController implements PreservationEventRestService
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils.okResponse(
-      indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedPreservationEvent.class));
+      indexService.exportToCSV(findRequestString, IndexedPreservationEvent.class));
   }
 }

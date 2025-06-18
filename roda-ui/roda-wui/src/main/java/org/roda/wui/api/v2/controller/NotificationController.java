@@ -39,16 +39,16 @@ import jakarta.servlet.http.HttpServletRequest;
 public class NotificationController implements NotificationRestService, Exportable {
 
   @Autowired
-  private NotificationsService notificationsService;
+  NotificationsService notificationsService;
 
   @Autowired
-  private IndexService indexService;
+  IndexService indexService;
 
   @Autowired
-  private HttpServletRequest request;
+  HttpServletRequest request;
 
   @Autowired
-  private RequestHandler requestHandler;
+  RequestHandler requestHandler;
 
   @Override
   public Notification getNotification(String notificationId) {
@@ -112,9 +112,7 @@ public class NotificationController implements NotificationRestService, Exportab
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils
-      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, Notification.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, Notification.class));
   }
 }

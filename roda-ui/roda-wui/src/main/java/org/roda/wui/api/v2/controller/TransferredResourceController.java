@@ -262,9 +262,8 @@ public class TransferredResourceController implements TransferredResourceRestSer
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils
-      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, TransferredResource.class));
+      .okResponse(indexService.exportToCSV(findRequestString, TransferredResource.class));
   }
 }

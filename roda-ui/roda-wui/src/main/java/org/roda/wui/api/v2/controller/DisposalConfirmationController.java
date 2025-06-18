@@ -207,9 +207,8 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
     return ApiUtils
-      .okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, DisposalConfirmation.class));
+      .okResponse(indexService.exportToCSV(findRequestString, DisposalConfirmation.class));
   }
 }

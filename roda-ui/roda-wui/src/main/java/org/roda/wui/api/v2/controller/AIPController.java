@@ -1372,9 +1372,8 @@ public class AIPController implements AIPRestService, Exportable {
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, IndexedAIP.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, IndexedAIP.class));
   }
 
   @Override

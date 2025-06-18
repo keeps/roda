@@ -88,16 +88,16 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping(path = "/api/v2/members")
 public class MembersController implements MembersRestService, Exportable {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(MembersController.class);
-  @Autowired
-  private HttpServletRequest request;
 
   @Autowired
-  private MembersService membersService;
+  HttpServletRequest request;
 
   @Autowired
-  private IndexService indexService;
+  MembersService membersService;
+
+  @Autowired
+  IndexService indexService;
 
   public static void logout(HttpServletRequest request, List<String> extraAttributesToBeRemovedFromSession) {
     User user = UserUtility.getUser(request);
@@ -799,13 +799,11 @@ public class MembersController implements MembersRestService, Exportable {
 
   @Override
   public RodaPrincipal findByUuid(String uuid, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.retrieve(RodaPrincipal.class, uuid, new ArrayList<>());
   }
 
   @Override
   public IndexResult<RODAMember> find(@RequestBody FindRequest findRequest, String localeString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.find(RODAMember.class, findRequest, localeString);
   }
 
@@ -821,14 +819,12 @@ public class MembersController implements MembersRestService, Exportable {
 
   @Override
   public List<String> suggest(SuggestRequest suggestRequest) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     return indexService.suggest(suggestRequest, RODAMember.class);
   }
 
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
-    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     // delegate
-    return ApiUtils.okResponse(indexService.exportToCSV(requestContext.getUser(), findRequestString, RODAMember.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, RODAMember.class));
   }
 }
