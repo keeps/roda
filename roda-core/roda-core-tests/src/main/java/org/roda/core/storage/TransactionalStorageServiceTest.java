@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -324,6 +325,70 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     storage3.deleteContainer(containerStoragePath);
     // 3.3) end third transaction
     transactionManager.endTransaction(context3.transactionLog().getId());
+  }
+
+  @Test
+  public void testListDeletedResource() throws RODAException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) end first transaction
+    transactionManager.endTransaction(context1.transactionLog().getId());
+
+    // 2.1) start second transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage2 = context2.transactionalStorageService();
+    // 2.2) create a binary
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage2.createBinary(binaryStoragePath, payload, false);
+    // 2.3) end second transaction
+    transactionManager.endTransaction(context2.transactionLog().getId());
+
+    // 3.1) start third transaction
+    TransactionalContext context3 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage3 = context3.transactionalStorageService();
+    // 3.2) list resources
+    Iterable<Resource> resources = storage3.listResourcesUnderDirectory(containerStoragePath, false);
+    // 3.3) end third transaction
+    transactionManager.endTransaction(context3.transactionLog().getId());
+    // 3.4) assert that there is a resource
+    Resource resource = resources.iterator().next();
+    assertNotNull(resource);
+
+    // 4.1) start fourth transaction
+    TransactionalContext context4 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage4 = context4.transactionalStorageService();
+    // 4.2) delete binary
+    storage4.deleteResource(binaryStoragePath);
+    // 4.3) end fourth transaction
+    transactionManager.endTransaction(context4.transactionLog().getId());
+
+    // 5.1) start fifth transaction
+    TransactionalContext context5 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage5 = context5.transactionalStorageService();
+    // 5.2) list resources
+    resources = storage5.listResourcesUnderDirectory(containerStoragePath, false);
+    // 5.3) end fifth transaction
+    transactionManager.endTransaction(context5.transactionLog().getId());
+    try {
+      // 5.4) assert that there isn't a resource
+      resources.iterator().next();
+      Assert.fail("An exception should have been thrown while listing a deleted resource");
+    } catch (NoSuchElementException e) {
+      LOGGER.info("Caught expected exception: {}", e.getMessage());
+    }
+
+    // 6.1) start sixth transaction
+    TransactionalContext context6 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage6 = context6.transactionalStorageService();
+    // 6.2) cleanup
+    storage6.deleteContainer(containerStoragePath);
+    // 6.3) end sixth transaction
+    transactionManager.endTransaction(context6.transactionLog().getId());
   }
 
   @Override
@@ -1143,6 +1208,8 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     // 7.2) cleanup
     storage7.deleteContainer(copyContainerStoragePath);
     storage7.deleteContainer(targetContainerStoragePath);
+    // 7.3) end seventh transaction
+    transactionManager.endTransaction(context7.transactionLog().getId());
   }
 
   @Override
