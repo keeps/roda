@@ -43,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -79,7 +79,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     mainStorage = new FileStorageService(basePath);
   }
 
-  @AfterClass
+  @AfterMethod
   public void cleanUp() {
     LOGGER.debug("Cleanning up");
     try {
@@ -215,6 +215,299 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     iterator = storage5.listContainers().iterator();
     // 5.3) check if the container is gone
     assertFalse(iterator.hasNext());
+  }
+
+  @Override
+  @Test
+  public void testCreateGetDeleteContainer() throws RODAException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) end first transaction
+    transactionManager.endTransaction(context1.transactionLog().getId());
+
+    // 2.1) start second transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage2 = context2.transactionalStorageService();
+    // 2.2) get created container
+    Container container = storage2.getContainer(containerStoragePath);
+    // 2.3) end second transaction
+    transactionManager.endTransaction(context2.transactionLog().getId());
+    // 2.4) assert that the container is correct
+    assertNotNull(container);
+    assertEquals(containerStoragePath, container.getStoragePath());
+
+    // 3.1) start third transaction
+    TransactionalContext context3 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage3 = context3.transactionalStorageService();
+    // 3.2) create container that already exists
+    try {
+      storage3.createContainer(containerStoragePath);
+      transactionManager.endTransaction(context3.transactionLog().getId());
+      Assert.fail("An exception should have been thrown while creating a container that already exists");
+    } catch (AlreadyExistsException | RODATransactionException e) {
+      LOGGER.info("Caught expected exception: {}", e.getMessage());
+    }
+
+    // 4.1) start fourth transaction
+    TransactionalContext context4 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage4 = context4.transactionalStorageService();
+    // 4.2) delete container
+    storage4.deleteContainer(containerStoragePath);
+    // 4.3) end fourth transaction
+    transactionManager.endTransaction(context4.transactionLog().getId());
+
+    // 5.1) start fifth transaction
+    TransactionalContext context5 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage5 = context5.transactionalStorageService();
+    // 5.2) test delete container
+    try {
+      storage5.getContainer(containerStoragePath);
+      Assert.fail("An exception should have been thrown while getting a container that was deleted");
+    } catch (NotFoundException e) {
+      LOGGER.info("Caught expected exception: {}", e.getMessage());
+    }
+  }
+
+  @Override
+  @Test
+  public void testGetContainerThatDoesntExist() throws RODAException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) get container that doesn't exist
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    try {
+      storage1.getContainer(containerStoragePath);
+      Assert.fail("An exception should have been thrown while getting a container that doesn't exist");
+    } catch (NotFoundException e) {
+      LOGGER.info("Caught expected exception: {}", e.getMessage());
+    }
+  }
+
+  @Override
+  @Test
+  public void testGetContainerThatIsActuallyADirectory() throws RODAException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) create a container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) end first transaction
+    transactionManager.endTransaction(context1.transactionLog().getId());
+
+    // 2.1) start second transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage2 = context2.transactionalStorageService();
+    // 2.2) create a directory under the container
+    final StoragePath directoryStoragePath = StorageTestUtils
+      .generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage2.createDirectory(directoryStoragePath);
+    // 2.3) end second transaction
+    transactionManager.endTransaction(context2.transactionLog().getId());
+
+    // 3.1) start third transaction
+    TransactionalContext context3 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage3 = context3.transactionalStorageService();
+    // 3.2) get directory as it was a binary
+    try {
+      storage3.getContainer(directoryStoragePath);
+      Assert.fail("An exception should have been thrown while getting a container which is actually a directory");
+    } catch (RequestNotValidException e) {
+      LOGGER.info("Caught expected exception: {}", e.getMessage());
+    }
+    // 3.3) end third transaction
+    transactionManager.endTransaction(context3.transactionLog().getId());
+
+    // 4.1) start fourth transaction
+    TransactionalContext context4 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage4 = context4.transactionalStorageService();
+    // 4.2) cleanup
+    storage4.deleteContainer(containerStoragePath);
+  }
+
+  @Override
+  @Test
+  public void testGetContainerThatIsActuallyABinary() throws RODAException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) set up
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) end first transaction
+    transactionManager.endTransaction(context1.transactionLog().getId());
+
+    // 2.1) start second transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage2 = context2.transactionalStorageService();
+    // 2.2) continue set up
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload = new RandomMockContentPayload();
+    storage2.createBinary(binaryStoragePath, payload, false);
+    // 2.3) end second transaction
+    transactionManager.endTransaction(context2.transactionLog().getId());
+
+    // 3.1) start third transaction
+    TransactionalContext context3 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage3 = context3.transactionalStorageService();
+    // 3.2) get binary as it was a directory
+    try {
+      storage3.getContainer(binaryStoragePath);
+      Assert.fail("An exception should have been thrown while getting a container which is actually a binary");
+    } catch (RequestNotValidException e) {
+      LOGGER.info("Caught expected exception: {}", e.getMessage());
+    }
+    // 3.3) end third transaction
+    transactionManager.endTransaction(context3.transactionLog().getId());
+
+    // 4.1) start fourth transaction
+    TransactionalContext context4 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage4 = context4.transactionalStorageService();
+    // 4.2) cleanup
+    storage4.deleteContainer(containerStoragePath);
+  }
+
+  @Override
+  @Test
+  public void testDeleteContainerThatDoesntExist() throws RODAException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) end first transaction
+    transactionManager.endTransaction(context1.transactionLog().getId());
+
+    // 2.1) start second transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage2 = context2.transactionalStorageService();
+    // 2.2) delete container that exists
+    storage2.deleteContainer(containerStoragePath);
+    // 2.3) end second transaction
+    transactionManager.endTransaction(context2.transactionLog().getId());
+
+    // 3.1) start third transaction
+    TransactionalContext context3 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage3 = context3.transactionalStorageService();
+    // 3.2) delete container that no longer exists
+    storage3.deleteContainer(containerStoragePath);
+    transactionManager.endTransaction(context3.transactionLog().getId());
+  }
+
+  public void testListResourcesUnderContainer() throws RODAException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) end first transaction
+    transactionManager.endTransaction(context1.transactionLog().getId());
+
+    // 2.1) start second transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage2 = context2.transactionalStorageService();
+    // 2.2) list empty container
+    Iterable<Resource> resources = storage2.listResourcesUnderContainer(containerStoragePath, false);
+    // 2.3) end second transaction
+    transactionManager.endTransaction(context2.transactionLog().getId());
+    // 2.4) assert that there are no resources
+    assertNotNull(resources);
+    assertNotNull(resources.iterator());
+    assertFalse(resources.iterator().hasNext());
+
+    // 3.1) start third transaction
+    TransactionalContext context3 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage3 = context3.transactionalStorageService();
+    // 3.2) create directories
+    StoragePath directoryStoragePath1 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage3.createDirectory(directoryStoragePath1);
+    StoragePath directoryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage3.createDirectory(directoryStoragePath2);
+    // 3.3) end third transaction
+    transactionManager.endTransaction(context3.transactionLog().getId());
+
+    // 4.1) start fourth transaction
+    TransactionalContext context4 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage4 = context4.transactionalStorageService();
+    // 4.2) list container with 2 resources beneath (directories)
+    resources = storage4.listResourcesUnderContainer(containerStoragePath, false);
+    // 4.3) end fourth transaction
+    transactionManager.endTransaction(context4.transactionLog().getId());
+    // 4.4) assert that there are 2 resources
+    assertNotNull(resources);
+    assertThat(resources, Matchers.<Resource> iterableWithSize(2));
+
+    // TODO test recursive listing
+
+    // 5.1) start fifth transaction
+    TransactionalContext context5 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage5 = context5.transactionalStorageService();
+    // 5.2) cleanup
+    storage5.deleteResource(containerStoragePath);
+    // 5.3) end fifth transaction
+    transactionManager.endTransaction(context5.transactionLog().getId());
+  }
+
+  public void testDeleteNonEmptyContainer() throws RODAException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) end first transaction
+    transactionManager.endTransaction(context1.transactionLog().getId());
+
+    // 2.1) start second transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage2 = context2.transactionalStorageService();
+    // 2.2) create directory under container
+    StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    storage2.createDirectory(directoryStoragePath);
+    // 2.3) end second transaction
+    transactionManager.endTransaction(context2.transactionLog().getId());
+
+    // 3.1) start third transaction
+    TransactionalContext context3 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage3 = context3.transactionalStorageService();
+    // 3.2) delete container recursively
+    storage3.deleteContainer(containerStoragePath);
+    // 3.3) end third transaction
+    transactionManager.endTransaction(context3.transactionLog().getId());
+
+    // 4.1) start fourth transaction
+    TransactionalContext context4 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage4 = context4.transactionalStorageService();
+    // 4.2) test delete container
+    try {
+      storage4.getContainer(containerStoragePath);
+      Assert.fail("An exception should have been thrown while getting a container that doesn't exist");
+    } catch (NotFoundException e) {
+      LOGGER.info("Caught expected exception: {}", e.getMessage());
+    }
+    // 4.3) end fourth transaction
+    transactionManager.endTransaction(context4.transactionLog().getId());
+
+    // 5.1) start fifth transaction
+    TransactionalContext context5 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage5 = context5.transactionalStorageService();
+    // 5.2) test getting a directory that doesn't exist
+    try {
+      storage5.getDirectory(directoryStoragePath);
+      Assert.fail("An exception should have been thrown while getting a container that doesn't exist");
+    } catch (NotFoundException e) {
+      LOGGER.info("Caught expected exception: {}", e.getMessage());
+    }
+    // 5.3) end fifth transaction
+    transactionManager.endTransaction(context5.transactionLog().getId());
+
   }
 
   @Override
