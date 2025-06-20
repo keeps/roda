@@ -304,20 +304,9 @@ public class BrowseAIP extends Composite {
             s -> s.count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, id)), false)),
             IndexedDIP.class);
 
-          List<String> jobIds = new ArrayList<>();
-          jobIds.add(aip.getIngestJobId());
-          jobIds.addAll(aip.getIngestUpdateJobIds());
-
-          List<CompletableFuture<Job>> futures = jobIds.stream()
-            .map(jobId -> service.jobsResource(s -> s.getJobFromModel(jobId))).collect(Collectors.toList());
-
-          CompletableFuture<List<Job>> futureIngestJobs = CompletableFuture
-            .allOf(futures.toArray(new CompletableFuture[0]))
-            .thenApply(v -> futures.stream().map(CompletableFuture::join) // join each individual Job future here
-              .collect(Collectors.toList()));
 
           CompletableFuture.allOf(futureChildAipCount, futureDipCount, futureAncestors, futureRepFields,
-            futureDescriptiveMetadataInfos, futureIngestJobs).thenApply(v -> {
+            futureDescriptiveMetadataInfos).thenApply(v -> {
               BrowseAIPResponse rp = new BrowseAIPResponse();
               rp.setIndexedAIP(aip);
               rp.setAncestors(futureAncestors.join());
@@ -325,7 +314,6 @@ public class BrowseAIP extends Composite {
               rp.setDescriptiveMetadataInfos(futureDescriptiveMetadataInfos.join());
               rp.setChildAipsCount(futureChildAipCount.join());
               rp.setDipCount(futureDipCount.join());
-              rp.setIngestJobs(futureIngestJobs.join());
               return rp;
             }).whenComplete((value, throwable) -> {
 

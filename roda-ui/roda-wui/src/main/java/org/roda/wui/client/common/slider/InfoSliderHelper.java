@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
@@ -24,6 +26,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.common.actions.AipActions;
@@ -34,12 +37,14 @@ import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
@@ -206,27 +211,59 @@ public class InfoSliderHelper {
     }
 
 
-    if (!response.getIngestJobs().isEmpty()) {
+    if (response.getIndexedAIP().getIngestJobId() != null) {
       FlowPanel jobIdsList = new FlowPanel();
       jobIdsList.addStyleName("slider-info-entry-value-aip-ingest-jobs");
 
-
-      response.getIngestJobs().forEach(job -> {
-        Anchor jobIdentifier = new Anchor();
-        SafeHtmlBuilder b = new SafeHtmlBuilder();
-          jobIdentifier.setHTML(b.appendEscaped(job.getName()).appendHtmlConstant(" <span class='details-date'>")
-            .appendHtmlConstant(Humanize.formatDateTime(job.getStartDate())).appendHtmlConstant("</span>")
-            .toSafeHtml());
-        jobIdentifier.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, job.getId(),
-          RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
-        jobIdentifier.setStyleName("value");
-        jobIdentifier.addStyleName("details-anchor");
+      response.getIndexedAIP().getAllIngestJobIds().forEach(jobId -> {
+        Anchor jobIdentifier = new Anchor(jobId);
         jobIdsList.add(jobIdentifier);
 
       });
-      values.put(messages.processIdTitle(), jobIdsList);
-    }
 
+      Services service = new Services("Retrieve AIP jobs information", "get");
+
+      List<String> jobIds = new ArrayList<>();
+
+      jobIds.add(response.getIndexedAIP().getIngestJobId());
+      jobIds.addAll(response.getIndexedAIP().getIngestUpdateJobIds());
+
+      List<CompletableFuture<Job>> futures = jobIds.stream()
+        .map(jobId -> service.jobsResource(s -> s.getJobFromModel(jobId))).collect(Collectors.toList());
+
+      CompletableFuture<List<Job>> futureIngestJobs = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+        .thenApply(v -> futures.stream().map(CompletableFuture::join) // join each individual Job future here
+          .collect(Collectors.toList()));
+
+      CompletableFuture.allOf(futureIngestJobs).thenApply(v -> {
+        List<Job> jobs = futureIngestJobs.join();
+        if (jobs != null && !jobs.isEmpty()) {
+          jobs.forEach(job -> {
+            Anchor jobIdentifier = new Anchor();
+            SafeHtmlBuilder b = new SafeHtmlBuilder();
+            jobIdentifier.setHTML(b.appendEscaped(job.getName()).appendHtmlConstant(" <span class='details-date'>")
+              .appendHtmlConstant(Humanize.formatDateTime(job.getStartDate())).appendHtmlConstant("</span>")
+              .toSafeHtml());
+            jobIdentifier.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, job.getId(),
+              RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
+            jobIdentifier.setStyleName("value");
+            jobIdentifier.addStyleName("details-anchor");
+            jobIdsList.add(jobIdentifier);
+          });
+        }
+        return jobIdsList;
+      }).whenComplete((value, throwable) -> {
+
+        if (throwable == null) {
+
+          GWT.log("a meter values");
+          values.put(messages.processIdTitle(), value);
+        } else {
+          Toast.showError("Error fetching AIP jobs information");
+        }
+      });
+
+    }
 
     return values;
   }
