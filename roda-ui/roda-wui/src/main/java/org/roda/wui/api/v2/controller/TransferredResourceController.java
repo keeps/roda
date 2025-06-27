@@ -87,7 +87,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
 
   @Override
   public Job moveTransferredResources(@RequestBody SelectedItemsRequest items, String resourceId) {
-    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
       @Override
       public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException {
@@ -113,7 +113,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
 
   @Override
   public Job deleteMultipleResources(@RequestBody SelectedItemsRequest transferredResourceSelectedItems) {
-    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
       @Override
       public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException {
@@ -127,7 +127,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
 
   @Override
   public TransferredResource renameTransferredResource(String resourceId, String newName, Boolean replaceExisting) {
-    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<TransferredResource>() {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<TransferredResource>() {
       @Override
       public TransferredResource process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException {
@@ -163,7 +163,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
 
   @Override
   public TransferredResource reindexResources(String path) {
-    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<TransferredResource>() {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<TransferredResource>() {
       @Override
       public TransferredResource process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException {
@@ -208,7 +208,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
     @Parameter(content = @Content(mediaType = "multipart/form-data", schema = @Schema(implementation = MultipartFile.class)), description = "Multipart file") @RequestPart(value = "resource") MultipartFile resource,
     @Parameter(description = "Commit after creation", content = @Content(schema = @Schema(defaultValue = "false", implementation = Boolean.class))) @RequestParam(value = "commit", defaultValue = "false") boolean commit) {
 
-    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<TransferredResource>() {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<TransferredResource>() {
       @Override
       public TransferredResource process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException, IOException {
@@ -223,7 +223,7 @@ public class TransferredResourceController implements TransferredResourceRestSer
 
   @Override
   public TransferredResource createTransferredResourcesFolder(String parentUUID, String folderName, boolean commit) {
-    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<TransferredResource>() {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<TransferredResource>() {
       @Override
       public TransferredResource process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException, IOException {
