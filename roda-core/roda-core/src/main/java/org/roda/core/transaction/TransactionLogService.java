@@ -26,6 +26,11 @@ public class TransactionLogService {
   private TransactionalStoragePathRepository transactionalStoragePathRepository;
 
   @Transactional
+  public List<TransactionLog> getUnfinishedTransactions() {
+    return transactionLogRepository.findByStatusOrderByCreatedAt(TransactionLog.TransactionStatus.PENDING);
+  }
+
+  @Transactional
   public TransactionLog createTransactionLog(TransactionLog.TransactionRequestType requestType, UUID requestId) {
     TransactionLog transactionLog = new TransactionLog(requestType, requestId);
     transactionLogRepository.save(transactionLog);

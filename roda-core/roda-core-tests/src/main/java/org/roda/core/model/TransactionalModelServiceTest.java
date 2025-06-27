@@ -31,6 +31,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
@@ -570,7 +571,7 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
   }
 
   private <T extends IsIndexed> void testRollbackAfterCreate(StoragePath storagePath, TransactionalContext context,
-                                                             Class<T> indexedClass, IsRODAObject rodaObject) throws RODATransactionException {
+    Class<T> indexedClass, IsRODAObject rodaObject) throws RODATransactionException {
     assertTrue(context.transactionalStorageService().exists(storagePath),
       "Storage path should exist in the transactional storage service: " + storagePath);
     assertFalse(storage.exists(storagePath),
@@ -591,6 +592,37 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
     } catch (RODAException e) {
       Assert.fail("Unexpected exception: " + e.getMessage());
     }
+  }
+
+  @Test
+  public void testUnfinishedTransactions() throws RODAException {
+    TransactionalContext context = transactionManager.beginTransaction();
+
+    AIP aip = createTestAIP(context.transactionalModelService());
+    StoragePath storagePath = ModelUtils.getAIPStoragePath(aip.getId());
+    context.indexService().commit(IndexedAIP.class);
+
+    assertTrue(context.transactionalStorageService().exists(storagePath),
+      "Storage path should exist in the transactional storage service: " + storagePath);
+
+    // Check if all representations are rolled back from the index
+    Filter AipIdFilter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aip.getId()));
+    IndexResult<IndexedAIP> results = context.indexService().find(IndexedAIP.class, AipIdFilter, null, new Sublist(0, 10),
+            Collections.emptyList());
+    assertEquals("There should be one AIP indexed before transaction cleanup", 1, results.getTotalCount());
+
+    transactionManager.cleanUnfinishedTransactions();
+    context.indexService().commit(IndexedAIP.class);
+
+    assertFalse(storage.exists(storagePath),
+      "Storage path should not exist in the main storage service after transaction cleanup: " + storagePath);
+
+    assertTrue(transactionLogService.getUnfinishedTransactions().isEmpty(),
+      "There should be no unfinished transactions after cleanup");
+
+    IndexResult<IndexedAIP> resultsAfterCleanup = context.indexService().find(IndexedAIP.class, AipIdFilter, null, new Sublist(0, 10),
+      Collections.emptyList());
+    assertEquals("There should be no AIPs indexed after transaction cleanup", 0, resultsAfterCleanup.getTotalCount());
   }
 
 }
