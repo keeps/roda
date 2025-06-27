@@ -450,11 +450,6 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
                             @Override
                             public void onFailure(Throwable caught) {
                               doActionCallbackNone();
-                              if (value != null) {
-                                HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
-                              } else {
-                                HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                              }
                             }
 
                             @Override
