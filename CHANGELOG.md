@@ -1,5 +1,20 @@
 # Changelog
 
+## v5.7.6 (01/01/1970)
+#### New features 
+
+#### Enhancements 
+
+#### Bug fixes
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.5 (19/05/2025)
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities
@@ -407,15 +422,3 @@ docker pull ghcr.io/keeps/roda:v4.5.6
 ---
 
 ## v5.1.0-RC (17/04/2023)
-
----
-
-## v4.5.5 (16/03/2023)
-#### Dependencies upgrade:
-- Bump commons-ip version from 2.3.0 to 2.3.2 
-
-
-Install for demonstration:
-```
-docker pull ghcr.io/keeps/roda:v4.5.5
-```
