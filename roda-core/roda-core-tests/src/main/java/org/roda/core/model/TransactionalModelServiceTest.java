@@ -1,6 +1,5 @@
 package org.roda.core.model;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hamcrest.Matchers;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -25,15 +23,19 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.orchestrate.JobsHelper;
@@ -44,11 +46,11 @@ import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.RandomMockContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceUtils;
 import org.roda.core.storage.StorageTestUtils;
 import org.roda.core.storage.TransactionalStorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.transaction.RODATransactionException;
 import org.roda.core.transaction.RODATransactionManager;
 import org.roda.core.transaction.TransactionLogService;
 import org.roda.core.transaction.TransactionalContext;
@@ -158,66 +160,6 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
     // commit: " + aipStoragePath);
     assertTrue(storage.exists(aipStoragePath),
       "AIP storage path should exist in the storage service after transaction commit: " + aipStoragePath);
-  }
-
-  @Test
-  public void testCreateAIPRollback() throws RODAException, IOException {
-    TransactionalContext context = transactionManager.beginTransaction();
-    assertNotNull(context);
-
-    TransactionalModelService transactionalModelService = context.transactionalModelService();
-    TransactionalStorageService transactionalStorageService = context.transactionalStorageService();
-    IndexService indexService = context.indexService();
-
-    // generate AIP ID
-    final String aipId = IdUtils.createUUID();
-
-    AIP aip = transactionalModelService.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_VERSION_EAD_UNKNOWN),
-      RodaConstants.ADMIN);
-
-    assertNotNull(aip);
-
-    StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
-
-    assertTrue(transactionalStorageService.exists(aipStoragePath),
-      "AIP storage path should exist in the transactional storage service: " + aipStoragePath);
-    assertFalse(storage.exists(aipStoragePath),
-      "AIP storage path should not exist in the storage service service before transaction commit: " + aipStoragePath);
-
-    // Rollback the transaction
-    transactionManager.rollbackTransaction(context.transactionLog().getId());
-    // assertFalse(transactionalStorageService.exists(aipStoragePath),
-    // "AIP storage path should not exist in the transactional storage service after
-    // transaction rollback: "
-    // + aipStoragePath);
-    assertFalse(storage.exists(aipStoragePath),
-      "AIP storage path should not exist in the storage service after transaction rollback: " + aipStoragePath);
-
-    try {
-      indexService.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
-      Assert.fail("Indexed AIP should not exist after transaction rollback");
-    } catch (NotFoundException e) {
-      // Expected exception, as the AIP should not be indexed
-      LOGGER.debug("Expected NotFoundException: {}", e.getMessage());
-    } catch (RODAException e) {
-      Assert.fail("Unexpected exception: " + e.getMessage());
-    }
-
-    // Check if all representations are rolled back from the index
-    Filter repAipId = new Filter();
-    repAipId.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
-    IndexResult<IndexedRepresentation> reps = indexService.find(IndexedRepresentation.class, repAipId, null,
-      new Sublist(0, 10), Collections.emptyList());
-    assertEquals(0, reps.getTotalCount());
-
-    // Check if all files are rolled back from the index
-    Filter fileAipId = new Filter();
-    fileAipId.add(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId));
-    IndexResult<IndexedFile> files = indexService.find(IndexedFile.class, fileAipId, null, new Sublist(0, 10),
-      Collections.emptyList());
-    assertEquals(0, files.getTotalCount());
-
   }
 
   @Test
@@ -498,12 +440,157 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
       .generateRandomResourceStoragePathUnder(subDirectoryStoragePath);
     final ContentPayload payload = new RandomMockContentPayload();
     storage.createBinary(binaryStoragePath, payload, false);
+    final StoragePath binaryStoragePath2 = StorageTestUtils
+      .generateRandomResourceStoragePathUnder(subDirectoryStoragePath);
+    final ContentPayload payload2 = new RandomMockContentPayload();
+    storage.createBinary(binaryStoragePath2, payload2, false);
 
     TransactionalContext context = transactionManager.beginTransaction();
     TransactionalStorageService transactionalStorage = context.transactionalStorageService();
 
     transactionalStorage.copy(storage, directoryStoragePath, targetDirectoryStoragePath);
-    transactionalStorage.deleteResource(targetDirectoryStoragePath);
+    transactionalStorage.deleteResource(binaryStoragePath);
     transactionManager.endTransaction(context.transactionLog().getId());
   }
+
+  /*
+   * Rollback tests
+   */
+  @Test
+  public void testAIPRollbackAfterCreate() throws RODAException {
+    TransactionalContext context = transactionManager.beginTransaction();
+    IndexService indexService = context.indexService();
+
+    AIP aip = createTestAIP(context.transactionalModelService());
+    StoragePath storagePath = ModelUtils.getAIPStoragePath(aip.getId());
+
+    testRollbackAfterCreate(storagePath, context, IndexedRepresentation.class, aip);
+
+    // Check if all representations are rolled back from the index
+    Filter repAipId = new Filter();
+    repAipId.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId()));
+    IndexResult<IndexedRepresentation> reps = indexService.find(IndexedRepresentation.class, repAipId, null,
+      new Sublist(0, 10), Collections.emptyList());
+    assertEquals(0, reps.getTotalCount());
+
+    // Check if all files are rolled back from the index
+    Filter fileAipId = new Filter();
+    fileAipId.add(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aip.getId()));
+    IndexResult<IndexedFile> files = indexService.find(IndexedFile.class, fileAipId, null, new Sublist(0, 10),
+      Collections.emptyList());
+    assertEquals(0, files.getTotalCount());
+  }
+
+  @Test
+  public void testRepresentationRollbackAfterCreate() throws RODAException {
+    AIP aip = createTestAIP(model);
+
+    TransactionalContext context = transactionManager.beginTransaction();
+    IndexService indexService = context.indexService();
+
+    Representation representation = createTestRepresentation(context.transactionalModelService(), aip.getId());
+    StoragePath storagePath = ModelUtils.getRepresentationStoragePath(representation.getAipId(),
+      representation.getId());
+
+    testRollbackAfterCreate(storagePath, context, IndexedRepresentation.class, representation);
+
+    // Check if all files are rolled back from the index
+    Filter fileAipId = new Filter();
+    fileAipId.add(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aip.getId()));
+    IndexResult<IndexedFile> files = indexService.find(IndexedFile.class, fileAipId, null, new Sublist(0, 10),
+      Collections.emptyList());
+    assertEquals(0, files.getTotalCount());
+  }
+
+  @Test
+  public void testFileRollbackAfterCreate() throws RODAException {
+    AIP aip = createTestAIP(model);
+    TransactionalContext context = transactionManager.beginTransaction();
+
+    File file = createTestFile(context.transactionalModelService(), aip.getId());
+    StoragePath storagePath = ModelUtils.getFileStoragePath(file);
+
+    testRollbackAfterCreate(storagePath, context, IndexedRepresentation.class, file);
+  }
+
+  @Test
+  public void testDescriptiveMetadataRollbackAfterCreate() throws RODAException {
+    AIP aip = createTestAIP(model);
+    TransactionalContext context = transactionManager.beginTransaction();
+
+    DescriptiveMetadata descriptiveMetadata = createTestDescriptiveMetadata(context.transactionalModelService(),
+      aip.getId());
+    StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(descriptiveMetadata);
+
+    testRollbackAfterCreate(storagePath, context, IndexedRepresentation.class, descriptiveMetadata);
+  }
+
+  private AIP createTestAIP(ModelService modelService) throws RODAException {
+    final String aipId = IdUtils.createUUID();
+
+    AIP aip = modelService.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_VERSION_EAD_UNKNOWN),
+      RodaConstants.ADMIN);
+    assertNotNull(aip);
+    return aip;
+  }
+
+  private Representation createTestRepresentation(ModelService modelService, String aipId) throws RODAException {
+    final String representationId = IdUtils.createUUID();
+
+    Representation representation = modelService.createRepresentation(aipId, representationId,
+      CorporaConstants.REPRESENTATION_1_ORIGINAL, CorporaConstants.REPRESENTATION_1_TYPE, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH), false, RodaConstants.ADMIN);
+    assertNotNull(representation);
+    return representation;
+  }
+
+  private File createTestFile(ModelService modelService, String aipId) throws RODAException {
+    final String fileId = IdUtils.createUUID();
+
+    final Binary binary = corporaService.getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_FILE_STORAGEPATH));
+    File file = modelService.createFile(aipId, CorporaConstants.REPRESENTATION_1_ID, new ArrayList<>(), fileId,
+      binary.getContent(), RodaConstants.ADMIN, true);
+    assertNotNull(file);
+    return file;
+  }
+
+  private DescriptiveMetadata createTestDescriptiveMetadata(ModelService modelService, String aipId)
+    throws RODAException {
+    final String descriptiveMetadataId = IdUtils.createUUID();
+
+    final Binary binary = corporaService
+      .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
+
+    final DescriptiveMetadata descriptiveMetadata = modelService.createDescriptiveMetadata(aipId, descriptiveMetadataId,
+      binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE,
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, RodaConstants.ADMIN);
+    assertNotNull(descriptiveMetadata);
+    return descriptiveMetadata;
+  }
+
+  private <T extends IsIndexed> void testRollbackAfterCreate(StoragePath storagePath, TransactionalContext context,
+                                                             Class<T> indexedClass, IsRODAObject rodaObject) throws RODATransactionException {
+    assertTrue(context.transactionalStorageService().exists(storagePath),
+      "Storage path should exist in the transactional storage service: " + storagePath);
+    assertFalse(storage.exists(storagePath),
+      "Storage path should not exist in the storage service service before transaction commit: " + storagePath);
+
+    // Rollback the transaction
+    transactionManager.rollbackTransaction(context.transactionLog().getId());
+
+    assertFalse(storage.exists(storagePath),
+      "Storage path should not exist in the storage service after transaction rollback: " + storagePath);
+
+    try {
+      context.indexService().retrieve(indexedClass, rodaObject.getId(), new ArrayList<>());
+      Assert.fail("Indexed Entity should not exist after transaction rollback");
+    } catch (NotFoundException e) {
+      // Expected exception, as the AIP should not be indexed
+      LOGGER.debug("Expected NotFoundException: {}", e.getMessage());
+    } catch (RODAException e) {
+      Assert.fail("Unexpected exception: " + e.getMessage());
+    }
+  }
+
 }

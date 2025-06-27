@@ -748,6 +748,7 @@ public class RodaCoreFactory {
             .resolve(RodaConstants.CORE_DEFAULT_FOLDER).resolve(RodaConstants.CORE_DATA_FOLDER);
           Path targetPath = configurationManager.getRodaHomePath().resolve(RodaConstants.CORE_DATA_FOLDER);
 
+          //TODO: We should avoid using FileSystem if we want to add support for other storage types
           if (FSUtils.exists(staticDataDefaultFolder)) {
             try {
               Files.walkFileTree(staticDataDefaultFolder, new SimpleFileVisitor<Path>() {

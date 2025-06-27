@@ -3,14 +3,31 @@ package org.roda.core.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.notifications.NotificationProcessor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.InvalidTokenException;
+import org.roda.core.data.exceptions.LockingException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.ConsumesOutputStream;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
@@ -29,8 +46,20 @@ import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
-import org.roda.core.data.v2.ip.*;
-import org.roda.core.data.v2.ip.metadata.*;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -52,11 +81,18 @@ import org.roda.core.entity.transaction.TransactionalModelOperationLog;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.iterables.LogEntryFileSystemIterable;
 import org.roda.core.plugins.PluginHelper;
-import org.roda.core.storage.*;
+import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryVersion;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DirectResourceAccess;
+import org.roda.core.storage.Directory;
+import org.roda.core.storage.Resource;
+import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.transaction.RODATransactionException;
 import org.roda.core.transaction.TransactionLogService;
+import org.roda.core.transaction.TransactionModelRollbackHandler;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1664,48 +1700,33 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public void addLogEntry(LogEntry logEntry, Path logDirectory, boolean notify)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    // TODO: review this, check the JsonUtils methods to add support to storage
-    // service
-    TransactionalModelOperationLog operationLog = registerOperationForLogEntry(logEntry.getUUID(),
-      OperationType.CREATE);
-    try {
-      getModelService().addLogEntry(logEntry, logDirectory, notify);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    // TODO: review this in order to add support for storageService
+    mainModelService.addLogEntry(logEntry, logDirectory, notify);
   }
 
   @Override
   public void addLogEntry(LogEntry logEntry, Path logDirectory)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    TransactionalModelOperationLog operationLog = registerOperationForLogEntry(logEntry.getUUID(),
-      OperationType.CREATE);
-    try {
-      getModelService().addLogEntry(logEntry, logDirectory);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    // TODO: review this in order to add support for storageService
+    mainModelService.addLogEntry(logEntry, logDirectory);
   }
 
   @Override
   public void findOldLogsAndSendThemToMaster(Path logDirectory, Path currentLogFile) throws IOException {
-    List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
-    try (LogEntryFileSystemIterable logEntries = new LogEntryFileSystemIterable(logDirectory)) {
-      for (OptionalWithCause<LogEntry> logEntry : logEntries) {
-        if (logEntry.isPresent()) {
-          operationLogs.add(registerOperationForLogEntry(logEntry.get().getId(), OperationType.CREATE));
-        }
-      }
-      getModelService().findOldLogsAndSendThemToMaster(logDirectory, currentLogFile);
-    } catch (IOException e) {
-      updateOperationState(operationLogs, OperationState.FAILURE);
-      throw e;
-    }
+    // TODO: review this in order to add support for storageService
+    mainModelService.findOldLogsAndSendThemToMaster(logDirectory, currentLogFile);
+//    List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
+//    try (LogEntryFileSystemIterable logEntries = new LogEntryFileSystemIterable(logDirectory)) {
+//      for (OptionalWithCause<LogEntry> logEntry : logEntries) {
+//        if (logEntry.isPresent()) {
+//          operationLogs.add(registerOperationForLogEntry(logEntry.get().getId(), OperationType.CREATE));
+//        }
+//      }
+//      getModelService().findOldLogsAndSendThemToMaster(logDirectory, currentLogFile);
+//    } catch (IOException e) {
+//      updateOperationState(operationLogs, OperationState.FAILURE);
+//      throw e;
+//    }
   }
 
   @Override
@@ -1891,133 +1912,61 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public void createJob(Job job)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    TransactionalModelOperationLog operationLog = registerOperationForJob(job.getId(), OperationType.CREATE);
-    try {
-      mainModelService.createJob(job);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    mainModelService.createJob(job);
   }
 
   @Override
   public void createOrUpdateJob(Job job)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    TransactionalModelOperationLog operationLog = registerOperationForJob(job.getId(), OperationType.UPDATE);
-    try {
-      mainModelService.createOrUpdateJob(job);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    mainModelService.createOrUpdateJob(job);
   }
 
   @Override
   public Job retrieveJob(String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    TransactionalModelOperationLog operationLog = registerOperationForJob(jobId, OperationType.READ);
-    try {
-      Job ret = mainModelService.retrieveJob(jobId);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-      return ret;
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    return mainModelService.retrieveJob(jobId);
   }
 
   @Override
   public CloseableIterable<OptionalWithCause<Report>> listJobReports(String jobId)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-    TransactionalModelOperationLog operationLog = registerOperation(Job.class, List.of(jobId), OperationType.READ);
-    try {
-      CloseableIterable<OptionalWithCause<Report>> ret = getModelService().listJobReports(jobId);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-      return ret;
-    } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    return mainModelService.listJobReports(jobId);
   }
 
   @Override
   public void deleteJob(String jobId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    TransactionalModelOperationLog operationLog = registerOperationForJob(jobId, OperationType.DELETE);
-    try {
-      mainModelService.deleteJob(jobId);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    mainModelService.deleteJob(jobId);
   }
 
   @Override
   public Report retrieveJobReport(String jobId, String jobReportId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobId, jobReportId, OperationType.READ);
-    try {
-      Report ret = mainModelService.retrieveJobReport(jobId, jobReportId);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-      return ret;
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    return mainModelService.retrieveJobReport(jobId, jobReportId);
   }
 
   @Override
   public Report retrieveJobReport(String jobId, String sourceObjectId, String outcomeObjectId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    Report ret = mainModelService.retrieveJobReport(jobId, sourceObjectId, outcomeObjectId);
-    TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobId, ret.getId(), OperationType.READ);
-    updateOperationState(operationLog, OperationState.SUCCESS);
-    return ret;
+    return mainModelService.retrieveJobReport(jobId, sourceObjectId, outcomeObjectId);
   }
 
   @Override
   public void createOrUpdateJobReport(Report jobReport, Job cachedJob)
     throws GenericException, AuthorizationDeniedException {
-    TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobReport.getJobId(), jobReport.getId(),
-      OperationType.UPDATE);
-    try {
-      mainModelService.createOrUpdateJobReport(jobReport, cachedJob);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    mainModelService.createOrUpdateJobReport(jobReport, cachedJob);
   }
 
   @Override
   public void createOrUpdateJobReport(Report jobReport, IndexedJob indexJob)
     throws GenericException, AuthorizationDeniedException {
-    TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobReport.getJobId(), jobReport.getId(),
-      OperationType.UPDATE);
-    try {
-      mainModelService.createOrUpdateJobReport(jobReport, indexJob);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    mainModelService.createOrUpdateJobReport(jobReport, indexJob);
   }
 
   @Override
   public void deleteJobReport(String jobId, String jobReportId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    TransactionalModelOperationLog operationLog = registerOperationForJobReport(jobId, jobReportId,
-      OperationType.DELETE);
-    try {
-      mainModelService.deleteJobReport(jobId, jobReportId);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (GenericException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    mainModelService.deleteJobReport(jobId, jobReportId);
   }
 
   @Override
@@ -2076,15 +2025,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public Job updateJobInstanceId(Job job)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    TransactionalModelOperationLog operationLog = registerOperationForJob(job.getId(), OperationType.UPDATE);
-    try {
-      Job ret = mainModelService.updateJobInstanceId(job);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-      return ret;
-    } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      updateOperationState(operationLog, OperationState.FAILURE);
-      throw e;
-    }
+    return mainModelService.updateJobInstanceId(job);
   }
 
   @Override
@@ -4198,32 +4139,32 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public ReturnWithExceptionsWrapper notifyUserCreated(User user) {
-    return getModelService().notifyUserCreated(user);
+    return mainModelService.notifyUserCreated(user);
   }
 
   @Override
   public ReturnWithExceptionsWrapper notifyUserUpdated(User user) {
-    return getModelService().notifyUserUpdated(user);
+    return mainModelService.notifyUserUpdated(user);
   }
 
   @Override
   public ReturnWithExceptionsWrapper notifyUserDeleted(String userID) {
-    return getModelService().notifyUserDeleted(userID);
+    return mainModelService.notifyUserDeleted(userID);
   }
 
   @Override
   public ReturnWithExceptionsWrapper notifyGroupCreated(Group group) {
-    return getModelService().notifyGroupCreated(group);
+    return mainModelService.notifyGroupCreated(group);
   }
 
   @Override
   public ReturnWithExceptionsWrapper notifyGroupUpdated(Group group) {
-    return getModelService().notifyGroupUpdated(group);
+    return mainModelService.notifyGroupUpdated(group);
   }
 
   @Override
   public ReturnWithExceptionsWrapper notifyGroupDeleted(String groupID) {
-    return getModelService().notifyGroupDeleted(groupID);
+    return mainModelService.notifyGroupDeleted(groupID);
   }
 
   @Override
@@ -4711,72 +4652,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
       if (isRODAObjectOptionalWithCause.isPresent()) {
         IsRODAObject rodaObject = isRODAObjectOptionalWithCause.get();
-        if (rodaObject instanceof AIP aip) {
-          handleAIPRollback(aip, modelOperation);
-        } else if (rodaObject instanceof Representation representation) {
-          handleRepresentationRollback(representation, modelOperation);
-        } else if (rodaObject instanceof File file) {
-          handleFileRollback(file, modelOperation);
-        } else if (rodaObject instanceof DIP dip) {
-          handleDIPRollback(dip, modelOperation);
-        } else {
-          LOGGER.warn("Cannot rollback operation for class: {} with ID: {}", rodaObject.getClass().getSimpleName(),
-            rodaObject.getId());
+        try {
+          TransactionModelRollbackHandler.processObject(rodaObject, modelOperation, mainModelService,
+            stagingModelService);
+        } catch (AuthorizationDeniedException | GenericException | NotFoundException | RequestNotValidException e) {
+          throw new RODATransactionException("Error during rollback for object: " + rodaObject.getId(), e);
+        } finally {
+          PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId().toString());
         }
-      }
-
-      PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId().toString());
-    }
-  }
-
-  private void handleAIPRollback(AIP aip, TransactionalModelOperationLog modelOperation) {
-    if (modelOperation.getOperationType() == OperationType.CREATE) {
-      LOGGER.debug("Rollback AIP creation for AIP: {}", aip.getId());
-      stagingModelService.notifyAipDeleted(aip.getId());
-    } else if (modelOperation.getOperationType() != OperationType.READ) {
-      LOGGER.debug("Rollback AIP update/delete for AIP: {}", aip.getId());
-      try {
-        mainModelService.notifyAipUpdated(aip.getId());
-      } catch (NotFoundException | AuthorizationDeniedException | RequestNotValidException | GenericException e) {
-        LOGGER.error("Error clearing specific indexes of a RODA entity", e);
+      } else {
+        PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId().toString());
       }
     }
   }
-
-  private void handleRepresentationRollback(Representation representation,
-    TransactionalModelOperationLog modelOperation) {
-    if (modelOperation.getOperationType() == OperationType.CREATE) {
-      LOGGER.debug("Rollback Representation creation for Representation: {}", representation.getId());
-      stagingModelService.notifyRepresentationDeleted(representation.getAipId(), representation.getId());
-    } else if (modelOperation.getOperationType() != OperationType.READ) {
-      LOGGER.debug("Rollback Representation update/delete for Representation: {}", representation.getId());
-      mainModelService.notifyRepresentationUpdated(representation);
-    }
-  }
-
-  private void handleFileRollback(File file, TransactionalModelOperationLog modelOperation) {
-    if (modelOperation.getOperationType() == OperationType.CREATE) {
-      LOGGER.debug("Rollback File creation for File: {}", file.getId());
-      stagingModelService.notifyFileDeleted(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
-    } else if (modelOperation.getOperationType() != OperationType.READ) {
-      LOGGER.debug("Rollback File update/delete for File: {}", file.getId());
-      mainModelService.notifyFileUpdated(file);
-    }
-  }
-
-  private void handleDIPRollback(DIP dip, TransactionalModelOperationLog modelOperation) {
-    if (modelOperation.getOperationType() == OperationType.CREATE) {
-      LOGGER.debug("Rollback DIP creation for DIP: {}", dip.getId());
-      stagingModelService.notifyDIPDeleted(dip.getId(), true);
-    } else if (modelOperation.getOperationType() != OperationType.READ) {
-      LOGGER.debug("Rollback DIP update/delete for DIP: {}", dip.getId());
-      try {
-        DIP retrieveDIP = mainModelService.retrieveDIP(dip.getId());
-        mainModelService.notifyDIPUpdated(retrieveDIP, true);
-      } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
 }
