@@ -498,6 +498,11 @@ public class RodaCoreFactory {
 
         instanceId = getProperty(RodaConstants.CORE_NODE_INSTANCE_ID, "");
 
+        if (nodeType == NodeType.PRIMARY && RODATransactionManager != null) {
+          RODATransactionManager.cleanUnfinishedTransactions();
+          LOGGER.debug("Finished clean unfinished transactions operation");
+        }
+
         instantiated = true;
 
       } catch (GenericException e) {

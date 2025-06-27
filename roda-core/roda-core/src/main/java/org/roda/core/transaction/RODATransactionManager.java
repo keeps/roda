@@ -144,4 +144,19 @@ public class RODATransactionManager {
     // transactionLogService.cleanUp(transactionID);
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLED_BACK);
   }
+
+  public void cleanUnfinishedTransactions() {
+    for (TransactionLog unfinishedTransaction : transactionLogService.getUnfinishedTransactions()) {
+      try {
+        if (transactionsContext.get(unfinishedTransaction.getId()) == null) {
+          TransactionalContext context = transactionContextFactory.create(unfinishedTransaction, mainModelService);
+          transactionsContext.put(unfinishedTransaction.getId(), context);
+        }
+
+        rollbackTransaction(unfinishedTransaction.getId());
+      } catch (RODATransactionException e) {
+        LOGGER.error("Error during cleanup of unfinished transaction: {}", unfinishedTransaction.getId(), e);
+      }
+    }
+  }
 }

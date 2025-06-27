@@ -457,6 +457,7 @@ public final class LiteRODAObjectFactory {
       StringBuilder sb = new StringBuilder();
       sb.append(objectClass.getName());
       for (String id : ids) {
+        if (id == null) continue;
         sb.append(SEPARATOR);
         try {
           sb.append(encodeId(id));

@@ -1,5 +1,6 @@
 package org.roda.core.repository.transaction;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,4 +18,6 @@ public interface TransactionLogRepository extends JpaRepository<TransactionLog, 
   @EntityGraph(attributePaths = {"storagePathsOperations", "modelOperations"})
   @NonNull
   Optional<TransactionLog> findById(@NonNull UUID id);
+
+  List<TransactionLog> findByStatusOrderByCreatedAt(TransactionLog.TransactionStatus transactionStatus);
 }
