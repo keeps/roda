@@ -255,6 +255,7 @@ public class RODA {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
       registry.addResourceHandler("/org.roda.wui.RodaWUI/**").addResourceLocations("classpath:/org.roda.wui.RodaWUI/");
+      registry.addResourceHandler("/org.roda.wui.RodaWUIPortal/**").addResourceLocations("classpath:/org.roda.wui.RodaWUIPortal/");
     }
   }
 
