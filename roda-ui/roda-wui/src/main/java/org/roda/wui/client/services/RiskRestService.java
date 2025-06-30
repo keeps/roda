@@ -97,4 +97,10 @@ public interface RiskRestService extends RODAEntityRestService<IndexedRisk> {
     @ApiResponse(responseCode = "200", description = "Risk mitigation properties", content = @Content(schema = @Schema(implementation = RiskMitigationProperties.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   RiskMitigationProperties retrieveRiskMitigationProperties();
+
+  @RequestMapping(path = "/refresh", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(summary = "Refreshes risks", description = "Refreshes risks", responses = {
+          @ApiResponse(responseCode = "204", description = "No Content")})
+  Void refreshRisk();
 }

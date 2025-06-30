@@ -1,5 +1,6 @@
 package org.roda.wui.api.v2.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -246,5 +247,18 @@ public class RiskController implements RiskRestService, Exportable {
     // delegate
     return ApiUtils
       .okResponse(indexService.exportToCSV(findRequestString, IndexedRisk.class));
+  }
+
+  @Override
+  public Void refreshRisk() {
+    return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Void>() {
+      @Override
+      public Void process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        // delegate
+        riskService.updateRiskCounters(requestContext.getIndexService());
+        return null;
+      }
+    });
   }
 }
