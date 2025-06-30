@@ -114,7 +114,7 @@ public class IndexService {
             .toStreamResponse();
         }
       }
-    });
+    }, returnClass);
   }
 
   public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn,
