@@ -305,13 +305,17 @@ public class BrowseAIP extends Composite {
             IndexedDIP.class);
 
           List<String> jobIds = new ArrayList<>();
-          jobIds.add(aip.getIngestJobId());
+          if (StringUtils.isNotBlank(aip.getIngestJobId())) {
+            jobIds.add(aip.getIngestJobId());
+          }
           jobIds.addAll(aip.getIngestUpdateJobIds());
 
-          List<CompletableFuture<Job>> futures = jobIds.stream()
+          List<CompletableFuture<Job>> futures = jobIds.isEmpty() ? new ArrayList<>() : jobIds.stream()
             .map(jobId -> service.jobsResource(s -> s.getJobFromModel(jobId))).collect(Collectors.toList());
 
-          CompletableFuture<List<Job>> futureIngestJobs = CompletableFuture
+          CompletableFuture<List<Job>> futureIngestJobs = futures.isEmpty()
+            ? CompletableFuture.completedFuture(new ArrayList<>())
+            : CompletableFuture
             .allOf(futures.toArray(new CompletableFuture[0]))
             .thenApply(v -> futures.stream().map(CompletableFuture::join) // join each individual Job future here
               .collect(Collectors.toList()));
@@ -326,9 +330,9 @@ public class BrowseAIP extends Composite {
               rp.setChildAipsCount(futureChildAipCount.join());
               rp.setDipCount(futureDipCount.join());
               rp.setIngestJobs(futureIngestJobs.join());
+
               return rp;
             }).whenComplete((value, throwable) -> {
-
               if (throwable == null) {
                 container.setWidget(new BrowseAIP(value));
                 callback.onSuccess(aip);
@@ -336,8 +340,8 @@ public class BrowseAIP extends Composite {
             });
         }
       });
-
   }
+
 
   private void updateSectionIdentification(BrowseAIPResponse response) {
 
