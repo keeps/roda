@@ -43,7 +43,7 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<IndexedRiskAction> POSSIBLE_ACTIONS_WITHOUT_RISK = new HashSet<>(
-    Arrays.asList(IndexedRiskAction.NEW));
+    Arrays.asList(IndexedRiskAction.NEW, IndexedRiskAction.REFRESH));
 
   private static final Set<IndexedRiskAction> POSSIBLE_ACTIONS_ON_SINGLE_RISK = new HashSet<>(
     Arrays.asList(IndexedRiskAction.REMOVE, IndexedRiskAction.START_PROCESS, IndexedRiskAction.EDIT));
@@ -61,7 +61,7 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   public enum IndexedRiskAction implements Action<IndexedRisk> {
     NEW(RodaConstants.PERMISSION_METHOD_CREATE_RISK), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_RISK),
     START_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_RISK),
-    HISTORY(RodaConstants.PERMISSION_METHOD_RETRIEVE_RISK_VERSIONS);
+    REFRESH(), HISTORY(RodaConstants.PERMISSION_METHOD_RETRIEVE_RISK_VERSIONS);
 
     private List<String> methods;
 
@@ -137,6 +137,8 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   public void act(Action<IndexedRisk> action, AsyncCallback<ActionImpact> callback) {
     if (IndexedRiskAction.NEW.equals(action)) {
       create(callback);
+    } else if (IndexedRiskAction.REFRESH.equals(action)) {
+      refresh(callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -167,6 +169,19 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
     } else {
       unsupportedAction(action, callback);
     }
+  }
+
+  private void refresh(AsyncCallback<ActionImpact> callback) {
+    Services service = new Services("Refresh risks", "refresh");
+
+    service.riskResource(s -> s.refreshRisk()).whenComplete((unused, throwable) -> {
+      if (throwable != null) {
+        callback.onFailure(throwable);
+      } else {
+        Toast.showInfo(messages.dialogRefresh(), messages.riskRefreshDone());
+        callback.onSuccess(ActionImpact.UPDATED);
+      }
+    });
   }
 
   private void history(IndexedRisk object, AsyncCallback<ActionImpact> callback) {
@@ -243,6 +258,7 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
     managementGroup.addButton(messages.newButton(), IndexedRiskAction.NEW, ActionImpact.UPDATED, "btn-plus-circle");
     managementGroup.addButton(messages.editButton(), IndexedRiskAction.EDIT, ActionImpact.UPDATED, "btn-edit");
     managementGroup.addButton(messages.removeButton(), IndexedRiskAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
+    managementGroup.addButton(messages.refreshButton(), IndexedRiskAction.REFRESH, ActionImpact.UPDATED, "btn-refresh");
 
     // PRESERVATION
     ActionableGroup<IndexedRisk> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
