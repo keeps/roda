@@ -956,6 +956,10 @@ public class FileStorageService implements StorageService {
     }
   }
 
+  public Path getHistoryPath() {
+    return historyPath;
+  }
+
   public Path getHistoryDataPath() {
     return historyDataPath;
   }

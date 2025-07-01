@@ -120,6 +120,7 @@ public class TransactionalModelServiceTest extends AbstractTestNGSpringContextTe
     model = RodaCoreFactory.getModelService();
 
     transactionManager.setMainModelService(model);
+    transactionManager.setInitialized(true);
   }
 
   @AfterClass

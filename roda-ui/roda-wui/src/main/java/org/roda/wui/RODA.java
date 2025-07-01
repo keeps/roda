@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServic
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(exclude = {OAuth2ClientAutoConfiguration.class, SecurityAutoConfiguration.class,
   UserDetailsServiceAutoConfiguration.class})
@@ -24,6 +25,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = "org.roda.core.repository")
 @EntityScan(basePackages = "org.roda.core.entity")
 @ServletComponentScan
+@EnableScheduling
 public class RODA {
   public static void main(String[] args) {
     RodaBootstrap.instantiate();

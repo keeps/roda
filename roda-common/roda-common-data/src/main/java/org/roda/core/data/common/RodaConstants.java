@@ -264,6 +264,7 @@ public final class RodaConstants {
   public static final String CORE_DATA_FOLDER = "data";
   public static final String CORE_STORAGE_FOLDER = "storage";
   public static final String CORE_STAGING_STORAGE_FOLDER = "staging-storage";
+  public static final String CORE_STAGING_TRANSACTIONS_LOG_BACKUP_FOLDER = "transactions-log-backup";
   public static final String CORE_STORAGE_HISTORY_FOLDER = "storage-history";
   public static final String CORE_INDEX_FOLDER = "index";
   public static final String CORE_CROSSWALKS_FOLDER = "crosswalks";
