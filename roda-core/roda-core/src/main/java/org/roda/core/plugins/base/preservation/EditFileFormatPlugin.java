@@ -1,6 +1,5 @@
 package org.roda.core.plugins.base.preservation;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -8,7 +7,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -21,7 +19,6 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
-import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -35,7 +32,6 @@ import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
-import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
@@ -224,45 +220,44 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
     String username) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
     PluginException {
     StoragePath fileDataPath = ModelUtils.getFileStoragePath(file);
-    Optional<LiteRODAObject> liteAIP = LiteRODAObjectFactory.get(AIP.class, file.getAipId());
-    if (liteAIP.isEmpty()) {
-      throw new RequestNotValidException("Could not get LITE for AIP " + file.getAipId());
-    }
-    StorageService tmpStorageService = model.resolveTemporaryResourceShallow(jobId, liteAIP.get());
+    AIP aip = model.retrieveAIP(file.getAipId());
+    DirectResourceAccess directAccess;
     LinkingIdentifier source = null;
-    try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(fileDataPath)) {
-      List<String> jsonFilePath = new ArrayList<>();
-      jsonFilePath.add(file.getId());
-
-      Path fileFsPath = directAccess.getPath();
-      Path fullFsPath = Paths.get(FilenameUtils.normalize(fileFsPath.toString()));
-      Path relativeFsPath = fileFsPath.relativize(fullFsPath);
-
-      for (int i = 0; i < relativeFsPath.getNameCount()
-        && StringUtils.isNotBlank(relativeFsPath.getName(i).toString()); i++) {
-        jsonFilePath.add(relativeFsPath.getName(i).toString());
-      }
-
-      jsonFilePath.remove(jsonFilePath.size() - 1);
-      String jsonFileId = fullFsPath.getFileName().toString();
-
-      String updatedFormat = format;
-      String updatedFormatVersion = formatVersion;
-      String updatedPronomIdentifier = pronom;
-      String updatedMimetype = mimetype;
-
-      List<String> notes = mitigatePreviousIncidencesAndCreateNotes(model, index, file.getAipId(),
-        file.getRepresentationId(), file.getId(), jsonFilePath, username);
-      PremisV3Utils.updateFormatPreservationMetadata(model, file.getAipId(), file.getRepresentationId(), jsonFilePath,
-        jsonFileId, updatedFormat, updatedFormatVersion, updatedPronomIdentifier, updatedMimetype, notes, username,
-        true);
-
-      source = PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(), jsonFilePath, jsonFileId,
-        RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
-      model.notifyFileUpdated(file);
-    } catch (IOException e) {
-      throw new PluginException("Could not create direct access StorageService for file " + file.getId(), e);
+    if (aip.getHasShallowFiles() != null && aip.getHasShallowFiles()) {
+      StorageService tmpStorageService = model.resolveTemporaryResourceShallow(jobId, aip);
+      directAccess = tmpStorageService.getDirectAccess(fileDataPath);
     }
+    else {
+      directAccess = model.getDirectAccess(file);
+    }
+    List<String> jsonFilePath = new ArrayList<>();
+    jsonFilePath.add(file.getId());
+
+    Path fileFsPath = directAccess.getPath();
+    Path fullFsPath = Paths.get(FilenameUtils.normalize(fileFsPath.toString()));
+    Path relativeFsPath = fileFsPath.relativize(fullFsPath);
+
+    for (int i = 0; i < relativeFsPath.getNameCount()
+      && StringUtils.isNotBlank(relativeFsPath.getName(i).toString()); i++) {
+      jsonFilePath.add(relativeFsPath.getName(i).toString());
+    }
+
+    jsonFilePath.remove(jsonFilePath.size() - 1);
+    String jsonFileId = fullFsPath.getFileName().toString();
+
+    String updatedFormat = format;
+    String updatedFormatVersion = formatVersion;
+    String updatedPronomIdentifier = pronom;
+    String updatedMimetype = mimetype;
+
+    List<String> notes = mitigatePreviousIncidencesAndCreateNotes(model, index, file.getAipId(),
+      file.getRepresentationId(), file.getId(), jsonFilePath, username);
+    PremisV3Utils.updateFormatPreservationMetadata(model, file.getAipId(), file.getRepresentationId(), jsonFilePath,
+      jsonFileId, updatedFormat, updatedFormatVersion, updatedPronomIdentifier, updatedMimetype, notes, username, true);
+
+    source = PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(), jsonFilePath, jsonFileId,
+      RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
+    model.notifyFileUpdated(file);
     return source;
   }
 
