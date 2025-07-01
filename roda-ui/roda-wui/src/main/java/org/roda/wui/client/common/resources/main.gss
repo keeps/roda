@@ -970,7 +970,7 @@ pre code {
 	width: 100%;
 }
 
-.btn-block + .btn-block {
+.btn-block + .btn-block, .sidebar .actionable-button + .actionable-button {
 	margin-top: 10px;
 }
 
@@ -7882,8 +7882,8 @@ span.code {
 .slider .actionable-button,
 .ActionableStyleButtons .actionable-button {
     /* mimic <button> and .btn */
-    border-radius: 2px;
-    padding: 8px 8px 8px 10px;
+    border-radius: 4px;
+    padding: 8px 27px 8px 10px;
     border: none;
     background-color: COLOR_PRIMARY;
     color: white;
@@ -7907,6 +7907,7 @@ span.code {
     margin: 0em;
     font-family: FONT_PRIMARY;
     line-height: normal;
+    justify-content: space-between;
 }
 
 .browseNewDescriptiveMetadataButton {
