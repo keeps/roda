@@ -916,7 +916,7 @@ public class RodaCoreFactory {
     if (SpringContext.isContextInitialized()) {
       RODATransactionManager = SpringContext.getBean(RODATransactionManager.class);
       RODATransactionManager.setMainModelService(model);
-      RODATransactionManager.setNodeType(RodaCoreFactory.nodeType);
+      RODATransactionManager.setInitialized(true);
     } else {
       throw new GenericException(
         "Unable to instantiate RODA transaction manager, because Spring context is not initialized");

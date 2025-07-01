@@ -5,7 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.roda.core.entity.transaction.*;
+import org.roda.core.entity.transaction.OperationState;
+import org.roda.core.entity.transaction.OperationType;
+import org.roda.core.entity.transaction.TransactionLog;
+import org.roda.core.entity.transaction.TransactionalModelOperationLog;
+import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
 import org.roda.core.repository.transaction.TransactionLogRepository;
 import org.roda.core.repository.transaction.TransactionalModelOperationLogRepository;
 import org.roda.core.repository.transaction.TransactionalStoragePathRepository;
@@ -31,10 +35,23 @@ public class TransactionLogService {
   }
 
   @Transactional
+  public List<TransactionLog> getCommittedTransactions() {
+    return transactionLogRepository.findByStatusOrderByCreatedAt(TransactionLog.TransactionStatus.COMMITTED);
+  }
+
+  @Transactional
   public TransactionLog createTransactionLog(TransactionLog.TransactionRequestType requestType, UUID requestId) {
     TransactionLog transactionLog = new TransactionLog(requestType, requestId);
     transactionLogRepository.save(transactionLog);
     return transactionLog;
+  }
+
+  @Transactional
+  public TransactionLog getTransactionLog(UUID transactionId) throws RODATransactionException {
+    if (transactionId == null) {
+      throw new RODATransactionException("Transaction ID cannot be null");
+    }
+    return getTransactionLogById(transactionId);
   }
 
   private TransactionLog getTransactionLogById(UUID transactionId) throws RODATransactionException {
@@ -138,9 +155,9 @@ public class TransactionLogService {
   @Transactional
   public void cleanUp(UUID transactionID) throws RODATransactionException {
     TransactionLog transactionLog = getTransactionLogById(transactionID);
-    transactionLog.getStoragePathsOperations().clear();
-    transactionLog.getModelOperations().clear();
-    transactionLogRepository.save(transactionLog);
+    if (null != transactionLog) {
+      transactionLogRepository.delete(transactionLog);
+    }
   }
 
   @Transactional

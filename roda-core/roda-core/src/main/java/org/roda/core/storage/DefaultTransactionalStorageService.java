@@ -59,6 +59,11 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   @Override
+  public StorageService getStagingStorageService() {
+    return stagingStorageService;
+  }
+
+  @Override
   public boolean exists(StoragePath storagePath) {
     TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
     try {
@@ -644,7 +649,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
       | AuthorizationDeniedException e) {
       throw new RODATransactionException(
-        "Failed to sync storage path from staging to main storage service: " + storagePath, e);
+        "Failed to update storage path from staging to main storage service: " + storagePath, e);
     }
   }
 

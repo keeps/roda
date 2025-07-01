@@ -302,6 +302,7 @@ public class ConfigurationManager {
         throw new RuntimeException("Unable to load configuration for RODA " + configuration + ". Aborting...", e);
       }
     }
+    instantiated = true;
   }
 
   public void addConfiguration(String configurationFile) throws ConfigurationException {

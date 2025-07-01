@@ -1,11 +1,15 @@
 package org.roda.core.transaction;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -13,9 +17,12 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.DefaultTransactionalStorageService;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.TransactionalStorageService;
+import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +39,7 @@ public class RODATransactionManager {
   private final Map<UUID, TransactionalContext> transactionsContext = new ConcurrentHashMap<>();
 
   private ModelService mainModelService;
-  private RodaConstants.NodeType nodeType;
+  private boolean initialized = false;
 
   public RODATransactionManager(TransactionLogService transactionLogService,
     TransactionContextFactory transactionContextFactory) {
@@ -44,8 +51,12 @@ public class RODATransactionManager {
     this.mainModelService = mainModelService;
   }
 
-  public void setNodeType(RodaConstants.NodeType nodeType) {
-    this.nodeType = nodeType;
+  public boolean isInitialized() {
+    return initialized;
+  }
+
+  public void setInitialized(boolean initialized) {
+    this.initialized = initialized;
   }
 
   public TransactionalContext beginTransaction() throws RODATransactionException {
@@ -101,7 +112,7 @@ public class RODATransactionManager {
   }
 
   public void runPluginInTransaction(Plugin<IsRODAObject> plugin, List<LiteOptionalWithCause> objectsToBeProcessed)
-    throws RODATransactionException {
+    throws RODATransactionException, PluginException {
     String requestUUID = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
       IdUtils.createUUID());
     plugin.getParameterValues().put(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID, requestUUID);
@@ -116,13 +127,13 @@ public class RODATransactionManager {
       } else {
         endTransaction(transactionId);
       }
-    } catch (Exception e) {
+    } catch (RODATransactionException | PluginException e) {
       try {
         rollbackTransaction(transactionId);
       } catch (RODATransactionException ex) {
         LOGGER.error("Error during rollback", ex);
       }
-      throw new RODATransactionException("Error during plugin execution", e);
+      throw e;
     }
   }
 
@@ -141,22 +152,54 @@ public class RODATransactionManager {
     }
 
     transactionsContext.remove(transactionID);
-    // transactionLogService.cleanUp(transactionID);
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLED_BACK);
   }
 
   public void cleanUnfinishedTransactions() {
     for (TransactionLog unfinishedTransaction : transactionLogService.getUnfinishedTransactions()) {
       try {
-        if (transactionsContext.get(unfinishedTransaction.getId()) == null) {
-          TransactionalContext context = transactionContextFactory.create(unfinishedTransaction, mainModelService);
-          transactionsContext.put(unfinishedTransaction.getId(), context);
-        }
-
+        TransactionalContext context = getContext(unfinishedTransaction);
+        transactionsContext.put(unfinishedTransaction.getId(), context);
         rollbackTransaction(unfinishedTransaction.getId());
       } catch (RODATransactionException e) {
         LOGGER.error("Error during cleanup of unfinished transaction: {}", unfinishedTransaction.getId(), e);
       }
     }
+  }
+
+  public void cleanCommittedTransactions(UUID transactionId)
+    throws RODATransactionException, NotFoundException, GenericException {
+
+    TransactionLog transactionLog = transactionLogService.getTransactionLog(transactionId);
+
+    // Remove the transactional history storage path if it exists
+    TransactionalContext context = getContext(transactionLog);
+
+    TransactionalStorageService storageService = context.transactionalStorageService();
+    StorageService stagingStorageService = storageService.getStagingStorageService();
+    if (stagingStorageService instanceof FileStorageService fileStorageService) {
+      Path historyPath = fileStorageService.getHistoryPath();
+      if (FSUtils.exists(historyPath)) {
+        FSUtils.deletePath(historyPath);
+      }
+    }
+
+    // Remove the transactional storage path if it exists
+    Path transactionPath = ConfigurationManager.getInstance().getStagingStoragePath().resolve(transactionId.toString());
+    if (FSUtils.exists(transactionPath)) {
+      FSUtils.deletePath(transactionPath);
+    }
+
+    // Clean up the transaction log
+    transactionLogService.cleanUp(transactionId);
+  }
+
+  private TransactionalContext getContext(TransactionLog transactionLog) throws RODATransactionException {
+    TransactionalContext context = transactionsContext.get(transactionLog.getId());
+    if (context == null) {
+      context = transactionContextFactory.create(transactionLog, mainModelService);
+    }
+
+    return context;
   }
 }
