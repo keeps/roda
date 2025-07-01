@@ -3045,8 +3045,8 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public boolean isAIPOnDirectHold(String aipId, String holdId)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    List<TransactionalModelOperationLog> operationLogs = new ArrayList<>(
-      List.of(registerOperationForAIP(aipId, OperationType.READ)));
+    List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
+    operationLogs.add(registerOperationForAIP(aipId, OperationType.READ));
     operationLogs.add(registerOperationForDisposalHold(holdId, OperationType.READ));
     try {
       boolean ret = getModelService().isAIPOnDirectHold(aipId, holdId);
