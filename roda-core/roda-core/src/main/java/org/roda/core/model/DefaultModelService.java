@@ -5342,14 +5342,49 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public StorageService resolveTemporaryResourceShallow(String jobId, LiteRODAObject lite, String... pathPartials) {
+  public StorageService resolveTemporaryResourceShallow(String jobId, LiteRODAObject lite, String... pathPartials)
+    throws RequestNotValidException, GenericException {
     return resolveTemporaryResourceShallow(jobId, getStorage(), lite, pathPartials);
   }
 
   @Override
   public StorageService resolveTemporaryResourceShallow(String jobId, StorageService storage, LiteRODAObject lite,
-    String... pathPartials) {
-    return resolveTemporaryResourceShallow(jobId, getStorage(), lite, pathPartials);
+    String... pathPartials) throws GenericException, RequestNotValidException {
+    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(lite), pathPartials);
+    FileStorageService temporaryStorage;
+    Path tempPath = RodaCoreFactory.getFileShallowTmpDirectoryPath().resolve(jobId)
+      .resolve(String.valueOf(storagePath.hashCode()));
+    try {
+      if (Files.exists(tempPath)) {
+        temporaryStorage = new FileStorageService(tempPath, false, null, false);
+      } else {
+        Files.createDirectories(tempPath);
+        temporaryStorage = new FileStorageService(tempPath, false, null, false);
+
+        temporaryStorage.copy(storage, storagePath, storagePath);
+        List<StoragePath> externalFiles = temporaryStorage.getShallowFiles(storagePath);
+        for (StoragePath externalFile : externalFiles) {
+          final CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderFile(externalFile, true);
+          for (Resource resource : resources) {
+            if (resource instanceof DefaultBinary) {
+              ContentPayload content = ((DefaultBinary) resource).getContent();
+              if (content instanceof JsonContentPayload) {
+                ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
+                Protocol pm = RodaCoreFactory.getProtocol(shallowFile.getLocation());
+                pm.downloadResource(temporaryStorage.getDirectAccess(externalFile).getPath().getParent());
+              }
+
+            }
+          }
+          temporaryStorage.deleteResource(externalFile);
+        }
+      }
+    } catch (IOException | AlreadyExistsException | AuthorizationDeniedException e) {
+      throw new GenericException("Cannot create temporary directory " + tempPath);
+    } catch (RequestNotValidException | NotFoundException e) {
+      throw new GenericException("Cannot found resources at " + storagePath.toString());
+    }
+    return temporaryStorage;
   }
 
   @Override
