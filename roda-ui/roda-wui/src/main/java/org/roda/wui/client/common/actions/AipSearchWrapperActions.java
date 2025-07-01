@@ -613,7 +613,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
 
           AssessmentRequest request = new AssessmentRequest();
           request.setItems(SelectedItemsUtils.convertToRESTRequest(aips));
-          request.setAccept(true);
+          request.setAccept(false);
           request.setRejectReason(rejectReason);
 
           service.aipResource(s -> s.appraisal(request)).whenComplete((value, error) -> {
