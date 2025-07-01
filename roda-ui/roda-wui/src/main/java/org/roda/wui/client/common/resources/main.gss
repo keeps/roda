@@ -9223,6 +9223,10 @@ wui-disposal-hold-data .form-textbox {
     content: "\e92c";
 }
 
+.cmi-upload:after {
+    content: "\e929";
+}
+
 .details-date {
     font-size: 1.1rem;
     color: #999;
