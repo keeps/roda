@@ -8,7 +8,7 @@
 	<g:FlowPanel styleName="wui-ingest-transfer-upload" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<common:TitlePanel icon="fas fa-file-upload" ui:field="uploadTitle" />
+				<common:TitlePanel icon="cmi cmi-upload" ui:field="uploadTitle" />
 
 				<g:HTML ui:field="uploadMessage" />
 				<g:HTML ui:field="uploadForm" />
