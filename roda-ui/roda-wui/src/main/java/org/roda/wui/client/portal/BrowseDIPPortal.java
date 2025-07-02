@@ -1,0 +1,218 @@
+package org.roda.wui.client.portal;
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.SortParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.ip.AIPLink;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.FileLink;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.RepresentationLink;
+import org.roda.wui.client.browse.BrowseRepresentation;
+import org.roda.wui.client.browse.BrowseTop;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.DipFilePreview;
+import org.roda.wui.client.browse.DipUrlPreview;
+import org.roda.wui.client.browse.Viewers;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseDipBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
+import org.roda.wui.client.browse.bundle.Bundle;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.DisseminationFileActions;
+import org.roda.wui.client.common.lists.DIPFileList;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.common.slider.Sliders;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.IndexedDIPUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
+
+
+import config.i18n.client.ClientMessages;
+import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
+
+/**
+ * @author Eduardo Teixeira <eteixeira@keep.pt>
+ */
+public class BrowseDIPPortal extends Composite {
+
+    public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+        @Override
+        public String getHistoryToken() {
+            return "dip";
+        }
+
+        @Override
+        public List<String> getHistoryPath() {
+            return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
+        }
+
+        @Override
+        public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+            UserLogin.getInstance().checkRole(this, callback);
+        }
+
+        @Override
+        public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+            GWT.log("BrowseDIPPortal tokens: " + historyTokens);
+            BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
+                @Override
+                public void onFailure(Throwable throwable) {
+                    errorRedirect(callback);
+                }
+
+                @Override
+                public void onSuccess(Viewers viewers) {
+                    load(viewers, historyTokens, callback);
+                }
+            });
+        }
+
+        private void errorRedirect(AsyncCallback<Widget> callback) {
+            HistoryUtils.newHistory(BrowseTop.RESOLVER);
+            callback.onSuccess(null);
+        }
+
+        private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
+            if (!historyTokens.isEmpty()) {
+                final String historyDipUUID = historyTokens.get(0);
+                final String historyDipFileUUID = historyTokens.size() > 1 ? historyTokens.get(1) : null;
+                BrowserService.Util.getInstance().retrieveDipBundle(historyDipUUID, historyDipFileUUID,
+                    LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseDipBundle>() {
+                        @Override
+                            public void onFailure(Throwable throwable) {
+                                AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                            }
+                            @Override
+                            public void onSuccess(BrowseDipBundle browseDipBundle) {
+                                BrowserService.Util.getInstance().showDIPEmbedded(new AsyncCallback<Boolean>() {
+                                    @Override
+                                    public void onFailure(Throwable throwable) {
+                                        AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                                    }
+
+                                    @Override
+                                    public void onSuccess(Boolean showEmbedded) {
+                                        IndexedDIP dip =  browseDipBundle.getDip();
+                                        if (StringUtils.isNotBlank(dip.getOpenExternalURL()) && !showEmbedded) {
+                                            String url = IndexedDIPUtils.interpolateOpenExternalURL(dip,
+                                                    LocaleInfo.getCurrentLocale().getLocaleName());
+                                            Window.open(url, "_blank", "");
+                                            Toast.showInfo(messages.browseFileDipOpenedExternalURL(), url);
+                                            History.back();
+                                        } else {
+                                            callback.onSuccess(new BrowseDIPPortal(viewers, browseDipBundle));
+                                        }
+
+                                    }
+                                });
+                            }
+                    });
+            } else {
+                errorRedirect(callback);
+            }
+        }
+
+
+    };
+
+    interface MyUiBinder extends UiBinder<Widget, BrowseDIPPortal> {
+    }
+
+    private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+    private static ClientMessages messages = GWT.create(ClientMessages.class);
+
+    //public static final Sorter DEFAULT_DIPFILE_SORTER = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
+
+    // interface
+
+    @UiField
+    AccessibleFocusPanel keyboardFocus;
+
+    @UiField
+    FlowPanel center;
+
+    @UiField
+    FlowPanel container;
+
+    public BrowseDIPPortal(Viewers viewers, BrowseDipBundle bundle) {
+        GWT.log("CHEGOU AQUI CRL");
+        IndexedDIP dip = bundle.getDip();
+        DIPFile dipFile = bundle.getDipFile();
+
+        initWidget(uiBinder.createAndBindUi(this));
+
+        if (dipFile != null) {
+            center.add(new DipFilePreview(viewers, dipFile));
+        } else if (dip.getOpenExternalURL() != null) {
+            center.add(new DipUrlPreview(viewers, dip));
+        } else {
+            final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
+                    new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
+
+            ListBuilder<DIPFile> dipFileListBuilder = new ListBuilder<>(() -> new DIPFileList(),
+                    new AsyncTableCellOptions<>(DIPFile.class, "BrowseDIPPortal_dipFiles").withFilter(filter)
+                            .withSummary(messages.allOfAObject(DIPFile.class.getName())).bindOpener()
+                            .withActionable(DisseminationFileActions.get(dip.getPermissions())));
+
+            SearchWrapper search = new SearchWrapper(false).createListAndSearchPanel(dipFileListBuilder);
+
+            SimplePanel layout = new SimplePanel();
+            layout.add(search);
+            center.add(layout);
+            layout.addStyleName("browseDip-topList");
+        }
+
+        NavigationToolbar<IsIndexed> bottomNavigationToolbar = new NavigationToolbar<>();
+        bottomNavigationToolbar.withObject(dipFile != null ? dipFile : dip);
+        bottomNavigationToolbar.withPermissions(dip.getPermissions());
+        bottomNavigationToolbar.updateBreadcrumb(bundle);
+        bottomNavigationToolbar.setHeader(messages.catalogueDIPTitle());
+        bottomNavigationToolbar.build();
+        container.insert(bottomNavigationToolbar, 0);
+
+        keyboardFocus.setFocus(true);
+    }
+
+    @Override
+    protected void onLoad() {
+        super.onLoad();
+        JavascriptUtils.smoothScroll(keyboardFocus.getElement());
+    }
+}

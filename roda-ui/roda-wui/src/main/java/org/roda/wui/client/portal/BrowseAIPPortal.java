@@ -35,6 +35,8 @@ import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.DisseminationActions;
+import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -231,65 +233,90 @@ public class BrowseAIPPortal extends Composite {
     // DISSEMINATIONS
     disseminationsCard.setVisible(false);
     preDisseminations.setVisible(false);
-
+    boolean showAllDIPs = ConfigurationManager.getBoolean(true, RodaConstants.UI_PORTAL_DIP_SHOW_ALL);
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_DIP)) {
-      BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
-
-        @Override
-        public void onSuccess(Viewers viewers) {
-          Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId()));
-          Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
-
-          BrowserService.Util.getInstance().find(IndexedDIP.class.getName(), filter, sorter, new Sublist(0, 1),
-            Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), true,
-            Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID),
-            new AsyncCallback<IndexResult<IndexedDIP>>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-
-              @Override
-              public void onSuccess(IndexResult<IndexedDIP> result) {
-                if (result.getTotalCount() > 0) {
-                  String dipId = result.getResults().get(0).getId();
-                  Filter fileFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dipId));
-                  BrowserService.Util.getInstance().find(
-                    DIPFile.class.getName(), fileFilter, Sorter.NONE, new Sublist(0, 1), Facets.NONE,
-                    LocaleInfo.getCurrentLocale().getLocaleName(), true, Arrays.asList(RodaConstants.INDEX_UUID,
-                      RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_SIZE, RodaConstants.DIPFILE_IS_DIRECTORY),
-                    new AsyncCallback<IndexResult<DIPFile>>() {
-
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS,aip.getUUID()));
+      Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
+      if (!showAllDIPs){
+        BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
+          @Override
+          public void onSuccess(Viewers viewers) {
+            BrowserService.Util.getInstance().find(IndexedDIP.class.getName(), filter, sorter, new Sublist(0, 1),
+                    Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), true,
+                    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID),
+                    new AsyncCallback<IndexResult<IndexedDIP>>() {
                       @Override
                       public void onFailure(Throwable caught) {
                         AsyncCallbackUtils.defaultFailureTreatment(caught);
                       }
 
                       @Override
-                      public void onSuccess(IndexResult<DIPFile> result) {
+                      public void onSuccess(IndexResult<IndexedDIP> result) {
+                        //GWT.log(String.valueOf(result));
                         if (result.getTotalCount() > 0) {
-                          disseminationsCard.setVisible(true);
-                          preDisseminations.setVisible(true);
-                          disseminationsCard.add(new DipFilePreview(viewers, result.getResults().get(0)));
+                          String dipId = result.getResults().get(0).getId();
+                          Filter fileFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dipId));
+                          BrowserService.Util.getInstance().find(
+                                  DIPFile.class.getName(), fileFilter, Sorter.NONE, new Sublist(0, 1), Facets.NONE,
+                                  LocaleInfo.getCurrentLocale().getLocaleName(), true, Arrays.asList(RodaConstants.INDEX_UUID,
+                                          RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_SIZE, RodaConstants.DIPFILE_IS_DIRECTORY),
+                                  new AsyncCallback<IndexResult<DIPFile>>() {
+
+                                    @Override
+                                    public void onFailure(Throwable caught) {
+                                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                                    }
+
+                                    @Override
+                                    public void onSuccess(IndexResult<DIPFile> result) {
+                                      if (result.getTotalCount() > 0) {
+                                        disseminationsCard.setVisible(true);
+                                        preDisseminations.setVisible(true);
+                                        disseminationsCard.add(new DipFilePreview(viewers, result.getResults().get(0)));
+                                      }
+                                    }
+                                  });
                         }
                       }
                     });
-                }
-              }
-            });
-        }
+          }
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.treatCommonFailures(caught);
+          }
+        });
+      }else{
+        BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, true, new AsyncCallback<Long>() {
+          @Override
+          public void onFailure(Throwable throwable) {
+            disseminationsCard.setVisible(false);
+          }
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.treatCommonFailures(caught);
-        }
-      });
+          @Override
+          public void onSuccess(Long dipCount) {
+            ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(() -> new DIPList(),
+                    new AsyncTableCellOptions<>(IndexedDIP.class, "BrowseAIPPortal_disseminations")
+                            .withFilter(filter)
+                            .withJustActive(justActive)
+                            .bindOpener()
+                            .withSummary(messages.listOfDisseminations())
+                            .withActionable(DisseminationActions.get())
+                            .withActionableCallback(listActionableCallback));
+
+            SearchWrapper disseminationsSearchWrapper = new SearchWrapper(false)
+                    .createListAndSearchPanel(disseminationsListBuilder);
+            disseminationsCard.setWidget(disseminationsSearchWrapper);
+            disseminationsCard.setVisible(dipCount > 0);
+          }
+        });
+      }
+    }else {
+      disseminationsCard.setVisible(false);
     }
+
 
     // AIP CHILDREN
     preChildren.setVisible(false);
-
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
       String listId;
 
@@ -342,8 +369,13 @@ public class BrowseAIPPortal extends Composite {
     }
 
     // STATE
-    this.addStyleName("browse_level_" + aip.getLevel().toLowerCase());
-    this.addStyleName(aip.getState().toString().toLowerCase());
+    //this.addStyleName("browse_level_" + aip.getLevel().toLowerCase());
+    //this.addStyleName(aip.getState().toString().toLowerCase());
+    if(aip.getLevel()!=null){
+      this.addStyleName("browse_level_" + aip.getLevel().toLowerCase());
+      this.addStyleName(aip.getState().toString().toLowerCase());
+    }
+
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(aip.getState()));
     aipState.setVisible(!justActive);
 

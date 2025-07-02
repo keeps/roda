@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -55,6 +56,7 @@ import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.planning.ShowRisk;
 import org.roda.wui.client.planning.ShowRiskIncidence;
 import org.roda.wui.client.portal.BrowseAIPPortal;
+import org.roda.wui.client.portal.BrowseDIPPortal;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.widgets.Toast;
@@ -342,7 +344,6 @@ public class HistoryUtils {
 
   public static <T extends IsIndexed> void resolve(T object, boolean replace) {
     List<String> path = null;
-
     if (object instanceof IndexedAIP) {
       IndexedAIP aip = (IndexedAIP) object;
       if (USING_PORTAL_UI) {
@@ -358,10 +359,23 @@ public class HistoryUtils {
       path = HistoryUtils.getHistoryBrowse(file);
     } else if (object instanceof IndexedDIP) {
       IndexedDIP dip = (IndexedDIP) object;
-      path = HistoryUtils.getHistoryBrowseDIP(dip.getId());
+      if (USING_PORTAL_UI){
+        path = HistoryUtils.getHistory(BrowseDIPPortal.RESOLVER,dip.getId());
+        GWT.log(object.toString());
+      }else{
+        path = HistoryUtils.getHistoryBrowseDIP(dip.getId());
+      }
     } else if (object instanceof DIPFile) {
       DIPFile dipFile = (DIPFile) object;
-      path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID());
+      /*
+        TODO
+          Confirmar isto
+       */
+      if (USING_PORTAL_UI){
+        path = HistoryUtils.getHistory(BrowseDIPPortal.RESOLVER,dipFile.getDipId(),dipFile.getId());
+      }else {
+        path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID());
+      }
     } else if (object instanceof TransferredResource) {
       TransferredResource resource = (TransferredResource) object;
       path = HistoryUtils.getHistory(IngestTransfer.RESOLVER.getHistoryPath(), resource.getUUID());
