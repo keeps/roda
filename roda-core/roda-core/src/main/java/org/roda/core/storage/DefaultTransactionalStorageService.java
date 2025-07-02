@@ -3,18 +3,33 @@ package org.roda.core.storage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.entity.transaction.OperationState;
 import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
-import org.roda.core.transaction.*;
+import org.roda.core.transaction.ConsolidatedOperation;
+import org.roda.core.transaction.RODATransactionException;
+import org.roda.core.transaction.StoragePathVersion;
+import org.roda.core.transaction.TransactionLogConsolidator;
+import org.roda.core.transaction.TransactionLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,11 +116,13 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     // TODO: What to do in this case?
     try {
       stagingStorageService.deleteContainer(storagePath);
-      updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException e) {
+    } catch (NotFoundException e) {
+      // ignored
+    } catch (GenericException | AuthorizationDeniedException e) {
       updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
     }
+    updateOperationState(operationLog, OperationState.SUCCESS);
   }
 
   @Override
