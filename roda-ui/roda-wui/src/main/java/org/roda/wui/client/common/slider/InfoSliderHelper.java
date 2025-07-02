@@ -211,7 +211,7 @@ public class InfoSliderHelper {
     }
 
 
-    if (response.getIndexedAIP().getIngestJobId() != null) {
+    if (response.getIndexedAIP().getIngestJobId() != null && !response.getIndexedAIP().getIngestJobId().isEmpty()) {
       FlowPanel jobIdsList = new FlowPanel();
       jobIdsList.addStyleName("slider-info-entry-value-aip-ingest-jobs");
 
