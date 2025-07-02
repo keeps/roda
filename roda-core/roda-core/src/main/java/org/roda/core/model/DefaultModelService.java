@@ -1522,7 +1522,7 @@ public class DefaultModelService implements ModelService {
         }
       }
     } else {
-      deleteFile(file.getId(), file.getRepresentationId(), file.getPath(), file.getId(), deletedBy, notify);
+      deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), deletedBy, notify);
     }
   }
 

@@ -924,10 +924,17 @@ public class RodaCoreFactory {
   }
 
   public static RODATransactionManager getTransactionManager() {
+    if(nodeType.equals(NodeType.TEST)) {
+      //TODO: Handle test mode
+      return null;
+    }
     if (SpringContext.isContextInitialized()) {
       RODATransactionManager = SpringContext.getBean(RODATransactionManager.class);
+      RODATransactionManager.setMainModelService(model);
+      RODATransactionManager.setNodeType(RodaCoreFactory.nodeType);
+      return RODATransactionManager;
     }
-    return RODATransactionManager;
+    return null;
   }
 
   /**
