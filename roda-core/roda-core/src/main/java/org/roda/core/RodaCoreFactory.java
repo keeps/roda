@@ -931,7 +931,6 @@ public class RodaCoreFactory {
     if (SpringContext.isContextInitialized()) {
       RODATransactionManager = SpringContext.getBean(RODATransactionManager.class);
       RODATransactionManager.setMainModelService(model);
-      RODATransactionManager.setNodeType(RodaCoreFactory.nodeType);
       return RODATransactionManager;
     }
     return null;
