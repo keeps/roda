@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import jakarta.transaction.TransactionalException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
@@ -397,6 +398,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     StorageService storage3 = context3.transactionalStorageService();
     // 3.2) delete container that no longer exists
     storage3.deleteContainer(containerStoragePath);
+    // 3.3) end third transaction
     transactionManager.endTransaction(context3.transactionLog().getId());
   }
 

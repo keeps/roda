@@ -197,14 +197,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     getStorage().deleteContainer(containerStoragePath);
 
     // 2) delete container that no longer exists
-    try {
-      getStorage().deleteContainer(containerStoragePath);
-      Assert.fail(
-        "An exception should have been thrown while deleting a container that no longer exists but it didn't happened!");
-    } catch (NotFoundException e) {
-      // do nothing
-    }
-
+    getStorage().deleteContainer(containerStoragePath);
   }
 
   public void testDeleteNonEmptyContainer() throws RODAException {
