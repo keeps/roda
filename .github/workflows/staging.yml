@@ -23,6 +23,14 @@ jobs:
         env:
           ZK_HOST: zookeeper:2181
         options: -e cloud
+      postgres:
+        image: postgres:17
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: roda
+          POSTGRES_DB: roda_core_db
       mailhog:
         image: mailhog/mailhog:v1.0.1
         ports:
@@ -83,6 +91,7 @@ jobs:
           SIEGFRIED_MODE: standalone
           LDAP_SERVER_URL: ldap://localhost
           LDAP_SERVER_PORT: 1389
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/roda_core_db
       - name: Copy target to docker context
         run: |
           mkdir -p docker/target
