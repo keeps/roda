@@ -39,6 +39,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
@@ -157,6 +158,8 @@ public final class LiteRODAObjectFactory {
       ret = get(ModelUtils.giveRespectiveModelClass(object.getClass()), Arrays.asList(object.getId()), false);
     } else if (object instanceof DescriptiveMetadata) {
       ret = getDescriptiveMetadata(object);
+    } else if (object instanceof OtherMetadata) {
+      ret = getOtherMetadata(object);
     } else if (object instanceof PreservationMetadata) {
       ret = getPreservationMetadata(object);
     } else if (object instanceof IndexedPreservationEvent) {
@@ -212,6 +215,10 @@ public final class LiteRODAObjectFactory {
       if (ids.size() == 2 || ids.size() == 3) {
         ret = create(objectClass, ids.size(), ids);
       }
+    } else if (objectClass == OtherMetadata.class) {
+      if (ids.size() == 2 || ids.size() == 3) {
+        ret = create(objectClass, ids.size(), ids);
+      }
     } else if (objectClass == DIPFile.class) {
       if (ids.size() >= 2) {
         ret = create(objectClass, ids.size(), ids);
@@ -253,6 +260,19 @@ public final class LiteRODAObjectFactory {
       ret = get(DescriptiveMetadata.class, Arrays.asList(o.getAipId(), o.getId()), false);
     } else {
       ret = get(DescriptiveMetadata.class, Arrays.asList(o.getAipId(), o.getRepresentationId(), o.getId()), false);
+    }
+
+    return ret;
+  }
+
+  private static <T extends IsRODAObject> Optional<LiteRODAObject> getOtherMetadata(T object) {
+    Optional<LiteRODAObject> ret;
+
+    OtherMetadata o = (OtherMetadata) object;
+    if (o.getRepresentationId() == null) {
+      ret = get(OtherMetadata.class, Arrays.asList(o.getAipId(), o.getId()), false);
+    } else {
+      ret = get(OtherMetadata.class, Arrays.asList(o.getAipId(), o.getRepresentationId(), o.getId()), false);
     }
 
     return ret;
