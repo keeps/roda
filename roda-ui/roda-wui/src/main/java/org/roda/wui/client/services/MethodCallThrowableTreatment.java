@@ -10,6 +10,7 @@ import org.roda.core.data.v2.validation.ValidationReport;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
@@ -30,17 +31,29 @@ public class MethodCallThrowableTreatment {
 
   public static Throwable treatCommonFailures(Method method, Throwable throwable) {
     final JSONValue parse = JSONParser.parseStrict(method.getResponse().getText());
+    String throwableMessage;
+    String throwableDetails;
+    try {
+      throwableMessage = parse.isObject().get("message").toString().replace("\"", "");
+    } catch (JavaScriptException e) {
+      throwableMessage = "";
+    }
+    try {
+      throwableDetails = parse.isObject().get("details").toString().replace("\"", "");
+    } catch (JavaScriptException e) {
+      throwableDetails = "";
+    }
 
     if (method.getResponse().getStatusCode() == Response.SC_NOT_FOUND) {
-      throwable = new NotFoundException();
+      throwable = new NotFoundException(throwableDetails);
     } else if (method.getResponse().getStatusCode() == Response.SC_UNAUTHORIZED) {
-      throwable = new AuthenticationDeniedException();
-    } else if (method.getResponse().getStatusCode() ==  Response.SC_FORBIDDEN) {
-      throwable = new AuthorizationDeniedException();
+      throwable = new AuthenticationDeniedException(throwableDetails);
+    } else if (method.getResponse().getStatusCode() == Response.SC_FORBIDDEN) {
+      throwable = new AuthorizationDeniedException(throwableDetails);
     } else if (method.getResponse().getStatusCode() == Response.SC_CONFLICT) {
-      throwable = new AlreadyExistsException();
+      throwable = new AlreadyExistsException(throwableDetails);
     } else if (method.getResponse().getStatusCode() == Response.SC_BAD_REQUEST) {
-      if (parse.isObject().get("message").toString().replace("\"", "").equals("Validation error")) {
+      if (throwableMessage.equals("Validation error")) {
         ValidationReport details = VALIDATION_REPORT_MAPPER.read(parse.isObject().get("objectDetails").toString());
         throwable = new ValidationException(details);
       }
