@@ -3,6 +3,7 @@ package org.roda.wui.api.v2.controller;
 import java.io.IOException;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -50,7 +51,8 @@ public class RequestHandler {
     return processRequest(handler, null, false, false);
   }
 
-  private <T> T processRequest(RequestProcessor<T> processor, Class<?> returnClass, boolean isTransactional, boolean checkRoles) {
+  private <T> T processRequest(RequestProcessor<T> processor, Class<?> returnClass, boolean isTransactional,
+    boolean checkRoles) {
     RequestControllerAssistant controllerAssistant = new RequestControllerAssistant(processor);
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -70,6 +72,9 @@ public class RequestHandler {
         requestContext.setIndexService(transactionalContext.indexService());
         // execute the request
         T result = processor.process(requestContext, controllerAssistant);
+
+        controllerAssistant.addParameters(RodaConstants.CONTROLLER_TRANSACTION_ID_PARAM,
+          transactionalContext.transactionLog().getId());
 
         // End transaction
         transactionManager.endTransaction(transactionalContext.transactionLog().getId());

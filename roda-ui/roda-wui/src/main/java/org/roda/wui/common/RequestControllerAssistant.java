@@ -1,6 +1,7 @@
 package org.roda.wui.common;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -93,5 +94,16 @@ public class RequestControllerAssistant extends ControllerAssistant {
 
   public Object[] getParameters() {
     return parameters;
+  }
+
+  public void addParameters(Object... parameters) {
+    if (this.parameters == null) {
+      this.parameters = parameters;
+    } else {
+      ArrayList<Object> paramsList = new ArrayList<>();
+      paramsList.addAll(Arrays.asList(this.parameters));
+      paramsList.addAll(Arrays.asList(parameters));
+      this.parameters = paramsList.toArray();
+    }
   }
 }

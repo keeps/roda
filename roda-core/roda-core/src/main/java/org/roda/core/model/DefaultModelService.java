@@ -3599,8 +3599,7 @@ public class DefaultModelService implements ModelService {
    * OTHER DIRECTORIES (submission, documentation, schemas)
    *********************************************************/
 
-  @Override
-  public Directory getSubmissionDirectory(String aipId)
+  private Directory getSubmissionDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getSubmissionStoragePath(aipId));
   }
@@ -3625,14 +3624,13 @@ public class DefaultModelService implements ModelService {
     storage.createBinary(submissionStoragePath, new FSPathContentPayload(submissionPath), false);
   }
 
-  @Override
-  public Directory getDocumentationDirectory(String aipId)
+
+  private Directory getDocumentationDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getDocumentationStoragePath(aipId));
   }
 
-  @Override
-  public Directory getDocumentationDirectory(String aipId, String representationId)
+  private Directory getDocumentationDirectory(String aipId, String representationId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getDocumentationStoragePath(aipId, representationId));
   }
@@ -3680,28 +3678,25 @@ public class DefaultModelService implements ModelService {
     return getStorage().countResourcesUnderDirectory(schemaDirectory.getStoragePath(), true);
   }
 
-  @Override
-  public Directory getSchemasDirectory(String aipId)
+  private Directory getSchemasDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getSchemasStoragePath(aipId));
   }
 
-  @Override
-  public Directory getSchemasDirectory(String aipId, String representationId)
+  private Directory getSchemasDirectory(String aipId, String representationId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getSchemasStoragePath(aipId, representationId));
   }
 
   @Override
-  public File createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
+  public void createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     boolean asReference = false;
     StoragePath filePath = ModelUtils.getSchemaStoragePath(aipId, representationId, directoryPath, fileId);
-    final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
-    return ResourceParseUtils.convertResourceToFile(createdBinary);
+    storage.createBinary(filePath, contentPayload, asReference);
   }
 
   @Override

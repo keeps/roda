@@ -49,6 +49,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
+import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.ParseException;
 import org.roda_project.commons_ip.utils.IPEnums;
@@ -149,7 +150,7 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
         Optional<String> parentId = Optional.empty();
         if (IPEnums.IPStatus.NEW == sip.getStatus()) {
           parentId = PluginHelper.getComputedParent(model, index, sip.getAncestors(), computedSearchScope,
-            forceSearchScope, cachedJob.getId());
+            forceSearchScope, cachedJob.getId(), cachedJob.getUsername());
           aip = processNewSIP(index, model, reportItem, sip, parentId, transferredResource.getUUID());
         } else if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
           aip = processUpdateSIP(index, model, sip, computedSearchScope, forceSearchScope);

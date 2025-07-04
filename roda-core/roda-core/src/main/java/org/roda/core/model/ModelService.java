@@ -680,21 +680,12 @@ public interface ModelService extends ModelObservable {
   DIPFile retrieveDIPFile(String dipId, List<String> directoryPath, String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
-  Directory getSubmissionDirectory(String aipId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
-
   void createSubmission(StorageService submissionStorage, StoragePath submissionStoragePath, String aipId)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException;
 
   void createSubmission(Path submissionPath, String aipId) throws AlreadyExistsException, GenericException,
     RequestNotValidException, NotFoundException, AuthorizationDeniedException;
-
-  Directory getDocumentationDirectory(String aipId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
-
-  Directory getDocumentationDirectory(String aipId, String representationId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
 
   File createDocumentation(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
@@ -709,13 +700,7 @@ public interface ModelService extends ModelObservable {
   Long countSchemaFiles(String aipId, String representationId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
-  Directory getSchemasDirectory(String aipId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
-
-  Directory getSchemasDirectory(String aipId, String representationId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
-
-  File createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
+  void createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException;
 

@@ -155,7 +155,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
         if (IPEnums.IPStatus.NEW == sip.getStatus()) {
           parentId = PluginHelper.getComputedParent(model, index, sip.getAncestors(), computedSearchScope,
-            forceSearchScope, jobId);
+            forceSearchScope, jobId, cachedJob.getUsername());
           aip = processNewSIP(index, model, reportItem, sip, parentId, transferredResource.getUUID());
         } else if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
           aip = processUpdateSIP(index, model, sip, computedSearchScope, forceSearchScope);

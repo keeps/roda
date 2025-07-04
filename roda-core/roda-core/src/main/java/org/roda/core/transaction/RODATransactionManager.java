@@ -128,11 +128,8 @@ public class RODATransactionManager {
         endTransaction(transactionId);
       }
     } catch (RODATransactionException | PluginException e) {
-      try {
-        rollbackTransaction(transactionId);
-      } catch (RODATransactionException ex) {
-        LOGGER.error("Error during rollback", ex);
-      }
+      LOGGER.error("Rolling back transaction due to exception", e);
+      rollbackTransaction(transactionId);
       throw e;
     }
   }
@@ -143,16 +140,25 @@ public class RODATransactionManager {
       throw new RODATransactionException("No transaction context found for ID: " + transactionID);
     }
 
-    if (context.transactionalStorageService() != null) {
-      context.transactionalStorageService().rollback();
-    }
+    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLING_BACK);
 
-    if (context.transactionalModelService() != null) {
-      context.transactionalModelService().rollback();
-    }
+    try {
 
-    transactionsContext.remove(transactionID);
-    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLED_BACK);
+      if (context.transactionalStorageService() != null) {
+        context.transactionalStorageService().rollback();
+      }
+
+      if (context.transactionalModelService() != null) {
+        context.transactionalModelService().rollback();
+      }
+
+      transactionsContext.remove(transactionID);
+      transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLED_BACK);
+
+    } catch (Exception e) {
+      transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLL_BACK_FAILED);
+      throw new RODATransactionException("Error during rollback of transaction: " + transactionID, e);
+    }
   }
 
   public void cleanUnfinishedTransactions() {

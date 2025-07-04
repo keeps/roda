@@ -112,7 +112,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
       SIP bagit = BagitSIP.parse(bagitPath);
 
       Optional<String> computedParentId = PluginHelper.getComputedParent(model, index, bagit.getAncestors(),
-        computedSearchScope, forceSearchScope, job.getId());
+        computedSearchScope, forceSearchScope, job.getId(), job.getUsername());
 
       AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagit, model, METADATA_FILE,
         Arrays.asList(transferredResource.getName()), reportItem.getJobId(), computedParentId, job.getUsername(),

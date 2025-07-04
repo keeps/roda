@@ -787,8 +787,9 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   private TransactionalStoragePathOperationLog registerOperation(String storagePathAsString, OperationType operation,
     String version) {
-    LOGGER.debug("Registering operation for storage path: {}", storagePathAsString);
     try {
+      LOGGER.debug("[transactionId:{}] Registering operation for storage path: {} with operation: {}",
+        transaction.getId(), storagePathAsString, operation);
       return transactionLogService.registerStoragePathOperation(transaction.getId(), storagePathAsString, operation,
         version);
     } catch (RODATransactionException e) {
@@ -823,16 +824,22 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     try {
       Optional<TransactionalStoragePathOperationLog> storagePathOperation = transactionLogService
         .getLastStoragePathOperation(transaction.getId(), storagePathAsString);
-      // TODO gbarros: remove second condition on rebase
-      if (storagePathOperation.isPresent()
-        && storagePathOperation.get().getOperationState().equals(OperationState.SUCCESS)) {
-        return switch (storagePathOperation.get().getOperationType()) {
+      if (storagePathOperation.isPresent()) {
+        LOGGER.debug("[transactionId:{}] Storage path operation for {}: {}", transaction.getId(), storagePathAsString,
+          storagePathOperation.get().getOperationType());
+        switch (storagePathOperation.get().getOperationType()) {
           case DELETE -> throw new NotFoundException("Resource was deleted in this transaction.");
-          case CREATE, UPDATE -> stagingStorageService;
+          case CREATE, UPDATE -> {
+            LOGGER.debug("[transactionId:{}] Using staging storage service for storage path: {}", transaction.getId(),
+              storagePathAsString);
+            return stagingStorageService;
+          }
           default ->
             throw new GenericException("Unexpected operation type: " + storagePathOperation.get().getOperationType());
-        };
+        }
       }
+      LOGGER.debug("[transactionId:{}] Using main storage service for storage path: {}", transaction.getId(),
+        storagePathAsString);
       return mainStorageService;
     } catch (RODATransactionException e) {
       throw new GenericException("Failed to get effective storage service for storage path: " + storagePath, e);
