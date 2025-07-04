@@ -10,15 +10,18 @@ package org.roda.wui.client.common.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.fusesource.restygwt.client.FailedResponseException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
@@ -107,6 +110,19 @@ public class AsyncCallbackUtils {
     if (!treatCommonFailures(caught, redirectPath)) {
       Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
       LOGGER.error("Async request error", caught);
+    }
+  }
+
+  public static final void defaultRestErrorTreatment(Throwable caught) {
+    if (caught instanceof FailedResponseException) {
+      FailedResponseException failedResponseException = (FailedResponseException) caught;
+      if (!treatCommonFailures(caught)) {
+        RestErrorOverlayType error = JsonUtils.safeEval(failedResponseException.getResponse().getText());
+        Toast.showError(error.getMessage(), error.getDetails());
+        LOGGER.error("Async request error", caught);
+      }
+    } else {
+      defaultFailureTreatment(caught);
     }
   }
 
