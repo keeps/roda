@@ -266,9 +266,15 @@ public final class StorageServiceUtils {
             while (mainIterator.hasNext()) {
               Resource res = mainIterator.next();
               StoragePath path = res.getStoragePath();
-              if (seenPaths.contains(path)) {
+
+              boolean alreadySeen = seenPaths.stream()
+                .filter(Objects::nonNull)
+                .anyMatch(seen -> path.toString().equals(seen.toString()));
+
+              if (alreadySeen) {
                 continue;
               }
+
               nextItem = res;
               return;
             }
