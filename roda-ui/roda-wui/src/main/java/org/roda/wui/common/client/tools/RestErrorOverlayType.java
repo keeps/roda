@@ -22,4 +22,8 @@ public class RestErrorOverlayType extends JavaScriptObject {
   public final native String getMessage() /*-{
 		return this.message;
   }-*/;
+
+  public final native String getDetails() /*-{
+        return this.details;
+  }-*/;
 }
