@@ -63,6 +63,7 @@ import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.common.slider.SliderPanel;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
@@ -165,7 +166,6 @@ public class BrowseDIPPortal extends Composite {
             }
         }
 
-
     };
 
     interface MyUiBinder extends UiBinder<Widget, BrowseDIPPortal> {
@@ -175,7 +175,9 @@ public class BrowseDIPPortal extends Composite {
 
     private static ClientMessages messages = GWT.create(ClientMessages.class);
 
-    //public static final Sorter DEFAULT_DIPFILE_SORTER = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
+
+
+    private SliderPanel disseminationsSlider;
 
     // IDENTIFICATION
     @UiField
@@ -205,9 +207,11 @@ public class BrowseDIPPortal extends Composite {
         DIPFile dipFile = bundle.getDipFile();
 
         initWidget(uiBinder.createAndBindUi(this));
+
         preMetadata.add(new HTMLWidgetWrapper("PreMetadataPortal.html"));
         preMetadata.addStyleName("preSectionTitle preMetadataTitle");
 
+        //TODO: getTile do AIP e não de disseminacao?
         //title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
         title.setText(dip.getTitle() != null ? aipTitle : aipId);
 
@@ -233,14 +237,51 @@ public class BrowseDIPPortal extends Composite {
         }
 
         //NAVIGATION TOOLBAR
-        NavigationToolbar<IsIndexed> bottomNavigationToolbar = new NavigationToolbar<>();
-        bottomNavigationToolbar.withObject(dipFile != null ? dipFile : dip);
-        bottomNavigationToolbar.withPermissions(dip.getPermissions());
-        bottomNavigationToolbar.updateBreadcrumb(bundle);
-        bottomNavigationToolbar.setHeader(messages.catalogueDIPTitle());
-        bottomNavigationToolbar.build();
-        container.insert(bottomNavigationToolbar, 0);
+        Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS,aipId));
+        Sorter dipsSorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
+        getAIPassociatedDIPs(aipId, dipsFilter, dipsSorter, new AsyncCallback<List<IndexedDIP>>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                //toolbar with just one DIP
+                GWT.log("APENAS UM DIP");
+                NavigationToolbar<IsIndexed> navigationToolbar = new NavigationToolbar<>();
+                navigationToolbar.withObject(dipFile != null ? dipFile : dip);
+                navigationToolbar.withPermissions(dip.getPermissions());
+                navigationToolbar.updateBreadcrumb(bundle);
+                navigationToolbar.setHeader(messages.catalogueDIPTitle());
+                navigationToolbar.build();
+                container.insert(navigationToolbar, 0);
+            }
 
+            @Override
+            public void onSuccess(List<IndexedDIP> indexedDIPS) {
+                //toolbar with several dips
+                int currentIdx = -1;
+                for(int i= 0; i<indexedDIPS.size();i++){
+                    if(indexedDIPS.get(i).getId().equals(dip.getId())){
+                        currentIdx = i;
+                        break;
+                    }
+                }
+                if (currentIdx == -1){
+                    onFailure(null);
+                }
+                ListSelectionUtils.save(ListSelectionUtils.create(dip, dipsFilter,true, Facets.NONE, dipsSorter,currentIdx,(long) indexedDIPS.size()));
+                ListSelectionUtils.ProcessRelativeItem<IsIndexed> processor = nextDIP -> {
+                   HistoryUtils.newHistory(BrowseDIPPortal.RESOLVER, nextDIP.getUUID());
+                };
+
+                NavigationToolbar<IsIndexed> navigationToolbar = new NavigationToolbar<>();
+                navigationToolbar.withObject(dip);
+                navigationToolbar.withProcessor(processor);
+                navigationToolbar.withPermissions(dip.getPermissions());
+                navigationToolbar.updateBreadcrumb(bundle);
+                navigationToolbar.setHeader(messages.catalogueDIPTitle());
+                navigationToolbar.build();
+                container.insert(navigationToolbar, 0);
+
+            }
+        });
         // DESCRIPTIVE METADATA
         updateSectionDescriptiveMetadata(aipId);
     }
@@ -320,6 +361,26 @@ public class BrowseDIPPortal extends Composite {
         } catch (RequestException e) {
             callback.onFailure(e);
         }
+    }
+
+    private static void getAIPassociatedDIPs(String aipId, Filter dipsFilter, Sorter dipsSorter,AsyncCallback<List<IndexedDIP>> callback){
+
+        BrowserService.Util.getInstance().find(IndexedDIP.class.getName(), dipsFilter, dipsSorter, new Sublist(),Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), true, Arrays.asList(RodaConstants.INDEX_UUID,RodaConstants.DIP_ID),
+                new AsyncCallback<IndexResult<IndexedDIP>>(){
+
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        callback.onFailure(throwable);
+                    }
+
+                    @Override
+                    public void onSuccess(IndexResult<IndexedDIP> result) {
+                       callback.onSuccess(result.getResults());
+
+                    }
+                });
+
+
     }
 
 }

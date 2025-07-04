@@ -172,9 +172,6 @@ public final class RodaConstants {
   public static final String UI_SERVICE_MONITORING_DEFAULT_URL = "https://www.roda-enterprise.com";
   public static final String UI_SERVICE_CAS_DEFAULT_URL = "https://www.roda-enterprise.com";
   public static final String UI_SERVICE_MARKETPLACE_DEFAULT_URL = "https://marketplace.roda-community.org";
-
-  // TODO alterar nome
-  public static final String UI_PORTAL_DIP_SHOW_ALL = "ui.portal.dip.show.all";
   /*
    * RODA objects
    */

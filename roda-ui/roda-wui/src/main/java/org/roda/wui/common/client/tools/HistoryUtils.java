@@ -206,7 +206,11 @@ public class HistoryUtils {
   }
 
   public static void openBrowse(DIPFile dipFile) {
-    HistoryUtils.newHistory(getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID()));
+    if(USING_PORTAL_UI) {
+      HistoryUtils.newHistory(BrowseDIPPortal.RESOLVER,dipFile.getDipId());
+    } else {
+      HistoryUtils.newHistory(getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID()));
+    }
   }
 
   public static void openBrowseDIP(String dipId) {
