@@ -17,6 +17,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -148,7 +149,8 @@ public class Services implements DirectRestService {
       service = GWT.create(MembersRestService.class);
     } else if (IndexedDIP.class.getName().equals(objectClassString)) {
       service = GWT.create(DIPRestService.class);
-    } else if (IndexedRepresentation.class.getName().equals(objectClassString)) {
+    } else if (IndexedRepresentation.class.getName().equals(objectClassString)
+      || Representation.class.getName().equals(objectClassString)) {
       service = GWT.create(RepresentationRestService.class);
     } else if (IndexedFile.class.getName().equals(objectClassString)
       || File.class.getName().equals(objectClassString)) {
