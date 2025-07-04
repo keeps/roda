@@ -575,7 +575,8 @@ public class IndexedAIP
   }
 
   public void setFields(Map<String, Object> fields) {
-    this.fields = fields;
+    fields.entrySet().stream().filter(p -> p.getValue() != null)
+      .forEach(e -> this.fields.put(e.getKey(), e.getValue()));
   }
 
   @Override
