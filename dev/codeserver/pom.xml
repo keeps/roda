@@ -100,6 +100,13 @@
             <artifactId>gwt-jackson</artifactId>
             <version>0.15.4</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.nmorel.gwtjackson</groupId>
+            <artifactId>gwt-jackson</artifactId>
+            <version>0.15.4</version>
+            <classifier>sources</classifier>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>

@@ -17,7 +17,6 @@ public class JavascriptUtils {
   }
 
   public static native JavaScriptObject durationInYMD(String futureDate) /*-{
-    console.log("Calculating duration in YMD for date: " + futureDate);
       var todayDate = $wnd.luxon.DateTime.now();
       var disposalDate = $wnd.luxon.DateTime.fromISO(futureDate);
 
