@@ -3,7 +3,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
@@ -11,6 +21,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.roda.core.data.common.RodaConstants;
@@ -43,6 +54,7 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.Bundle;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.DisseminationFileActions;
@@ -56,14 +68,19 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.common.client.tools.RestErrorOverlayType;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
+import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 /**
  * @author Eduardo Teixeira <eteixeira@keep.pt>
@@ -79,7 +96,7 @@ public class BrowseDIPPortal extends Composite {
 
         @Override
         public List<String> getHistoryPath() {
-            return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
+            return Arrays.asList(getHistoryToken());
         }
 
         @Override
@@ -160,8 +177,18 @@ public class BrowseDIPPortal extends Composite {
 
     //public static final Sorter DEFAULT_DIPFILE_SORTER = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
 
-    // interface
+    // IDENTIFICATION
+    @UiField
+    TitlePanel title;
 
+    // DESCRIPTIVE METADATA
+    @UiField
+    HTML descriptiveMetadata;
+
+    @UiField
+    FlowPanel preMetadata;
+
+    // DIP
     @UiField
     AccessibleFocusPanel keyboardFocus;
 
@@ -172,11 +199,17 @@ public class BrowseDIPPortal extends Composite {
     FlowPanel container;
 
     public BrowseDIPPortal(Viewers viewers, BrowseDipBundle bundle) {
-        GWT.log("CHEGOU AQUI CRL");
         IndexedDIP dip = bundle.getDip();
+        String aipId = dip.getFileIds().get(0).getAipId();
+        String aipTitle = dip.getTitle();
         DIPFile dipFile = bundle.getDipFile();
 
         initWidget(uiBinder.createAndBindUi(this));
+        preMetadata.add(new HTMLWidgetWrapper("PreMetadataPortal.html"));
+        preMetadata.addStyleName("preSectionTitle preMetadataTitle");
+
+        //title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
+        title.setText(dip.getTitle() != null ? aipTitle : aipId);
 
         if (dipFile != null) {
             center.add(new DipFilePreview(viewers, dipFile));
@@ -199,6 +232,7 @@ public class BrowseDIPPortal extends Composite {
             layout.addStyleName("browseDip-topList");
         }
 
+        //NAVIGATION TOOLBAR
         NavigationToolbar<IsIndexed> bottomNavigationToolbar = new NavigationToolbar<>();
         bottomNavigationToolbar.withObject(dipFile != null ? dipFile : dip);
         bottomNavigationToolbar.withPermissions(dip.getPermissions());
@@ -207,7 +241,8 @@ public class BrowseDIPPortal extends Composite {
         bottomNavigationToolbar.build();
         container.insert(bottomNavigationToolbar, 0);
 
-        keyboardFocus.setFocus(true);
+        // DESCRIPTIVE METADATA
+        updateSectionDescriptiveMetadata(aipId);
     }
 
     @Override
@@ -215,4 +250,76 @@ public class BrowseDIPPortal extends Composite {
         super.onLoad();
         JavascriptUtils.smoothScroll(keyboardFocus.getElement());
     }
+
+    private void updateSectionDescriptiveMetadata(String aipId) {
+        getDescriptiveMetadataHTML(aipId, new AsyncCallback<SafeHtml>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
+                    Toast.showError(messages.errorLoadingDescriptiveMetadata(caught.getMessage()));
+                }
+            }
+
+            @Override
+            public void onSuccess(SafeHtml result) {
+                descriptiveMetadata.setHTML(result);
+            }
+        });
+
+        WCAGUtilities.getInstance().makeAccessible(descriptiveMetadata.getElement());
+    }
+
+    private void getDescriptiveMetadataHTML(final String aipId, final AsyncCallback<SafeHtml> callback) {
+        try {
+            SafeUri uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, null);
+            RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
+
+            requestBuilder.sendRequest(null, new RequestCallback() {
+
+                @Override
+                public void onResponseReceived(Request request, Response response) {
+                    if (200 == response.getStatusCode()) {
+                        String html = response.getText();
+
+                        SafeHtmlBuilder b = new SafeHtmlBuilder();
+                        b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataHTML'>"));
+                        b.append(SafeHtmlUtils.fromTrustedString(html));
+                        b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+                        b.append(SafeHtmlUtils.fromSafeConstant("<div style=\"clear: both\"/>"));
+                        callback.onSuccess(b.toSafeHtml());
+                    } else {
+                        String text = response.getText();
+                        String message;
+                        try {
+                            RestErrorOverlayType error = JsonUtils.safeEval(text);
+                            message = error.getMessage();
+                        } catch (IllegalArgumentException e) {
+                            message = text;
+                        }
+
+                        SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+                        // error message
+                        b.append(SafeHtmlUtils.fromSafeConstant("<div class='error'>"));
+                        b.append(messages.descriptiveMetadataTransformToHTMLError());
+                        b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
+                        b.append(SafeHtmlUtils.fromString(message));
+                        b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
+                        b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+
+                        callback.onSuccess(b.toSafeHtml());
+                    }
+                }
+
+                @Override
+                public void onError(Request request, Throwable exception) {
+                    callback.onFailure(exception);
+                }
+            });
+        } catch (RequestException e) {
+            callback.onFailure(e);
+        }
+    }
+
 }

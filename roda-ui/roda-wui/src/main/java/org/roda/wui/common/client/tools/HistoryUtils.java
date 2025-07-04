@@ -186,7 +186,11 @@ public class HistoryUtils {
   }
 
   public static List<String> getHistoryBrowseDIP(String dipId) {
-    return getHistory(BrowseDIP.RESOLVER, dipId);
+    if(USING_PORTAL_UI) {
+      return getHistory(BrowseDIPPortal.RESOLVER, dipId);
+    } else {
+      return getHistory(BrowseDIP.RESOLVER, dipId);
+    }
   }
 
   public static List<String> getHistoryBrowseDIPFile(String dipId, String dipFileUUID) {
@@ -360,22 +364,13 @@ public class HistoryUtils {
     } else if (object instanceof IndexedDIP) {
       IndexedDIP dip = (IndexedDIP) object;
       if (USING_PORTAL_UI){
-        path = HistoryUtils.getHistory(BrowseDIPPortal.RESOLVER,dip.getId());
-        GWT.log(object.toString());
+        HistoryUtils.newHistory(BrowseDIPPortal.RESOLVER,dip.getId());
       }else{
         path = HistoryUtils.getHistoryBrowseDIP(dip.getId());
       }
     } else if (object instanceof DIPFile) {
       DIPFile dipFile = (DIPFile) object;
-      /*
-        TODO
-          Confirmar isto
-       */
-      if (USING_PORTAL_UI){
-        path = HistoryUtils.getHistory(BrowseDIPPortal.RESOLVER,dipFile.getDipId(),dipFile.getId());
-      }else {
-        path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID());
-      }
+      path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID());
     } else if (object instanceof TransferredResource) {
       TransferredResource resource = (TransferredResource) object;
       path = HistoryUtils.getHistory(IngestTransfer.RESOLVER.getHistoryPath(), resource.getUUID());
