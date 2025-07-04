@@ -290,9 +290,9 @@ public class SiegfriedPluginUtils {
     if (fileId != null) {
       riskIncidence.setFileId(fileId);
       riskIncidence.setFilePath(filePath);
-      riskIncidence.setObjectClass(File.class.getName());
+      riskIncidence.setObjectClass(File.class.getSimpleName());
     } else {
-      riskIncidence.setObjectClass(Representation.class.getName());
+      riskIncidence.setObjectClass(Representation.class.getSimpleName());
     }
     riskIncidence.setRiskId(RodaConstants.RISK_ID_SIEGFRIED_IDENTIFICATION_WARNING);
     riskIncidence.setDetectedBy(SiegfriedPlugin.getStaticName());
