@@ -77,14 +77,18 @@ public class BrowseFileTabs extends Tabs {
     });
 
     // Technical metadata
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.technicalTab()), new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        FileTechnicalMetadataTabs tmdTabs = new FileTechnicalMetadataTabs();
-        tmdTabs.setStyleName("descriptiveMetadataTabs");
-        tmdTabs.init(file, browseFileResponse.getTechnicalMetadataInfos());
-        return tmdTabs;
-      }
-    });
+
+    if (browseFileResponse.getTechnicalMetadataInfos() != null
+      && !browseFileResponse.getTechnicalMetadataInfos().getTechnicalMetadataInfoList().isEmpty()) {
+      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.technicalTab()), new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          FileTechnicalMetadataTabs tmdTabs = new FileTechnicalMetadataTabs();
+          tmdTabs.setStyleName("descriptiveMetadataTabs");
+          tmdTabs.init(file, browseFileResponse.getTechnicalMetadataInfos());
+          return tmdTabs;
+        }
+      });
+    }
   }
 }
