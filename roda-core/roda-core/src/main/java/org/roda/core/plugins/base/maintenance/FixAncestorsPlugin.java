@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -104,7 +105,8 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID)) {
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID)
+      && StringUtils.isNotBlank(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID))) {
       originalJobId = getParameterValues().get(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID);
     }
   }
@@ -145,9 +147,8 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
     JobPluginInfo jobPluginInfo, int counter) {
     try {
       Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
-      Job originalJob = PluginHelper.getJob(originalJobId, model);
-      PluginHelper.fixParents(index, model, Optional.ofNullable(originalJob.getId()), computedSearchScope,
-        originalJob.getUsername());
+      PluginHelper.fixParents(index, model, Optional.ofNullable(originalJobId), computedSearchScope,
+        cachedJob.getUsername());
       jobPluginInfo.incrementObjectsProcessedWithSuccess(counter);
       report.setPluginState(PluginState.SUCCESS);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
