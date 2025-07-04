@@ -163,6 +163,9 @@ public class DisposalScheduleService {
     if (StringUtils.isBlank(disposalSchedule.getTitle())) {
       throw new DisposalScheduleNotValidException("The disposal schedule title is mandatory");
     }
+    if (!isNumberOfAIPsValid(disposalSchedule.getApiCounter(), disposalSchedule.getState())) {
+      throw new DisposalScheduleNotValidException("The disposal schedule can not be deactivated");
+    }
   }
 
   public DisposalSchedule createDisposalSchedule(DisposalSchedule disposalSchedule, RequestContext requestContext)

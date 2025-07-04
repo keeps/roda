@@ -261,7 +261,7 @@ public class ShowDisposalSchedule extends Composite {
           services.disposalScheduleResource(s -> s.updateDisposalSchedule(disposalSchedule))
             .whenComplete((disposalSchedule1, throwable) -> {
               if (throwable != null) {
-                AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                AsyncCallbackUtils.defaultRestErrorTreatment(throwable);
               } else {
                 HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
               }
@@ -275,13 +275,13 @@ public class ShowDisposalSchedule extends Composite {
         // Delete the disposal schedule
         Button deleteDisposalSchedule = new Button();
         deleteDisposalSchedule.addStyleName("btn btn-block btn-danger btn-delete");
-        deleteDisposalSchedule.setText("Delete");
+        deleteDisposalSchedule.setText(messages.removeButton());
         deleteDisposalSchedule.addClickHandler(clickEvent -> {
           Services services = new Services("Delete disposal schedule", "delete");
           services.disposalScheduleResource(s -> s.deleteDisposalSchedule(disposalSchedule.getId()))
             .whenComplete((unused, throwable) -> {
               if (throwable != null) {
-                AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                AsyncCallbackUtils.defaultRestErrorTreatment(throwable);
               } else {
                 Toast.showInfo(messages.disposalSchedulesTitle(),
                   messages.deleteDisposalSchedule(disposalSchedule.getTitle()));

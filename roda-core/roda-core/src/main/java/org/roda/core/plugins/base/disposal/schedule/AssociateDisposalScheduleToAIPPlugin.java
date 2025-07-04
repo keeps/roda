@@ -234,8 +234,8 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
     disposalAIPMetadata.setSchedule(disposalScheduleAIPMetadata);
     aip.setDisposal(disposalAIPMetadata);
     model.updateAIP(aip, cachedJob.getUsername());
-    //disposalSchedule.setFirstTimeUsed(new Date());
-    //model.updateDisposalSchedule(disposalSchedule, cachedJob.getUsername());
+    disposalSchedule.setFirstTimeUsed(new Date());
+    model.updateDisposalSchedule(disposalSchedule, cachedJob.getUsername());
   }
 
   @Override
