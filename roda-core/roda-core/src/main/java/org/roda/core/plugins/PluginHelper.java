@@ -55,6 +55,7 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -86,6 +87,7 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
@@ -785,16 +787,22 @@ public final class PluginHelper {
 
   /*********************************/
   public static Optional<String> getComputedParent(ModelService model, IndexService index, List<String> ancestors,
-    Optional<String> computedSearchScope, boolean forceSearchScope, String jobId) {
+    Optional<String> computedSearchScope, boolean forceSearchScope, String jobId, String jobUsername) {
     if (ancestors.isEmpty()) {
       return computedSearchScope;
     }
-    return resolveParent(model, index, ancestors, computedSearchScope, forceSearchScope, jobId);
+    return resolveParent(model, index, ancestors, computedSearchScope, forceSearchScope, jobId, jobUsername);
   }
 
   private static Optional<String> resolveParent(ModelService model, IndexService index, List<String> ancestorsFromSIP,
-    Optional<String> computedSearchScope, boolean forceParent, String jobId) {
+    Optional<String> computedSearchScope, boolean forceParent, String jobId, String jobUsername) {
     Optional<String> parent = computedSearchScope;
+    User jobUser;
+    try {
+      jobUser = model.retrieveUser(jobUsername);
+    } catch (GenericException e) {
+      jobUser = null;
+    }
 
     if (forceParent) {
       parent = computedSearchScope;
@@ -806,9 +814,10 @@ public final class PluginHelper {
 
       try {
         for (String ancestor : ancestors) {
-          Optional<String> computedAncestorId = getAncestorById(ancestor, parent, index, RodaConstants.INGEST_SIP_IDS);
+          Optional<String> computedAncestorId = getAncestorById(model, ancestor, parent, index,
+            RodaConstants.INGEST_SIP_IDS, jobUser);
           if (!computedAncestorId.isPresent()) {
-            computedAncestorId = getAncestorById(ancestor, parent, index, RodaConstants.INDEX_UUID);
+            computedAncestorId = getAncestorById(model, ancestor, parent, index, RodaConstants.INDEX_UUID, jobUser);
           }
 
           if (computedAncestorId.isPresent()) {
@@ -840,8 +849,8 @@ public final class PluginHelper {
     return Optional.ofNullable(ghostAIP.getId());
   }
 
-  private static Optional<String> getAncestorById(String ancestor, Optional<String> computedSearchScope,
-    IndexService index, String aipField) {
+  private static Optional<String> getAncestorById(ModelService model, String ancestor,
+    Optional<String> computedSearchScope, IndexService index, String aipField, User jobUser) {
     if (ancestor.equalsIgnoreCase(computedSearchScope.orElse(null))) {
       return computedSearchScope;
     }
@@ -859,13 +868,19 @@ public final class PluginHelper {
     }
 
     try {
-      // TODO 2016-11-24 sleroux: add user permission
       IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, ancestorFilter, Sorter.NONE, new Sublist(0, 1),
-        Arrays.asList(RodaConstants.INDEX_UUID));
+        Facets.NONE, jobUser, false, Arrays.asList(RodaConstants.INDEX_UUID));
 
       if (result.getTotalCount() >= 1) {
         IndexedAIP indexedAIP = result.getResults().get(0);
-        ancestorBySIPId = Optional.ofNullable(indexedAIP.getId());
+
+        // Check if exist on Model due to transactions
+        try {
+          model.retrieveAIP(indexedAIP.getId());
+          ancestorBySIPId = Optional.ofNullable(indexedAIP.getId());
+        } catch (NotFoundException | AuthorizationDeniedException e) {
+          ancestorBySIPId = Optional.empty();
+        }
       }
     } catch (GenericException | RequestNotValidException e) {
       // Do nothing
@@ -1317,13 +1332,13 @@ public final class PluginHelper {
               model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION,
                 "The process of deleting an object of the repository", PluginState.FAILURE,
                 "The transferred resource " + transferredResource.getName() + " has not been deleted.", "",
-                cachedJob.getUsername(), true);
+                cachedJob.getUsername(), true, null);
               LOGGER.debug("Failed to remove SIP {}", transferredResource.getFullPath(), e);
             }
             model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION,
               "The process of deleting an object of the repository", PluginState.SUCCESS,
               "The transferred resource " + transferredResource.getName() + " has been deleted.", "",
-              cachedJob.getUsername(), true);
+              cachedJob.getUsername(), true, null);
             LOGGER.debug("Done with removing SIP {}", transferredResource.getFullPath());
           }
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {

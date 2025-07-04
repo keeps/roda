@@ -150,7 +150,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       throw e;
     } catch (RODATransactionException e) {
       updateOperationState(operationLog, OperationState.FAILURE);
-      throw new GenericException("Failed to retrieve storage paths operations from database", e);
+      throw new GenericException(
+        "[transactionId:" + transaction.getId() + "] Failed to retrieve storage paths operations from database", e);
     }
 
   }
@@ -240,7 +241,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       throw e;
     } catch (RODATransactionException e) {
       updateOperationState(operationLog, OperationState.FAILURE);
-      throw new GenericException("Failed to retrieve storage paths operations from database", e);
+      throw new GenericException(
+        "[transactionId:" + transaction.getId() + "] Failed to retrieve storage paths operations from database", e);
     }
   }
 
@@ -349,7 +351,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         throw e;
       }
     }
-    throw new NotFoundException("Storage path does not exist: " + storagePath);
+    throw new NotFoundException(
+      "[transactionId:" + transaction.getId() + "] Storage path does not exist: " + storagePath);
   }
 
   @Override
@@ -439,7 +442,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     try {
       if (storagePath.isFromAContainer()) {
         updateOperationState(operationLog, OperationState.FAILURE);
-        throw new IllegalArgumentException("Cannot get direct access to a container: " + storagePath);
+        throw new IllegalArgumentException(
+          "[transactionId:" + transaction.getId() + "] Cannot get direct access to a container: " + storagePath);
       }
 
       // check if transaction has any changes below the storagePath, if not use
@@ -523,7 +527,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         throw e;
       }
     } catch (AlreadyExistsException e) {
-      throw new GenericException("Failed to import binary version", e);
+      throw new GenericException("[transactionId:" + transaction.getId() + "] Failed to import binary version", e);
     }
   }
 
@@ -543,7 +547,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         throw e;
       }
     } catch (AlreadyExistsException e) {
-      throw new GenericException("Failed to import binary version", e);
+      throw new GenericException("[transactionId:" + transaction.getId() + "] Failed to import binary version", e);
     }
   }
 
@@ -614,13 +618,15 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
             handleCreateOperation(storagePath, version);
           } else if (operationType == OperationType.READ) {
             // TODO: READ
-            LOGGER.debug("Skipping read operation for storage path: {}", storagePath);
+            LOGGER.debug("[transactionId:{}] Skipping read operation for storage path: {}", transaction.getId(),
+              storagePath);
           }
         }
 
       }
     } catch (RequestNotValidException e) {
-      throw new RODATransactionException("Failed to consolidate transaction logs", e);
+      throw new RODATransactionException(
+        "[transactionId:" + transaction.getId() + "] Failed to consolidate transaction logs", e);
     }
   }
 
@@ -632,34 +638,39 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         mainStorageService.deleteResource(storagePath);
       }
     } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
-      throw new RODATransactionException("Failed to delete storage path at " + storagePath, e);
+      throw new RODATransactionException(
+        "[transactionId:" + transaction.getId() + "] Failed to delete storage path at " + storagePath, e);
     }
   }
 
   private void handleUpdateOperation(StoragePath storagePath, String version) throws RODATransactionException {
     try {
       if (version != null) {
-        LOGGER.info("Importing binary version from staging to main storage service: {}", storagePath);
+        LOGGER.info("[transactionId:{}] Importing binary version from staging to main storage service: {}",
+          transaction.getId(), storagePath);
         mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
       } else {
-        LOGGER.info("Updating resource from staging to main storage service: {}", storagePath);
+        LOGGER.info("[transactionId:{}] Updating resource from staging to main storage service: {}",
+          transaction.getId(), storagePath);
         StorageServiceUtils.syncBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
           storagePath, getEntity(storagePath));
       }
     } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
       | AuthorizationDeniedException e) {
-      throw new RODATransactionException(
-        "Failed to update storage path from staging to main storage service: " + storagePath, e);
+      throw new RODATransactionException("[transactionId:" + transaction.getId()
+        + "] Failed to update storage path from staging to main storage service: " + storagePath, e);
     }
   }
 
   private void handleCreateOperation(StoragePath storagePath, String version) throws RODATransactionException {
     try {
       if (version != null) {
-        LOGGER.info("Creating binary version from staging to main storage service: {}", storagePath);
+        LOGGER.info("[transactionId:{}] Creating binary version from staging to main storage service: {}",
+          transaction.getId(), storagePath);
         mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
       } else {
-        LOGGER.info("Moving resource from staging to main storage service: {}", storagePath);
+        LOGGER.info("[transactionId:{}] Moving resource from staging to main storage service: {}", transaction.getId(),
+          storagePath);
         Class<? extends Entity> rootEntity = stagingStorageService.getEntity(storagePath);
         // TODO: This is necessary to avoid recursive copies, we should handle it better
         // in StorageServiceUtils
@@ -674,8 +685,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       }
     } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
       | AuthorizationDeniedException e) {
-      throw new RODATransactionException("Failed to copy storage path from staging to main storage service: "
-        + storagePath + ". (transactionID:" + transaction.getId() + ")", e);
+      throw new RODATransactionException("[transactionId:" + transaction.getId()
+        + "] Failed to copy storage path from staging to main storage service: " + storagePath, e);
     }
   }
 
@@ -704,7 +715,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       }
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | IOException e) {
-      throw new RODATransactionException("Failed to copy resources from main storage to staging storage", e);
+      throw new RODATransactionException(
+        "[transactionId:" + transaction.getId() + "] Failed to copy resources from main storage to staging storage", e);
     }
   }
 
@@ -720,7 +732,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   @Override
   public void rollback() throws RODATransactionException {
-    LOGGER.warn("Rolling back transaction: {}", transaction.getId());
+    LOGGER.warn("[transactionId:{}] Rolling back transaction", transaction.getId());
     // DO NOTHING
   }
 
@@ -734,7 +746,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       }
       return registerOperationForCopy(fromService, fromStoragePath, DefaultStoragePath.parse(pathParts), operation);
     } catch (RequestNotValidException e) {
-      throw new GenericException("Failed to register operation for copy: " + toPath, e);
+      throw new GenericException(
+        "[transactionId:" + transaction.getId() + "] Failed to register operation for copy: " + toPath, e);
     }
 
   }
@@ -762,7 +775,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         ret.add(registerOperation(destinationStoragePathAsString, operation, null));
       }
     } catch (NotFoundException | RequestNotValidException | IOException e) {
-      throw new GenericException("Failed to register operation for copy: " + toStoragePath, e);
+      throw new GenericException(
+        "[transactionId:" + transaction.getId() + "] Failed to register operation for copy: " + toStoragePath, e);
     }
     return ret;
   }
@@ -787,12 +801,15 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   private TransactionalStoragePathOperationLog registerOperation(String storagePathAsString, OperationType operation,
     String version) {
-    LOGGER.debug("Registering operation for storage path: {}", storagePathAsString);
     try {
+      LOGGER.debug("[transactionId:{}] Registering operation for storage path: {} with operation: {}",
+        transaction.getId(), storagePathAsString, operation);
       return transactionLogService.registerStoragePathOperation(transaction.getId(), storagePathAsString, operation,
         version);
     } catch (RODATransactionException e) {
-      throw new IllegalArgumentException("Cannot register operation for storagePath: " + storagePathAsString, e);
+      throw new IllegalArgumentException(
+        "[transactionId:" + transaction.getId() + "] Cannot register operation for storagePath: " + storagePathAsString,
+        e);
     }
   }
 
@@ -802,7 +819,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         transactionLogService.updateStoragePathOperationState(operationLog.getId(), state);
       }
     } catch (RODATransactionException e) {
-      throw new IllegalArgumentException("Cannot update operation state: " + operationLog.getId(), e);
+      throw new IllegalArgumentException(
+        "[transactionId:" + transaction.getId() + "] Cannot update operation state: " + operationLog.getId(), e);
     }
   }
 
@@ -823,19 +841,27 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     try {
       Optional<TransactionalStoragePathOperationLog> storagePathOperation = transactionLogService
         .getLastStoragePathOperation(transaction.getId(), storagePathAsString);
-      // TODO gbarros: remove second condition on rebase
-      if (storagePathOperation.isPresent()
-        && storagePathOperation.get().getOperationState().equals(OperationState.SUCCESS)) {
-        return switch (storagePathOperation.get().getOperationType()) {
-          case DELETE -> throw new NotFoundException("Resource was deleted in this transaction.");
-          case CREATE, UPDATE -> stagingStorageService;
-          default ->
-            throw new GenericException("Unexpected operation type: " + storagePathOperation.get().getOperationType());
-        };
+      if (storagePathOperation.isPresent()) {
+        LOGGER.debug("[transactionId:{}] Storage path operation for {}: {}", transaction.getId(), storagePathAsString,
+          storagePathOperation.get().getOperationType());
+        switch (storagePathOperation.get().getOperationType()) {
+          case DELETE -> throw new NotFoundException(
+            "[transactionId:" + transaction.getId() + "] Resource was deleted in this transaction.");
+          case CREATE, UPDATE -> {
+            LOGGER.debug("[transactionId:{}] Using staging storage service for storage path: {}", transaction.getId(),
+              storagePathAsString);
+            return stagingStorageService;
+          }
+          default -> throw new GenericException("[transactionId:" + transaction.getId()
+            + "] Unexpected operation type: " + storagePathOperation.get().getOperationType());
+        }
       }
+      LOGGER.debug("[transactionId:{}] Using main storage service for storage path: {}", transaction.getId(),
+        storagePathAsString);
       return mainStorageService;
     } catch (RODATransactionException e) {
-      throw new GenericException("Failed to get effective storage service for storage path: " + storagePath, e);
+      throw new GenericException("[transactionId:" + transaction.getId()
+        + "] Failed to get effective storage service for storage path: " + storagePath, e);
     }
   }
 }

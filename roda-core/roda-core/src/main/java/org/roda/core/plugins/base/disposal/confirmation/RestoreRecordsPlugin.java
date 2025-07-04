@@ -235,7 +235,7 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     }
 
     model.createEvent(aipEntry.getAipId(), null, null, null, RodaConstants.PreservationEventType.RECOVERY,
-      EVENT_DESCRIPTION, null, null, pluginState, outcomeText, "", cachedJob.getUsername(), true);
+      EVENT_DESCRIPTION, null, null, pluginState, outcomeText, "", cachedJob.getUsername(), true, null);
 
     jobPluginInfo.incrementObjectsProcessed(pluginState);
 

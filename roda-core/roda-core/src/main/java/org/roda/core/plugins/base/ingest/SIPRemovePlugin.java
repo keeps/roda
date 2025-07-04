@@ -96,7 +96,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
         model.createRepositoryEvent(PreservationEventType.DELETION,
           "The process of deleting an object of the repository", PluginState.SUCCESS,
           "The transferred resource " + transferredResource.getId() + " has been deleted.", "", job.getUsername(),
-          true);
+          true, null);
       }
 
       pluginInfo.incrementObjectsProcessedWithSuccess();
@@ -105,7 +105,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
         model.createRepositoryEvent(PreservationEventType.DELETION,
           "The process of deleting an object of the repository", PluginState.SUCCESS,
           "The transferred resource " + transferredResource.getId() + " has not been deleted.", "", job.getUsername(),
-          true);
+          true, null);
       }
 
       pluginInfo.incrementObjectsProcessedWithFailure();

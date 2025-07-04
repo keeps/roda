@@ -1591,41 +1591,42 @@ public class DefaultModelService implements ModelService {
 
   @Override
   public PreservationMetadata createRepositoryEvent(PreservationEventType eventType, String eventDescription,
-    PluginState outcomeState, String outcomeText, String outcomeDetail, String agentName, boolean notify) {
+    PluginState outcomeState, String outcomeText, String outcomeDetail, String agentName, boolean notify,
+    String eventId) {
     return createRepositoryEvent(eventType, eventDescription, null, null, outcomeState, outcomeText, outcomeDetail,
-      agentName, notify);
+      agentName, notify, eventId);
   }
 
   @Override
   public PreservationMetadata createRepositoryEvent(PreservationEventType eventType, String eventDescription,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText,
-    String outcomeDetail, String agentName, boolean notify) {
+    String outcomeDetail, String agentName, boolean notify, String eventId) {
     return createEvent(null, null, null, null, eventType, eventDescription, sources, targets, outcomeState, outcomeText,
-      outcomeDetail, agentName, notify);
+      outcomeDetail, agentName, notify, eventId);
   }
 
   @Override
   public PreservationMetadata createUpdateAIPEvent(String aipId, String representationId, List<String> filePath,
     String fileId, PreservationEventType eventType, String eventDescription, PluginState outcomeState,
-    String outcomeText, String outcomeDetail, String agentName, boolean notify) {
+    String outcomeText, String outcomeDetail, String agentName, boolean notify, String eventId) {
     return createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, null, null, outcomeState,
-      outcomeText, outcomeDetail, agentName, notify);
+      outcomeText, outcomeDetail, agentName, notify, eventId);
   }
 
   @Override
   public PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
-    String agentName, boolean notify) {
+    String agentName, boolean notify, String eventId) {
     return createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets,
-      outcomeState, outcomeText, outcomeDetail, agentName, null, notify);
+      outcomeState, outcomeText, outcomeDetail, agentName, null, notify, eventId);
   }
 
   @Override
   public PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
-    String agentName, String agentRole, boolean notify) {
+    String agentName, String agentRole, boolean notify, String eventId) {
     try {
       StringBuilder builder = new StringBuilder(outcomeText);
       if (StringUtils.isNotBlank(outcomeDetail) && !outcomeState.equals(PluginState.SUCCESS)) {
@@ -1638,7 +1639,7 @@ public class DefaultModelService implements ModelService {
         linkingIdentifier.getRoles().add(agentRole);
       }
       return createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets,
-        outcomeState, builder.toString(), "", Collections.singletonList(linkingIdentifier), agentName, notify);
+        outcomeState, builder.toString(), "", Collections.singletonList(linkingIdentifier), agentName, notify, eventId);
     } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
       | RequestNotValidException | AuthorizationDeniedException e1) {
       LOGGER.error("Could not create an event for: {}", eventDescription, e1);
@@ -1650,29 +1651,32 @@ public class DefaultModelService implements ModelService {
   public PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeDetail, String outcomeExtension,
-    List<LinkingIdentifier> agentIds, String username, boolean notify) throws GenericException, ValidationException,
-    NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    List<LinkingIdentifier> agentIds, String username, boolean notify, String eventId)
+    throws GenericException, ValidationException, NotFoundException, RequestNotValidException,
+    AuthorizationDeniedException, AlreadyExistsException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT,
-      RODAInstanceUtils.getLocalInstanceIdentifier());
-    ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, new Date(), eventType.toString(),
+    if (eventId == null) {
+      eventId = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT,
+        RODAInstanceUtils.getLocalInstanceIdentifier());
+    }
+    ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(eventId, new Date(), eventType.toString(),
       eventDescription, sources, targets, outcomeState.toString(), outcomeDetail, outcomeExtension, agentIds);
 
     if (eventType.equals(PreservationEventType.DELETION)) {
       if (aipId != null && representationId == null) {
-        return createPreservationMetadata(PreservationMetadataType.EVENT, id, null, null, null, null, premisEvent,
+        return createPreservationMetadata(PreservationMetadataType.EVENT, eventId, null, null, null, null, premisEvent,
           username, notify);
       } else if (representationId != null && fileId == null) {
-        return createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, null, null, null, premisEvent,
+        return createPreservationMetadata(PreservationMetadataType.EVENT, eventId, aipId, null, null, null, premisEvent,
           username, notify);
       } else {
-        return createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, null, null,
+        return createPreservationMetadata(PreservationMetadataType.EVENT, eventId, aipId, representationId, null, null,
           premisEvent, username, notify);
       }
     } else {
-      return createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
-        premisEvent, username, notify);
+      return createPreservationMetadata(PreservationMetadataType.EVENT, eventId, aipId, representationId, filePath,
+        fileId, premisEvent, username, notify);
     }
   }
 
@@ -3599,8 +3603,7 @@ public class DefaultModelService implements ModelService {
    * OTHER DIRECTORIES (submission, documentation, schemas)
    *********************************************************/
 
-  @Override
-  public Directory getSubmissionDirectory(String aipId)
+  private Directory getSubmissionDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getSubmissionStoragePath(aipId));
   }
@@ -3625,14 +3628,12 @@ public class DefaultModelService implements ModelService {
     storage.createBinary(submissionStoragePath, new FSPathContentPayload(submissionPath), false);
   }
 
-  @Override
-  public Directory getDocumentationDirectory(String aipId)
+  private Directory getDocumentationDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getDocumentationStoragePath(aipId));
   }
 
-  @Override
-  public Directory getDocumentationDirectory(String aipId, String representationId)
+  private Directory getDocumentationDirectory(String aipId, String representationId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getDocumentationStoragePath(aipId, representationId));
   }
@@ -3680,28 +3681,25 @@ public class DefaultModelService implements ModelService {
     return getStorage().countResourcesUnderDirectory(schemaDirectory.getStoragePath(), true);
   }
 
-  @Override
-  public Directory getSchemasDirectory(String aipId)
+  private Directory getSchemasDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getSchemasStoragePath(aipId));
   }
 
-  @Override
-  public Directory getSchemasDirectory(String aipId, String representationId)
+  private Directory getSchemasDirectory(String aipId, String representationId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getSchemasStoragePath(aipId, representationId));
   }
 
   @Override
-  public File createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
+  public void createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     boolean asReference = false;
     StoragePath filePath = ModelUtils.getSchemaStoragePath(aipId, representationId, directoryPath, fileId);
-    final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
-    return ResourceParseUtils.convertResourceToFile(createdBinary);
+    storage.createBinary(filePath, contentPayload, asReference);
   }
 
   @Override
@@ -4194,7 +4192,7 @@ public class DefaultModelService implements ModelService {
     storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
 
     createRepositoryEvent(PreservationEventType.UPDATE, "Update disposal hold", PluginState.SUCCESS, "", details, "",
-      true);
+      true, null);
 
     return currentDisposalHold;
   }

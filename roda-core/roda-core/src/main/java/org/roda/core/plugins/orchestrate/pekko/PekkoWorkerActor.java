@@ -67,7 +67,7 @@ public class PekkoWorkerActor extends PekkoBaseActor {
     boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(RodaCoreFactory.getNodeType());
 
     try {
-      if (writeIsAllowed && RODATransactionManager != null) {
+      if (writeIsAllowed && RODATransactionManager != null && RODATransactionManager.isInitialized()) {
         RODATransactionManager.runPluginInTransaction(plugin, objectsToBeProcessed);
       } else {
         plugin.execute(index, model, objectsToBeProcessed);

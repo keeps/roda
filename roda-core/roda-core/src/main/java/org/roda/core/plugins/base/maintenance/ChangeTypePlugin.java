@@ -138,7 +138,7 @@ public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> 
           .append("' changed its type from '").append(aip.getType()).append("' to '").append(newType).append("'.");
 
         model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, EVENT_DESCRIPTION,
-          state, outcomeText.toString(), details, job.getUsername(), true);
+          state, outcomeText.toString(), details, job.getUsername(), true, null);
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
@@ -168,7 +168,7 @@ public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> 
 
         model.createUpdateAIPEvent(representation.getAipId(), representation.getId(), null, null,
           PreservationEventType.UPDATE, EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(),
-          true);
+          true, null);
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }

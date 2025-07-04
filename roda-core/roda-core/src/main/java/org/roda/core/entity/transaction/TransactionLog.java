@@ -29,7 +29,7 @@ public class TransactionLog implements Serializable {
   private static final long serialVersionUID = -1711448061359115698L;
 
   public enum TransactionStatus {
-    PENDING, COMMITTING, COMMITTED, ROLLED_BACK
+    PENDING, COMMITTING, COMMITTED, ROLLING_BACK, ROLL_BACK_FAILED, ROLLED_BACK
   }
 
   public enum TransactionRequestType {

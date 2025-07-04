@@ -188,7 +188,7 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
     }
 
     model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION, getPreservationEventDescription(),
-      report.getPluginState(), outcomeText, details, cachedJob.getUsername(), true);
+      report.getPluginState(), outcomeText, details, cachedJob.getUsername(), true, null);
   }
 
   private void processAIP(AIP aip, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob,
@@ -226,7 +226,7 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
     model.createUpdateAIPEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.UPDATE,
-      EVENT_DESCRIPTION, state, outcomeText, details, cachedJob.getUsername(), true);
+      EVENT_DESCRIPTION, state, outcomeText, details, cachedJob.getUsername(), true, null);
   }
 
   @Override
