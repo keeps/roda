@@ -124,7 +124,7 @@ public class RepresentationService {
 
       String outcomeText = "The representation '" + representationId + "' has been manually created";
       model.createEvent(aipId, null, null, null, RodaConstants.PreservationEventType.CREATION, eventDescription, null,
-        targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
+        targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true, null);
 
       index.commit(IndexedRepresentation.class);
       return representation;
@@ -132,7 +132,7 @@ public class RepresentationService {
       | AlreadyExistsException e) {
       String outcomeText = "The representation '" + representationId + "' has not been manually created";
       model.createUpdateAIPEvent(aipId, null, null, null, RodaConstants.PreservationEventType.CREATION,
-        eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true);
+        eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true, null);
 
       throw e;
     }

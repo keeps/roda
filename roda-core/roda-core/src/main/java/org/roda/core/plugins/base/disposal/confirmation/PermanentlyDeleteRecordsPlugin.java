@@ -140,7 +140,7 @@ public class PermanentlyDeleteRecordsPlugin extends AbstractPlugin<DisposalConfi
 
     model.createRepositoryEvent(getPreservationEventType(), getPreservationEventDescription(), state,
       PluginState.FAILURE.equals(state) ? getPreservationEventFailureMessage() : getPreservationEventSuccessMessage(),
-      confirmation.getId(), cachedJob.getUsername(), true);
+      confirmation.getId(), cachedJob.getUsername(), true, null);
   }
 
   @Override

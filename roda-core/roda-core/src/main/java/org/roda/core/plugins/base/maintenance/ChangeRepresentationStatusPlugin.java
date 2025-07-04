@@ -141,7 +141,7 @@ public class ChangeRepresentationStatusPlugin extends AbstractPlugin<Representat
 
         model.createUpdateAIPEvent(representation.getAipId(), representation.getId(), null, null,
           PreservationEventType.UPDATE, EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(),
-          true);
+          true, null);
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }

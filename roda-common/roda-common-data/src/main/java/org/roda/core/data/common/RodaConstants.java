@@ -797,6 +797,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_DETAILS_PARAM = "details";
   public static final String CONTROLLER_REQUEST_METRICS_PARAM = "metricsToObtain";
   public static final String CONTROLLER_LOGIN_METHOD_PARAM = "loginMethod";
+  public static final String CONTROLLER_TRANSACTION_ID_PARAM = "transactionID";
 
   /*
    * Core (storage, index, orchestrator, etc.)

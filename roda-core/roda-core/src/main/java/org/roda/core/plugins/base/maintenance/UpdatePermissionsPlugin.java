@@ -7,6 +7,12 @@
  */
 package org.roda.core.plugins.base.maintenance;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -41,12 +47,6 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private Permissions permissions;
   private String details = null;
@@ -55,9 +55,9 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON, "Permission object in JSON",
-        PluginParameterType.STRING).isMandatory(false).withDescription("Permission object in JSON.").build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON, PluginParameter
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON, "Permission object in JSON", PluginParameterType.STRING)
+      .isMandatory(false).withDescription("Permission object in JSON.").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
       PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details", PluginParameterType.STRING)
@@ -132,8 +132,8 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
 
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<T>() {
       @Override
@@ -183,7 +183,7 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
       List<LinkingIdentifier> sources = Arrays
         .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       model.createEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, sources, null,
-        state, outcome, details, job.getUsername(), true);
+        state, outcome, details, job.getUsername(), true, null);
     }
   }
 
@@ -207,8 +207,7 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 

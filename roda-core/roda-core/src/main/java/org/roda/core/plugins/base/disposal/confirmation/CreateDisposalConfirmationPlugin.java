@@ -277,7 +277,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
       model.createUpdateAIPEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.UPDATE,
-        EVENT_DESCRIPTION, state, outcomeText, "", cachedJob.getUsername(), true);
+        EVENT_DESCRIPTION, state, outcomeText, "", cachedJob.getUsername(), true, null);
 
       if (processChildren) {
         processAIPChildren(aip, confirmationId, index, model, cachedJob);
@@ -331,7 +331,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           storageSize, disposalHolds, disposalSchedules, aipCounter, extraInformation), cachedJob.getUsername());
 
         model.createRepositoryEvent(getPreservationEventType(), getPreservationEventDescription(), PluginState.SUCCESS,
-          getPreservationEventSuccessMessage(), confirmationId, cachedJob.getUsername(), true);
+          getPreservationEventSuccessMessage(), confirmationId, cachedJob.getUsername(), true, null);
       } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
         | AuthorizationDeniedException e) {
         LOGGER.error("Failed to create disposal confirmation metadata file", e);
@@ -339,7 +339,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           .setPluginDetails("Failed to create disposal confirmation metadata file: " + e.getMessage());
 
         model.createRepositoryEvent(getPreservationEventType(), getPreservationEventDescription(), PluginState.FAILURE,
-          getPreservationEventFailureMessage(), confirmationId, cachedJob.getUsername(), true);
+          getPreservationEventFailureMessage(), confirmationId, cachedJob.getUsername(), true, null);
       }
     }
   }
@@ -418,7 +418,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
     }
 
     model.createUpdateAIPEvent(child.getId(), null, null, null, RodaConstants.PreservationEventType.UPDATE,
-      EVENT_DESCRIPTION, state, outcomeText, "", cachedJob.getUsername(), true);
+      EVENT_DESCRIPTION, state, outcomeText, "", cachedJob.getUsername(), true, null);
   }
 
   @Override

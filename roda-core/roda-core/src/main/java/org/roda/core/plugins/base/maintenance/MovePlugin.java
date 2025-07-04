@@ -174,7 +174,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     sources.add(PluginHelper.getLinkingIdentifier(entityId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
     model.createUpdateAIPEvent(entityId, null, null, null, PreservationEventType.UPDATE, EVENT_DESCRIPTION,
-      PluginState.FAILURE, outcomeText, details, job.getUsername(), true);
+      PluginState.FAILURE, outcomeText, details, job.getUsername(), true, null);
   }
 
   private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo, Job job,
@@ -242,7 +242,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
       jobPluginInfo.incrementObjectsProcessed(state);
       model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, EVENT_DESCRIPTION, state,
-        outcomeText, details, job.getUsername(), true);
+        outcomeText, details, job.getUsername(), true, null);
     }
   }
 
@@ -293,7 +293,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
     jobPluginInfo.incrementObjectsProcessed(state);
     model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null, PreservationEventType.UPDATE,
-      EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(), true);
+      EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(), true, null);
   }
 
   @SuppressWarnings("unchecked")

@@ -313,7 +313,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
                   + " are disassociated from AIP " + transitiveAIP.getId();
                 model.createEvent(transitiveAIP.getId(), null, null, null, POLICY_ASSIGNMENT,
                   LiftDisposalHoldPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
-                  cachedJob.getUsername(), true);
+                  cachedJob.getUsername(), true, null);
               }
             }
           }
