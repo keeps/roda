@@ -35,22 +35,27 @@ public class RequestHandler {
   private HttpServletRequest request;
 
   public <T> T processRequestWithTransaction(RequestProcessor<T> handler) {
-    return processRequest(handler, null, true, true);
+    return processRequest(handler, null, true, true, true);
   }
 
   public <T> T processRequest(RequestProcessor<T> handler) {
-    return processRequest(handler, null, false, true);
+    return processRequest(handler, null, false, true, true);
   }
 
   public <T> T processRequest(RequestProcessor<T> handler, Class<?> returnClass) {
-    return processRequest(handler, returnClass, false, true);
+    return processRequest(handler, returnClass, false, true, true);
   }
 
   public <T> T processRequestWithoutCheckRoles(RequestProcessor<T> handler) {
-    return processRequest(handler, null, false, false);
+    return processRequest(handler, null, false, false, true);
   }
 
-  private <T> T processRequest(RequestProcessor<T> processor, Class<?> returnClass, boolean isTransactional, boolean checkRoles) {
+  public <T> T processRequestWithoutCheckRolesAndLog(RequestProcessor<T> handler) {
+    return processRequest(handler, null, false, false, false);
+  }
+
+  private <T> T processRequest(RequestProcessor<T> processor, Class<?> returnClass, boolean isTransactional,
+    boolean checkRoles, boolean logAction) {
     RequestControllerAssistant controllerAssistant = new RequestControllerAssistant(processor);
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -86,8 +91,10 @@ public class RequestHandler {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext, controllerAssistant.getRelatedObjectId(), state,
-        controllerAssistant.getParameters());
+      if (logAction) {
+        controllerAssistant.registerAction(requestContext, controllerAssistant.getRelatedObjectId(), state,
+          controllerAssistant.getParameters());
+      }
       try {
         if (isAValidTransactionalContext(isTransactional) && transactionalContext != null
           && state != LogEntryState.SUCCESS) {

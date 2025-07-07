@@ -54,7 +54,8 @@ public class ThemesController {
     WebRequest request) {
 
     return requestHandler
-      .processRequestWithoutCheckRoles(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      .processRequestWithoutCheckRolesAndLog(
+        new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
         @Override
         public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
           RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
