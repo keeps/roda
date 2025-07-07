@@ -207,10 +207,10 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     try {
       index.commitAIPs();
       boolean skipFixParents = RodaCoreFactory.getRodaConfiguration()
-          .getBoolean(RodaConstants.CORE_INGEST_SKIP_FIX_PARENTS, false);
+        .getBoolean(RodaConstants.CORE_INGEST_SKIP_FIX_PARENTS, false);
       if (!skipFixParents) {
         PluginHelper.fixParents(index, model, Optional.ofNullable(PluginHelper.getJobId(this)),
-            PluginHelper.getSearchScopeFromParameters(this, model), PluginHelper.getJobUsername(this, index));
+          PluginHelper.getSearchScopeFromParameters(this, model), PluginHelper.getJobUsername(this, index));
       }
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Could not fix parents", e);
