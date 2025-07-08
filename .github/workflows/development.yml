@@ -27,6 +27,14 @@ jobs:
         image: mailhog/mailhog:v1.0.1
         ports:
           - 1025:1025
+      postgres:
+        image: postgres:17
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: roda
+          POSTGRES_DB: roda_core_db
       openldap:
         image: docker.io/bitnami/openldap:2.6
         ports:
