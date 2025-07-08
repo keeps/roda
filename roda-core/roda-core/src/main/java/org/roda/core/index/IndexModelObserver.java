@@ -273,7 +273,7 @@ public class IndexModelObserver implements ModelObserver {
 
         String suffix = otherMetadata.get().getFileSuffix();
         String type = otherMetadata.get().getType();
-        List<String> path = new ArrayList<>();
+        List<String> path = otherMetadata.get().getFileDirectoryPath();
 
         // suppose that all suffixes in othermetadata are like this
         // ".metadata.<real_suffix>

@@ -1,14 +1,11 @@
 package org.roda.core.plugins.base.preservation;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
@@ -19,9 +16,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -33,7 +28,6 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -41,8 +35,6 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.base.characterization.SiegfriedPluginUtils;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.DirectResourceAccess;
-import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -219,43 +211,19 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   private LinkingIdentifier setFileFormatMetadata(ModelService model, IndexService index, File file, String jobId,
     String username) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
     PluginException {
-    StoragePath fileDataPath = ModelUtils.getFileStoragePath(file);
-    AIP aip = model.retrieveAIP(file.getAipId());
-    DirectResourceAccess directAccess;
-    LinkingIdentifier source = null;
-    if (aip.getHasShallowFiles() != null && aip.getHasShallowFiles()) {
-      StorageService tmpStorageService = model.resolveTemporaryResourceShallow(jobId, aip);
-      directAccess = tmpStorageService.getDirectAccess(fileDataPath);
-    }
-    else {
-      directAccess = model.getDirectAccess(file);
-    }
-    List<String> jsonFilePath = new ArrayList<>();
-    jsonFilePath.add(file.getId());
-
-    Path fileFsPath = directAccess.getPath();
-    Path fullFsPath = Paths.get(FilenameUtils.normalize(fileFsPath.toString()));
-    Path relativeFsPath = fileFsPath.relativize(fullFsPath);
-
-    for (int i = 0; i < relativeFsPath.getNameCount()
-      && StringUtils.isNotBlank(relativeFsPath.getName(i).toString()); i++) {
-      jsonFilePath.add(relativeFsPath.getName(i).toString());
-    }
-
-    jsonFilePath.remove(jsonFilePath.size() - 1);
-    String jsonFileId = fullFsPath.getFileName().toString();
-
     String updatedFormat = format;
     String updatedFormatVersion = formatVersion;
     String updatedPronomIdentifier = pronom;
     String updatedMimetype = mimetype;
 
     List<String> notes = mitigatePreviousIncidencesAndCreateNotes(model, index, file.getAipId(),
-      file.getRepresentationId(), file.getId(), jsonFilePath, username);
-    PremisV3Utils.updateFormatPreservationMetadata(model, file.getAipId(), file.getRepresentationId(), jsonFilePath,
-      jsonFileId, updatedFormat, updatedFormatVersion, updatedPronomIdentifier, updatedMimetype, notes, username, true);
+      file.getRepresentationId(), file.getId(), file.getPath(), username);
+    PremisV3Utils.updateFormatPreservationMetadata(model, file.getAipId(), file.getRepresentationId(), file.getPath(),
+      file.getId(), updatedFormat, updatedFormatVersion, updatedPronomIdentifier, updatedMimetype, notes, username,
+      true);
 
-    source = PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(), jsonFilePath, jsonFileId,
+    LinkingIdentifier source = PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(),
+      file.getPath(), file.getId(),
       RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
     model.notifyFileUpdated(file);
     return source;
