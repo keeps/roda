@@ -1269,7 +1269,7 @@ public final class PluginHelper {
         throw new RequestNotValidException(
           "Could not get LITE for agent with ID: " + linkingIdentifierAgent.getValue());
       }
-      if (model.existsInStorage(agentLite.get())) {
+      if (!model.existsInStorage(agentLite.get())) {
         PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true,
           jobUserDetails);
         if (pm != null) {

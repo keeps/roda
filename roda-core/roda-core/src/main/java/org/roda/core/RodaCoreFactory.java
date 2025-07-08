@@ -433,8 +433,10 @@ public class RodaCoreFactory {
         instantiateStorageAndModel();
         LOGGER.debug("Finished instantiating storage & model");
 
-        instantiateTransactionManager(nodeType);
-        LOGGER.debug("Finished instantiating transaction manager");
+        if (configurationManager.isExperimentalFeaturesEnabled()) {
+          instantiateTransactionManager(nodeType);
+          LOGGER.debug("Finished instantiating transaction manager");
+        }
 
         // initialize disposal bin directory
         initializeDisposalBinDirectory();
@@ -498,9 +500,12 @@ public class RodaCoreFactory {
 
         instanceId = getProperty(RodaConstants.CORE_NODE_INSTANCE_ID, "");
 
-        if (nodeType == NodeType.PRIMARY && RODATransactionManager != null) {
-          RODATransactionManager.cleanUnfinishedTransactions();
-          LOGGER.debug("Finished clean unfinished transactions operation");
+        if (configurationManager.isExperimentalFeaturesEnabled()) {
+          if (nodeType == NodeType.PRIMARY && RODATransactionManager != null
+            && RODATransactionManager.isInitialized()) {
+            RODATransactionManager.cleanUnfinishedTransactions();
+            LOGGER.debug("Finished clean unfinished transactions operation");
+          }
         }
 
         instantiated = true;
@@ -727,9 +732,8 @@ public class RodaCoreFactory {
 
   private static void instantiateDefaultObjects() {
     if (INSTANTIATE_DEFAULT_RESOURCES) {
-      try (
-        CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(DefaultStoragePath.parse(""),
-          true)) {
+      try (CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(DefaultStoragePath.parse(""),
+        true)) {
 
         Iterator<Resource> resourceIterator = resources.iterator();
         boolean hasFileResources = false;
@@ -753,7 +757,8 @@ public class RodaCoreFactory {
             .resolve(RodaConstants.CORE_DEFAULT_FOLDER).resolve(RodaConstants.CORE_DATA_FOLDER);
           Path targetPath = configurationManager.getRodaHomePath().resolve(RodaConstants.CORE_DATA_FOLDER);
 
-          //TODO: We should avoid using FileSystem if we want to add support for other storage types
+          // TODO: We should avoid using FileSystem if we want to add support for other
+          // storage types
           if (FSUtils.exists(staticDataDefaultFolder)) {
             try {
               Files.walkFileTree(staticDataDefaultFolder, new SimpleFileVisitor<Path>() {
@@ -909,8 +914,9 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateTransactionManager(NodeType nodeType) throws GenericException {
-    if(nodeType.equals(NodeType.TEST)) {
-      //TODO: Handle test mode
+    LOGGER.warn("RODA transactions are an experimental feature and may be unstable. Use with caution.");
+    if (nodeType.equals(NodeType.TEST)) {
+      // TODO: Handle test mode
       return;
     }
     if (SpringContext.isContextInitialized()) {
@@ -924,13 +930,14 @@ public class RodaCoreFactory {
   }
 
   public static RODATransactionManager getTransactionManager() {
-    if(nodeType.equals(NodeType.TEST)) {
-      //TODO: Handle test mode
+    if (nodeType.equals(NodeType.TEST)) {
+      // TODO: Handle test mode
       return null;
     }
     if (SpringContext.isContextInitialized()) {
       RODATransactionManager = SpringContext.getBean(RODATransactionManager.class);
       RODATransactionManager.setMainModelService(model);
+      RODATransactionManager.setInitialized(true);
       return RODATransactionManager;
     }
     return null;

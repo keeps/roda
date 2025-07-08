@@ -77,6 +77,18 @@
 		<appender-ref ref="METRICS" />
 	</logger>
 
+	<logger name="org.roda.core.storage.DefaultTransactionalStorageService" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="CORE_FILEOUT" />
+		<appender-ref ref="METRICS" />
+	</logger>
+
+	<logger name="org.roda.core.model.DefaultTransactionalModelService" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="CORE_FILEOUT" />
+		<appender-ref ref="METRICS" />
+	</logger>
+
 	<logger name="org.roda.core" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="CORE_FILEOUT" />

@@ -1521,9 +1521,10 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     // TODO: Temporary fix "Agent" preservation metadata need to be transactional,
     // but during multi-threaded ingestion, one thread locks the resource and blocks
     // the others.
-    if (type.equals(PreservationMetadata.PreservationMetadataType.AGENT)) {
-      return mainModelService.createPreservationMetadata(type, id, payload, notify);
-    }
+    // if (type.equals(PreservationMetadata.PreservationMetadataType.AGENT)) {
+    // return mainModelService.createPreservationMetadata(type, id, payload,
+    // notify);
+    // }
 
     List<TransactionalModelOperationLog> operationLogs = operationRegistry
       .registerCreateOperationForPreservationMetadata(null, null, null, null, id, type);
@@ -1532,9 +1533,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       PreservationMetadata ret = getModelService().createPreservationMetadata(type, id, payload, notify);
       operationRegistry.updateOperationState(operationLogs, OperationState.SUCCESS);
       return ret;
-    } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException
-      | AlreadyExistsException e) {
+    } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
       operationRegistry.updateOperationState(operationLogs, OperationState.FAILURE);
+      throw e;
+    } catch (AlreadyExistsException e) {
+      // if the agent already exists we do nothing register failure
+      if (!type.equals(PreservationMetadata.PreservationMetadataType.AGENT)) {
+        operationRegistry.updateOperationState(operationLogs, OperationState.FAILURE);
+      }
       throw e;
     }
   }
@@ -1568,9 +1574,10 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     // TODO: Temporary fix "Agent" preservation metadata need to be transactional,
     // but during multi-threaded ingestion, one thread locks the resource and blocks
     // the others.
-    if (type.equals(PreservationMetadata.PreservationMetadataType.AGENT)) {
-      return mainModelService.updatePreservationMetadata(type, id, payload, notify);
-    }
+    // if (type.equals(PreservationMetadata.PreservationMetadataType.AGENT)) {
+    // return mainModelService.updatePreservationMetadata(type, id, payload,
+    // notify);
+    // }
 
     List<TransactionalModelOperationLog> operationLogs = operationRegistry
       .registerUpdateOperationForPreservationMetadata(null, null, null, null, id, type);
