@@ -92,45 +92,44 @@ public class MembersService {
     return uuids;
   }
 
-
   public static Set<MetadataValue> retrieveUserExtra(String extraLDAP) {
-      String template = null;
+    String template = null;
 
-      try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-        RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE)) {
-        template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
-      } catch (IOException e) {
-        LOGGER.error("Error getting template from stream", e);
-      }
+    try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+      RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE)) {
+      template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      LOGGER.error("Error getting template from stream", e);
+    }
 
-      Set<MetadataValue> values = ServerTools.transform(template);
+    Set<MetadataValue> values = ServerTools.transform(template);
 
-      if (extraLDAP != null && !values.isEmpty()) {
-        for (MetadataValue mv : values) {
-          // clear the auto-generated values
-          // mv.set("value", null);
-          String xpathRaw = mv.get("xpath");
-          if (xpathRaw != null && xpathRaw.length() > 0) {
-            String[] xpaths = xpathRaw.split("##%##");
-            String value;
-            List<String> allValues = new ArrayList<>();
-            for (String xpath : xpaths) {
-              allValues.addAll(ServerTools.applyXpath(extraLDAP, xpath));
-            }
-            // if any of the values is different, concatenate all values in a
-            // string, otherwise return the value
-            boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
-            if (allEqual && !allValues.isEmpty()) {
-              value = allValues.get(0);
-            } else {
-              value = String.join(" / ", allValues);
-            }
-            mv.set("value", value.trim());
+    if (extraLDAP != null && !values.isEmpty()) {
+      for (MetadataValue mv : values) {
+        // clear the auto-generated values
+        // mv.set("value", null);
+        String xpathRaw = mv.get("xpath");
+        if (xpathRaw != null && xpathRaw.length() > 0) {
+          String[] xpaths = xpathRaw.split("##%##");
+          String value;
+          List<String> allValues = new ArrayList<>();
+          for (String xpath : xpaths) {
+            allValues.addAll(ServerTools.applyXpath(extraLDAP, xpath));
           }
+          // if any of the values is different, concatenate all values in a
+          // string, otherwise return the value
+          boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
+          if (allEqual && !allValues.isEmpty()) {
+            value = allValues.get(0);
+          } else {
+            value = String.join(" / ", allValues);
+          }
+          mv.set("value", value.trim());
         }
       }
+    }
 
-      return values;
+    return values;
 
   }
 
