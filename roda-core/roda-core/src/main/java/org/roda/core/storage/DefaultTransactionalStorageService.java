@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -278,7 +277,14 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
     throws GenericException, AlreadyExistsException, RequestNotValidException, AuthorizationDeniedException,
     NotFoundException {
-    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.CREATE);
+    TransactionalStoragePathOperationLog operationLog;
+    // if storage path is agent we need to register a create or update operation
+    if (storagePath.getDirectoryPath() != null && !storagePath.getDirectoryPath().isEmpty()
+      && storagePath.getDirectoryPath().getFirst().equals(RodaConstants.STORAGE_DIRECTORY_AGENTS)) {
+      operationLog = registerOperation(storagePath, OperationType.CREATE_OR_UPDATE);
+    } else {
+      operationLog = registerOperation(storagePath, OperationType.CREATE);
+    }
     try {
       Binary ret = stagingStorageService.createBinary(storagePath, payload, asReference);
       updateOperationState(operationLog, OperationState.SUCCESS);
@@ -616,6 +622,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
             handleUpdateOperation(storagePath, version);
           } else if (operationType == OperationType.CREATE) {
             handleCreateOperation(storagePath, version);
+          } else if (operationType == OperationType.CREATE_OR_UPDATE) {
+            handleCreateUpdateOperation(storagePath, version);
           } else if (operationType == OperationType.READ) {
             // TODO: READ
             LOGGER.debug("[transactionId:{}] Skipping read operation for storage path: {}", transaction.getId(),
@@ -687,6 +695,34 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       | AuthorizationDeniedException e) {
       throw new RODATransactionException("[transactionId:" + transaction.getId()
         + "] Failed to copy storage path from staging to main storage service: " + storagePath, e);
+    }
+  }
+
+  private void handleCreateUpdateOperation(StoragePath storagePath, String version) throws RODATransactionException {
+    try {
+      if (version != null) {
+        LOGGER.info("[transactionId:{}] Creating or updating binary version from staging to main storage service: {}",
+          transaction.getId(), storagePath);
+        mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
+      } else {
+        LOGGER.info("[transactionId:{}] Creating or updating resource from staging to main storage service: {}",
+          transaction.getId(), storagePath);
+        Class<? extends Entity> rootEntity = stagingStorageService.getEntity(storagePath);
+        // TODO: This is necessary to avoid recursive copies, we should handle it better
+        // in StorageServiceUtils
+        if (Container.class.isAssignableFrom(rootEntity)) {
+          mainStorageService.createContainer(storagePath);
+        } else if (Directory.class.isAssignableFrom(rootEntity)) {
+          mainStorageService.createDirectory(storagePath);
+        } else {
+          StorageServiceUtils.syncBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
+            storagePath, getEntity(storagePath));
+        }
+      }
+    } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
+      | AuthorizationDeniedException e) {
+      throw new RODATransactionException("[transactionId:" + transaction.getId()
+        + "] Failed to update storage path from staging to main storage service: " + storagePath, e);
     }
   }
 
@@ -838,27 +874,21 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   private StorageService getEffectiveStorageService(StoragePath storagePath)
     throws NotFoundException, GenericException {
     String storagePathAsString = stagingStorageService.getStoragePathAsString(storagePath, false);
-    try {
-      Optional<TransactionalStoragePathOperationLog> storagePathOperation = transactionLogService
-        .getLastStoragePathOperation(transaction.getId(), storagePathAsString);
-      if (storagePathOperation.isPresent()) {
-        LOGGER.debug("[transactionId:{}] Storage path operation for {}: {}", transaction.getId(), storagePathAsString,
-          storagePathOperation.get().getOperationType());
-        switch (storagePathOperation.get().getOperationType()) {
-          case DELETE -> throw new NotFoundException(
-            "[transactionId:" + transaction.getId() + "] Resource was deleted in this transaction.");
-          case CREATE, UPDATE -> {
-            LOGGER.debug("[transactionId:{}] Using staging storage service for storage path: {}", transaction.getId(),
-              storagePathAsString);
-            return stagingStorageService;
-          }
-          default -> throw new GenericException("[transactionId:" + transaction.getId()
-            + "] Unexpected operation type: " + storagePathOperation.get().getOperationType());
-        }
-      }
-      LOGGER.debug("[transactionId:{}] Using main storage service for storage path: {}", transaction.getId(),
+    if (stagingStorageService.exists(storagePath)) {
+      LOGGER.debug("[transactionId:{}] Using staging storage service for storage path: {}", transaction.getId(),
         storagePathAsString);
-      return mainStorageService;
+      return stagingStorageService;
+    }
+    try {
+      TransactionalStoragePathOperationLog storagePathOperation = transactionLogService
+        .getAnyDeletedStoragePathOperation(transaction.getId(), storagePathAsString);
+      if (storagePathOperation == null) {
+        LOGGER.debug("[transactionId:{}] Using main storage service for storage path: {}", transaction.getId(),
+          storagePathAsString);
+        return mainStorageService;
+      }
+      throw new NotFoundException(
+        "[transactionId:" + transaction.getId() + "] Resource was deleted in this transaction.");
     } catch (RODATransactionException e) {
       throw new GenericException("[transactionId:" + transaction.getId()
         + "] Failed to get effective storage service for storage path: " + storagePath, e);

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.micrometer.core.annotation.Timed;
 import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 @Service
+@Timed
 public class RODATransactionManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(RODATransactionManager.class);
   private final TransactionLogService transactionLogService;

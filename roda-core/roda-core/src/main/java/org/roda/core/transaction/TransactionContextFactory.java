@@ -3,6 +3,7 @@ package org.roda.core.transaction;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import io.micrometer.core.annotation.Timed;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 @Component
+@Timed
 public class TransactionContextFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(TransactionContextFactory.class);
   private final ConfigurationManager configurationManager = ConfigurationManager.getInstance();

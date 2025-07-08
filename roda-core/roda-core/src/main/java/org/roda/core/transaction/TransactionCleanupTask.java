@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import io.micrometer.core.annotation.Timed;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.roda.core.config.ConfigurationManager;
@@ -53,6 +54,7 @@ import jakarta.persistence.OneToMany;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 @Component
+@Timed
 public class TransactionCleanupTask {
   private static final Logger LOGGER = LoggerFactory.getLogger(TransactionCleanupTask.class);
 
