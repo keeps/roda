@@ -7,6 +7,15 @@
  */
 package org.roda.core.plugins.base.maintenance;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -17,6 +26,7 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -24,17 +34,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ActionLogCleanerPlugin.class);
@@ -103,6 +105,9 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
   public Report execute(IndexService index, ModelService model,
     List<LiteOptionalWithCause> entries) throws PluginException {
 
+    Report report = PluginHelper.initPluginReportItem(this, Report.NO_OUTCOME_OBJECT_ID, Report.NO_SOURCE_OBJECT_ID);
+    report.setPluginState(PluginState.SUCCESS);
+
     if (deleteOlderThanXDays > 0) {
       Calendar cal = Calendar.getInstance();
 
@@ -111,11 +116,14 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
       try {
         index.deleteActionLog(until);
       } catch (SolrServerException | IOException | AuthorizationDeniedException e) {
-        LOGGER.error("Error deleting audit logs until {}", until);
+        String errorMessage = "Error deleting audit logs until " + until;
+        LOGGER.error(errorMessage);
+        report.setPluginDetails(errorMessage);
+        report.setPluginState(PluginState.FAILURE);
       }
     }
 
-    return null;
+    return report;
   }
 
   @Override
