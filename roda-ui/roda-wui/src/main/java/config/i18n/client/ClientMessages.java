@@ -179,6 +179,8 @@ public interface ClientMessages extends Messages {
 
   SafeHtml aipStillIngestingError();
 
+  String aipNotInStorageError();
+
   String notFoundError();
 
   String allCollectionsTitle();
