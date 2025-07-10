@@ -177,6 +177,8 @@ public interface ClientMessages extends Messages {
 
   SafeHtml preservationEventDetailsTransformToHTMLError();
 
+  SafeHtml aipStillIngestingError();
+
   String notFoundError();
 
   String allCollectionsTitle();
@@ -693,7 +695,6 @@ public interface ClientMessages extends Messages {
   String viewTab();
 
   String technicalTab();
-
 
   /************* Search ****************/
   String searchDropdownLabels(@Select String objectClass);

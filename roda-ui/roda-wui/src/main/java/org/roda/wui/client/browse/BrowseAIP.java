@@ -223,7 +223,8 @@ public class BrowseAIP extends Composite {
 
     // Side panel representations
     // Check if user has permissions to see the representations
-    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)
+      && !aip.getState().equals(AIPState.INGEST_PROCESSING)) {
       boolean showSidePanel = false;
       if (Boolean.TRUE.equals(response.getIndexedAIP().getHasRepresentations())) {
         showSidePanel = true;
@@ -299,9 +300,9 @@ public class BrowseAIP extends Composite {
               IndexedAIP.class);
 
           CompletableFuture<LongResponse> futureDipCount = service.rodaEntityRestService(
-            s -> s.count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, id)), false)),
+            s -> s.count(
+              new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, id)), false)),
             IndexedDIP.class);
-
 
           CompletableFuture.allOf(futureChildAipCount, futureDipCount, futureAncestors, futureRepFields,
             futureDescriptiveMetadataInfos).thenApply(v -> {

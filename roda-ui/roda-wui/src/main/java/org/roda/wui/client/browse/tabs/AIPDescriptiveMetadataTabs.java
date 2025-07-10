@@ -1,6 +1,5 @@
 package org.roda.wui.client.browse.tabs;
 
-import com.google.gwt.user.client.ui.Widget;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -31,6 +30,7 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
@@ -39,6 +39,28 @@ import com.google.gwt.user.client.ui.HTML;
 public class AIPDescriptiveMetadataTabs extends Tabs {
 
   public void init(IndexedAIP aip, DescriptiveMetadataInfos descriptiveMetadataInfos) {
+    if (aip.getState().equals(AIPState.INGEST_PROCESSING)) {
+      // Content container
+      FlowPanel content = new FlowPanel();
+      content.addStyleName("descriptiveMetadataTabContainer roda6CardWithHeader");
+      // Get metadata and populate widget
+      FlowPanel cardBody = new FlowPanel();
+      content.add(cardBody);
+      cardBody.setStyleName("cardBody");
+      HTML metadataHTML = new HTML();
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      // error message
+      b.append(SafeHtmlUtils.fromSafeConstant("<div class='error'>"));
+      b.append(messages.descriptiveMetadataTransformToHTMLError());
+      b.append(SafeHtmlUtils.fromSafeConstant("<pre>"));
+      b.append(messages.aipStillIngestingError());
+      b.append(SafeHtmlUtils.fromSafeConstant("</pre>" + ""));
+      b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+      SafeHtml safeHtml = b.toSafeHtml();
+      metadataHTML.setHTML(safeHtml);
+      cardBody.add(metadataHTML);
+      tabContentWrapper.setWidget(content);
+    }
     for (DescriptiveMetadataInfo metadataInfo : descriptiveMetadataInfos.getDescriptiveMetadataInfoList()) {
       // Tab button
       SafeHtml buttonTitle = SafeHtmlUtils.fromString(metadataInfo.getLabel());
@@ -120,7 +142,7 @@ public class AIPDescriptiveMetadataTabs extends Tabs {
               b.append(messages.descriptiveMetadataTransformToHTMLError());
               b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
               b.append(SafeHtmlUtils.fromString(message));
-              b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
+              b.append(SafeHtmlUtils.fromSafeConstant("</code></pre>"));
               b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
               safeHtml = b.toSafeHtml();
             }
