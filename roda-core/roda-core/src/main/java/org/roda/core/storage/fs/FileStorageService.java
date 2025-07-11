@@ -223,6 +223,22 @@ public class FileStorageService implements StorageService {
     }
   }
 
+  private void restoreFromTrash(Path filePath) throws GenericException, NotFoundException {
+    if (trashPath == null) {
+      LOGGER.error("Error restoring from trash: {} because no trash folder is defined", filePath);
+      throw new GenericException("Cannot restore from trash folder because it is not defined");
+    }
+      Path fromPath = trashPath.resolve(rodaDataPath.relativize(filePath));
+      LOGGER.debug("Moving from trash: {} to {}", fromPath, filePath);
+    try {
+      FSUtils.move(fromPath, filePath, false);
+    }
+    catch (AlreadyExistsException e) {
+      LOGGER.error("Attempted to restore {} from trash but it already exists", filePath, e);
+      throw new GenericException("Cannot restore from trash because the file already exists", e);
+    }
+  }
+
   @Override
   public CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException {
