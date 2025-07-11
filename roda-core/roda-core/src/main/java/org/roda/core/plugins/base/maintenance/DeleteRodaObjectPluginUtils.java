@@ -249,7 +249,7 @@ public class DeleteRodaObjectPluginUtils {
     Job job, final Plugin<? extends IsRODAObject> plugin, File file, final String details, final boolean doReport) {
     PluginState state = PluginState.SUCCESS;
 
-    Report reportItem = PluginHelper.initPluginReportItem(plugin, file.getId(), File.class);
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, IdUtils.getFileId(file), File.class);
 
     try {
       AIP retrievedAIP = model.retrieveAIP(file.getAipId());
