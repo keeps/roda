@@ -18,12 +18,14 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
@@ -223,7 +225,8 @@ public class BrowseAIP extends Composite {
 
     // Side panel representations
     // Check if user has permissions to see the representations
-    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)
+      && !aip.getState().equals(AIPState.INGEST_PROCESSING)) {
       boolean showSidePanel = false;
       if (Boolean.TRUE.equals(response.getIndexedAIP().getHasRepresentations())) {
         showSidePanel = true;
@@ -299,27 +302,46 @@ public class BrowseAIP extends Composite {
               IndexedAIP.class);
 
           CompletableFuture<LongResponse> futureDipCount = service.rodaEntityRestService(
-            s -> s.count(new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, id)), false)),
+            s -> s.count(
+              new CountRequest(new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, id)), false)),
             IndexedDIP.class);
 
+          // Unused for now, but required to see if the AIP is in the model
+          CompletableFuture<AIP> futureModelAIP = service.aipResource(s -> s.getModelAIP(id));
 
-          CompletableFuture.allOf(futureChildAipCount, futureDipCount, futureAncestors, futureRepFields,
-            futureDescriptiveMetadataInfos).thenApply(v -> {
-              BrowseAIPResponse rp = new BrowseAIPResponse();
-              rp.setIndexedAIP(aip);
-              rp.setAncestors(futureAncestors.join());
-              rp.setRepresentationInformationFields(futureRepFields.join());
-              rp.setDescriptiveMetadataInfos(futureDescriptiveMetadataInfos.join());
-              rp.setChildAipsCount(futureChildAipCount.join());
-              rp.setDipCount(futureDipCount.join());
-              return rp;
-            }).whenComplete((value, throwable) -> {
-
-              if (throwable == null) {
-                container.setWidget(new BrowseAIP(value));
-                callback.onSuccess(aip);
+          futureModelAIP.handle((modelAIP, throwable) -> {
+            if (throwable != null) {
+              if (throwable instanceof AuthorizationDeniedException) {
+                Toast.showError(messages.authorizationDeniedAlert(), "");
+                HistoryUtils.newHistory(BrowseTop.RESOLVER);
+              } else if (throwable instanceof NotFoundException) {
+                Toast.showError(messages.aipNotInStorageError(), "");
+                HistoryUtils.newHistory(BrowseTop.RESOLVER);
+              } else {
+                Toast.showError(throwable.getClass().getSimpleName(), throwable.getMessage());
+                HistoryUtils.newHistory(BrowseTop.RESOLVER);
               }
-            });
+            } else {
+              CompletableFuture.allOf(futureChildAipCount, futureDipCount, futureAncestors, futureRepFields,
+                futureDescriptiveMetadataInfos).thenApply(v -> {
+                  BrowseAIPResponse rp = new BrowseAIPResponse();
+                  rp.setIndexedAIP(aip);
+                  rp.setAncestors(futureAncestors.join());
+                  rp.setRepresentationInformationFields(futureRepFields.join());
+                  rp.setDescriptiveMetadataInfos(futureDescriptiveMetadataInfos.join());
+                  rp.setChildAipsCount(futureChildAipCount.join());
+                  rp.setDipCount(futureDipCount.join());
+                  return rp;
+                }).whenComplete((value, innerThrowable) -> {
+
+                  if (innerThrowable == null) {
+                    container.setWidget(new BrowseAIP(value));
+                    callback.onSuccess(aip);
+                  }
+                });
+            }
+            return null;
+          });
         }
       });
 
