@@ -114,6 +114,26 @@ public class TransactionalModelOperationRegistry {
     return operationLogs;
   }
 
+  public List<TransactionalModelOperationLog> registerCreateOperationForFile(String aipID, String representationId,
+    List<String> directoryPath, String fileID, String folderName)
+    throws RequestNotValidException, AlreadyExistsException, GenericException {
+    List<String> list = new ArrayList<>();
+    list.add(aipID);
+    list.add(representationId);
+    if (directoryPath != null) {
+      list.addAll(directoryPath);
+    }
+    if (fileID != null) {
+      list.add(fileID);
+    }
+    if (folderName != null) {
+      list.add(folderName);
+    }
+
+    checkIfEntityExistsAndThrowException(File.class, list.toArray(new String[0]));
+    return registerOperationForFile(aipID, representationId, directoryPath, fileID, folderName, OperationType.CREATE);
+  }
+
   public List<TransactionalModelOperationLog> registerOperationForFile(String aipID, String representationId,
     List<String> path, String fileID, OperationType operation) {
     return registerOperationForFile(aipID, representationId, path, fileID, null, operation);
