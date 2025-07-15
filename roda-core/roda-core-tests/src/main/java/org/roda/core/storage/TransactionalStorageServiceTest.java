@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import jakarta.transaction.TransactionalException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
@@ -29,6 +28,7 @@ import org.roda.core.TestsHelper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
@@ -634,7 +634,8 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     mainStorage.createBinary(binaryStoragePath, payload, false);
 
     // 2.2) create a second binary with main storage
-    final StoragePath binaryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final StoragePath binaryStoragePath2 = StorageTestUtils
+      .generateRandomResourceStoragePathUnder(containerStoragePath);
     final ContentPayload payload2 = new RandomMockContentPayload();
     mainStorage.createBinary(binaryStoragePath2, payload2, false);
 
@@ -690,7 +691,8 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     mainStorage.createBinary(binaryStoragePath, payload, false);
 
     // 2.2) create a second binary with main storage
-    final StoragePath binaryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    final StoragePath binaryStoragePath2 = StorageTestUtils
+      .generateRandomResourceStoragePathUnder(directoryStoragePath);
     final ContentPayload payload2 = new RandomMockContentPayload();
     mainStorage.createBinary(binaryStoragePath2, payload2, false);
 
@@ -713,7 +715,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     // 4.3) list resources using same transaction from delete
     resources = storage2.listResourcesUnderDirectory(directoryStoragePath, false);
     for (Resource resource1 : resources) {
-        LOGGER.info("Resource: {}", resource1.getStoragePath());
+      LOGGER.info("Resource: {}", resource1.getStoragePath());
     }
     try {
       // 4.4) assert that there isn't a resource
@@ -1868,5 +1870,33 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     storage15.deleteContainer(containerStoragePath);
     // 15.3) end fifteenth transaction
     transactionManager.endTransaction(context15.transactionLog().getId());
+  }
+
+  @Test
+  public void testCreateRollback() throws RODATransactionException, AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, GenericException, NotFoundException, IOException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) create a random file
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload1 = new RandomMockContentPayload();
+    storage1.createBinary(binaryStoragePath, payload1, false);
+    // 1.4) commit first transaction
+    transactionManager.commitTestTransactionWithoutRemoving(context1.transactionLog().getId());
+    // 1.5) rollback first transaction
+    transactionManager.rollbackTransaction(context1.transactionLog().getId());
+    // 3.1) start second transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage2 = context2.transactionalStorageService();
+    // 3.2) test that the container doesn't exist
+    try (CloseableIterable<Container> containers = storage2.listContainers()) {
+      assertFalse(containers.iterator().hasNext());
+    }
+    // 3.3) end second transaction
+    transactionManager.endTransaction(context2.transactionLog().getId());
   }
 }

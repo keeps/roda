@@ -4403,6 +4403,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public void rollback() throws RODATransactionException {
     for (TransactionalModelOperationLog modelOperation : transactionLogService
       .getModelOperations(transaction.getId())) {
+      transactionLogService.updateModelOperationState(modelOperation.getId(), OperationState.ROLLING_BACK);
       LiteRODAObject liteRODAObject = new LiteRODAObject(modelOperation.getLiteObject());
       OptionalWithCause<IsRODAObject> isRODAObjectOptionalWithCause = LiteRODAObjectFactory.get(this, liteRODAObject);
 
@@ -4411,7 +4412,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
         try {
           TransactionModelRollbackHandler.processObject(rodaObject, modelOperation, mainModelService,
             stagingModelService);
+          transactionLogService.updateModelOperationState(modelOperation.getId(), OperationState.ROLLED_BACK);
         } catch (AuthorizationDeniedException | GenericException | NotFoundException | RequestNotValidException e) {
+          transactionLogService.updateModelOperationState(modelOperation.getId(), OperationState.ROLL_BACK_FAILURE);
           throw new RODATransactionException("Error during rollback for object: " + rodaObject.getId(), e);
         } finally {
           PluginHelper.releaseObjectLock(modelOperation.getLiteObject(), transaction.getRequestId().toString());
