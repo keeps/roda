@@ -143,7 +143,7 @@ public class DeleteRodaObjectPluginUtils {
     sources.add(PluginHelper.getLinkingIdentifier(entityId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
     model.createEvent(entityId, null, null, null, RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION,
-      sources, null, reportItem.getPluginState(), outcomeText, details, job.getUsername(), true);
+      sources, null, reportItem.getPluginState(), outcomeText, details, job.getUsername(), true, null);
   }
 
   private static void processAIP(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
@@ -192,7 +192,7 @@ public class DeleteRodaObjectPluginUtils {
                   PluginHelper.getLinkingIdentifier(item.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
                 model.createEvent(item.getId(), null, null, null, RodaConstants.PreservationEventType.DELETION,
-                  EVENT_DESCRIPTION, sources, null, state, outcomeText, details, job.getUsername(), true);
+                  EVENT_DESCRIPTION, sources, null, state, outcomeText, details, job.getUsername(), true, null);
               }
             }, e -> {
               reportItem.setPluginState(PluginState.FAILURE);
@@ -242,7 +242,7 @@ public class DeleteRodaObjectPluginUtils {
       sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
       model.createEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION,
-        sources, null, reportItem.getPluginState(), outcomeText, details, job.getUsername(), true);
+        sources, null, reportItem.getPluginState(), outcomeText, details, job.getUsername(), true, null);
     }
   }
 
@@ -303,7 +303,7 @@ public class DeleteRodaObjectPluginUtils {
     Job job, final Plugin<? extends IsRODAObject> plugin, File file, final String details, final boolean doReport) {
     PluginState state = PluginState.SUCCESS;
 
-    Report reportItem = PluginHelper.initPluginReportItem(plugin, file.getId(), File.class);
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, IdUtils.getFileId(file), File.class);
 
     try {
       AIP retrievedAIP = model.retrieveAIP(file.getAipId());
@@ -354,7 +354,6 @@ public class DeleteRodaObjectPluginUtils {
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
         }
-
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
@@ -431,7 +430,7 @@ public class DeleteRodaObjectPluginUtils {
 
         model.createEvent(representation.getAipId(), representation.getId(), null, null,
           RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText, details,
-          job.getUsername(), true);
+          job.getUsername(), true, null);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
@@ -527,8 +526,8 @@ public class DeleteRodaObjectPluginUtils {
     if (object instanceof AIP aip) {
       dipFilter.add(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, aip.getId()));
     } else if (object instanceof Representation representation) {
-      dipFilter.add(
-        new SimpleFilterParameter(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS, IdUtils.getRepresentationId(representation)));
+      dipFilter.add(new SimpleFilterParameter(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS,
+        IdUtils.getRepresentationId(representation)));
     } else if (object instanceof File file) {
       dipFilter.add(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, IdUtils.getFileId(file)));
     } else {
@@ -594,7 +593,7 @@ public class DeleteRodaObjectPluginUtils {
     Plugin<? extends IsRODAObject> plugin, DIP dip, boolean doReport, String deletePlugin) {
     try {
       String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
-          IdUtils.createUUID());
+        IdUtils.createUUID());
       Plugin<? extends IsRODAObject> externalDeletePlugin = RodaCoreFactory.getPluginManager().getPlugin(deletePlugin);
       Map<String, String> parameters = new HashMap<>(job.getPluginParameters());
       parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());
@@ -639,10 +638,12 @@ public class DeleteRodaObjectPluginUtils {
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 
-  private static void processTransferredResource(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
-                                     final Plugin<? extends IsRODAObject> plugin, TransferredResource transferredResource, final boolean doReport) {
+  private static void processTransferredResource(ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    Job job, final Plugin<? extends IsRODAObject> plugin, TransferredResource transferredResource,
+    final boolean doReport) {
     PluginState state = PluginState.SUCCESS;
-    Report reportItem = PluginHelper.initPluginReportItem(plugin, transferredResource.getId(), TransferredResource.class);
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, transferredResource.getId(),
+      TransferredResource.class);
 
     try {
       model.deleteTransferredResource(transferredResource);

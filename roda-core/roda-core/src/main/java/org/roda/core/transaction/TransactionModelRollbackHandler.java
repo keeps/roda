@@ -54,13 +54,15 @@ public class TransactionModelRollbackHandler {
   private static <T extends IsRODAObject> void process(T rodaObject, TransactionalModelOperationLog modelOperation,
     ThrowingSupplier<T> retrieveFromStorage, ThrowingRunnable notifyDeleted, ThrowingConsumer<T> notifyUpdated)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    if (modelOperation.getOperationType() == OperationType.CREATE) {
-      LOGGER.info("Rollback {} creation for ID: {}", rodaObject.getClass().getSimpleName(), rodaObject.getId());
-      notifyDeleted.run();
-    } else if (modelOperation.getOperationType() != OperationType.READ) {
-      LOGGER.info("Rollback {} update/delete for ID: {}", rodaObject.getClass().getSimpleName(), rodaObject.getId());
+
+    LOGGER.info("Rollback {} for ID: {}", rodaObject.getClass().getSimpleName(), rodaObject.getId());
+    try {
+      // If it exists in main storage, reindex it.
       T retrieved = retrieveFromStorage.get();
       notifyUpdated.accept(retrieved);
+    } catch (NotFoundException e) {
+      // If it does NOT exist in main storage, remove it from index.
+      notifyDeleted.run();
     }
   }
 

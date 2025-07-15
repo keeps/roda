@@ -41,6 +41,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.TransactionalModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
@@ -195,8 +196,12 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     } catch (JobException e) {
       // do nothing
     } finally {
-      // remove locks if any
-      PluginHelper.releaseObjectLock(this);
+      if(model instanceof TransactionalModelService) {
+        LOGGER.info("Delegating object lock release to RODATransactionManager");
+      } else {
+        // remove locks if any
+        PluginHelper.releaseObjectLock(this);
+      }
     }
   }
 

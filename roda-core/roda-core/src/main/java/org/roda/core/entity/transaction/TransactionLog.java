@@ -13,6 +13,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -29,7 +30,7 @@ public class TransactionLog implements Serializable {
   private static final long serialVersionUID = -1711448061359115698L;
 
   public enum TransactionStatus {
-    PENDING, COMMITTING, COMMITTED, ROLLED_BACK
+    PENDING, COMMITTING, COMMITTED, ROLLING_BACK, ROLL_BACK_FAILED, ROLLED_BACK
   }
 
   public enum TransactionRequestType {
@@ -56,10 +57,10 @@ public class TransactionLog implements Serializable {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
-  @OneToMany(mappedBy = "transactionLog", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "transactionLog", cascade = CascadeType.ALL, orphanRemoval = true,  fetch = FetchType.LAZY)
   private List<TransactionalStoragePathOperationLog> storagePathsOperations = new ArrayList<>();
 
-  @OneToMany(mappedBy = "transactionLog", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "transactionLog", cascade = CascadeType.ALL, orphanRemoval = true,  fetch = FetchType.LAZY)
   private List<TransactionalModelOperationLog> modelOperations = new ArrayList<>();
 
   public TransactionLog() {
@@ -75,6 +76,10 @@ public class TransactionLog implements Serializable {
 
   public UUID getId() {
     return id;
+  }
+
+  public void setId(UUID id) {
+    this.id = id;
   }
 
   public UUID getRequestId() {

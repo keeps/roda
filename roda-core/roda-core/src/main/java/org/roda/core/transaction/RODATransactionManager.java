@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.micrometer.core.annotation.Timed;
 import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -18,6 +19,7 @@ import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.DefaultTransactionalStorageService;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.TransactionalStorageService;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Service;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 @Service
+@Timed
 public class RODATransactionManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(RODATransactionManager.class);
   private final TransactionLogService transactionLogService;
@@ -107,7 +110,6 @@ public class RODATransactionManager {
     }
 
     transactionsContext.remove(transactionID);
-    // transactionLogService.cleanUp(transactionID);
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTED);
   }
 
@@ -120,6 +122,7 @@ public class RODATransactionManager {
     TransactionalContext context = beginTransaction(TransactionLog.TransactionRequestType.JOB,
       UUID.fromString(requestUUID));
     UUID transactionId = context.transactionLog().getId();
+    LOGGER.debug("[transactionId:{}] Running the plugin {} in a transaction", transactionId, plugin.getName());
     try {
       Report report = plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
       if (report.getPluginState().equals(PluginState.FAILURE)) {
@@ -128,12 +131,12 @@ public class RODATransactionManager {
         endTransaction(transactionId);
       }
     } catch (RODATransactionException | PluginException e) {
-      try {
-        rollbackTransaction(transactionId);
-      } catch (RODATransactionException ex) {
-        LOGGER.error("Error during rollback", ex);
-      }
+      LOGGER.error("[transactionId:{}] Rolling back transaction due to exception", transactionId, e);
+      rollbackTransaction(transactionId);
       throw e;
+    } finally {
+      // remove locks if any
+      PluginHelper.releaseObjectLock(plugin);
     }
   }
 
@@ -143,16 +146,25 @@ public class RODATransactionManager {
       throw new RODATransactionException("No transaction context found for ID: " + transactionID);
     }
 
-    if (context.transactionalStorageService() != null) {
-      context.transactionalStorageService().rollback();
-    }
+    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLING_BACK);
 
-    if (context.transactionalModelService() != null) {
-      context.transactionalModelService().rollback();
-    }
+    try {
 
-    transactionsContext.remove(transactionID);
-    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLED_BACK);
+      if (context.transactionalStorageService() != null) {
+        context.transactionalStorageService().rollback();
+      }
+
+      if (context.transactionalModelService() != null) {
+        context.transactionalModelService().rollback();
+      }
+
+      transactionsContext.remove(transactionID);
+      transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLED_BACK);
+
+    } catch (Exception e) {
+      transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLL_BACK_FAILED);
+      throw new RODATransactionException("Error during rollback of transaction: " + transactionID, e);
+    }
   }
 
   public void cleanUnfinishedTransactions() {

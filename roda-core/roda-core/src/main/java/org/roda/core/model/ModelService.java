@@ -309,31 +309,33 @@ public interface ModelService extends ModelObservable {
     RequestNotValidException, AuthorizationDeniedException;
 
   PreservationMetadata createRepositoryEvent(RodaConstants.PreservationEventType eventType, String eventDescription,
-    PluginState outcomeState, String outcomeText, String outcomeDetail, String agentName, boolean notify);
+    PluginState outcomeState, String outcomeText, String outcomeDetail, String agentName, boolean notify,
+    String eventId);
 
   PreservationMetadata createRepositoryEvent(RodaConstants.PreservationEventType eventType, String eventDescription,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText,
-    String outcomeDetail, String agentName, boolean notify);
+    String outcomeDetail, String agentName, boolean notify, String eventId);
 
   PreservationMetadata createUpdateAIPEvent(String aipId, String representationId, List<String> filePath, String fileId,
     RodaConstants.PreservationEventType eventType, String eventDescription, PluginState outcomeState,
-    String outcomeText, String outcomeDetail, String agentName, boolean notify);
+    String outcomeText, String outcomeDetail, String agentName, boolean notify, String eventId);
 
   PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     RodaConstants.PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
-    String agentName, boolean notify);
+    String agentName, boolean notify, String eventId);
 
   PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     RodaConstants.PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
-    String agentName, String agentRole, boolean notify);
+    String agentName, String agentRole, boolean notify, String eventId);
 
   PreservationMetadata createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     RodaConstants.PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeDetail, String outcomeExtension,
-    List<LinkingIdentifier> agentIds, String username, boolean notify) throws GenericException, ValidationException,
-    NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException;
+    List<LinkingIdentifier> agentIds, String username, boolean notify, String eventId)
+    throws GenericException, ValidationException, NotFoundException, RequestNotValidException,
+    AuthorizationDeniedException, AlreadyExistsException;
 
   PreservationMetadata retrievePreservationMetadata(String id, PreservationMetadata.PreservationMetadataType type);
 
@@ -680,21 +682,12 @@ public interface ModelService extends ModelObservable {
   DIPFile retrieveDIPFile(String dipId, List<String> directoryPath, String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
-  Directory getSubmissionDirectory(String aipId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
-
   void createSubmission(StorageService submissionStorage, StoragePath submissionStoragePath, String aipId)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException;
 
   void createSubmission(Path submissionPath, String aipId) throws AlreadyExistsException, GenericException,
     RequestNotValidException, NotFoundException, AuthorizationDeniedException;
-
-  Directory getDocumentationDirectory(String aipId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
-
-  Directory getDocumentationDirectory(String aipId, String representationId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
 
   File createDocumentation(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
@@ -709,13 +702,7 @@ public interface ModelService extends ModelObservable {
   Long countSchemaFiles(String aipId, String representationId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
-  Directory getSchemasDirectory(String aipId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
-
-  Directory getSchemasDirectory(String aipId, String representationId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
-
-  File createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
+  void createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException;
 

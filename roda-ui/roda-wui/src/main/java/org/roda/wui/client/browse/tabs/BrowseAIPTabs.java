@@ -103,7 +103,8 @@ public class BrowseAIPTabs extends Tabs {
     List<String> disposalMethods = new ArrayList<>();
     disposalMethods.addAll(AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_HOLD.getMethods());
     disposalMethods.addAll(AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.getMethods());
-    if (PermissionClientUtils.hasPermissions(disposalMethods, aip.getPermissions())) {
+    if (PermissionClientUtils.hasPermissions(disposalMethods, aip.getPermissions())
+      && !aip.getState().equals(AIPState.INGEST_PROCESSING)) {
       createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalTab()), new TabContentBuilder() {
         @Override
         public Widget buildTabWidget() {

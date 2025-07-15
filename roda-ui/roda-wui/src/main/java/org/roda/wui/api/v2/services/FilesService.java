@@ -91,7 +91,7 @@ public class FilesService {
       String outcomeText = "The folder '" + oldName + "' has been manually renamed to '" + newName + "'.";
       model.createUpdateAIPEvent(indexedFolder.getAipId(), indexedFolder.getRepresentationId(), null, null,
         RodaConstants.PreservationEventType.UPDATE, eventDescription, PluginState.SUCCESS, outcomeText, details,
-        user.getName(), true);
+        user.getName(), true, null);
 
       index.commitAIPs();
       return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder), RodaConstants.FILE_FIELDS_TO_RETURN);
@@ -100,7 +100,7 @@ public class FilesService {
 
       model.createUpdateAIPEvent(indexedFolder.getAipId(), indexedFolder.getRepresentationId(), null, null,
         RodaConstants.PreservationEventType.UPDATE, eventDescription, PluginState.FAILURE, outcomeText, details,
-        user.getName(), true);
+        user.getName(), true, null);
 
       throw e;
     }
@@ -164,7 +164,7 @@ public class FilesService {
 
       String outcomeText = "The file '" + file.getId() + "' has been manually created.";
       model.createEvent(aipId, representationId, null, null, RodaConstants.PreservationEventType.CREATION,
-        eventDescription, null, targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
+        eventDescription, null, targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true, null);
 
       requestContext.getIndexService().commit(IndexedFile.class);
       return file;
@@ -172,7 +172,7 @@ public class FilesService {
       | AlreadyExistsException e) {
       String outcomeText = "The file '" + fileId + "' has not been manually created.";
       model.createUpdateAIPEvent(aipId, representationId, null, null, RodaConstants.PreservationEventType.CREATION,
-        eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true);
+        eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true, null);
 
       throw e;
     }
@@ -205,7 +205,7 @@ public class FilesService {
       String outcomeText = "The folder '" + folderName + "' has been manually created.";
       model.createUpdateAIPEvent(indexedRepresentation.getAipId(), indexedRepresentation.getId(), null, null,
         RodaConstants.PreservationEventType.CREATION, eventDescription, PluginState.SUCCESS, outcomeText, details,
-        user.getName(), true);
+        user.getName(), true, null);
 
       index.commit(IndexedFile.class);
       return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder), new ArrayList<>());
@@ -213,7 +213,7 @@ public class FilesService {
       String outcomeText = "The folder '" + folderName + "' has not been manually created.";
       model.createUpdateAIPEvent(indexedRepresentation.getAipId(), indexedRepresentation.getId(), null, null,
         RodaConstants.PreservationEventType.CREATION, eventDescription, PluginState.FAILURE, outcomeText, details,
-        user.getName(), true);
+        user.getName(), true, null);
 
       throw e;
     }

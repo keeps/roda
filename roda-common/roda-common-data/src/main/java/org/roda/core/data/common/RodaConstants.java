@@ -70,6 +70,8 @@ public final class RodaConstants {
   public static final String CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT = "core.ingest.processed.move_when_autoaccept";
   public static final String CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED = "core.ingest.delete_transfer_resource_after_successfully_ingested";
   public static final String CORE_INGEST_SKIP_FIX_PARENTS = "core.ingest.skip.fix.parents";
+
+  public static final String CORE_EXPERIMENTAL_FEATURES_ENABLED = "core.experimental.features.enabled";
   /*
    * Misc
    */
@@ -797,6 +799,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_DETAILS_PARAM = "details";
   public static final String CONTROLLER_REQUEST_METRICS_PARAM = "metricsToObtain";
   public static final String CONTROLLER_LOGIN_METHOD_PARAM = "loginMethod";
+  public static final String CONTROLLER_TRANSACTION_ID_PARAM = "transactionID";
 
   /*
    * Core (storage, index, orchestrator, etc.)

@@ -2,7 +2,9 @@ package org.roda.wui.api.v2.controller;
 
 import java.io.IOException;
 
+import io.micrometer.core.annotation.Timed;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -25,6 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 @Component
+@Timed
 public class RequestHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(RequestHandler.class);
 
@@ -76,6 +79,9 @@ public class RequestHandler {
         // execute the request
         T result = processor.process(requestContext, controllerAssistant);
 
+        controllerAssistant.addParameters(RodaConstants.CONTROLLER_TRANSACTION_ID_PARAM,
+          transactionalContext.transactionLog().getId());
+
         // End transaction
         transactionManager.endTransaction(transactionalContext.transactionLog().getId());
         return result;
@@ -107,9 +113,12 @@ public class RequestHandler {
   }
 
   private boolean isAValidTransactionalContext(boolean isTransactional) {
-    // Check if the current node is not a read-only node
-    boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(RodaCoreFactory.getNodeType());
-    return writeIsAllowed && isTransactional;
+    if(transactionManager != null && transactionManager.isInitialized()) {
+      // Check if the current node is not a read-only node
+      boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(RodaCoreFactory.getNodeType());
+      return writeIsAllowed && isTransactional;
+    }
+    return false;
   }
 
   public interface RequestProcessor<T> {

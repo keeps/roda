@@ -3,7 +3,14 @@ package org.roda.core.transaction;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -141,6 +148,19 @@ public class TransactionLogConsolidator {
           result.add(new ConsolidatedOperation(OperationType.UPDATE, updatedAt));
           break;
 
+        case CREATE_OR_UPDATE:
+          if (result.isEmpty()) {
+            result.add(new ConsolidatedOperation(OperationType.CREATE_OR_UPDATE, updatedAt));
+          } else {
+            OperationType last = result.getLast().operationType();
+            if (last == OperationType.CREATE || last == OperationType.UPDATE
+              || last == OperationType.CREATE_OR_UPDATE) {
+              result.removeLast();
+            }
+            result.add(new ConsolidatedOperation(OperationType.CREATE_OR_UPDATE, updatedAt));
+          }
+          break;
+
         case DELETE:
           result.add(new ConsolidatedOperation(OperationType.DELETE, updatedAt));
           break;
@@ -161,7 +181,7 @@ public class TransactionLogConsolidator {
         continue;
       }
 
-      if (curr == OperationType.CREATE && next == OperationType.DELETE) {
+      if ((curr == OperationType.CREATE || curr == OperationType.CREATE_OR_UPDATE) && next == OperationType.DELETE) {
         result.remove(i);
         result.remove(i);
         if (i > 0)
@@ -170,6 +190,11 @@ public class TransactionLogConsolidator {
       }
 
       if (curr == OperationType.UPDATE && next == OperationType.DELETE) {
+        result.remove(i);
+        continue;
+      }
+
+      if (curr == OperationType.CREATE_OR_UPDATE && next == OperationType.CREATE_OR_UPDATE) {
         result.remove(i);
         continue;
       }

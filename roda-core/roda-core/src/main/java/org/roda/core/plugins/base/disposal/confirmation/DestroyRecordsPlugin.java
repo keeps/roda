@@ -256,7 +256,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     }
 
     model.createEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.DESTRUCTION, EVENT_DESCRIPTION,
-      null, null, state, outcomeText, "", cachedJob.getUsername(), true);
+      null, null, state, outcomeText, "", cachedJob.getUsername(), true, null);
 
     // copy the preservation event to the AIP in the disposal bin
     // using the --ignore-existing flag in the rsync process, copying only the new

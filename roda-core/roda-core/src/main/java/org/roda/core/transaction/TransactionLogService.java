@@ -1,8 +1,6 @@
 package org.roda.core.transaction;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.roda.core.entity.transaction.OperationState;
@@ -13,15 +11,25 @@ import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
 import org.roda.core.repository.transaction.TransactionLogRepository;
 import org.roda.core.repository.transaction.TransactionalModelOperationLogRepository;
 import org.roda.core.repository.transaction.TransactionalStoragePathRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 @Service
+@Timed
+@Counted
 public class TransactionLogService {
+  private static final Logger LOGGER = LoggerFactory.getLogger(TransactionLogService.class);
+
   @Autowired
   private TransactionLogRepository transactionLogRepository;
   @Autowired
@@ -29,12 +37,14 @@ public class TransactionLogService {
   @Autowired
   private TransactionalStoragePathRepository transactionalStoragePathRepository;
 
-  @Transactional
+  /*
+   * TransactionLogRepository
+   */
+
   public List<TransactionLog> getUnfinishedTransactions() {
     return transactionLogRepository.findByStatusOrderByCreatedAt(TransactionLog.TransactionStatus.PENDING);
   }
 
-  @Transactional
   public List<TransactionLog> getCommittedTransactions() {
     return transactionLogRepository.findByStatusOrderByCreatedAt(TransactionLog.TransactionStatus.COMMITTED);
   }
@@ -46,18 +56,43 @@ public class TransactionLogService {
     return transactionLog;
   }
 
-  @Transactional
   public TransactionLog getTransactionLog(UUID transactionId) throws RODATransactionException {
     if (transactionId == null) {
       throw new RODATransactionException("Transaction ID cannot be null");
     }
-    return getTransactionLogById(transactionId);
+    return getTransactionLogById(transactionId, true);
   }
 
-  private TransactionLog getTransactionLogById(UUID transactionId) throws RODATransactionException {
-    return transactionLogRepository.findById(transactionId)
-      .orElseThrow(() -> new RODATransactionException("Transaction not found for ID: " + transactionId));
+  private TransactionLog getTransactionLogById(UUID transactionId, boolean fetch) throws RODATransactionException {
+    if (fetch) {
+      return transactionLogRepository.findById(transactionId)
+        .orElseThrow(() -> new RODATransactionException("Transaction not found for ID: " + transactionId));
+    } else {
+      TransactionLog transactionLog = new TransactionLog();
+      transactionLog.setId(transactionId);
+      return transactionLog;
+    }
   }
+
+  @Transactional
+  public void changeStatus(UUID transactionId, TransactionLog.TransactionStatus status)
+    throws RODATransactionException {
+    TransactionLog transactionLog = getTransactionLogById(transactionId, true);
+    transactionLog.setStatus(status);
+    transactionLogRepository.save(transactionLog);
+  }
+
+  @Transactional
+  public void cleanUp(UUID transactionID) throws RODATransactionException {
+    TransactionLog transactionLog = getTransactionLogById(transactionID, true);
+    if (null != transactionLog) {
+      transactionLogRepository.delete(transactionLog);
+    }
+  }
+
+  /*
+   * transactionalModelOperationLogRepository
+   */
 
   private TransactionalModelOperationLog getTransactionalModelOperationLogById(UUID operationId)
     throws RODATransactionException {
@@ -65,18 +100,35 @@ public class TransactionLogService {
       .orElseThrow(() -> new RODATransactionException("Model operation log not found for ID: " + operationId));
   }
 
+  @Transactional
+  public TransactionalModelOperationLog registerModelOperation(UUID transactionId, String liteObject,
+    OperationType operation) throws RODATransactionException {
+    TransactionLog transactionLog = getTransactionLogById(transactionId, false);
+    TransactionalModelOperationLog operationLog = transactionLog.addModelOperation(liteObject, operation);
+    operationLog.setTransactionLog(transactionLog);
+    return transactionalModelOperationLogRepository.save(operationLog);
+  }
+
+  @Transactional
+  public void updateModelOperationState(UUID operationId, OperationState state) throws RODATransactionException {
+    TransactionalModelOperationLog operationLog = getTransactionalModelOperationLogById(operationId);
+    operationLog.setOperationState(state);
+    transactionalModelOperationLogRepository.save(operationLog);
+  }
+
+  public List<TransactionalModelOperationLog> getModelOperations(UUID transactionId) throws RODATransactionException {
+    TransactionLog transactionLog = getTransactionLogById(transactionId, false);
+    return transactionalModelOperationLogRepository.findByTransactionLogOrderByUpdatedAt(transactionLog);
+  }
+
+  /*
+   * transactionalStoragePathRepository
+   */
+
   private TransactionalStoragePathOperationLog getTransactionalStoragePathOperationLogById(UUID operationId)
     throws RODATransactionException {
     return transactionalStoragePathRepository.findById(operationId)
       .orElseThrow(() -> new RODATransactionException("Storage path operation log not found for ID: " + operationId));
-  }
-
-  @Transactional
-  public void changeStatus(UUID transactionId, TransactionLog.TransactionStatus status)
-    throws RODATransactionException {
-    TransactionLog transactionLog = getTransactionLogById(transactionId);
-    transactionLog.setStatus(status);
-    transactionLogRepository.save(transactionLog);
   }
 
   @Transactional
@@ -87,7 +139,7 @@ public class TransactionLogService {
       // purposes
       return null;
     }
-    TransactionLog transactionLog = getTransactionLogById(transactionId);
+    TransactionLog transactionLog = getTransactionLogById(transactionId, false);
     TransactionalStoragePathOperationLog operationLog = transactionLog.addStoragePath(storagePath, operation, version);
     operationLog.setTransactionLog(transactionLog);
     return transactionalStoragePathRepository.save(operationLog);
@@ -100,82 +152,40 @@ public class TransactionLogService {
     transactionalStoragePathRepository.save(operationLog);
   }
 
-  @Transactional
   public List<TransactionalStoragePathOperationLog> getStoragePathsOperations(UUID transactionId)
     throws RODATransactionException {
-    TransactionLog transactionLog = getTransactionLogById(transactionId);
+    TransactionLog transactionLog = getTransactionLogById(transactionId, false);
     return transactionalStoragePathRepository.findByTransactionLogOrderByUpdatedAt(transactionLog,
       OperationState.SUCCESS);
   }
 
-  @Transactional
   public List<TransactionalStoragePathOperationLog> getStoragePathsOperations(UUID transactionId,
     OperationType operationType) throws RODATransactionException {
-    TransactionLog transactionLog = getTransactionLogById(transactionId);
+    TransactionLog transactionLog = getTransactionLogById(transactionId, false);
     return transactionalStoragePathRepository.findByTransactionLogAndOperationType(transactionLog, operationType,
       OperationState.SUCCESS);
   }
 
-  @Transactional
-  public Optional<TransactionalStoragePathOperationLog> getLastStoragePathOperation(UUID transactionId,
-    String storagePath) throws RODATransactionException {
-    TransactionLog transactionLog = getTransactionLogById(transactionId);
-    return transactionalStoragePathRepository
-      .findByTransactionLogAndStoragePath(transactionLog, OperationState.SUCCESS, storagePath).stream()
-      .filter(operationLog -> isMutatingOperation(operationLog.getOperationType()))
-      .max(Comparator.comparing(TransactionalStoragePathOperationLog::getUpdatedAt));
+  public TransactionalStoragePathOperationLog getAnyDeletedStoragePathOperation(UUID transactionId, String storagePath)
+    throws RODATransactionException {
+    TransactionLog transactionLog = getTransactionLogById(transactionId, false);
+    List<TransactionalStoragePathOperationLog> result = transactionalStoragePathRepository
+      .findAnyByTransactionLogAndStoragePathAndOperationType(transactionLog, OperationState.SUCCESS, storagePath,
+        OperationType.DELETE, PageRequest.of(0, 1));
+    return result.isEmpty() ? null : result.getFirst();
   }
 
-  private boolean isMutatingOperation(OperationType operationType) {
-    return operationType == OperationType.CREATE || operationType == OperationType.UPDATE
-      || operationType == OperationType.DELETE;
-  }
-
-  @Transactional
-  public List<TransactionalModelOperationLog> getModelOperations(UUID transactionId) throws RODATransactionException {
-    return getTransactionLogById(transactionId).getModelOperations();
-  }
-
-  @Transactional
-  public TransactionalModelOperationLog registerModelOperation(UUID transactionId, String liteObject,
-    OperationType operation) throws RODATransactionException {
-    TransactionLog transactionLog = getTransactionLogById(transactionId);
-    TransactionalModelOperationLog operationLog = transactionLog.addModelOperation(liteObject, operation);
-    operationLog.setTransactionLog(getTransactionLogById(transactionId));
-    return transactionalModelOperationLogRepository.save(operationLog);
-  }
-
-  @Transactional
-  public void updateModelOperationState(UUID operationId, OperationState state) throws RODATransactionException {
-    TransactionalModelOperationLog operationLog = getTransactionalModelOperationLogById(operationId);
-    operationLog.setOperationState(state);
-    transactionalModelOperationLogRepository.save(operationLog);
-  }
-
-  @Transactional
-  public void cleanUp(UUID transactionID) throws RODATransactionException {
-    TransactionLog transactionLog = getTransactionLogById(transactionID);
-    if (null != transactionLog) {
-      transactionLogRepository.delete(transactionLog);
-    }
-  }
-
-  @Transactional
   public boolean hasModificationsUnderStoragePath(UUID transactionID, String storagePath)
     throws RODATransactionException {
-    TransactionLog transactionLog = getTransactionLogById(transactionID);
-    // TODO create a query for this in the repository
-    return transactionLog.getStoragePathsOperations().stream()
-      .anyMatch(op -> op.getStoragePath().startsWith(storagePath + "/") && op.getOperationType() != OperationType.READ);
+    TransactionLog transactionLog = getTransactionLogById(transactionID, false);
+    List<TransactionalStoragePathOperationLog> results = transactionalStoragePathRepository
+      .findModificationsUnderStoragePath(transactionLog, storagePath);
+    return !results.isEmpty();
   }
 
-  @Transactional
   public List<TransactionalStoragePathOperationLog> listModificationsUnderStoragePath(UUID transactionID,
     String storagePath) throws RODATransactionException {
-    TransactionLog transactionLog = getTransactionLogById(transactionID);
-    // TODO create a query for this in the repository
-    return transactionLog.getStoragePathsOperations().stream()
-      .filter(op -> op.getStoragePath().startsWith(storagePath + "/") && op.getOperationType() != OperationType.READ)
-      .toList();
+    TransactionLog transactionLog = getTransactionLogById(transactionID, false);
+    return transactionalStoragePathRepository.findModificationsUnderStoragePath(transactionLog, storagePath);
   }
 }

@@ -69,6 +69,7 @@ public class ConfigurationManager {
   private Path defaultPath;
   private Path reportPath;
   private Path synchronizationDirectoryPath;
+  private boolean experimentalFeaturesEnabled;
   private Map<String, Map<String, String>> rodaPropertiesCache = null;
 
   /**
@@ -269,6 +270,10 @@ public class ConfigurationManager {
     this.synchronizationDirectoryPath = synchronizationDirectoryPath;
   }
 
+  public boolean isExperimentalFeaturesEnabled() {
+    return experimentalFeaturesEnabled;
+  }
+
   private List<String> CONFIGURATIONS = new ArrayList<>(Arrays.asList("roda-core.properties", "roda-roles.properties",
     "roda-permissions.properties", "roda-instance.properties"));
 
@@ -302,6 +307,9 @@ public class ConfigurationManager {
         throw new RuntimeException("Unable to load configuration for RODA " + configuration + ". Aborting...", e);
       }
     }
+
+    experimentalFeaturesEnabled = Boolean
+      .parseBoolean(getRodaConfigurationAsString(RodaConstants.CORE_EXPERIMENTAL_FEATURES_ENABLED));
     instantiated = true;
   }
 
