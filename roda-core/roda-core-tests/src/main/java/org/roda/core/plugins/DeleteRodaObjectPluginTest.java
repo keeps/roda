@@ -426,4 +426,111 @@ public class DeleteRodaObjectPluginTest {
     }
   }
 
+  @Test
+  public void testDeleteFileFolderWithChildren() throws AuthorizationDeniedException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException, GenericException, InterruptedException {
+    // create AIP and rep
+    AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN, null);
+
+    Representation representation = model.createRepresentation(aip.getId(), IdUtils.createUUID(), true, "", true,
+      RodaConstants.ADMIN);
+
+    File fileTop = model.createFile(aip.getId(), representation.getId(), Collections.emptyList(), null, "FileTop",
+      RodaConstants.ADMIN, true);
+
+    File fileChild = model.createFile(aip.getId(), representation.getId(), fileTop.getPath(), fileTop.getId(),
+      "fileChild", RodaConstants.ADMIN, true);
+
+    File fileGrandChild = model.createFile(aip.getId(), representation.getId(), fileChild.getPath(), fileChild.getId(),
+      "fileGrandChild", RodaConstants.ADMIN, true);
+
+    Job jobDeleteFile = TestsHelper.executeJob(DeleteRODAObjectPlugin.class, Collections.EMPTY_MAP, PluginType.INTERNAL,
+      SelectedItemsList.create(IndexedFile.class, IdUtils.getFileId(fileTop)), Job.JOB_STATE.COMPLETED);
+
+    TestsHelper.getJobReports(index, jobDeleteFile, true);
+
+    List<File> files = Arrays.asList(fileTop, fileChild, fileGrandChild);
+
+    for (File file : files) {
+      try {
+        File retrievedFile = model.retrieveFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
+          file.getId());
+        AssertJUnit.assertNull("Failed to delete File : " + file.getId(), retrievedFile);
+      } catch (NotFoundException e) {
+        // pass
+      }
+    }
+  }
+
+  @Test
+  public void testDeleteSingleFile() throws AuthorizationDeniedException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException, GenericException, InterruptedException {
+    // create AIP and rep
+    AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN, null);
+
+    Representation representation = model.createRepresentation(aip.getId(), IdUtils.createUUID(), true, "", true,
+      RodaConstants.ADMIN);
+
+    File file = model.createFile(aip.getId(), representation.getId(), Collections.emptyList(), "fileTop", "FileTop",
+      RodaConstants.ADMIN, true);
+
+    Job jobDeleteFile = TestsHelper.executeJob(DeleteRODAObjectPlugin.class, Collections.EMPTY_MAP, PluginType.INTERNAL,
+      SelectedItemsList.create(IndexedFile.class, IdUtils.getFileId(file)), Job.JOB_STATE.COMPLETED);
+
+    TestsHelper.getJobReports(index, jobDeleteFile, true);
+
+    try {
+      File retrievedFile = model.retrieveFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
+        file.getId());
+      AssertJUnit.assertNull("Failed to delete File " + file.getId(), retrievedFile);
+    } catch (NotFoundException e) {
+      // pass
+    }
+
+  }
+
+  @Test
+  public void testDeleteChildren() throws AuthorizationDeniedException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException, GenericException, InterruptedException {
+    // create AIP and rep
+    AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN, null);
+
+    Representation representation = model.createRepresentation(aip.getId(), IdUtils.createUUID(), true, "", true,
+      RodaConstants.ADMIN);
+
+    File fileTop = model.createFile(aip.getId(), representation.getId(), Collections.emptyList(), null, "FileTop",
+      RodaConstants.ADMIN, true);
+
+    File fileChild = model.createFile(aip.getId(), representation.getId(), fileTop.getPath(), fileTop.getId(),
+      "fileChild", RodaConstants.ADMIN, true);
+
+    File fileGrandChild = model.createFile(aip.getId(), representation.getId(), fileChild.getPath(), fileChild.getId(),
+      "fileGrandChild", RodaConstants.ADMIN, true);
+
+    Job jobDeleteFile = TestsHelper.executeJob(DeleteRODAObjectPlugin.class, Collections.EMPTY_MAP, PluginType.INTERNAL,
+      SelectedItemsList.create(IndexedFile.class, IdUtils.getFileId(fileChild)), Job.JOB_STATE.COMPLETED);
+
+    TestsHelper.getJobReports(index, jobDeleteFile, true);
+
+    try {
+      File retrievedTopFile = model.retrieveFile(fileTop.getAipId(), fileTop.getRepresentationId(), fileTop.getPath(),
+        fileTop.getId());
+    } catch (NotFoundException e) {
+      AssertJUnit.fail("Failed to preserve File Top " + fileTop.getId() + " with children");
+    }
+
+    List<File> files = Arrays.asList(fileChild, fileGrandChild);
+    for (File file : files) {
+      try {
+
+        File retrievedFile = model.retrieveFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
+          file.getId());
+        AssertJUnit.assertNull("Failed to delete File : " + file.getId(), retrievedFile);
+      } catch (NotFoundException e) {
+        // pass
+      }
+    }
+
+  }
+
 }
