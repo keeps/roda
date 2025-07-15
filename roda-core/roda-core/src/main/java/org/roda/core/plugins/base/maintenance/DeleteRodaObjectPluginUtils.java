@@ -295,7 +295,7 @@ public class DeleteRodaObjectPluginUtils {
 
     model.createEvent(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
       RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION,
-        sources, null, state, reportItem.getPluginDetails(), details, job.getUsername(), true);
+        sources, null, state, reportItem.getPluginDetails(), details, job.getUsername(), true, null);
 
   }
 
