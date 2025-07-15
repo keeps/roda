@@ -23,7 +23,9 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.entity.transaction.OperationState;
 import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionLog;
+import org.roda.core.entity.transaction.TransactionStoragePathConsolidatedOperation;
 import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.transaction.ConsolidatedOperation;
 import org.roda.core.transaction.RODATransactionException;
 import org.roda.core.transaction.StoragePathVersion;
@@ -604,18 +606,28 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   @Override
   public void commit() throws RODATransactionException {
+    Map<StoragePathVersion, List<ConsolidatedOperation>> consolidatedOperations;
     try {
-      Map<StoragePathVersion, List<ConsolidatedOperation>> consolidatedOperations = TransactionLogConsolidator
+      consolidatedOperations = TransactionLogConsolidator
         .consolidateLogs(transactionLogService.getStoragePathsOperations(transaction.getId()));
-      for (Map.Entry<StoragePathVersion, List<ConsolidatedOperation>> consolidatedOperation : consolidatedOperations
-        .entrySet()) {
-        StoragePath storagePath = consolidatedOperation.getKey().storagePath();
-        String version = consolidatedOperation.getKey().version();
-        List<ConsolidatedOperation> operations = consolidatedOperation.getValue();
+    } catch (RequestNotValidException e) {
+      throw new RODATransactionException(
+        "[transactionId:" + transaction.getId() + "] Failed to consolidate transaction logs", e);
+    }
 
-        for (ConsolidatedOperation operation : operations) {
-          OperationType operationType = operation.operationType();
+    for (Map.Entry<StoragePathVersion, List<ConsolidatedOperation>> consolidatedOperation : consolidatedOperations
+      .entrySet()) {
+      StoragePath storagePath = consolidatedOperation.getKey().storagePath();
+      String version = consolidatedOperation.getKey().version();
+      List<ConsolidatedOperation> operations = consolidatedOperation.getValue();
+      List<TransactionStoragePathConsolidatedOperation> databaseOperations = transactionLogService
+        .registerConsolidatedStoragePathOperations(transaction, getStoragePathAsString(storagePath, false), version,
+          operations);
 
+      for (TransactionStoragePathConsolidatedOperation operation : databaseOperations) {
+        try {
+          transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.RUNNING);
+          OperationType operationType = operation.getOperationType();
           if (operationType == OperationType.DELETE) {
             handleDeleteOperation(storagePath, version);
           } else if (operationType == OperationType.UPDATE) {
@@ -629,12 +641,12 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
             LOGGER.debug("[transactionId:{}] Skipping read operation for storage path: {}", transaction.getId(),
               storagePath);
           }
+          transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.SUCCESS);
+        } catch (RODATransactionException e) {
+          transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.FAILURE);
+          throw e;
         }
-
       }
-    } catch (RequestNotValidException e) {
-      throw new RODATransactionException(
-        "[transactionId:" + transaction.getId() + "] Failed to consolidate transaction logs", e);
     }
   }
 
@@ -769,7 +781,56 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   @Override
   public void rollback() throws RODATransactionException {
     LOGGER.warn("[transactionId:{}] Rolling back transaction", transaction.getId());
-    // DO NOTHING
+    List<TransactionStoragePathConsolidatedOperation> successfulOperations = transactionLogService
+      .getSuccessfulConsolidatedStoragePathOperations(transaction);
+    try {
+      for (TransactionStoragePathConsolidatedOperation operation : successfulOperations) {
+        transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.ROLLING_BACK);
+        if (operation.getOperationType() == OperationType.DELETE) {
+          // rollbackDeleteOperation(operation);
+        } else if (operation.getOperationType() == OperationType.UPDATE) {
+          rollbackUpdateOperation(operation);
+        } else if (operation.getOperationType() == OperationType.CREATE) {
+          rollbackCreateOperation(operation);
+        } else if (operation.getOperationType() == OperationType.READ) {
+          // do nothing for read operations
+        }
+        transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.ROLLED_BACK);
+      }
+    } catch (RODATransactionException e) {
+      for (TransactionStoragePathConsolidatedOperation operation : successfulOperations) {
+        transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.ROLL_BACK_FAILURE);
+      }
+      throw new RODATransactionException(
+        "[transactionId:" + transaction.getId() + "] Failed to rollback this transaction", e);
+    }
+  }
+
+  public void rollbackCreateOperation(TransactionStoragePathConsolidatedOperation operation)
+    throws RODATransactionException {
+    try {
+      StoragePath storagePath = FSUtils.getStoragePathFromString(operation.getStoragePath());
+      if (operation.getVersion() != null) {
+        mainStorageService.deleteBinaryVersion(storagePath, operation.getVersion());
+      } else {
+        mainStorageService.deleteResource(storagePath);
+      }
+    } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
+      throw new RODATransactionException("[transactionId:" + transaction.getId()
+        + "] Failed to roll back create operation path at " + operation.getStoragePath(), e);
+    }
+  }
+
+  public void rollbackUpdateOperation(TransactionStoragePathConsolidatedOperation operation)
+    throws RODATransactionException {
+    throw new RODATransactionException(
+      "[transactionId:" + transaction.getId() + "] Update operation roll back not supported");
+  }
+
+  public void rollbackDeleteOperation(TransactionStoragePathConsolidatedOperation operation)
+    throws RODATransactionException {
+    throw new RODATransactionException(
+      "[transactionId:" + transaction.getId() + "] Delete operation roll back not supported");
   }
 
   private List<TransactionalStoragePathOperationLog> registerOperationForCopy(StorageService fromService,

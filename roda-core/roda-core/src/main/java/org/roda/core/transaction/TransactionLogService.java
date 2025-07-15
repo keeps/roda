@@ -1,14 +1,17 @@
 package org.roda.core.transaction;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.entity.transaction.OperationState;
 import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionLog;
+import org.roda.core.entity.transaction.TransactionStoragePathConsolidatedOperation;
 import org.roda.core.entity.transaction.TransactionalModelOperationLog;
 import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
 import org.roda.core.repository.transaction.TransactionLogRepository;
+import org.roda.core.repository.transaction.TransactionStoragePathConsolidatedOperationsRepository;
 import org.roda.core.repository.transaction.TransactionalModelOperationLogRepository;
 import org.roda.core.repository.transaction.TransactionalStoragePathRepository;
 import org.slf4j.Logger;
@@ -36,6 +39,8 @@ public class TransactionLogService {
   private TransactionalModelOperationLogRepository transactionalModelOperationLogRepository;
   @Autowired
   private TransactionalStoragePathRepository transactionalStoragePathRepository;
+  @Autowired
+  private TransactionStoragePathConsolidatedOperationsRepository transactionStoragePathConsolidatedOperationsRepository;
 
   /*
    * TransactionLogRepository
@@ -196,5 +201,33 @@ public class TransactionLogService {
     String storagePath) throws RODATransactionException {
     TransactionLog transactionLog = getTransactionLogById(transactionID, false);
     return transactionalStoragePathRepository.findModificationsUnderStoragePath(transactionLog, storagePath);
+  }
+
+  @Transactional
+  public List<TransactionStoragePathConsolidatedOperation> registerConsolidatedStoragePathOperations(
+    TransactionLog transaction, String storagePathAsString, String storagePathVersion,
+    List<ConsolidatedOperation> consolidatedOperations) {
+    List<TransactionStoragePathConsolidatedOperation> databaseOperations = new ArrayList<>();
+    for (ConsolidatedOperation operation : consolidatedOperations) {
+      TransactionStoragePathConsolidatedOperation databaseOperation = new TransactionStoragePathConsolidatedOperation(
+        transaction, storagePathAsString, storagePathVersion, operation.operationType());
+      databaseOperations.add(databaseOperation);
+      transactionStoragePathConsolidatedOperationsRepository.save(databaseOperation);
+    }
+    return databaseOperations;
+  }
+
+  @Transactional
+  public void updateConsolidatedStoragePathOperationState(TransactionStoragePathConsolidatedOperation operation,
+    OperationState state) {
+    operation.setOperationState(state);
+    transactionStoragePathConsolidatedOperationsRepository.save(operation);
+  }
+
+  @Transactional
+  public List<TransactionStoragePathConsolidatedOperation> getSuccessfulConsolidatedStoragePathOperations(
+    TransactionLog transactionLog) {
+    return transactionStoragePathConsolidatedOperationsRepository
+      .getSuccessfulOperationsByTransactionLog(transactionLog);
   }
 }
