@@ -71,7 +71,7 @@ public final class RodaConstants {
   public static final String CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED = "core.ingest.delete_transfer_resource_after_successfully_ingested";
   public static final String CORE_INGEST_SKIP_FIX_PARENTS = "core.ingest.skip.fix.parents";
 
-  public static final String CORE_EXPERIMENTAL_FEATURES_ENABLED = "core.experimental.features.enabled";
+  public static final String CORE_STORAGE_LEGACY_IMPLEMENTATION_ENABLED = "core.storage.legacy.implementation.enabled";
   /*
    * Misc
    */
@@ -356,7 +356,7 @@ public final class RodaConstants {
   public static final String API_REST_V2_DOWNLOAD_HANDLER = "/download";
   public static final String API_REST_V2_PREVIEW_HANDLER = "/preview";
   public static final String API_REST_V2_REPRESENTATION_OTHER_METADATA = "/other-metadata";
-    public static final String API_REST_V2_REPRESENTATION_BINARY = "/binary";
+  public static final String API_REST_V2_REPRESENTATION_BINARY = "/binary";
 
   // aips
   public static final String API_REST_V2_AIPS = "api/v2/aips/";

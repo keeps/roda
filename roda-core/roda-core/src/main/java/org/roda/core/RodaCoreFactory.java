@@ -433,7 +433,7 @@ public class RodaCoreFactory {
         instantiateStorageAndModel();
         LOGGER.debug("Finished instantiating storage & model");
 
-        if (configurationManager.isExperimentalFeaturesEnabled()) {
+        if (configurationManager.isTransactionalStorageImplementationEnabled()) {
           instantiateTransactionManager(nodeType);
           LOGGER.debug("Finished instantiating transaction manager");
         }
@@ -500,7 +500,7 @@ public class RodaCoreFactory {
 
         instanceId = getProperty(RodaConstants.CORE_NODE_INSTANCE_ID, "");
 
-        if (configurationManager.isExperimentalFeaturesEnabled()) {
+        if (configurationManager.isTransactionalStorageImplementationEnabled()) {
           if (nodeType == NodeType.PRIMARY && RODATransactionManager != null
             && RODATransactionManager.isInitialized()) {
             RODATransactionManager.cleanUnfinishedTransactions();

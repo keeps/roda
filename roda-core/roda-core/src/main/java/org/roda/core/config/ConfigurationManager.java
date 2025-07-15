@@ -69,7 +69,7 @@ public class ConfigurationManager {
   private Path defaultPath;
   private Path reportPath;
   private Path synchronizationDirectoryPath;
-  private boolean experimentalFeaturesEnabled;
+  private boolean transactionalStorageImplementationEnabled;
   private Map<String, Map<String, String>> rodaPropertiesCache = null;
 
   /**
@@ -270,8 +270,8 @@ public class ConfigurationManager {
     this.synchronizationDirectoryPath = synchronizationDirectoryPath;
   }
 
-  public boolean isExperimentalFeaturesEnabled() {
-    return experimentalFeaturesEnabled;
+  public boolean isTransactionalStorageImplementationEnabled() {
+    return transactionalStorageImplementationEnabled;
   }
 
   private List<String> CONFIGURATIONS = new ArrayList<>(Arrays.asList("roda-core.properties", "roda-roles.properties",
@@ -308,8 +308,8 @@ public class ConfigurationManager {
       }
     }
 
-    experimentalFeaturesEnabled = Boolean
-      .parseBoolean(getRodaConfigurationAsString(RodaConstants.CORE_EXPERIMENTAL_FEATURES_ENABLED));
+    transactionalStorageImplementationEnabled = getProperty(RodaConstants.CORE_STORAGE_LEGACY_IMPLEMENTATION_ENABLED,
+      false);
     instantiated = true;
   }
 
