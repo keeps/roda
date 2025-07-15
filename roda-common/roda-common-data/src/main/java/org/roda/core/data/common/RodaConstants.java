@@ -1530,6 +1530,7 @@ public final class RodaConstants {
   public static final String FILE_HASH = "hash";
   public static final String FILE_FULLTEXT = "fulltext";
   public static final String FILE_ANCESTORS = "ancestors";
+  public static final String FILE_ANCESTORS_LIST = "ancestorsPath";
   public static final String FILE_FORMAT_DESIGNATION = "formatDesignation";
 
   public static final String FILE_CREATED_ON = "createdOn";
