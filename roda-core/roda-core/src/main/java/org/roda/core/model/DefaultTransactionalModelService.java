@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -474,6 +475,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
 
+    operationRegistry.checkIfEntityExistsAndThrowException(DescriptiveMetadata.class, aipId, null,
+      descriptiveMetadataId);
+
     List<TransactionalModelOperationLog> operationLogs = operationRegistry
       .registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId, OperationType.CREATE);
     try {
@@ -495,6 +499,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
     NotFoundException {
 
+    operationRegistry.checkIfEntityExistsAndThrowException(DescriptiveMetadata.class, aipId, null,
+      descriptiveMetadataId);
+
     List<TransactionalModelOperationLog> operationLogs = operationRegistry
       .registerOperationForDescriptiveMetadata(aipId, null, descriptiveMetadataId, OperationType.CREATE);
     try {
@@ -515,6 +522,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String descriptiveMetadataVersion, String createdBy) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
 
+    operationRegistry.checkIfEntityExistsAndThrowException(DescriptiveMetadata.class, aipId, representationId,
+      descriptiveMetadataId);
+
     List<TransactionalModelOperationLog> operationLogs = operationRegistry
       .registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, OperationType.CREATE);
     try {
@@ -534,6 +544,9 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     String descriptiveMetadataId, ContentPayload payload, String descriptiveMetadataType,
     String descriptiveMetadataVersion, String createdBy, boolean notify) throws RequestNotValidException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+
+    operationRegistry.checkIfEntityExistsAndThrowException(DescriptiveMetadata.class, aipId, representationId,
+      descriptiveMetadataId);
 
     List<TransactionalModelOperationLog> operationLogs = operationRegistry
       .registerOperationForDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, OperationType.CREATE);
@@ -977,6 +990,11 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, String createdBy) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+
+    operationRegistry.checkIfEntityExistsAndThrowException(File.class,
+      Stream.concat(Stream.of(aipId, representationId), Stream.concat(directoryPath.stream(), Stream.of(fileId)))
+        .toArray(String[]::new));
+
     List<TransactionalModelOperationLog> operationLogs = operationRegistry.registerOperationForFile(aipId,
       representationId, directoryPath, fileId, OperationType.CREATE);
     try {
@@ -995,6 +1013,11 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, String createdBy, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+
+    operationRegistry.checkIfEntityExistsAndThrowException(File.class,
+      Stream.concat(Stream.of(aipId, representationId), Stream.concat(directoryPath.stream(), Stream.of(fileId)))
+        .toArray(String[]::new));
+
     List<TransactionalModelOperationLog> operationLogs = operationRegistry.registerOperationForFile(aipId,
       representationId, directoryPath, fileId, OperationType.CREATE);
     try {
@@ -1013,6 +1036,11 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     String dirName, String createdBy, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+
+    operationRegistry.checkIfEntityExistsAndThrowException(File.class,
+      Stream.concat(Stream.of(aipId, representationId), Stream.concat(directoryPath.stream(), Stream.of(fileId)))
+        .toArray(String[]::new));
+
     List<TransactionalModelOperationLog> operationLogs = operationRegistry.registerOperationForFile(aipId,
       representationId, directoryPath, fileId, dirName, OperationType.CREATE);
     try {
