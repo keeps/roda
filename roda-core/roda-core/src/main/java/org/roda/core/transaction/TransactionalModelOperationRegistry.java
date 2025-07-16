@@ -541,13 +541,33 @@ public class TransactionalModelOperationRegistry {
 
   public <T extends IsRODAObject> void checkIfEntityExistsAndThrowException(Class<T> objectClass, String... ids)
     throws AlreadyExistsException, RequestNotValidException, GenericException {
+    // Filter out null IDs
     String[] filteredIds = Arrays.stream(ids).filter(Objects::nonNull).toArray(String[]::new);
+
+    // Try to get a LiteRODAObject based on the provided IDs
     Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, filteredIds);
-    if (liteRODAObject.isPresent()) {
-      if (mainModelService.existsInStorage(liteRODAObject.get())) {
-        throw new AlreadyExistsException("[transactionId:" + transaction.getId() + "] Entity '" + liteRODAObject.get()
-          + "' already exists in the storage");
+    if (liteRODAObject.isEmpty()) {
+      throw new RequestNotValidException("[transactionId:" + transaction.getId() + "] Could not get LITE for class "
+        + objectClass.getName() + " with IDs: " + Arrays.toString(filteredIds));
+    }
+
+    // Check if the object already exists in storage
+    if (!mainModelService.existsInStorage(liteRODAObject.get())) {
+      return; // No conflict if it doesn't exist
+    }
+
+    try {
+      // Check if the object was deleted in the current transaction
+      if (transactionLogService.getAnyDeletedModelOperation(transaction.getId(),
+        liteRODAObject.get().getInfo()) != null) {
+        return;
       }
+      // If the object wasn't deleted in the current transaction, throw an exception
+      throw new AlreadyExistsException("[transactionId:" + transaction.getId() + "] Entity '" + liteRODAObject.get()
+        + "' already exists in the storage");
+
+    } catch (RODATransactionException e) {
+      throw new RequestNotValidException("Unable to check if entity was deleted in the transaction", e);
     }
   }
 }
