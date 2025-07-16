@@ -23,6 +23,7 @@ import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
+import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -383,6 +384,10 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
                   }
                 } else if (selected instanceof SelectedItemsFilter && parentAipId != null) {
                   filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, parentAipId));
+                }
+
+                if (filter.getParameters().isEmpty()) {
+                  filter.add(new AllFilterParameter());
                 }
 
                 SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive);
