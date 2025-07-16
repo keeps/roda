@@ -1389,13 +1389,7 @@ public class AIPController implements AIPRestService, Exportable {
         IndexedAIP aip = requestContext.getIndexService().retrieve(IndexedAIP.class, aipId,
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
-
-        // check state
-        controllerAssistant.checkAIPState(aip);
-
-        // check if AIP is in a disposal confirmation
-        controllerAssistant.checkIfAIPIsUnderADisposalPolicy(aip);
-
+        
         // delegate
         return requestContext.getModelService().retrieveAIP(aipId);
       }
