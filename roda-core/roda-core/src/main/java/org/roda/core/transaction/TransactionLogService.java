@@ -121,6 +121,15 @@ public class TransactionLogService {
     return transactionalModelOperationLogRepository.findByTransactionLogOrderByUpdatedAt(transactionLog);
   }
 
+  public TransactionalModelOperationLog getAnyDeletedModelOperation(UUID transactionId, String liteObject)
+    throws RODATransactionException {
+    TransactionLog transactionLog = getTransactionLogById(transactionId, false);
+    List<TransactionalModelOperationLog> result = transactionalModelOperationLogRepository
+      .findAnyByTransactionLogAndLiteObjectAndOperationType(transactionLog, OperationState.SUCCESS, liteObject,
+        OperationType.DELETE, PageRequest.of(0, 1));
+    return result.isEmpty() ? null : result.getFirst();
+  }
+
   /*
    * transactionalStoragePathRepository
    */
