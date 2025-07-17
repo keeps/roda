@@ -9,6 +9,7 @@ package org.roda.core.common.notifications;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
         templateStream = RodaCoreFactory.getConfigurationFileAsStream(templateCompletePath);
       }
 
-      String template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+      String template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
       IOUtils.closeQuietly(templateStream);
 
       if (!scope.containsKey(FROM)) {

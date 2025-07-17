@@ -10,6 +10,7 @@ package org.roda.core.data.v2.ip;
 import java.io.Serial;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +56,7 @@ public class IndexedFile
   private List<String> ancestors;
   private Map<String, List<String>> otherProperties;
 
-  private Map<String, Object> fields;
+  private Map<String, Object> fields = new HashMap<>();
 
   private String instanceId;
   private String instanceName = null;
@@ -305,7 +306,8 @@ public class IndexedFile
   }
 
   public void setFields(Map<String, Object> fields) {
-    this.fields = fields;
+    fields.entrySet().stream().filter(p -> p.getValue() != null)
+      .forEach(e -> this.fields.put(e.getKey(), e.getValue()));
   }
 
   public String getInstanceId() {
