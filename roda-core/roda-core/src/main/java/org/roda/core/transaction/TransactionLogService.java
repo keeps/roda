@@ -47,11 +47,13 @@ public class TransactionLogService {
    */
 
   public List<TransactionLog> getUnfinishedTransactions() {
-    return transactionLogRepository.findByStatusOrderByCreatedAt(TransactionLog.TransactionStatus.PENDING);
+    return transactionLogRepository.findAllByStatusInOrderByCreatedAt(
+      List.of(TransactionLog.TransactionStatus.PENDING, TransactionLog.TransactionStatus.COMMITTING));
   }
 
   public List<TransactionLog> getCommittedTransactions() {
-    return transactionLogRepository.findByStatusOrderByCreatedAt(TransactionLog.TransactionStatus.COMMITTED);
+    return transactionLogRepository
+      .findAllByStatusInOrderByCreatedAt(List.of(TransactionLog.TransactionStatus.COMMITTED));
   }
 
   @Transactional
@@ -147,14 +149,15 @@ public class TransactionLogService {
 
   @Transactional
   public TransactionalStoragePathOperationLog registerStoragePathOperation(UUID transactionId, String storagePath,
-    OperationType operation, String version) throws RODATransactionException {
+    OperationType operation, String previousVersion, String version) throws RODATransactionException {
     if (operation == OperationType.READ) {
       // TODO: add a configuration to allow logging the read operation for debugging
       // purposes
       return null;
     }
     TransactionLog transactionLog = getTransactionLogById(transactionId, false);
-    TransactionalStoragePathOperationLog operationLog = transactionLog.addStoragePath(storagePath, operation, version);
+    TransactionalStoragePathOperationLog operationLog = transactionLog.addStoragePath(storagePath, operation,
+      previousVersion, version);
     operationLog.setTransactionLog(transactionLog);
     return transactionalStoragePathRepository.save(operationLog);
   }
@@ -163,6 +166,16 @@ public class TransactionLogService {
   public void updateStoragePathOperationState(UUID operationId, OperationState state) throws RODATransactionException {
     TransactionalStoragePathOperationLog operationLog = getTransactionalStoragePathOperationLogById(operationId);
     operationLog.setOperationState(state);
+    transactionalStoragePathRepository.save(operationLog);
+  }
+
+  @Transactional
+  public void updateStoragePathOperationState(UUID operationId, OperationState state, String previousVersionID,
+    String version) throws RODATransactionException {
+    TransactionalStoragePathOperationLog operationLog = getTransactionalStoragePathOperationLogById(operationId);
+    operationLog.setOperationState(state);
+    operationLog.setPreviousVersion(previousVersionID);
+    operationLog.setVersion(version);
     transactionalStoragePathRepository.save(operationLog);
   }
 
@@ -205,12 +218,12 @@ public class TransactionLogService {
 
   @Transactional
   public List<TransactionStoragePathConsolidatedOperation> registerConsolidatedStoragePathOperations(
-    TransactionLog transaction, String storagePathAsString, String storagePathVersion,
-    List<ConsolidatedOperation> consolidatedOperations) {
+    TransactionLog transaction, String storagePathAsString, String storagePathPreviousVersion,
+    String storagePathVersion, List<ConsolidatedOperation> consolidatedOperations) {
     List<TransactionStoragePathConsolidatedOperation> databaseOperations = new ArrayList<>();
     for (ConsolidatedOperation operation : consolidatedOperations) {
       TransactionStoragePathConsolidatedOperation databaseOperation = new TransactionStoragePathConsolidatedOperation(
-        transaction, storagePathAsString, storagePathVersion, operation.operationType());
+        transaction, storagePathAsString, storagePathPreviousVersion, storagePathVersion, operation.operationType());
       databaseOperations.add(databaseOperation);
       transactionStoragePathConsolidatedOperationsRepository.save(databaseOperation);
     }
@@ -221,6 +234,14 @@ public class TransactionLogService {
   public void updateConsolidatedStoragePathOperationState(TransactionStoragePathConsolidatedOperation operation,
     OperationState state) {
     operation.setOperationState(state);
+    transactionStoragePathConsolidatedOperationsRepository.save(operation);
+  }
+
+  @Transactional
+  public void updateConsolidatedStoragePathOperationState(TransactionStoragePathConsolidatedOperation operation,
+    OperationState state, String previousVersionID) {
+    operation.setOperationState(state);
+    operation.setPreviousVersion(previousVersionID);
     transactionStoragePathConsolidatedOperationsRepository.save(operation);
   }
 
