@@ -11,22 +11,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.migration.MigrationAction;
-import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StringContentPayload;
-import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +65,8 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
         StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromNode(obj));
         boolean asReference = false;
         boolean createIfNotExists = false;
-        model.updateBinaryContent(risk, payload, asReference, createIfNotExists);
+        boolean snapshotCurrentVersion = false;
+        model.updateBinaryContent(risk, payload, asReference, createIfNotExists, snapshotCurrentVersion);
       } else {
         LOGGER.error("Could not migrate risk {} because the JSON is not an object node", binary.getStoragePath());
       }

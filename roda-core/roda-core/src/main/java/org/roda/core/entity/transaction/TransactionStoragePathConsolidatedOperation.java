@@ -38,6 +38,9 @@ public class TransactionStoragePathConsolidatedOperation implements Serializable
   @Column(name = "storage_path", nullable = false, columnDefinition = "text")
   private String storagePath;
 
+  @Column(name = "previous_version")
+  private String previousVersion;
+
   @Column(name = "version")
   private String version;
 
@@ -58,12 +61,13 @@ public class TransactionStoragePathConsolidatedOperation implements Serializable
   public TransactionStoragePathConsolidatedOperation() {
   }
 
-  public TransactionStoragePathConsolidatedOperation(TransactionLog transaction, String storagePath, String version,
-    OperationType operationType) {
+  public TransactionStoragePathConsolidatedOperation(TransactionLog transaction, String storagePath,
+    String previousVersion, String version, OperationType operationType) {
     this.transactionLog = transaction;
     this.storagePath = storagePath;
     this.operationType = operationType;
     this.operationState = OperationState.PENDING;
+    this.previousVersion = previousVersion;
     this.version = version;
     this.createdAt = LocalDateTime.now();
     this.updatedAt = LocalDateTime.now();
@@ -89,6 +93,10 @@ public class TransactionStoragePathConsolidatedOperation implements Serializable
     return version;
   }
 
+  public String getPreviousVersion() {
+    return previousVersion;
+  }
+
   public LocalDateTime getCreatedAt() {
     return createdAt;
   }
@@ -104,6 +112,11 @@ public class TransactionStoragePathConsolidatedOperation implements Serializable
   public void setOperationState(OperationState operationState) {
     this.updatedAt = LocalDateTime.now();
     this.operationState = operationState;
+  }
+
+  public void setPreviousVersion(String previousVersion) {
+    this.updatedAt = LocalDateTime.now();
+    this.previousVersion = previousVersion;
   }
 
   @Override

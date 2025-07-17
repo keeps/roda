@@ -17,8 +17,6 @@ public interface BinaryVersion extends Serializable {
 
   String getId();
 
-  Map<String, String> getProperties();
-
   Date getCreatedDate();
 
 }

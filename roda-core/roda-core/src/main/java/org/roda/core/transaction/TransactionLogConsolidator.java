@@ -71,6 +71,7 @@ public class TransactionLogConsolidator {
       if (log.getOperationState() == OperationState.SUCCESS) {
         OperationType operationType = log.getOperationType();
         String version = log.getVersion();
+        String previousVersionId = log.getPreviousVersion();
         LocalDateTime updatedAt = log.getUpdatedAt();
 
         DefaultStoragePath storagePath = DefaultStoragePath
@@ -79,7 +80,7 @@ public class TransactionLogConsolidator {
 
         StoragePathVersion storagePathVersion = new StoragePathVersion(storagePath, version);
         map.computeIfAbsent(storagePathVersion, k -> new ArrayList<>())
-          .add(new ConsolidatedOperation(operationType, updatedAt));
+          .add(new ConsolidatedOperation(operationType, updatedAt, previousVersionId));
       }
     }
     return map;
@@ -128,13 +129,14 @@ public class TransactionLogConsolidator {
     for (ConsolidatedOperation consolidatedOperation : consolidatedOperations) {
       OperationType op = consolidatedOperation.operationType();
       LocalDateTime updatedAt = consolidatedOperation.updatedAt();
+      String previousVersion = consolidatedOperation.previousVersionId();
       switch (op) {
         case READ:
           break;
 
         case CREATE:
           if (result.isEmpty() || result.getLast().operationType() != OperationType.CREATE) {
-            result.add(new ConsolidatedOperation(OperationType.CREATE, updatedAt));
+            result.add(new ConsolidatedOperation(OperationType.CREATE, updatedAt, null));
           }
           break;
 
@@ -145,24 +147,27 @@ public class TransactionLogConsolidator {
               break;
             }
           }
-          result.add(new ConsolidatedOperation(OperationType.UPDATE, updatedAt));
+          result.add(new ConsolidatedOperation(OperationType.UPDATE, updatedAt, previousVersion));
           break;
 
         case CREATE_OR_UPDATE:
           if (result.isEmpty()) {
-            result.add(new ConsolidatedOperation(OperationType.CREATE_OR_UPDATE, updatedAt));
+            result.add(new ConsolidatedOperation(OperationType.CREATE_OR_UPDATE, updatedAt, previousVersion));
           } else {
             OperationType last = result.getLast().operationType();
             if (last == OperationType.CREATE || last == OperationType.UPDATE
               || last == OperationType.CREATE_OR_UPDATE) {
+              if (result.getLast().previousVersionId() != null) {
+                previousVersion = result.getLast().previousVersionId();
+              }
               result.removeLast();
             }
-            result.add(new ConsolidatedOperation(OperationType.CREATE_OR_UPDATE, updatedAt));
+            result.add(new ConsolidatedOperation(OperationType.CREATE_OR_UPDATE, updatedAt, previousVersion));
           }
           break;
 
         case DELETE:
-          result.add(new ConsolidatedOperation(OperationType.DELETE, updatedAt));
+          result.add(new ConsolidatedOperation(OperationType.DELETE, updatedAt, null));
           break;
       }
     }
@@ -170,9 +175,15 @@ public class TransactionLogConsolidator {
     for (int i = 0; i < result.size() - 1;) {
       OperationType curr = result.get(i).operationType();
       OperationType next = result.get(i + 1).operationType();
+      String currPreviousVersion = result.get(i).previousVersionId();
 
       if (curr == OperationType.UPDATE && next == OperationType.UPDATE) {
         result.remove(i);
+        if (currPreviousVersion != null) {
+          result.add(i,
+            new ConsolidatedOperation(OperationType.UPDATE, result.get(i).updatedAt(), currPreviousVersion));
+          result.remove(i + 1);
+        }
         continue;
       }
 
@@ -196,6 +207,11 @@ public class TransactionLogConsolidator {
 
       if (curr == OperationType.CREATE_OR_UPDATE && next == OperationType.CREATE_OR_UPDATE) {
         result.remove(i);
+        if (currPreviousVersion != null) {
+          result.remove(i);
+          result.add(i,
+            new ConsolidatedOperation(OperationType.UPDATE, result.get(i).updatedAt(), currPreviousVersion));
+        }
         continue;
       }
 

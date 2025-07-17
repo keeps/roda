@@ -251,8 +251,7 @@ public class AIPService {
 
       for (DescriptiveMetadata descriptiveMetadata : orderedMetadata) {
         DescriptiveMetadataInfo dmis = retrieveDescriptiveMetadataInfo(model, aipId, representationId,
-          descriptiveMetadata,
-          locale);
+          descriptiveMetadata, locale);
 
         descriptiveMetadataList.add(dmis);
       }
@@ -287,8 +286,7 @@ public class AIPService {
   }
 
   private DescriptiveMetadataInfo retrieveDescriptiveMetadataInfo(ModelService model, String aipId,
-    String representationId,
-    DescriptiveMetadata descriptiveMetadata, final Locale locale) {
+    String representationId, DescriptiveMetadata descriptiveMetadata, final Locale locale) {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     DescriptiveMetadataInfo metadataInfo = new DescriptiveMetadataInfo();
     metadataInfo.setId(descriptiveMetadata.getId());
@@ -387,8 +385,7 @@ public class AIPService {
   }
 
   public DescriptiveMetadata revertDescriptiveMetadataVersion(RequestContext context, String aipId,
-    String representationId,
-    String descriptiveMetadataId, String versionId)
+    String representationId, String descriptiveMetadataId, String versionId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
 
     Map<String, String> properties = new HashMap<>();
@@ -398,8 +395,7 @@ public class AIPService {
     context.getModelService().revertDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId,
       versionId, properties);
 
-    return context.getModelService().retrieveDescriptiveMetadata(aipId, representationId,
-      descriptiveMetadataId);
+    return context.getModelService().retrieveDescriptiveMetadata(aipId, representationId, descriptiveMetadataId);
   }
 
   public DescriptiveMetadata revertDescriptiveMetadataVersion(RequestContext requestContext, String aipId,
@@ -540,8 +536,8 @@ public class AIPService {
         descriptiveMetadataId + XML_EXT)) {
         template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         String representationId = representation != null ? representation.getId() : null;
-        Binary binary = context.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(),
-          representationId, descriptiveMetadataId + XML_EXT);
+        Binary binary = context.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), representationId,
+          descriptiveMetadataId + XML_EXT);
         String xml = IOUtils.toString(binary.getContent().createInputStream(), StandardCharsets.UTF_8);
 
         Set<MetadataValue> result = getMetadataValuesFromDescriptiveMetadataFile(template, xml);
@@ -550,8 +546,7 @@ public class AIPService {
       } else {
         template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         Set<MetadataValue> result = getDefaultDescriptiveMetadataValues(template, aip, representation,
-          context.getUser(), locale,
-          messages);
+          context.getUser(), locale, messages);
         return new SupportedMetadataValue(result);
       }
     } catch (IOException e) {
@@ -562,12 +557,10 @@ public class AIPService {
   }
 
   private boolean checkIfDescriptiveMetadataExists(ModelService model, IndexedAIP aip,
-    IndexedRepresentation representation,
-    String descriptiveMetadataId)
+    IndexedRepresentation representation, String descriptiveMetadataId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     if (representation != null) {
-      Representation modelRepresentation = model.retrieveRepresentation(aip.getId(),
-        representation.getId());
+      Representation modelRepresentation = model.retrieveRepresentation(aip.getId(), representation.getId());
       if (!modelRepresentation.getDescriptiveMetadata().isEmpty()) {
         return modelRepresentation.getDescriptiveMetadata().stream()
           .anyMatch(dm -> dm.getId().equals(descriptiveMetadataId));
@@ -777,14 +770,12 @@ public class AIPService {
     DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aip.getId(), representationId,
       metadataId);
     DescriptiveMetadataInfo descriptiveMetadataInfo = retrieveDescriptiveMetadataInfo(model, aip.getId(),
-      representationId,
-      descriptiveMetadata, locale);
+      representationId, descriptiveMetadata, locale);
 
     try (CloseableIterable<BinaryVersion> binaryVersions = listDescriptiveMetadataVersions(model, aip.getId(),
       representationId, metadataId)) {
       for (BinaryVersion binaryVersion : binaryVersions) {
-        versionResponses.add(
-          new ResourceVersion(binaryVersion.getId(), binaryVersion.getCreatedDate(), binaryVersion.getProperties()));
+        versionResponses.add(new ResourceVersion(binaryVersion.getId(), binaryVersion.getCreatedDate()));
       }
     } catch (IOException e) {
       throw new GenericException(e);
@@ -825,8 +816,7 @@ public class AIPService {
   }
 
   private CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(ModelService model, String aipId,
-    String representationId,
-    String descriptiveMetadataId)
+    String representationId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Optional<LiteRODAObject> liteDM = LiteRODAObjectFactory.get(DescriptiveMetadata.class, aipId, representationId,
       descriptiveMetadataId);

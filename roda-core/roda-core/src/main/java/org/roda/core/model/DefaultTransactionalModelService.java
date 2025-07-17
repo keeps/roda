@@ -3707,11 +3707,12 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public Binary updateBinaryContent(IsRODAObject object, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists)
+    boolean createIfNotExists, boolean snapshotCurrentVersion)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     TransactionalModelOperationLog operationLog = operationRegistry.registerOperation(object, OperationType.UPDATE);
     try {
-      Binary ret = getModelService().updateBinaryContent(object, payload, asReference, createIfNotExists);
+      Binary ret = getModelService().updateBinaryContent(object, payload, asReference, createIfNotExists,
+        snapshotCurrentVersion);
       operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
       return ret;
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
@@ -3722,12 +3723,13 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public Binary updateBinaryContent(LiteRODAObject lite, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists)
+    boolean createIfNotExists, boolean snapshotCurrentVersion)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     TransactionalModelOperationLog operationLog = operationRegistry.registerOperation(lite.getInfo(),
       OperationType.UPDATE);
     try {
-      Binary ret = getModelService().updateBinaryContent(lite, payload, asReference, createIfNotExists);
+      Binary ret = getModelService().updateBinaryContent(lite, payload, asReference, createIfNotExists,
+        snapshotCurrentVersion);
       operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
       return ret;
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
