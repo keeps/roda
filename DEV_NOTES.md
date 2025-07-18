@@ -53,6 +53,28 @@ mvn -f dev/codeserver gwt:codeserver -DrodaPath=$(pwd)
 
 Optional: Check Google Chrome "RemoteLiveReload" extension for automatic reloading with spring boot.
 
+To debug Portal:
+```bash
+# If never GWT compiled before, compile once and copy gwt.rpc files
+mvn -pl roda-ui/roda-wui -am gwt:compile -Pdebug-portal -Dscope.gwt-dev=compile
+./roda-ui/roda-wui/copy_gwt_rpc.sh
+
+mvn install -Pcore -DskipTests
+
+# Start up dependencies (Solr, Zookeeper, Siegfried, ClamAV)
+mkdir -p $HOME/.roda/data/storage
+docker compose -f deploys/standalone/docker-compose-dev.yaml up -d
+
+# Open WUI in Spring boot
+mvn -pl roda-ui/roda-wui -am spring-boot:run -Pdebug-portal
+
+# Open codeserver
+mvn -f dev/codeserver gwt:codeserver -Pdebug-portal -DrodaPath=$(pwd)
+
+# Open codeserver http://127.0.0.1:9876/ and add bookmarks
+# Open RODA http://localhost:8080/Portal.html and click the "Dev Mode On" bookmark
+```
+
 ## Build local docker image
 
 ```bash

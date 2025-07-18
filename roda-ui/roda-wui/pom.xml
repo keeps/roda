@@ -252,24 +252,47 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${springboot.version}</version>
                         <configuration>
+                            <environmentVariables>
+                                <SIEGFRIED_MODE>server</SIEGFRIED_MODE>
+                                <SIEGFRIED_SERVER_URL>http://localhost:5138</SIEGFRIED_SERVER_URL>
+                                <JDK_JAVA_OPTIONS>--add-opens java.base/java.util=ALL-UNNAMED</JDK_JAVA_OPTIONS>
+                            </environmentVariables>
                             <skip>false</skip>
+                            <additionalClasspathElements>
+                                <additionalClasspathElement>
+                                    ${project.build.directory}/${project.build.finalName}
+                                </additionalClasspathElement>
+                            </additionalClasspathElements>
                             <jvmArguments>
                                 -Dgwt.codeServerPort=9876 -Xdebug
+                                <!-- Remove after upgrade to spring-boot 3-->
+                                -Dorg.springframework.boot.logging.LoggingSystem=none
+                                <!-- Remove -->
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
+                                -Droda.environment.collect.version=false
+                                --add-opens java.base/java.util=ALL-UNNAMED
+                                --add-opens java.base/java.lang=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
                     </plugin>
                     <plugin>
                         <groupId>net.ltgt.gwt.maven</groupId>
                         <artifactId>gwt-maven-plugin</artifactId>
+                        <version>1.0.1</version>
                         <extensions>true</extensions>
                         <configuration>
                             <moduleName>${gwt.module.portal}</moduleName>
                             <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
-
+                            <classpathScope>test</classpathScope>
                             <skipCompilation>false</skipCompilation>
                             <draftCompile>true</draftCompile>
                             <style>PRETTY</style>
+                            <forceCompilation>true</forceCompilation>
+                            <environmentVariables>
+                                <JDK_JAVA_OPTIONS>
+                                    --add-opens java.base/java.util=ALL-UNNAMED
+                                </JDK_JAVA_OPTIONS>
+                            </environmentVariables>
                         </configuration>
                         <executions>
                             <execution>
@@ -279,10 +302,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>pl.project13.maven</groupId>
-                        <artifactId>git-commit-id-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>

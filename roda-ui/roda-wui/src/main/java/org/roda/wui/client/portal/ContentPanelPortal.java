@@ -69,6 +69,8 @@ public class ContentPanelPortal extends SimplePanel {
     resolvers.add(Theme.RESOLVER);
     // Browse
     resolvers.add(BrowseAIPPortal.RESOLVER);
+    // DIP
+    resolvers.add(BrowseDIPPortal.RESOLVER);
     // Search
     resolvers.add(SearchPortal.RESOLVER);
     // UUID resolver
