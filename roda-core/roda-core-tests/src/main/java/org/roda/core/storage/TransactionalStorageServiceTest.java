@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import jakarta.transaction.TransactionalException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
@@ -29,6 +28,7 @@ import org.roda.core.TestsHelper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
@@ -634,7 +634,8 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     mainStorage.createBinary(binaryStoragePath, payload, false);
 
     // 2.2) create a second binary with main storage
-    final StoragePath binaryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final StoragePath binaryStoragePath2 = StorageTestUtils
+      .generateRandomResourceStoragePathUnder(containerStoragePath);
     final ContentPayload payload2 = new RandomMockContentPayload();
     mainStorage.createBinary(binaryStoragePath2, payload2, false);
 
@@ -690,7 +691,8 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     mainStorage.createBinary(binaryStoragePath, payload, false);
 
     // 2.2) create a second binary with main storage
-    final StoragePath binaryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
+    final StoragePath binaryStoragePath2 = StorageTestUtils
+      .generateRandomResourceStoragePathUnder(directoryStoragePath);
     final ContentPayload payload2 = new RandomMockContentPayload();
     mainStorage.createBinary(binaryStoragePath2, payload2, false);
 
@@ -713,7 +715,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     // 4.3) list resources using same transaction from delete
     resources = storage2.listResourcesUnderDirectory(directoryStoragePath, false);
     for (Resource resource1 : resources) {
-        LOGGER.info("Resource: {}", resource1.getStoragePath());
+      LOGGER.info("Resource: {}", resource1.getStoragePath());
     }
     try {
       // 4.4) assert that there isn't a resource
@@ -1083,7 +1085,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     StorageService storage4 = context4.transactionalStorageService();
     // 4.2) update binary content
     final ContentPayload newPayload = new RandomMockContentPayload();
-    final Binary binaryUpdated = storage4.updateBinaryContent(binaryStoragePath, newPayload, false, false);
+    final Binary binaryUpdated = storage4.updateBinaryContent(binaryStoragePath, newPayload, false, false, false);
     // 4.3) end fourth transaction
     transactionManager.endTransaction(context4.transactionLog().getId());
     // 4.4) assert that the binary was updated
@@ -1122,7 +1124,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     final ContentPayload payload = new RandomMockContentPayload();
     final boolean asReference = false;
     try {
-      storage2.updateBinaryContent(binaryStoragePath, payload, asReference, false);
+      storage2.updateBinaryContent(binaryStoragePath, payload, asReference, false, false);
       Assert.fail("An exception should have been thrown while updating a binary that doesn't exist");
     } catch (NotFoundException e) {
       LOGGER.info("Caught expected exception: {}", e.getMessage());
@@ -1134,7 +1136,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     TransactionalContext context3 = transactionManager.beginTestTransaction(mainStorage);
     StorageService storage3 = context3.transactionalStorageService();
     // 3.2) update binary content now with createIfNotExists=true
-    Binary updatedBinaryContent = storage3.updateBinaryContent(binaryStoragePath, payload, asReference, true);
+    Binary updatedBinaryContent = storage3.updateBinaryContent(binaryStoragePath, payload, asReference, true, false);
     // 3.3) end third transaction
     transactionManager.endTransaction(context3.transactionLog().getId());
     // 3.4) assert that the binary content is valid
@@ -1737,42 +1739,14 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     // 2.3) end second transaction
     transactionManager.endTransaction(context2.transactionLog().getId());
 
-    // 3.1) start third transaction
-    TransactionalContext context3 = transactionManager.beginTestTransaction(mainStorage);
-    StorageService storage3 = context3.transactionalStorageService();
-    // 3.2) create binary version
-    String message1 = "v1";
-    properties.put(RodaConstants.VERSION_MESSAGE, message1);
-    BinaryVersion v1 = storage3.createBinaryVersion(binaryStoragePath, properties);
-    // 3.3) end third transaction
-    transactionManager.endTransaction(context3.transactionLog().getId());
-
     // 4.1) start fourth transaction
     TransactionalContext context4 = transactionManager.beginTestTransaction(mainStorage);
     StorageService storage4 = context4.transactionalStorageService();
     // 4.2) update binary
     final ContentPayload payload2 = new RandomMockContentPayload();
-    storage4.updateBinaryContent(binaryStoragePath, payload2, false, false);
+    storage4.updateBinaryContent(binaryStoragePath, payload2, false, false, true);
     // 4.3) end fourth transaction
     transactionManager.endTransaction(context4.transactionLog().getId());
-
-    // 5.1) start fifth transaction
-    TransactionalContext context5 = transactionManager.beginTestTransaction(mainStorage);
-    StorageService storage5 = context5.transactionalStorageService();
-    // 5.2) create binary version 2
-    String message2 = "v2";
-    properties.put(RodaConstants.VERSION_MESSAGE, message2);
-    storage5.createBinaryVersion(binaryStoragePath, properties);
-    // 5.3) end fifth transaction
-    transactionManager.endTransaction(context5.transactionLog().getId());
-
-    // 6.1) start sixth transaction
-    TransactionalContext context6 = transactionManager.beginTestTransaction(mainStorage);
-    StorageService storage6 = context6.transactionalStorageService();
-    // 6.2) create a version with a message that already exists
-    storage6.createBinaryVersion(binaryStoragePath, properties);
-    // 6.3) end sixth transaction
-    transactionManager.endTransaction(context6.transactionLog().getId());
 
     // 7.1) start seventh transaction
     TransactionalContext context7 = transactionManager.beginTestTransaction(mainStorage);
@@ -1785,18 +1759,11 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     // 7.3) end seventh transaction
     transactionManager.endTransaction(context7.transactionLog().getId());
     // 7.4) test binary versions total
-    assertEquals(3, reusableBinaryVersions.size());
+    assertEquals(1, reusableBinaryVersions.size());
 
-    // 8.1) start eighth transaction
-    TransactionalContext context8 = transactionManager.beginTestTransaction(mainStorage);
-    StorageService storage8 = context8.transactionalStorageService();
     // 8.2) get binary version
-    BinaryVersion binaryVersion1 = storage8.getBinaryVersion(binaryStoragePath, v1.getId());
-    // 8.3) end eighth transaction
-    transactionManager.endTransaction(context8.transactionLog().getId());
+    BinaryVersion binaryVersion1 = reusableBinaryVersions.getFirst();
     // 8.4) asserts
-    // TODO compare properties
-    assertEquals(message1, binaryVersion1.getProperties().get(RodaConstants.VERSION_MESSAGE));
     assertNotNull(binaryVersion1.getCreatedDate());
     assertTrue(
       IOUtils.contentEquals(payload1.createInputStream(), binaryVersion1.getBinary().getContent().createInputStream()));
@@ -1805,7 +1772,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     TransactionalContext context9 = transactionManager.beginTestTransaction(mainStorage);
     StorageService storage9 = context9.transactionalStorageService();
     // 9.2) revert to previous version
-    storage9.revertBinaryVersion(binaryStoragePath, v1.getId());
+    storage9.revertBinaryVersion(binaryStoragePath, binaryVersion1.getId());
     // 9.3) end ninth transaction
     transactionManager.endTransaction(context9.transactionLog().getId());
 
@@ -1823,7 +1790,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     TransactionalContext context11 = transactionManager.beginTestTransaction(mainStorage);
     StorageService storage11 = context11.transactionalStorageService();
     // 11.2) delete binary version
-    storage11.deleteBinaryVersion(binaryStoragePath, v1.getId());
+    storage11.deleteBinaryVersion(binaryStoragePath, binaryVersion1.getId());
     // 11.3) end eleventh transaction
     transactionManager.endTransaction(context11.transactionLog().getId());
 
@@ -1832,7 +1799,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     StorageService storage12 = context12.transactionalStorageService();
     try {
       // 12.2) try to get deleted binary version
-      storage12.getBinaryVersion(binaryStoragePath, v1.getId());
+      storage12.getBinaryVersion(binaryStoragePath, binaryVersion1.getId());
       Assert.fail("Should have thrown NotFoundException");
     } catch (NotFoundException e) {
       LOGGER.info("Caught expected exception: {}", e.getMessage());
@@ -1853,7 +1820,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     StorageService storage14 = context14.transactionalStorageService();
     try {
       // 14.2) try to get deleted binary
-      storage14.getBinaryVersion(binaryStoragePath, v1.getId());
+      storage14.getBinaryVersion(binaryStoragePath, binaryVersion1.getId());
       Assert.fail("Should have thrown NotFoundException");
     } catch (NotFoundException e) {
       LOGGER.info("Caught expected exception: {}", e.getMessage());
@@ -1868,5 +1835,108 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     storage15.deleteContainer(containerStoragePath);
     // 15.3) end fifteenth transaction
     transactionManager.endTransaction(context15.transactionLog().getId());
+  }
+
+  @Test
+  public void testCreateRollback() throws RODATransactionException, AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, GenericException, NotFoundException, IOException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) create a random file
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload1 = new RandomMockContentPayload();
+    storage1.createBinary(binaryStoragePath, payload1, false);
+    // 1.4) commit first transaction
+    transactionManager.commitTestTransactionWithoutRemoving(context1.transactionLog().getId());
+    // 1.5) rollback first transaction
+    transactionManager.rollbackTransaction(context1.transactionLog().getId());
+    // 3.1) start second transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage2 = context2.transactionalStorageService();
+    // 3.2) test that the container doesn't exist
+    try (CloseableIterable<Container> containers = storage2.listContainers()) {
+      assertFalse(containers.iterator().hasNext());
+    }
+    // 3.3) end second transaction
+    transactionManager.endTransaction(context2.transactionLog().getId());
+  }
+
+  @Test
+  public void testUpdateRollback() throws RODATransactionException, RequestNotValidException,
+    AuthorizationDeniedException, AlreadyExistsException, GenericException, NotFoundException, IOException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) create a random file
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload1 = new RandomMockContentPayload();
+    storage1.createBinary(binaryStoragePath, payload1, false);
+    // 1.4) end first transaction
+    transactionManager.endTransaction(context1.transactionLog().getId());
+
+    // 2.1) start second transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage2 = context2.transactionalStorageService();
+    // 2.2) update the binary
+    final ContentPayload payload2 = new RandomMockContentPayload();
+    Binary updatedBinary = storage2.updateBinaryContent(binaryStoragePath, payload2, false, false, true);
+    // 2.3) commit second transaction
+    transactionManager.commitTestTransactionWithoutRemoving(context2.transactionLog().getId());
+    // 2.4) check that the binary was updated
+    testBinaryContent(updatedBinary, payload2);
+    // 2.5) rollback second transaction
+    transactionManager.rollbackTransaction(context2.transactionLog().getId());
+    // 2.6) check that the binary was rolled back
+    Binary rolledBackBinary = mainStorage.getBinary(binaryStoragePath);
+    testBinaryContent(rolledBackBinary, payload1);
+  }
+
+  @Test
+  public void testVersioningWithMultipleUpdates() throws RODATransactionException, RequestNotValidException,
+    AuthorizationDeniedException, AlreadyExistsException, GenericException, NotFoundException, IOException {
+    // 1.1) start first transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) create a random file
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload1 = new RandomMockContentPayload();
+    storage1.createBinary(binaryStoragePath, payload1, false);
+    // 1.4) end first transaction
+    transactionManager.endTransaction(context1.transactionLog().getId());
+
+    // 2.1) start second transaction
+    TransactionalContext context2 = transactionManager.beginTestTransaction(mainStorage);
+    StorageService storage2 = context2.transactionalStorageService();
+    // 2.2) update the binary
+    final ContentPayload payload2 = new RandomMockContentPayload();
+    storage2.updateBinaryContent(binaryStoragePath, payload2, false, false, true);
+    // 2.3) update the binary
+    final ContentPayload payload3 = new RandomMockContentPayload();
+    storage2.updateBinaryContent(binaryStoragePath, payload3, false, false, true);
+    // 2.4) commit second transaction
+    transactionManager.commitTestTransactionWithoutRemoving(context2.transactionLog().getId());
+    // 2.5) count binary versions
+    CloseableIterable<BinaryVersion> binaryVersions = mainStorage.listBinaryVersions(binaryStoragePath);
+    List<BinaryVersion> reusableBinaryVersions = new ArrayList<>();
+    binaryVersions.iterator().forEachRemaining(reusableBinaryVersions::add);
+    assertEquals(1, reusableBinaryVersions.size());
+    // 2.5) check that the binary versions have the correct content
+    testBinaryContent(mainStorage.getBinary(binaryStoragePath), payload3);
+    testBinaryContent(reusableBinaryVersions.getFirst().getBinary(), payload1);
+    // 2.6) rollback second transaction
+    transactionManager.rollbackTransaction(context2.transactionLog().getId());
+    // 2.7) check that the binary was rolled back
+    Binary rolledBackBinary = mainStorage.getBinary(binaryStoragePath);
+    testBinaryContent(rolledBackBinary, payload1);
   }
 }

@@ -540,7 +540,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
 
     // 1) update binary content
     final ContentPayload newPayload = new RandomMockContentPayload();
-    final Binary binaryUpdated = getStorage().updateBinaryContent(binaryStoragePath, newPayload, false, false);
+    final Binary binaryUpdated = getStorage().updateBinaryContent(binaryStoragePath, newPayload, false, false, false);
     assertNotNull(binaryUpdated);
 
     try (InputStream stream = Files.newInputStream(original)) {
@@ -564,7 +564,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     final ContentPayload payload = new RandomMockContentPayload();
     final boolean asReference = false;
     try {
-      getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, false);
+      getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, false, false);
       Assert.fail(
         "An exception should have been thrown while updating a binary that doesn't exist but it didn't happened!");
     } catch (NotFoundException e) {
@@ -572,7 +572,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     }
 
     // update binary content now with createIfNotExists=true
-    Binary updatedBinaryContent = getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, true);
+    Binary updatedBinaryContent = getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, true,
+      false);
     testBinaryContent(updatedBinaryContent, payload);
 
     // cleanup
@@ -889,62 +890,48 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     final ContentPayload payload1 = new RandomMockContentPayload();
     getStorage().createBinary(binaryStoragePath, payload1, false);
 
-    // 2) create binary version
-    String message1 = "v1";
-    properties.put(RodaConstants.VERSION_MESSAGE, message1);
-    BinaryVersion v1 = getStorage().createBinaryVersion(binaryStoragePath, properties);
-
-    // 3) update binary
+    // 2) update binary
     final ContentPayload payload2 = new RandomMockContentPayload();
-    getStorage().updateBinaryContent(binaryStoragePath, payload2, false, false);
+    getStorage().updateBinaryContent(binaryStoragePath, payload2, false, false, true);
 
-    // 4) create binary version 2
-    String message2 = "v2";
-    properties.put(RodaConstants.VERSION_MESSAGE, message2);
-    getStorage().createBinaryVersion(binaryStoragePath, properties);
-
-    // 5) create a version with a message that already exists
-    getStorage().createBinaryVersion(binaryStoragePath, properties);
-
-    // 6) list binary versions
+    // 3) list binary versions
     CloseableIterable<BinaryVersion> binaryVersions = getStorage().listBinaryVersions(binaryStoragePath);
     List<BinaryVersion> reusableBinaryVersions = new ArrayList<>();
     // Iterables.addAll(reusableBinaryVersions, binaryVersions);
 
     binaryVersions.forEach(reusableBinaryVersions::add);
 
-    assertEquals(3, reusableBinaryVersions.size());
+    assertEquals(1, reusableBinaryVersions.size());
 
-    // 7) get binary version
-    BinaryVersion binaryVersion1 = getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
+    // 4) get binary version
+    BinaryVersion binaryVersion1 = reusableBinaryVersions.getFirst();
     // TODO compare properties
-    assertEquals(message1, binaryVersion1.getProperties().get(RodaConstants.VERSION_MESSAGE));
     assertNotNull(binaryVersion1.getCreatedDate());
 
     assertTrue(
       IOUtils.contentEquals(payload1.createInputStream(), binaryVersion1.getBinary().getContent().createInputStream()));
 
-    // 8) revert to previous version
-    getStorage().revertBinaryVersion(binaryStoragePath, v1.getId());
+    // 5) revert to previous version
+    getStorage().revertBinaryVersion(binaryStoragePath, binaryVersion1.getId());
 
     Binary binary = getStorage().getBinary(binaryStoragePath);
     testBinaryContent(binary, payload1);
 
-    // 9) delete binary version
-    getStorage().deleteBinaryVersion(binaryStoragePath, v1.getId());
+    // 6) delete binary version
+    getStorage().deleteBinaryVersion(binaryStoragePath, binaryVersion1.getId());
 
     try {
-      getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
+      getStorage().getBinaryVersion(binaryStoragePath, binaryVersion1.getId());
       Assert.fail("Should have thrown NotFoundException");
     } catch (NotFoundException e) {
       // do nothing
     }
 
-    // 10) delete binary and all its history
+    // 7) delete binary and all its history
     getStorage().deleteResource(binaryStoragePath);
 
     try {
-      getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
+      getStorage().getBinaryVersion(binaryStoragePath, binaryVersion1.getId());
       Assert.fail("Should have thrown NotFoundException");
     } catch (NotFoundException e) {
       // do nothing
@@ -953,5 +940,4 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     // cleanup
     getStorage().deleteContainer(containerStoragePath);
   }
-
 }

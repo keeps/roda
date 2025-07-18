@@ -925,11 +925,11 @@ public interface ModelService extends ModelObservable {
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   Binary updateBinaryContent(IsRODAObject object, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists)
+    boolean createIfNotExists, boolean snapshotCurrentVersion)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   Binary updateBinaryContent(LiteRODAObject lite, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists)
+    boolean createIfNotExists, boolean snapshotCurrentVersion)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   Directory createDirectory(IsRODAObject object, String... pathPartials)

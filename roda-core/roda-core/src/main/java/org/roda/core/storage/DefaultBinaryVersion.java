@@ -8,7 +8,6 @@
 package org.roda.core.storage;
 
 import java.util.Date;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -20,18 +19,16 @@ public class DefaultBinaryVersion implements BinaryVersion {
   private Binary binary;
   private String id;
   private Date createdDate;
-  private Map<String, String> properties;
 
   public DefaultBinaryVersion() {
     super();
   }
 
-  public DefaultBinaryVersion(Binary binary, String id, Date createdDate, Map<String, String> properties) {
+  public DefaultBinaryVersion(Binary binary, String id, Date createdDate) {
     super();
     this.binary = binary;
     this.id = id;
     this.createdDate = createdDate;
-    this.properties = properties;
   }
 
   @Override
@@ -63,16 +60,6 @@ public class DefaultBinaryVersion implements BinaryVersion {
 
   @Override
   public String toString() {
-    return "DefaultBinaryVersion [binary=" + binary + ", id=" + id + ", createdDate=" + createdDate + ", properties="
-      + properties + "]";
-  }
-
-  @Override
-  public Map<String, String> getProperties() {
-    return properties;
-  }
-
-  public void setProperties(Map<String, String> properties) {
-    this.properties = properties;
+    return "DefaultBinaryVersion [binary=" + binary + ", id=" + id + ", createdDate=" + createdDate + "]";
   }
 }

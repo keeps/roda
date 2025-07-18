@@ -90,7 +90,7 @@ public class RiskService {
 
     try (CloseableIterable<BinaryVersion> iterable = model.listBinaryVersions(liteRisk.get())) {
       for (BinaryVersion bv : iterable) {
-        versions.addObject(new ResourceVersion(bv.getId(), bv.getCreatedDate(), bv.getProperties()));
+        versions.addObject(new ResourceVersion(bv.getId(), bv.getCreatedDate()));
       }
     } catch (IOException e) {
       throw new GenericException(e.getMessage() != null ? e.getMessage() : "");

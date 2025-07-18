@@ -301,7 +301,7 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    */
   Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists)
+    boolean createIfNotExists, boolean snapshotCurrentVersion)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException;
 
   /**
@@ -380,10 +380,7 @@ public interface StorageService {
   BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
     throws RequestNotValidException, NotFoundException, GenericException;
 
-  BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
-
-  void revertBinaryVersion(StoragePath storagePath, String version)
+  Binary revertBinaryVersion(StoragePath storagePath, String version)
     throws NotFoundException, RequestNotValidException, GenericException, AuthorizationDeniedException;
 
   void deleteBinaryVersion(StoragePath storagePath, String version)

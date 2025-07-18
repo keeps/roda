@@ -17,12 +17,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 /**
- * @author Gabriel Barros <gbarros@keep.pt>
+ * @author Alexandre Flores <aflores@keep.pt>
  */
 
 @Entity
-@Table(name = "transactional_storage_path_operation_log")
-public class TransactionalStoragePathOperationLog implements Serializable {
+@Table(name = "transactional_storage_path_consolidated_operation")
+public class TransactionStoragePathConsolidatedOperation implements Serializable {
 
   @Serial
   private static final long serialVersionUID = -359012958079838014L;
@@ -58,14 +58,15 @@ public class TransactionalStoragePathOperationLog implements Serializable {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
-  public TransactionalStoragePathOperationLog() {
+  public TransactionStoragePathConsolidatedOperation() {
   }
 
-  public TransactionalStoragePathOperationLog(String storagePath, OperationType operationType, String previousVersion,
-    String version) {
+  public TransactionStoragePathConsolidatedOperation(TransactionLog transaction, String storagePath,
+    String previousVersion, String version, OperationType operationType) {
+    this.transactionLog = transaction;
     this.storagePath = storagePath;
     this.operationType = operationType;
-    this.operationState = OperationState.RUNNING;
+    this.operationState = OperationState.PENDING;
     this.previousVersion = previousVersion;
     this.version = version;
     this.createdAt = LocalDateTime.now();
@@ -88,12 +89,12 @@ public class TransactionalStoragePathOperationLog implements Serializable {
     return operationType;
   }
 
-  public String getPreviousVersion() {
-    return previousVersion;
-  }
-
   public String getVersion() {
     return version;
+  }
+
+  public String getPreviousVersion() {
+    return previousVersion;
   }
 
   public LocalDateTime getCreatedAt() {
@@ -118,18 +119,13 @@ public class TransactionalStoragePathOperationLog implements Serializable {
     this.previousVersion = previousVersion;
   }
 
-  public void setVersion(String version) {
-    this.updatedAt = LocalDateTime.now();
-    this.version = version;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o)
       return true;
     if (o == null || getClass() != o.getClass())
       return false;
-    TransactionalStoragePathOperationLog that = (TransactionalStoragePathOperationLog) o;
+    TransactionStoragePathConsolidatedOperation that = (TransactionStoragePathConsolidatedOperation) o;
     return Objects.equals(id, that.id);
   }
 
