@@ -23,7 +23,6 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
@@ -81,8 +80,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-
-import javax.swing.text.LabelView;
 
 public class BrowseAIPPortal extends Composite {
   private static SimplePanel container;
@@ -173,7 +170,6 @@ public class BrowseAIPPortal extends Composite {
   NavigationToolbar<IndexedAIP> navigationToolbar;
 
   // STATUS
-
   @UiField
   HTML aipState;
 
@@ -215,12 +211,7 @@ public class BrowseAIPPortal extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     preMetadata.add(new HTMLWidgetWrapper("PreMetadataPortal.html"));
     preMetadata.addStyleName("preSectionTitle preMetadataTitle");
-
-    //
-    Label disseminationsTitle = new Label();
-    //preDisseminations.add(new HTMLWidgetWrapper("PreDisseminationsPortal.html"));
     preDisseminations.addStyleName("preSectionTitle preDisseminationsTitle");
-
     preChildren.add(new HTMLWidgetWrapper("PreChildrenPortal.html"));
     preChildren.addStyleName("preSectionTitle preChildrenTitle");
 
@@ -235,7 +226,7 @@ public class BrowseAIPPortal extends Composite {
 
     // DISSEMINATIONS
     disseminationsCard.setVisible(false);
-    preDisseminations.setVisible(false);
+    preDisseminations.setVisible(true);
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_DIP)) {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, aip.getUUID()));
       Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
@@ -263,7 +254,7 @@ public class BrowseAIPPortal extends Composite {
 
             SearchWrapper disseminationsSearchWrapper = new SearchWrapper(false)
               .createListAndSearchPanel(disseminationsListBuilder);
-            //no preDisseminations
+            // no preDisseminations
             disseminationsCard.setWidget(disseminationsSearchWrapper);
             disseminationsCard.setVisible(dipCount > 0);
 
@@ -299,8 +290,7 @@ public class BrowseAIPPortal extends Composite {
                             public void onSuccess(IndexResult<DIPFile> result) {
                               if (result.getTotalCount() > 0) {
                                 DIPFile dip = result.getResults().get(0);
-                                disseminationsTitle.setText(dip.getDipId());
-                                preDisseminations.add(disseminationsTitle);
+                                preDisseminations.add(new Label(dip.getId()));
                                 preDisseminations.setVisible(true);
                                 disseminationsCard.setVisible(true);
                                 disseminationsCard.add(new DipFilePreview(viewers, dip));
@@ -385,7 +375,7 @@ public class BrowseAIPPortal extends Composite {
     navigationToolbar.withObject(aip);
     navigationToolbar.withPermissions(aip.getPermissions());
     navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.UPDATED,
-      () -> getAndRefresh(aipId, new NoAsyncCallback<>()));
+      () -> refresh(aipId, new NoAsyncCallback<>()));
     navigationToolbar.build();
     navigationToolbar.setActionsButtonVisibility(false);
     navigationToolbar.setSearchButtonVisibility(false);

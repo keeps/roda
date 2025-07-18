@@ -13,13 +13,20 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.DipFilePreview;
 import org.roda.wui.client.browse.DipUrlPreview;
 import org.roda.wui.client.browse.Viewers;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.Bundle;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.TitlePanel;
@@ -224,7 +231,7 @@ public class BrowseDIPPortal extends Composite {
     // NAVIGATION DIP TOOLBAR
     Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, aipId));
     Sorter dipsSorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
-    getAIPassociatedDIPs(aipId, dipsFilter, dipsSorter, new AsyncCallback<List<IndexedDIP>>() {
+    getAIPassociatedDIPs(dipsFilter, dipsSorter, new AsyncCallback<List<IndexedDIP>>() {
       @Override
       public void onFailure(Throwable throwable) {
         // toolbar with just one DIP
@@ -242,7 +249,6 @@ public class BrowseDIPPortal extends Composite {
           }
         }
         if (currentIdx == -1) {
-          GWT.log("DIP index não encontrado na IndexedDIP list:" + dip.getId());
           Toast.showError("Não é possível encontrar objeto atual", "DIP atual não encontrado na lista");
           return;
         }
@@ -336,9 +342,8 @@ public class BrowseDIPPortal extends Composite {
     }
   }
 
-  private static void getAIPassociatedDIPs(String aipId, Filter dipsFilter, Sorter dipsSorter,
+  private static void getAIPassociatedDIPs(Filter dipsFilter, Sorter dipsSorter,
     AsyncCallback<List<IndexedDIP>> callback) {
-
     BrowserService.Util.getInstance().find(IndexedDIP.class.getName(), dipsFilter, dipsSorter, new Sublist(),
       Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), true,
       Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID), new AsyncCallback<IndexResult<IndexedDIP>>() {
@@ -357,7 +362,7 @@ public class BrowseDIPPortal extends Composite {
   }
 
   private void addNavigationToolBarDIPIteration(IsIndexed obj,
-    ListSelectionUtils.ProcessRelativeItem<IsIndexed> processor, Bundle bundle, boolean hasProcessor) {
+    ListSelectionUtils.ProcessRelativeItem<IsIndexed> processor, BrowseDipBundle bundle, boolean hasProcessor) {
     NavigationToolbar<IsIndexed> navigationToolbar = new NavigationToolbar<>();
     navigationToolbar.withObject(obj);
     if (hasProcessor) {
@@ -372,4 +377,5 @@ public class BrowseDIPPortal extends Composite {
     navigationToolbar.build();
     container.insert(navigationToolbar, 0);
   }
+
 }
