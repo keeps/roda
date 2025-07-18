@@ -238,7 +238,7 @@ public class ShowDisposalHold extends Composite {
             public void onSuccess(Boolean confirm) {
               if (confirm) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
                   new AsyncCallback<String>() {
                     @Override
                     public void onFailure(Throwable throwable) {

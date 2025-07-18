@@ -58,7 +58,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
   TextBox description;
 
   @UiField
-  TextBox mandate;
+  TextArea mandate;
 
   @UiField
   TextArea notes;

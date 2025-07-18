@@ -182,7 +182,7 @@ public class DisposalHoldsPanel extends Composite {
         @Override
         public void onSuccess(Boolean result) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
             new NoAsyncCallback<String>() {
               @Override
               public void onFailure(Throwable caught) {

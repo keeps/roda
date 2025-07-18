@@ -112,7 +112,7 @@ public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
             public void onSuccess(Boolean result) {
               if (result) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
                   new ActionNoAsyncCallback<String>(callback) {
                     @Override
                     public void onFailure(Throwable caught) {
