@@ -6,11 +6,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -25,7 +27,6 @@ import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.entity.transaction.TransactionStoragePathConsolidatedOperation;
 import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.transaction.ConsolidatedOperation;
 import org.roda.core.transaction.RODATransactionException;
 import org.roda.core.transaction.StoragePathVersion;
@@ -599,28 +600,41 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     stagingStorageService.importBinaryVersion(fromService, storagePath, version);
   }
 
-  @Override
-  public void commit() throws RODATransactionException {
-    Map<StoragePathVersion, List<ConsolidatedOperation>> consolidatedOperations;
-    try {
-      consolidatedOperations = TransactionLogConsolidator
-        .consolidateLogs(transactionLogService.getStoragePathsOperations(transaction.getId()));
-    } catch (RequestNotValidException e) {
-      throw new RODATransactionException(
-        "[transactionId:" + transaction.getId() + "] Failed to consolidate transaction logs", e);
-    }
-
+  private Map<StoragePathVersion, List<TransactionStoragePathConsolidatedOperation>> consolidateLogs(
+    List<TransactionalStoragePathOperationLog> logs) throws RequestNotValidException, RODATransactionException {
+    Map<StoragePathVersion, List<ConsolidatedOperation>> consolidatedOperations = TransactionLogConsolidator
+      .consolidateLogs(transactionLogService.getStoragePathsOperations(transaction.getId()));
+    Map<StoragePathVersion, List<TransactionStoragePathConsolidatedOperation>> databaseOperationsMap = new HashMap<>();
     for (Map.Entry<StoragePathVersion, List<ConsolidatedOperation>> consolidatedOperation : consolidatedOperations
       .entrySet()) {
       StoragePath storagePath = consolidatedOperation.getKey().storagePath();
-      String previousVersion = consolidatedOperation.getValue().getFirst().previousVersionId();
       String version = consolidatedOperation.getKey().version();
       List<ConsolidatedOperation> operations = consolidatedOperation.getValue();
       List<TransactionStoragePathConsolidatedOperation> databaseOperations = transactionLogService
         .registerConsolidatedStoragePathOperations(transaction, getStoragePathAsString(storagePath, false), null,
           version, operations);
+      databaseOperationsMap.put(consolidatedOperation.getKey(), databaseOperations);
+    }
+    return databaseOperationsMap;
+  }
 
+  @Override
+  public void commit() throws RODATransactionException {
+    Map<StoragePathVersion, List<TransactionStoragePathConsolidatedOperation>> databaseOperationsMap;
+    try {
+      databaseOperationsMap = consolidateLogs(transactionLogService.getStoragePathsOperations(transaction.getId()));
+    } catch (RequestNotValidException e) {
+      throw new RODATransactionException(
+        "[transactionId:" + transaction.getId() + "] Failed to consolidate transaction logs", e);
+    }
+
+    for (Map.Entry<StoragePathVersion, List<TransactionStoragePathConsolidatedOperation>> consolidatedOperation : databaseOperationsMap
+      .entrySet()) {
+      StoragePath storagePath = consolidatedOperation.getKey().storagePath();
+      String version = consolidatedOperation.getKey().version();
+      List<TransactionStoragePathConsolidatedOperation> databaseOperations = consolidatedOperation.getValue();
       for (TransactionStoragePathConsolidatedOperation operation : databaseOperations) {
+        String previousVersion = operation.getPreviousVersion();
         try {
           transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.RUNNING);
           OperationType operationType = operation.getOperationType();
@@ -817,7 +831,9 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public void rollbackCreateOperation(TransactionStoragePathConsolidatedOperation operation)
     throws RODATransactionException {
     try {
-      StoragePath storagePath = FSUtils.getStoragePathFromString(operation.getStoragePath());
+      StoragePath storagePath = DefaultStoragePath
+        .parse(StreamSupport.stream(Paths.get(operation.getStoragePath()).spliterator(), false).map(Path::toString)
+          .collect(Collectors.toList()));
       if (operation.getPreviousVersion() != null) {
         mainStorageService.deleteBinaryVersion(storagePath, operation.getVersion());
       } else {
@@ -840,7 +856,9 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         "[transactionId:" + transaction.getId() + "] Can't roll back an update to binary's version history file");
     }
     try {
-      StoragePath storagePath = FSUtils.getStoragePathFromString(operation.getStoragePath());
+      StoragePath storagePath = DefaultStoragePath
+        .parse(StreamSupport.stream(Paths.get(operation.getStoragePath()).spliterator(), false).map(Path::toString)
+          .collect(Collectors.toList()));
       mainStorageService.revertBinaryVersion(storagePath, operation.getPreviousVersion());
     } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       throw new RODATransactionException("[transactionId:" + transaction.getId()
