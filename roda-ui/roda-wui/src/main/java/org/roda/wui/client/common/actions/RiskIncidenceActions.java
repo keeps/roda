@@ -167,7 +167,7 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
                   new ActionNoAsyncCallback<String>(callback) {
 
                     @Override

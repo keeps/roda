@@ -312,7 +312,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
                   IndexedAIP.class.getName());
 
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
                   new ActionNoAsyncCallback<String>(callback) {
                     @Override
                     public void onSuccess(String details) {
@@ -407,7 +407,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
 
                     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null,
                       messages.outcomeDetailPlaceholder(), RegExp.compile(".*"), messages.cancelButton(),
-                      messages.confirmButton(), false, false, new ActionNoAsyncCallback<String>(callback) {
+                      messages.confirmButton(), false, true, new ActionNoAsyncCallback<String>(callback) {
 
                         @Override
                         public void onSuccess(String details) {
@@ -466,7 +466,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
           if (confirmed) {
             Services services = new Services("Delete AIP", "deletion");
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
               new ActionNoAsyncCallback<String>(callback) {
 
                 @Override
@@ -515,7 +515,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
               if (confirmed) {
                 Services service = new Services("Delete AIPs", "deletion");
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
                   new ActionNoAsyncCallback<String>(callback) {
 
                     @Override
@@ -610,7 +610,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
 
   private void appraisalReject(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, null, RegExp.compile(".+"),
-      messages.dialogCancel(), messages.dialogOk(), true, false, new ActionNoAsyncCallback<String>(callback) {
+      messages.dialogCancel(), messages.dialogOk(), true, true, new ActionNoAsyncCallback<String>(callback) {
 
         @Override
         public void onSuccess(final String rejectReason) {
@@ -662,7 +662,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
               @Override
               public void onSuccess(final String newType) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
                   new ActionNoAsyncCallback<String>(callback) {
 
                     @Override
@@ -932,7 +932,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean result) {
           if (result) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
               new ActionNoAsyncCallback<String>(callback) {
                 @Override
                 public void onFailure(Throwable caught) {
