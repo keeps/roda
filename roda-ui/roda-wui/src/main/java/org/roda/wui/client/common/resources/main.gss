@@ -7897,7 +7897,7 @@ span.code {
     position: relative;
     white-space: nowrap;
     width: 100%;
-    align-items: flex-start;
+    align-items: center;
     box-sizing: border-box;
     text-rendering: auto;
     letter-spacing: normal;
