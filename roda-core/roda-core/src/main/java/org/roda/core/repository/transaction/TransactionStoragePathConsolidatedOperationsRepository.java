@@ -22,6 +22,10 @@ import io.micrometer.core.annotation.Timed;
 public interface TransactionStoragePathConsolidatedOperationsRepository
   extends JpaRepository<TransactionStoragePathConsolidatedOperation, UUID> {
 
+  @Query("SELECT o FROM TransactionStoragePathConsolidatedOperation o WHERE o.transactionLog = :transactionLog ORDER BY o.updatedAt ASC")
+  List<TransactionStoragePathConsolidatedOperation> getOperationsByTransactionLog(
+    @Param("transactionLog") TransactionLog transactionLog);
+
   @Query("SELECT o FROM TransactionStoragePathConsolidatedOperation o WHERE o.transactionLog = :transactionLog AND o.operationState = SUCCESS ORDER BY o.updatedAt DESC")
   List<TransactionStoragePathConsolidatedOperation> getSuccessfulOperationsByTransactionLog(
     @Param("transactionLog") TransactionLog transactionLog);

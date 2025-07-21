@@ -218,12 +218,12 @@ public class TransactionLogService {
 
   @Transactional
   public List<TransactionStoragePathConsolidatedOperation> registerConsolidatedStoragePathOperations(
-    TransactionLog transaction, String storagePathAsString, String storagePathPreviousVersion,
-    String storagePathVersion, List<ConsolidatedOperation> consolidatedOperations) {
+    TransactionLog transaction, String storagePathAsString, String storagePathVersion,
+    List<ConsolidatedOperation> consolidatedOperations) {
     List<TransactionStoragePathConsolidatedOperation> databaseOperations = new ArrayList<>();
     for (ConsolidatedOperation operation : consolidatedOperations) {
       TransactionStoragePathConsolidatedOperation databaseOperation = new TransactionStoragePathConsolidatedOperation(
-        transaction, storagePathAsString, storagePathPreviousVersion, storagePathVersion, operation.operationType());
+        transaction, storagePathAsString, operation.previousVersionId(), storagePathVersion, operation.operationType());
       databaseOperations.add(databaseOperation);
       transactionStoragePathConsolidatedOperationsRepository.save(databaseOperation);
     }
@@ -243,6 +243,12 @@ public class TransactionLogService {
     operation.setOperationState(state);
     operation.setPreviousVersion(previousVersionID);
     transactionStoragePathConsolidatedOperationsRepository.save(operation);
+  }
+
+  @Transactional
+  public List<TransactionStoragePathConsolidatedOperation> getConsolidatedStoragePathOperations(
+    TransactionLog transactionLog) {
+    return transactionStoragePathConsolidatedOperationsRepository.getOperationsByTransactionLog(transactionLog);
   }
 
   @Transactional
