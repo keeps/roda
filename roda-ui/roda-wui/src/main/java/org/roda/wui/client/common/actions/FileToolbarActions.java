@@ -250,7 +250,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
             new ActionNoAsyncCallback<String>(callback) {
 
               @Override
@@ -303,7 +303,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
         final IndexedFile toFolder = event.getValue();
 
         Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
           new ActionNoAsyncCallback<String>(callback) {
 
             @Override
@@ -357,7 +357,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
 
   private void uploadFiles(final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
       new ActionNoAsyncCallback<String>(callback) {
 
         @Override
@@ -373,7 +373,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   private void uploadFiles(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     if (file.isDirectory()) {
       Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-        RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+        RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
         new ActionNoAsyncCallback<String>(callback) {
 
           @Override
@@ -395,7 +395,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
             new ActionNoAsyncCallback<String>(callback) {
 
               @Override
@@ -434,7 +434,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
             new ActionNoAsyncCallback<String>(callback) {
 
               @Override
@@ -522,7 +522,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
               new ActionNoAsyncCallback<String>(callback) {
 
                 @Override

@@ -142,7 +142,7 @@ public class RepresentationSearchWrapperActions extends AbstractActionable<Index
 
   private void create(AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
       new ActionNoAsyncCallback<String>(callback) {
         @Override
         public void onSuccess(String details) {
@@ -210,7 +210,7 @@ public class RepresentationSearchWrapperActions extends AbstractActionable<Index
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
               new ActionNoAsyncCallback<String>(callback) {
 
                 @Override
@@ -264,7 +264,7 @@ public class RepresentationSearchWrapperActions extends AbstractActionable<Index
               @Override
               public void onSuccess(final String newType) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
                   new ActionNoAsyncCallback<String>(callback) {
 
                     @Override
@@ -350,7 +350,7 @@ public class RepresentationSearchWrapperActions extends AbstractActionable<Index
         @Override
         public void onSuccess(final List<String> newStates) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
             new ActionNoAsyncCallback<String>(callback) {
 
               @Override

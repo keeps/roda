@@ -36,7 +36,7 @@
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.disposalScheduleMandate}' />
 				</g:Label>
-				<g:TextBox title="{messages.disposalScheduleMandate}" ui:field="mandate" addStyleNames="form-textbox" />
+				<g:TextArea title="{messages.disposalScheduleMandate}" ui:field="mandate" addStyleNames="disposalMandate form-textbox" />
 
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.disposalScheduleNotes}' />
