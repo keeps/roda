@@ -27,8 +27,10 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 
@@ -93,7 +95,9 @@ public class Services implements DirectRestService {
     } else if (ClientLoggerRestService.class.equals(serviceClass)) {
       return GWT.create(ClientLoggerRestService.class);
     } else {
-      throw new IllegalArgumentException(serviceClass.getName() + " not supported");
+      String error = serviceClass.getName() + " not supported";
+      Toast.showError(error);
+      throw new IllegalArgumentException(error);
     }
   }
 
@@ -133,7 +137,8 @@ public class Services implements DirectRestService {
       service = GWT.create(DisposalConfirmationRestService.class);
     } else if (RiskIncidence.class.getName().equals(objectClassString)) {
       service = GWT.create(RiskIncidenceRestService.class);
-    } else if (IndexedRisk.class.getName().equals(objectClassString)) {
+    } else if (IndexedRisk.class.getName().equals(objectClassString)
+      || Risk.class.getName().equals(objectClassString)) {
       service = GWT.create(RiskRestService.class);
     } else if (IndexedPreservationEvent.class.getName().equals(objectClassString)) {
       service = GWT.create(PreservationEventRestService.class);
@@ -160,7 +165,9 @@ public class Services implements DirectRestService {
     } else if (DIPFile.class.getName().equals(objectClassString)) {
       service = GWT.create(DIPFileRestService.class);
     } else {
-      throw new IllegalArgumentException(objectClassString + " not supported");
+      String error = objectClassString + " not supported";
+      Toast.showError(error);
+      throw new IllegalArgumentException(error);
     }
 
     CompletableFuture<T> result = new CompletableFuture<>();
