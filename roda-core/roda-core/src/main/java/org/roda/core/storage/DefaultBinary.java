@@ -30,14 +30,21 @@ public class DefaultBinary extends AbstractResource implements Binary {
   private Long sizeInBytes;
   private boolean reference;
   private Map<String, String> contentDigest;
+  private String previousVersionId;
 
   public DefaultBinary(StoragePath storagePath, ContentPayload content, Long sizeInBytes, boolean reference,
     Map<String, String> contentDigest) {
+    this(storagePath, content, sizeInBytes, reference, contentDigest, null);
+  }
+
+  public DefaultBinary(StoragePath storagePath, ContentPayload content, Long sizeInBytes, boolean reference,
+    Map<String, String> contentDigest, String previousVersionId) {
     super(storagePath, false);
     this.content = content;
     this.sizeInBytes = sizeInBytes;
     this.reference = reference;
     this.contentDigest = contentDigest;
+    this.previousVersionId = previousVersionId;
   }
 
   /**
@@ -94,6 +101,22 @@ public class DefaultBinary extends AbstractResource implements Binary {
   @Override
   public Map<String, String> getContentDigest() {
     return contentDigest;
+  }
+
+  /**
+   * @return the binary's previous version ID, or null if it does not have one.
+   */
+  @Override
+  public String getPreviousVersionId() {
+    return previousVersionId;
+  }
+
+  /**
+   * @param previousVersionId
+   *          the ID to set as this binary's previous version ID.
+   */
+  public void setPreviousVersionId(String previousVersionId) {
+    this.previousVersionId = previousVersionId;
   }
 
   /**

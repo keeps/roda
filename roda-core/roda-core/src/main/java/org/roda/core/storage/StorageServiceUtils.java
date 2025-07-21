@@ -8,11 +8,21 @@
 package org.roda.core.storage;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 
 /**
@@ -136,7 +146,7 @@ public final class StorageServiceUtils {
       boolean asReference = false;
 
       if (sync) {
-        toService.updateBinaryContent(toStoragePath, binary.getContent(), asReference, true);
+        toService.updateBinaryContent(toStoragePath, binary.getContent(), asReference, true, false);
       } else {
         toService.createBinary(toStoragePath, binary.getContent(), asReference);
       }
@@ -179,7 +189,8 @@ public final class StorageServiceUtils {
   }
 
   public static CloseableIterable<Resource> listTransactionalResourcesUnderContainer(
-    StorageService stagingStorageService, StorageService mainStorageService, StoragePath storagePath, HashSet<StoragePath> deletedStoragePaths, boolean recursive)
+    StorageService stagingStorageService, StorageService mainStorageService, StoragePath storagePath,
+    HashSet<StoragePath> deletedStoragePaths, boolean recursive)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
 
     if (!stagingStorageService.exists(storagePath) && !mainStorageService.exists(storagePath)) {
@@ -267,8 +278,7 @@ public final class StorageServiceUtils {
               Resource res = mainIterator.next();
               StoragePath path = res.getStoragePath();
 
-              boolean alreadySeen = seenPaths.stream()
-                .filter(Objects::nonNull)
+              boolean alreadySeen = seenPaths.stream().filter(Objects::nonNull)
                 .anyMatch(seen -> path.toString().equals(seen.toString()));
 
               if (alreadySeen) {

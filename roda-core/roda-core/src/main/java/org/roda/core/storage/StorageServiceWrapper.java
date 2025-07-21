@@ -10,7 +10,6 @@ package org.roda.core.storage;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -150,10 +149,11 @@ public class StorageServiceWrapper implements StorageService {
 
   @Override
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists)
+    boolean createIfNotExists, boolean snapshotCurrentVersion)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-    return storageService.updateBinaryContent(storagePath, payload, asReference, createIfNotExists);
+    return storageService.updateBinaryContent(storagePath, payload, asReference, createIfNotExists,
+      snapshotCurrentVersion);
   }
 
   @Override
@@ -178,8 +178,8 @@ public class StorageServiceWrapper implements StorageService {
   }
 
   @Override
-  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
+  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
     storageService.copy(fromService, fromStoragePath, toPath, resource, false);
   }
@@ -210,17 +210,10 @@ public class StorageServiceWrapper implements StorageService {
   }
 
   @Override
-  public BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-    return storageService.createBinaryVersion(storagePath, properties);
-  }
-
-  @Override
-  public void revertBinaryVersion(StoragePath storagePath, String version)
+  public Binary revertBinaryVersion(StoragePath storagePath, String version)
     throws NotFoundException, RequestNotValidException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-    storageService.revertBinaryVersion(storagePath, version);
+    return storageService.revertBinaryVersion(storagePath, version);
   }
 
   @Override

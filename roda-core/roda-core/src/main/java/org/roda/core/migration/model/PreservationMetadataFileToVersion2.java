@@ -49,25 +49,23 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
       for (OptionalWithCause<Representation> representation : representations) {
         if (representation.isPresent()) {
           try (CloseableIterable<OptionalWithCause<PreservationMetadata>> pms = model
-                  .listPreservationMetadata(representation.get().getAipId(), representation.get().getId())) {
+            .listPreservationMetadata(representation.get().getAipId(), representation.get().getId())) {
             for (OptionalWithCause<PreservationMetadata> pm : pms) {
               if (pm.isPresent()) {
                 if (!model.hasDirectory(pm.get()) && pm.get().getId().startsWith(URNUtils
-                        .getPremisPrefix(PreservationMetadataType.FILE, RODAInstanceUtils.getLocalInstanceIdentifier()))) {
+                  .getPremisPrefix(PreservationMetadataType.FILE, RODAInstanceUtils.getLocalInstanceIdentifier()))) {
                   Binary pmBinary = model.getBinary(pm.get());
                   migrate(model, pmBinary, pm.get(), representation.get().getAipId(), representation.get().getId());
                 }
-              }
-              else {
+              } else {
                 LOGGER.debug("Couldn't get preservation metadata", pm.getCause());
               }
             }
           } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-                   | IOException e) {
+            | IOException e) {
             LOGGER.warn("Could not find preservation metadata files", e);
           }
-        }
-        else {
+        } else {
           LOGGER.warn("Couldn't get representation", representation.getCause());
         }
       }
@@ -105,7 +103,8 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
       ContentPayload newPremis = PremisV3Utils.fileToBinary(file);
       boolean asReference = false;
       boolean createIfNotExists = false;
-      model.updateBinaryContent(newPMLite.get(), newPremis, asReference, createIfNotExists);
+      boolean snapshotCurrentVersion = false;
+      model.updateBinaryContent(newPMLite.get(), newPremis, asReference, createIfNotExists, snapshotCurrentVersion);
     } catch (GenericException | IOException | ValidationException | NotFoundException | RequestNotValidException
       | AuthorizationDeniedException | AlreadyExistsException e) {
       LOGGER.error("Could not migrate preservation metadata file {}", binary.getStoragePath(), e);

@@ -93,6 +93,24 @@ public class RODATransactionManager {
     return context;
   }
 
+  public void commitTestTransactionWithoutRemoving(UUID transactionID) throws RODATransactionException {
+    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTING);
+    TransactionalContext context = transactionsContext.get(transactionID);
+    if (context == null) {
+      throw new RODATransactionException("No transaction context found for ID: " + transactionID);
+    }
+
+    if (context.transactionalStorageService() != null) {
+      context.transactionalStorageService().commit();
+    }
+
+    if (context.transactionalModelService() != null) {
+      context.transactionalModelService().commit();
+    }
+
+    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTED);
+  }
+
   public void endTransaction(UUID transactionID) throws RODATransactionException {
 
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTING);

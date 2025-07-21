@@ -57,10 +57,10 @@ public class TransactionLog implements Serializable {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
-  @OneToMany(mappedBy = "transactionLog", cascade = CascadeType.ALL, orphanRemoval = true,  fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "transactionLog", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   private List<TransactionalStoragePathOperationLog> storagePathsOperations = new ArrayList<>();
 
-  @OneToMany(mappedBy = "transactionLog", cascade = CascadeType.ALL, orphanRemoval = true,  fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "transactionLog", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   private List<TransactionalModelOperationLog> modelOperations = new ArrayList<>();
 
   public TransactionLog() {
@@ -104,10 +104,10 @@ public class TransactionLog implements Serializable {
   }
 
   public TransactionalStoragePathOperationLog addStoragePath(String storagePath, OperationType operation,
-    String version) {
+    String previousVersion, String version) {
     if (storagePath != null) {
       TransactionalStoragePathOperationLog transactionalStoragePathOperationLog = new TransactionalStoragePathOperationLog(
-        storagePath, operation, version);
+        storagePath, operation, previousVersion, version);
       transactionalStoragePathOperationLog.setTransactionLog(this);
       storagePathsOperations.add(transactionalStoragePathOperationLog);
       return transactionalStoragePathOperationLog;
