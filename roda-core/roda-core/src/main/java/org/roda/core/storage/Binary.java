@@ -33,6 +33,13 @@ public interface Binary extends Resource {
   boolean isReference();
 
   /**
+   * The ID of this binary's previous version, or null if it doesn't have one.
+   *
+   * @return
+   */
+  String getPreviousVersionId();
+
+  /**
    * Get the checksums of the binary content.
    *
    * @return A map with all the checksums where the key is the checksum algorithm

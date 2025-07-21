@@ -13,8 +13,8 @@ import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionalStoragePathOperationLog;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.transaction.ConsolidatedOperation;
-import org.roda.core.transaction.TransactionLogConsolidator;
 import org.roda.core.transaction.StoragePathVersion;
+import org.roda.core.transaction.TransactionLogConsolidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -28,8 +28,9 @@ public class TransactionLogConsolidatorTest extends AbstractTestNGSpringContextT
   private static final Logger LOGGER = LoggerFactory.getLogger(TransactionLogConsolidatorTest.class);
 
   private TransactionalStoragePathOperationLog buildLog(String path, OperationType type, OperationState state,
-    String version) {
-    TransactionalStoragePathOperationLog log = new TransactionalStoragePathOperationLog(path, type, version);
+    String previousVersion, String version) {
+    TransactionalStoragePathOperationLog log = new TransactionalStoragePathOperationLog(path, type, previousVersion,
+      version);
     log.setOperationState(state);
     return log;
   }
@@ -37,8 +38,8 @@ public class TransactionLogConsolidatorTest extends AbstractTestNGSpringContextT
   @Test
   public void testCreateFollowedByDeleteResultsInNoOperation() throws RODAException {
     List<TransactionalStoragePathOperationLog> logs = List.of(
-      buildLog("x/y/z.txt", OperationType.CREATE, OperationState.SUCCESS, null),
-      buildLog("x/y/z.txt", OperationType.DELETE, OperationState.SUCCESS, null));
+      buildLog("x/y/z.txt", OperationType.CREATE, OperationState.SUCCESS, null, null),
+      buildLog("x/y/z.txt", OperationType.DELETE, OperationState.SUCCESS, null, null));
 
     Map<StoragePathVersion, List<ConsolidatedOperation>> result = TransactionLogConsolidator.consolidateLogs(logs);
     assertTrue(result.values().iterator().next().isEmpty());
@@ -47,28 +48,29 @@ public class TransactionLogConsolidatorTest extends AbstractTestNGSpringContextT
   @Test
   public void testCreateFollowedByUpdateAndDeleteResultsInNoOperations() throws RODAException {
     List<TransactionalStoragePathOperationLog> logs = List.of(
-      buildLog("a/b/c.txt", OperationType.CREATE, OperationState.SUCCESS, null),
-      buildLog("a/b/c.txt", OperationType.UPDATE, OperationState.SUCCESS, null),
-      buildLog("a/b/c.txt", OperationType.DELETE, OperationState.SUCCESS, null));
+      buildLog("a/b/c.txt", OperationType.CREATE, OperationState.SUCCESS, null, null),
+      buildLog("a/b/c.txt", OperationType.UPDATE, OperationState.SUCCESS, null, null),
+      buildLog("a/b/c.txt", OperationType.DELETE, OperationState.SUCCESS, null, null));
 
-    Map<StoragePathVersion, List<ConsolidatedOperation>> storagePathListMap = TransactionLogConsolidator.consolidateLogs(logs);
+    Map<StoragePathVersion, List<ConsolidatedOperation>> storagePathListMap = TransactionLogConsolidator
+      .consolidateLogs(logs);
 
     for (Map.Entry<StoragePathVersion, List<ConsolidatedOperation>> storagePathListEntry : storagePathListMap
       .entrySet()) {
       System.out
-              .println("Storage Path: " + storagePathListEntry.getKey() + ", Operations: " + storagePathListEntry.getValue());
+        .println("Storage Path: " + storagePathListEntry.getKey() + ", Operations: " + storagePathListEntry.getValue());
       // operations should be empty
       assertTrue(storagePathListEntry.getValue().isEmpty(),
-              "Consolidated operations should be empty for path: " + storagePathListEntry.getKey());
+        "Consolidated operations should be empty for path: " + storagePathListEntry.getKey());
     }
   }
 
   @Test
   public void testConsolidatesConsecutiveUpdateOperationsIntoSingleUpdate() throws RODAException {
     List<TransactionalStoragePathOperationLog> logs = List.of(
-      buildLog("a/b/file.txt", OperationType.UPDATE, OperationState.SUCCESS, null),
-      buildLog("a/b/file.txt", OperationType.UPDATE, OperationState.SUCCESS, null),
-      buildLog("a/b/file.txt", OperationType.UPDATE, OperationState.SUCCESS, null));
+      buildLog("a/b/file.txt", OperationType.UPDATE, OperationState.SUCCESS, null, null),
+      buildLog("a/b/file.txt", OperationType.UPDATE, OperationState.SUCCESS, null, null),
+      buildLog("a/b/file.txt", OperationType.UPDATE, OperationState.SUCCESS, null, null));
 
     Map<StoragePathVersion, List<ConsolidatedOperation>> result = TransactionLogConsolidator.consolidateLogs(logs);
 
@@ -82,8 +84,8 @@ public class TransactionLogConsolidatorTest extends AbstractTestNGSpringContextT
   @Test
   public void testUpdateAfterCreateIsIgnoredInConsolidation() throws RODAException {
     List<TransactionalStoragePathOperationLog> logs = List.of(
-      buildLog("a/b/file.txt", OperationType.CREATE, OperationState.SUCCESS, null),
-      buildLog("a/b/file.txt", OperationType.UPDATE, OperationState.SUCCESS, null));
+      buildLog("a/b/file.txt", OperationType.CREATE, OperationState.SUCCESS, null, null),
+      buildLog("a/b/file.txt", OperationType.UPDATE, OperationState.SUCCESS, null, null));
 
     Map<StoragePathVersion, List<ConsolidatedOperation>> result = TransactionLogConsolidator.consolidateLogs(logs);
 
@@ -95,9 +97,9 @@ public class TransactionLogConsolidatorTest extends AbstractTestNGSpringContextT
   @Test
   public void testDeleteRemovesChildOperationsFromConsolidation() throws RODAException {
     List<TransactionalStoragePathOperationLog> logs = List.of(
-      buildLog("a/b/c", OperationType.UPDATE, OperationState.SUCCESS, null),
-      buildLog("a/b/c/d", OperationType.CREATE, OperationState.SUCCESS, null),
-      buildLog("a/b", OperationType.DELETE, OperationState.SUCCESS, null));
+      buildLog("a/b/c", OperationType.UPDATE, OperationState.SUCCESS, null, null),
+      buildLog("a/b/c/d", OperationType.CREATE, OperationState.SUCCESS, null, null),
+      buildLog("a/b", OperationType.DELETE, OperationState.SUCCESS, null, null));
 
     Map<StoragePathVersion, List<ConsolidatedOperation>> result = TransactionLogConsolidator.consolidateLogs(logs);
 
@@ -109,8 +111,8 @@ public class TransactionLogConsolidatorTest extends AbstractTestNGSpringContextT
   @Test
   public void testDeleteRemovesChildOperationsWithVersionFromConsolidation() throws RODAException {
     List<TransactionalStoragePathOperationLog> logs = List.of(
-            buildLog("a/b", OperationType.CREATE, OperationState.SUCCESS, "1.0"),
-            buildLog("a/b", OperationType.DELETE, OperationState.SUCCESS, null));
+      buildLog("a/b", OperationType.CREATE, OperationState.SUCCESS, null, "1.0"),
+      buildLog("a/b", OperationType.DELETE, OperationState.SUCCESS, null, null));
 
     Map<StoragePathVersion, List<ConsolidatedOperation>> result = TransactionLogConsolidator.consolidateLogs(logs);
 
@@ -120,9 +122,9 @@ public class TransactionLogConsolidatorTest extends AbstractTestNGSpringContextT
   @Test
   public void testDeleteDoesNotRemoveChildOperationsFromConsolidation() throws RODAException {
     List<TransactionalStoragePathOperationLog> logs = List.of(
-      buildLog("a/b", OperationType.DELETE, OperationState.SUCCESS, null),
-      buildLog("a/b/c", OperationType.UPDATE, OperationState.SUCCESS, null),
-      buildLog("a/b/c/d", OperationType.CREATE, OperationState.SUCCESS, null));
+      buildLog("a/b", OperationType.DELETE, OperationState.SUCCESS, null, null),
+      buildLog("a/b/c", OperationType.UPDATE, OperationState.SUCCESS, null, null),
+      buildLog("a/b/c/d", OperationType.CREATE, OperationState.SUCCESS, null, null));
 
     Map<StoragePathVersion, List<ConsolidatedOperation>> result = TransactionLogConsolidator.consolidateLogs(logs);
 
@@ -152,8 +154,8 @@ public class TransactionLogConsolidatorTest extends AbstractTestNGSpringContextT
   @Test
   public void testMoveOperationShouldHaveCreateAndDeleteOperationsAfterConsolidation() throws RODAException {
     List<TransactionalStoragePathOperationLog> logs = List.of(
-      buildLog("a/b/c/d.txt", OperationType.CREATE, OperationState.SUCCESS, null),
-      buildLog("a/b/d.txt", OperationType.DELETE, OperationState.SUCCESS, null));
+      buildLog("a/b/c/d.txt", OperationType.CREATE, OperationState.SUCCESS, null, null),
+      buildLog("a/b/d.txt", OperationType.DELETE, OperationState.SUCCESS, null, null));
 
     Map<StoragePathVersion, List<ConsolidatedOperation>> result = TransactionLogConsolidator.consolidateLogs(logs);
 

@@ -41,31 +41,31 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
           for (Representation representation : aip.get().getRepresentations()) {
             Path representationPath = model.getDirectAccess(representation).getPath();
 
-              BasicFileAttributes attr = Files.readAttributes(representationPath, BasicFileAttributes.class);
-              Date createDate = new Date(attr.creationTime().toMillis());
-              Date updateDate = new Date(attr.lastModifiedTime().toMillis());
+            BasicFileAttributes attr = Files.readAttributes(representationPath, BasicFileAttributes.class);
+            Date createDate = new Date(attr.creationTime().toMillis());
+            Date updateDate = new Date(attr.lastModifiedTime().toMillis());
 
-              representation.setCreatedOn(createDate);
-              representation.setCreatedBy(aip.get().getCreatedBy());
-              representation.setUpdatedOn(updateDate);
-              representation.setUpdatedBy(aip.get().getUpdatedBy());
+            representation.setCreatedOn(createDate);
+            representation.setCreatedBy(aip.get().getCreatedBy());
+            representation.setUpdatedOn(updateDate);
+            representation.setUpdatedBy(aip.get().getUpdatedBy());
 
-              if (representation.isOriginal()) {
-                representation.setRepresentationStates(Arrays.asList(RepresentationState.ORIGINAL));
-              } else {
-                representation.setRepresentationStates(Arrays.asList(RepresentationState.OTHER));
-              }
+            if (representation.isOriginal()) {
+              representation.setRepresentationStates(Arrays.asList(RepresentationState.ORIGINAL));
+            } else {
+              representation.setRepresentationStates(Arrays.asList(RepresentationState.OTHER));
             }
-
-            StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromObject(aip));
-            model.updateBinaryContent(aip.get(), payload, false, false);
-          } else {
-            LOGGER.warn("Could not get list an AIP");
           }
+
+          StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromObject(aip));
+          model.updateBinaryContent(aip.get(), payload, false, false, false);
+        } else {
+          LOGGER.warn("Could not get list an AIP");
         }
-      } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-        | IOException e) {
-        LOGGER.warn("Could not find AIPs", e);
+      }
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+      | IOException e) {
+      LOGGER.warn("Could not find AIPs", e);
     }
   }
 

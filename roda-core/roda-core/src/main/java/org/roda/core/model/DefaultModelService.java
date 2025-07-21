@@ -305,7 +305,8 @@ public class DefaultModelService implements ModelService {
       RodaConstants.STORAGE_AIP_METADATA_FILENAME);
     boolean asReference = false;
     boolean createIfNotExists = true;
-    storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(json), asReference, createIfNotExists);
+    storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(json), asReference, createIfNotExists,
+      false);
     return aip;
   }
 
@@ -825,11 +826,8 @@ public class DefaultModelService implements ModelService {
     boolean asReference = false;
     boolean createIfNotExists = false;
 
-    // Create version snapshot
-    storage.createBinaryVersion(binaryPath, properties);
-
     // Update
-    storage.updateBinaryContent(binaryPath, descriptiveMetadataPayload, asReference, createIfNotExists);
+    storage.updateBinaryContent(binaryPath, descriptiveMetadataPayload, asReference, createIfNotExists, true);
 
     // set descriptive metadata type
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
@@ -939,13 +937,13 @@ public class DefaultModelService implements ModelService {
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
       descriptiveMetadataId);
 
-    BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, properties);
-    storage.revertBinaryVersion(binaryPath, versionId);
+    Binary updatedBinary = storage.revertBinaryVersion(binaryPath, versionId);
+    BinaryVersion beforeRevertVersion = storage.getBinaryVersion(binaryPath, updatedBinary.getPreviousVersionId());
 
     notifyDescriptiveMetadataUpdated(retrieveDescriptiveMetadata(aipId, representationId, descriptiveMetadataId))
       .failOnError();
 
-    return currentVersion;
+    return beforeRevertVersion;
   }
 
   @Override
@@ -1465,7 +1463,7 @@ public class DefaultModelService implements ModelService {
     }
 
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
-    storage.updateBinaryContent(filePath, contentPayload, asReference, createIfNotExists);
+    storage.updateBinaryContent(filePath, contentPayload, asReference, createIfNotExists, false);
     Binary binaryUpdated = storage.getBinary(filePath);
     File file = ResourceParseUtils.convertResourceToFile(binaryUpdated);
 
@@ -1516,7 +1514,7 @@ public class DefaultModelService implements ModelService {
         shallowFiles.removeObject(IdUtils.getFileId(file));
 
         ContentPayload newContentPayload = new ExternalFileManifestContentPayload(shallowFiles);
-        getStorage().updateBinaryContent(storagePath, newContentPayload, false, false);
+        getStorage().updateBinaryContent(storagePath, newContentPayload, false, false, false);
         if (notify) {
           notifyFileDeleted(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()).failOnError();
         }
@@ -1912,7 +1910,7 @@ public class DefaultModelService implements ModelService {
     pm.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
 
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
-    storage.updateBinaryContent(binaryPath, payload, false, true);
+    storage.updateBinaryContent(binaryPath, payload, false, true, false);
 
     AIP updatedAIP = null;
     if (aipId != null) {
@@ -2155,7 +2153,7 @@ public class DefaultModelService implements ModelService {
     boolean createIfNotExists = true;
 
     if (storage.exists(binaryPath)) {
-      storage.updateBinaryContent(binaryPath, payload, asReference, createIfNotExists);
+      storage.updateBinaryContent(binaryPath, payload, asReference, createIfNotExists, false);
     } else {
       try {
         storage.createBinary(binaryPath, payload, asReference);
@@ -2820,7 +2818,7 @@ public class DefaultModelService implements ModelService {
     // create or update job in storage
     String jobAsJson = JsonUtils.getJsonFromObject(job);
     StoragePath jobPath = ModelUtils.getJobStoragePath(job.getId());
-    storage.updateBinaryContent(jobPath, new StringContentPayload(jobAsJson), false, true);
+    storage.updateBinaryContent(jobPath, new StringContentPayload(jobAsJson), false, true, false);
     // index it
     notifyJobCreatedOrUpdated(job, false).failOnError();
   }
@@ -2906,7 +2904,7 @@ public class DefaultModelService implements ModelService {
 
       String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);
       StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReport.getJobId(), jobReport.getId());
-      storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true);
+      storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true, false);
 
       // index it
       notifyJobReportCreatedOrUpdated(jobReport, cachedJob).failOnError();
@@ -2936,7 +2934,7 @@ public class DefaultModelService implements ModelService {
 
       String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);
       StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReport.getJobId(), jobReport.getId());
-      storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true);
+      storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true, false);
 
       // index it
       notifyJobReportCreatedOrUpdated(jobReport, indexJob).failOnError();
@@ -3084,12 +3082,7 @@ public class DefaultModelService implements ModelService {
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
 
-      // Create version snapshot
-      if (properties != null && !properties.isEmpty()) {
-        storage.createBinaryVersion(riskPath, properties);
-      }
-
-      storage.updateBinaryContent(riskPath, new StringContentPayload(riskAsJson), false, true);
+      storage.updateBinaryContent(riskPath, new StringContentPayload(riskAsJson), false, true, false);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Error updating risk in storage", e);
     }
@@ -3139,11 +3132,11 @@ public class DefaultModelService implements ModelService {
 
     StoragePath binaryPath = ModelUtils.getRiskStoragePath(riskId);
 
-    BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, properties);
-    storage.revertBinaryVersion(binaryPath, versionId);
+    Binary revertedBinary = storage.revertBinaryVersion(binaryPath, versionId);
+    BinaryVersion beforeRevertVersion = storage.getBinaryVersion(binaryPath, revertedBinary.getPreviousVersionId());
 
     notifyRiskCreatedOrUpdated(retrieveRisk(riskId), incidences, commit).failOnError();
-    return currentVersion;
+    return beforeRevertVersion;
   }
 
   @Override
@@ -3190,7 +3183,7 @@ public class DefaultModelService implements ModelService {
       riskIncidence.setUpdatedOn(new Date());
       String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
       StoragePath riskIncidencePath = ModelUtils.getRiskIncidenceStoragePath(riskIncidence.getId());
-      storage.updateBinaryContent(riskIncidencePath, new StringContentPayload(riskIncidenceAsJson), false, true);
+      storage.updateBinaryContent(riskIncidencePath, new StringContentPayload(riskIncidenceAsJson), false, true, false);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Error updating risk incidence in storage", e);
     }
@@ -3274,7 +3267,7 @@ public class DefaultModelService implements ModelService {
     try {
       String notificationAsJson = JsonUtils.getJsonFromObject(notification);
       StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notification.getId());
-      storage.updateBinaryContent(notificationPath, new StringContentPayload(notificationAsJson), false, true);
+      storage.updateBinaryContent(notificationPath, new StringContentPayload(notificationAsJson), false, true, false);
     } catch (GenericException | RequestNotValidException e) {
       LOGGER.error("Error updating notification in storage", e);
       throw new GenericException(e);
@@ -3412,7 +3405,8 @@ public class DefaultModelService implements ModelService {
       RodaConstants.STORAGE_DIP_METADATA_FILENAME);
     boolean asReference = false;
     boolean createIfNotExists = true;
-    storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(json), asReference, createIfNotExists);
+    storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(json), asReference, createIfNotExists,
+      false);
   }
 
   @Override
@@ -4054,7 +4048,7 @@ public class DefaultModelService implements ModelService {
 
       String riAsXML = XMLUtils.getXMLFromObject(ri);
       StoragePath representationInformationPath = ModelUtils.getRepresentationInformationStoragePath(ri.getId());
-      storage.updateBinaryContent(representationInformationPath, new StringContentPayload(riAsXML), false, true);
+      storage.updateBinaryContent(representationInformationPath, new StringContentPayload(riAsXML), false, true, false);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Error updating format in storage", e);
     }
@@ -4189,7 +4183,7 @@ public class DefaultModelService implements ModelService {
     String disposalHoldAsJson = JsonUtils.getJsonFromObject(currentDisposalHold);
     StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(currentDisposalHold.getId());
 
-    storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
+    storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true, false);
 
     createRepositoryEvent(PreservationEventType.UPDATE, "Update disposal hold", PluginState.SUCCESS, "", details, "",
       true, null);
@@ -4382,7 +4376,8 @@ public class DefaultModelService implements ModelService {
 
     String disposalScheduleAsJson = JsonUtils.getJsonFromObject(currentDisposalSchedule);
     StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(currentDisposalSchedule.getId());
-    storage.updateBinaryContent(disposalSchedulePath, new StringContentPayload(disposalScheduleAsJson), false, false);
+    storage.updateBinaryContent(disposalSchedulePath, new StringContentPayload(disposalScheduleAsJson), false, false,
+      false);
 
     return currentDisposalSchedule;
   }
@@ -4540,7 +4535,7 @@ public class DefaultModelService implements ModelService {
     DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
       ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmation.getId()),
       RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
-    storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(disposalConfirmationAsJson), false,
+    storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(disposalConfirmationAsJson), false, false,
       false);
 
     notifyDisposalConfirmationCreatedOrUpdated(disposalConfirmation).failOnError();
@@ -4642,7 +4637,7 @@ public class DefaultModelService implements ModelService {
 
     String disposalRuleAsJson = JsonUtils.getJsonFromObject(disposalRule);
     StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRule.getId());
-    storage.updateBinaryContent(disposalRulePath, new StringContentPayload(disposalRuleAsJson), false, false);
+    storage.updateBinaryContent(disposalRulePath, new StringContentPayload(disposalRuleAsJson), false, false, false);
 
     return disposalRule;
   }
@@ -4822,7 +4817,7 @@ public class DefaultModelService implements ModelService {
 
     if (distributedInstancePath != null) {
       storage.updateBinaryContent(distributedInstancePath, new StringContentPayload(distributedInstanceAsJson), false,
-        false);
+        false, false);
     }
     return distributedInstance;
   }
@@ -4907,7 +4902,7 @@ public class DefaultModelService implements ModelService {
 
     String accessKeyAsJson = JsonUtils.getJsonFromObject(accessKey);
     StoragePath accessKeysStoragePath = ModelUtils.getAccessKeysStoragePath(accessKey.getId());
-    storage.updateBinaryContent(accessKeysStoragePath, new StringContentPayload(accessKeyAsJson), false, false);
+    storage.updateBinaryContent(accessKeysStoragePath, new StringContentPayload(accessKeyAsJson), false, false, false);
 
     return accessKey;
   }
@@ -4929,7 +4924,7 @@ public class DefaultModelService implements ModelService {
     }
     String accessKeyAsJson = JsonUtils.getJsonFromObject(accessKey);
     StoragePath accessKeysStoragePath = ModelUtils.getAccessKeysStoragePath(accessKey.getId());
-    storage.updateBinaryContent(accessKeysStoragePath, new StringContentPayload(accessKeyAsJson), false, false);
+    storage.updateBinaryContent(accessKeysStoragePath, new StringContentPayload(accessKeyAsJson), false, false, false);
   }
 
   @Override
@@ -5441,18 +5436,20 @@ public class DefaultModelService implements ModelService {
 
   @Override
   public Binary updateBinaryContent(IsRODAObject object, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists)
+    boolean createIfNotExists, boolean snapshotCurrentVersion)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     StoragePath storagePath = ModelUtils.getStoragePath(object);
-    return getStorage().updateBinaryContent(storagePath, payload, asReference, createIfNotExists);
+    return getStorage().updateBinaryContent(storagePath, payload, asReference, createIfNotExists,
+      snapshotCurrentVersion);
   }
 
   @Override
   public Binary updateBinaryContent(LiteRODAObject lite, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists)
+    boolean createIfNotExists, boolean snapshotCurrentVersion)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     StoragePath storagePath = ModelUtils.getStoragePath(lite);
-    return getStorage().updateBinaryContent(storagePath, payload, asReference, createIfNotExists);
+    return getStorage().updateBinaryContent(storagePath, payload, asReference, createIfNotExists,
+      snapshotCurrentVersion);
   }
 
   @Override

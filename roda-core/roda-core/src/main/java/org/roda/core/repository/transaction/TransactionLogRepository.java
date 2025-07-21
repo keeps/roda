@@ -23,5 +23,5 @@ public interface TransactionLogRepository extends JpaRepository<TransactionLog, 
   @NonNull
   Optional<TransactionLog> findById(@NonNull UUID id);
 
-  List<TransactionLog> findByStatusOrderByCreatedAt(TransactionLog.TransactionStatus transactionStatus);
+  List<TransactionLog> findAllByStatusInOrderByCreatedAt(List<TransactionLog.TransactionStatus> transactionStatus);
 }
