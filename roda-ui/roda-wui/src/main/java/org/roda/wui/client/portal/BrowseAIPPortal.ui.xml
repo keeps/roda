@@ -8,7 +8,7 @@
 	<g:FocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
 			<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.catalogueItemTitle}" />
-			<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
+			<g:FlowPanel addStyleNames="row full_width skip_padding">
 				<g:FlowPanel addStyleNames="col_12 content">
 					<!-- STATUS -->
 					<g:HTML ui:field="aipState" addStyleNames="aipState" />
@@ -25,7 +25,7 @@
 					</g:FlowPanel>
 
 					<!-- DIPs -->
-					<g:FlowPanel ui:field="preDisseminations" />
+					<g:FlowPanel ui:field="preDisseminations"/>
 					<g:SimplePanel ui:field="disseminationsCard" addStyleNames="card disseminationsCard" />
 
 					<!-- AIP CHILDREN -->
