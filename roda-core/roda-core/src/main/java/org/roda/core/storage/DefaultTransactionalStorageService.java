@@ -637,14 +637,14 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
           .parse(StreamSupport.stream(Paths.get(operation.getStoragePath()).spliterator(), false).map(Path::toString)
             .collect(Collectors.toList()));
       } catch (RequestNotValidException e) {
-        transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.FAILURE);
+        transactionLogService.updateConsolidatedStoragePathOperationState(operation.getId(), OperationState.FAILURE);
         throw new RODATransactionException(
           "[transactionId:" + transaction.getId() + "] Failed to parse storage path: " + operation.getStoragePath(), e);
       }
       String version = operation.getVersion();
       String previousVersion = operation.getPreviousVersion();
       try {
-        transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.RUNNING);
+        transactionLogService.updateConsolidatedStoragePathOperationState(operation.getId(), OperationState.RUNNING);
         OperationType operationType = operation.getOperationType();
         String previousVersionId = null;
         if (operationType == OperationType.DELETE) {
@@ -659,10 +659,10 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
           LOGGER.debug("[transactionId:{}] Skipping read operation for storage path: {}", transaction.getId(),
             storagePath);
         }
-        transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.SUCCESS,
+        transactionLogService.updateConsolidatedStoragePathOperationState(operation.getId(), OperationState.SUCCESS,
           previousVersionId);
       } catch (RODATransactionException e) {
-        transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.FAILURE);
+        transactionLogService.updateConsolidatedStoragePathOperationState(operation.getId(), OperationState.FAILURE);
         throw e;
       }
     }
@@ -813,7 +813,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       .getSuccessfulConsolidatedStoragePathOperations(transaction);
     try {
       for (TransactionStoragePathConsolidatedOperation operation : successfulOperations) {
-        transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.ROLLING_BACK);
+        transactionLogService.updateConsolidatedStoragePathOperationState(operation.getId(),
+          OperationState.ROLLING_BACK);
         if (operation.getOperationType() == OperationType.DELETE) {
           // rollbackDeleteOperation(operation);
         } else if (operation.getOperationType() == OperationType.UPDATE) {
@@ -823,11 +824,13 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         } else if (operation.getOperationType() == OperationType.READ) {
           // do nothing for read operations
         }
-        transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.ROLLED_BACK);
+        transactionLogService.updateConsolidatedStoragePathOperationState(operation.getId(),
+          OperationState.ROLLED_BACK);
       }
     } catch (RODATransactionException e) {
       for (TransactionStoragePathConsolidatedOperation operation : successfulOperations) {
-        transactionLogService.updateConsolidatedStoragePathOperationState(operation, OperationState.ROLL_BACK_FAILURE);
+        transactionLogService.updateConsolidatedStoragePathOperationState(operation.getId(),
+          OperationState.ROLL_BACK_FAILURE);
       }
       throw new RODATransactionException(
         "[transactionId:" + transaction.getId() + "] Failed to rollback this transaction", e);
