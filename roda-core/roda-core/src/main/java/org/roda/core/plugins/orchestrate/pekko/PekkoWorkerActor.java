@@ -42,7 +42,12 @@ public class PekkoWorkerActor extends PekkoBaseActor {
     super();
     this.model = getModel();
     this.index = getIndex();
-    this.RODATransactionManager = getStorageTransactionManager();
+    try {
+      this.RODATransactionManager = getStorageTransactionManager();
+    } catch (GenericException e) {
+      LOGGER.error("Error initializing RODATransactionManager", e);
+      this.RODATransactionManager = null;
+    }
   }
 
   @Override
