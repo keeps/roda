@@ -149,6 +149,8 @@ public class MembersController implements MembersRestService, Exportable {
     if (request.getUserPrincipal() instanceof AttributePrincipal attributesPrincipal) {
       attributes = attributesPrincipal.getAttributes();
     }
+    String groupsAttribute = RodaCoreFactory.getRodaConfiguration()
+      .getString(RodaConstants.CORE_EXTERNAL_AUTH_GROUPS_ATTRIBUTE, "memberOf");
 
     if ((user == null || user.equals(new User())) && attributes != null) {
       // couldn't find with username, so try to find with email
@@ -172,7 +174,10 @@ public class MembersController implements MembersRestService, Exportable {
       // try to set user email, full name and groups from cas principal attributes
       mapCasStringAttribute(user, attributes, "fullname", (u, a) -> u.setFullName(a));
       mapCasStringAttribute(user, attributes, "email", (u, a) -> u.setEmail(a));
-      mapCasSetAttribute(user, attributes, "memberOf", (u, a) -> u.setGroups(a));
+      mapCasSetAttribute(user, attributes, groupsAttribute, (u, a) -> {
+        Set<String> rodaGroups = mapCasGroupstoRODAGroups(a);
+        u.setGroups(rodaGroups);
+      });
 
       user = RodaCoreFactory.getModelService().createUser(user, true);
     } else {
@@ -186,11 +191,14 @@ public class MembersController implements MembersRestService, Exportable {
         && !user.getFullName().equals(attributes.get("fullname"))) {
         user.setFullName(fullname);
       }
-      if (attributes.get("memberOf") instanceof Collection<?> memberOf) {
+      if (attributes.get(groupsAttribute) instanceof Collection<?> memberOf) {
         Set<String> groups = new HashSet<>();
         for (Object group : memberOf) {
           if (group instanceof String groupString) {
-            groups.add(groupString);
+            String rodaGroup = mapCasGrouptoRODAGroup(groupString);
+            if (rodaGroup != null) {
+              groups.add(rodaGroup);
+            }
           }
         }
         if (!user.getGroups().equals(groups)) {
@@ -230,6 +238,22 @@ public class MembersController implements MembersRestService, Exportable {
       newCollection.add(group);
     }
     mapping.accept(user, newCollection);
+  }
+
+  private static Set<String> mapCasGroupstoRODAGroups(Set<String> casGroups) {
+    Set<String> result = new HashSet<>();
+    for (String casGroup : casGroups) {
+      String rodaGroup = mapCasGrouptoRODAGroup(casGroup);
+      if (rodaGroup != null) {
+        result.add(rodaGroup);
+      }
+    }
+    return result;
+  }
+
+  private static String mapCasGrouptoRODAGroup(String casGroup) {
+    return RodaCoreFactory.getRodaConfiguration()
+      .getString(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_PREFIX + "." + casGroup, null);
   }
 
   @Override
