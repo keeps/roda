@@ -73,6 +73,7 @@ public final class RodaConstants {
 
   public static final String CORE_STORAGE_LEGACY_IMPLEMENTATION_ENABLED = "core.storage.legacy.implementation.enabled";
 
+  public static final String CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED = "core.authorization.external.group_mapping";
   public static final String CORE_EXTERNAL_AUTH_GROUPS_ATTRIBUTE = "core.authorization.external.attribute";
   public static final String CORE_EXTERNAL_AUTH_GROUP_MAPPING_PREFIX = "core.authorization.internal.groups";
   /*

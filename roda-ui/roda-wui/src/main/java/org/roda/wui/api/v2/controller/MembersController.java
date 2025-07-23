@@ -174,10 +174,13 @@ public class MembersController implements MembersRestService, Exportable {
       // try to set user email, full name and groups from cas principal attributes
       mapCasStringAttribute(user, attributes, "fullname", (u, a) -> u.setFullName(a));
       mapCasStringAttribute(user, attributes, "email", (u, a) -> u.setEmail(a));
-      mapCasSetAttribute(user, attributes, groupsAttribute, (u, a) -> {
-        Set<String> rodaGroups = mapCasGroupstoRODAGroups(a);
-        u.setGroups(rodaGroups);
-      });
+      if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED,
+        true)) {
+        mapCasSetAttribute(user, attributes, groupsAttribute, (u, a) -> {
+          Set<String> rodaGroups = mapCasGroupstoRODAGroups(a);
+          u.setGroups(rodaGroups);
+        });
+      }
 
       user = RodaCoreFactory.getModelService().createUser(user, true);
     } else {
@@ -191,18 +194,21 @@ public class MembersController implements MembersRestService, Exportable {
         && !user.getFullName().equals(attributes.get("fullname"))) {
         user.setFullName(fullname);
       }
-      if (attributes.get(groupsAttribute) instanceof Collection<?> memberOf) {
-        Set<String> groups = new HashSet<>();
-        for (Object group : memberOf) {
-          if (group instanceof String groupString) {
-            String rodaGroup = mapCasGrouptoRODAGroup(groupString);
-            if (rodaGroup != null) {
-              groups.add(rodaGroup);
+      if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED,
+        true)) {
+        if (attributes.get(groupsAttribute) instanceof Collection<?> memberOf) {
+          Set<String> groups = new HashSet<>();
+          for (Object group : memberOf) {
+            if (group instanceof String groupString) {
+              String rodaGroup = mapCasGrouptoRODAGroup(groupString);
+              if (rodaGroup != null) {
+                groups.add(rodaGroup);
+              }
             }
           }
-        }
-        if (!user.getGroups().equals(groups)) {
-          user.setGroups(groups);
+          if (!user.getGroups().equals(groups)) {
+            user.setGroups(groups);
+          }
         }
       }
       RodaCoreFactory.getModelService().updateUser(user, null, true);
