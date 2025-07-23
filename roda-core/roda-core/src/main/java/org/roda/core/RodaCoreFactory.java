@@ -433,7 +433,7 @@ public class RodaCoreFactory {
         instantiateStorageAndModel();
         LOGGER.debug("Finished instantiating storage & model");
 
-        if (configurationManager.isTransactionalStorageImplementationEnabled()) {
+        if (!configurationManager.isLegacyImplementationEnabled()) {
           instantiateTransactionManager(nodeType);
           LOGGER.debug("Finished instantiating transaction manager");
         }
@@ -500,12 +500,10 @@ public class RodaCoreFactory {
 
         instanceId = getProperty(RodaConstants.CORE_NODE_INSTANCE_ID, "");
 
-        if (configurationManager.isTransactionalStorageImplementationEnabled()) {
-          if (nodeType == NodeType.PRIMARY && RODATransactionManager != null
-            && RODATransactionManager.isInitialized()) {
-            RODATransactionManager.cleanUnfinishedTransactions();
-            LOGGER.debug("Finished clean unfinished transactions operation");
-          }
+        if (!configurationManager.isLegacyImplementationEnabled() && nodeType == NodeType.PRIMARY
+          && RODATransactionManager != null && RODATransactionManager.isInitialized()) {
+          RODATransactionManager.cleanUnfinishedTransactions();
+          LOGGER.debug("Finished clean unfinished transactions operation");
         }
 
         instantiated = true;
@@ -929,18 +927,16 @@ public class RodaCoreFactory {
     }
   }
 
-  public static RODATransactionManager getTransactionManager() {
+  public static RODATransactionManager getTransactionManager() throws GenericException {
     if (nodeType.equals(NodeType.TEST)) {
       // TODO: Handle test mode
       return null;
     }
-    if (SpringContext.isContextInitialized()) {
-      RODATransactionManager = SpringContext.getBean(RODATransactionManager.class);
-      RODATransactionManager.setMainModelService(model);
-      RODATransactionManager.setInitialized(true);
-      return RODATransactionManager;
+    if (RODATransactionManager == null && !configurationManager.isLegacyImplementationEnabled()) {
+      instantiateTransactionManager(nodeType);
+      LOGGER.debug("Finished instantiating transaction manager");
     }
-    return null;
+    return RODATransactionManager;
   }
 
   /**

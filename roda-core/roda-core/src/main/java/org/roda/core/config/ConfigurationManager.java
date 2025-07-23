@@ -69,7 +69,7 @@ public class ConfigurationManager {
   private Path defaultPath;
   private Path reportPath;
   private Path synchronizationDirectoryPath;
-  private boolean transactionalStorageImplementationEnabled;
+  private boolean legacyStorageImplementationEnabled;
   private Map<String, Map<String, String>> rodaPropertiesCache = null;
 
   /**
@@ -270,8 +270,8 @@ public class ConfigurationManager {
     this.synchronizationDirectoryPath = synchronizationDirectoryPath;
   }
 
-  public boolean isTransactionalStorageImplementationEnabled() {
-    return transactionalStorageImplementationEnabled;
+  public boolean isLegacyImplementationEnabled() {
+    return legacyStorageImplementationEnabled;
   }
 
   private List<String> CONFIGURATIONS = new ArrayList<>(Arrays.asList("roda-core.properties", "roda-roles.properties",
@@ -308,7 +308,7 @@ public class ConfigurationManager {
       }
     }
 
-    transactionalStorageImplementationEnabled = getProperty(RodaConstants.CORE_STORAGE_LEGACY_IMPLEMENTATION_ENABLED,
+    legacyStorageImplementationEnabled = getProperty(RodaConstants.CORE_STORAGE_LEGACY_IMPLEMENTATION_ENABLED,
       false);
     instantiated = true;
   }
