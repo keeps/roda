@@ -447,7 +447,7 @@ public class DescriptiveMetadataHistory extends Composite {
                       AsyncCallbackUtils.defaultFailureTreatment(error);
                     } else {
                       if (value.getVersions().isEmpty()) {
-                        HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
+                        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
                       } else {
                         descriptiveMetadataVersions = value;
                         clean();
