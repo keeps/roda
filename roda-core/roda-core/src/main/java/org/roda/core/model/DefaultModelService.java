@@ -1296,10 +1296,10 @@ public class DefaultModelService implements ModelService {
       }
     }
 
-    notifyRepresentationDeleted(aipId, representationId).failOnError();
-
     AIP updatedAIP = updateAIPMetadata(aip, username);
     notifyAipUpdatedOnChanged(updatedAIP).failOnError();
+
+    notifyRepresentationDeleted(aipId, representationId).failOnError();
   }
 
   @Override
