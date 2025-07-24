@@ -197,17 +197,15 @@ public class MembersController implements MembersRestService, Exportable {
       if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED,
         true)) {
         if (attributes.get(groupsAttribute) instanceof Collection<?> memberOf) {
-          Set<String> groups = new HashSet<>();
+          Set<String> casGroups = new HashSet<>();
           for (Object group : memberOf) {
             if (group instanceof String groupString) {
-              String rodaGroup = mapCasGrouptoRODAGroup(groupString);
-              if (rodaGroup != null) {
-                groups.add(rodaGroup);
-              }
+              casGroups.add(groupString);
             }
           }
-          if (!user.getGroups().equals(groups)) {
-            user.setGroups(groups);
+          Set<String> rodaGroups = mapCasGroupstoRODAGroups(casGroups);
+          if (!user.getGroups().equals(rodaGroups)) {
+            user.setGroups(rodaGroups);
           }
         }
       }
@@ -248,18 +246,22 @@ public class MembersController implements MembersRestService, Exportable {
 
   private static Set<String> mapCasGroupstoRODAGroups(Set<String> casGroups) {
     Set<String> result = new HashSet<>();
-    for (String casGroup : casGroups) {
-      String rodaGroup = mapCasGrouptoRODAGroup(casGroup);
-      if (rodaGroup != null) {
-        result.add(rodaGroup);
+    List<String> mappings = RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPINGS);
+
+    for (String mapping : mappings) {
+      String externalGroupRegex = RodaCoreFactory.getRodaConfiguration()
+        .getString(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_PREFIX + "." + mapping + "."
+          + RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_EXTERNAL_SUFFIX, null);
+      for (String casGroup : casGroups) {
+        if (casGroup.matches(externalGroupRegex)) {
+          List<String> rodaGroups = RodaCoreFactory
+            .getRodaConfigurationAsList(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_PREFIX + "." + mapping + "."
+              + RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_INTERNAL_SUFFIX);
+          result.addAll(rodaGroups);
+        }
       }
     }
     return result;
-  }
-
-  private static String mapCasGrouptoRODAGroup(String casGroup) {
-    return RodaCoreFactory.getRodaConfiguration()
-      .getString(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_PREFIX + "." + casGroup, null);
   }
 
   @Override
