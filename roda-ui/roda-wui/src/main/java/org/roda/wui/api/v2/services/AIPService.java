@@ -775,7 +775,8 @@ public class AIPService {
     try (CloseableIterable<BinaryVersion> binaryVersions = listDescriptiveMetadataVersions(model, aip.getId(),
       representationId, metadataId)) {
       for (BinaryVersion binaryVersion : binaryVersions) {
-        versionResponses.add(new ResourceVersion(binaryVersion.getId(), binaryVersion.getCreatedDate()));
+        versionResponses.add(
+          new ResourceVersion(binaryVersion.getId(), binaryVersion.getCreatedDate(), binaryVersion.getProperties()));
       }
     } catch (IOException e) {
       throw new GenericException(e);

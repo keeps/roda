@@ -10,6 +10,7 @@ package org.roda.core.storage;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -149,11 +150,11 @@ public class StorageServiceWrapper implements StorageService {
 
   @Override
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists, boolean snapshotCurrentVersion)
+    boolean createIfNotExists, boolean snapshotCurrentVersion, Map<String, String> properties)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
     return storageService.updateBinaryContent(storagePath, payload, asReference, createIfNotExists,
-      snapshotCurrentVersion);
+      snapshotCurrentVersion, properties);
   }
 
   @Override
@@ -210,10 +211,10 @@ public class StorageServiceWrapper implements StorageService {
   }
 
   @Override
-  public Binary revertBinaryVersion(StoragePath storagePath, String version)
+  public Binary revertBinaryVersion(StoragePath storagePath, String version, Map<String, String> properties)
     throws NotFoundException, RequestNotValidException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-    return storageService.revertBinaryVersion(storagePath, version);
+    return storageService.revertBinaryVersion(storagePath, version, properties);
   }
 
   @Override

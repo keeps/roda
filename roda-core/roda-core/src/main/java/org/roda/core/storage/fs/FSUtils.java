@@ -1004,7 +1004,7 @@ public class FSUtils {
         ret.setBinary(binary);
       } else {
         Date createdDate = new Date(Files.readAttributes(path, BasicFileAttributes.class).creationTime().toMillis());
-        ret = new DefaultBinaryVersion(binary, id, createdDate);
+        ret = new DefaultBinaryVersion(binary, id, createdDate, new HashMap<>());
       }
 
     } catch (IOException e) {

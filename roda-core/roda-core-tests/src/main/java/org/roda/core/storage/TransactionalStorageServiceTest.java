@@ -1085,7 +1085,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     StorageService storage4 = context4.transactionalStorageService();
     // 4.2) update binary content
     final ContentPayload newPayload = new RandomMockContentPayload();
-    final Binary binaryUpdated = storage4.updateBinaryContent(binaryStoragePath, newPayload, false, false, false);
+    final Binary binaryUpdated = storage4.updateBinaryContent(binaryStoragePath, newPayload, false, false, false, null);
     // 4.3) end fourth transaction
     transactionManager.endTransaction(context4.transactionLog().getId());
     // 4.4) assert that the binary was updated
@@ -1124,7 +1124,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     final ContentPayload payload = new RandomMockContentPayload();
     final boolean asReference = false;
     try {
-      storage2.updateBinaryContent(binaryStoragePath, payload, asReference, false, false);
+      storage2.updateBinaryContent(binaryStoragePath, payload, asReference, false, false, null);
       Assert.fail("An exception should have been thrown while updating a binary that doesn't exist");
     } catch (NotFoundException e) {
       LOGGER.info("Caught expected exception: {}", e.getMessage());
@@ -1136,7 +1136,8 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     TransactionalContext context3 = transactionManager.beginTestTransaction(mainStorage);
     StorageService storage3 = context3.transactionalStorageService();
     // 3.2) update binary content now with createIfNotExists=true
-    Binary updatedBinaryContent = storage3.updateBinaryContent(binaryStoragePath, payload, asReference, true, false);
+    Binary updatedBinaryContent = storage3.updateBinaryContent(binaryStoragePath, payload, asReference, true, false,
+      null);
     // 3.3) end third transaction
     transactionManager.endTransaction(context3.transactionLog().getId());
     // 3.4) assert that the binary content is valid
@@ -1743,8 +1744,9 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     TransactionalContext context4 = transactionManager.beginTestTransaction(mainStorage);
     StorageService storage4 = context4.transactionalStorageService();
     // 4.2) update binary
+    properties.put(RodaConstants.VERSION_MESSAGE, "v1");
     final ContentPayload payload2 = new RandomMockContentPayload();
-    storage4.updateBinaryContent(binaryStoragePath, payload2, false, false, true);
+    storage4.updateBinaryContent(binaryStoragePath, payload2, false, false, true, properties);
     // 4.3) end fourth transaction
     transactionManager.endTransaction(context4.transactionLog().getId());
 
@@ -1772,7 +1774,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     TransactionalContext context9 = transactionManager.beginTestTransaction(mainStorage);
     StorageService storage9 = context9.transactionalStorageService();
     // 9.2) revert to previous version
-    storage9.revertBinaryVersion(binaryStoragePath, binaryVersion1.getId());
+    storage9.revertBinaryVersion(binaryStoragePath, binaryVersion1.getId(), null);
     // 9.3) end ninth transaction
     transactionManager.endTransaction(context9.transactionLog().getId());
 
@@ -1886,7 +1888,7 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     StorageService storage2 = context2.transactionalStorageService();
     // 2.2) update the binary
     final ContentPayload payload2 = new RandomMockContentPayload();
-    Binary updatedBinary = storage2.updateBinaryContent(binaryStoragePath, payload2, false, false, true);
+    Binary updatedBinary = storage2.updateBinaryContent(binaryStoragePath, payload2, false, false, true, null);
     // 2.3) commit second transaction
     transactionManager.commitTestTransactionWithoutRemoving(context2.transactionLog().getId());
     // 2.4) check that the binary was updated
@@ -1919,10 +1921,10 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     StorageService storage2 = context2.transactionalStorageService();
     // 2.2) update the binary
     final ContentPayload payload2 = new RandomMockContentPayload();
-    storage2.updateBinaryContent(binaryStoragePath, payload2, false, false, true);
+    storage2.updateBinaryContent(binaryStoragePath, payload2, false, false, true, null);
     // 2.3) update the binary
     final ContentPayload payload3 = new RandomMockContentPayload();
-    storage2.updateBinaryContent(binaryStoragePath, payload3, false, false, true);
+    storage2.updateBinaryContent(binaryStoragePath, payload3, false, false, true, null);
     // 2.4) commit second transaction
     transactionManager.commitTestTransactionWithoutRemoving(context2.transactionLog().getId());
     // 2.5) count binary versions
