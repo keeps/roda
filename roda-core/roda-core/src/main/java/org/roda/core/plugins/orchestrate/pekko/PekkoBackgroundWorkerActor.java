@@ -9,6 +9,7 @@ package org.roda.core.plugins.orchestrate.pekko;
 
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.pekko.Messages;
 import org.roda.core.common.pekko.PekkoBaseActor;
 import org.roda.core.common.pekko.messages.plugins.PluginAfterAllExecuteIsReady;
@@ -27,6 +28,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.transaction.RODATransactionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,11 +40,18 @@ public class PekkoBackgroundWorkerActor extends PekkoBaseActor {
 
   private final IndexService index;
   private final ModelService model;
+  private RODATransactionManager RODATransactionManager;
 
   public PekkoBackgroundWorkerActor() {
     super();
     this.model = getModel();
     this.index = getIndex();
+    try {
+      this.RODATransactionManager = getStorageTransactionManager();
+    } catch (GenericException e) {
+      LOGGER.error("Error initializing RODATransactionManager", e);
+      this.RODATransactionManager = null;
+    }
   }
 
   @Override
@@ -63,8 +72,15 @@ public class PekkoBackgroundWorkerActor extends PekkoBaseActor {
     List<LiteOptionalWithCause> objectsToBeProcessed = message.getList();
     message.logProcessingStarted();
     Plugin<IsRODAObject> messagePlugin = message.getPlugin();
+
+    boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(RodaCoreFactory.getNodeType());
+
     try {
-      messagePlugin.execute(index, model, objectsToBeProcessed);
+      if (writeIsAllowed && RODATransactionManager != null && RODATransactionManager.isInitialized()) {
+        RODATransactionManager.runPluginInTransaction(messagePlugin, objectsToBeProcessed);
+      } else {
+        messagePlugin.execute(index, model, objectsToBeProcessed);
+      }
       getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, false).withJobPriority(message.getJobPriority())
         .withParallelism(message.getParallelism()), getSelf());
     } catch (Throwable e) {
