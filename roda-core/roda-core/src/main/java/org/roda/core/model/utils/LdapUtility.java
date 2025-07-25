@@ -1243,6 +1243,8 @@ public class LdapUtility {
       modifiedLdapGroup.setId(ldapGroup.getId());
       modifiedLdapGroup.setNew(false);
       ldapGroupRepository.save(modifiedLdapGroup);
+
+      setMemberDirectRoles(getGroupDN(modifiedGroup.getName()), modifiedGroup.getDirectRoles());
     } catch (NamingException e) {
       throw new GenericException("Error modifying group " + modifiedGroup.getName(), e);
     }
