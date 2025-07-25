@@ -437,7 +437,7 @@ public class FileStorageService implements StorageService {
 
   @Override
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists, boolean snapshotCurrentVersion)
+    boolean createIfNotExists, boolean snapshotCurrentVersion, Map<String, String> properties)
     throws GenericException, NotFoundException, RequestNotValidException {
     if (asReference) {
       Path binaryPath = FSUtils.getEntityPath(basePath, storagePath);
@@ -479,7 +479,7 @@ public class FileStorageService implements StorageService {
       } else {
         if (snapshotCurrentVersion) {
           try {
-            previousBinaryVersion = snapshotBinaryVersion(storagePath);
+            previousBinaryVersion = snapshotBinaryVersion(storagePath, properties);
           } catch (RequestNotValidException | NotFoundException | GenericException e) {
             LOGGER.warn("Could not create binary version for {}", storagePath, e);
           }
@@ -753,7 +753,7 @@ public class FileStorageService implements StorageService {
     return FSUtils.convertPathToBinaryVersion(historyDataPath, historyMetadataPath, binVersionPath);
   }
 
-  private BinaryVersion snapshotBinaryVersion(StoragePath storagePath)
+  private BinaryVersion snapshotBinaryVersion(StoragePath storagePath, Map<String, String> properties)
     throws RequestNotValidException, NotFoundException, GenericException {
     if (historyDataPath == null) {
       throw new GenericException("Skipping create binary version because no history folder is defined!");
@@ -791,6 +791,7 @@ public class FileStorageService implements StorageService {
       DefaultBinaryVersion b = new DefaultBinaryVersion();
       b.setId(id);
       b.setCreatedDate(new Date());
+      b.setProperties(properties);
       Files.createDirectories(metadataPath.getParent());
       JsonUtils.writeObjectToFile(b, metadataPath);
 
@@ -802,7 +803,7 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public Binary revertBinaryVersion(StoragePath storagePath, String version)
+  public Binary revertBinaryVersion(StoragePath storagePath, String version, Map<String, String> properties)
     throws NotFoundException, RequestNotValidException, GenericException {
 
     Path binPath = FSUtils.getEntityPath(basePath, storagePath);
@@ -830,7 +831,7 @@ public class FileStorageService implements StorageService {
       // get binary
       BinaryVersion previousBinaryVersion = null;
       try {
-        previousBinaryVersion = snapshotBinaryVersion(storagePath);
+        previousBinaryVersion = snapshotBinaryVersion(storagePath, properties);
       } catch (RequestNotValidException | NotFoundException | GenericException e) {
         LOGGER.warn("Could not create binary version for {}", storagePath, e);
       }

@@ -58,7 +58,7 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
           }
 
           StringContentPayload payload = new StringContentPayload(JsonUtils.getJsonFromObject(aip));
-          model.updateBinaryContent(aip.get(), payload, false, false, false);
+          model.updateBinaryContent(aip.get(), payload, false, false, false, null);
         } else {
           LOGGER.warn("Could not get list an AIP");
         }

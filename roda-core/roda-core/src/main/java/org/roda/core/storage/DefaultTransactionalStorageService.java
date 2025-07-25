@@ -337,7 +337,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   @Override
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
-    boolean createIfNotExists, boolean snapshotCurrentVersion)
+    boolean createIfNotExists, boolean snapshotCurrentVersion, Map<String, String> properties)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     if (mainStorageService.exists(storagePath) || stagingStorageService.exists(storagePath)) {
       TransactionalStoragePathOperationLog updateBinaryLog = registerOperation(storagePath, OperationType.UPDATE);
@@ -350,7 +350,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       }
       try {
         Binary ret = stagingStorageService.updateBinaryContent(storagePath, payload, asReference, true,
-          snapshotCurrentVersion);
+          snapshotCurrentVersion, properties);
         updateOperationState(updateBinaryLog, OperationState.SUCCESS, ret.getPreviousVersionId(), null);
         return ret;
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -360,7 +360,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     } else if (createIfNotExists) {
       TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.CREATE);
       try {
-        Binary ret = stagingStorageService.updateBinaryContent(storagePath, payload, asReference, true, false);
+        Binary ret = stagingStorageService.updateBinaryContent(storagePath, payload, asReference, true, false,
+          properties);
         updateOperationState(operationLog, OperationState.SUCCESS);
         return ret;
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -512,14 +513,14 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   @Override
-  public Binary revertBinaryVersion(StoragePath storagePath, String version)
+  public Binary revertBinaryVersion(StoragePath storagePath, String version, Map<String, String> properties)
     throws NotFoundException, RequestNotValidException, GenericException, AuthorizationDeniedException {
     TransactionalStoragePathOperationLog updateBinaryOperation = registerOperation(storagePath, OperationType.UPDATE);
     copyToStagingStorageService(mainStorageService, storagePath);
     try {
       importBinaryVersion(mainStorageService, storagePath, version);
       try {
-        Binary ret = stagingStorageService.revertBinaryVersion(storagePath, version);
+        Binary ret = stagingStorageService.revertBinaryVersion(storagePath, version, properties);
         if (ret.getPreviousVersionId() != null) {
           updateOperationState(updateBinaryOperation, OperationState.SUCCESS, ret.getPreviousVersionId(), null);
         }
@@ -694,8 +695,9 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
           transaction.getId(), storagePath);
         if (previousVersion != null) {
           Binary stagingBinary = stagingStorageService.getBinary(storagePath);
+          BinaryVersion previousStagingBinary = stagingStorageService.getBinaryVersion(storagePath, previousVersion);
           Binary mainStorageBinary = mainStorageService.updateBinaryContent(storagePath, stagingBinary.getContent(),
-            false, false, true);
+            false, false, true, previousStagingBinary.getProperties());
           return mainStorageBinary.getPreviousVersionId();
         }
 
@@ -868,7 +870,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       StoragePath storagePath = DefaultStoragePath
         .parse(StreamSupport.stream(Paths.get(operation.getStoragePath()).spliterator(), false).map(Path::toString)
           .collect(Collectors.toList()));
-      mainStorageService.revertBinaryVersion(storagePath, operation.getPreviousVersion());
+      mainStorageService.revertBinaryVersion(storagePath, operation.getPreviousVersion(), null);
     } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       throw new RODATransactionException("[transactionId:" + transaction.getId()
         + "] Failed to roll back update operation path at " + operation.getStoragePath(), e);
