@@ -474,16 +474,6 @@ public class TransactionalModelOperationRegistry {
         "[transactionId:" + transaction.getId() + "] Object class is not lockable: " + objectClass.getName());
     }
 
-    if (PreservationMetadata.class.isAssignableFrom(objectClass)) {
-      PreservationMetadata.PreservationMetadataType preservationType = IdUtils.getPreservationTypeFromId(id);
-      if (preservationType != null && preservationType.equals(PreservationMetadata.PreservationMetadataType.AGENT)) {
-        // AGENT type is a special case, do not acquire lock for it
-        LOGGER.debug("[transactionId:{}] Skipping lock for agent {} and operation {}", transaction.getId(), id,
-          operation);
-        return;
-      }
-    }
-
     Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, id);
     if (liteRODAObject.isPresent()) {
       try {
@@ -514,15 +504,6 @@ public class TransactionalModelOperationRegistry {
         "[transactionId:" + transaction.getId() + "] Object class is not lockable: " + objectClass.getName());
     }
 
-    if (PreservationMetadata.class.isAssignableFrom(objectClass)) {
-      PreservationMetadata.PreservationMetadataType preservationType = IdUtils.getPreservationTypeFromId(id);
-      if (preservationType != null && preservationType.equals(PreservationMetadata.PreservationMetadataType.AGENT)) {
-        // AGENT type is a special case, do not acquire lock for it
-        LOGGER.debug("[transactionId:{}] Skipping release lock for agent {} and operation {}", transaction.getId(), id,
-          operation);
-        return;
-      }
-    }
 
     Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, id);
     if (liteRODAObject.isPresent()) {

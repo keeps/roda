@@ -2064,12 +2064,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public void createOrUpdateJobReport(Report jobReport, Job cachedJob)
     throws GenericException, AuthorizationDeniedException {
+    jobReport.setTransactionId(transaction.getId().toString());
     mainModelService.createOrUpdateJobReport(jobReport, cachedJob);
   }
 
   @Override
   public void createOrUpdateJobReport(Report jobReport, IndexedJob indexJob)
     throws GenericException, AuthorizationDeniedException {
+    jobReport.setTransactionId(transaction.getId().toString());
     mainModelService.createOrUpdateJobReport(jobReport, indexJob);
   }
 

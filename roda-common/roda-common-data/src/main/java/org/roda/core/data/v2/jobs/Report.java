@@ -58,6 +58,7 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
   private boolean htmlPluginDetails = false;
 
   private String instanceId = null;
+  private String transactionId = null;
 
   @JsonIgnore
   private SIPInformation sipInformation = new SIPInformation();
@@ -102,6 +103,7 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
     this.htmlPluginDetails = report.isHtmlPluginDetails();
     this.reports = new ArrayList<>();
     this.instanceId = report.getInstanceId();
+    this.transactionId = report.getTransactionId();
   }
 
   @JsonIgnore
@@ -348,14 +350,28 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
     return this;
   }
 
-  public String getIngestType() { return ingestType; }
-  public void setIngestType(String status) { this.ingestType = status; }
+  public String getIngestType() {
+    return ingestType;
+  }
+
+  public void setIngestType(String status) {
+    this.ingestType = status;
+  }
+
   public String getInstanceId() {
     return instanceId;
   }
 
   public void setInstanceId(String instanceId) {
     this.instanceId = instanceId;
+  }
+
+  public String getTransactionId() {
+    return transactionId;
+  }
+
+  public void setTransactionId(String transactionId) {
+    this.transactionId = transactionId;
   }
 
   @JsonIgnore
@@ -442,7 +458,7 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
   public void injectLineSeparator(String lineSeparator) {
     this.lineSeparator = lineSeparator;
   }
-  
+
   public String getLineSeparator() {
     return lineSeparator;
   }
@@ -464,7 +480,8 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
       + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
       + plugin + ", pluginName=" + pluginName + ", pluginVersion=" + pluginVersion + ", pluginState=" + pluginState
       + ", pluginIsMandatory=" + pluginIsMandatory + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails="
-      + htmlPluginDetails + ", reports=" + reports + ", instanceId=" + instanceId + "]";
+      + htmlPluginDetails + ", reports=" + reports + ", instanceId=" + instanceId + ", transactionId=" + transactionId
+      + "]";
   }
 
 }
