@@ -2,6 +2,7 @@ package org.roda.core.transaction;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -10,6 +11,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -23,8 +25,8 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.entity.transaction.OperationType;
 import org.roda.core.entity.transaction.TransactionalModelOperationLog;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,8 +178,19 @@ public class TransactionModelRollbackHandler {
     TransactionalModelOperationLog modelOperation, ModelService mainModelService, ModelService stagingModelService)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
 
-    ThrowingSupplier<IsRODAObject> supplier = () -> mainModelService.retrievePreservationMetadata(pm.getId(),
-      pm.getType());
+    ThrowingSupplier<IsRODAObject> supplier = () -> {
+      Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(pm);
+      if (liteRODAObject.isPresent() && mainModelService.existsInStorage(liteRODAObject.get())) {
+        if (pm.getAipId() == null) {
+          return mainModelService.retrievePreservationMetadata(pm.getId(), pm.getType());
+        } else {
+          return mainModelService.retrievePreservationMetadata(pm.getAipId(), pm.getRepresentationId(),
+            pm.getFileDirectoryPath(), pm.getFileId(), pm.getType());
+        }
+      } else {
+        throw new NotFoundException("PreservationMetadata with ID " + pm.getId() + " not found in main storage.");
+      }
+    };
     ThrowingRunnable notifyDeleted = () -> stagingModelService.notifyPreservationMetadataDeleted(pm);
     ThrowingConsumer<IsRODAObject> notifyUpdated = retrieved -> mainModelService
       .notifyPreservationMetadataUpdated((PreservationMetadata) retrieved);

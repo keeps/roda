@@ -1,18 +1,21 @@
 package org.roda.core.transaction;
 
 import java.nio.file.Path;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.micrometer.core.annotation.Timed;
 import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.entity.transaction.TransactionLog;
@@ -29,6 +32,8 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import io.micrometer.core.annotation.Timed;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -62,10 +67,6 @@ public class RODATransactionManager {
     this.initialized = initialized;
   }
 
-  public TransactionalContext beginTransaction() throws RODATransactionException {
-    return this.beginTransaction(TransactionLog.TransactionRequestType.NON_DEFINED);
-  }
-
   public TransactionalContext beginTransaction(TransactionLog.TransactionRequestType requestType)
     throws RODATransactionException {
     return this.beginTransaction(requestType, UUID.randomUUID());
@@ -81,34 +82,56 @@ public class RODATransactionManager {
     return context;
   }
 
-  public TransactionalContext beginTestTransaction(StorageService mainStorage) throws RODATransactionException {
-    TransactionLog transactionLog = transactionLogService
-      .createTransactionLog(TransactionLog.TransactionRequestType.NON_DEFINED, UUID.randomUUID());
-    TransactionalStorageService transactionalStorageService = transactionContextFactory
-      .createTransactionalStorageService(mainStorage, transactionLog);
-    TransactionalContext context = new TransactionalContext(transactionLog, transactionalStorageService, null, null);
-    ((DefaultTransactionalStorageService) transactionalStorageService).setInitialized(true);
+  public void runPluginInTransaction(Plugin<IsRODAObject> plugin, List<LiteOptionalWithCause> objectsToBeProcessed)
+    throws RODATransactionException, PluginException {
+    String requestUUID = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+      IdUtils.createUUID());
+    plugin.getParameterValues().put(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID, requestUUID);
 
-    transactionsContext.put(transactionLog.getId(), context);
-    return context;
+    TransactionalContext context = beginTransaction(TransactionLog.TransactionRequestType.JOB,
+      UUID.fromString(requestUUID));
+    UUID transactionId = context.transactionLog().getId();
+    LOGGER.debug("[transactionId:{}] Running the plugin {} in a transaction", transactionId, plugin.getName());
+
+    Date initDate = new Date();
+    try {
+      plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
+    } catch (PluginException e) {
+      LOGGER.error("[transactionId:{}] Plugin execution failed: {}", transactionId, e.getMessage(), e);
+      throw e;
+    } finally {
+      processPluginExecutionResult(plugin, transactionId, initDate);
+      // remove locks if any
+      PluginHelper.releaseObjectLock(plugin);
+    }
   }
 
-  public void commitTestTransactionWithoutRemoving(UUID transactionID) throws RODATransactionException {
-    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTING);
-    TransactionalContext context = transactionsContext.get(transactionID);
-    if (context == null) {
-      throw new RODATransactionException("No transaction context found for ID: " + transactionID);
-    }
+  private void processPluginExecutionResult(Plugin<IsRODAObject> plugin, UUID transactionId, Date initDate)
+    throws RODATransactionException {
+    try {
+      Job job = mainModelService.retrieveJob(PluginHelper.getJobId(plugin));
+      List<Report> relatedReports = RODATransactionManagerUtils.getReportsForTransaction(job.getId(), transactionId,
+        mainModelService);
 
-    if (context.transactionalStorageService() != null) {
-      context.transactionalStorageService().commit();
-    }
+      List<Report> failedReports = relatedReports.stream()
+        .filter(report -> PluginState.FAILURE.equals(report.getPluginState())).toList();
 
-    if (context.transactionalModelService() != null) {
-      context.transactionalModelService().commit();
-    }
+      List<Report> nonFailedReports = relatedReports.stream()
+        .filter(report -> !PluginState.FAILURE.equals(report.getPluginState())).toList();
 
-    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTED);
+      if (!failedReports.isEmpty()) {
+        rollbackTransaction(transactionId);
+        RODATransactionManagerUtils.createTransactionFailureReports(failedReports, nonFailedReports, transactionId,
+          initDate, mainModelService);
+      } else {
+        endTransaction(transactionId);
+        RODATransactionManagerUtils.createTransactionSuccessReports(relatedReports, transactionId, initDate,
+          mainModelService);
+      }
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      throw new RODATransactionException(
+        "Error handling plugin result for plugin: " + plugin.getName() + " with transaction ID: " + transactionId, e);
+    }
   }
 
   public void endTransaction(UUID transactionID) throws RODATransactionException {
@@ -131,33 +154,6 @@ public class RODATransactionManager {
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTED);
   }
 
-  public void runPluginInTransaction(Plugin<IsRODAObject> plugin, List<LiteOptionalWithCause> objectsToBeProcessed)
-    throws RODATransactionException, PluginException {
-    String requestUUID = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
-      IdUtils.createUUID());
-    plugin.getParameterValues().put(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID, requestUUID);
-
-    TransactionalContext context = beginTransaction(TransactionLog.TransactionRequestType.JOB,
-      UUID.fromString(requestUUID));
-    UUID transactionId = context.transactionLog().getId();
-    LOGGER.debug("[transactionId:{}] Running the plugin {} in a transaction", transactionId, plugin.getName());
-    try {
-      Report report = plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
-      if (report.getPluginState().equals(PluginState.FAILURE)) {
-        rollbackTransaction(transactionId);
-      } else {
-        endTransaction(transactionId);
-      }
-    } catch (RODATransactionException | PluginException e) {
-      LOGGER.error("[transactionId:{}] Rolling back transaction due to exception", transactionId, e);
-      rollbackTransaction(transactionId);
-      throw e;
-    } finally {
-      // remove locks if any
-      PluginHelper.releaseObjectLock(plugin);
-    }
-  }
-
   public void rollbackTransaction(UUID transactionID) throws RODATransactionException {
     TransactionalContext context = transactionsContext.get(transactionID);
     if (context == null) {
@@ -167,7 +163,6 @@ public class RODATransactionManager {
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLING_BACK);
 
     try {
-
       if (context.transactionalStorageService() != null) {
         context.transactionalStorageService().rollback();
       }
@@ -231,5 +226,43 @@ public class RODATransactionManager {
     }
 
     return context;
+  }
+
+  /**
+   * Transaction methods for unit testing purposes.
+   */
+
+  public TransactionalContext beginTransaction() throws RODATransactionException {
+    return this.beginTransaction(TransactionLog.TransactionRequestType.NON_DEFINED);
+  }
+
+  public TransactionalContext beginTestTransaction(StorageService mainStorage) throws RODATransactionException {
+    TransactionLog transactionLog = transactionLogService
+      .createTransactionLog(TransactionLog.TransactionRequestType.NON_DEFINED, UUID.randomUUID());
+    TransactionalStorageService transactionalStorageService = transactionContextFactory
+      .createTransactionalStorageService(mainStorage, transactionLog);
+    TransactionalContext context = new TransactionalContext(transactionLog, transactionalStorageService, null, null);
+    ((DefaultTransactionalStorageService) transactionalStorageService).setInitialized(true);
+
+    transactionsContext.put(transactionLog.getId(), context);
+    return context;
+  }
+
+  public void commitTestTransactionWithoutRemoving(UUID transactionID) throws RODATransactionException {
+    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTING);
+    TransactionalContext context = transactionsContext.get(transactionID);
+    if (context == null) {
+      throw new RODATransactionException("No transaction context found for ID: " + transactionID);
+    }
+
+    if (context.transactionalStorageService() != null) {
+      context.transactionalStorageService().commit();
+    }
+
+    if (context.transactionalModelService() != null) {
+      context.transactionalModelService().commit();
+    }
+
+    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTED);
   }
 }
