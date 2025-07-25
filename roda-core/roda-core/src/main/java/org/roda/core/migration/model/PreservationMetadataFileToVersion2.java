@@ -104,7 +104,8 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
       boolean asReference = false;
       boolean createIfNotExists = false;
       boolean snapshotCurrentVersion = false;
-      model.updateBinaryContent(newPMLite.get(), newPremis, asReference, createIfNotExists, snapshotCurrentVersion);
+      model.updateBinaryContent(newPMLite.get(), newPremis, asReference, createIfNotExists, snapshotCurrentVersion,
+        null);
     } catch (GenericException | IOException | ValidationException | NotFoundException | RequestNotValidException
       | AuthorizationDeniedException | AlreadyExistsException e) {
       LOGGER.error("Could not migrate preservation metadata file {}", binary.getStoragePath(), e);

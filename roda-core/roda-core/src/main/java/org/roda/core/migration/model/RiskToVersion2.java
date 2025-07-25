@@ -66,7 +66,7 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
         boolean asReference = false;
         boolean createIfNotExists = false;
         boolean snapshotCurrentVersion = false;
-        model.updateBinaryContent(risk, payload, asReference, createIfNotExists, snapshotCurrentVersion);
+        model.updateBinaryContent(risk, payload, asReference, createIfNotExists, snapshotCurrentVersion, null);
       } else {
         LOGGER.error("Could not migrate risk {} because the JSON is not an object node", binary.getStoragePath());
       }

@@ -234,7 +234,14 @@ public class DescriptiveMetadataHistory extends Composite {
     // create list layout
     for (ResourceVersion version : versionList) {
       String versionKey = version.getId();
-      String message = messages.versionAction(versionKey);
+      String message = "";
+      if (version.getProperties() != null) {
+        message = messages.versionAction(version.getProperties().get(RodaConstants.VERSION_ACTION));
+
+        if (version.getProperties().get(RodaConstants.VERSION_USER) != null) {
+          message = messages.versionActionBy(message, version.getProperties().get(RodaConstants.VERSION_USER));
+        }
+      }
       Date createdDate = version.getCreatedDate();
 
       list.addItem(messages.descriptiveMetadataHistoryLabel(message, createdDate), versionKey);

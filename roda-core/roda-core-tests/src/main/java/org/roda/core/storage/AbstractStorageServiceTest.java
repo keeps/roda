@@ -540,7 +540,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
 
     // 1) update binary content
     final ContentPayload newPayload = new RandomMockContentPayload();
-    final Binary binaryUpdated = getStorage().updateBinaryContent(binaryStoragePath, newPayload, false, false, false);
+    final Binary binaryUpdated = getStorage().updateBinaryContent(binaryStoragePath, newPayload, false, false, false,
+      null);
     assertNotNull(binaryUpdated);
 
     try (InputStream stream = Files.newInputStream(original)) {
@@ -564,7 +565,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     final ContentPayload payload = new RandomMockContentPayload();
     final boolean asReference = false;
     try {
-      getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, false, false);
+      getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, false, false, null);
       Assert.fail(
         "An exception should have been thrown while updating a binary that doesn't exist but it didn't happened!");
     } catch (NotFoundException e) {
@@ -573,7 +574,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
 
     // update binary content now with createIfNotExists=true
     Binary updatedBinaryContent = getStorage().updateBinaryContent(binaryStoragePath, payload, asReference, true,
-      false);
+      false, null);
     testBinaryContent(updatedBinaryContent, payload);
 
     // cleanup
@@ -891,8 +892,10 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     getStorage().createBinary(binaryStoragePath, payload1, false);
 
     // 2) update binary
+    String message1 = "v1";
+    properties.put(RodaConstants.VERSION_MESSAGE, message1);
     final ContentPayload payload2 = new RandomMockContentPayload();
-    getStorage().updateBinaryContent(binaryStoragePath, payload2, false, false, true);
+    getStorage().updateBinaryContent(binaryStoragePath, payload2, false, false, true, properties);
 
     // 3) list binary versions
     CloseableIterable<BinaryVersion> binaryVersions = getStorage().listBinaryVersions(binaryStoragePath);
@@ -907,12 +910,13 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> exten
     BinaryVersion binaryVersion1 = reusableBinaryVersions.getFirst();
     // TODO compare properties
     assertNotNull(binaryVersion1.getCreatedDate());
+    ;
 
     assertTrue(
       IOUtils.contentEquals(payload1.createInputStream(), binaryVersion1.getBinary().getContent().createInputStream()));
 
     // 5) revert to previous version
-    getStorage().revertBinaryVersion(binaryStoragePath, binaryVersion1.getId());
+    getStorage().revertBinaryVersion(binaryStoragePath, binaryVersion1.getId(), null);
 
     Binary binary = getStorage().getBinary(binaryStoragePath);
     testBinaryContent(binary, payload1);

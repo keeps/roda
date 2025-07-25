@@ -146,7 +146,7 @@ public final class StorageServiceUtils {
       boolean asReference = false;
 
       if (sync) {
-        toService.updateBinaryContent(toStoragePath, binary.getContent(), asReference, true, false);
+        toService.updateBinaryContent(toStoragePath, binary.getContent(), asReference, true, false, null);
       } else {
         toService.createBinary(toStoragePath, binary.getContent(), asReference);
       }
