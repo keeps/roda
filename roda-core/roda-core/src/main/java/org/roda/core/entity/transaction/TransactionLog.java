@@ -63,6 +63,9 @@ public class TransactionLog implements Serializable {
   @OneToMany(mappedBy = "transactionLog", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   private List<TransactionalModelOperationLog> modelOperations = new ArrayList<>();
 
+  @OneToMany(mappedBy = "transactionLog", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  private List<TransactionStoragePathConsolidatedOperation> storagePathsConsolidatedOperations = new ArrayList<>();
+
   public TransactionLog() {
 
   }
