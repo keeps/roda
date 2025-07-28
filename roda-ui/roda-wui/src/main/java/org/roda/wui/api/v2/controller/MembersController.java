@@ -149,6 +149,8 @@ public class MembersController implements MembersRestService, Exportable {
     if (request.getUserPrincipal() instanceof AttributePrincipal attributesPrincipal) {
       attributes = attributesPrincipal.getAttributes();
     }
+    String groupsAttribute = RodaCoreFactory.getRodaConfiguration()
+      .getString(RodaConstants.CORE_EXTERNAL_AUTH_GROUPS_ATTRIBUTE, "memberOf");
 
     if ((user == null || user.equals(new User())) && attributes != null) {
       // couldn't find with username, so try to find with email
@@ -172,7 +174,13 @@ public class MembersController implements MembersRestService, Exportable {
       // try to set user email, full name and groups from cas principal attributes
       mapCasStringAttribute(user, attributes, "fullname", (u, a) -> u.setFullName(a));
       mapCasStringAttribute(user, attributes, "email", (u, a) -> u.setEmail(a));
-      mapCasSetAttribute(user, attributes, "memberOf", (u, a) -> u.setGroups(a));
+      if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED,
+        false)) {
+        mapCasSetAttribute(user, attributes, groupsAttribute, (u, a) -> {
+          Set<String> rodaGroups = mapCasGroupstoRODAGroups(a);
+          u.setGroups(rodaGroups);
+        });
+      }
 
       user = RodaCoreFactory.getModelService().createUser(user, true);
     } else {
@@ -186,15 +194,19 @@ public class MembersController implements MembersRestService, Exportable {
         && !user.getFullName().equals(attributes.get("fullname"))) {
         user.setFullName(fullname);
       }
-      if (attributes.get("memberOf") instanceof Collection<?> memberOf) {
-        Set<String> groups = new HashSet<>();
-        for (Object group : memberOf) {
-          if (group instanceof String groupString) {
-            groups.add(groupString);
+      if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED,
+        false)) {
+        if (attributes.get(groupsAttribute) instanceof Collection<?> memberOf) {
+          Set<String> casGroups = new HashSet<>();
+          for (Object group : memberOf) {
+            if (group instanceof String groupString) {
+              casGroups.add(groupString);
+            }
           }
-        }
-        if (!user.getGroups().equals(groups)) {
-          user.setGroups(groups);
+          Set<String> rodaGroups = mapCasGroupstoRODAGroups(casGroups);
+          if (!user.getGroups().equals(rodaGroups)) {
+            user.setGroups(rodaGroups);
+          }
         }
       }
       RodaCoreFactory.getModelService().updateUser(user, null, true);
@@ -230,6 +242,26 @@ public class MembersController implements MembersRestService, Exportable {
       newCollection.add(group);
     }
     mapping.accept(user, newCollection);
+  }
+
+  private static Set<String> mapCasGroupstoRODAGroups(Set<String> casGroups) {
+    Set<String> result = new HashSet<>();
+    List<String> mappings = RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPINGS);
+
+    for (String mapping : mappings) {
+      String externalGroupRegex = RodaCoreFactory.getRodaConfiguration()
+        .getString(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_PREFIX + "." + mapping + "."
+          + RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_EXTERNAL_SUFFIX, null);
+      for (String casGroup : casGroups) {
+        if (casGroup.matches(externalGroupRegex)) {
+          List<String> rodaGroups = RodaCoreFactory
+            .getRodaConfigurationAsList(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_PREFIX + "." + mapping + "."
+              + RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_INTERNAL_SUFFIX);
+          result.addAll(rodaGroups);
+        }
+      }
+    }
+    return result;
   }
 
   @Override

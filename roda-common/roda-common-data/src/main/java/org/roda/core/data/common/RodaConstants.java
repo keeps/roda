@@ -72,6 +72,13 @@ public final class RodaConstants {
   public static final String CORE_INGEST_SKIP_FIX_PARENTS = "core.ingest.skip.fix.parents";
 
   public static final String CORE_STORAGE_LEGACY_IMPLEMENTATION_ENABLED = "core.storage.legacy.implementation.enabled";
+
+  public static final String CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED = "core.authorization.external.group_mapping";
+  public static final String CORE_EXTERNAL_AUTH_GROUPS_ATTRIBUTE = "core.authorization.external.attribute";
+  public static final String CORE_EXTERNAL_AUTH_GROUP_MAPPINGS = "core.authorization.external.mappings[]";
+  public static final String CORE_EXTERNAL_AUTH_GROUP_MAPPING_PREFIX = "core.authorization.external.mapping";
+  public static final String CORE_EXTERNAL_AUTH_GROUP_MAPPING_INTERNAL_SUFFIX = "internal.groups[]";
+  public static final String CORE_EXTERNAL_AUTH_GROUP_MAPPING_EXTERNAL_SUFFIX = "external.group";
   /*
    * Misc
    */
