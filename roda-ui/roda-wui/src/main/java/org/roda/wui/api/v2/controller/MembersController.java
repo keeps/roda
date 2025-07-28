@@ -175,7 +175,7 @@ public class MembersController implements MembersRestService, Exportable {
       mapCasStringAttribute(user, attributes, "fullname", (u, a) -> u.setFullName(a));
       mapCasStringAttribute(user, attributes, "email", (u, a) -> u.setEmail(a));
       if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED,
-        true)) {
+        false)) {
         mapCasSetAttribute(user, attributes, groupsAttribute, (u, a) -> {
           Set<String> rodaGroups = mapCasGroupstoRODAGroups(a);
           u.setGroups(rodaGroups);
@@ -195,7 +195,7 @@ public class MembersController implements MembersRestService, Exportable {
         user.setFullName(fullname);
       }
       if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_EXTERNAL_AUTH_GROUP_MAPPING_ENABLED,
-        true)) {
+        false)) {
         if (attributes.get(groupsAttribute) instanceof Collection<?> memberOf) {
           Set<String> casGroups = new HashSet<>();
           for (Object group : memberOf) {
