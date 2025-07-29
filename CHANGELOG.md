@@ -1,14 +1,42 @@
 # Changelog
 
-## v5.7.6 (01/01/1970)
-#### New features 
+## v6.0.0 (29/07/2025)
+### :warning: Breaking Changes
 
-#### Enhancements 
+- Due to various dependency changes in this release, it is strongly recommended to back up all data and configurations before performing the upgrade. After upgrading, a complete reindexing of all data is required to maintain system integrity and performance.
+- The embedded ApacheDS has been replaced by an external LDAP server running in an OpenLDAP container. Due to this change, starting RODA will cause previously stored user data to be lost. We recommend backing up all user information before upgrading. A migration process to transfer existing user data will be provided as soon as possible.
+- The legacy REST API (v1) has been fully removed. All external integrations must now use the new REST API (v2)
 
-#### Bug fixes
+#### New features:
+- Major Web UI redesign: The RODA interface has been completely reimagined to deliver a cleaner, more intuitive, and user-friendly experience. This overhaul touches nearly every aspect of the UI, streamlining workflows, improving accessibility, and aligning with modern design standards. [3330](https://github.com/keeps/roda/issues/3330)
+- Introduced a transactional storage mechanism that stages most write operations before committing them to the main storage, enabling rollback in case of errors and improving data integrity and reliability. [102](https://github.com/keeps/roda/issues/102)[1224](https://github.com/keeps/roda/issues/1224)
+- The user database service has been upgraded from embedded ApacheDS to an external LDAP server with Spring LDAP integration, enhancing security, performance, and maintainability. [3115](https://github.com/keeps/roda/issues/3115)
+- Added support for manual override of file format identification via the Web UI, allowing users to correct misidentified formats when automatic detection fails. [3256](https://github.com/keeps/roda/issues/3256)
+- File format identification warnings now generate risk incidents, visible in the file information panel, allowing users to assess and accept potential issues like format mismatches or multiple matches.  [3259](https://github.com/keeps/roda/issues/3259)
+- Improved audit log presentation by grouping related REST-API calls under single user actions and allowing inspection of detailed calls, enhancing clarity and reducing noise in the Web UI. [3383](https://github.com/keeps/roda/issues/3383)
+- Added support for advanced search over nested items using Solr block join queries, enabling more precise queries across hierarchical metadata structures via new filter parameters: ParentWhichFilterParameter and ChildOfFilterParameter [3322](https://github.com/keeps/roda/issues/3322)
+- Added support for external user group mapping by allowing administrators to define mappings between CAS attributes and RODA groups through configuration. User group membership is now resolved dynamically at login based on the external attribute (e.g. memberOf) and assigned to corresponding RODA groups [3499](https://github.com/keeps/roda/pull/3499)
 
-#### Security
+#### Changes:
+- Migrated all GWT-RPC interface methods to REST API, reducing dependency on GWT and aligning with modern web architecture practices. [2060](https://github.com/keeps/roda/issues/2060)
+- Removed the sourceObjects field from the JobCollections index to prevent Solr overload caused by large identifier lists, improving system scalability and stability. Adjusted interface components to retrieve object data from the model instead of the index as needed.  [3307](https://github.com/keeps/roda/issues/3307)
+- Added welcome pages for languages other than English and Portuguese, improving user onboarding for a wider audience. [7c506370f](https://github.com/keeps/roda/commit/7c506370f22fd598ecaa48f5b26714ca4e3dbb8e)
+- Reviewed and updated pre-ingest text [3412](https://github.com/keeps/roda/pull/3412)
+- Improve support for E-ARK SIP administrative metadata (amdSec) [3380](https://github.com/keeps/roda/issues/3380)
+- Added detailed prompts and outcome tracking for lifting disposal holds, including preservation event generation via ModelService. Replaced liftDisposalHoldBySelectedItems API calls with dissociateDisposalHold for disposal hold removal.  [3235](https://github.com/keeps/roda/pull/3235)
+- Added indexing support for technical metadata to improve searchability and metadata management. [0723959e](https://github.com/keeps/roda/commit/0723959e45f137fee982d67450058fc8e757426a)
+
+#### Security:
 - Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.6 (27/06/2025)
+#### Bug fixes
+- Updated dependency of jaxb for glassfish (#3411)
 
 ---
 
@@ -419,6 +447,3 @@ Install for demonstration:
 ```
 docker pull ghcr.io/keeps/roda:v4.5.6
 ```
----
-
-## v5.1.0-RC (17/04/2023)
