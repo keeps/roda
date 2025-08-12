@@ -35,7 +35,6 @@ import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -240,16 +239,12 @@ public class BrowseAIPPortal extends Composite {
 
         @Override
         public void onSuccess(Long dipCount) {
+          String listId = "BrowseAIPPortal_dipChildren";
           if (dipCount > 1) {
-            String listId;
-            if (StringUtils.isNotBlank(bundle.getAip().getLevel())) {
-              listId = "BrowseAIPPortal_aipChildren_" + bundle.getAip().getLevel();
-            } else
-              listId = "BrowseAIPPortal_dipChildren";
-
-            ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(DIPList::new,
+            ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(ConfigurableAsyncTableCell::new,
               new AsyncTableCellOptions<>(IndexedDIP.class, listId).withFilter(filter).withJustActive(justActive)
-                .bindOpener().withSummary(messages.listOfDisseminations())
+                .withDefaultSortListColumnName(RodaConstants.DIP_DATE_CREATED).withDefaultSortListAscending(false)
+                .withSummary(messages.listOfDisseminations()).bindOpener()
                 .withActionableCallback(listActionableCallback));
 
             SearchWrapper disseminationsSearchWrapper = new SearchWrapper(false)
