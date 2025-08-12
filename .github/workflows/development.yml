@@ -1,9 +1,9 @@
-name: "Development"
+name: "RODA 5: Development"
 
 on:
   push:
     branches:
-      - "development"
+      - "roda-5-development"
 
 jobs:
   build:
@@ -92,14 +92,14 @@ jobs:
           push: true
           context: docker
           tags: |
-            ghcr.io/keeps/roda:development
-            keeps/roda:development
+            ghcr.io/keeps/roda:5-development
+            keeps/roda:5-development
           sbom: true
           provenance: mode=max
-      - name: Trigger KEEPS GitLab CI/CD
-        run: |
-          curl --progress-bar -o /dev/null -L --request POST \
-               --form ref=development \
-               --form token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
-               --form "variables[DOCKER_TAG]=development" \
-               ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
+      #- name: Trigger KEEPS GitLab CI/CD
+      #  run: |
+      #    curl --progress-bar -o /dev/null -L --request POST \
+      #         --form ref=development \
+      #         --form token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
+      #         --form "variables[DOCKER_TAG]=development" \
+      #         ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
