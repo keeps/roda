@@ -23,7 +23,9 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.wui.client.browse.DipFilePreview;
+import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbarLegacy;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -150,6 +152,43 @@ public class BrowseAIPPortal extends Composite {
   private String aipId;
   private IndexedAIP aip;
 
+  public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
+    container = new SimplePanel();
+    refresh(id, new AsyncCallback<BrowseAIPResponse>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
+      }
+
+      @Override
+      public void onSuccess(BrowseAIPResponse result) {
+        callback.onSuccess(container);
+      }
+    });
+  }
+
+  private static void refresh(String id, AsyncCallback<BrowseAIPResponse> callback) {
+
+    Services service = new Services("Retrieve AIP", "get");
+    service
+      .rodaEntityRestService(s -> s.findByUuid(id, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class)
+      .thenCompose(result -> service
+        .rodaEntityRestService(s -> s.count(new FindRequest.FindRequestBuilder(
+          new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, id)), false).build()), IndexedAIP.class)
+        .whenComplete((childAIPCount, error) -> {
+          if (error == null) {
+
+            BrowseAIPResponse aipResponse = new BrowseAIPResponse();
+            aipResponse.setIndexedAIP(result);
+            aipResponse.setChildAipsCount(childAIPCount);
+            container.setWidget(new BrowseAIPPortal(aipResponse));
+          } else {
+            callback.onFailure(error);
+          }
+        }));
+
+  }
+
   private BrowseAIPPortal(BrowseAIPResponse rp) {
     aip = rp.getIndexedAIP();
     aipId = aip.getId();
@@ -186,39 +225,33 @@ public class BrowseAIPPortal extends Composite {
           } else {
             Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId()));
             Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
+            // number of DIPs call
+            FindRequest dipCountReq = FindRequest.getBuilder(filter, true).build();
+            Services dipService = new Services("Count DIPs", "get");
+            dipService.dipResource(s -> s.count(dipCountReq)).whenComplete((dipCount, countThrowable) -> {
+              if (countThrowable != null) {
+                AsyncCallbackUtils.defaultFailureTreatment(countThrowable);
+              } else {
+                if (dipCount != null && dipCount.getResult() > 1L) {
+                  String listId = "BrowseAIPPortal_dipChildren";
+                  ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(ConfigurableAsyncTableCell::new,
+                    new AsyncTableCellOptions<>(IndexedDIP.class, listId).withFilter(filter).withJustActive(justActive)
+                      .withSummary(messages.listOfDisseminations()).bindOpener()
+                      .withActionableCallback(listActionableCallback));
 
-            FindRequest request = FindRequest.getBuilder(filter, true)
-              .withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID)).withSorter(sorter)
-              .withSublist(new Sublist(0, 1)).build();
+                  SearchWrapper disseminationsSearchWrapper = new SearchWrapper(false)
+                    .createListAndSearchPanel(disseminationsListBuilder);
 
-            Services service = new Services("Find DIPs", "get");
-            service.dipResource(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()))
-              .whenComplete((indexedDIPIndexResult, throwable1) -> {
-                if (throwable1 != null) {
-                  AsyncCallbackUtils.defaultFailureTreatment(throwable1);
+                  disseminationsCard.setWidget(disseminationsSearchWrapper);
+                  disseminationsCard.setVisible(true);
+                  preDisseminations.setVisible(true);
+
                 } else {
-                  if (indexedDIPIndexResult.getTotalCount() > 0) {
-                    String dipId = indexedDIPIndexResult.getResults().get(0).getId();
-                    Filter fileFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dipId));
-                    FindRequest findRequest = FindRequest.getBuilder(fileFilter, true)
-                      .withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIPFILE_ID,
-                        RodaConstants.DIPFILE_SIZE, RodaConstants.DIPFILE_IS_DIRECTORY))
-                      .withSublist(new Sublist(0, 1)).build();
-                    service.dipFileResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()))
-                      .whenComplete((dipFileIndexResult, throwable2) -> {
-                        if (throwable2 != null) {
-                          AsyncCallbackUtils.defaultFailureTreatment(throwable2);
-                        } else {
-                          if (dipFileIndexResult.getTotalCount() > 0) {
-                            disseminationsCard.setVisible(true);
-                            preDisseminations.setVisible(true);
-                            disseminationsCard.add(new DipFilePreview(viewers, dipFileIndexResult.getResults().get(0)));
-                          }
-                        }
-                      });
-                  }
+                  buildSingleDipPreview(viewers, filter, sorter);
                 }
-              });
+              }
+            });
+
           }
         });
     }
@@ -258,7 +291,6 @@ public class BrowseAIPPortal extends Composite {
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
     }
-
 
     title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
     title.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
@@ -301,43 +333,6 @@ public class BrowseAIPPortal extends Composite {
     }
 
     keyboardFocus.setFocus(true);
-  }
-
-  public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
-    container = new SimplePanel();
-    refresh(id, new AsyncCallback<BrowseAIPResponse>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      @Override
-      public void onSuccess(BrowseAIPResponse result) {
-        callback.onSuccess(container);
-      }
-    });
-  }
-
-  private static void refresh(String id, AsyncCallback<BrowseAIPResponse> callback) {
-
-    Services service = new Services("Retrieve AIP", "get");
-    service
-      .rodaEntityRestService(s -> s.findByUuid(id, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class)
-      .thenCompose(result -> service
-        .rodaEntityRestService(s -> s.count(new FindRequest.FindRequestBuilder(
-          new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, id)), false).build()), IndexedAIP.class)
-        .whenComplete((childAIPCount, error) -> {
-          if (error == null) {
-
-            BrowseAIPResponse aipResponse = new BrowseAIPResponse();
-            aipResponse.setIndexedAIP(result);
-            aipResponse.setChildAipsCount(childAIPCount);
-            container.setWidget(new BrowseAIPPortal(aipResponse));
-          } else {
-            callback.onFailure(error);
-          }
-        }));
-
   }
 
   private void updateSectionDescriptiveMetadata() {
@@ -409,6 +404,41 @@ public class BrowseAIPPortal extends Composite {
     } catch (RequestException e) {
       callback.onFailure(e);
     }
+  }
+
+  private void buildSingleDipPreview(Viewers viewers, Filter dipFilter, Sorter sorter) {
+    FindRequest request = FindRequest.getBuilder(dipFilter, true)
+      .withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID)).withSorter(sorter)
+      .withSublist(new Sublist(0, 1)).build();
+
+    Services service = new Services("Find DIPs", "get");
+    service.dipResource(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()))
+      .whenComplete((indexedDIPIndexResult, throwable1) -> {
+        if (throwable1 != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable1);
+        } else {
+          if (indexedDIPIndexResult.getTotalCount() > 0) {
+            String dipId = indexedDIPIndexResult.getResults().get(0).getId();
+            Filter fileFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dipId));
+            FindRequest fileRequest = FindRequest
+              .getBuilder(fileFilter, true).withFieldsToReturn(Arrays.asList(RodaConstants.INDEX_UUID,
+                RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_SIZE, RodaConstants.DIPFILE_IS_DIRECTORY))
+              .withSublist(new Sublist(0, 1)).build();
+            service.dipFileResource(s -> s.find(fileRequest, LocaleInfo.getCurrentLocale().getLocaleName()))
+              .whenComplete((dipFileIndexResult, throwable2) -> {
+                if (throwable2 != null) {
+                  AsyncCallbackUtils.defaultFailureTreatment(throwable2);
+                } else {
+                  if (dipFileIndexResult.getTotalCount() > 0) {
+                    disseminationsCard.setVisible(true);
+                    preDisseminations.setVisible(true);
+                    disseminationsCard.add(new DipFilePreview(viewers, dipFileIndexResult.getResults().get(0)));
+                  }
+                }
+              });
+          }
+        }
+      });
   }
 
   interface MyUiBinder extends UiBinder<Widget, BrowseAIPPortal> {
