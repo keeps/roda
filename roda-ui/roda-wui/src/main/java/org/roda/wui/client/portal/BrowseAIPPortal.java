@@ -144,9 +144,6 @@ public class BrowseAIPPortal extends Composite {
   SimplePanel aipChildrenCard;
   @UiField
   FlowPanel preChildren;
-  // DESCRIPTIVE METADATA
-  @UiField
-  FlowPanel center;
   @UiField
   Label dateCreatedAndModified;
   private String aipId;

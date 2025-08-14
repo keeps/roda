@@ -54,6 +54,7 @@ import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.planning.ShowRisk;
 import org.roda.wui.client.planning.ShowRiskIncidence;
 import org.roda.wui.client.portal.BrowseAIPPortal;
+import org.roda.wui.client.portal.BrowseDIPPortal;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -212,7 +213,11 @@ public class HistoryUtils {
   }
 
   public static List<String> getHistoryBrowseDIP(String dipId) {
-    return getHistory(BrowseDIP.RESOLVER, dipId);
+    if(USING_PORTAL_UI) {
+      return getHistory(BrowseDIPPortal.RESOLVER, dipId);
+    } else {
+      return getHistory(BrowseDIP.RESOLVER, dipId);
+    }
   }
 
   public static List<String> getHistoryBrowseDIPFile(String dipId, String dipFileUUID) {
@@ -228,7 +233,11 @@ public class HistoryUtils {
   }
 
   public static void openBrowse(DIPFile dipFile) {
-    HistoryUtils.newHistory(getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID()));
+    if(USING_PORTAL_UI) {
+      HistoryUtils.newHistory(BrowseDIPPortal.RESOLVER,dipFile.getDipId());
+    } else {
+      HistoryUtils.newHistory(getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID()));
+    }
   }
 
   public static void openBrowseDIP(String dipId) {
@@ -384,7 +393,11 @@ public class HistoryUtils {
       path = HistoryUtils.getHistoryBrowse(file);
     } else if (object instanceof IndexedDIP) {
       IndexedDIP dip = (IndexedDIP) object;
-      path = HistoryUtils.getHistoryBrowseDIP(dip.getId());
+      if (USING_PORTAL_UI){
+        HistoryUtils.newHistory(BrowseDIPPortal.RESOLVER,dip.getId());
+      }else{
+        path = HistoryUtils.getHistoryBrowseDIP(dip.getId());
+      }
     } else if (object instanceof DIPFile) {
       DIPFile dipFile = (DIPFile) object;
       path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID());
