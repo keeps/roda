@@ -8,6 +8,7 @@
 package org.roda.core.plugins.base.disposal.rules;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -68,9 +69,16 @@ public class ApplyDisposalRulesPluginUtils {
 
     Map<String, Object> fields = indexedAIP.getFields();
     Object o = fields.get(rule.getConditionKey());
-    String metadataValue = (String) o;
 
-    if (metadataValue != null && metadataValue.equals(rule.getConditionValue())) {
+    boolean match = false;
+
+    if (o instanceof String s) {
+      match = s.equals(rule.getConditionValue());
+    } else if (o instanceof List<?> list && !list.isEmpty()) {
+      match = list.contains(rule.getConditionValue());
+    }
+
+    if (match) {
       DisposalAIPMetadata disposal = getDisposalAipMetadata(aip, rule);
       aip.setDisposal(disposal);
       return Optional.of(rule);
