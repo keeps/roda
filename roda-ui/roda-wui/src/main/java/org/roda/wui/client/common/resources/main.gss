@@ -5432,7 +5432,8 @@ td.datePickerMonth, td.datePickerYear {
 
 .viewRepresentationHtmlFilePreview, .viewDIPPreview {
     width: 100%;
-    height: 670px;
+    height: 80vh;
+    min-height: 480px;
 }
 
 .viewRepresentationTextFilePreview {
