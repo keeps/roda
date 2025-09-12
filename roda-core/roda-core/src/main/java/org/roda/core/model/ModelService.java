@@ -1485,7 +1485,7 @@ public class ModelService extends ModelObservable {
     String agentName, String agentRole, boolean notify) {
     try {
       StringBuilder builder = new StringBuilder(outcomeText);
-      if (StringUtils.isNotBlank(outcomeDetail) && !outcomeState.equals(PluginState.SUCCESS)) {
+      if (StringUtils.isNotBlank(outcomeDetail)) {
         builder.append("\n").append("The following reason has been reported by the user: ").append(agentName)
           .append("\n").append(outcomeDetail);
       }
