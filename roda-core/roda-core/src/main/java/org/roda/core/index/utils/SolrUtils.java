@@ -417,7 +417,7 @@ public class SolrUtils {
    * "Internal" helper methods
    * ____________________________________________________________________________________________________________________
    */
-  private static String[] parseFieldsToReturn(FindRequest findRequest) {
+  private static String[] parseFieldsToReturn(FindRequest findRequest) throws RequestNotValidException {
     if (findRequest.getChildren()) {
       List<String> fieldsToReturn = new ArrayList<>(findRequest.getFieldsToReturn());
 
@@ -428,18 +428,36 @@ public class SolrUtils {
     return findRequest.getFieldsToReturn().toArray(new String[0]);
   }
 
-  private static String parseChildTransformer(FindRequest findRequest) {
+  private static String parseChildTransformer(FindRequest findRequest) throws RequestNotValidException {
+    String childrenFilter = findRequest.getChildrenFilter() != null ? parseFilter(findRequest.getChildrenFilter())
+      : null;
+
     String childrenLimit = String
       .valueOf(findRequest.getChildrenLimit() != null ? findRequest.getChildrenLimit() : 100);
 
-    if (findRequest.getChildrenFieldsToReturn() != null && !findRequest.getChildrenFieldsToReturn().isEmpty()) {
-      String childrenFl = findRequest.getChildrenFieldsToReturn().stream().filter(Objects::nonNull)
-        .collect(Collectors.joining(", "));
+    String childrenFl = (findRequest.getChildrenFieldsToReturn() != null
+      && !findRequest.getChildrenFieldsToReturn().isEmpty())
+        ? findRequest.getChildrenFieldsToReturn().stream().filter(Objects::nonNull).collect(Collectors.joining(", "))
+        : null;
 
-      return String.format("[child fl=%s limit=%s]", childrenFl, childrenLimit);
+    return buildChildDocTransformerString(childrenFl, childrenLimit, childrenFilter);
+  }
+
+  private static String buildChildDocTransformerString(String fl, String limit, String childFilter) {
+    StringBuilder sb = new StringBuilder("[child");
+
+    if (fl != null) {
+      sb.append(" fl=").append(fl);
+    }
+    if (limit != null) {
+      sb.append(" limit=").append(limit);
+    }
+    if (childFilter != null) {
+      sb.append(" childFilter=").append(childFilter);
     }
 
-    return String.format("[child limit=%s]", childrenLimit);
+    sb.append(']');
+    return sb.toString();
   }
 
   private static String parseCollapse(Collapse collapse) {
@@ -881,8 +899,8 @@ public class SolrUtils {
       return new SolrInputDocument();
     }
 
-    try (Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_TECHNICAL,
-      metadataType, metadataVersion, parameters)) {
+    try (Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary,
+      RodaConstants.CORE_CROSSWALKS_TECHNICAL, metadataType, metadataVersion, parameters)) {
 
       if (!transformationResult.ready()) {
         return new SolrInputDocument();
@@ -1065,7 +1083,7 @@ public class SolrUtils {
   private static void appendExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
-    ret.append("(").append(key).append(": ");
+    ret.append("(").append(key).append(":");
     if (appendDoubleQuotes) {
       ret.append("\"");
     }
@@ -1134,9 +1152,9 @@ public class SolrUtils {
         ret.append(" ").append(operator).append(" ");
       }
       if (split[i].matches("(AND|OR|NOT)")) {
-        ret.append(key).append(": \"").append(split[i]).append("\"");
+        ret.append(key).append(":\"").append(split[i]).append("\"");
       } else {
-        ret.append(key).append(": (").append(escapeSolrSpecialChars(split[i])).append(")");
+        ret.append(key).append(":(").append(escapeSolrSpecialChars(split[i])).append(")");
       }
     }
     ret.append(")");
@@ -1447,7 +1465,7 @@ public class SolrUtils {
   }
 
   public static <I extends IsIndexed, M extends IsModelObject, S extends Object> ReturnWithExceptions<Void, S> create2(
-    SolrClient index,  ModelService model, S source, Class<I> indexClass, M object) {
+    SolrClient index, ModelService model, S source, Class<I> indexClass, M object) {
     return create2(index, model, source, indexClass, object, IndexingAdditionalInfo.empty());
   }
 

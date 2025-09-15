@@ -59,6 +59,8 @@ public class FindRequest extends CountRequest {
   private List<String> childrenFieldsToReturn;
   @JsonProperty("childrenLimit")
   private Long childrenLimit;
+  @JsonProperty("childrenFilter")
+  private Filter childrenFilter;
 
   // Private constructor for Jackson deserialization
   private FindRequest(FindRequestBuilder builder) {
@@ -73,6 +75,7 @@ public class FindRequest extends CountRequest {
     this.children = builder.children;
     this.childrenFieldsToReturn = builder.childrenFieldsToReturn;
     this.childrenLimit = builder.childrenLimit;
+    this.childrenFilter = builder.childrenFilter;
   }
 
   public Sorter getSorter() {
@@ -115,6 +118,10 @@ public class FindRequest extends CountRequest {
     return childrenLimit;
   }
 
+  public Filter getChildrenFilter() {
+    return childrenFilter;
+  }
+
   public static FindRequestBuilder getBuilder(final Filter filter, boolean onlyActive) {
     return new FindRequestBuilder(filter, onlyActive);
   }
@@ -133,6 +140,7 @@ public class FindRequest extends CountRequest {
     private boolean children;
     private List<String> childrenFieldsToReturn;
     private Long childrenLimit;
+    private Filter childrenFilter;
 
     public FindRequestBuilder(@JsonProperty("filter") final Filter filter,
       @JsonProperty("onlyActive") boolean onlyActive) {
@@ -200,6 +208,11 @@ public class FindRequest extends CountRequest {
 
     public FindRequestBuilder withChildrenLimit(Long childrenLimit) {
       this.childrenLimit = childrenLimit;
+      return this;
+    }
+
+    public FindRequestBuilder withChildrenFilter(Filter childrenFilter) {
+      this.childrenFilter = childrenFilter;
       return this;
     }
   }
