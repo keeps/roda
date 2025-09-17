@@ -234,6 +234,15 @@
         <url-pattern>/logout</url-pattern>
     </filter-mapping>
 
+    <filter>
+        <filter-name>SecurityHeadersFilter</filter-name>
+        <filter-class>org.roda.wui.filter.SecurityHeadersFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>SecurityHeadersFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <!-- ************************************ -->
     <!-- REST related servlets/servlet-mappings -->
     <!-- ************************************ -->
@@ -338,4 +347,14 @@
         </web-resource-collection>
         <auth-constraint/>
     </security-constraint>
+
+    <session-config>
+        <cookie-config>
+            <http-only>true</http-only>
+            <secure>true</secure>
+        </cookie-config>
+    </session-config>
+
+
+
 </web-app>

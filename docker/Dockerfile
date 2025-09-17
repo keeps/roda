@@ -13,7 +13,7 @@ RUN set -ex; \
 COPY ./docker-files/clamd.conf /etc/clamav/clamd.conf
 
 # Copy the Roda WUI WAR file
-COPY ./target/roda-wui-*.war  /KEEPS/bin/
+COPY ./target/roda-wui-*.jar  /KEEPS/bin/
 
 ENV RODA_HOME=/roda \
     LDAP_SERVER_URL=ldap://openldap \

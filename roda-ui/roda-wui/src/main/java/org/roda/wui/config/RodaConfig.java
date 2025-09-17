@@ -209,11 +209,6 @@ public class RodaConfig {
       registry.addViewController("/").setViewName("forward:/Main.html");
       registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-      registry.addResourceHandler("/org.roda.wui.RodaWUI/**").addResourceLocations("classpath:/org.roda.wui.RodaWUI/");
-    }
   }
 
   // TODO: add welcome page
