@@ -14,7 +14,7 @@
         <gwt.module.main>org.roda.wui.RodaWUI</gwt.module.main>
         <gwt.module.portal>org.roda.wui.RodaWUIPortal</gwt.module.portal>
     </properties>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <profiles>
         <profile>
             <id>default</id>
@@ -37,6 +37,7 @@
                                 <id>${gwt.module.main}</id>
                                 <configuration>
                                     <moduleName>${gwt.module.main}</moduleName>
+                                    <webappDirectory>${project.build.directory}/classes/static</webappDirectory>
                                 </configuration>
                                 <goals>
                                     <goal>compile</goal>
@@ -47,6 +48,7 @@
                                 <id>${gwt.module.portal}</id>
                                 <configuration>
                                     <moduleName>${gwt.module.portal}</moduleName>
+                                    <workingDirectory>${project.build.directory}/classes/static</workingDirectory>
                                 </configuration>
                                 <goals>
                                     <goal>compile</goal>
@@ -71,7 +73,7 @@
                         <configuration>
                             <skip>false</skip>
                             <mainClass>org.roda.wui.RODA</mainClass>
-                            <layout>WAR</layout>
+                            <layout>ZIP</layout>
                             <excludeDevtools>true</excludeDevtools>
                             <excludes>
                                 <exclude>
@@ -79,6 +81,7 @@
                                     <artifactId>gwt-dev</artifactId>
                                 </exclude>
                             </excludes>
+                            <addResources>true</addResources>
                         </configuration>
                         <executions>
                             <execution>

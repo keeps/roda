@@ -20,6 +20,6 @@ fi
 mkdir -p "$SCRIPT_DIR"/target
 
 # Copy target
-cp -r "$PROJECT_DIR"/roda-ui/roda-wui/target/roda-wui-"$VERSION".war "$SCRIPT_DIR"/target/
+cp -r "$PROJECT_DIR"/roda-ui/roda-wui/target/roda-wui-"$VERSION".jar "$SCRIPT_DIR"/target/
 
 docker build -t keeps/roda:latest -t keeps/roda:"$VERSION" "$SCRIPT_DIR"

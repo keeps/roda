@@ -10,7 +10,7 @@ fi
 
 if [[ $# -eq 0 ]] ; then
     echo "Starting RODA (user: $(whoami))"
-    exec java -jar /KEEPS/bin/roda-wui-*.war
+    exec java -jar /KEEPS/bin/roda-wui-*.jar
 fi
 
 exec "$@"

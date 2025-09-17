@@ -425,7 +425,7 @@
                             <configuration>
                                 <generateGitPropertiesFile>true</generateGitPropertiesFile>
                                 <generateGitPropertiesFilename>
-                                    ${project.build.directory}/classes/version.json
+                                    ${project.build.directory}/classes/static/version.json
                                 </generateGitPropertiesFilename>
                                 <format>json</format>
                             </configuration>

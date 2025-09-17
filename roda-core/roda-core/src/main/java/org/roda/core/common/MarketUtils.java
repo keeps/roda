@@ -41,7 +41,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class MarketUtils {
   private static String retrieveRodaVersion() throws MarketException {
-    try (InputStream inputStream = MarketUtils.class.getClassLoader().getResourceAsStream("version.json");
+    try (InputStream inputStream = MarketUtils.class.getClassLoader().getResourceAsStream("static/version.json");
       BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
       StringBuilder builder = new StringBuilder();
       for (String line = null; (line = bufferedReader.readLine()) != null;) {
