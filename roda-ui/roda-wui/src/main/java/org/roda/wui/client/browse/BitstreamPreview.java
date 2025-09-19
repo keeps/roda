@@ -388,7 +388,11 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     final Frame frame = new Frame(url);
     frame.setStyleName("viewDIPPreview");
     frame.setTitle(dip.getTitle());
-    frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
+    frame.getElement().setAttribute("scrolling", "auto");
+
+    if(isSameOrigin(url)){
+        frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
+    }
     panel.add(frame);
   }
 
@@ -534,5 +538,10 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       }
     }
     return false;
+  }
+
+  public boolean isSameOrigin(String url){
+      String base = GWT.getHostPageBaseURL();
+      return url !=null && base != null && url.startsWith(base);
   }
 }
