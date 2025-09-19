@@ -103,7 +103,7 @@ jobs:
       - name: Copy target to docker context
         run: |
           mkdir -p docker/target
-          cp -r roda-ui/roda-wui/target/roda-wui-${{ env.release_version }}.war docker/target
+          cp -r roda-ui/roda-wui/target/roda-wui-${{ env.release_version }}.jar docker/target
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
