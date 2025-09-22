@@ -1,5 +1,21 @@
 # Changelog
 
+## v6.0.1 (22/09/2025)
+#### Enhancements 
+- Change RODA packaging from WAR to JAR in order to use Spring [PropertiesLauncher](https://docs.spring.io/spring-boot/specification/executable-jar/property-launcher.html).
+
+
+#### Bug fixes
+- Add option for ChildFilter when using ChildDocTransform
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v6.0.0 (29/07/2025)
 ### :warning: Breaking Changes
 
@@ -435,15 +451,3 @@ To try out this version, check the [install instructions](https://www.roda-commu
 
 To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
 
-
----
-
-## v4.5.6 (04/05/2023)
-#### Bug fixes:
-
-- Option to disable user registration on server-side #2840 
-
-Install for demonstration:
-```
-docker pull ghcr.io/keeps/roda:v4.5.6
-```
