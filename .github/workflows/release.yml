@@ -142,8 +142,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: roda-ui/roda-wui/target/roda-wui-${{ env.release_version }}.war
-          asset_name: roda-wui-${{ env.release_version }}.war
+          file: roda-ui/roda-wui/target/roda-wui-${{ env.release_version }}.jar
+          asset_name: roda-wui-${{ env.release_version }}.jar
           tag: ${{ github.ref }}
           release_name: ${{ github.ref_name }}
           draft: true
