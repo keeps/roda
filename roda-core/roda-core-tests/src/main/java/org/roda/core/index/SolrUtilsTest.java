@@ -137,7 +137,7 @@ public class SolrUtilsTest {
       filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, FONDS));
       String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("(%s: \"%s\")", RodaConstants.INDEX_SEARCH, FONDS), stringFilter);
+      assertEquals(String.format("(%s:\"%s\")", RodaConstants.INDEX_SEARCH, FONDS), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
@@ -151,7 +151,7 @@ public class SolrUtilsTest {
       filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, SERIES));
       String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("(%s: \"%s\") AND (%s: \"%s\")", RodaConstants.INDEX_SEARCH, FONDS,
+      assertEquals(String.format("(%s:\"%s\") AND (%s:\"%s\")", RodaConstants.INDEX_SEARCH, FONDS,
         RodaConstants.INDEX_SEARCH, SERIES), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
@@ -165,7 +165,7 @@ public class SolrUtilsTest {
       filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_SEARCH, Arrays.asList(FONDS, SERIES)));
       String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("((%s: \"%s\") OR (%s: \"%s\"))", RodaConstants.INDEX_SEARCH, FONDS,
+      assertEquals(String.format("((%s:\"%s\") OR (%s:\"%s\"))", RodaConstants.INDEX_SEARCH, FONDS,
         RodaConstants.INDEX_SEARCH, SERIES), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
@@ -205,7 +205,7 @@ public class SolrUtilsTest {
       String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals(
-        String.format("(%s: (%s) AND %s: (%s))", RodaConstants.INDEX_SEARCH, FONDS, RodaConstants.INDEX_SEARCH, SERIES),
+        String.format("(%s:(%s) AND %s:(%s))", RodaConstants.INDEX_SEARCH, FONDS, RodaConstants.INDEX_SEARCH, SERIES),
         stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
