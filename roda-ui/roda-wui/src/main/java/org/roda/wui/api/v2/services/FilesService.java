@@ -441,4 +441,16 @@ public class FilesService {
     return ret;
   }
 
+  public StreamResponse retrieveOtherMetadata(RequestContext requestContext, IndexedFile file, String metadataType,
+    String metadataSuffix, String acceptFormat)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    final ConsumesOutputStream stream;
+    StreamResponse ret;
+    ModelService model = requestContext.getModelService();
+    Binary otherMetadataBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
+      file.getPath(), file.getId(), metadataSuffix, metadataType);
+    stream = new BinaryConsumesOutputStream(otherMetadataBinary, acceptFormat);
+    return new StreamResponse(stream);
+  }
+
 }

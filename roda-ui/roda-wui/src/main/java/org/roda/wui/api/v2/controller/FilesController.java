@@ -34,6 +34,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfos;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.model.utils.UserUtility;
@@ -480,6 +481,26 @@ public class FilesController implements FileRestService, Exportable {
         StreamResponse streamResponse = filesService.retrieveFileTechnicalMetadata(requestContext, indexedFile, typeId,
           versionId);
         return ApiUtils.okResponse(streamResponse);
+      }
+    });
+  }
+
+  @Override
+  public ResponseEntity<StreamingResponseBody> getOtherMetadata(String fileUUID, String metadataType, String metadataSuffix,
+                                        String acceptFormat, String jsonpCallbackName) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_ID_PARAM, fileUUID);
+        // check object permissions
+        IndexedFile indexedFile = requestContext.getIndexService().retrieve(IndexedFile.class, fileUUID,
+          RodaConstants.FILE_FIELDS_TO_RETURN);
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedFile);
+
+        // delegate
+          StreamResponse streamResponse = filesService.retrieveOtherMetadata(requestContext, indexedFile, metadataType, metadataSuffix, acceptFormat);
+          return ApiUtils.okResponse(streamResponse);
       }
     });
   }
