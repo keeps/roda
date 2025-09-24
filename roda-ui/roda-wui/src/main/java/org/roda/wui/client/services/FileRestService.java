@@ -9,7 +9,6 @@ package org.roda.wui.client.services;
 
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.file.CreateFolderRequest;
 import org.roda.core.data.v2.file.MoveFilesRequest;
 import org.roda.core.data.v2.file.RenameFolderRequest;
@@ -114,7 +113,5 @@ public interface FileRestService extends RODAEntityRestService<IndexedFile> {
   ResponseEntity<StreamingResponseBody> getOtherMetadata(
     @Parameter(description = "The UUID of the existing File", required = true) @PathVariable(name = "fileUUID") String fileUUID,
     @Parameter(description = "The type of the other metadata", required = true) @PathVariable(name = "metadata_type") String metadataType,
-    @Parameter(description = "The file suffix of the other metadata", required = true) @PathVariable(name = "metadata_file_suffix") String metadataFileSuffix,
-    @Parameter(description = "Choose format in which to get the metadata") @RequestParam(name = RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) String acceptFormat,
-    @Parameter(description = "JSONP callback name") @RequestParam(name = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName);
+    @Parameter(description = "The file suffix of the other metadata", required = true) @PathVariable(name = "metadata_file_suffix") String metadataFileSuffix);
 }

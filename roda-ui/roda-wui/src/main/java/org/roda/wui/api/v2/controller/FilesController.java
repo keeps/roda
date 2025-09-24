@@ -34,7 +34,6 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfos;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.model.utils.UserUtility;
@@ -414,8 +413,7 @@ public class FilesController implements FileRestService, Exportable {
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     // delegate
-    return ApiUtils
-      .okResponse(indexService.exportToCSV(findRequestString, IndexedFile.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, IndexedFile.class));
   }
 
   @GetMapping(path = "/{uuid}/metadata/technical/{typeId}/html", produces = MediaType.TEXT_HTML_VALUE)
@@ -486,12 +484,12 @@ public class FilesController implements FileRestService, Exportable {
   }
 
   @Override
-  public ResponseEntity<StreamingResponseBody> getOtherMetadata(String fileUUID, String metadataType, String metadataSuffix,
-                                        String acceptFormat, String jsonpCallbackName) {
+  public ResponseEntity<StreamingResponseBody> getOtherMetadata(String fileUUID, String metadataType,
+    String metadataSuffix) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
       @Override
-      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
-        throws RODAException, RESTException, IOException {
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_ID_PARAM, fileUUID);
         // check object permissions
         IndexedFile indexedFile = requestContext.getIndexService().retrieve(IndexedFile.class, fileUUID,
@@ -499,8 +497,9 @@ public class FilesController implements FileRestService, Exportable {
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedFile);
 
         // delegate
-          StreamResponse streamResponse = filesService.retrieveOtherMetadata(requestContext, indexedFile, metadataType, metadataSuffix, acceptFormat);
-          return ApiUtils.okResponse(streamResponse);
+        StreamResponse streamResponse = filesService.retrieveOtherMetadata(requestContext, indexedFile, metadataType,
+          metadataSuffix);
+        return ApiUtils.okResponse(streamResponse);
       }
     });
   }
