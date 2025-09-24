@@ -16,20 +16,17 @@ import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.IndexedFileRequest;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfo;
 import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfos;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -103,15 +100,4 @@ public interface FileRestService extends RODAEntityRestService<IndexedFile> {
   TechnicalMetadataInfos retrieveTechnicalMetadataInfos(
     @Parameter(description = "The file identifier", required = true) @PathVariable(name = "fileUUID") String fileUUID,
     @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
-
-  @RequestMapping(method = RequestMethod.GET, path = "/{fileUUID}/other_metadata/{metadata_type}/{metadata_file_suffix}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Gets other metadata (JSON info or ZIP file).\nOptional query params of **start** and **limit** defined the returned query", responses = {
-    @ApiResponse(responseCode = "200", description = "Other metadata file", content = @Content(schema = @Schema(implementation = OtherMetadata.class))),
-    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
-    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
-    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  ResponseEntity<StreamingResponseBody> getOtherMetadata(
-    @Parameter(description = "The UUID of the existing File", required = true) @PathVariable(name = "fileUUID") String fileUUID,
-    @Parameter(description = "The type of the other metadata", required = true) @PathVariable(name = "metadata_type") String metadataType,
-    @Parameter(description = "The file suffix of the other metadata", required = true) @PathVariable(name = "metadata_file_suffix") String metadataFileSuffix);
 }
