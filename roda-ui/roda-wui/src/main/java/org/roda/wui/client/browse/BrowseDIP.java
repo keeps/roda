@@ -36,7 +36,10 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.wui.client.browse.tabs.BrowseDIPTabs;
+import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.BrowseDIPActionsToolbar;
+import org.roda.wui.client.common.BrowseDIPFileActionsToolbar;
+import org.roda.wui.client.common.BrowseObjectActionsToolbar;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -269,6 +272,8 @@ public class BrowseDIP extends Composite {
         .fileResource(s -> s.retrieveIndexedFileViaRequest(request));
       CompletableFuture<IndexedAIP> indexedAIPCompletableFuture = services
         .aipResource(s -> s.findByUuid(request.getAipId(), LocaleInfo.getCurrentLocale().getLocaleName()));
+      CompletableFuture<IndexedRepresentation> indexedRepresentationCompletableFuture = services
+        .representationResource(s -> s.retrieveIndexedRepresentationViaRequest(request));
       CompletableFuture<Boolean> showEmbeddedDIPFuture = services
         .configurationsResource(ConfigurationRestService::retrieveShowEmbeddedDIP).exceptionally(throwable1 -> false);
 
@@ -279,11 +284,13 @@ public class BrowseDIP extends Composite {
         indexedFileCompletableFuture, showEmbeddedDIPFuture).thenApply(v -> {
           BrowseDIPResponse response = new BrowseDIPResponse();
           IndexedAIP indexedAIP = indexedAIPCompletableFuture.join();
+          IndexedRepresentation indexedRepresentation = indexedRepresentationCompletableFuture.join();
           IndexedFile indexedFile = indexedFileCompletableFuture.join();
           IndexResult<DIPFile> dipFileIndexResult = retrieveDIPFileCompletableFuture.join();
 
           response.setIndexedAIP(indexedAIP);
           response.setPermissions(indexedAIP.getPermissions());
+          response.setIndexedRepresentation(indexedRepresentation);
           response.setIndexedFile(indexedFile);
           response.setReferred(indexedFile);
           response.setDip(indexedDIP);
@@ -331,8 +338,8 @@ public class BrowseDIP extends Composite {
   FlowPanel container;
   @UiField
   NavigationToolbar navigationToolbar;
-  @UiField
-  BrowseDIPActionsToolbar objectToolbar;
+  @UiField(provided = true)
+  ActionsToolbar objectToolbar;
   @UiField
   BrowseDIPTabs browseTab;
 
@@ -350,6 +357,17 @@ public class BrowseDIP extends Composite {
     // target
     IndexedDIP dip = response.getDip();
     DIPFile dipFile = response.getDipFile();
+
+    if (dipFile != null) {
+      BrowseObjectActionsToolbar<DIPFile> toolbar = new BrowseDIPFileActionsToolbar();
+      toolbar.setObjectAndBuild(dipFile, response.getPermissions(), handler);
+      objectToolbar = toolbar;
+
+    } else {
+      BrowseObjectActionsToolbar<IndexedDIP> toolbar = new BrowseDIPActionsToolbar();
+      toolbar.setObjectAndBuild(dip, dip.getPermissions(), handler);
+      objectToolbar = toolbar;
+    }
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -380,8 +398,6 @@ public class BrowseDIP extends Composite {
       || response.getReferred() instanceof IndexedFile) {
       navigationToolbar.withAlternativeStyle(true);
     }
-
-    objectToolbar.setObjectAndBuild(dip, dip.getPermissions(), handler);
 
     browseTab.init(viewers, response, handler);
 
