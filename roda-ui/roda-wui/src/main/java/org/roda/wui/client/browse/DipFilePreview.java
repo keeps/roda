@@ -19,7 +19,6 @@ import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -32,13 +31,8 @@ public class DipFilePreview extends BitstreamPreview<DIPFile> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public DipFilePreview(Viewers viewers, DIPFile dipFile) {
-    super(viewers, RestUtils.createDipFileDownloadUri(dipFile.getUUID(), CONTENT_DISPOSITION_INLINE), NO_FORMAT,
+    super(viewers, RestUtils.createDipFilePreviewUri(dipFile.getUUID(), CONTENT_DISPOSITION_INLINE), NO_FORMAT,
       dipFile.getId(), dipFile.getSize(), dipFile.isDirectory(), dipFile);
-  }
-
-  public DipFilePreview(Viewers viewers, DIPFile dipFile, Command onPreviewFailure) {
-    super(viewers, RestUtils.createDipFileDownloadUri(dipFile.getUUID(), CONTENT_DISPOSITION_INLINE), NO_FORMAT,
-      dipFile.getId(), dipFile.getSize(), dipFile.isDirectory(), onPreviewFailure, dipFile);
   }
 
   @Override
