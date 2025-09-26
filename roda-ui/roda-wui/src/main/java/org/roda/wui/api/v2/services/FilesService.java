@@ -247,7 +247,13 @@ public class FilesService {
   public StreamResponse retrieveAIPRepresentationFile(RequestContext requestContext, IndexedFile indexedFile)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = requestContext.getModelService();
-    Optional<LiteRODAObject> liteFile = LiteRODAObjectFactory.get(File.class, indexedFile.getId());
+    List<String> ids = new ArrayList<>();
+    ids.add(indexedFile.getAipId());
+    ids.add(indexedFile.getRepresentationId());
+    ids.addAll(indexedFile.getPath());
+    ids.add(indexedFile.getId());
+    Optional<LiteRODAObject> liteFile = LiteRODAObjectFactory.get(File.class, ids.toArray(String[]::new));
+
     if (liteFile.isEmpty()) {
       throw new RequestNotValidException("Couldn't retrieve file with id: " + indexedFile.getId());
     }

@@ -10,7 +10,7 @@
     <wcag:AccessibleFocusPanel ui:field="keyboardFocus">
         <g:FlowPanel styleName="viewRepresentationFile" ui:field="container">
             <common:NavigationToolbar ui:field="navigationToolbar"/>
-            <common:BrowseDIPActionsToolbar ui:field="objectToolbar" label="{messages.catalogueDIPTitle}"/>
+            <common:ActionsToolbar ui:field="objectToolbar" label="{messages.catalogueDIPTitle}"/>
             <!-- top navigation toolbar for referrer is inserted here  -->
             <!-- bottom navigation toolbar for dipfile or dip is inserted here -->
             <g:FlowPanel addStyleNames="row full_width skip_padding">
