@@ -214,7 +214,7 @@ public class PekkoEventsHandlerAndNotifier extends AbstractEventsHandler impleme
     try {
       String separator = RodaCoreFactory.getProperty("core.events.pekko.address.separator", ":");
       String[] nodeParts = node.split(separator, 2);
-      seedNodes.add(new Address("pekko.tcp", EVENTS_SYSTEM, nodeParts[0], Integer.parseInt(nodeParts[1])));
+      seedNodes.add(new Address("pekko", EVENTS_SYSTEM, nodeParts[0], Integer.parseInt(nodeParts[1])));
     } catch (NumberFormatException | IndexOutOfBoundsException e) {
       // do nothing and carry on
     }
