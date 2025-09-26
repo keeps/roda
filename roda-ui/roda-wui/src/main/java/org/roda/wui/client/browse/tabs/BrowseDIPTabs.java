@@ -47,7 +47,7 @@ public class BrowseDIPTabs extends Tabs {
     DIPFile dipFile = browseDIPResponse.getDipFile();
 
     // DIPFile preview
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.descriptiveMetadataTab()), new TabContentBuilder() {
+    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.viewTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
         if (dipFile != null) {

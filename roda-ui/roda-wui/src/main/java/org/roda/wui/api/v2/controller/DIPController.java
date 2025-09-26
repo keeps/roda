@@ -107,10 +107,8 @@ public class DIPController implements DIPRestService, Exportable {
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
 
-        IndexedDIP dip = indexService.retrieve(IndexedDIP.class, dipUUID, new ArrayList<>());
-
+        IndexedDIP dip = requestContext.getIndexService().retrieve(IndexedDIP.class, dipUUID, new ArrayList<>());
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), dip);
-
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_DIP_UUID_PARAM, dipUUID);
 
         return ApiUtils.okResponse(dipService.createStreamResponse(requestContext, dip.getUUID()));
