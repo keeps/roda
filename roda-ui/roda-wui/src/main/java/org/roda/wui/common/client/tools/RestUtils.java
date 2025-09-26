@@ -84,16 +84,20 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-  public static SafeUri createRepresentationFileDownloadUri(String fileUuid) {
-    return createRepresentationFileDownloadUri(fileUuid, false);
-  }
-
-  public static SafeUri createRepresentationFileDownloadUri(String fileUuid, boolean contentDispositionInline) {
+    public static SafeUri createRepresentationFilePreviewUri(String fileUuid, boolean contentDispositionInline) {
     // api/v2/files/{file_uuid}/preview
     String b = RodaConstants.API_REST_V2_FILES + URL.encodeQueryString(fileUuid)
       + RodaConstants.API_REST_V2_PREVIEW_HANDLER;
 
     return UriUtils.fromSafeConstant(b);
+  }
+
+  public static SafeUri createRepresentationFileDownloadUri(String fileUuid){
+      // api/v2/files/{file_uuid}/download
+      StringBuilder b = new StringBuilder();
+      b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileUuid)).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
+
+      return UriUtils.fromSafeConstant(b.toString());
   }
 
   public static SafeUri createDipDownloadUri(String dipUUID) {
@@ -105,23 +109,22 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-  public static SafeUri createDipFileDownloadUri(String dipFileUUID) {
-    return createDipFileDownloadUri(dipFileUUID, false);
-  }
-
-  public static SafeUri createDipFileDownloadUri(String dipFileUUID, boolean contentDispositionInline) {
-
-    // api/v1/dipfiles/{file_uuid}?acceptFormat=bin&inline={inline}
+  public static SafeUri createDipFilePreviewUri(String dipFileUUID, boolean contentDispositionInline) {
+    // api/v2/dip-files/{file_uuid}/preview?inline={inline}
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_DIPFILES).append(URL.encodeQueryString(dipFileUUID));
-    // accept format attribute
-    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+    b.append(RodaConstants.API_REST_V2_DIPFILES).append(URL.encodeQueryString(dipFileUUID))
+      .append(RodaConstants.API_REST_V2_PREVIEW_HANDLER).append(RodaConstants.API_QUERY_START)
+      .append(RodaConstants.API_QUERY_KEY_INLINE).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(contentDispositionInline);
+    return UriUtils.fromSafeConstant(b.toString());
+  }
 
-    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_INLINE)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(contentDispositionInline);
-
+  public static SafeUri createDipFileDownloadUri(String dipFileUUID){
+    // api/v2/dip-files/{file_uuid}/download
+    StringBuilder b = new StringBuilder();
+    b.append(RodaConstants.API_REST_V2_DIPFILES).append(URL.encodeQueryString(dipFileUUID))
+      .append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
     return UriUtils.fromSafeConstant(b.toString());
   }
 

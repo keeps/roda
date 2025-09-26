@@ -401,6 +401,9 @@ public final class RodaConstants {
   // dips
   public static final String API_REST_V2_DIPS = "api/v2/dips/";
 
+  // dipfiles
+  public static final String API_REST_V2_DIPFILES = "api/v2/dip-files/";
+
   // representation-information
   public static final String API_REST_V2_REPRESENTATION_INFORMATION = "api/v2/representation-information/";
 
