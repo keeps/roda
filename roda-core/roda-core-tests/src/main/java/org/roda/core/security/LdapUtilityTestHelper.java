@@ -38,7 +38,7 @@ public class LdapUtilityTestHelper {
 
   public LdapUtilityTestHelper() {
     final String ldapBaseDN = "dc=roda,dc=org";
-    DockerImageName OPENLDAP_IMAGE = DockerImageName.parse("docker.io/bitnami/openldap:2.6");
+    DockerImageName OPENLDAP_IMAGE = DockerImageName.parse("docker.io/bitnamilegacy/openldap:2.6");
 
     openldap = new GenericContainer<>(OPENLDAP_IMAGE);
     openldap.withExposedPorts(1389);
