@@ -45,7 +45,7 @@ public interface TransactionalStoragePathRepository extends JpaRepository<Transa
     @Param("transactionLog") TransactionLog transactionLog, @Param("operationType") OperationType operationType,
     @Param("operationState") OperationState operationState);
 
-  @Query("SELECT o FROM TransactionalStoragePathOperationLog o WHERE o.transactionLog = :transactionLog AND o.storagePath LIKE CONCAT(:storagePath, '/%') AND o.operationType <> 'READ'")
+  @Query("SELECT o FROM TransactionalStoragePathOperationLog o WHERE o.transactionLog = :transactionLog AND (o.storagePath = :storagePath OR o.storagePath LIKE CONCAT(:storagePath, '/%')) AND o.operationType <> 'READ'")
   List<TransactionalStoragePathOperationLog> findModificationsUnderStoragePath(
     @Param("transactionLog") TransactionLog transactionLog, @Param("storagePath") String storagePath);
 }
