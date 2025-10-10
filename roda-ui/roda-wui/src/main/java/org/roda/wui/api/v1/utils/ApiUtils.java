@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -191,7 +193,8 @@ public class ApiUtils {
 
     String mediaType = MimeTypeHelper.getContentType(streamResponse.getFilename(), streamResponse.getMediaType());
     Response.ResponseBuilder response = Response.ok(so, mediaType).header(HttpHeaders.CONTENT_DISPOSITION,
-      contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"");
+      contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\""
+        + URLEncoder.encode(streamResponse.getFilename(), StandardCharsets.UTF_8) + "\"");
 
     if (streamResponse.getFileSize() > 0) {
       response.header(HttpHeaders.CONTENT_LENGTH, streamResponse.getFileSize());
@@ -216,7 +219,8 @@ public class ApiUtils {
 
     String mediaType = MimeTypeHelper.getContentType(streamResponse.getFilename(), streamResponse.getMediaType());
     Response.ResponseBuilder response = Response.ok(so, mediaType).header(HttpHeaders.CONTENT_DISPOSITION,
-      contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"");
+      contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\""
+        + URLEncoder.encode(streamResponse.getFilename(), StandardCharsets.UTF_8) + "\"");
 
     if (streamResponse.getFileSize() > 0) {
       response.header(HttpHeaders.CONTENT_LENGTH, streamResponse.getFileSize());
@@ -285,7 +289,7 @@ public class ApiUtils {
       .header(HttpHeaders.CONTENT_TYPE, mediaType).header("Accept-Ranges", "bytes")
       .header("Content-Range", responseRange).header(HttpHeaders.CONTENT_LENGTH, len)
       .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\""
-        + streamResponse.getFilename() + "\"");
+        + URLEncoder.encode(streamResponse.getFilename(), StandardCharsets.UTF_8) + "\"");
 
     Date lastModifiedDate = streamResponse.getLastModified();
     if (lastModifiedDate != null) {
@@ -321,7 +325,8 @@ public class ApiUtils {
     String mediaType = MimeTypeHelper.getContentType(streamResponse.getFilename(), streamResponse.getMediaType());
 
     Response.ResponseBuilder response = Response.ok(so, mediaType).header(HttpHeaders.CONTENT_DISPOSITION,
-      contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"");
+      contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\""
+        + URLEncoder.encode(streamResponse.getFilename(), StandardCharsets.UTF_8) + "\"");
 
     if (streamResponse.getFileSize() > 0) {
       response.header(HttpHeaders.CONTENT_LENGTH, streamResponse.getFileSize());
