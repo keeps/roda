@@ -7,6 +7,9 @@
  */
 package org.roda.wui.client.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.actions.FileToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -31,7 +34,8 @@ public class BrowseFileActionsToolbar extends BrowseObjectActionsToolbar<Indexed
     this.actions.clear();
     FileToolbarActions fileActions = FileToolbarActions.get(object.getAipId(), object.getRepresentationId(), state,
       object.isDirectory() ? object : null, actionPermissions);
-    this.actions.add(new ActionableWidgetBuilder<IndexedFile>(fileActions)
-      .buildGroupedListWithObjects(new ActionableObject<>(object)));
+
+    this.actions.add(new ActionableWidgetBuilder<IndexedFile>(fileActions).buildGroupedListWithObjects(
+      new ActionableObject<>(object), new ArrayList<>(), List.of(FileToolbarActions.FileAction.DOWNLOAD)));
   }
 }
