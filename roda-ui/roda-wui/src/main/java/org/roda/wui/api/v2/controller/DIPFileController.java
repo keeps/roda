@@ -129,6 +129,9 @@ public class DIPFileController implements DIPFileRestService, Exportable {
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
         List<String> fileFields = new ArrayList<>(RodaConstants.DIPFILE_FIELDS_TO_RETURN);
         DIPFile dipFile = requestContext.getIndexService().retrieve(DIPFile.class, dipFileUUID, fileFields);
+        controllerAssistant.setRelatedObjectId(dipFile.getDipId());
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_DIP_FILE_ID_PARAM, dipFile.getId(),
+          RodaConstants.CONTROLLER_DIP_FILE_UUID_PARAM, dipFileUUID);
         return ApiUtils.okResponse(dipFileService.retrieveDIPFileStreamResponse(requestContext, dipFile));
       }
     });
