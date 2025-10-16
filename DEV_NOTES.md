@@ -31,9 +31,8 @@ Follow the official documentation page: <https://docs.github.com/en/authenticati
 ## Debug WUI
 
 ```bash
-# If never GWT compiled before, compile once and copy gwt.rpc files
+# If never GWT compiled before, compile once
 mvn -pl roda-ui/roda-wui -am gwt:compile -Pdebug-main -Dscope.gwt-dev=compile
-./roda-ui/roda-wui/copy_gwt_rpc.sh
 
 mvn install -Pcore -DskipTests
 
