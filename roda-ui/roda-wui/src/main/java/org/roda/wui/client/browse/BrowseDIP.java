@@ -37,9 +37,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.wui.client.browse.tabs.BrowseDIPTabs;
 import org.roda.wui.client.common.ActionsToolbar;
-import org.roda.wui.client.common.BrowseDIPActionsToolbar;
-import org.roda.wui.client.common.BrowseDIPFileActionsToolbar;
-import org.roda.wui.client.common.BrowseObjectActionsToolbar;
+import org.roda.wui.client.common.BrowseDIPContentActionsToolbar;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -358,16 +356,9 @@ public class BrowseDIP extends Composite {
     IndexedDIP dip = response.getDip();
     DIPFile dipFile = response.getDipFile();
 
-    if (dipFile != null) {
-      BrowseObjectActionsToolbar<DIPFile> toolbar = new BrowseDIPFileActionsToolbar();
-      toolbar.setObjectAndBuild(dipFile, response.getPermissions(), handler);
-      objectToolbar = toolbar;
-
-    } else {
-      BrowseObjectActionsToolbar<IndexedDIP> toolbar = new BrowseDIPActionsToolbar();
-      toolbar.setObjectAndBuild(dip, dip.getPermissions(), handler);
-      objectToolbar = toolbar;
-    }
+    BrowseDIPContentActionsToolbar toolbar = new BrowseDIPContentActionsToolbar();
+    toolbar.setObjectsAndBuild(dip, dipFile, response.getPermissions(), handler);
+    objectToolbar = toolbar;
 
     initWidget(uiBinder.createAndBindUi(this));
 
