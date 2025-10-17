@@ -166,7 +166,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
                   deleteRequest.setSelectedItemsToDelete(selectedItems);
                   deleteRequest.setDetails(details);
 
-                  services.dipResource(s -> s.deleteIndexedDIPs(deleteRequest)).whenComplete((job, throwable) -> {
+                  services.dipResource(s -> s.deleteDIPs(deleteRequest)).whenComplete((job, throwable) -> {
                     if (throwable != null) {
                       doActionCallbackNone();
                       Toast.showError("Unable to perform the actions", "");
