@@ -1,5 +1,18 @@
 # Changelog
 
+## v5.7.8 (03/11/2025)
+#### Bug fixes
+
+- Add UTF-8 encoding when downloading files with non-ASCII characteres
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.7 (24/09/2025)
 #### Enhancements 
 - SecurityHeadersFilter is now fully configurable via properties. 7f7df9a3fd2a149df5b0dfee74264522cafb4a0f
@@ -409,25 +422,6 @@ To try out this version, check the [install instructions](https://www.roda-commu
 
 #### Security:
 - Several dependency upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
-
-
----
-
-## v5.2.0 (28/07/2023)
-#### Enhancements:
-- DIP must be deleted if it no longer contains any link with any entity. #2863
-- Ingest job report could expose if SIP is update #2212
-
-#### Bug fixes:
-- Unexpected behaviour can cause index to be completely deleted #2921
-
-#### Security:
-- Several dependency upgrades to fix security vulnerabilities
-- Remove python from Docker image
 
 ---
 
