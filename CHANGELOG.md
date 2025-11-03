@@ -1,5 +1,18 @@
 # Changelog
 
+## v5.7.9 (03/11/2025)
+#### Enhancements 
+
+- Enhance support for representation status other than Original when ingesting a E-ARK SIP package
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.8 (03/11/2025)
 #### Bug fixes
 
@@ -402,23 +415,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 #### Bug fixes:
 - Fixed FileID when it is encoded #2963
 - Fixed API filter issue #2965
-
-#### Security:
-- Several dependency upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
-
-
----
-
-## v5.2.1 (08/09/2023)
-#### Bug fixes:
-- Listing RODA objects via REST-API is not showing any results #2935
-- Preservation events page is not showing no events #2928
-- REST API endpoint to retrieve the last transferred resource report does not show the reports #2929
-- Problem with pre-filter not being reset when searching preservation events #2941
 
 #### Security:
 - Several dependency upgrades to fix security vulnerabilities
