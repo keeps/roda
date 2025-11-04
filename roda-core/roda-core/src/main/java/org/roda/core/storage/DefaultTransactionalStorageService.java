@@ -424,7 +424,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
     List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(fromService, fromStoragePath,
-      toPath, OperationType.CREATE);
+      toPath, OperationType.READ);
     try {
       stagingStorageService.copy(fromService, fromStoragePath, toPath, resource, replaceExisting);
       for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
