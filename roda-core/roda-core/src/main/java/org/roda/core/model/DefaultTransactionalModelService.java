@@ -3933,7 +3933,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
     TransactionalModelOperationLog operationLog = operationRegistry.registerOperation(object, OperationType.READ);
     try {
-      getModelService().exportToPath(object, toPath, replaceExisting, fromPathPartials);
+      mainModelService.exportToPath(object, toPath, replaceExisting, fromPathPartials);
       operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
     } catch (RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException | GenericException e) {
       operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
