@@ -568,7 +568,7 @@ public class FileStorageService implements StorageService {
 
   @Override
   public void export(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
-    boolean replaceExisting) throws AlreadyExistsException, GenericException {
+                     boolean replaceExisting) throws AlreadyExistsException, GenericException {
     Path sourcePath = null;
     if (StringUtils.isNotBlank(resource)) {
       sourcePath = FSUtils.getEntityPath(basePath, fromStoragePath).resolve(resource);
