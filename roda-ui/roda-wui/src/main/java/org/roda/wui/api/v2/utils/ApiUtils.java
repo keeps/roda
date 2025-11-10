@@ -7,11 +7,12 @@
  */
 package org.roda.wui.api.v2.utils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -22,7 +23,6 @@ import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.model.ModelService;
-import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.RangeConsumesOutputStream;
 import org.roda.wui.common.model.RequestContext;
 import org.springframework.http.CacheControl;
@@ -48,8 +48,8 @@ public class ApiUtils {
     StreamingResponseBody responseStream = outputStream -> streamResponse.getStream().consumeOutputStream(outputStream);
 
     responseHeaders.add("Content-Type", streamResponse.getStream().getMediaType());
-    responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION,
-      "attachment; filename=\"" + streamResponse.getStream().getFileName() + "\"");
+    responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+      + URLEncoder.encode(streamResponse.getStream().getFileName(), StandardCharsets.UTF_8) + "\"");
     responseHeaders.add("Content-Length", String.valueOf(streamResponse.getStream().getSize()));
 
     Date lastModifiedDate = streamResponse.getStream().getLastModified();
@@ -71,8 +71,8 @@ public class ApiUtils {
     if (headers.getRange().isEmpty()) {
       responseStream = consumesOutputStream::consumeOutputStream;
       responseHeaders.add("Content-Type", consumesOutputStream.getMediaType());
-      responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION,
-        "attachment; filename=\"" + consumesOutputStream.getFileName() + "\"");
+      responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+        + URLEncoder.encode(consumesOutputStream.getFileName(), StandardCharsets.UTF_8) + "\"");
       responseHeaders.add("Content-Length", String.valueOf(consumesOutputStream.getSize()));
 
       return ResponseEntity.ok().headers(responseHeaders).body(responseStream);
@@ -86,7 +86,7 @@ public class ApiUtils {
     responseHeaders.add(HttpHeaders.CONTENT_TYPE, consumesOutputStream.getMediaType());
     responseHeaders.add(HttpHeaders.CONTENT_LENGTH, contentLength);
     responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION,
-      "inline; filename=\"" + consumesOutputStream.getFileName() + "\"");
+      "inline; filename=\"" + URLEncoder.encode(consumesOutputStream.getFileName(), StandardCharsets.UTF_8) + "\"");
     responseHeaders.add(HttpHeaders.ACCEPT_RANGES, "bytes");
     responseHeaders.add(HttpHeaders.CONTENT_RANGE,
       "bytes" + " " + start + "-" + end + "/" + consumesOutputStream.getSize());
@@ -105,26 +105,26 @@ public class ApiUtils {
   }
 
   public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String... pathPartials)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     return download(requestContext, object, null, false, pathPartials);
   }
 
   public static StreamResponse download(RequestContext requestContext, LiteRODAObject lite, String... pathPartials)
-          throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return download(requestContext,lite, null, false, pathPartials);
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    return download(requestContext, lite, null, false, pathPartials);
   }
 
-  public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String fileName, boolean addTopDirectory,
-    String... pathPartials)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+  public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String fileName,
+    boolean addTopDirectory, String... pathPartials)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = requestContext.getModelService();
     ConsumesOutputStream download = model.exportObjectToStream(object, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
   }
 
-  public static StreamResponse download(RequestContext requestContext, LiteRODAObject lite, String fileName, boolean addTopDirectory,
-                                        String... pathPartials)
-          throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+  public static StreamResponse download(RequestContext requestContext, LiteRODAObject lite, String fileName,
+    boolean addTopDirectory, String... pathPartials)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ModelService model = requestContext.getModelService();
     ConsumesOutputStream download = model.exportObjectToStream(lite, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
@@ -136,8 +136,8 @@ public class ApiUtils {
    * values are provided.
    */
   public static Pair<Integer, Integer> processPagingParams(String start, String limit) {
-    Integer startInteger;
-    Integer limitInteger;
+    int startInteger;
+    int limitInteger;
     try {
       startInteger = Integer.parseInt(start);
       if (startInteger < 0) {
