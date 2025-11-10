@@ -9,6 +9,8 @@ package org.roda.core.plugins.base.ingest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -307,7 +309,7 @@ public class EARKSIP2ToAIPPluginUtils {
     // Either we're not updating or the retrieve failed
     if (representation == null) {
       representation = model.createRepresentation(aipId, sr.getObjectID(), isOriginal, representationType, notify,
-        username);
+        username, isOriginal ? Collections.emptyList() : List.of(sr.getStatus().asString()));
       if (reportItem != null && update) {
         reportItem.getSipInformation().addRepresentationData(aipId, IdUtils.getRepresentationId(representation));
       }
