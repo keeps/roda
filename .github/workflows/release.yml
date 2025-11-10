@@ -38,7 +38,7 @@ jobs:
         ports:
           - 1025:1025
       openldap:
-        image: docker.io/bitnami/openldap:2.6
+        image: docker.io/bitnamilegacy/openldap:2.6
         ports:
           - 1389:1389
           - 1636:1636
