@@ -304,13 +304,17 @@ public class BrowseDIP extends Composite {
         }).whenComplete((response, throwable1) -> {
           if (response.getDipFile() != null) {
             List<CompletableFuture<DIPFile>> dipFileAncestors = response.getDipFile().getAncestorsUUIDs().stream()
-              .map(m -> services.dipFileResource(s -> s.findByUuid(m, LocaleInfo.getCurrentLocale().getLocaleName())))
-              .collect(Collectors.toList());
+              .map(uuid -> services.dipFileResource(s -> s.findByUuid(uuid, LocaleInfo.getCurrentLocale().getLocaleName()))
+                  .handle((file, e)-> {
+                      if(e != null) return null;
+                      else return file;
+                  })).collect(Collectors.toList());
+
             CompletableFuture<?>[] futuresArray = dipFileAncestors.toArray(new CompletableFuture<?>[0]);
             CompletableFuture.allOf(futuresArray).thenApply(v -> {
               for (CompletableFuture<DIPFile> dipFileAncestor : dipFileAncestors) {
                 DIPFile file = dipFileAncestor.join();
-                response.getDipFileAncestors().add(file);
+                if(file != null) response.getDipFileAncestors().add(file);
               }
               return response;
             }).whenComplete((o, throwable) -> render(o, viewers, callback, services));
