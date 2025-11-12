@@ -1,5 +1,14 @@
 # Changelog
 
+## v5.7.10 (12/11/2025)
+#### Bug fixes
+- Fixed incorrect HTTP error code when using REST-API and Bearer authentication
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.9 (03/11/2025)
 #### Enhancements 
 
@@ -407,19 +416,4 @@ To try out this version, check the [install instructions](https://github.com/kee
 ---
 
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
-
-
----
-
-## v5.2.2 (04/10/2023)
-#### Bug fixes:
-- Fixed FileID when it is encoded #2963
-- Fixed API filter issue #2965
-
-#### Security:
-- Several dependency upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
 
