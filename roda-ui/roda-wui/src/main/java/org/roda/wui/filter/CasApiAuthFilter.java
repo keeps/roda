@@ -96,6 +96,7 @@ public class CasApiAuthFilter implements Filter {
       } catch (final GenericException e) {
         throw new ServletException(e.getMessage(), e);
       }
+      return;
     }
 
     // try basic auth
