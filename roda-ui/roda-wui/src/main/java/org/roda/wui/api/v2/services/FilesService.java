@@ -398,12 +398,12 @@ public class FilesService {
     if (versionID != null) {
       BinaryVersion binaryVersion = model.getBinaryVersion(representation, versionID,
         List.of(RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_TECHNICAL, type,
-          techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION));
+          techMDURN));
       metadataBinary = binaryVersion.getBinary();
     } else {
       metadataBinary = model.getBinary(representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
         RodaConstants.STORAGE_DIRECTORY_TECHNICAL, type,
-        techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
+        techMDURN);
     }
     String filename = metadataBinary.getStoragePath().getName() + HTML_EXT;
     String htmlDescriptive = HTMLUtils.technicalMetadataToHtml(metadataBinary, type, versionID,
@@ -433,12 +433,12 @@ public class FilesService {
     if (versionID != null) {
       BinaryVersion binaryVersion = model.getBinaryVersion(representation, versionID,
         List.of(RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_TECHNICAL, type,
-          techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION));
+          techMDURN));
       metadataBinary = binaryVersion.getBinary();
     } else {
       metadataBinary = model.getBinary(representation, RodaConstants.STORAGE_DIRECTORY_METADATA,
         RodaConstants.STORAGE_DIRECTORY_TECHNICAL, type,
-        techMDURN + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
+        techMDURN);
     }
     stream = new BinaryConsumesOutputStream(metadataBinary, RodaConstants.MEDIA_TYPE_TEXT_XML);
 
