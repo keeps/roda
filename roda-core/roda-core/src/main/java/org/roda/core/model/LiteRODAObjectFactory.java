@@ -42,6 +42,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -162,6 +163,8 @@ public final class LiteRODAObjectFactory {
       ret = getOtherMetadata(object);
     } else if (object instanceof PreservationMetadata) {
       ret = getPreservationMetadata(object);
+    } else if (object instanceof TechnicalMetadata) {
+      ret = getTechnicalMetadata(object);
     } else if (object instanceof IndexedPreservationEvent) {
       ret = getIndexedPreservationEvent(object);
     } else if (object instanceof DIPFile) {
@@ -215,6 +218,10 @@ public final class LiteRODAObjectFactory {
       if (ids.size() == 2 || ids.size() == 3) {
         ret = create(objectClass, ids.size(), ids);
       }
+    } else if (objectClass == TechnicalMetadata.class) {
+      if (ids.size() >= 3) {
+        ret = create(objectClass, ids.size(), ids);
+      }
     } else if (objectClass == OtherMetadata.class) {
       if (ids.size() == 2 || ids.size() == 3) {
         ret = create(objectClass, ids.size(), ids);
@@ -263,6 +270,16 @@ public final class LiteRODAObjectFactory {
     }
 
     return ret;
+  }
+
+  private static <T extends IsRODAObject> Optional<LiteRODAObject> getTechnicalMetadata(T object) {
+    Optional<LiteRODAObject> ret;
+    TechnicalMetadata o = (TechnicalMetadata) object;
+    List<String> list = new ArrayList<>();
+    list.add(o.getAipId());
+    list.add(o.getRepresentationId());
+    list.add(o.getId());
+    return get(TechnicalMetadata.class, list, false);
   }
 
   private static <T extends IsRODAObject> Optional<LiteRODAObject> getOtherMetadata(T object) {
