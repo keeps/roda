@@ -1382,6 +1382,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DONT_CHECK_RELATIVES = "parameter.dont_check_relatives";
   public static final String PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER = "parameter.representation_information_filter";
   public static final String PLUGIN_PARAMS_RODA_MEMBER_ACTIVATE = "parameter.activate";
+  public static final String PLUGIN_PARAM_SKIP_ROLLBACK_ON_VALIDATION_FAILURE = "parameter.skip_rollback_on_validation_failure";
 
   public static final String PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA = "parameter.validate_descriptive_metadata";
   public static final String PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE = "parameter.metadata_type";
