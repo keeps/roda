@@ -422,7 +422,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   @Override
   public void export(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
-                     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
     List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(fromService, fromStoragePath,
       toPath, OperationType.READ);
     try {
