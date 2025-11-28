@@ -14,6 +14,12 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang3.StringUtils;
+import org.roda.core.RodaCoreFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -21,12 +27,6 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang3.StringUtils;
-import org.roda.core.RodaCoreFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A filter that can be turned on/off using RODA configuration file.
@@ -116,13 +116,14 @@ public class OnOffFilter implements Filter {
    */
   private void initInnerFilter() throws ServletException {
     final Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
-    if (rodaConfig == null) {
+    final String innerFilterClass = this.webXmlFilterConfig.getInitParameter(PARAM_INNER_FILTER_CLASS);
+    final String configPrefix = this.webXmlFilterConfig.getInitParameter(PARAM_CONFIG_PREFIX);
+    final String configKey = configPrefix + ".enabled";
+    if (rodaConfig == null || !rodaConfig.containsKey(configKey)) {
       LOGGER.info("RODA configuration not available yet. Delaying init of {}.",
         this.webXmlFilterConfig.getInitParameter(PARAM_INNER_FILTER_CLASS));
     } else {
-      final String innerFilterClass = this.webXmlFilterConfig.getInitParameter(PARAM_INNER_FILTER_CLASS);
-      final String configPrefix = this.webXmlFilterConfig.getInitParameter(PARAM_CONFIG_PREFIX);
-      if (rodaConfig.getBoolean(configPrefix + ".enabled", false)) {
+      if (rodaConfig.getBoolean(configKey, false)) {
         try {
           this.innerFilter = (Filter) Class.forName(innerFilterClass).newInstance();
           this.innerFilter.init(getFilterConfig());
@@ -134,8 +135,8 @@ public class OnOffFilter implements Filter {
       } else {
         this.isOn = false;
       }
+      LOGGER.info("{} is {}", getFilterConfig().getFilterName(), (this.isOn ? "ON" : "OFF"));
     }
-    LOGGER.info("{} is {}", getFilterConfig().getFilterName(), (this.isOn ? "ON" : "OFF"));
   }
 
   /**
