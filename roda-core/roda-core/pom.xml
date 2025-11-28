@@ -46,16 +46,12 @@
                                     <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
                                     <createDependencyReducedPom>false</createDependencyReducedPom>
                                     <transformers>
-                                        <transformer
-                                                implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer"/>
-                                        <transformer
-                                                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                                        <transformer
-                                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer"/>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                             <mainClass>org.roda.core.RodaCoreFactory</mainClass>
                                         </transformer>
-                                        <transformer
-                                                implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                             <!-- akka related conf appending -->
                                             <resource>reference.conf</resource>
                                         </transformer>
@@ -96,16 +92,12 @@
                                     <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
                                     <createDependencyReducedPom>false</createDependencyReducedPom>
                                     <transformers>
-                                        <transformer
-                                                implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer"/>
-                                        <transformer
-                                                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                                        <transformer
-                                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer"/>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                             <mainClass>org.roda.core.RodaCoreFactory</mainClass>
                                         </transformer>
-                                        <transformer
-                                                implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                             <!-- akka related conf appending -->
                                             <resource>reference.conf</resource>
                                         </transformer>
@@ -164,7 +156,7 @@
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
-            <version>3.9.3</version>
+            <version>3.9.4</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.solr/solr-solrj-zookeeper -->
         <dependency>
