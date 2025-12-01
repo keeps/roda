@@ -440,6 +440,23 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public Binary retrieveTechnicalMetadataBinary(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    List<TransactionalModelOperationLog> operationLogs = operationRegistry.registerOperationForTechnicalMetadata(aipId,
+      representationId, fileDirectoryPath, fileId, OperationType.READ);
+
+    try {
+      Binary binary = stagingModelService.retrieveTechnicalMetadataBinary(aipId, representationId, fileDirectoryPath,
+        fileId);
+      operationRegistry.updateOperationState(operationLogs, OperationState.SUCCESS);
+      return binary;
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      operationRegistry.updateOperationState(operationLogs, OperationState.FAILURE);
+      throw e;
+    }
+  }
+
+  @Override
   public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<TransactionalModelOperationLog> operationLogs = operationRegistry
@@ -1482,6 +1499,23 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       representationId, OperationType.CREATE);
     try {
       getModelService().createTechnicalMetadata(aipId, representationId, metadataType, fileId, payload, createdBy,
+        notify);
+      operationRegistry.updateOperationState(operationLogs, OperationState.SUCCESS);
+    } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException
+      | GenericException e) {
+      operationRegistry.updateOperationState(operationLogs, OperationState.FAILURE);
+      throw e;
+    }
+  }
+
+  @Override
+  public void updateTechnicalMetadata(String aipId, String representationId, String metadataType, String fileId,
+    ContentPayload payload, String createdBy, boolean notify) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
+    List<TransactionalModelOperationLog> operationLogs = operationRegistry.registerOperationForRepresentation(aipId,
+      representationId, OperationType.UPDATE);
+    try {
+      getModelService().updateTechnicalMetadata(aipId, representationId, metadataType, fileId, payload, createdBy,
         notify);
       operationRegistry.updateOperationState(operationLogs, OperationState.SUCCESS);
     } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException

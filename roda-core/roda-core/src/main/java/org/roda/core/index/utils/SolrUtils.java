@@ -1545,7 +1545,7 @@ public class SolrUtils {
 
       StoragePath storagePath = ModelUtils.getTechnicalMetadataStoragePath(techMd.getAipId(),
         techMd.getRepresentationId(), Collections.singletonList(techMd.getType()),
-        urn + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
+        urn);
 
       Binary binary = model.getStorage().getBinary(storagePath);
 

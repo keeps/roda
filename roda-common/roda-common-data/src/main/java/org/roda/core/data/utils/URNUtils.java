@@ -51,7 +51,7 @@ public final class URNUtils {
   }
 
   public static String createRodaTechnicalMetadataURN(String id, String instanceId, String technicalMetadataType) {
-    return getTechnicalMetadataPrefix(technicalMetadataType, instanceId) + id;
+    return getTechnicalMetadataPrefix(technicalMetadataType, instanceId) + id + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION;
   }
 
   public static String getTechnicalMetadataPrefix(String technicalMetadataType, String instanceId) {

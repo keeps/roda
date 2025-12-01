@@ -195,8 +195,11 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
 
     Long sizeInBytes = 0L;
 
-    SolrUtils.indexRepresentationTechnicalMetadata(model,
-      getRepresentationTechnicalMetadata(((Info) info).aip, file.getRepresentationId()), fileId, doc);
+    if (!file.isDirectory()) {
+      String techMdFileId = IdUtils.createTechnicalMetadataFileId(fileId, file.getPath());
+      SolrUtils.indexRepresentationTechnicalMetadata(model,
+        getRepresentationTechnicalMetadata(((Info) info).aip, file.getRepresentationId()), techMdFileId, doc);
+    }
 
     // Add information from PREMIS
     Binary premisFile = getFilePremisFile(model, file);
