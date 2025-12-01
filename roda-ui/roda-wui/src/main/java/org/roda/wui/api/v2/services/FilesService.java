@@ -447,4 +447,15 @@ public class FilesService {
     return ret;
   }
 
+  public StreamResponse retrieveOtherMetadata(RequestContext requestContext, IndexedFile file, String metadataType,
+    String metadataSuffix)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    final ConsumesOutputStream stream;
+    ModelService model = requestContext.getModelService();
+    Binary otherMetadataBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
+      file.getPath(), file.getId(), metadataSuffix, metadataType);
+    stream = new BinaryConsumesOutputStream(otherMetadataBinary, RodaConstants.MEDIA_TYPE_TEXT_HTML);
+    return new StreamResponse(stream);
+  }
+
 }

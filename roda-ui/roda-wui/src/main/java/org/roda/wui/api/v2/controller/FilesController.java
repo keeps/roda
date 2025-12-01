@@ -34,6 +34,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.TechnicalMetadataInfos;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.model.utils.UserUtility;
@@ -413,8 +414,7 @@ public class FilesController implements FileRestService, Exportable {
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     // delegate
-    return ApiUtils
-      .okResponse(indexService.exportToCSV(findRequestString, IndexedFile.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, IndexedFile.class));
   }
 
   @GetMapping(path = "/{uuid}/metadata/technical/{typeId}/html", produces = MediaType.TEXT_HTML_VALUE)
@@ -479,6 +479,34 @@ public class FilesController implements FileRestService, Exportable {
         // delegate
         StreamResponse streamResponse = filesService.retrieveFileTechnicalMetadata(requestContext, indexedFile, typeId,
           versionId);
+        return ApiUtils.okResponse(streamResponse);
+      }
+    });
+  }
+
+  @RequestMapping(method = RequestMethod.GET, path = "/{fileUUID}/other_metadata/{metadata_type}/{metadata_file_suffix}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Gets other metadata (JSON info or ZIP file).\nOptional query params of **start** and **limit** defined the returned query", responses = {
+    @ApiResponse(responseCode = "200", description = "Other metadata file", content = @Content(schema = @Schema(implementation = OtherMetadata.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  ResponseEntity<StreamingResponseBody> getOtherMetadata(
+    @Parameter(description = "The UUID of the existing File", required = true) @PathVariable(name = "fileUUID") String fileUUID,
+    @Parameter(description = "The type of the other metadata", required = true) @PathVariable(name = "metadata_type") String metadataType,
+    @Parameter(description = "The file suffix of the other metadata", required = true) @PathVariable(name = "metadata_file_suffix") String metadataFileSuffix) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+      @Override
+      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_ID_PARAM, fileUUID);
+        // check object permissions
+        IndexedFile indexedFile = requestContext.getIndexService().retrieve(IndexedFile.class, fileUUID,
+          RodaConstants.FILE_FIELDS_TO_RETURN);
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(), indexedFile);
+
+        // delegate
+        StreamResponse streamResponse = filesService.retrieveOtherMetadata(requestContext, indexedFile, metadataType,
+          metadataFileSuffix);
         return ApiUtils.okResponse(streamResponse);
       }
     });
