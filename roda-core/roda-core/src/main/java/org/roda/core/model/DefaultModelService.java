@@ -5627,13 +5627,13 @@ public class DefaultModelService implements ModelService {
   public void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting, String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
     StoragePath sourceObjectPath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object), fromPathPartials);
-    getStorage().copy(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
+    getStorage().export(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
   }
 
   public void exportToPath(LiteRODAObject lite, Path toPath, boolean replaceExisting, String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
     StoragePath sourceObjectPath = DefaultStoragePath.parse(ModelUtils.getStoragePath(lite), fromPathPartials);
-    getStorage().copy(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
+    getStorage().export(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
   }
 
   @Override
