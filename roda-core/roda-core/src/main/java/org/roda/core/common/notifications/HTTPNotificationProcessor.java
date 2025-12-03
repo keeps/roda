@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.common.notifications;
@@ -107,6 +107,11 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
       httppost.setConfig(requestConfig);
       httppost
         .setEntity(new StringEntity(content, ContentType.create("application/json", RodaConstants.DEFAULT_ENCODING)));
+
+      String apiKey = RodaCoreFactory.getRodaConfigurationAsString("core.notification.api.key");
+      if (apiKey != null && !apiKey.isEmpty()) {
+        httppost.addHeader("X-API-KEY", apiKey);
+      }
 
       HttpResponse response = httpclient.execute(httppost);
       if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
