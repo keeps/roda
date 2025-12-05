@@ -108,6 +108,12 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
       httppost
         .setEntity(new StringEntity(content, ContentType.create("application/json", RodaConstants.DEFAULT_ENCODING)));
 
+      String key = RodaCoreFactory.getRodaConfigurationAsString("core.notification.header.key");
+      String value = RodaCoreFactory.getRodaConfigurationAsString("core.notification.header.value");
+      if (key != null && !key.isEmpty() && value != null && !value.isEmpty()) {
+        httppost.setHeader(key, value);
+      }
+
       HttpResponse response = httpclient.execute(httppost);
       if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
         success = false;
