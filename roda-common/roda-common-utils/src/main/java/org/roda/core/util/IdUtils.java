@@ -191,6 +191,12 @@ public final class IdUtils {
     return getTransferredResourceUUID(relativeToBase.toString());
   }
 
+  public static String createTechnicalMetadataFileId(String fileId, List<String> fileDirectoryPath){
+    if(fileDirectoryPath.isEmpty()) return fileId;
+    String pathPrefix = String.join(ID_SEPARATOR, fileDirectoryPath);
+    return pathPrefix + ID_SEPARATOR + fileId;
+  }
+
   public static String getTransferredResourceUUID(String relativeToBase) {
     return IdUtils.createUUID(relativeToBase);
   }
