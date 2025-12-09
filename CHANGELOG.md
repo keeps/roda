@@ -1,5 +1,14 @@
 # Changelog
 
+## v5.7.11 (09/12/2025)
+#### Enhancements 
+- Enable HTTP Notification Processor to have HTTP header 
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.10 (12/11/2025)
 #### Bug fixes
 - Fixed incorrect HTTP error code when using REST-API and Bearer authentication
@@ -385,33 +394,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 #### Enhancements:
 
 - Update Swedish translation language
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
-
-
----
-
-## v5.2.3 (10/11/2023)
-#### What's new:
-
-- New German (Austrian) translation of the Web interface :austria: 
-
-#### Bug fixes:
-
-- Create folder access-keys when initializing RODA for the first time #2992
-- Add default representation type when creating a preservation action job #2990
-- Edit button for selecting parent does not work as expected #2988
-- EAD 2002 dissemination crosswalk duplicates record group level #2987
-
-#### Enhancements:
-
-- Add title attribute to improve accessibility #2989
-
-#### Security:
-
-- Bump several dependencies
 
 ---
 
