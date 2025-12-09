@@ -33,6 +33,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.metadata.TechnicalMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -110,6 +111,21 @@ public class TransactionalModelOperationRegistry {
       operationLogs.add(registerOperation(DescriptiveMetadata.class,
         Arrays.asList(aipID, representationId, descriptiveMetadataId), operation));
     }
+    return operationLogs;
+  }
+
+  public List<TransactionalModelOperationLog> registerOperationForTechnicalMetadata(String aipID,
+    String representationId, List<String> fileDirectoryPath, String fileId, OperationType operation) {
+    List<TransactionalModelOperationLog> operationLogs = new ArrayList<>();
+    operationLogs.add(registerOperationForRelatedAIP(aipID, operation));
+    List<String> list = new ArrayList<>();
+    list.add(aipID);
+    list.addAll(fileDirectoryPath);
+    if (representationId != null) {
+      list.add(representationId);
+    }
+    list.add(fileId);
+    operationLogs.add(registerOperation(TechnicalMetadata.class, list, operation));
     return operationLogs;
   }
 
@@ -510,7 +526,6 @@ public class TransactionalModelOperationRegistry {
       throw new IllegalArgumentException(
         "[transactionId:" + transaction.getId() + "] Object class is not lockable: " + objectClass.getName());
     }
-
 
     Optional<LiteRODAObject> liteRODAObject = LiteRODAObjectFactory.get(objectClass, id);
     if (liteRODAObject.isPresent()) {

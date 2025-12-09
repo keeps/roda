@@ -721,6 +721,12 @@ public class DefaultModelService implements ModelService {
     return storage.getBinary(binaryPath);
   }
 
+  public Binary retrieveTechnicalMetadataBinary(String aipId, String representationId, List<String> fileDirectoryPath, String fileId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath binaryPath = ModelUtils.getTechnicalMetadataStoragePath(aipId, representationId, fileDirectoryPath, fileId);
+    return storage.getBinary(binaryPath);
+  }
+
   @Override
   public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
@@ -1790,18 +1796,57 @@ public class DefaultModelService implements ModelService {
     StoragePath binaryPath = ModelUtils.getTechnicalMetadataStoragePath(aipId, representationId,
       Collections.singletonList(metadataType), urn);
     storage.createBinary(binaryPath, payload, false);
-    TechnicalMetadata techMd = new TechnicalMetadata(metadataType, aipId, representationId, metadataType);
 
-    AIP updatedAIP = null;
     if (aipId != null) {
       AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
-      aip.addTechnicalMetadata(techMd);
-      updatedAIP = updateAIPMetadata(aip, createdBy);
+      addTechnicalMetadataToAIPMetadata(aip, representationId, metadataType, createdBy, notify);
     }
+  }
+
+  @Override
+  public void updateTechnicalMetadata(String aipId, String representationId, String metadataType, String fileId,
+    ContentPayload payload, String createdBy, boolean notify)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    String urn = URNUtils.createRodaTechnicalMetadataURN(fileId, RODAInstanceUtils.getLocalInstanceIdentifier(),
+      metadataType.toLowerCase());
+    StoragePath binaryPath = ModelUtils.getTechnicalMetadataStoragePath(aipId, representationId,
+      Collections.singletonList(metadataType), urn);
+    storage.updateBinaryContent(binaryPath, payload, false, false, true, null);
+    // update technicalmetadata logic
+    if (aipId != null) {
+      AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+      List<TechnicalMetadata> techMetadataList = getTechnicalMetadata(aip, representationId);
+      techMetadataList.removeIf(tm -> tm.getId().equals(metadataType));
+      addTechnicalMetadataToAIPMetadata(aip, representationId, metadataType, createdBy, notify);
+    }
+  }
+
+  private void addTechnicalMetadataToAIPMetadata(AIP aip, String representationId, String metadataType,
+    String createdBy, boolean notify)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    TechnicalMetadata techMd = new TechnicalMetadata(metadataType, aip.getId(), representationId, metadataType);
+
+    aip.addTechnicalMetadata(techMd);
+    AIP updatedAIP = updateAIPMetadata(aip, createdBy);
 
     if (notify && updatedAIP != null) {
       notifyAipUpdatedOnChanged(updatedAIP).failOnError();
     }
+  }
+
+  private List<TechnicalMetadata> getTechnicalMetadata(AIP aip, String representationId) {
+    if (representationId == null) {
+      return new ArrayList<>();
+    }
+    Optional<Representation> oRep = aip.getRepresentations().stream()
+      .filter(rep -> rep.getId().equals(representationId)).findFirst();
+    if (oRep.isPresent()) {
+      return oRep.get().getTechnicalMetadata();
+    }
+
+    return new ArrayList<>();
   }
 
   @Override

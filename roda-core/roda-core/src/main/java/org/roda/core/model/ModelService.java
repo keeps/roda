@@ -164,6 +164,9 @@ public interface ModelService extends ModelObservable {
   Binary retrieveDescriptiveMetadataBinary(String aipId, String representationId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
+  Binary retrieveTechnicalMetadataBinary(String aipId, String representationId, List<String> fileDirectoryPath, String fileId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException ;
+
   DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
@@ -379,6 +382,10 @@ public interface ModelService extends ModelObservable {
     AlreadyExistsException;
 
   void createTechnicalMetadata(String aipId, String representationId, String metadataType, String fileId,
+    ContentPayload payload, String createdBy, boolean notify) throws AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException;
+  
+  void updateTechnicalMetadata(String aipId, String representationId, String metadataType, String fileId,
     ContentPayload payload, String createdBy, boolean notify) throws AuthorizationDeniedException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException;
 
