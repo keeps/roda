@@ -671,6 +671,54 @@ public class FileStorageService implements StorageService {
     };
   }
 
+  public DirectResourceAccess getHistoryDataDirectAccess(final StoragePath storagePath){
+      return new DirectResourceAccess() {
+          @Override
+          public Path getPath(){
+              return FSUtils.getEntityPath(historyDataPath, storagePath);
+          }
+
+          @Override
+          public boolean isDirectory() {
+              return FSUtils.isDirectory(getPath());
+          }
+
+          @Override
+          public boolean exists() {
+              return FSUtils.exists(getPath());
+          }
+
+          @Override
+          public void close() throws IOException {
+
+          }
+      };
+  }
+
+  public DirectResourceAccess getHistoryMetadataDirectAccess(final StoragePath storagePath) {
+    return new DirectResourceAccess() {
+      @Override
+      public Path getPath() {
+        return FSUtils.getEntityPath(historyMetadataPath, storagePath);
+      }
+
+      @Override
+      public boolean isDirectory() {
+        return FSUtils.isDirectory(getPath());
+      }
+
+      @Override
+      public boolean exists() {
+        return FSUtils.exists(getPath());
+      }
+
+      @Override
+      public void close() throws IOException {
+
+      }
+    };
+  }
+
   @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, NotFoundException {

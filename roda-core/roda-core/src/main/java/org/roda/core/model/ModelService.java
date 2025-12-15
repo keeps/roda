@@ -967,6 +967,11 @@ public interface ModelService extends ModelObservable {
   DirectResourceAccess getDirectAccess(LiteRODAObject liteObj, String... pathPartials)
     throws RequestNotValidException, GenericException;
 
+  DirectResourceAccess getHistoryDataDirectAccess(IsRODAObject obj, String... pathPartials) throws RequestNotValidException;
+
+  DirectResourceAccess getHistoryMetadataDirectAccess(IsRODAObject obj, String... pathPartials) throws RequestNotValidException;
+
+
   int importAll(IndexService index, final FileStorageService fromStorage, final boolean importJobs)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException;

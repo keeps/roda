@@ -3898,6 +3898,34 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public DirectResourceAccess getHistoryDataDirectAccess(IsRODAObject object, String... pathPartials)
+    throws RequestNotValidException {
+    TransactionalModelOperationLog operationLog = operationRegistry.registerOperation(object, OperationType.READ);
+    try {
+      DirectResourceAccess ret = getModelService().getHistoryDataDirectAccess(object, pathPartials);
+      operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException e) {
+      operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
+  }
+
+  @Override
+  public DirectResourceAccess getHistoryMetadataDirectAccess(IsRODAObject object, String... pathPartials)
+    throws RequestNotValidException {
+    TransactionalModelOperationLog operationLog = operationRegistry.registerOperation(object, OperationType.READ);
+    try {
+      DirectResourceAccess ret = getModelService().getHistoryMetadataDirectAccess(object, pathPartials);
+      operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (RequestNotValidException e) {
+      operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
+  }  
+
+  @Override
   public int importAll(IndexService index, FileStorageService fromStorage, boolean importJobs)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException {

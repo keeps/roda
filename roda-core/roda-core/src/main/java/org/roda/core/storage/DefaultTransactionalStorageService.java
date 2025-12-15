@@ -490,6 +490,63 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     }
   }
 
+
+  @Override
+  public DirectResourceAccess getHistoryDataDirectAccess(StoragePath storagePath) {
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      if (storagePath.isFromAContainer()) {
+        updateOperationState(operationLog, OperationState.FAILURE);
+        throw new IllegalArgumentException(
+          "[transactionId:" + transaction.getId() + "] Cannot get direct access to a container: " + storagePath);
+      }
+
+      if (!transactionLogService.hasModificationsUnderStoragePath(transaction.getId(), storagePath.toString())) {
+        DirectResourceAccess ret = mainStorageService.getHistoryDataDirectAccess(storagePath);
+        updateOperationState(operationLog, OperationState.SUCCESS);
+        return ret;
+      }
+
+      copyMissingResourcesToStagingStorage(storagePath);
+      DirectResourceAccess ret = stagingStorageService.getHistoryDataDirectAccess(storagePath);
+      updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (RODATransactionException | RequestNotValidException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      // TODO: Handle this exception properly
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public DirectResourceAccess getHistoryMetadataDirectAccess(StoragePath storagePath) {
+    TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.READ);
+    try {
+      if (storagePath.isFromAContainer()) {
+        updateOperationState(operationLog, OperationState.FAILURE);
+        throw new IllegalArgumentException(
+          "[transactionId:" + transaction.getId() + "] Cannot get direct access to a container: " + storagePath);
+      }
+
+      if (!transactionLogService.hasModificationsUnderStoragePath(transaction.getId(), storagePath.toString())) {
+        DirectResourceAccess ret = mainStorageService.getHistoryMetadataDirectAccess(storagePath);
+        updateOperationState(operationLog, OperationState.SUCCESS);
+        return ret;
+      }
+
+      copyMissingResourcesToStagingStorage(storagePath);
+      DirectResourceAccess ret = stagingStorageService.getHistoryMetadataDirectAccess(storagePath);
+      updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (RODATransactionException | RequestNotValidException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      // TODO: Handle this exception properly
+      throw new RuntimeException(e);
+    }
+  }  
+  
+  
+
   @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {

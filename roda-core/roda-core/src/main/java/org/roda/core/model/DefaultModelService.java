@@ -5558,6 +5558,21 @@ public class DefaultModelService implements ModelService {
     return getDirectAccess(liteObj, getStorage(), pathPartials);
   }
 
+  @Override
+  public DirectResourceAccess getHistoryDataDirectAccess(IsRODAObject obj, String... pathPartials)
+    throws RequestNotValidException {
+    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(obj), pathPartials);
+    return getStorage().getHistoryDataDirectAccess(storagePath);
+  }
+
+  @Override
+  public DirectResourceAccess getHistoryMetadataDirectAccess(IsRODAObject obj, String... pathPartials)
+    throws RequestNotValidException {
+    StoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getStoragePath(obj), pathPartials);
+    return getStorage().getHistoryMetadataDirectAccess(storagePath);
+  }
+    
+  
   // TODO: Review these import methods to see if IndexService really needs to be
   // in Model
   @Override

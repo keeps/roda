@@ -369,6 +369,10 @@ public interface StorageService {
 
   DirectResourceAccess getDirectAccess(StoragePath storagePath);
 
+  DirectResourceAccess getHistoryDataDirectAccess(StoragePath storagePath);
+
+  DirectResourceAccess getHistoryMetadataDirectAccess(StoragePath storagePath);
+
   // TODO: gbarros, implement this
   default DirectResourceAccess getDirectAccess(StoragePath storagePath, Boolean isReadOnly) {
     return getDirectAccess(storagePath);
