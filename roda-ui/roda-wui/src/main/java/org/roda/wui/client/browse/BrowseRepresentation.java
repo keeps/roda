@@ -19,10 +19,10 @@ import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.utils.SorterUtils;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.IndexedRepresentationRequest;
-import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
@@ -30,8 +30,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.tabs.BrowseRepresentationTabs;
 import org.roda.wui.client.common.BrowseRepresentationActionsToolbar;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -195,7 +193,7 @@ public class BrowseRepresentation extends Composite {
 
       // CARDS
       if (dipCounterResponse.getResult() > 0) {
-        this.disseminationCards.add(new RepresentationDisseminationCardList(aipId, repId));
+        this.disseminationCards.add(new RepresentationDisseminationCardList(aipId, repId, SorterUtils.representationDefault(), dipCounterResponse.getResult().intValue()));
       } else {
         this.sidePanel.setVisible(false);
       }

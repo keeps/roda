@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SorterUtils;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.IndexedFileRequest;
@@ -278,7 +279,7 @@ public class BrowseFile extends Composite {
         } else {
           if (longResponse.getResult() > 0) {
             this.disseminationCards.add(new FileDisseminationCardList(response.getIndexedAIP().getId(),
-              response.getIndexedRepresentation().getId(), indexedFile.getId(), indexedFile.getUUID()));
+              response.getIndexedRepresentation().getId(), indexedFile.getId(), indexedFile.getUUID(), SorterUtils.dipsDefault(),longResponse.getResult().intValue()));
           } else {
             this.sidePanel.setVisible(false);
           }

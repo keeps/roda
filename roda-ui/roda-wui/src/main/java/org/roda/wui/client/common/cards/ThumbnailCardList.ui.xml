@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:commonlabels="urn:import:org.roda.wui.client.common.labels">
+             xmlns:commonlabels="urn:import:org.roda.wui.client.common.labels"
+             xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag">
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
     <g:FlowPanel styleName="thumbnailCardList">
-        <commonlabels:Header ui:field="title" styleName="thumbnailCardListTitle"/>
+        <g:FlowPanel styleName="thumbnailCardListHeader">
+            <commonlabels:Header ui:field="title" styleName="thumbnailCardListTitle"/>
+            <g:FlowPanel ui:field="pagination" styleName="thumbnailCardListButtons">
+                <wcag:AccessibleFocusPanel ui:field="prev" addStyleNames="paginationBtn">
+                    <g:HTML>
+                        <i class="fa fa-chevron-left">
+                        </i>
+                    </g:HTML>
+                </wcag:AccessibleFocusPanel>
+
+                <g:HTML ui:field="pageInfo" addStyleNames="paginationInfo" />
+
+                <wcag:AccessibleFocusPanel ui:field="next" addStyleNames="paginationBtn">
+                    <g:HTML>
+                        <i class="fa fa-chevron-right">
+                        </i>
+                    </g:HTML>
+                </wcag:AccessibleFocusPanel>
+            </g:FlowPanel>
+        </g:FlowPanel>
         <g:FlowPanel ui:field="cardsPanel" styleName="thumbnailCardListCards" />
-        <g:FlowPanel ui:field="buttons" styleName="thumbnailCardListButtons"/>
     </g:FlowPanel>
 </ui:UiBinder>
