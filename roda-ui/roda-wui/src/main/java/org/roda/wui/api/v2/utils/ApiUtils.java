@@ -13,6 +13,9 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -31,6 +34,9 @@ import org.springframework.http.HttpRange;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.context.request.async.AsyncWebRequest;
+import org.springframework.web.context.request.async.WebAsyncUtils;
+import org.springframework.web.servlet.HttpServletBean;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 public class ApiUtils {
@@ -128,6 +134,14 @@ public class ApiUtils {
     ModelService model = requestContext.getModelService();
     ConsumesOutputStream download = model.exportObjectToStream(lite, fileName, addTopDirectory, pathPartials);
     return new StreamResponse(download);
+  }
+
+  public static void setAsyncTimeout(HttpServletRequest request, long defaultValue){
+      AsyncWebRequest asyncWebRequest = WebAsyncUtils.getAsyncManager(request).getAsyncWebRequest();
+      long timeoutMs = Long.parseLong(RodaCoreFactory.getProperty(RodaConstants.CORE_API_ASYNC_TIMEOUT_PROPERTY, String.valueOf(defaultValue)));
+      if (asyncWebRequest!=null){
+          asyncWebRequest.setTimeout(timeoutMs);
+      }
   }
 
   /**

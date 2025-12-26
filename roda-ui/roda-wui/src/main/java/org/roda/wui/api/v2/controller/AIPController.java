@@ -166,6 +166,7 @@ public class AIPController implements AIPRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        ApiUtils.setAsyncTimeout(request,  3600000L);
 
         String indexedRepresentationId = IdUtils.getRepresentationId(aipId, representationId);
 
@@ -202,6 +203,7 @@ public class AIPController implements AIPRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
 
         String indexedRepresentationId = IdUtils.getRepresentationId(aipId, representationId);
 
@@ -307,6 +309,7 @@ public class AIPController implements AIPRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
 
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
           RodaConstants.CONTROLLER_METADATA_ID_PARAM, descriptiveMetadataId);
@@ -376,6 +379,7 @@ public class AIPController implements AIPRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
 
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
 
@@ -406,6 +410,7 @@ public class AIPController implements AIPRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
 
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
 
@@ -435,6 +440,7 @@ public class AIPController implements AIPRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
 
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
         controllerAssistant.setRelatedObjectId(aipId);
@@ -462,6 +468,7 @@ public class AIPController implements AIPRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
 
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
         controllerAssistant.setRelatedObjectId(aipId);
@@ -488,6 +495,8 @@ public class AIPController implements AIPRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
+
         controllerAssistant.setRelatedObjectId(aipId);
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
 
@@ -517,6 +526,8 @@ public class AIPController implements AIPRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
+
         controllerAssistant.setRelatedObjectId(representationId);
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
           RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,

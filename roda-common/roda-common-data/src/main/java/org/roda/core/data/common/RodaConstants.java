@@ -57,6 +57,9 @@ public final class RodaConstants {
 
   public static final String CORE_SYNCHRONIZATION_BUNDLE_PATH = "core.synchronization.bundle.path";
 
+  // ASYNC TIMEOUTS
+  public static final String CORE_API_ASYNC_TIMEOUT_PROPERTY = "core.api.download.async.timeout_ms";
+
   public static final String CORE_WEB_BASIC_AUTH_DISABLE = "core.web.basicAuth.disable";
   public static final String CORE_WEB_BASIC_AUTH_WHITELIST = "core.web.basicAuth.whitelist[]";
   public static final String CORE_API_BASIC_AUTH_DISABLE = "core.api.basicAuth.disable";

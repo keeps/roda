@@ -127,6 +127,8 @@ public class DIPFileController implements DIPFileRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
+
         List<String> fileFields = new ArrayList<>(RodaConstants.DIPFILE_FIELDS_TO_RETURN);
         DIPFile dipFile = requestContext.getIndexService().retrieve(DIPFile.class, dipFileUUID, fileFields);
         return ApiUtils.okResponse(dipFileService.retrieveDIPFileStreamResponse(requestContext, dipFile));

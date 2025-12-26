@@ -132,6 +132,8 @@ public class FilesController implements FileRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
+
         controllerAssistant.setRelatedObjectId(fileUUID);
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
         List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
@@ -184,6 +186,8 @@ public class FilesController implements FileRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
+
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId);
         // check object permissions
         IndexedFile indexedFile = requestContext.getIndexService().retrieve(IndexedFile.class, fileId,
@@ -469,6 +473,8 @@ public class FilesController implements FileRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
+
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_ID_PARAM, fileUUID);
         // check object permissions
         IndexedFile indexedFile = requestContext.getIndexService().retrieve(IndexedFile.class, fileUUID,

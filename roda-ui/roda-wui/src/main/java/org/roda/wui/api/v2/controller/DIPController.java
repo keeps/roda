@@ -106,6 +106,7 @@ public class DIPController implements DIPRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+        ApiUtils.setAsyncTimeout(request, 3600000L);
 
         IndexedDIP dip = requestContext.getIndexService().retrieve(IndexedDIP.class, dipUUID, new ArrayList<>());
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), dip);
