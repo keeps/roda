@@ -7,8 +7,6 @@
  */
 package org.roda.wui.client.common;
 
-import java.util.List;
-import java.util.Optional;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
@@ -40,7 +38,7 @@ public class BrowseRepresentationActionsToolbar extends BrowseObjectActionsToolb
     getStateTag().ifPresent(tag -> tags.add(tag));
 
     for (String state : object.getRepresentationStates()) {
-      Tag tag = Tag.fromText(state, Tag.TagStyle.SUCCESS);
+      Tag tag = Tag.fromText(messages.statusLabel(state), Tag.TagStyle.SUCCESS);
       final String filter = RepresentationInformationUtils.createRepresentationInformationFilter(
         RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_STATES, state);
       tag.addClickHandler(new ClickHandler() {

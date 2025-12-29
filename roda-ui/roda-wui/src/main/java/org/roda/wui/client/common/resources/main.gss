@@ -2560,11 +2560,8 @@ td.datePickerMonth, td.datePickerYear {
 
 .main .wui-breadcrumbPanel .breadcrumb-last {
     font-weight: bold;
-    color: black
-}
-
-.viewRepresentationBreadcrumb .breadcrumb-last {
-	max-width: none !important;
+    color: black;
+    max-width: none !important;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-last .fa, .main .wui-breadcrumbPanel .breadcrumb-last .description-level {
@@ -5376,16 +5373,6 @@ td.datePickerMonth, td.datePickerYear {
 	vertical-align: bottom;
     margin-right: 2px;
     color: #222;
-}
-
-.viewRepresentationFile .filePreviewToolbar .viewRepresentationBreadcrumb {
-    margin: 0;
-    padding: 0;
-    display: inline-block;
-}
-
-.viewRepresentationFile.single .filePreviewToolbar .viewRepresentationBreadcrumb {
-    margin-left: 35px;
 }
 
 .viewRepresentationFile .filePreviewToolbar .filePreviewToolbarIcons {
