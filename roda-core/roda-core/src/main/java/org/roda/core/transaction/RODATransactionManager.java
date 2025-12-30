@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
@@ -133,20 +134,18 @@ public class RODATransactionManager {
         .getOrDefault(RodaConstants.PLUGIN_PARAM_SKIP_ROLLBACK_ON_VALIDATION_FAILURE, "");
       Set<String> noRollbackPlugins = Arrays.stream(noRollback.split(",")).map(String::trim).filter(s -> !s.isEmpty())
         .collect(Collectors.toSet());
-      boolean shouldRollback = false;
-      for (Report failedReport : failedReports) {
-        for (Report nestedReport : failedReport.getReports()) {
-          if (nestedReport.getPluginState().equals(PluginState.FAILURE)
-            && !noRollbackPlugins.contains(nestedReport.getPlugin())) {
-            rollbackTransaction(transactionId);
-            RODATransactionManagerUtils.createTransactionFailureReports(failedReports, nonFailedReports, transactionId,
-              initDate, mainModelService);
-            shouldRollback = true;
-          }
-        }
-      }
 
-      if (!shouldRollback) {
+      boolean shouldRollback = failedReports.stream().flatMap(fr -> {
+        List<Report> nested = fr.getReports();
+        return nested == null ? Stream.empty() : nested.stream();
+      }).filter(nr -> PluginState.FAILURE.equals(nr.getPluginState())).map(Report::getPlugin)
+        .filter(java.util.Objects::nonNull).anyMatch(pluginName -> !noRollbackPlugins.contains(pluginName));
+
+      if (shouldRollback) {
+        rollbackTransaction(transactionId);
+        RODATransactionManagerUtils.createTransactionFailureReports(failedReports, nonFailedReports, transactionId,
+          initDate, mainModelService);
+      } else {
         endTransaction(transactionId);
         RODATransactionManagerUtils.createTransactionSuccessReports(relatedReports, transactionId, initDate,
           mainModelService);

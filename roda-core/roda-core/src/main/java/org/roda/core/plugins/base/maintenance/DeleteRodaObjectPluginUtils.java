@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -44,6 +45,7 @@ import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -163,6 +165,9 @@ public class DeleteRodaObjectPluginUtils {
       if (!dontCheckRelatives) {
         try {
           Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+          final List<IndexedAIP> sublevelAIPs = new ArrayList<>();
+          final List<String> blockedIds = new ArrayList<>();
+          final AtomicBoolean verificationFailed = new AtomicBoolean(false);
           index.execute(
             IndexedAIP.class, filter, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID,
               RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL),
@@ -170,37 +175,52 @@ public class DeleteRodaObjectPluginUtils {
               @Override
               public void run(IndexedAIP item)
                 throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-                PluginState state = PluginState.SUCCESS;
                 try {
-                  AIP childAip = model.retrieveAIP(item.getId());
-                  processLinkedDIP(childAip, index, model, report, reportItem, jobPluginInfo, job, plugin);
-                  model.deleteAIP(item.getId());
+                  sublevelAIPs.add(item);
+                  boolean shouldDelete = model.checkObjectPermission(job.getUsername(),
+                    Permissions.PermissionType.DELETE.name(), AIP.class.getName(), item.getId());
+                  if (!shouldDelete) {
+                    blockedIds.add(item.getId());
+                  }
                 } catch (NotFoundException e) {
-                  state = PluginState.FAILURE;
-                  reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
+                  throw new GenericException(e.getMessage());
                 }
-
-                String outcomeText;
-                if (state.equals(PluginState.SUCCESS)) {
-                  outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
-                } else {
-                  outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
-                }
-
-                List<LinkingIdentifier> sources = new ArrayList<>();
-                sources.add(
-                  PluginHelper.getLinkingIdentifier(item.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-
-                model.createEvent(item.getId(), null, null, null, RodaConstants.PreservationEventType.DELETION,
-                  EVENT_DESCRIPTION, sources, null, state, outcomeText, details, job.getUsername(), true, null);
               }
             }, e -> {
-              reportItem.setPluginState(PluginState.FAILURE);
-              reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
+              verificationFailed.set(true);
+              failAndReport(model, report, reportItem, jobPluginInfo, job, plugin, doReport,
+                "Failed verification of sublevel AIPs");
             });
-        } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-          reportItem.setPluginState(PluginState.FAILURE);
-          reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
+
+          if (verificationFailed.get()) {
+            return;
+          }
+
+          if (!blockedIds.isEmpty()) {
+            failAndReport(model, report, reportItem, jobPluginInfo, job, plugin, doReport, "User " + job.getUsername()
+              + " does not have permission to delete the following sublevel AIPs: " + String.join(", ", blockedIds));
+            return;
+          } else {
+            String outcomeText;
+            for (IndexedAIP childAIP : sublevelAIPs) {
+              AIP childAip = model.retrieveAIP(childAIP.getId());
+              processLinkedDIP(childAip, index, model, report, reportItem, jobPluginInfo, job, plugin);
+              model.deleteAIP(childAIP.getId());
+
+              outcomeText = PluginHelper.createOutcomeTextForAIP(childAIP, "has been manually deleted");
+              List<LinkingIdentifier> sources = new ArrayList<>();
+              sources.add(
+                PluginHelper.getLinkingIdentifier(childAIP.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+              model.createEvent(childAIP.getId(), null, null, null, RodaConstants.PreservationEventType.DELETION,
+                EVENT_DESCRIPTION, sources, null, PluginState.SUCCESS, outcomeText, details, job.getUsername(), true,
+                null);
+            }
+          }
+        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+          failAndReport(model, report, reportItem, jobPluginInfo, job, plugin, doReport,
+            "Could not verify/delete sublevel AIPs: " + e.getMessage());
+          return;
         }
       }
 
@@ -244,6 +264,20 @@ public class DeleteRodaObjectPluginUtils {
       model.createEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION,
         sources, null, reportItem.getPluginState(), outcomeText, details, job.getUsername(), true, null);
     }
+  }
+
+  private static void failAndReport(ModelService model, Report report, Report reportItem, JobPluginInfo jobPluginInfo,
+    Job job, Plugin<? extends IsRODAObject> plugin, boolean doReport, String message) {
+
+    reportItem.setPluginState(PluginState.FAILURE);
+    reportItem.setPluginDetails(message);
+    report.setPluginState(PluginState.FAILURE);
+
+    if (doReport) {
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+    }
+    jobPluginInfo.incrementObjectsProcessed(reportItem.getPluginState());
   }
 
   private static void deleteFile(File file, IndexService index, ModelService model, Report report,
@@ -294,8 +328,8 @@ public class DeleteRodaObjectPluginUtils {
     reportItem.setPluginState(state);
 
     model.createEvent(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-      RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION,
-        sources, null, state, reportItem.getPluginDetails(), details, job.getUsername(), true, null);
+      RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state,
+      reportItem.getPluginDetails(), details, job.getUsername(), true, null);
 
   }
 
