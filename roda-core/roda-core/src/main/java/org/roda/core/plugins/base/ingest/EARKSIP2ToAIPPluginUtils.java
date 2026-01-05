@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.base.ingest;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collections;
@@ -20,6 +21,7 @@ import gov.loc.premis.v3.EventComplexType;
 import gov.loc.premis.v3.PremisComplexType;
 import jakarta.xml.bind.JAXBElement;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -44,6 +46,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.ExternalFileManifestContentPayload;
 import org.roda.core.storage.StorageService;
@@ -224,10 +227,19 @@ public class EARKSIP2ToAIPPluginUtils {
               agentComplexType.getVersion());
 
             try {
-              if (model.retrievePreservationAgent(
-                agentComplexType.getAgentIdentifier().getFirst().getAgentIdentifierValue()) != null) {
-                model.updatePreservationMetadata(PreservationMetadataType.AGENT,
-                  agentComplexType.getAgentIdentifier().getFirst().getAgentIdentifierValue(), premisAgentBinary, true);
+              Binary existingPA = model
+                .retrievePreservationAgent(agentComplexType.getAgentIdentifier().getFirst().getAgentIdentifierValue());
+              if (existingPA != null) {
+                try {
+                  if (!IOUtils.contentEquals(existingPA.getContent().createInputStream(),
+                    premisAgentBinary.createInputStream())) {
+                    model.updatePreservationMetadata(PreservationMetadataType.AGENT,
+                      agentComplexType.getAgentIdentifier().getFirst().getAgentIdentifierValue(), premisAgentBinary,
+                      true);
+                  }
+                } catch (IOException e) {
+                  throw new GenericException("Could not update binary content", e);
+                }
               } else {
                 model.createPreservationMetadata(PreservationMetadataType.AGENT,
                   agentComplexType.getAgentIdentifier().getFirst().getAgentIdentifierValue(), premisAgentBinary, true);
