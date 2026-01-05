@@ -1,5 +1,15 @@
 # Changelog
 
+## v5.7.12 (05/01/2026)
+#### Enhancements 
+- Updating preservation agent only when its different from the existing one
+
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.11 (09/12/2025)
 #### Enhancements 
 - Enable HTTP Notification Processor to have HTTP header 
@@ -388,14 +398,3 @@ To try out this version, check the [install instructions](https://github.com/kee
 ---
 
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.2.4 (10/11/2023)
-#### Enhancements:
-
-- Update Swedish translation language
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
-
