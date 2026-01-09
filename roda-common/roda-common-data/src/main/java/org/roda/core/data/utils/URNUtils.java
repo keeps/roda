@@ -160,6 +160,15 @@ public final class URNUtils {
     return fields[URN_INSTANCE_IDENTIFIER_POSITION];
   }
 
+  public static String extractFileIdFromTechnicalURN(String urnId) {
+    String s = urnId.trim();
+    if (s.endsWith(RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION)) {
+      s = s.substring(0, s.length() - RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION.length());
+    }
+
+    return s;
+  }
+
   public static boolean hasInstanceId(String id) {
     String[] fields = id.split(RodaConstants.URN_SEPARATOR);
     return !fields[URN_INSTANCE_IDENTIFIER_POSITION].equals(RodaConstants.PREMIS_METADATA_TYPE);

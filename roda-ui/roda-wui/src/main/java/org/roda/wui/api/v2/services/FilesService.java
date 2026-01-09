@@ -375,15 +375,21 @@ public class FilesService {
     Locale locale = ServerTools.parseLocale(localeString);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
 
+    List<String> techMdTypes = file.getTechnicalMetadataIds();
+    if (techMdTypes == null || techMdTypes.isEmpty()) {
+      return new TechnicalMetadataInfos();
+    }
+
     Representation representation = model.retrieveRepresentation(file.getAipId(), file.getRepresentationId());
 
     for (TechnicalMetadata technicalMetadata : representation.getTechnicalMetadata()) {
       String type = technicalMetadata.getType();
-      String label = messages.getTranslation(
-        RodaConstants.I18N_UI_BROWSE_METADATA_TECHNICAL_TYPE_PREFIX + type.toLowerCase(), technicalMetadata.getId());
-      technicalMetadataInfos.addObject(new TechnicalMetadataInfo(type, label));
+      if (techMdTypes.contains(type.toLowerCase())) {
+        String label = messages.getTranslation(
+          RodaConstants.I18N_UI_BROWSE_METADATA_TECHNICAL_TYPE_PREFIX + type.toLowerCase(), technicalMetadata.getId());
+        technicalMetadataInfos.addObject(new TechnicalMetadataInfo(type, label));
+      }
     }
-
     return technicalMetadataInfos;
   }
 

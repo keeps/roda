@@ -9,7 +9,6 @@ package org.roda.core.plugins.base.ingest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +24,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -66,8 +66,8 @@ public class EARKSIP2ToAIPPluginUtils {
     // do nothing
   }
 
-  public static AIP earkSIPToAIP(SIP sip, String username, ModelService model, List<String> ingestSIPIds,
-    String ingestJobId, Optional<String> parentId, String ingestSIPUUID, Plugin<?> plugin)
+  public static AIP earkSIPToAIP(SIP sip, String username, ModelService model, boolean validateTechMD,
+    List<String> ingestSIPIds, String ingestJobId, Optional<String> parentId, String ingestSIPUUID, Plugin<?> plugin)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, ValidationException, LockingException {
 
@@ -87,7 +87,8 @@ public class EARKSIP2ToAIPPluginUtils {
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
+      processIPRepresentationInformation(model, representation, aip.getId(), notify, validateTechMD, false, username,
+        null);
     }
 
     // INFO 20190509 hsilva: this is required as the previous instructions
@@ -97,17 +98,18 @@ public class EARKSIP2ToAIPPluginUtils {
     return model.updateAIP(createdAIP, username);
   }
 
-  public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
-    String username, String ingestJobId, Report reportItem, Plugin<?> plugin)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+  public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model,
+    boolean enableTechMDValidation, StorageService storage, String username, String ingestJobId, Report reportItem,
+    Plugin<?> plugin) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, ValidationException, LockingException {
-    return earkSIPToAIPUpdate(sip, indexedAIP, model, username, Optional.empty(), ingestJobId, reportItem, plugin);
+    return earkSIPToAIPUpdate(sip, indexedAIP, model, enableTechMDValidation, username, Optional.empty(), ingestJobId,
+      reportItem, plugin);
   }
 
-  public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, String username,
-    Optional<String> searchScope, String ingestJobId, Report reportItem, Plugin<?> plugin)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, ValidationException, LockingException {
+  public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model,
+    boolean enableTechMDValidation, String username, Optional<String> searchScope, String ingestJobId,
+    Report reportItem, Plugin<?> plugin) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, ValidationException, LockingException {
     boolean notify = false;
     AIP aip;
 
@@ -123,7 +125,8 @@ public class EARKSIP2ToAIPPluginUtils {
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, indexedAIP.getId(), notify, true, username, reportItem);
+      processIPRepresentationInformation(model, representation, indexedAIP.getId(), notify, enableTechMDValidation,
+        true, username, reportItem);
     }
 
     aip = model.retrieveAIP(indexedAIP.getId());
@@ -245,15 +248,29 @@ public class EARKSIP2ToAIPPluginUtils {
     }
   }
 
-  private static void processTechnicalMetadata(ModelService model, List<IPMetadata> technicalMetadata, String aipId,
-    Optional<String> representationId, String username, boolean notify) throws AuthorizationDeniedException,
-    RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException {
+  private static void processTechnicalMetadata(ModelService model, List<IPFileInterface> representationData,
+    List<IPMetadata> technicalMetadata, String aipId, Optional<String> representationId, String username,
+    boolean validateTechMD, boolean notify) throws AuthorizationDeniedException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException, GenericException, ValidationException {
     for (IPMetadata techMd : technicalMetadata) {
       IPFileInterface file = techMd.getMetadata();
       ContentPayload payload = new FSPathContentPayload(file.getPath());
 
-      model.createTechnicalMetadata(aipId, representationId.orElse(null), techMd.getMetadataType().asString(),
-        file.getFileName(), payload, username, notify);
+      String metadataType = techMd.getMetadataType().asString();
+      String fileName = URNUtils.extractFileIdFromTechnicalURN(file.getFileName());
+
+      if (validateTechMD) {
+        if (representationData.stream().anyMatch(p -> p.getFileName().equals(fileName))) {
+          model.createTechnicalMetadata(aipId, representationId.orElse(null), metadataType, fileName, payload, username,
+            notify);
+        } else {
+          String validationMessage = "Unable to process technical metadata due to invalid techMD filename:" + fileName;
+          throw new ValidationException(validationMessage);
+        }
+      } else
+        model.createTechnicalMetadata(aipId, representationId.orElse(null), metadataType, file.getFileName(), payload,
+          username, notify);
+
     }
   }
 
@@ -293,8 +310,9 @@ public class EARKSIP2ToAIPPluginUtils {
   }
 
   private static void processIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
-    boolean notify, boolean update, String username, Report reportItem) throws RequestNotValidException,
-    GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
+    boolean notify, boolean validateTechMD, boolean update, String username, Report reportItem)
+    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+    NotFoundException, ValidationException {
     String representationType = getType(sr);
     boolean isOriginal = RepresentationStatus.getORIGINAL().equals(sr.getStatus());
 
@@ -328,8 +346,8 @@ public class EARKSIP2ToAIPPluginUtils {
       username, notify);
 
     // process representation technical metadata
-    processTechnicalMetadata(model, sr.getTechnicalMetadata(), aipId, Optional.ofNullable(representation.getId()),
-      username, notify);
+    processTechnicalMetadata(model, sr.getData(), sr.getTechnicalMetadata(), aipId,
+      Optional.ofNullable(representation.getId()), username, validateTechMD, notify);
 
     // process representation files
     boolean hasShallowFile = false;

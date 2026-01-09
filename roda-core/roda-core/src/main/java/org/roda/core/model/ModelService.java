@@ -389,7 +389,7 @@ public interface ModelService extends ModelObservable {
     ContentPayload payload, String createdBy, boolean notify) throws AuthorizationDeniedException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException;
 
-  public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
+  PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
     List<String> fileDirectoryPath, String fileId, ContentPayload payload, String username, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException;

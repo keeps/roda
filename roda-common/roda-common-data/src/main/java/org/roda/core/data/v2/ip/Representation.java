@@ -10,7 +10,9 @@ package org.roda.core.data.v2.ip;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -43,22 +45,22 @@ public class Representation implements IsModelObject, HasId, HasInstanceID {
   private String updatedBy = null;
 
   private List<DescriptiveMetadata> descriptiveMetadata = new ArrayList<>();
-  private List<TechnicalMetadata> technicalMetadata = new ArrayList<>();
+  private Set<TechnicalMetadata> technicalMetadata = new HashSet<>();
 
   public Representation() {
     super();
   }
 
   public Representation(String id, String aipId, boolean original, String type) {
-    this(id, aipId, original, type, null, new ArrayList<>(), new ArrayList<>(), false);
+    this(id, aipId, original, type, null, new ArrayList<>(), new HashSet<>(), false);
   }
 
   public Representation(String id, String aipId, boolean original, String type, Boolean hasShallowFiles) {
-    this(id, aipId, original, type, null, new ArrayList<>(), new ArrayList<>(), hasShallowFiles);
+    this(id, aipId, original, type, null, new ArrayList<>(), new HashSet<>(), hasShallowFiles);
   }
 
   public Representation(String id, String aipId, boolean original, String type, String instanceId,
-    List<DescriptiveMetadata> descriptiveMetadata, List<TechnicalMetadata> technicalMetadata, Boolean hasShallowFiles) {
+    List<DescriptiveMetadata> descriptiveMetadata, Set<TechnicalMetadata> technicalMetadata, Boolean hasShallowFiles) {
     super();
     this.id = id;
     this.aipId = aipId;
@@ -189,16 +191,16 @@ public class Representation implements IsModelObject, HasId, HasInstanceID {
     this.representationStates = states;
   }
 
-  public List<TechnicalMetadata> getTechnicalMetadata() {
+  public Set<TechnicalMetadata> getTechnicalMetadata() {
     return this.technicalMetadata;
   }
 
-  public void setTechnicalMetadata(List<TechnicalMetadata> technicalMetadata) {
+  public void setTechnicalMetadata(Set<TechnicalMetadata> technicalMetadata) {
     this.technicalMetadata = technicalMetadata;
   }
 
   public void addTechnicalMetadata(TechnicalMetadata technicalMetadata) {
-    this.technicalMetadata.add(technicalMetadata);
+      this.technicalMetadata.add(technicalMetadata);
   }
 
   @Override

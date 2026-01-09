@@ -49,7 +49,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
-import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.ParseException;
 import org.roda_project.commons_ip.utils.IPEnums;
@@ -65,6 +64,7 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
 
   private Optional<String> computedSearchScope;
   private boolean forceSearchScope;
+  private boolean enableTechMDValidation = true;
   private Path jobWorkingDirectory;
 
   @Override
@@ -98,6 +98,11 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
 
     if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION)) {
       createSubmission = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION));
+    }
+
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_ENABLE_TECHMD_VALIDATION)) {
+      enableTechMDValidation = Boolean
+        .parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_ENABLE_TECHMD_VALIDATION));
     }
   }
 
@@ -197,8 +202,8 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException, LockingException {
     String jobUsername = PluginHelper.getJobUsername(this, index);
-    return EARKSIP2ToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, model, sip.getIds(), reportItem.getJobId(),
-      computedParentId, ingestSIPUUID, this);
+    return EARKSIP2ToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, model, enableTechMDValidation, sip.getIds(),
+      reportItem.getJobId(), computedParentId, ingestSIPUUID, this);
   }
 
   private AIP processUpdateSIP(IndexService index, ModelService model, SIP sip, Optional<String> searchScope,
@@ -243,8 +248,8 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
     String jobId = PluginHelper.getJobId(this);
 
     // Update the AIP
-    return EARKSIP2ToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, jobUsername, searchScope, jobId, null,
-      this);
+    return EARKSIP2ToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, enableTechMDValidation, jobUsername,
+      searchScope, jobId, null, this);
   }
 
   @Override
