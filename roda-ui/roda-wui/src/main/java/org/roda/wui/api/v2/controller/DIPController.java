@@ -117,7 +117,7 @@ public class DIPController implements DIPRestService, Exportable {
   }
 
   @Override
-  public Job deleteIndexedDIPs(@RequestBody DeleteRequest deleteRequest) {
+  public Job deleteDIPs(@RequestBody DeleteRequest deleteRequest) {
     return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<Job>() {
       @Override
       public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)

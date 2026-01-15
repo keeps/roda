@@ -132,11 +132,12 @@ public class FilesController implements FileRestService, Exportable {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
-        controllerAssistant.setRelatedObjectId(fileUUID);
-        controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
         List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
         fileFields.add(RodaConstants.FILE_ISDIRECTORY);
         IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
+        controllerAssistant.setRelatedObjectId(file.getAipId());
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID, RodaConstants.CONTROLLER_FILE_ID_PARAM, file.getId());
+
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
         StreamResponse response = filesService.retrieveAIPRepresentationFile(requestContext, file);

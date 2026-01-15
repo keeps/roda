@@ -2103,7 +2103,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_FIND_RISK = "org.roda.wui.api.v2.services.IndexService.find(IndexedRisk)";
 
   public static final String PERMISSION_METHOD_DELETE_AIP = "org.roda.wui.api.v2.controller.AIPController.deleteAIPs";
-  public static final String PERMISSION_METHOD_DELETE_DIP = "org.roda.wui.api.v2.controller.DIPController.deleteIndexedDIPs";
+  public static final String PERMISSION_METHOD_DELETE_DIP = "org.roda.wui.api.v2.controller.DIPController.deleteDIPs";
   public static final String PERMISSION_METHOD_DELETE_REPRESENTATION = "org.roda.wui.api.v2.controller.RepresentationController.deleteRepresentation";
   public static final String PERMISSION_METHOD_DELETE_FILE = "org.roda.wui.api.v2.controller.FilesController.deleteFiles";
   public static final String PERMISSION_METHOD_DELETE_REPRESENTATION_INFORMATION = "org.roda.wui.api.v2.controller.RepresentationInformationController.deleteMultipleRepresentationInformation";
