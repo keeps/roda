@@ -1366,6 +1366,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_AIP_ID = "parameter.aip_id";
   public static final String PLUGIN_PARAMS_ID = "parameter.id";
   public static final String PLUGIN_PARAMS_PERMISSIONS_JSON = "parameter.permissions_json";
+  public static final String PLUGIN_PARAMS_ENABLE_TECHMD_VALIDATION =  "parameter.enable_techmd_validation";
   public static final String PLUGIN_PARAMS_DETAILS = "parameter.details";
   public static final String PLUGIN_PARAMS_OUTCOME_TEXT = "parameter.outcome_text";
   public static final String PLUGIN_PARAMS_EVENT_DESCRIPTION = "parameter.event_description";

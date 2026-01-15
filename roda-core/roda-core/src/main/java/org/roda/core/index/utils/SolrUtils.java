@@ -1538,7 +1538,6 @@ public class SolrUtils {
     ArrayList<String> techMdIds = new ArrayList<>();
 
     for (TechnicalMetadata techMd : technicalMetadatum) {
-      techMdIds.add(techMd.getType().toLowerCase());
 
       String urn = URNUtils.createRodaTechnicalMetadataURN(fileId, RODAInstanceUtils.getLocalInstanceIdentifier(),
         techMd.getType().toLowerCase());
@@ -1547,27 +1546,30 @@ public class SolrUtils {
         techMd.getRepresentationId(), Collections.singletonList(techMd.getType()),
         urn);
 
-      Binary binary = model.getStorage().getBinary(storagePath);
-
-      try {
-        SolrInputDocument technicalMetadataFields = getTechnicalMetadataFields(binary, techMd.getType(), null);
-        for (SolrInputField field : technicalMetadataFields) {
-          if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
-            boolean added = usedNonRepeatableFields.add(field.getName());
-            if (added) {
+      if (model.getStorage().exists(storagePath)) {
+        Binary binary = model.getStorage().getBinary(storagePath);
+        try {
+          SolrInputDocument technicalMetadataFields = getTechnicalMetadataFields(binary, techMd.getType(), null);
+          for (SolrInputField field : technicalMetadataFields) {
+            if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
+              boolean added = usedNonRepeatableFields.add(field.getName());
+              if (added) {
+                doc.addField(field.getName(), field.getValue());
+              }
+            } else {
               doc.addField(field.getName(), field.getValue());
             }
-          } else {
-            doc.addField(field.getName(), field.getValue());
           }
+        } catch (GenericException e) {
+          LOGGER.warn("Problem processing technical metadata: {}", e.getMessage(), e);
+        } catch (Exception e) {
+          LOGGER.error("Error processing technical metadata: {}", techMd, e);
         }
-      } catch (GenericException e) {
-        LOGGER.warn("Problem processing technical metadata: {}", e.getMessage(), e);
-      } catch (Exception e) {
-        LOGGER.error("Error processing technical metadata: {}", techMd, e);
+        techMdIds.add(techMd.getType().toLowerCase());
+      } else {
+        LOGGER.warn("Technical metadata not found for: {}", storagePath);
       }
     }
-
     doc.addField(RodaConstants.FILE_TECHNICAL_METADATA_ID, techMdIds);
   }
 

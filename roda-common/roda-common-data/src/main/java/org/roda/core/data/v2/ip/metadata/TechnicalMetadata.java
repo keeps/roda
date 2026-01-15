@@ -83,7 +83,7 @@ public class TechnicalMetadata implements IsModelObject {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass())
+    if (!(o instanceof TechnicalMetadata))
       return false;
     TechnicalMetadata that = (TechnicalMetadata) o;
     return Objects.equals(id, that.id) && Objects.equals(aipId, that.aipId)

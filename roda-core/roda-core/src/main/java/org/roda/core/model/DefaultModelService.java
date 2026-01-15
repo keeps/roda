@@ -1814,10 +1814,10 @@ public class DefaultModelService implements ModelService {
     StoragePath binaryPath = ModelUtils.getTechnicalMetadataStoragePath(aipId, representationId,
       Collections.singletonList(metadataType), urn);
     storage.updateBinaryContent(binaryPath, payload, false, false, true, null);
-    // update technicalmetadata logic
+    // update technical metadata logic
     if (aipId != null) {
       AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
-      List<TechnicalMetadata> techMetadataList = getTechnicalMetadata(aip, representationId);
+      Set<TechnicalMetadata> techMetadataList = getTechnicalMetadata(aip, representationId);
       techMetadataList.removeIf(tm -> tm.getId().equals(metadataType));
       addTechnicalMetadataToAIPMetadata(aip, representationId, metadataType, createdBy, notify);
     }
@@ -1836,9 +1836,9 @@ public class DefaultModelService implements ModelService {
     }
   }
 
-  private List<TechnicalMetadata> getTechnicalMetadata(AIP aip, String representationId) {
+  private Set<TechnicalMetadata> getTechnicalMetadata(AIP aip, String representationId) {
     if (representationId == null) {
-      return new ArrayList<>();
+      return new HashSet<>();
     }
     Optional<Representation> oRep = aip.getRepresentations().stream()
       .filter(rep -> rep.getId().equals(representationId)).findFirst();
@@ -1846,7 +1846,7 @@ public class DefaultModelService implements ModelService {
       return oRep.get().getTechnicalMetadata();
     }
 
-    return new ArrayList<>();
+    return new HashSet<>();
   }
 
   @Override
