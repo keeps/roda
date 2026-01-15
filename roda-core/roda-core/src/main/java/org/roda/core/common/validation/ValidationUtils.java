@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
@@ -271,7 +272,25 @@ public class ValidationUtils {
         try (InputStreamReader inputStreamReader = new InputStreamReader(
           new BOMInputStream(descriptiveMetadataPayload.createInputStream()))) {
 
-          XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+          XMLReader xmlReader;
+          try {
+            SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+            saxParserFactory.setNamespaceAware(true);
+            // Enable secure processing
+            saxParserFactory.setFeature("http://javax.xml.XMLConstants/feature/secure-processing", true);
+            // Disallow DOCTYPE declarations
+            saxParserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            // Disable external entities
+            saxParserFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            // Do not load external DTDs
+            saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+            xmlReader = saxParserFactory.newSAXParser().getXMLReader();
+          } catch (ParserConfigurationException | SAXException e) {
+            throw new IOException("Failed to securely configure XML parser", e);
+          }
+
           xmlReader.setEntityResolver(new RodaEntityResolver());
           InputSource inputSource = new InputSource(inputStreamReader);
           Source source = new SAXSource(xmlReader, inputSource);
