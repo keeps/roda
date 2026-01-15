@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.common;
@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
+import java.util.regex.Pattern;
 
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -88,13 +89,13 @@ public class Messages {
     while (keys.hasMoreElements()) {
       String key = keys.nextElement();
       if (key.startsWith(fullPrefix)) {
-        map.put(replacePrefixFromKey ? key.replaceFirst(fullPrefix, "i18n.") : key,
+        map.put(replacePrefixFromKey ? key.replaceFirst(Pattern.quote(fullPrefix), "i18n.") : key,
           valueClass.cast(resourceBundle.getString(key)));
       }
     }
 
     // cache it
-    translationsCache.put(prefix, (Map<String, ?>) map);
+    translationsCache.put(prefix, map);
     return map;
   }
 
