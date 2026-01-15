@@ -13,6 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,7 @@ import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.services.ConfigurationRestService;
 import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -75,6 +77,7 @@ public class BrowseDIP extends Composite {
 
   public static final Sorter DEFAULT_DIPFILE_SORTER = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientLogger logger = new ClientLogger(BrowseDIP.class.getName());
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -167,20 +170,22 @@ public class BrowseDIP extends Composite {
           return response;
         }).whenComplete((response, throwable1) -> {
           if (response.getDipFile() != null) {
-            List<CompletableFuture<DIPFile>> dipFileAncestors = response.getDipFile().getAncestorsUUIDs().stream()
-              .map(uuid -> services.dipFileResource(s -> s.findByUuid(uuid, LocaleInfo.getCurrentLocale().getLocaleName()))
+            List<CompletableFuture<Optional<DIPFile>>> dipFileAncestors = response.getDipFile().getAncestorsUUIDs()
+              .stream()
+              .map(
+                uuid -> services.dipFileResource(s -> s.findByUuid(uuid, LocaleInfo.getCurrentLocale().getLocaleName()))
                   .handle((file, e) -> {
-                    if (e != null)
-                      return null;
-                    else
-                      return file;
+                    if (e != null) {
+                      logger.warn("Failed to retrieve DIP file for DIP ID " + uuid + ": " + e.getMessage());
+                      return Optional.<DIPFile> empty();
+                    } else
+                      return Optional.ofNullable(file);
                   }))
               .collect(Collectors.toList());
             CompletableFuture<?>[] futuresArray = dipFileAncestors.toArray(new CompletableFuture<?>[0]);
             CompletableFuture.allOf(futuresArray).thenApply(v -> {
-              for (CompletableFuture<DIPFile> dipFileAncestor : dipFileAncestors) {
-                DIPFile file = dipFileAncestor.join();
-                if(file != null) response.getDipFileAncestors().add(file);
+              for (CompletableFuture<Optional<DIPFile>> dipFileAncestor : dipFileAncestors) {
+                dipFileAncestor.join().ifPresent(response.getDipFileAncestors()::add);
               }
               return response;
             }).whenComplete((o, throwable) -> render(o, viewers, callback, services));
@@ -247,7 +252,8 @@ public class BrowseDIP extends Composite {
         }).whenComplete((response, throwable1) -> {
           if (response.getDipFile() != null) {
             List<CompletableFuture<DIPFile>> dipFileAncestors = response.getDipFile().getAncestorsUUIDs().stream()
-              .map(uuid -> services.dipFileResource(s -> s.findByUuid(uuid, LocaleInfo.getCurrentLocale().getLocaleName()))
+              .map(
+                uuid -> services.dipFileResource(s -> s.findByUuid(uuid, LocaleInfo.getCurrentLocale().getLocaleName()))
                   .handle((file, e) -> {
                     if (e != null)
                       return null;
@@ -259,7 +265,8 @@ public class BrowseDIP extends Composite {
             CompletableFuture.allOf(futuresArray).thenApply(v -> {
               for (CompletableFuture<DIPFile> dipFileAncestor : dipFileAncestors) {
                 DIPFile file = dipFileAncestor.join();
-                if(file != null) response.getDipFileAncestors().add(file);
+                if (file != null)
+                  response.getDipFileAncestors().add(file);
               }
               return response;
             }).whenComplete((o, throwable) -> render(o, viewers, callback, services));
@@ -316,17 +323,22 @@ public class BrowseDIP extends Composite {
         }).whenComplete((response, throwable1) -> {
           if (response.getDipFile() != null) {
             List<CompletableFuture<DIPFile>> dipFileAncestors = response.getDipFile().getAncestorsUUIDs().stream()
-              .map(uuid -> services.dipFileResource(s -> s.findByUuid(uuid, LocaleInfo.getCurrentLocale().getLocaleName()))
-                  .handle((file, e)-> {
-                      if(e != null) return null;
-                      else return file;
-                  })).collect(Collectors.toList());
+              .map(
+                uuid -> services.dipFileResource(s -> s.findByUuid(uuid, LocaleInfo.getCurrentLocale().getLocaleName()))
+                  .handle((file, e) -> {
+                    if (e != null)
+                      return null;
+                    else
+                      return file;
+                  }))
+              .collect(Collectors.toList());
 
             CompletableFuture<?>[] futuresArray = dipFileAncestors.toArray(new CompletableFuture<?>[0]);
             CompletableFuture.allOf(futuresArray).thenApply(v -> {
               for (CompletableFuture<DIPFile> dipFileAncestor : dipFileAncestors) {
                 DIPFile file = dipFileAncestor.join();
-                if(file != null) response.getDipFileAncestors().add(file);
+                if (file != null)
+                  response.getDipFileAncestors().add(file);
               }
               return response;
             }).whenComplete((o, throwable) -> render(o, viewers, callback, services));
@@ -385,12 +397,12 @@ public class BrowseDIP extends Composite {
       if (!dip.getAipIds().isEmpty()) {
         AIPLink link = dip.getAipIds().get(0);
         HistoryUtils.openBrowse(link.getAipId());
-      } else if (!dip.getRepresentationIds().isEmpty()){
-          RepresentationLink link = dip.getRepresentationIds().get(0);
-          HistoryUtils.openBrowse(link.getAipId());
+      } else if (!dip.getRepresentationIds().isEmpty()) {
+        RepresentationLink link = dip.getRepresentationIds().get(0);
+        HistoryUtils.openBrowse(link.getAipId());
       } else if (!dip.getFileIds().isEmpty()) {
-          AIPLink link = dip.getFileIds().get(0);
-          HistoryUtils.openBrowse(link.getAipId());
+        AIPLink link = dip.getFileIds().get(0);
+        HistoryUtils.openBrowse(link.getAipId());
       }
     });
 
