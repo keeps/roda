@@ -360,8 +360,25 @@ public class FSUtils {
 
   public static Path getEntityPath(Path basePath, StoragePath storagePath, String version)
     throws RequestNotValidException {
+
+    if (version == null || version.trim().isEmpty()) {
+      throw new RequestNotValidException("Version cannot be null or empty");
+    }
+
     if (version.indexOf(VERSION_SEP) >= 0) {
       throw new RequestNotValidException("Cannot use '" + VERSION_SEP + "' in version " + version);
+    }
+
+    // Reject any path traversal or separator characters in version, since it is used
+    // as part of a single path component.
+    if (version.contains("/") || version.contains("\\") || version.contains("..")) {
+      throw new RequestNotValidException("Invalid characters in version: " + version);
+    }
+
+    // Optionally enforce a conservative allow-list of characters for version IDs.
+    // Allow letters, digits, dot, dash and underscore.
+    if (!version.matches("[A-Za-z0-9._-]+")) {
+      throw new RequestNotValidException("Invalid version format: " + version);
     }
 
     Path resourcePath = basePath;
