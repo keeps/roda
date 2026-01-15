@@ -282,8 +282,10 @@ public class Header extends Composite {
     // TODO make creating sync (not async)
 
     // Home
-    updateResolverTopItemVisibility(Welcome.RESOLVER, about, 0);
-
+    final boolean showHome = user != null && !user.isGuest();
+    if (showHome) {
+      updateResolverTopItemVisibility(Welcome.RESOLVER, about, 0);
+    }
     // Dissemination
     updateResolverTopItemVisibility(BrowseTop.RESOLVER, disseminationBrowse, 1);
     updateResolverTopItemVisibility(Search.RESOLVER, disseminationSearchBasic, 2);
