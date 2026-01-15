@@ -337,7 +337,7 @@ public class JobsController implements JobsRestService, Exportable {
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
-    } catch (NotFoundException e) {
+    } catch (NotFoundException | GenericException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
