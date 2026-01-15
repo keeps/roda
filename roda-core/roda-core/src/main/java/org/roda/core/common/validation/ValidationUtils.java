@@ -145,11 +145,22 @@ public class ValidationUtils {
     SAXParserFactory factory = SAXParserFactory.newInstance();
     factory.setValidating(false);
     factory.setNamespaceAware(true);
+    try {
+      // Disable DTDs and external entities to prevent XXE
+      factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+    } catch (ParserConfigurationException | SAXException e) {
+      LOGGER.error("Failed to configure secure XML parser features", e);
+      ret.setValid(false);
+      ret.setMessage("Failed to configure secure XML parser");
+      return ret;
+    }
 
     RodaErrorHandler errorHandler = new RodaErrorHandler();
 
     try (Reader reader = new InputStreamReader(new BOMInputStream(xmlPayload.createInputStream()))) {
-      XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+      XMLReader xmlReader = factory.newSAXParser().getXMLReader();
       xmlReader.setEntityResolver(new RodaEntityResolver());
       InputSource inputSource = new InputSource(reader);
 
@@ -159,7 +170,7 @@ public class ValidationUtils {
       for (SAXParseException saxParseException : errorHandler.getErrors()) {
         ret.addIssue(convertSAXParseException(saxParseException));
       }
-    } catch (SAXException e) {
+    } catch (SAXException | ParserConfigurationException e) {
       ret.setValid(false);
       for (SAXParseException saxParseException : errorHandler.getErrors()) {
         ret.addIssue(convertSAXParseException(saxParseException));
