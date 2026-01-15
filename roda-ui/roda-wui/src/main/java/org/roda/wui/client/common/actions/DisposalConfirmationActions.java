@@ -140,14 +140,14 @@ public class DisposalConfirmationActions extends AbstractActionable<DisposalConf
     ActionableBundle<DisposalConfirmation> confirmationActionableBundle = new ActionableBundle<>();
 
     // management
-    ActionableGroup<DisposalConfirmation> actionsGroup = new ActionableGroup<>("Disposal confirmation");
+    ActionableGroup<DisposalConfirmation> actionsGroup = new ActionableGroup<>(messages.sidebarDisposalConfirmationTitle());
     actionsGroup.addButton(messages.newDisposalConfirmationButton(), DisposalConfirmationAction.NEW,
       ActionImpact.UPDATED, "btn-plus-circle");
     actionsGroup.addButton(messages.applyDisposalScheduleButton(), DisposalConfirmationAction.DESTROY,
       ActionImpact.DESTROYED, "btn-trash-alt");
 
     // disposal bin
-    ActionableGroup<DisposalConfirmation> disposalBinGroup = new ActionableGroup<>("Disposal bin");
+    ActionableGroup<DisposalConfirmation> disposalBinGroup = new ActionableGroup<>(messages.sidebarDisposalBinTitle());
     disposalBinGroup.addButton(messages.permanentlyDeleteFromBinButton(), DisposalConfirmationAction.PERM_DELETE,
       ActionImpact.UPDATED, "btn-delete-forever");
 
