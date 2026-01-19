@@ -1,5 +1,14 @@
 # Changelog
 
+## v5.7.13 (19/01/2026)
+#### Enhancements 
+- Added translations to access key management 
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.12 (05/01/2026)
 #### Enhancements 
 - Updating preservation agent only when its different from the existing one
@@ -384,16 +393,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 - Problem using index REST API without filter #2962
 #### Security:
 - Several dependency upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.2.5 (06/12/2023)
-#### Bug fixes:
-
-- Error sending ingestion failure notification via email #3023 
 
 ---
 
