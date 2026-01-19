@@ -440,6 +440,25 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   @Override
+  public void importObject(StorageService toService, StoragePath toStoragePath, Path fromPath, boolean replaceExisting)
+    throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
+    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(toService, toStoragePath,
+      fromPath, OperationType.READ);
+    try {
+      stagingStorageService.importObject(toService, toStoragePath, fromPath, replaceExisting);
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog, OperationState.SUCCESS);
+      }
+    } catch (AlreadyExistsException | GenericException | AuthorizationDeniedException e) {
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog, OperationState.FAILURE);
+      }
+      throw e;
+    }
+
+  }
+
+  @Override
   public void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {

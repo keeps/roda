@@ -355,6 +355,9 @@ public interface StorageService {
   void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
+  void importObject(StorageService toService, StoragePath toStoragePath, Path fromPath, boolean replaceExisting)
+    throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
+
   /**
    * Move resources from another (or the same) storage service.
    *

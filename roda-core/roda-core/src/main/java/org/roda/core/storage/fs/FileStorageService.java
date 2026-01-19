@@ -581,6 +581,19 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
+  public void importObject(StorageService toService, StoragePath toStoragePath, Path fromPath, boolean replaceExisting)
+    throws AlreadyExistsException, GenericException {
+    Path destPath = null;
+    if (FSUtils.exists(fromPath)) {
+      destPath = FSUtils.getEntityPath(basePath, toStoragePath);
+    }
+
+    if (FSUtils.exists(destPath)) {
+      FSUtils.copy(fromPath, destPath, replaceExisting);
+    }
+  }
+
+  @Override
   public void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {

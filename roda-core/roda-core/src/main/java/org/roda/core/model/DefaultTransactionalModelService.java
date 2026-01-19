@@ -3924,10 +3924,17 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public void importObject(IsRODAObject object, StorageService fromStorage) {
-    TransactionalModelOperationLog operationLog = operationRegistry.registerOperation(object, OperationType.UPDATE);
-    getModelService().importObject(object, fromStorage);
-    operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
+  public void importObject(LiteRODAObject lite, Path fromPath, boolean replaceExisting) throws RequestNotValidException,
+          GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
+    TransactionalModelOperationLog operationLog = operationRegistry.registerOperation(lite.getInfo(),
+            OperationType.READ);
+    try {
+      getModelService().importObject(lite, fromPath, replaceExisting);
+      operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
+    } catch (RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException | GenericException e) {
+      operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
   }
 
   @Override

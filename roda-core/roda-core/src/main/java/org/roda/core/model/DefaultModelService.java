@@ -5649,8 +5649,16 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public void importObject(IsRODAObject object, StorageService fromStorage) {
-    // TODO
+  public void importObject(LiteRODAObject object, Path fromPath, boolean replaceExisting) throws RequestNotValidException, GenericException,
+    NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
+    if (!Files.exists(fromPath)){
+      throw new NotFoundException("Could not find Path to import: " + fromPath);
+    }
+
+    StoragePath toStoragePath = ModelUtils.getStoragePath(object);
+    if (getStorage().exists(toStoragePath)){
+      getStorage().importObject(getStorage(), toStoragePath, fromPath, replaceExisting);
+    }
   }
 
   @Override
