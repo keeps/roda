@@ -5647,10 +5647,18 @@ public class DefaultModelService implements ModelService {
   public void exportAll(StorageService toStorage) {
     // TODO
   }
-
+  
   @Override
-  public void importObject(IsRODAObject object, StorageService fromStorage) {
-    // TODO
+  public void importObject(ModelService fromModel, LiteRODAObject object, boolean replaceExisting)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException {
+    StoragePath toObjectPath = ModelUtils.getStoragePath(object);
+
+    if (getStorage().exists(toObjectPath) && !replaceExisting) {
+      throw new AlreadyExistsException("Target already exists: " + toObjectPath);
+    }
+    getStorage().importObject(fromModel.getStorage(), object, toObjectPath, replaceExisting);
+
   }
 
   @Override
