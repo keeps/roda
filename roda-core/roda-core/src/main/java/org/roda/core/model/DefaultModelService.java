@@ -5059,6 +5059,17 @@ public class DefaultModelService implements ModelService {
     }
     return wrapper;
   }
+  public ReturnWithExceptionsWrapper notifyLiteRodaObjectCreated(LiteRODAObject object){
+    return notifyObserversSafely(observer -> observer.liteRODAObjectCreated(object));
+  }
+
+  public ReturnWithExceptionsWrapper notifyLiteRodaObjectUpdated(LiteRODAObject object){
+    return notifyObserversSafely(observer -> observer.liteRODAObjectUpdated(object));
+  }
+
+  public ReturnWithExceptionsWrapper notifyLiteRodaObjectDeleted(LiteRODAObject object){
+    return notifyObserversSafely(observer -> observer.liteRODAObjectUpdated(object));
+  }
 
   @Override
   public ReturnWithExceptionsWrapper notifyAipCreated(AIP aip) {
@@ -5647,10 +5658,23 @@ public class DefaultModelService implements ModelService {
   public void exportAll(StorageService toStorage) {
     // TODO
   }
-
+  
   @Override
-  public void importObject(IsRODAObject object, StorageService fromStorage) {
-    // TODO
+  public void importObject(ModelService fromModel, LiteRODAObject object, boolean replaceExisting)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException {
+    StoragePath toObjectPath = ModelUtils.getStoragePath(object);
+    boolean existsBeforeImport = getStorage().exists(toObjectPath);
+
+    getStorage().importObject(fromModel.getStorage(), object, toObjectPath, replaceExisting);
+
+    boolean notifyUpdate = existsBeforeImport && replaceExisting;
+
+    if (notifyUpdate) {
+      notifyLiteRodaObjectUpdated(object);
+    } else {
+      notifyLiteRodaObjectCreated(object);
+    }
   }
 
   @Override

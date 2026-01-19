@@ -28,6 +28,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.entity.transaction.OperationState;
 import org.roda.core.entity.transaction.OperationType;
@@ -440,6 +441,31 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   @Override
+  public void importObject(StorageService fromService, LiteRODAObject object, StoragePath toStoragePath,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException,
+    NotFoundException, RequestNotValidException {
+    List<TransactionalStoragePathOperationLog> operationLogs;
+    if (replaceExisting) {
+      operationLogs = registerOperationForCopy(fromService, toStoragePath, toStoragePath,
+        OperationType.CREATE_OR_UPDATE);
+    } else {
+      operationLogs = registerOperationForCopy(fromService, toStoragePath, toStoragePath, OperationType.CREATE);
+    }
+    try {
+      stagingStorageService.importObject(fromService, object, toStoragePath, replaceExisting);
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog, OperationState.SUCCESS);
+      }
+    } catch (AlreadyExistsException | NotFoundException | RequestNotValidException | GenericException
+      | AuthorizationDeniedException e) {
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog, OperationState.FAILURE);
+      }
+      throw e;
+    }
+  }
+
+  @Override
   public void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
@@ -763,7 +789,8 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         if (Container.class.isAssignableFrom(rootEntity)) {
           mainStorageService.createContainer(storagePath);
         } else if (Directory.class.isAssignableFrom(rootEntity)) {
-          mainStorageService.createDirectory(storagePath);
+          if (!mainStorageService.exists(storagePath))
+            mainStorageService.createDirectory(storagePath);
         } else {
           StorageServiceUtils.syncBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
             storagePath, getEntity(storagePath));

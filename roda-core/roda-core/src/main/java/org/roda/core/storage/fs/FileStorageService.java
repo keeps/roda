@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -577,6 +578,26 @@ public class FileStorageService implements StorageService {
     if (FSUtils.exists(sourcePath)) {
       FSUtils.copy(sourcePath, toPath, replaceExisting);
     }
+  }
+
+  @Override
+  public void importObject(StorageService fromService, LiteRODAObject object, StoragePath toStoragePath,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, NotFoundException,
+    AuthorizationDeniedException, RequestNotValidException {
+    StoragePath fromPath = ModelUtils.getStoragePath(object);
+    if (!fromService.exists(fromPath)) {
+      throw new NotFoundException("Source Path does not exist: " + fromPath);
+    }
+
+    if (exists(toStoragePath)) {
+      if(replaceExisting) {
+        // workaround
+        deleteResource(toStoragePath);
+      } else {
+        throw new AlreadyExistsException("Destination already exists: " + toStoragePath);
+      }
+    }
+    copy(fromService, fromPath, toStoragePath);
   }
 
   @Override
