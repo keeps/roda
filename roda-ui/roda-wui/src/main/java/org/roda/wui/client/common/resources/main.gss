@@ -3311,8 +3311,9 @@ td.datePickerMonth, td.datePickerYear {
     flex-direction: column;
     padding: 24px 32px;
     background: COLOR_GREY_DARK;
-    gap: 32px;
+    gap: 12px;
 }
+
 
 .browseSidePanel .actionable-menu {
     display: flex;
@@ -3348,9 +3349,51 @@ td.datePickerMonth, td.datePickerYear {
     gap: 12px;
 }
 
+.thumbnailCardListHeader{
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+}
+
 .thumbnailCardListTitle {
     color: #CCCCCC;
     text-transform: capitalize;
+}
+
+.thumbnailCardListButtons{
+    display: flex;
+    align-items: center;
+    color: #CCCCCC;
+
+}
+
+.thumbnailCardListButtons .paginationBtn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  cursor: pointer;
+}
+
+.thumbnailCardListButtons .paginationBtn.isHidden{
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.thumbnailCardListButtons .paginationBtn:hover{
+    color: #CCCCCC;
+    background-color: COLOR_GREY_VERYLIGHT;
+    border-radius: 13px;
+}
+
+.thumbnailCardListButtons .paginationInfo {
+  font-size: 13px;
+  text-align: center;
+  padding: 0 2px;
+  min-width: 20px;
+
 }
 
 .thumbnailCardListCards {

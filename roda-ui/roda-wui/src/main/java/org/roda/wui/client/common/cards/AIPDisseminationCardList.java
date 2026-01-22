@@ -12,10 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.common.cards.utils.CardBuilder;
@@ -35,7 +35,7 @@ import config.i18n.client.ClientMessages;
  * @author Alexandre Flores <aflores@keep.pt>
  */
 public class AIPDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
-  public AIPDisseminationCardList(String aipId) {
+  public AIPDisseminationCardList(String aipId, Sorter sorter, int cardsTotal) {
     super(messages.someOfAObject(IndexedDIP.class.getName()),
       ConfigurationManager.getString(RodaConstants.UI_ICONS_CLASS, IndexedDIP.class.getSimpleName()), IndexedDIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, aipId)), new CardBuilder<IndexedDIP>() {
@@ -66,6 +66,9 @@ public class AIPDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
 
           return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler);
         }
-      });
+      }, sorter);
+    withPagination(5, cardsTotal);
+    // Initialize
+    refresh();
   }
 }

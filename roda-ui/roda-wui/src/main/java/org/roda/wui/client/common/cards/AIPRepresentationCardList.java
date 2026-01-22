@@ -77,5 +77,7 @@ public class AIPRepresentationCardList extends ThumbnailCardList<IndexedRepresen
           return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler);
         }
       });
+    // Initialize
+    refresh();
   }
 }

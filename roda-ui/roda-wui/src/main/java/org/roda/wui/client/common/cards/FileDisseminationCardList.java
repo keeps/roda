@@ -15,6 +15,7 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.common.cards.utils.CardBuilder;
@@ -34,7 +35,7 @@ import config.i18n.client.ClientMessages;
  * @author Alexandre Flores <aflores@keep.pt>
  */
 public class FileDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
-  public FileDisseminationCardList(String aipId, String representationId, String fileId, String fileUUID) {
+  public FileDisseminationCardList(String aipId, String representationId, String fileId, String fileUUID, Sorter sorter, int cardsTotal) {
     super(messages.someOfAObject(IndexedDIP.class.getName()),
       ConfigurationManager.getString(RodaConstants.UI_ICONS_CLASS, IndexedDIP.class.getSimpleName()), IndexedDIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, fileUUID)), new CardBuilder<IndexedDIP>() {
@@ -65,6 +66,9 @@ public class FileDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
 
           return new ThumbnailCard(title, iconThumbnailHTML, tags, attributes, thumbnailClickHandler);
         }
-      });
+      }, sorter);
+    withPagination(5, cardsTotal);
+    // Initialize
+    refresh();
   }
 }

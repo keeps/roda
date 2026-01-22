@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.utils.SorterUtils;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
@@ -235,7 +237,7 @@ public class BrowseAIP extends Composite {
 
       if (response.getDipCount().getResult() > 0) {
         showSidePanel = true;
-        this.disseminationCards.add(new AIPDisseminationCardList(aipId));
+        this.disseminationCards.add(new AIPDisseminationCardList(aipId, SorterUtils.dipsDefault(), response.getDipCount().getResult().intValue()));
       }
 
       this.sidePanel.setVisible(showSidePanel);

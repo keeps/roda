@@ -19,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.utils.SorterUtils;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.IndexedRepresentationRequest;
@@ -192,7 +193,7 @@ public class BrowseRepresentation extends Composite {
 
       // CARDS
       if (dipCounterResponse.getResult() > 0) {
-        this.disseminationCards.add(new RepresentationDisseminationCardList(aipId, repId));
+        this.disseminationCards.add(new RepresentationDisseminationCardList(aipId, repId, SorterUtils.representationDefault(), dipCounterResponse.getResult().intValue()));
       } else {
         this.sidePanel.setVisible(false);
       }
