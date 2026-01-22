@@ -441,7 +441,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
 
   @Override
   public void importObject(StorageService toService, StoragePath toStoragePath, Path fromPath, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
+    throws AlreadyExistsException, GenericException, AuthorizationDeniedException, NotFoundException {
     List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(toService, toStoragePath,
       fromPath, OperationType.READ);
     try {
@@ -450,6 +450,26 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         updateOperationState(operationLog, OperationState.SUCCESS);
       }
     } catch (AlreadyExistsException | GenericException | AuthorizationDeniedException e) {
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog, OperationState.FAILURE);
+      }
+      throw e;
+    }
+
+  }
+
+  @Override
+  public void importObject(StorageService toService, StoragePath toStoragePath, StoragePath fromPath,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException,
+    NotFoundException, RequestNotValidException {
+    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(toService, toStoragePath,
+      fromPath, OperationType.READ);
+    try {
+      stagingStorageService.importObject(toService, toStoragePath, fromPath, replaceExisting);
+      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
+        updateOperationState(operationLog, OperationState.SUCCESS);
+      }
+    } catch (AlreadyExistsException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
         updateOperationState(operationLog, OperationState.FAILURE);
       }

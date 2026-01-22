@@ -187,7 +187,15 @@ public class StorageServiceWrapper implements StorageService {
 
   @Override
   public void importObject(StorageService toService, StoragePath toStoragePath, Path fromPath, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
+    throws AlreadyExistsException, GenericException, AuthorizationDeniedException, NotFoundException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    storageService.importObject(toService, toStoragePath, fromPath, replaceExisting);
+  }
+
+  @Override
+  public void importObject(StorageService toService, StoragePath toStoragePath, StoragePath fromPath,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException,
+    NotFoundException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
     storageService.importObject(toService, toStoragePath, fromPath, replaceExisting);
   }

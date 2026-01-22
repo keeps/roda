@@ -356,7 +356,10 @@ public interface StorageService {
     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
   void importObject(StorageService toService, StoragePath toStoragePath, Path fromPath, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
+          throws AlreadyExistsException, GenericException, AuthorizationDeniedException, NotFoundException;
+
+  void importObject(StorageService toService, StoragePath toStoragePath, StoragePath fromPath, boolean replaceExisting)
+          throws AlreadyExistsException, GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException;
 
   /**
    * Move resources from another (or the same) storage service.

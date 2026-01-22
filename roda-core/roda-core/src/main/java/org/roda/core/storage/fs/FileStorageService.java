@@ -582,15 +582,37 @@ public class FileStorageService implements StorageService {
 
   @Override
   public void importObject(StorageService toService, StoragePath toStoragePath, Path fromPath, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException {
-    Path destPath = null;
-    if (FSUtils.exists(fromPath)) {
-      destPath = FSUtils.getEntityPath(basePath, toStoragePath);
+    throws AlreadyExistsException, GenericException, NotFoundException {
+
+    if (!FSUtils.exists(fromPath)) {
+      throw new NotFoundException("Source Path does not exist: " + fromPath);
     }
 
-    if (FSUtils.exists(destPath)) {
-      FSUtils.copy(fromPath, destPath, replaceExisting);
+    Path destPath = FSUtils.getEntityPath(basePath, toStoragePath);
+
+    if (FSUtils.exists(destPath) && !replaceExisting) {
+      throw new AlreadyExistsException("Destination already exists: " + destPath);
     }
+    FSUtils.copy(fromPath, destPath, replaceExisting);
+
+  }
+
+  @Override
+  public void importObject(StorageService toService, StoragePath toStoragePath, StoragePath fromPath,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, NotFoundException,
+    AuthorizationDeniedException, RequestNotValidException {
+
+    if (!exists(fromPath)) {
+      throw new NotFoundException("Source Path does not exist: " + fromPath);
+    }
+
+    Path destPath = FSUtils.getEntityPath(basePath, toStoragePath);
+
+    if (exists(fromPath) && !replaceExisting) {
+      throw new AlreadyExistsException("Destination already exists: " + fromPath);
+    }
+    copy(this, fromPath, toStoragePath);
+
   }
 
   @Override

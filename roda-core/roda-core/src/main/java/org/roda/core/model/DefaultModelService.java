@@ -5649,16 +5649,36 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public void importObject(LiteRODAObject object, Path fromPath, boolean replaceExisting) throws RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
-    if (!Files.exists(fromPath)){
+  public void importObject(Path fromPath, LiteRODAObject object, boolean replaceExisting, String... toPathPartials)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException {
+    if (fromPath == null || !Files.exists(fromPath)) {
       throw new NotFoundException("Could not find Path to import: " + fromPath);
     }
 
-    StoragePath toStoragePath = ModelUtils.getStoragePath(object);
-    if (getStorage().exists(toStoragePath)){
-      getStorage().importObject(getStorage(), toStoragePath, fromPath, replaceExisting);
+    StoragePath baseTarget = ModelUtils.getStoragePath(object);
+    StoragePath target = DefaultStoragePath.parse(baseTarget, toPathPartials);
+    if (getStorage().exists(target) && !replaceExisting) {
+      throw new AlreadyExistsException("Target already exists: " + target);
     }
+    getStorage().importObject(getStorage(), target, fromPath, replaceExisting);
+
+  }
+  
+  @Override
+  public void importObject(StoragePath fromPath, IsRODAObject object, boolean replaceExisting)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException {
+    StoragePath objectPath = ModelUtils.getStoragePath(object);
+    if (fromPath == null || !getStorage().exists(objectPath)) {
+      throw new NotFoundException("Could not find Path to import: " + fromPath);
+    }
+
+    if (getStorage().exists(objectPath) && !replaceExisting) {
+      throw new AlreadyExistsException("Target already exists: " + objectPath);
+    }
+    getStorage().importObject(getStorage(), objectPath, fromPath, replaceExisting);
+
   }
 
   @Override

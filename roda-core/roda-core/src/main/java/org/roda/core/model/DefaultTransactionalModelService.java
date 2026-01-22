@@ -3924,12 +3924,27 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public void importObject(LiteRODAObject lite, Path fromPath, boolean replaceExisting) throws RequestNotValidException,
+  public void importObject(Path fromPath, LiteRODAObject lite, boolean replaceExisting, String... toPathPartials) throws RequestNotValidException,
           GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
     TransactionalModelOperationLog operationLog = operationRegistry.registerOperation(lite.getInfo(),
             OperationType.READ);
     try {
-      getModelService().importObject(lite, fromPath, replaceExisting);
+      getModelService().importObject(fromPath, lite, replaceExisting);
+      operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
+    } catch (RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException | GenericException e) {
+      operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
+  }
+
+  @Override
+  public void importObject(StoragePath fromPath, IsRODAObject object, boolean replaceExisting)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException {
+    TransactionalModelOperationLog operationLog = operationRegistry.registerOperation(object.getId(),
+      OperationType.READ);
+    try {
+      getModelService().importObject(fromPath, object, replaceExisting);
       operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
     } catch (RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException | GenericException e) {
       operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
