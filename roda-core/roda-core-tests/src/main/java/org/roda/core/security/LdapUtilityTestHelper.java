@@ -58,7 +58,7 @@ public class LdapUtilityTestHelper {
     context.refresh();
     LdapTemplate ldapTemplate = context.getBean(LdapTemplate.class);
     LdapContextSource contextSource = (LdapContextSource) ldapTemplate.getContextSource();
-    contextSource.setUrl(RodaConstants.CORE_LDAP_DEFAULT_URL + ":" + openldap.getMappedPort(1389));
+    contextSource.setUrl("ldap://" + openldap.getHost() + ":" + openldap.getMappedPort(1389));
     contextSource.afterPropertiesSet();
     LdapUserRepository ldapUserRepository = context.getBean(LdapUserRepository.class);
     LdapGroupRepository ldapGroupRepository = context.getBean(LdapGroupRepository.class);
