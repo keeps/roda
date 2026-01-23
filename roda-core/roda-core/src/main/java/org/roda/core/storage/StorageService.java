@@ -347,8 +347,23 @@ public interface StorageService {
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException;
 
-  void export(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
+  /**
+   * @deprecated Use
+   *             {@link #export(StorageService, StoragePath, Path, String, boolean)}
+   *             instead. This method is maintained for compatibility with legacy libraries.
+   */
+  @Deprecated(since = "6.0.2", forRemoval = true)
+  default void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
+    throw new UnsupportedOperationException(
+      "The 'copy' method is deprecated and was not overridden by " + this.getClass().getName() + ". "
+        + "New StorageService implementations must override and use the 'export' method instead.");
+  }
+
+  default void export(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
+    copy(fromService, fromStoragePath, toPath, resource, replaceExisting);
+  }
 
   /**
    * Move resources from another (or the same) storage service.
@@ -396,5 +411,5 @@ public interface StorageService {
   Date getCreationDate(StoragePath storagePath) throws GenericException;
 
   void importBinaryVersion(StorageService fromService, StoragePath storagePath, String version)
-          throws AlreadyExistsException, GenericException, RequestNotValidException, AuthorizationDeniedException;
+    throws AlreadyExistsException, GenericException, RequestNotValidException, AuthorizationDeniedException;
 }
