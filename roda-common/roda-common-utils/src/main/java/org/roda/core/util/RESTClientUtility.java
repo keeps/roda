@@ -175,7 +175,7 @@ public final class RESTClientUtility {
       // Optional but safer: prevent requests to loopback or private addresses
       try {
         InetAddress addr = InetAddress.getByName(base.getHost());
-        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress() || addr.isSiteLocalAddress()) {
+        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
           throw new GenericException("Central instance URL points to a disallowed address");
         }
       } catch (UnknownHostException e) {
