@@ -347,8 +347,13 @@ public interface StorageService {
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException;
 
-  void export(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
+  /**
+   * @deprecated This method will be changed in the next major release to an
+   *             export method.
+   */
+  @Deprecated
+  void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
   /**
    * Move resources from another (or the same) storage service.
@@ -396,5 +401,5 @@ public interface StorageService {
   Date getCreationDate(StoragePath storagePath) throws GenericException;
 
   void importBinaryVersion(StorageService fromService, StoragePath storagePath, String version)
-          throws AlreadyExistsException, GenericException, RequestNotValidException, AuthorizationDeniedException;
+    throws AlreadyExistsException, GenericException, RequestNotValidException, AuthorizationDeniedException;
 }

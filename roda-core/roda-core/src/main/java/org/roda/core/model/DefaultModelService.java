@@ -721,9 +721,10 @@ public class DefaultModelService implements ModelService {
     return storage.getBinary(binaryPath);
   }
 
-  public Binary retrieveTechnicalMetadataBinary(String aipId, String representationId, List<String> fileDirectoryPath, String fileId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath binaryPath = ModelUtils.getTechnicalMetadataStoragePath(aipId, representationId, fileDirectoryPath, fileId);
+  public Binary retrieveTechnicalMetadataBinary(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath binaryPath = ModelUtils.getTechnicalMetadataStoragePath(aipId, representationId, fileDirectoryPath,
+      fileId);
     return storage.getBinary(binaryPath);
   }
 
@@ -5672,13 +5673,13 @@ public class DefaultModelService implements ModelService {
   public void exportToPath(IsRODAObject object, Path toPath, boolean replaceExisting, String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
     StoragePath sourceObjectPath = DefaultStoragePath.parse(ModelUtils.getStoragePath(object), fromPathPartials);
-    getStorage().export(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
+    getStorage().copy(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
   }
 
   public void exportToPath(LiteRODAObject lite, Path toPath, boolean replaceExisting, String... fromPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, GenericException {
     StoragePath sourceObjectPath = DefaultStoragePath.parse(ModelUtils.getStoragePath(lite), fromPathPartials);
-    getStorage().export(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
+    getStorage().copy(getStorage(), sourceObjectPath, toPath, "", replaceExisting);
   }
 
   @Override

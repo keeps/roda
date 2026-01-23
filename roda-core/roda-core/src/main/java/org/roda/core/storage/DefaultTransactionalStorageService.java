@@ -421,12 +421,12 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   @Override
-  public void export(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
+  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
     List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(fromService, fromStoragePath,
       toPath, OperationType.READ);
     try {
-      stagingStorageService.export(fromService, fromStoragePath, toPath, resource, replaceExisting);
+      stagingStorageService.copy(fromService, fromStoragePath, toPath, resource, replaceExisting);
       for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
         updateOperationState(operationLog, OperationState.SUCCESS);
       }
@@ -910,7 +910,7 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     StoragePath fromStoragePath, StoragePath toStoragePath, OperationType operation)
     throws AuthorizationDeniedException, GenericException {
     List<TransactionalStoragePathOperationLog> ret = new ArrayList<>();
-    ret.add(registerOperation(toStoragePath,operation));
+    ret.add(registerOperation(toStoragePath, operation));
     try (CloseableIterable<Resource> listResourcesUnderDirectory = fromService
       .listResourcesUnderDirectory(fromStoragePath, true)) {
       if (listResourcesUnderDirectory == null) {
