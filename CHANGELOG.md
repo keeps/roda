@@ -1,5 +1,112 @@
 # Changelog
 
+## v6.0.2 (23/01/2026)
+#### Enhancements 
+
+- Add configuration to setup an HTTP header when using the HTTPNotificationProcessor 58791d11da136d1d05d3bbfa1338434d80dc090d
+- Enhance support for representation status other than Original when ingesting a E-ARK SIP package be884ca54d358c7be71d7cd52c49b899c8925abd
+- Rename filesystem StorageService copy to export and mark as READ operation #3555
+- Update HTTPUtility with Bearer access token authentication GET and DELETE methods #3563
+- Skip Rollback on Validation Failure #3572
+- Refactor DIP/File actions #3576
+- Improve audit logs #3576
+- Add pagination to side bar card lists (Representation and Dissemination) #3577
+- Fix PT-PT translation bugs and update breadcrumb styling #3578 - Hide home button in header when user is not authenticated #3579
+
+#### Bug fixes
+- Fix techMD ingest validation, repeated representation techMD types, and align UI technical metadata visibility #3581
+-  Tests and fixes AIP delete permission checks on relatives, resolves incorrect nested iteration on transactional reports #3580
+- Fix technical metadata URN, File collision and Solr indexing inconsistencies #3561
+- Add UTF-8 encoding when downloading files with non-ASCII characteres 144c4c21d2f39458f2d73c10817dba8a4a45e04c
+- Storing the reason for created events https://github.com/keeps/roda/commit/aa4781eb89fec469ead45b67a9a9cfbdf762d205
+- Fixed incorrect HTTP error code when using REST-API and Bearer authentication 572bf3e65292ed92bc644f4c878ffdcc12b061bc
+- Fixed truncated iframe in BitstreamPreview #3524
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+
+---
+
+## v5.7.13 (19/01/2026)
+#### Enhancements 
+- Added translations to access key management 
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.12 (05/01/2026)
+#### Enhancements 
+- Updating preservation agent only when its different from the existing one
+
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.11 (09/12/2025)
+#### Enhancements 
+- Enable HTTP Notification Processor to have HTTP header 
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.10 (12/11/2025)
+#### Bug fixes
+- Fixed incorrect HTTP error code when using REST-API and Bearer authentication
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.9 (03/11/2025)
+#### Enhancements 
+
+- Enhance support for representation status other than Original when ingesting a E-ARK SIP package
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.8 (03/11/2025)
+#### Bug fixes
+
+- Add UTF-8 encoding when downloading files with non-ASCII characteres
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.7 (24/09/2025)
+#### Enhancements 
+- SecurityHeadersFilter is now fully configurable via properties. 7f7df9a3fd2a149df5b0dfee74264522cafb4a0f
+- Added support for DIP lists in the portal. 91d5d0efccaca007271b90c0e61ba3076dffbc82
+#### Bug fixes
+- Storing the reason for created events aa4781eb89fec469ead45b67a9a9cfbdf762d205
+- Resolved #3505: added support for both String and List values in conditionTypeMetadataValue
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v6.0.1 (22/09/2025)
 #### Enhancements 
 - Change RODA packaging from WAR to JAR in order to use Spring [PropertiesLauncher](https://docs.spring.io/spring-boot/specification/executable-jar/property-launcher.html).
@@ -304,150 +411,3 @@ To try out this version, check the [install instructions](https://github.com/kee
 ---
 
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.3.0 (14/12/2023)
-#### Enhancement:
-- Added tool tip to plugin license verification panel #2974
-#### New features:
-- Added permissions configuration for newly created AIPs #3032
-#### Bug fixes:
-- Unable to perform actions even having right permissions #2986
-- Ingest jobs created in RODA 4 cannot be accessed on the interface of RODA 5 #3037
-- Problem using index REST API without filter #2962
-#### Security:
-- Several dependency upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.2.5 (06/12/2023)
-#### Bug fixes:
-
-- Error sending ingestion failure notification via email #3023 
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.2.4 (10/11/2023)
-#### Enhancements:
-
-- Update Swedish translation language
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
-
-
----
-
-## v5.2.3 (10/11/2023)
-#### What's new:
-
-- New German (Austrian) translation of the Web interface :austria: 
-
-#### Bug fixes:
-
-- Create folder access-keys when initializing RODA for the first time #2992
-- Add default representation type when creating a preservation action job #2990
-- Edit button for selecting parent does not work as expected #2988
-- EAD 2002 dissemination crosswalk duplicates record group level #2987
-
-#### Enhancements:
-
-- Add title attribute to improve accessibility #2989
-
-#### Security:
-
-- Bump several dependencies
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
-
-
----
-
-## v5.2.2 (04/10/2023)
-#### Bug fixes:
-- Fixed FileID when it is encoded #2963
-- Fixed API filter issue #2965
-
-#### Security:
-- Several dependency upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
-
-
----
-
-## v5.2.1 (08/09/2023)
-#### Bug fixes:
-- Listing RODA objects via REST-API is not showing any results #2935
-- Preservation events page is not showing no events #2928
-- REST API endpoint to retrieve the last transferred resource report does not show the reports #2929
-- Problem with pre-filter not being reset when searching preservation events #2941
-
-#### Security:
-- Several dependency upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
-
-
----
-
-## v5.2.0 (28/07/2023)
-#### Enhancements:
-- DIP must be deleted if it no longer contains any link with any entity. #2863
-- Ingest job report could expose if SIP is update #2212
-
-#### Bug fixes:
-- Unexpected behaviour can cause index to be completely deleted #2921
-
-#### Security:
-- Several dependency upgrades to fix security vulnerabilities
-- Remove python from Docker image
-
----
-
-To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
-
-
----
-
-## v5.1.0 (20/06/2023)
-#### New features:
-
-- Added property to differentiate environments #2676 
-- Added link to RODA Marketplace in Menu #2722
-- Added links to additional features #2723
-- Added marketplace text to welcome page #2724
-- Option to enable AIP locking when editing descriptive metadata #2672
-- Preview functionality in disposal rules with AIPs affected by #2664 
-
-#### Enhancements:
-- Reduce indexed information of the entities that spend much of the index #2058
-- Partial updates are not affecting the updatedOn field #2851
-- Updated the banner #2725
-
-#### Bug fixes:
-- Minimal ingest plugin is using E-ARK SIP 1.0 as SIP format instead of E-ARK SIP 2.0.4 #2736 
-- Could not resolve type id 'AndFiltersParameters' #2809
-- Access token can only be created if RODA is instantiated as CENTRAL #2881
-- Saved search for files associated to a representation information not working properly #2671 
-
-#### Security:
-- Remove xml-beans dependency #2726 
-
----
-
-To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
-
