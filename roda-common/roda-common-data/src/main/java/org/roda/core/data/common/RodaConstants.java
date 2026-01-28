@@ -1010,6 +1010,7 @@ public final class RodaConstants {
 
   public static final String STORAGE_AIP_METADATA_FILENAME = "aip.json";
   public static final String STORAGE_DIP_METADATA_FILENAME = "dip.json";
+  public static final String STORAGE_METS_FILENAME = "METS.xml";
 
   /*
    * OTHER METADATA TYPES

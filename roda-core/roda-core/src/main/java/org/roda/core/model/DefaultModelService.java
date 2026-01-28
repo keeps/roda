@@ -15,6 +15,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.StandardProtocolFamily;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -3669,6 +3670,22 @@ public class DefaultModelService implements ModelService {
     StoragePath submissionStoragePath = DefaultStoragePath.parse(ModelUtils.getSubmissionStoragePath(aipId),
       DateTimeFormatter.ISO_INSTANT.format(Instant.now()), submissionPath.getFileName().toString());
     storage.createBinary(submissionStoragePath, new FSPathContentPayload(submissionPath), false);
+  }
+
+  @Override
+  public void createMetsFile(String aipId, String repId, ContentPayload metsPayload) throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    StoragePath metsOutPut = null;
+
+    if (repId!=null) {
+      metsOutPut = ModelUtils.getMetsStoragePath(aipId, repId);
+    }
+    else {
+      metsOutPut = ModelUtils.getMetsStoragePath(aipId, null);
+    }
+    storage.createBinary(metsOutPut, metsPayload, false);
+
   }
 
   private Directory getDocumentationDirectory(String aipId)

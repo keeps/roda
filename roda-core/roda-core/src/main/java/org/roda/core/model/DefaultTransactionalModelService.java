@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.checkerframework.checker.units.qual.C;
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.notifications.NotificationProcessor;
@@ -2661,6 +2662,20 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
       operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
     } catch (AlreadyExistsException | GenericException | RequestNotValidException | NotFoundException
       | AuthorizationDeniedException e) {
+      operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
+  }
+
+  @Override
+  public void createMetsFile(String aipId, String repID, ContentPayload metsPayload) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    TransactionalModelOperationLog operationLog = operationRegistry.registerUpdateOperationForAIP(aipId);
+    try {
+      getModelService().createMetsFile(aipId, repID, metsPayload);
+      operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
+    } catch (AlreadyExistsException | GenericException | RequestNotValidException | NotFoundException
+             | AuthorizationDeniedException e) {
       operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
     }
