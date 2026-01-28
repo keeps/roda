@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -581,38 +582,18 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public void importObject(StorageService toService, StoragePath toStoragePath, Path fromPath, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException, NotFoundException {
-
-    if (!FSUtils.exists(fromPath)) {
-      throw new NotFoundException("Source Path does not exist: " + fromPath);
-    }
-
-    Path destPath = FSUtils.getEntityPath(basePath, toStoragePath);
-
-    if (FSUtils.exists(destPath) && !replaceExisting) {
-      throw new AlreadyExistsException("Destination already exists: " + destPath);
-    }
-    FSUtils.copy(fromPath, destPath, replaceExisting);
-
-  }
-
-  @Override
-  public void importObject(StorageService toService, StoragePath toStoragePath, StoragePath fromPath,
+  public void importObject(StorageService fromService, LiteRODAObject object, StoragePath toStoragePath,
     boolean replaceExisting) throws AlreadyExistsException, GenericException, NotFoundException,
     AuthorizationDeniedException, RequestNotValidException {
-
-    if (!exists(fromPath)) {
+    StoragePath fromPath = ModelUtils.getStoragePath(object);
+    if (!fromService.exists(fromPath)) {
       throw new NotFoundException("Source Path does not exist: " + fromPath);
     }
 
-    Path destPath = FSUtils.getEntityPath(basePath, toStoragePath);
-
-    if (exists(fromPath) && !replaceExisting) {
-      throw new AlreadyExistsException("Destination already exists: " + fromPath);
+    if (exists(toStoragePath) && !replaceExisting) {
+      throw new AlreadyExistsException("Destination already exists: " + toStoragePath);
     }
-    copy(this, fromPath, toStoragePath);
-
+    copy(fromService, fromPath, toStoragePath);
   }
 
   @Override

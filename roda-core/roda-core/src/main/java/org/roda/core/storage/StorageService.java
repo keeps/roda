@@ -18,6 +18,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.ip.StoragePath;
 
 /**
@@ -355,10 +356,8 @@ public interface StorageService {
   void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
-  void importObject(StorageService toService, StoragePath toStoragePath, Path fromPath, boolean replaceExisting)
-          throws AlreadyExistsException, GenericException, AuthorizationDeniedException, NotFoundException;
 
-  void importObject(StorageService toService, StoragePath toStoragePath, StoragePath fromPath, boolean replaceExisting)
+  void importObject(StorageService fromService, LiteRODAObject object, StoragePath toStoragePath, boolean replaceExisting)
           throws AlreadyExistsException, GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException;
 
   /**

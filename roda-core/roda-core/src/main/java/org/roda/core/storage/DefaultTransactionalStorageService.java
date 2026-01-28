@@ -28,6 +28,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.entity.transaction.OperationState;
 import org.roda.core.entity.transaction.OperationType;
@@ -440,12 +441,13 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   @Override
-  public void importObject(StorageService toService, StoragePath toStoragePath, Path fromPath, boolean replaceExisting)
-    throws AlreadyExistsException, GenericException, AuthorizationDeniedException, NotFoundException {
-    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(toService, toStoragePath,
-      fromPath, OperationType.READ);
+  public void importObject(StorageService fromService, LiteRODAObject object, StoragePath toStoragePath,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException,
+    NotFoundException, RequestNotValidException {
+    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(fromService, toStoragePath,
+      toStoragePath, OperationType.READ);
     try {
-      stagingStorageService.importObject(toService, toStoragePath, fromPath, replaceExisting);
+      stagingStorageService.importObject(fromService, object, toStoragePath, replaceExisting);
       for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
         updateOperationState(operationLog, OperationState.SUCCESS);
       }
@@ -455,27 +457,6 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       }
       throw e;
     }
-
-  }
-
-  @Override
-  public void importObject(StorageService toService, StoragePath toStoragePath, StoragePath fromPath,
-    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException,
-    NotFoundException, RequestNotValidException {
-    List<TransactionalStoragePathOperationLog> operationLogs = registerOperationForCopy(toService, toStoragePath,
-      fromPath, OperationType.READ);
-    try {
-      stagingStorageService.importObject(toService, toStoragePath, fromPath, replaceExisting);
-      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog, OperationState.SUCCESS);
-      }
-    } catch (AlreadyExistsException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-      for (TransactionalStoragePathOperationLog operationLog : operationLogs) {
-        updateOperationState(operationLog, OperationState.FAILURE);
-      }
-      throw e;
-    }
-
   }
 
   @Override

@@ -973,11 +973,7 @@ public interface ModelService extends ModelObservable {
 
   void exportAll(StorageService toStorage);
 
-  void importObject(Path fromPath, LiteRODAObject object, boolean replaceExisting, String... toPathPartials)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-    AlreadyExistsException;
-
-  void importObject(StoragePath fromPath, IsRODAObject object, boolean replaceExisting) throws RequestNotValidException,
+  void importObject(ModelService fromModel, LiteRODAObject object, boolean replaceExisting) throws RequestNotValidException,
     GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException;
 
   void exportObject(IsRODAObject object, StorageService toStorage, String... toPathPartials)
