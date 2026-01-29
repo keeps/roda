@@ -248,7 +248,8 @@ public class StorageServiceWrapper implements StorageService {
 
   @Override
   public void importBinaryVersion(StorageService fromService, StoragePath storagePath, String version)
-    throws AlreadyExistsException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    throws AlreadyExistsException, GenericException, RequestNotValidException, AuthorizationDeniedException,
+    NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
     storageService.importBinaryVersion(fromService, storagePath, version);
   }

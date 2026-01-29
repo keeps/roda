@@ -54,7 +54,6 @@ import org.roda.core.storage.ExternalFileManifestContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceUtils;
-import org.roda.core.storage.StorageServiceWrapper;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -997,24 +996,26 @@ public class FileStorageService implements StorageService {
 
   @Override
   public void importBinaryVersion(StorageService fromService, StoragePath storagePath, String version)
-    throws AlreadyExistsException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    FileStorageService storageService;
-    if (fromService instanceof FileStorageService) {
-      storageService = (FileStorageService) fromService;
-    } else if (fromService instanceof StorageServiceWrapper) {
-      storageService = (FileStorageService) ((StorageServiceWrapper) fromService).getWrappedStorageService();
-    } else {
-      throw new GenericException("Cannot import binary version from " + fromService.getClass().getName());
+    throws AlreadyExistsException, GenericException, RequestNotValidException, AuthorizationDeniedException,
+    NotFoundException {
+    try {
+      Path targetDataPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
+      Path targetMetadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath,
+        targetDataPath);
+
+      BinaryVersion binaryVersion = fromService.getBinaryVersion(storagePath, version);
+
+      // write binary data to target path
+      Files.createDirectories(targetDataPath.getParent());
+      ContentPayload payload = binaryVersion.getBinary().getContent();
+      payload.writeToPath(targetDataPath);
+
+      // write metadata to target path
+      Files.createDirectories(targetMetadataPath.getParent());
+      JsonUtils.writeObjectToFile(binaryVersion, targetMetadataPath);
+
+    } catch (IOException e) {
+      throw new GenericException("Could not import binary version", e);
     }
-
-    Path sourceDataPath = FSUtils.getEntityPath(storageService.getHistoryDataPath(), storagePath, version);
-    Path targetDataPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
-    FSUtils.copy(sourceDataPath, targetDataPath, true);
-
-    Path sourceMetadataPath = FSUtils.getBinaryHistoryMetadataPath(storageService.getHistoryDataPath(),
-      storageService.getHistoryMetadataPath(), sourceDataPath);
-    Path targetMetadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath,
-      targetDataPath);
-    FSUtils.copy(sourceMetadataPath, targetMetadataPath, true);
   }
 }
