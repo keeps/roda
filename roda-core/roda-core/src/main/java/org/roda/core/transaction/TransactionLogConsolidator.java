@@ -143,7 +143,7 @@ public class TransactionLogConsolidator {
 
         case CREATE:
           if (result.isEmpty() || result.getLast().operationType() != OperationType.CREATE) {
-            result.add(new ConsolidatedOperation(OperationType.CREATE, updatedAt, null));
+            result.add(new ConsolidatedOperation(OperationType.CREATE, updatedAt, previousVersion));
           }
           break;
 

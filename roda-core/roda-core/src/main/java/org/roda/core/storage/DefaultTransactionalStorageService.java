@@ -284,10 +284,36 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
   }
 
   @Override
+  public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference,
+    boolean snapshotCurrentVersion, Map<String, String> properties) throws GenericException, AlreadyExistsException,
+    RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    TransactionalStoragePathOperationLog operationLog;
+    throwsExceptionIfAlreadyExist(storagePath);
+    // if storage path is agent we need to register a create or update operation
+    if (storagePath.getDirectoryPath() != null && !storagePath.getDirectoryPath().isEmpty()
+      && storagePath.getDirectoryPath().getFirst().equals(RodaConstants.STORAGE_DIRECTORY_AGENTS)) {
+      operationLog = registerOperation(storagePath, OperationType.CREATE_OR_UPDATE);
+    } else {
+      operationLog = registerOperation(storagePath, OperationType.CREATE);
+    }
+    try {
+      Binary ret = stagingStorageService.createBinary(storagePath, payload, asReference, snapshotCurrentVersion,
+        properties);
+      updateOperationState(operationLog, OperationState.SUCCESS, null, RodaConstants.LATEST_VERSION);
+      return ret;
+    } catch (AlreadyExistsException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | NotFoundException e) {
+      updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
+  }
+
+  @Override
   public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
     throws GenericException, AlreadyExistsException, RequestNotValidException, AuthorizationDeniedException,
     NotFoundException {
     TransactionalStoragePathOperationLog operationLog;
+    throwsExceptionIfAlreadyExist(storagePath);
     // if storage path is agent we need to register a create or update operation
     if (storagePath.getDirectoryPath() != null && !storagePath.getDirectoryPath().isEmpty()
       && storagePath.getDirectoryPath().getFirst().equals(RodaConstants.STORAGE_DIRECTORY_AGENTS)) {
@@ -303,6 +329,13 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       | NotFoundException e) {
       updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
+    }
+  }
+
+  private void throwsExceptionIfAlreadyExist(StoragePath storagePath) throws AlreadyExistsException {
+    if (mainStorageService.exists(storagePath)) {
+      throw new AlreadyExistsException(
+        "[transactionId:" + transaction.getId() + "] Storage path already exists in main storage: " + storagePath);
     }
   }
 
@@ -355,7 +388,11 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
           LOGGER.warn("Failed to copy binary to staging storage before update", e);
         }
       }
+
       try {
+        if (snapshotCurrentVersion) {
+          importBinaryVersion(mainStorageService, storagePath, RodaConstants.LATEST_VERSION);
+        }
         Binary ret = stagingStorageService.updateBinaryContent(storagePath, payload, asReference, true,
           snapshotCurrentVersion, properties);
         updateOperationState(updateBinaryLog, OperationState.SUCCESS, ret.getPreviousVersionId(), null);
@@ -363,6 +400,9 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
         updateOperationState(updateBinaryLog, OperationState.FAILURE);
         throw e;
+      } catch (AlreadyExistsException e) {
+        updateOperationState(updateBinaryLog, OperationState.FAILURE);
+        throw new GenericException("[transactionId:" + transaction.getId() + "] Failed to import binary version", e);
       }
     } else if (createIfNotExists) {
       TransactionalStoragePathOperationLog operationLog = registerOperation(storagePath, OperationType.CREATE);
@@ -726,20 +766,20 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
         LOGGER.info("[transactionId:{}] Creating binary version from staging to main storage service: {}",
           transaction.getId(), storagePath);
         mainStorageService.importBinaryVersion(stagingStorageService, storagePath, version);
+      }
+
+      LOGGER.info("[transactionId:{}] Moving resource from staging to main storage service: {}", transaction.getId(),
+        storagePath);
+      Class<? extends Entity> rootEntity = stagingStorageService.getEntity(storagePath);
+      // TODO: This is necessary to avoid recursive copies, we should handle it better
+      // in StorageServiceUtils
+      if (Container.class.isAssignableFrom(rootEntity)) {
+        mainStorageService.createContainer(storagePath);
+      } else if (Directory.class.isAssignableFrom(rootEntity)) {
+        mainStorageService.createDirectory(storagePath);
       } else {
-        LOGGER.info("[transactionId:{}] Moving resource from staging to main storage service: {}", transaction.getId(),
-          storagePath);
-        Class<? extends Entity> rootEntity = stagingStorageService.getEntity(storagePath);
-        // TODO: This is necessary to avoid recursive copies, we should handle it better
-        // in StorageServiceUtils
-        if (Container.class.isAssignableFrom(rootEntity)) {
-          mainStorageService.createContainer(storagePath);
-        } else if (Directory.class.isAssignableFrom(rootEntity)) {
-          mainStorageService.createDirectory(storagePath);
-        } else {
-          StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
-            storagePath, rootEntity);
-        }
+        StorageServiceUtils.copyBetweenStorageServices(stagingStorageService, storagePath, mainStorageService,
+          storagePath, rootEntity);
       }
     } catch (GenericException | RequestNotValidException | NotFoundException | AlreadyExistsException
       | AuthorizationDeniedException e) {

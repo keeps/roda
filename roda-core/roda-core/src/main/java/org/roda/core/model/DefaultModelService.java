@@ -794,7 +794,10 @@ public class DefaultModelService implements ModelService {
       descriptiveMetadataId);
     boolean asReference = false;
 
-    storage.createBinary(binaryPath, payload, asReference);
+    Map<String, String> properties = new HashMap<>();
+    properties.put(RodaConstants.VERSION_USER, createdBy);
+
+    storage.createBinary(binaryPath, payload, asReference, true, properties);
     DescriptiveMetadata descriptiveMetadata = new DescriptiveMetadata(descriptiveMetadataId, aipId, representationId,
       descriptiveMetadataType, descriptiveMetadataVersion);
 

@@ -235,6 +235,33 @@ public interface StorageService {
     AlreadyExistsException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   /**
+   * Create a binary resource with a defined content and create a binary version
+   * metadata for it.
+   *
+   * @param storagePath
+   *          storage path that identifies the binary
+   * @param payload
+   *          the content payload
+   * @param asReference
+   *          create the binary as a reference to the real content, which is
+   *          managed externally. If false, content should be copied into the
+   *          storage service.
+   * @param properties
+   *          properties to be associated with the binary version
+   *
+   * @throws GenericException
+   * @throws AlreadyExistsException
+   * @throws RequestNotValidException
+   * @throws AuthorizationDeniedException
+   * @throws NotFoundException
+   */
+  default Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference,
+    boolean snapshotCurrentVersion, Map<String, String> properties) throws GenericException, AlreadyExistsException,
+    RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    return createBinary(storagePath, payload, asReference);
+  }
+
+  /**
    * Create a binary resource with a defined content with a generated id.
    *
    * @param parentStoragePath

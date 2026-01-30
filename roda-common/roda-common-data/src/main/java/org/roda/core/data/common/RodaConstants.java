@@ -1885,9 +1885,11 @@ public final class RodaConstants {
   public static final String VERSION_USER = "user";
   public static final String VERSION_ACTION = "action";
 
+  public static final String LATEST_VERSION = "latest";
+
   public enum VersionAction {
     CREATED("created"), REVERTED("reverted"), UPDATED("updated"), METADATA_TYPE_FORCED("metadata_type_forced"),
-    UPDATE_FROM_SIP("update_from_sip");
+    UPDATE_FROM_SIP("update_from_sip"), AUTO_GENERATED("auto_generated");
 
     private final String text;
 

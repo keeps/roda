@@ -341,6 +341,21 @@ public class FileStorageService implements StorageService {
   @Override
   public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
     throws GenericException, AlreadyExistsException {
+    return createBinary(storagePath, payload, asReference, false, null);
+  }
+
+  @Override
+  public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference,
+    boolean snapshotCurrentVersion, Map<String, String> properties) throws GenericException, AlreadyExistsException {
+    DefaultBinary defaultBinary = createDefaultBinary(storagePath, payload, asReference);
+    if (snapshotCurrentVersion) {
+      createLatestBinaryVersionMetadata(storagePath, properties);
+    }
+    return defaultBinary;
+  }
+
+  private DefaultBinary createDefaultBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
+    throws GenericException, AlreadyExistsException {
     if (asReference) {
       Path binPath = FSUtils.getEntityPath(basePath, storagePath);
       try {
@@ -400,6 +415,33 @@ public class FileStorageService implements StorageService {
           throw new GenericException("Could not create binary", e);
         }
       }
+    }
+  }
+
+  private DefaultBinaryVersion createLatestBinaryVersionMetadata(StoragePath storagePath,
+    Map<String, String> properties) throws GenericException {
+    try {
+      // Current version metadata
+      String id = RodaConstants.LATEST_VERSION;
+      Path dataPath = FSUtils.getEntityPath(historyDataPath, storagePath, id);
+      Path metadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath, dataPath);
+
+      // Setting default properties
+      if (properties == null) {
+        properties = new HashMap<>();
+      }
+      properties.computeIfAbsent(RodaConstants.VERSION_ACTION, k -> RodaConstants.VersionAction.CREATED.toString());
+
+      // Creating metadata
+      DefaultBinaryVersion b = new DefaultBinaryVersion();
+      b.setId(id);
+      b.setCreatedDate(new Date());
+      b.setProperties(properties);
+      Files.createDirectories(metadataPath.getParent());
+      JsonUtils.writeObjectToFile(b, metadataPath);
+      return b;
+    } catch (RequestNotValidException | IOException e) {
+      throw new GenericException("Could not create current binary version metadata", e);
     }
   }
 
@@ -748,8 +790,21 @@ public class FileStorageService implements StorageService {
     if (historyDataPath == null) {
       throw new GenericException("Skipping get binary version because no history folder is defined!");
     }
+
     Path binVersionPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
-    return FSUtils.convertPathToBinaryVersion(historyDataPath, historyMetadataPath, binVersionPath);
+    if (version.equals(RodaConstants.LATEST_VERSION)) {
+      Path metadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath, binVersionPath);
+      if (FSUtils.exists(metadataPath)) {
+        return JsonUtils.readObjectFromFile(metadataPath, DefaultBinaryVersion.class);
+      } else {
+        LOGGER.warn("Could not find latest binary version metadata for {}", storagePath);
+        Map<String, String> properties = new HashMap<>();
+        properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.AUTO_GENERATED.toString());
+        return createLatestBinaryVersionMetadata(storagePath, properties);
+      }
+    } else {
+      return FSUtils.convertPathToBinaryVersion(historyDataPath, historyMetadataPath, binVersionPath);
+    }
   }
 
   private BinaryVersion snapshotBinaryVersion(StoragePath storagePath, Map<String, String> properties)
@@ -786,13 +841,16 @@ public class FileStorageService implements StorageService {
       // writing file
       Files.copy(binPath, dataPath);
 
-      // Creating metadata
-      DefaultBinaryVersion b = new DefaultBinaryVersion();
-      b.setId(id);
-      b.setCreatedDate(new Date());
-      b.setProperties(properties);
-      Files.createDirectories(metadataPath.getParent());
-      JsonUtils.writeObjectToFile(b, metadataPath);
+      BinaryVersion binaryVersionMetadata = getBinaryVersion(storagePath, RodaConstants.LATEST_VERSION);
+      if (binaryVersionMetadata instanceof DefaultBinaryVersion defaultBinaryVersionMetadata) {
+        defaultBinaryVersionMetadata.setId(id);
+        Files.createDirectories(metadataPath.getParent());
+        JsonUtils.writeObjectToFile(binaryVersionMetadata, metadataPath);
+      } else {
+        LOGGER.warn("Could not snapshot binary version metadata for {}", storagePath);
+      }
+
+      createLatestBinaryVersionMetadata(storagePath, properties);
 
       return FSUtils.convertPathToBinaryVersion(historyDataPath, historyMetadataPath, dataPath);
     } catch (IOException e) {
@@ -1004,15 +1062,31 @@ public class FileStorageService implements StorageService {
         targetDataPath);
 
       BinaryVersion binaryVersion = fromService.getBinaryVersion(storagePath, version);
+      if (version.equals(RodaConstants.LATEST_VERSION)) {
+        // We only have metadata for latest version, so just import it
+        // write metadata to target path
+        Files.createDirectories(targetMetadataPath.getParent());
+        JsonUtils.writeObjectToFile(binaryVersion, targetMetadataPath);
+      } else {
+        // write binary data to target path
+        Files.createDirectories(targetDataPath.getParent());
+        ContentPayload payload = binaryVersion.getBinary().getContent();
+        payload.writeToPath(targetDataPath);
 
-      // write binary data to target path
-      Files.createDirectories(targetDataPath.getParent());
-      ContentPayload payload = binaryVersion.getBinary().getContent();
-      payload.writeToPath(targetDataPath);
+        // write metadata to target path
+        Files.createDirectories(targetMetadataPath.getParent());
+        JsonUtils.writeObjectToFile(binaryVersion, targetMetadataPath);
 
-      // write metadata to target path
-      Files.createDirectories(targetMetadataPath.getParent());
-      JsonUtils.writeObjectToFile(binaryVersion, targetMetadataPath);
+        // Always import latest version metadata for consistency
+        Path dummyLatestPath = FSUtils.getEntityPath(historyDataPath, storagePath, RodaConstants.LATEST_VERSION);
+        Path latestMetadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath,
+          dummyLatestPath);
+        BinaryVersion latestBinaryVersion = fromService.getBinaryVersion(storagePath, RodaConstants.LATEST_VERSION);
+
+        // write metadata to target path
+        Files.createDirectories(targetMetadataPath.getParent());
+        JsonUtils.writeObjectToFile(latestBinaryVersion, latestMetadataPath);
+      }
 
     } catch (IOException e) {
       throw new GenericException("Could not import binary version", e);
