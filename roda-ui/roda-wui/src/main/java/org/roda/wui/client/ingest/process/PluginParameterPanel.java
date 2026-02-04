@@ -246,12 +246,10 @@ public class PluginParameterPanel extends Composite {
             selectBox.addItem(option);
           }
 
-          if (options.isControlledVocabulary()) {
-            selectBox.addItem(messages.entityTypeAddNew(), ADD_TYPE);
-          }
+          selectBox.addItem(messages.entityTypeAddNew(), ADD_TYPE);
           selectBox.setSelectedIndex(0);
           value = selectBox.getSelectedValue();
-          representationParameter.setValue(selectBox.getSelectedValue());
+          representationParameter.setValue(value);
         }
       });
 
