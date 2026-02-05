@@ -102,21 +102,22 @@ public class FilesController implements FileRestService, Exportable {
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   public ResponseEntity<StreamingResponseBody> previewBinary(
     @Parameter(description = "The UUID of the existing file", required = true) @PathVariable(name = "uuid") String fileUUID,
+    @Parameter(description = "Use to set the content disposition inline") @RequestParam(name = "inline", defaultValue = "true", required = false) boolean inline,
     @RequestHeader HttpHeaders headers) {
     return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
       @Override
       public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
-        controllerAssistant.setRelatedObjectId(fileUUID);
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
         List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
         fileFields.add(RodaConstants.FILE_ISDIRECTORY);
         IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
+        controllerAssistant.setRelatedObjectId(file.getAipId());
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
         RangeConsumesOutputStream stream = filesService.retrieveAIPRepresentationRangeStream(requestContext, file);
 
-        return ApiUtils.rangeResponse(headers, stream);
+        return ApiUtils.rangeResponse(headers, stream, inline);
       }
     });
   }
@@ -136,7 +137,8 @@ public class FilesController implements FileRestService, Exportable {
         fileFields.add(RodaConstants.FILE_ISDIRECTORY);
         IndexedFile file = indexService.retrieve(IndexedFile.class, fileUUID, fileFields);
         controllerAssistant.setRelatedObjectId(file.getAipId());
-        controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID, RodaConstants.CONTROLLER_FILE_ID_PARAM, file.getId());
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID,
+          RodaConstants.CONTROLLER_FILE_ID_PARAM, file.getId());
 
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), file);
 
