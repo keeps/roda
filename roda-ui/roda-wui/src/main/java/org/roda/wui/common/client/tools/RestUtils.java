@@ -60,8 +60,8 @@ public class RestUtils {
     // api/v2/{aip_id}/representations/{representation_id}/binary
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
+    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
       .append(URL.encodeQueryString(representationId)).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
 
     return UriUtils.fromSafeConstant(b.toString());
@@ -72,8 +72,8 @@ public class RestUtils {
     // api/v2/aip/{aip_id}/representations/{representation_id}/other-metadata/binary
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId))
-      .append(RodaConstants.API_SEP).append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
+    b.append(RodaConstants.API_REST_V2_AIPS).append(URL.encodeQueryString(aipId)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.AIP_REPRESENTATIONS).append(RodaConstants.API_SEP)
       .append(URL.encodeQueryString(representationId)).append(RodaConstants.API_REST_V2_REPRESENTATION_OTHER_METADATA)
       .append(RodaConstants.API_REST_V2_REPRESENTATION_BINARY);
 
@@ -84,20 +84,22 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-    public static SafeUri createRepresentationFilePreviewUri(String fileUuid, boolean contentDispositionInline) {
+  public static SafeUri createRepresentationFilePreviewUri(String fileUuid, boolean contentDispositionInline) {
     // api/v2/files/{file_uuid}/preview
     String b = RodaConstants.API_REST_V2_FILES + URL.encodeQueryString(fileUuid)
-      + RodaConstants.API_REST_V2_PREVIEW_HANDLER;
+      + RodaConstants.API_REST_V2_PREVIEW_HANDLER + RodaConstants.API_QUERY_START + RodaConstants.API_QUERY_PARAM_INLINE
+      + RodaConstants.API_QUERY_ASSIGN_SYMBOL + contentDispositionInline;
 
     return UriUtils.fromSafeConstant(b);
   }
 
-  public static SafeUri createRepresentationFileDownloadUri(String fileUuid){
-      // api/v2/files/{file_uuid}/download
-      StringBuilder b = new StringBuilder();
-      b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileUuid)).append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
+  public static SafeUri createRepresentationFileDownloadUri(String fileUuid) {
+    // api/v2/files/{file_uuid}/download
+    StringBuilder b = new StringBuilder();
+    b.append(RodaConstants.API_REST_V2_FILES).append(URL.encodeQueryString(fileUuid))
+      .append(RodaConstants.API_REST_V2_DOWNLOAD_HANDLER);
 
-      return UriUtils.fromSafeConstant(b.toString());
+    return UriUtils.fromSafeConstant(b.toString());
   }
 
   public static SafeUri createDipDownloadUri(String dipUUID) {
@@ -120,7 +122,7 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-  public static SafeUri createDipFileDownloadUri(String dipFileUUID){
+  public static SafeUri createDipFileDownloadUri(String dipFileUUID) {
     // api/v2/dip-files/{file_uuid}/download
     StringBuilder b = new StringBuilder();
     b.append(RodaConstants.API_REST_V2_DIPFILES).append(URL.encodeQueryString(dipFileUUID))

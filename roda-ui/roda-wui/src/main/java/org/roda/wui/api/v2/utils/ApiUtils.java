@@ -64,15 +64,15 @@ public class ApiUtils {
   }
 
   public static ResponseEntity<StreamingResponseBody> rangeResponse(HttpHeaders headers,
-    RangeConsumesOutputStream consumesOutputStream) {
+                                                                    RangeConsumesOutputStream consumesOutputStream, boolean inline) {
     final HttpHeaders responseHeaders = new HttpHeaders();
     StreamingResponseBody responseStream;
 
     if (headers.getRange().isEmpty()) {
       responseStream = consumesOutputStream::consumeOutputStream;
       responseHeaders.add("Content-Type", consumesOutputStream.getMediaType());
-      responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
-        + URLEncoder.encode(consumesOutputStream.getFileName(), StandardCharsets.UTF_8) + "\"");
+      responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, inline ? "inline; " : "attachment; " + "filename=\""
+              + URLEncoder.encode(consumesOutputStream.getFileName(), StandardCharsets.UTF_8) + "\"");
       responseHeaders.add("Content-Length", String.valueOf(consumesOutputStream.getSize()));
 
       return ResponseEntity.ok().headers(responseHeaders).body(responseStream);
@@ -86,10 +86,10 @@ public class ApiUtils {
     responseHeaders.add(HttpHeaders.CONTENT_TYPE, consumesOutputStream.getMediaType());
     responseHeaders.add(HttpHeaders.CONTENT_LENGTH, contentLength);
     responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION,
-      "inline; filename=\"" + URLEncoder.encode(consumesOutputStream.getFileName(), StandardCharsets.UTF_8) + "\"");
+            "inline; filename=\"" + URLEncoder.encode(consumesOutputStream.getFileName(), StandardCharsets.UTF_8) + "\"");
     responseHeaders.add(HttpHeaders.ACCEPT_RANGES, "bytes");
     responseHeaders.add(HttpHeaders.CONTENT_RANGE,
-      "bytes" + " " + start + "-" + end + "/" + consumesOutputStream.getSize());
+            "bytes" + " " + start + "-" + end + "/" + consumesOutputStream.getSize());
 
     responseStream = os -> (consumesOutputStream).consumeOutputStream(os, start, end);
 
@@ -102,6 +102,11 @@ public class ApiUtils {
     }
 
     return new ResponseEntity<>(responseStream, responseHeaders, HttpStatus.PARTIAL_CONTENT);
+  }
+
+  public static ResponseEntity<StreamingResponseBody> rangeResponse(HttpHeaders headers,
+    RangeConsumesOutputStream consumesOutputStream) {
+    return rangeResponse(headers, consumesOutputStream, false);
   }
 
   public static StreamResponse download(RequestContext requestContext, IsRODAObject object, String... pathPartials)
