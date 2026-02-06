@@ -243,6 +243,14 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                   aipFailed = true;
                   createIncidence(model, index, aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
                     pm.getFileId(), risks.get(0));
+                } catch (RequestNotValidException e) {
+                  LOGGER.error("Error retrieving file {} of representation {}", pm.getFileId(),
+                    pm.getRepresentationId(), e);
+                  ValidationIssue issue = new ValidationIssue(
+                    "File " + pm.getFileId() + " of representation " + pm.getRepresentationId() + " of AIP "
+                      + pm.getAipId() + " could not be retrieved but the PREMIS file exists: " + e.getMessage());
+                  validationReport.addIssue(issue);
+                  aipFailed = true;
                 }
               }
             }

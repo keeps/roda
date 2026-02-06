@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+    <eventIdentifier>
+        <eventIdentifierType>URN</eventIdentifierType>
+        <eventIdentifierValue>urn:roda:premis:event:10c334ef-a287-4995-9dd2-5070394f32b9</eventIdentifierValue>
+    </eventIdentifier>
+    <eventType>unpacking</eventType>
+    <eventDateTime>2026-02-06T17:17:38.911Z</eventDateTime>
+    <eventDetailInformation>
+        <eventDetail>Extracted objects from package in E-ARK SIP 2 format.</eventDetail>
+    </eventDetailInformation>
+    <eventOutcomeInformation>
+        <eventOutcome>SUCCESS</eventOutcome>
+        <eventOutcomeDetail>
+            <eventOutcomeDetailNote>The SIP has been successfully unpacked.</eventOutcomeDetailNote>
+        </eventOutcomeDetail>
+    </eventOutcomeInformation>
+    <linkingAgentIdentifier>
+        <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+        <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.base.ingest.EARKSIP2ToAIPPlugin@1.0</linkingAgentIdentifierValue>
+    </linkingAgentIdentifier>
+    <linkingAgentIdentifier>
+        <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+        <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+        <linkingAgentRole>implementer</linkingAgentRole>
+    </linkingAgentIdentifier>
+    <linkingObjectIdentifier>
+        <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+        <linkingObjectIdentifierValue>urn:roda:TRANSFERRED_RESOURCE:eark_sip_2.0.4.zip</linkingObjectIdentifierValue>
+        <linkingObjectRole>source</linkingObjectRole>
+    </linkingObjectIdentifier>
+    <linkingObjectIdentifier>
+        <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+        <linkingObjectIdentifierValue>urn:roda:AIP:6f8cbcb2-8d5b-4dfa-a38b-6a0779d579c2</linkingObjectIdentifierValue>
+        <linkingObjectRole>outcome</linkingObjectRole>
+    </linkingObjectIdentifier>
+</event>

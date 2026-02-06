@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+    <eventIdentifier>
+        <eventIdentifierType>URN</eventIdentifierType>
+        <eventIdentifierValue>urn:roda:premis:event:36c1f527-febe-44d1-83d3-89f5ee0deffb</eventIdentifierValue>
+    </eventIdentifier>
+    <eventType>wellformedness check</eventType>
+    <eventDateTime>2026-02-06T17:17:39.018Z</eventDateTime>
+    <eventDetailInformation>
+        <eventDetail>Checked that the received SIP is well formed, complete and that no unexpected files were included.</eventDetail>
+    </eventDetailInformation>
+    <eventOutcomeInformation>
+        <eventOutcome>SUCCESS</eventOutcome>
+        <eventOutcomeDetail>
+            <eventOutcomeDetailNote>The SIP was well formed and complete.</eventOutcomeDetailNote>
+        </eventOutcomeDetail>
+    </eventOutcomeInformation>
+    <linkingAgentIdentifier>
+        <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+        <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.base.ingest.EARKSIP2ToAIPPlugin@1.0</linkingAgentIdentifierValue>
+    </linkingAgentIdentifier>
+    <linkingAgentIdentifier>
+        <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+        <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+        <linkingAgentRole>implementer</linkingAgentRole>
+    </linkingAgentIdentifier>
+    <linkingObjectIdentifier>
+        <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+        <linkingObjectIdentifierValue>urn:roda:TRANSFERRED_RESOURCE:eark_sip_2.0.4.zip</linkingObjectIdentifierValue>
+        <linkingObjectRole>source</linkingObjectRole>
+    </linkingObjectIdentifier>
+    <linkingObjectIdentifier>
+        <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+        <linkingObjectIdentifierValue>urn:roda:AIP:6f8cbcb2-8d5b-4dfa-a38b-6a0779d579c2</linkingObjectIdentifierValue>
+        <linkingObjectRole>outcome</linkingObjectRole>
+    </linkingObjectIdentifier>
+</event>

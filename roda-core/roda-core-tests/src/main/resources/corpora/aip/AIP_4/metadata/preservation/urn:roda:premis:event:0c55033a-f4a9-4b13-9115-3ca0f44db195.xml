@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+    <eventIdentifier>
+        <eventIdentifierType>URN</eventIdentifierType>
+        <eventIdentifierValue>urn:roda:premis:event:0c55033a-f4a9-4b13-9115-3ca0f44db195</eventIdentifierValue>
+    </eventIdentifier>
+    <eventType>virus check</eventType>
+    <eventDateTime>2026-02-06T17:17:41.849Z</eventDateTime>
+    <eventDetailInformation>
+        <eventDetail>Scanned package for malicious programs using ClamAV.</eventDetail>
+    </eventDetailInformation>
+    <eventOutcomeInformation>
+        <eventOutcome>SUCCESS</eventOutcome>
+        <eventOutcomeDetail>
+            <eventOutcomeDetailNote>The package does not contain any known malicious programs.
+/roda/data/staging-storage/81f8b114-82aa-48a7-90e1-802876261381/aip/6f8cbcb2-8d5b-4dfa-a38b-6a0779d579c2: OK
+
+----------- SCAN SUMMARY -----------
+Infected files: 0
+Time: 2.429 sec (0 m 2 s)
+Start Date: 2026:02:06 17:17:39
+End Date:   2026:02:06 17:17:41
+</eventOutcomeDetailNote>
+        </eventOutcomeDetail>
+    </eventOutcomeInformation>
+    <linkingAgentIdentifier>
+        <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+        <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.base.antivirus.AntivirusPlugin@ClamAV 1.5.1/27904/Fri Feb  6 07:25:08 2026</linkingAgentIdentifierValue>
+    </linkingAgentIdentifier>
+    <linkingAgentIdentifier>
+        <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+        <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+        <linkingAgentRole>implementer</linkingAgentRole>
+    </linkingAgentIdentifier>
+    <linkingObjectIdentifier>
+        <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+        <linkingObjectIdentifierValue>urn:roda:AIP:6f8cbcb2-8d5b-4dfa-a38b-6a0779d579c2</linkingObjectIdentifierValue>
+        <linkingObjectRole>outcome</linkingObjectRole>
+    </linkingObjectIdentifier>
+</event>

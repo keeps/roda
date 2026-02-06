@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 
 public final class URNUtils {
@@ -147,12 +148,18 @@ public final class URNUtils {
       return retrieveIdWithHours(fields);
   }
 
-  public static boolean verifyInstanceIdentifier(String id, String instanceId) {
-    if (extractInstanceIdentifierFromId(id).equals(instanceId)) {
-      return true;
+  public static String getFileIdFromURN(String urn) throws RequestNotValidException {
+    String[] fields = urn.split(RodaConstants.URN_SEPARATOR);
+    if (fields.length == URN_LENGTH_WITH_INSTANCE_IDENTIFIER
+      || fields.length == URN_LENGTH_WITHOUT_INSTANCE_IDENTIFIER) {
+      return fields[fields.length - 1];
     } else {
-      return false;
+        throw new RequestNotValidException("Invalid URN format: " + urn);
     }
+  }
+
+  public static boolean verifyInstanceIdentifier(String id, String instanceId) {
+      return extractInstanceIdentifierFromId(id).equals(instanceId);
   }
 
   public static String extractInstanceIdentifierFromId(String id) {
