@@ -10,6 +10,7 @@ package org.roda.core.model;
 import java.util.List;
 
 import org.roda.core.data.exceptions.ReturnWithExceptions;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -151,4 +152,10 @@ public interface ModelObserver {
     DisposalConfirmation confirmation);
 
   public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationDeleted(String confirmationId, boolean commit);
+
+  public ReturnWithExceptions<Void, ModelObserver> liteRODAObjectCreated(LiteRODAObject liteRODAObject);
+
+  public ReturnWithExceptions<Void, ModelObserver> liteRODAObjectUpdated(LiteRODAObject liteRODAObject);
+
+  public ReturnWithExceptions<Void, ModelObserver> liteRODAObjectDeleted(LiteRODAObject liteRODAObject);
 }

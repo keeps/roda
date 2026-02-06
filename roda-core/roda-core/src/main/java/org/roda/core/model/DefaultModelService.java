@@ -143,6 +143,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.events.EventsManager;
+import org.roda.core.index.IndexModelObserver;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.iterables.LogEntryFileSystemIterable;
@@ -5059,6 +5060,17 @@ public class DefaultModelService implements ModelService {
     }
     return wrapper;
   }
+  public ReturnWithExceptionsWrapper notifyLiteRodaObjectCreated(LiteRODAObject object){
+    return notifyObserversSafely(observer -> observer.liteRODAObjectCreated(object));
+  }
+
+  public ReturnWithExceptionsWrapper notifyLiteRodaObjectUpdated(LiteRODAObject object){
+    return notifyObserversSafely(observer -> observer.liteRODAObjectUpdated(object));
+  }
+
+  public ReturnWithExceptionsWrapper notifyLiteRodaObjectDeleted(LiteRODAObject object){
+    return notifyObserversSafely(observer -> observer.liteRODAObjectUpdated(object));
+  }
 
   @Override
   public ReturnWithExceptionsWrapper notifyAipCreated(AIP aip) {
@@ -5654,11 +5666,15 @@ public class DefaultModelService implements ModelService {
     AlreadyExistsException {
     StoragePath toObjectPath = ModelUtils.getStoragePath(object);
 
-    if (getStorage().exists(toObjectPath) && !replaceExisting) {
-      throw new AlreadyExistsException("Target already exists: " + toObjectPath);
-    }
     getStorage().importObject(fromModel.getStorage(), object, toObjectPath, replaceExisting);
 
+    boolean notifyUpdate = getStorage().exists(toObjectPath) && replaceExisting;
+
+    if (notifyUpdate) {
+      notifyLiteRodaObjectUpdated(object);
+    } else {
+      notifyLiteRodaObjectCreated(object);
+    }
   }
 
   @Override

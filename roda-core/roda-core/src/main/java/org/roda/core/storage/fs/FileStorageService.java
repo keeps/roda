@@ -589,8 +589,13 @@ public class FileStorageService implements StorageService {
       throw new NotFoundException("Source Path does not exist: " + fromPath);
     }
 
-    if (exists(toStoragePath) && !replaceExisting) {
-      throw new AlreadyExistsException("Destination already exists: " + toStoragePath);
+    if (exists(toStoragePath)) {
+      if(replaceExisting) {
+        // workaround
+        deleteResource(toStoragePath);
+      } else {
+        throw new AlreadyExistsException("Destination already exists: " + toStoragePath);
+      }
     }
     copy(fromService, fromPath, toStoragePath);
   }

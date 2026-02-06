@@ -357,8 +357,10 @@ public interface StorageService {
     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
 
-  void importObject(StorageService fromService, LiteRODAObject object, StoragePath toStoragePath, boolean replaceExisting)
-          throws AlreadyExistsException, GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException;
+  default void importObject(StorageService fromService, LiteRODAObject object, StoragePath toStoragePath, boolean replaceExisting)
+          throws AlreadyExistsException, GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+    throw new UnsupportedOperationException("Not supported yet.");
+  };
 
   /**
    * Move resources from another (or the same) storage service.
