@@ -7,7 +7,10 @@
  */
 package org.roda.core.plugins;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -18,19 +21,31 @@ import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.base.ingest.v2.DefaultIngestPlugin;
 import org.roda.core.plugins.base.preservation.AIPCorruptionRiskAssessmentPlugin;
+import org.roda.core.plugins.base.v2.FailureOnMandatoryStepIngestPlugin;
 import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
@@ -105,5 +120,22 @@ public class AIPCorruptionRiskAssessmentTest {
     // without file Assert.assertEquals(count, 3);
     Assert.assertEquals(incidences, 2);
     Assert.assertEquals(jobReports.get(0).getPluginState(), PluginState.FAILURE);
+  }
+
+  @Test
+  public void testFileRemovedFromStorage() throws RequestNotValidException, AuthorizationDeniedException,
+    ValidationException, AlreadyExistsException, NotFoundException, GenericException {
+    String aipId = IdUtils.createUUID();
+    AIP aip = model.createAIP(aipId, corporaService,
+            DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, "AIP_4"),
+            RodaConstants.ADMIN);
+
+    File file = model.retrieveFile(aip.getId(), aip.getRepresentations().get(0).getId(), List.of(), "2012-roda-promo-en.pdf");
+    Path path = model.getDirectAccess(file).getPath();
+
+    Assert.assertTrue(path.toFile().exists());
+
+    path.toFile().delete();
+    Assert.assertFalse(path.toFile().exists());
   }
 }
