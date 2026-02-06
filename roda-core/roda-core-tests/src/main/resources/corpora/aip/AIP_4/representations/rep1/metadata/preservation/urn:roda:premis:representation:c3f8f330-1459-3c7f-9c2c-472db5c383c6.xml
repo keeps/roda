@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object xsi:type="representation" xmlns="http://www.loc.gov/premis/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <objectIdentifier>
+        <objectIdentifierType>URN</objectIdentifierType>
+        <objectIdentifierValue>urn:roda:premis:representation:c3f8f330-1459-3c7f-9c2c-472db5c383c6</objectIdentifierValue>
+    </objectIdentifier>
+    <preservationLevel>
+        <preservationLevelValue></preservationLevelValue>
+    </preservationLevel>
+    <relationship>
+        <relationshipType>structural</relationshipType>
+        <relationshipSubType>hasPart</relationshipSubType>
+        <relatedObjectIdentifier>
+            <relatedObjectIdentifierType>URN</relatedObjectIdentifierType>
+            <relatedObjectIdentifierValue>urn:roda:premis:file:folder-RODA 2 logo-circle-white.svg</relatedObjectIdentifierValue>
+        </relatedObjectIdentifier>
+    </relationship>
+    <relationship>
+        <relationshipType>structural</relationshipType>
+        <relationshipSubType>hasPart</relationshipSubType>
+        <relatedObjectIdentifier>
+            <relatedObjectIdentifierType>URN</relatedObjectIdentifierType>
+            <relatedObjectIdentifierValue>urn:roda:premis:file:folder-subfolder-RODA 2 logo.svg</relatedObjectIdentifierValue>
+        </relatedObjectIdentifier>
+    </relationship>
+    <relationship>
+        <relationshipType>structural</relationshipType>
+        <relationshipSubType>hasPart</relationshipSubType>
+        <relatedObjectIdentifier>
+            <relatedObjectIdentifierType>URN</relatedObjectIdentifierType>
+            <relatedObjectIdentifierValue>urn:roda:premis:file:folder-RODA 2 logo-circle-black.svg</relatedObjectIdentifierValue>
+        </relatedObjectIdentifier>
+    </relationship>
+    <relationship>
+        <relationshipType>structural</relationshipType>
+        <relationshipSubType>hasPart</relationshipSubType>
+        <relatedObjectIdentifier>
+            <relatedObjectIdentifierType>URN</relatedObjectIdentifierType>
+            <relatedObjectIdentifierValue>urn:roda:premis:file:2012-roda-promo-en.pdf</relatedObjectIdentifierValue>
+        </relatedObjectIdentifier>
+    </relationship>
+</object>
