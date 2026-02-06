@@ -200,6 +200,8 @@ public class ResourceParseUtils {
       type = PreservationMetadataType.FILE;
       id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
+      String fileIdFromURN = URNUtils.getFileIdFromURN(filename);
+      fileId = fileIdFromURN.substring(0, fileIdFromURN.length() - RodaConstants.PREMIS_SUFFIX.length());
     } else if (filename.endsWith(RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX)) {
       type = PreservationMetadataType.OTHER;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);

@@ -1,0 +1,74 @@
+{
+  "id": "6f8cbcb2-8d5b-4dfa-a38b-6a0779d579c2",
+  "type": "OTHER",
+  "state": "ACTIVE",
+  "permissions": {
+    "users": {
+      "CREATE": [
+        "admin"
+      ],
+      "READ": [
+        "admin"
+      ],
+      "UPDATE": [
+        "admin"
+      ],
+      "DELETE": [
+        "admin"
+      ],
+      "GRANT": [
+        "admin"
+      ]
+    },
+    "groups": {
+      "CREATE": [],
+      "READ": [],
+      "UPDATE": [],
+      "DELETE": [],
+      "GRANT": []
+    }
+  },
+  "descriptiveMetadata": [
+    {
+      "id": "ead2002.xml",
+      "type": "EAD",
+      "version": "2002"
+    }
+  ],
+  "representations": [
+    {
+      "aipId": "6f8cbcb2-8d5b-4dfa-a38b-6a0779d579c2",
+      "id": "rep1",
+      "original": true,
+      "representationStates": [],
+      "type": "Other",
+      "hasShallowFiles": false,
+      "createdOn": 1770398258477,
+      "createdBy": "admin",
+      "updatedOn": 1770398264029,
+      "updatedBy": "admin",
+      "descriptiveMetadata": [],
+      "technicalMetadata": []
+    }
+  ],
+  "ingestSIPUUID": "7084c01f-c61e-38f4-802b-37c2f94f90ee",
+  "ingestSIPIds": [
+    "uuid-a9916a17-9826-43fa-8a9b-47b85b55d04c"
+  ],
+  "ingestJobId": "5c2cea51-1a3c-41f4-8942-009ac8dfb28c",
+  "ingestUpdateJobIds": [],
+  "hasShallowFiles": false,
+  "format": {
+    "name": null,
+    "version": null
+  },
+  "relationships": [],
+  "createdOn": 1770398258094,
+  "createdBy": "admin",
+  "updatedOn": 1770398265212,
+  "updatedBy": "admin",
+  "disposal": {
+    "holds": [],
+    "transitiveHolds": []
+  }
+}

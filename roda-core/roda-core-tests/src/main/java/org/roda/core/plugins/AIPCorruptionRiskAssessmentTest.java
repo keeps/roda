@@ -7,7 +7,9 @@
  */
 package org.roda.core.plugins;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -18,15 +20,22 @@ import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
@@ -48,12 +57,12 @@ import org.testng.annotations.Test;
 public class AIPCorruptionRiskAssessmentTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AIPCorruptionRiskAssessmentTest.class);
-  private static Path basePath;
+  private Path basePath;
 
-  private static ModelService model;
-  private static IndexService index;
-  private static LdapUtilityTestHelper ldapUtilityTestHelper;
-  private static StorageService corporaService;
+  private ModelService model;
+  private IndexService index;
+  private LdapUtilityTestHelper ldapUtilityTestHelper;
+  private StorageService corporaService;
 
   @BeforeMethod
   public void setUp() throws Exception {
@@ -104,6 +113,39 @@ public class AIPCorruptionRiskAssessmentTest {
     // 3 errors: 1 checksum checking error, 1 file without premis, 1 premis
     // without file Assert.assertEquals(count, 3);
     Assert.assertEquals(incidences, 2);
-    Assert.assertEquals(jobReports.get(0).getPluginState(), PluginState.FAILURE);
+    Assert.assertEquals(jobReports.getFirst().getPluginState(), PluginState.FAILURE);
+  }
+
+  @Test
+  public void testFileRemovedFromStorage() throws RequestNotValidException, AuthorizationDeniedException,
+          ValidationException, AlreadyExistsException, NotFoundException, GenericException, IOException {
+    String aipId = IdUtils.createUUID();
+    AIP aip = model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, "AIP_4"), RodaConstants.ADMIN);
+
+    File file = model.retrieveFile(aip.getId(), aip.getRepresentations().getFirst().getId(), List.of(),
+      "2012-roda-promo-en.pdf");
+    Path path = model.getDirectAccess(file).getPath();
+
+    Assert.assertTrue(path.toFile().exists());
+
+    Files.delete(path);
+    Assert.assertFalse(path.toFile().exists());
+
+    Job job = TestsHelper.executeJob(AIPCorruptionRiskAssessmentPlugin.class, PluginType.AIP_TO_AIP,
+      SelectedItemsList.create(AIP.class, Collections.singletonList(aipId)));
+
+    List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
+
+    Assert.assertEquals(job.getJobStats().getCompletionPercentage(), 100,
+      "Job should be completed even if file is missing");
+    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithFailure(), 1,
+      "Job should report 1 source object processed with failure due to missing file");
+    Assert.assertEquals(jobReports.getFirst().getPluginState(), PluginState.FAILURE,
+      "Plugin should report failure due to missing file");
+
+    index.commit(RiskIncidence.class);
+    long incidences = index.count(RiskIncidence.class, Filter.ALL);
+    Assert.assertEquals(incidences, 1, "There should be 1 risk incidence reported due to missing file");
   }
 }
