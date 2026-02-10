@@ -371,6 +371,14 @@
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>apache-jsp</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>serializer</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <!-- /gwt -->
