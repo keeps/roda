@@ -106,13 +106,11 @@ public class AIPCorruptionRiskAssessmentTest {
       SelectedItemsList.create(AIP.class, Collections.singletonList(aipId)));
 
     List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
-    int count = StringUtils.countMatches(jobReports.get(0).getPluginDetails(), "<div class=\"entry level_error\">");
+
     index.commit(RiskIncidence.class);
     long incidences = index.count(RiskIncidence.class, Filter.ALL);
 
-    // 3 errors: 1 checksum checking error, 1 file without premis, 1 premis
-    // without file Assert.assertEquals(count, 3);
-    Assert.assertEquals(incidences, 2);
+    Assert.assertEquals(incidences, 3, "3 incidences should be reported for the corrupted AIP: 1 checksum error, 1 file without PREMIS, 1 PREMIS without file");
     Assert.assertEquals(jobReports.getFirst().getPluginState(), PluginState.FAILURE);
   }
 
