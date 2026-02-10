@@ -30,6 +30,7 @@ import java.util.NoSuchElementException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
+import org.mockito.Mockito;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -1947,5 +1948,48 @@ public class TransactionalStorageServiceTest extends AbstractStorageServiceTest<
     // 2.7) check that the binary was rolled back
     Binary rolledBackBinary = mainStorage.getBinary(binaryStoragePath);
     testBinaryContent(rolledBackBinary, payload1);
+  }
+
+  @Test
+  public void testRollbackAfterCommit() throws RODATransactionException, RequestNotValidException,
+    AuthorizationDeniedException, AlreadyExistsException, GenericException, NotFoundException {
+
+    StorageService mockMainStorageService = Mockito.spy(mainStorage);
+
+    // 1.1) start transaction
+    TransactionalContext context1 = transactionManager.beginTestTransaction(mockMainStorageService);
+    StorageService storage1 = context1.transactionalStorageService();
+    // 1.2) create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    storage1.createContainer(containerStoragePath);
+    // 1.3) create a random file
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload1 = new RandomMockContentPayload();
+    storage1.createBinary(binaryStoragePath, payload1, false);
+
+    // 1.4) create a second random file
+    final StoragePath binaryStoragePath2 = StorageTestUtils
+      .generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payload2 = new RandomMockContentPayload();
+    storage1.createBinary(binaryStoragePath2, payload2, false);
+
+    Mockito.doThrow(new GenericException("Mock exception for testing rollback after commit"))
+      .when(mockMainStorageService).createBinary(Mockito.eq(binaryStoragePath2), Mockito.any(), Mockito.anyBoolean());
+
+    // 1.5) end transaction
+    try {
+      transactionManager.endTransaction(context1.transactionLog().getId());
+      Assert.fail("Expected exception was not thrown");
+    } catch (RODATransactionException e) {
+      LOGGER.info("Caught expected exception: {}", e.getMessage());
+      Assert.assertTrue(mainStorage.exists(binaryStoragePath), "The first binary should exist after commit");
+      Assert.assertTrue(mainStorage.exists(containerStoragePath), "The container should exist after commit");
+      transactionManager.rollbackTransaction(context1.transactionLog().getId());
+    }
+
+    Assert.assertFalse(mainStorage.exists(binaryStoragePath), "The first binary should not exist after rollback");
+    Assert.assertFalse(mainStorage.exists(binaryStoragePath2), "The second binary should not exist after rollback");
+    Assert.assertFalse(mainStorage.exists(containerStoragePath), "The container should not exist after rollback");
+
   }
 }
