@@ -8,15 +8,11 @@
 package org.roda.core.transaction;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
@@ -26,8 +22,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
-import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.entity.transaction.TransactionLog;
 import org.roda.core.model.ModelService;
@@ -94,65 +88,74 @@ public class RODATransactionManager {
   }
 
   public void runPluginInTransaction(Plugin<IsRODAObject> plugin, List<LiteOptionalWithCause> objectsToBeProcessed)
-    throws RODATransactionException, PluginException {
+    throws PluginException {
     String requestUUID = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
       IdUtils.createUUID());
     plugin.getParameterValues().put(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID, requestUUID);
 
-    TransactionalContext context = beginTransaction(TransactionLog.TransactionRequestType.JOB,
-      UUID.fromString(requestUUID));
+    TransactionalContext context;
+    try {
+      context = beginTransaction(TransactionLog.TransactionRequestType.JOB, UUID.fromString(requestUUID));
+    } catch (RODATransactionException e) {
+      throw new PluginException("Failed to begin transaction for plugin execution", e);
+    }
+
     UUID transactionId = context.transactionLog().getId();
     LOGGER.debug("[transactionId:{}] Running the plugin {} in a transaction", transactionId, plugin.getName());
 
     Date initDate = new Date();
+    List<Report> reports;
     try {
       plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
+      reports = RODATransactionManagerUtils.getReportsForTransaction(plugin, transactionId, mainModelService);
     } catch (PluginException e) {
       LOGGER.error("[transactionId:{}] Plugin execution failed: {}", transactionId, e.getMessage(), e);
+      rollbackTransaction(transactionId);
       throw e;
+    } catch (RODATransactionException e) {
+      LOGGER.error("[transactionId:{}] Failed to retrieve transaction reports, rolling back transaction. Error: {}",
+        transactionId, e.getMessage(), e);
+      rollbackTransaction(transactionId);
+      throw new PluginException("Failed to retrieve transaction reports, transaction was rolled back", e);
     } finally {
-      processPluginExecutionResult(plugin, transactionId, initDate);
       // remove locks if any
       PluginHelper.releaseObjectLock(plugin);
     }
+
+    // Check if any of the reports indicate that the transaction should be rolled
+    // back
+    if (RODATransactionManagerUtils.shouldRollback(plugin, RODATransactionManagerUtils.getFailedReports(reports))) {
+      rollbackTransaction(transactionId);
+      processPluginExecutionResult(transactionId, initDate, reports, false);
+    } else {
+      // If everything is fine, commit the transaction
+      try {
+        endTransaction(transactionId);
+        processPluginExecutionResult(transactionId, initDate, reports, true);
+      } catch (RODATransactionException e) {
+        // If commit fails, we should attempt to rollback and log the error
+        rollbackTransaction(transactionId);
+        processPluginExecutionResult(transactionId, initDate, reports, false);
+        throw new PluginException("Failed to commit transaction for plugin execution, transaction was rolled back", e);
+      }
+    }
   }
 
-  private void processPluginExecutionResult(Plugin<IsRODAObject> plugin, UUID transactionId, Date initDate)
-    throws RODATransactionException {
+  private void processPluginExecutionResult(UUID transactionId, Date initDate, List<Report> relatedReports,
+    boolean success) {
     try {
-      Job job = mainModelService.retrieveJob(PluginHelper.getJobId(plugin));
-      List<Report> relatedReports = RODATransactionManagerUtils.getReportsForTransaction(job.getId(), transactionId,
-        mainModelService);
-
-      List<Report> failedReports = relatedReports.stream()
-        .filter(report -> PluginState.FAILURE.equals(report.getPluginState())).toList();
-
-      List<Report> nonFailedReports = relatedReports.stream()
-        .filter(report -> !PluginState.FAILURE.equals(report.getPluginState())).toList();
-
-      String noRollback = plugin.getParameterValues()
-        .getOrDefault(RodaConstants.PLUGIN_PARAM_SKIP_ROLLBACK_ON_VALIDATION_FAILURE, "");
-      Set<String> noRollbackPlugins = Arrays.stream(noRollback.split(",")).map(String::trim).filter(s -> !s.isEmpty())
-        .collect(Collectors.toSet());
-
-      boolean shouldRollback = failedReports.stream().flatMap(fr -> {
-        List<Report> nested = fr.getReports();
-        return nested == null ? Stream.empty() : nested.stream();
-      }).filter(nr -> PluginState.FAILURE.equals(nr.getPluginState())).map(Report::getPlugin)
-        .filter(java.util.Objects::nonNull).anyMatch(pluginName -> !noRollbackPlugins.contains(pluginName));
-
-      if (shouldRollback) {
-        rollbackTransaction(transactionId);
-        RODATransactionManagerUtils.createTransactionFailureReports(failedReports, nonFailedReports, transactionId,
-          initDate, mainModelService);
-      } else {
-        endTransaction(transactionId);
+      if (success) {
         RODATransactionManagerUtils.createTransactionSuccessReports(relatedReports, transactionId, initDate,
           mainModelService);
+      } else {
+        List<Report> failedReports = RODATransactionManagerUtils.getFailedReports(relatedReports);
+        List<Report> nonFailedReports = RODATransactionManagerUtils.getNonFailedReports(relatedReports);
+
+        RODATransactionManagerUtils.createTransactionFailureReports(failedReports, nonFailedReports, transactionId,
+          initDate, mainModelService);
       }
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      throw new RODATransactionException(
-        "Error handling plugin result for plugin: " + plugin.getName() + " with transaction ID: " + transactionId, e);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Critical: Failed to generate reports for transaction {}", transactionId, e);
     }
   }
 
@@ -176,29 +179,32 @@ public class RODATransactionManager {
     transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.COMMITTED);
   }
 
-  public void rollbackTransaction(UUID transactionID) throws RODATransactionException {
+  public void rollbackTransaction(UUID transactionID) {
     TransactionalContext context = transactionsContext.get(transactionID);
     if (context == null) {
-      throw new RODATransactionException("No transaction context found for ID: " + transactionID);
-    }
+      LOGGER.error("No transaction context found for ID: {}", transactionID);
+    } else {
+      try {
+        transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLING_BACK);
+        if (context.transactionalStorageService() != null) {
+          context.transactionalStorageService().rollback();
+        }
 
-    transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLING_BACK);
+        if (context.transactionalModelService() != null) {
+          context.transactionalModelService().rollback();
+        }
 
-    try {
-      if (context.transactionalStorageService() != null) {
-        context.transactionalStorageService().rollback();
+        transactionsContext.remove(transactionID);
+        transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLED_BACK);
+      } catch (Exception e) {
+        LOGGER.error("Error during rollback of transaction: {}", transactionID, e);
+        try {
+          transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLL_BACK_FAILED);
+        } catch (RODATransactionException ex) {
+          LOGGER.error("Error updating transaction log status to ROLL_BACK_FAILED for transaction: {}", transactionID,
+            ex);
+        }
       }
-
-      if (context.transactionalModelService() != null) {
-        context.transactionalModelService().rollback();
-      }
-
-      transactionsContext.remove(transactionID);
-      transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLLED_BACK);
-
-    } catch (Exception e) {
-      transactionLogService.changeStatus(transactionID, TransactionLog.TransactionStatus.ROLL_BACK_FAILED);
-      throw new RODATransactionException("Error during rollback of transaction: " + transactionID, e);
     }
   }
 
