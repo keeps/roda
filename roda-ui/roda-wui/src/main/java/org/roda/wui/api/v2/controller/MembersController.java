@@ -19,6 +19,7 @@ import java.util.function.BiConsumer;
 
 import javax.crypto.SecretKey;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.commons.lang3.StringUtils;
 import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
@@ -78,6 +79,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.NamingException;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -272,7 +274,7 @@ public class MembersController implements MembersRestService, Exportable {
   }
 
   @Override
-  public User getUser(String name) {
+  public RODAMember getUser(String name) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
@@ -281,7 +283,11 @@ public class MembersController implements MembersRestService, Exportable {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
 
-      return membersService.retrieveUser(name);
+      if (name.startsWith("user-")) {
+        return membersService.retrieveUser(name.substring("user-".length()));
+      } else {
+        return membersService.retrieveGroup(name.substring("group-".length()));
+      }
 
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
@@ -629,6 +635,136 @@ public class MembersController implements MembersRestService, Exportable {
       controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_GROUP_PARAM, modifiedGroup);
     }
     return null;
+  }
+
+  @Override
+  public User addGroupsToUser(String id, @RequestBody SelectedItemsRequest groups) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      return membersService.addGroupsToUser(id, groups);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USER_PARAM, id,
+        RodaConstants.CONTROLLER_SELECTED_ITEMS_PARAM, groups);
+    }
+  }
+
+  @Override
+  public Group addMembersToGroup(String id, @RequestBody SelectedItemsRequest members) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      return membersService.addMembersToGroup(id, members);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_GROUP_PARAM, id,
+        RodaConstants.CONTROLLER_SELECTED_ITEMS_PARAM, members);
+    }
+  }
+
+  @Override
+  public User removeGroupsFromUser(String id, String groupID) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      return membersService.removeGroupFromUser(id, groupID);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USER_PARAM, id,
+        RodaConstants.CONTROLLER_GROUP_PARAM, groupID);
+    }
+  }
+
+  @Override
+  public Group removeMembersFromGroup(String id, String userId) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      return membersService.removeMemberFromGroup(id, userId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_GROUP_PARAM, id,
+              RodaConstants.CONTROLLER_USER_PARAM, userId);
+    }
+  }
+
+  @Override
+  public Set<Group> getUserGroups(String id) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      return membersService.getGroupFromUser(id);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USER_PARAM, id);
+    }
+  }
+
+  @Override
+  public Set<User> getGroupMembers(String id) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      return membersService.getGroupMembers(id);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_GROUP_PARAM, id);
+    }
   }
 
   @Override

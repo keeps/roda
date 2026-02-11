@@ -74,7 +74,7 @@ public class ShowLogEntry extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Management.RESOLVER}, false, callback);
     }
 
     @Override
@@ -87,13 +87,8 @@ public class ShowLogEntry extends Composite {
       return "logentry";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, ShowLogEntry> {
-  }
-
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   @UiField
   Label logIdLabel;
   @UiField
@@ -144,7 +139,6 @@ public class ShowLogEntry extends Composite {
   SimplePanel expandedAuditLogs;
   @UiField
   SimplePanel expandedAuditLogsList;
-
   /**
    * Create a new panel to view a log entry
    *
@@ -228,6 +222,9 @@ public class ShowLogEntry extends Composite {
       expandedAuditLogsList.setWidget(aipsSearchWrapper);
       expandedAuditLogsList.setVisible(true);
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowLogEntry> {
   }
 
 }

@@ -2161,6 +2161,9 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_CREATE_GROUP = "org.roda.wui.api.v2.controller.MembersController.createGroup";
   public static final String PERMISSION_METHOD_UPDATE_USER = "org.roda.wui.api.v2.controller.MembersController.updateUser";
   public static final String PERMISSION_METHOD_DELETE_USER = "org.roda.wui.api.v2.controller.MembersController.deleteUser";
+  public static final String PERMISSION_METHOD_REVOKE_ACCESS_TOKEN = "org.roda.wui.api.v2.controller.MembersController.regenerateAccessKey";
+  public static final String PERMISSION_METHOD_DELETE_ACCESS_TOKEN = "org.roda.wui.api.v2.controller.MembersController.deleteAccessKey";
+  public static final String PERMISSION_METHOD_REGENERATE_ACCESS_TOKEN = "org.roda.wui.api.v2.controller.MembersController.regenerateAccessKey";
 
   public static final String PERMISSION_METHOD_CREATE_ACCESS_KEY = "org.roda.wui.api.v2.controller.MembersController.createAccessKey";
 

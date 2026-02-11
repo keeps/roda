@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.notifications.NotificationProcessor;
@@ -546,6 +547,8 @@ public interface ModelService extends ModelObservable {
 
   Group updateGroup(Group group, boolean notify, boolean isHandlingEvent)
     throws GenericException, NotFoundException, AuthorizationDeniedException;
+
+  Group updateGroupMembers(String id, Set<String> members, boolean notify,boolean isHandlingEvent) throws AuthorizationDeniedException, NotFoundException, GenericException;
 
   void deleteGroup(String id, boolean notify) throws GenericException, AuthorizationDeniedException;
 

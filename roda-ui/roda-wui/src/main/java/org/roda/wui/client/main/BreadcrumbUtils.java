@@ -19,11 +19,14 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.disposal.DisposalDestroyedRecords;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
+import org.roda.wui.client.management.members.MemberManagement;
+import org.roda.wui.client.management.members.ShowMember;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -434,6 +437,21 @@ public class BreadcrumbUtils {
     }
 
     return breadcrumbLabel;
+  }
+
+  public static List<BreadcrumbItem> getRODAMemberBreadcrumbs(RODAMember user) {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.usersAndGroupsTitle()), messages.usersAndGroupsTitle(),
+      MemberManagement.RESOLVER.getHistoryPath()));
+
+    if (user != null) {
+      List<String> path = new ArrayList<>(ShowMember.RESOLVER.getHistoryPath());
+      path.add(user.getUUID());
+      String label = user.getId();
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
+    }
+
+    return ret;
   }
 
   private static String getBreadcrumbTitle(IndexedAIP aip) {

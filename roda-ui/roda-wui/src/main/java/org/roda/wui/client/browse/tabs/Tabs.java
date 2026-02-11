@@ -120,6 +120,27 @@ public class Tabs extends Composite {
     }
   }
 
+  public void clear() {
+    tabButtons.clear();
+    tabContentWrapper.clear();
+    tabs.clear();
+    selectedTab = null;
+  }
+
+  public int getSelectedTabIndex() {
+    if (selectedTab == null) {
+      return 0; // Default to first tab
+    }
+    return tabButtons.getWidgetIndex(selectedTab);
+  }
+
+  public void selectTabByIndex(int index) {
+    if (index >= 0 && index < tabButtons.getWidgetCount()) {
+      Widget tabToSelect = tabButtons.getWidget(index);
+      selectTab(tabToSelect);
+    }
+  }
+
   public interface TabContentBuilder {
     public Widget buildTabWidget();
   }
