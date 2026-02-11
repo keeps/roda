@@ -57,8 +57,7 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   @Operation(summary = "Get user", description = "Gets a particular user", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  User getUser(
-    @Parameter(description = "The user identifier") @PathVariable(name = "id") String name);
+  RODAMember getUser(@Parameter(description = "The user identifier") @PathVariable(name = "id") String name);
 
   @RequestMapping(path = "/users/authenticated", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get authenticated user", description = "Gets the authenticated user", responses = {
@@ -70,23 +69,20 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   @Operation(summary = "Delete user", description = "Deletes an existing user", responses = {
     @ApiResponse(responseCode = "204", description = "No Content"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Void deleteUser(
-    @Parameter(description = "The user identifier") @PathVariable(name = "id") String name);
+  Void deleteUser(@Parameter(description = "The user identifier") @PathVariable(name = "id") String name);
 
   @RequestMapping(path = "/groups/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get group", description = "Gets a particular group", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Group getGroup(
-    @Parameter(description = "The group identifier") @PathVariable(name = "id") String name);
+  Group getGroup(@Parameter(description = "The group identifier") @PathVariable(name = "id") String name);
 
   @RequestMapping(path = "/groups/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(summary = "Delete group", description = "Deletes an existing group", responses = {
     @ApiResponse(responseCode = "204", description = "No Content"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Void deleteGroup(
-    @Parameter(description = "The group identifier") @PathVariable(name = "id") String name);
+  Void deleteGroup(@Parameter(description = "The group identifier") @PathVariable(name = "id") String name);
 
   @RequestMapping(path = "/users/status", method = RequestMethod.POST)
   @Operation(summary = "Activate or deactivate a RODA users via search query", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ChangeUserStatusRequest.class))), description = "Activates or deactivates RODA users", responses = {
@@ -136,6 +132,46 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   Void updateGroup(
     @Parameter(name = "group", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Group modifiedGroup);
 
+  @RequestMapping(path = "/users/{id}/addGroup", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Add group to user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = String.class))), description = "Adds a group to a user", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  User addGroupsToUser(@Parameter(description = "User identifier") @PathVariable(name = "id") String id,
+    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest request);
+
+  @RequestMapping(path = "/users/groups/{id}/addMembers", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Add group to user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = String.class))), description = "Adds a group to a user", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Group.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Group addMembersToGroup(@Parameter(description = "User identifier") @PathVariable(name = "id") String id,
+    @Parameter(name = "selectedItems", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest request);
+
+  @RequestMapping(path = "/users/{id}/removeGroup/{groupId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Remove group from user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = String.class))), description = "Removes a group from a user", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  User removeGroupsFromUser(@Parameter(description = "User identifier") @PathVariable(name = "id") String id,
+    @Parameter(description = "Group identifier") @PathVariable(name = "groupId") String groupId);
+
+  @RequestMapping(path = "/users/groups/{id}/removeMember/{userId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Remove group from user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = String.class))), description = "Removes a group from a user", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Group removeMembersFromGroup(@Parameter(description = "User identifier") @PathVariable(name = "id") String id,
+    @Parameter(description = "User identifier") @PathVariable(name = "userId") String userId);
+
+  @RequestMapping(path = "/users/{id}/groups", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get user groups", description = "Gets the groups of a user", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Group.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Set<Group> getUserGroups(@Parameter(description = "User identifier") @PathVariable(name = "id") String id);
+
+  @RequestMapping(path = "/users/groups/{id}/members", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get group members", description = "Gets members of a group", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  Set<User> getGroupMembers(@Parameter(description = "Group identifier") @PathVariable(name = "id") String id);
+
   @RequestMapping(path = "/users", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Update user", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UpdateUserRequest.class))), description = "Updates a user", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
@@ -163,14 +199,15 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StringResponse.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   StringResponse recoverLogin(@Parameter(description = "User email") @RequestParam(name = "email") String email,
-                              @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
-                              @Parameter(description = "captcha") @RequestParam(required = false, name = "captcha") String captcha);
+    @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString,
+    @Parameter(description = "captcha") @RequestParam(required = false, name = "captcha") String captcha);
 
   @RequestMapping(path = "/users/{id}/confirm", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Confirm user email", description = "Confirms a user email", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StringResponse.class))),
     @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  StringResponse confirmUserEmail(@Parameter(description = "User identifier") @PathVariable(name = "id") String username,
+  StringResponse confirmUserEmail(
+    @Parameter(description = "User identifier") @PathVariable(name = "id") String username,
     @Parameter(description = "token") @RequestParam(required = false, name = "token") String token);
 
   @RequestMapping(path = "/token", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -189,8 +226,7 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   @RequestMapping(path = "/users/{id}/resend-verification", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Resend verification email", description = "Resends verification email", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Notification.class)))})
-  Notification sendEmailVerification(
-    @Parameter(description = "User identifier") @PathVariable(name = "id") String id,
+  Notification sendEmailVerification(@Parameter(description = "User identifier") @PathVariable(name = "id") String id,
     @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
   @RequestMapping(path = "/users/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -207,8 +243,7 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   @Operation(summary = "Delete access key", description = "Deletes an access key", responses = {
     @ApiResponse(responseCode = "204", description = "No Content"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Void deleteAccessKey(
-    @Parameter(description = "The access key id") @PathVariable(name = "id") String accessKeyId);
+  Void deleteAccessKey(@Parameter(description = "The access key id") @PathVariable(name = "id") String accessKeyId);
 
   @RequestMapping(path = "/users/{id}/access-keys", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get user access keys list", description = "Gets a particular user access keys", responses = {

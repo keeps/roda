@@ -26,11 +26,11 @@ import org.roda.wui.client.disposal.Disposal;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.management.AcknowledgeNotification;
 import org.roda.wui.client.management.Management;
-import org.roda.wui.client.management.Profile;
-import org.roda.wui.client.management.RecoverLogin;
-import org.roda.wui.client.management.Register;
-import org.roda.wui.client.management.ResetPassword;
-import org.roda.wui.client.management.SetPassword;
+import org.roda.wui.client.management.members.Profile;
+import org.roda.wui.client.management.members.RecoverLogin;
+import org.roda.wui.client.management.members.Register;
+import org.roda.wui.client.management.members.ResetPassword;
+import org.roda.wui.client.management.members.SetPassword;
 import org.roda.wui.client.management.VerifyEmail;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.process.Process;
@@ -54,13 +54,10 @@ import java.util.Set;
  */
 public class ContentPanel extends SimplePanel {
 
-  private static ContentPanel instance = null;
-
-  private static ClientLogger logger = new ClientLogger(ContentPanel.class.getName());
-
   private static final Set<HistoryResolver> resolvers = new HashSet<>();
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static ContentPanel instance = null;
+  private static ClientLogger logger = new ClientLogger(ContentPanel.class.getName());
   private Widget currWidget;
   private List<String> lastHistoryTokens = null;
   private HistoryResolver lastResolver = null;

@@ -34,19 +34,17 @@ import config.i18n.client.ClientMessages;
 
 public class RodaMemberList extends AsyncTableCell<RODAMember> {
 
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_ID,
+    RodaConstants.MEMBERS_IS_USER, RodaConstants.MEMBERS_NAME, RodaConstants.MEMBERS_FULLNAME,
+    RodaConstants.MEMBERS_GROUPS, RodaConstants.MEMBERS_IS_ACTIVE);
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   private Column<RODAMember, SafeHtml> activeColumn;
   private Column<RODAMember, SafeHtml> typeColumn;
   private TextColumn<RODAMember> nameColumn;
   private TextColumn<RODAMember> fullNameColumn;
   private TextColumn<RODAMember> groupsColumn;
-
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_ID,
-    RodaConstants.MEMBERS_IS_USER, RodaConstants.MEMBERS_NAME, RodaConstants.MEMBERS_FULLNAME,
-    RodaConstants.MEMBERS_GROUPS, RodaConstants.MEMBERS_IS_ACTIVE);
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<RODAMember> options) {

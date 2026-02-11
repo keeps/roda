@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import com.google.gwt.user.client.ui.InlineHTML;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.wui.client.common.RichTextToolbar;
 
@@ -41,6 +42,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.datepicker.client.DateBox;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.common.client.tools.StringUtils;
 
 /**
  * Created by adrapereira on 13-06-2016.
@@ -568,5 +570,41 @@ public class FormUtilities {
     } catch (Exception e) {
       // do nothing
     }
+  }
+
+  public static FlowPanel buildField(String label, InlineHTML html) {
+    FlowPanel topPanel = new FlowPanel();
+    topPanel.addStyleName("descriptiveMetadata");
+    FlowPanel fieldPanel = new FlowPanel();
+    fieldPanel.setStyleName("field");
+
+    Label fieldLabel = new Label(label);
+    fieldLabel.setStyleName("label");
+
+    FlowPanel fieldValuePanel = new FlowPanel();
+    fieldValuePanel.setStyleName("value");
+    fieldValuePanel.add(html);
+
+    fieldPanel.add(fieldLabel);
+    fieldPanel.add(fieldValuePanel);
+
+    topPanel.add(fieldPanel);
+    return topPanel;
+  }
+
+  public static void addIfNotBlank(FlowPanel panel, String label, String value) {
+    if (StringUtils.isNotBlank(value)) {
+      panel.add(buildField(label, new InlineHTML(SafeHtmlUtils.htmlEscape(value))));
+    }
+  }
+
+  public static FlowPanel buildSeparator(String text) {
+    FlowPanel separator = new FlowPanel();
+    separator.addStyleName("form-separator");
+    Label separatorLabel = new Label(messages.groups());
+    separatorLabel.addStyleName("separator-label");
+    separator.add(separatorLabel);
+
+    return separator;
   }
 }

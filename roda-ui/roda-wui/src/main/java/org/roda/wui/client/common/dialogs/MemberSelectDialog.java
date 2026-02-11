@@ -18,6 +18,6 @@ public class MemberSelectDialog extends DefaultSelectDialog<RODAMember> {
     super(title,
       new ListBuilder<>(() -> new RodaMemberList(),
         new AsyncTableCellOptions<>(RODAMember.class, "MemberSelectDialog_rodaMembers").withFilter(filter)
-          .withSummary(title)));
+          .withCsvDownloadButtonVisibility(false).withSummary(title)));
   }
 }

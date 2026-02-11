@@ -11,7 +11,6 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import org.roda.wui.client.services.Services;
 
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>

@@ -7,11 +7,9 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -22,8 +20,6 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -138,56 +134,6 @@ public class Dialogs {
   public static void showInformationDialog(String title, final String message, String continueButtonText,
     boolean canCopyMessage) {
     showInformationDialog(title, message, continueButtonText, canCopyMessage, new NoAsyncCallback<>());
-  }
-
-  public static void showTechnicalMetadataInformation(String title, String downloadText, String closeText,
-    IndexedFile file, String html) {
-    final DialogBox dialogBox = new ClosableDialog(true, true);
-    FlowPanel main = new FlowPanel();
-    ScrollPanel layout = new ScrollPanel();
-    FlowPanel footer = new FlowPanel();
-    final Button downloadButton = new Button(downloadText);
-    final Button closeButton = new Button(closeText);
-    layout.setSize("70vw", "60vh");
-
-    VerticalPanel verticalPanel = new VerticalPanel();
-    verticalPanel.setWidth("100%");
-    if (html == null) {
-      html = "<div><p>No technical metadata found. Please contact system administrator</p></div>";
-    }
-    HTML keyHtml = new HTML(html);
-    keyHtml.setStyleName("value-overflow");
-    verticalPanel.add(keyHtml);
-
-    layout.add(verticalPanel);
-    layout.addStyleName("wui-dialog-message");
-
-    footer.add(closeButton);
-    footer.add(downloadButton);
-    footer.addStyleName("wui-dialog-layout-footer");
-
-    downloadButton.addStyleName("btn btn-download");
-    closeButton.addStyleName("btn btn-link");
-    main.addStyleName("wui-dialog-layout");
-    main.add(layout);
-    main.add(footer);
-
-    closeButton.addClickHandler(event -> {
-      dialogBox.hide();
-    });
-
-    downloadButton.addClickHandler(event -> {
-      SafeUri downloadUri = RestUtils.createTechnicalMetadataDownloadUri(file.getUUID());
-      Window.Location.assign(downloadUri.asString());
-    });
-
-    dialogBox.setWidget(main);
-    dialogBox.setText(title);
-    dialogBox.addStyleName("wui-dialog-information");
-    dialogBox.setGlassEnabled(true);
-    dialogBox.setAnimationEnabled(false);
-    dialogBox.center();
-    dialogBox.show();
   }
 
   public static void showInformationDialog(String title, final String message, String continueButtonText,

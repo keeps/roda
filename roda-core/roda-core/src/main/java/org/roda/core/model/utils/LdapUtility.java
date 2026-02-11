@@ -709,6 +709,10 @@ public class LdapUtility {
     return modifyGroup(modifiedGroup, false);
   }
 
+  public Group modifyGroupMembers(final Group modifiedGroup) throws NotFoundException, IllegalOperationException, GenericException {
+    return modifyGroup(modifiedGroup, true);
+  }
+
   /**
    * Removes a group.
    *
@@ -1809,6 +1813,9 @@ public class LdapUtility {
     return LdapUtils.removeFirst(dn, LdapUtils.newLdapName(ldapRootDN));
   }
 
+  public boolean isProtectedUser(String username) {
+    return this.ldapProtectedUsers.contains(username);
+  }
 
   public String transformExtra(Set<MetadataValue> values) {
     Handlebars handlebars = new Handlebars();

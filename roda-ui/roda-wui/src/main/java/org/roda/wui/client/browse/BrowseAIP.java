@@ -346,7 +346,6 @@ public class BrowseAIP extends Composite {
           });
         }
       });
-
   }
 
   private void updateSectionIdentification(BrowseAIPResponse response) {

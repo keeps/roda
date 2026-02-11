@@ -52,6 +52,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.CryptographyUtils;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.ProvidesInputStream;
@@ -214,6 +215,32 @@ public class DefaultModelService implements ModelService {
   private JobRepository jobRepository;
   private ReportRepository reportRepository;
 
+  public DefaultModelService(StorageService storage, EventsManager eventsManager, NodeType nodeType,
+    String instanceId) {
+    this.storage = storage;
+    this.eventsManager = eventsManager;
+    this.nodeType = nodeType;
+    this.instanceId = instanceId;
+    this.observers = new ArrayList<>();
+
+    if (RodaCoreFactory.checkIfWriteIsAllowed(nodeType)) {
+      ensureAllContainersExist();
+      ensureAllDirectoriesExist();
+    }
+  }
+
+  private static void clearSpecificIndexes(IndexService index, Class<IsRODAObject> objectClass,
+    IsModelObject rodaObject) throws AuthorizationDeniedException {
+    if (AIP.class.equals(objectClass)) {
+      List<String> ids = Arrays.asList(rodaObject.getId());
+      index.delete(IndexedRepresentation.class,
+        new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, ids)));
+      index.delete(IndexedFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_AIP_ID, ids)));
+      index.delete(IndexedPreservationEvent.class,
+        new Filter(new OneOfManyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, ids)));
+    }
+  }
+
   /**
    * Lazily retrieves the JobRepository bean from Spring context.
    */
@@ -239,32 +266,6 @@ public class DefaultModelService implements ModelService {
    */
   private boolean isJpaAvailable() {
     return SpringContext.isContextInitialized();
-  }
-
-  public DefaultModelService(StorageService storage, EventsManager eventsManager, NodeType nodeType,
-    String instanceId) {
-    this.storage = storage;
-    this.eventsManager = eventsManager;
-    this.nodeType = nodeType;
-    this.instanceId = instanceId;
-    this.observers = new ArrayList<>();
-
-    if (RodaCoreFactory.checkIfWriteIsAllowed(nodeType)) {
-      ensureAllContainersExist();
-      ensureAllDirectoriesExist();
-    }
-  }
-
-  private static void clearSpecificIndexes(IndexService index, Class<IsRODAObject> objectClass,
-    IsModelObject rodaObject) throws AuthorizationDeniedException {
-    if (AIP.class.equals(objectClass)) {
-      List<String> ids = Arrays.asList(rodaObject.getId());
-      index.delete(IndexedRepresentation.class,
-        new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, ids)));
-      index.delete(IndexedFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_AIP_ID, ids)));
-      index.delete(IndexedPreservationEvent.class,
-        new Filter(new OneOfManyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, ids)));
-    }
   }
 
   private void ensureAllContainersExist() {
@@ -2805,7 +2806,40 @@ public class DefaultModelService implements ModelService {
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
     }
+  }
 
+  @Override
+  public Group updateGroupMembers(String id, Set<String> members, boolean notify, boolean isHandlingEvent)
+          throws AuthorizationDeniedException, NotFoundException, GenericException {
+    boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(nodeType);
+
+    if (!writeIsAllowed && !isHandlingEvent) {
+      RodaCoreFactory.throwExceptionIfWriteIsNotAllowed();
+    }
+    Group group = UserUtility.getLdapUtility().getGroup(id);
+    group.getUsers().addAll(members);
+
+    for (String member: members) {
+      User user = UserUtility.getLdapUtility().getUser(member);
+      user.getGroups().add(id);
+      notifyUserUpdated(user).failOnError();
+    }
+
+    try {
+      Group updatedGroup = UserUtility.getLdapUtility().modifyGroupMembers(group);
+      if (notify && writeIsAllowed) {
+        notifyGroupUpdated(updatedGroup).failOnError();
+      }
+
+      if (!isHandlingEvent) {
+        // FIXME 20180813 hsilva: group is not the previous state of the group
+        eventsManager.notifyGroupUpdated(this, group, updatedGroup);
+      }
+
+      return updatedGroup;
+    } catch (IllegalOperationException e) {
+      throw new AuthorizationDeniedException("Illegal operation", e);
+    }
   }
 
   @Override
@@ -2942,8 +2976,8 @@ public class DefaultModelService implements ModelService {
   }
 
   /**
-   * Flushes a job and its reports from the database to the file storage.
-   * This method is called when a job reaches a final state.
+   * Flushes a job and its reports from the database to the file storage. This
+   * method is called when a job reaches a final state.
    */
   private void flushJobToStorage(Job job)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
@@ -3008,8 +3042,7 @@ public class DefaultModelService implements ModelService {
       if (jobRepo != null && reportRepo != null && jobRepo.existsById(jobId)) {
         // Return reports from database
         List<Report> dbReports = reportRepo.findByJobId(jobId);
-        List<OptionalWithCause<Report>> wrappedReports = dbReports.stream()
-          .map(OptionalWithCause::of)
+        List<OptionalWithCause<Report>> wrappedReports = dbReports.stream().map(OptionalWithCause::of)
           .collect(Collectors.toList());
         return CloseableIterables.fromList(wrappedReports);
       }
@@ -4081,13 +4114,13 @@ public class DefaultModelService implements ModelService {
     } else if (DescriptiveMetadata.class.equals(objectClass)) {
       ret = listDescriptiveMetadata();
     } else if (Report.class.equals(objectClass)) {
-      // Include both DB reports (for running jobs) and storage reports (for completed jobs)
+      // Include both DB reports (for running jobs) and storage reports (for completed
+      // jobs)
       CloseableIterable<OptionalWithCause<Report>> storageReports = ResourceParseUtils.convert(getStorage(),
         listReportResources(), Report.class);
       if (isJpaAvailable() && getReportRepository() != null) {
         List<Report> dbReports = getReportRepository().findAll();
-        List<OptionalWithCause<Report>> wrappedDbReports = dbReports.stream()
-          .map(OptionalWithCause::of)
+        List<OptionalWithCause<Report>> wrappedDbReports = dbReports.stream().map(OptionalWithCause::of)
           .collect(Collectors.toList());
         CloseableIterable<OptionalWithCause<Report>> dbIterable = CloseableIterables.fromList(wrappedDbReports);
         ret = CloseableIterables.concat(dbIterable, storageReports);
@@ -4102,8 +4135,7 @@ public class DefaultModelService implements ModelService {
         resourcesIterable, Job.class);
       if (isJpaAvailable() && getJobRepository() != null) {
         List<Job> dbJobs = getJobRepository().findAll();
-        List<OptionalWithCause<Job>> wrappedDbJobs = dbJobs.stream()
-          .map(OptionalWithCause::of)
+        List<OptionalWithCause<Job>> wrappedDbJobs = dbJobs.stream().map(OptionalWithCause::of)
           .collect(Collectors.toList());
         CloseableIterable<OptionalWithCause<Job>> dbIterable = CloseableIterables.fromList(wrappedDbJobs);
         ret = CloseableIterables.concat(dbIterable, storageJobs);
@@ -4144,13 +4176,13 @@ public class DefaultModelService implements ModelService {
       ret = ResourceParseUtils.convertLite(getStorage(), ResourceListUtils.listDescriptiveMetadataResources(storage),
         objectClass);
     } else if (Report.class.equals(objectClass)) {
-      // Include both DB reports (for running jobs) and storage reports (for completed jobs)
+      // Include both DB reports (for running jobs) and storage reports (for completed
+      // jobs)
       CloseableIterable<OptionalWithCause<LiteRODAObject>> storageReports = ResourceParseUtils.convertLite(getStorage(),
         listReportResources(), objectClass);
       if (isJpaAvailable() && getReportRepository() != null) {
         List<Report> dbReports = getReportRepository().findAll();
-        List<OptionalWithCause<Report>> wrappedDbReports = dbReports.stream()
-          .map(OptionalWithCause::of)
+        List<OptionalWithCause<Report>> wrappedDbReports = dbReports.stream().map(OptionalWithCause::of)
           .collect(Collectors.toList());
         CloseableIterable<OptionalWithCause<LiteRODAObject>> dbIterable = LiteRODAObjectFactory
           .transformIntoLite(CloseableIterables.fromList(wrappedDbReports));
@@ -4171,8 +4203,7 @@ public class DefaultModelService implements ModelService {
         resourcesIterable, objectClass);
       if (isJpaAvailable() && getJobRepository() != null) {
         List<Job> dbJobs = getJobRepository().findAll();
-        List<OptionalWithCause<Job>> wrappedDbJobs = dbJobs.stream()
-          .map(OptionalWithCause::of)
+        List<OptionalWithCause<Job>> wrappedDbJobs = dbJobs.stream().map(OptionalWithCause::of)
           .collect(Collectors.toList());
         CloseableIterable<OptionalWithCause<LiteRODAObject>> dbIterable = LiteRODAObjectFactory
           .transformIntoLite(CloseableIterables.fromList(wrappedDbJobs));
@@ -5266,9 +5297,10 @@ public class DefaultModelService implements ModelService {
       accessKey.setExpirationDate(expirationDate);
     }
 
-    String token = JwtUtils.generateToken(accessKey.getUserName(), accessKey.getExpirationDate());
+    String plainTextToken = JwtUtils.generateToken(accessKey.getUserName(), accessKey.getExpirationDate());
 
-    accessKey.setKey(token);
+    String hashedToken = CryptographyUtils.hashTokenSHA256(plainTextToken);
+    accessKey.setKey(hashedToken);
 
     accessKey.setCreatedOn(new Date());
     accessKey.setCreatedBy(createdBy);
@@ -5279,6 +5311,7 @@ public class DefaultModelService implements ModelService {
     StoragePath accessKeyPath = ModelUtils.getAccessKeysStoragePath(accessKey.getId());
     storage.createBinary(accessKeyPath, new StringContentPayload(accessKeyAsJson), false);
 
+    accessKey.setKey(plainTextToken);
     return accessKey;
   }
 

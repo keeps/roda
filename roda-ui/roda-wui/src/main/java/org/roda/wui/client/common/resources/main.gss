@@ -234,11 +234,12 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     /*     font-size: 75%; */
     /*     font-weight: 700; */
     line-height: 1;
-    color: #fff;
+    color: #047857;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: .25em;
+    font-weight: bold;
 }
 
 .label-danger {
@@ -248,11 +249,12 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     /*     font-size: 75%; */
     /*     font-weight: 700; */
     line-height: 1;
-    color: #fff;
+    color: #B91C3B;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: .25em;
+    font-weight: bold;
 }
 
 .label-warning {
@@ -262,11 +264,12 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     /*font-size: 75%;
     font-weight: 700;*/
     line-height: 1;
-    color: #fff;
+    color: #9b6100;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: .25em;
+    font-weight: bold;
 }
 
 .label-info {
@@ -276,11 +279,12 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     /*     font-size: 75%; */
     /*     font-weight: 700; */
     line-height: 1;
-    color: #fff;
+    color: #036d97;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: .25em;
+    font-weight: bold;
 }
 
 .label-default {
@@ -290,11 +294,12 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     /*     font-size: 75%; */
     /*     font-weight: 700; */
     line-height: 1;
-    color: #fff;
+    color: #666;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: .25em;
+    font-weight: bold;
 }
 
 .label-priority-urgent {
@@ -1189,6 +1194,14 @@ button:after {
 
 .btn-ban:after {
     content: "\e14b";
+}
+
+.btn-group:after {
+    content: "\f0c0";
+}
+
+.btn-user:after {
+    content: "\e7fe";
 }
 
 .btn-preview:after {
@@ -7215,7 +7228,8 @@ td.datePickerMonth, td.datePickerYear {
 .ri-dialog .ri-dialog-list-scroll {
     width: 800px;
     height: 400px;
-    overflow-x: scroll;
+    overflow-x: hidden !important; /* Hides the horizontal scrollbar entirely */
+    overflow-y: auto !important;   /* Adds a vertical scrollbar ONLY when content exceeds 400px */
     margin-top: 20px;
     margin-bottom: 20px;
 }
@@ -9183,11 +9197,11 @@ wui-disposal-hold-data .form-textbox {
  ******************************/
  .badge-panel {
     position: relative;
-    background-color: #e0e0e0;
+    background-color: #f5f5f5;
     display: inline-flex;
     padding: 0.7rem;
     line-height: 1;
-    color: #7f7f7f;
+    color: #666;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
@@ -9201,6 +9215,7 @@ wui-disposal-hold-data .form-textbox {
     text-align: left;
     text-transform: uppercase;
     text-decoration: none;
+    font-weight: bold;
 }
 
 .badge-panel-dark {
@@ -9713,3 +9728,146 @@ wui-disposal-hold-data .form-textbox {
     font-size: 13px;
 }
 
+
+
+/* Container and Search */
+.permissions-dashboard {
+    width: 100%;
+}
+.permissions-search-box {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Category Accordions */
+.permission-category {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    background: #fff;
+}
+
+.permission-category-header {
+    padding: 12px 15px;
+    background: #f5f5f5;
+    cursor: pointer;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between; /* Pushes title left, icon right */
+    align-items: center;            /* Vertically centers them */
+    transition: background 0.2s ease;
+}
+
+.permission-category-header.collapsed {
+    border-bottom: none;
+}
+.permission-category-header:hover {
+    background: #eaeaea;
+}
+
+/* Items container */
+.permission-category-items {
+    padding: 15px;
+
+    /* Creates responsive columns.
+       It will fit as many 350px columns as possible.
+       If the screen is small, it gracefully collapses to 1 column. */
+    column-width: 400px;
+    column-gap: 40px; /* The horizontal space between columns */
+}
+
+/* Select All styling */
+.select-all-wrapper {
+    font-weight: bold;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed #e0e0e0;
+}
+
+/* Individual permissions (Flexbox replaces HorizontalPanel) */
+.permission-category-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px; /* Adds vertical space since we removed flex gap */
+
+    /* CRITICAL: Prevents a checkbox and its label from
+       being visually ripped apart across two different columns */
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.permission-checkbox {
+    margin-right: 8px;
+}
+.permission-description {
+    cursor: pointer;
+    user-select: none;
+}
+.permission-description-off {
+    color: #999;
+}
+
+/* Right side wrapper containing Select All and Arrow */
+.permission-category-header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* Controls the small gap between the Select All checkbox and the arrow */
+}
+
+/* Header Checkbox */
+.permission-category-checkbox {
+    margin: 0;
+    cursor: pointer;
+    font-weight: normal;
+    color: #555;
+}
+
+.permission-category-title {
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    user-select: none;
+}
+
+/* Arrow Icon */
+.permission-category-icon {
+    font-size: 12px;
+    color: #888;
+    margin: 0;
+    user-select: none;
+}
+
+/* Add max-height so the dialog knows when to stop growing and start scrolling */
+.edit-permissions-dialog .wui-dialog-layout,
+.edit-user-information-dialog .wui-dialog-layout,
+.create-user-dialog .wui-dialog-layout {
+    width: 80vw;
+    max-width: 80vw !important;
+    max-height: 85vh; /* ADD THIS: Keeps the dialog within the monitor height */
+
+    /* Use flexbox to ensure internal scrolling works correctly */
+    display: flex;
+    flex-direction: column;
+}
+
+/* This will now work because we added content.addStyleName("content") in Java */
+.edit-permissions-dialog .wui-dialog-layout > .content,
+.edit-user-information-dialog .wui-dialog-layout > .content,
+.create-user-dialog .wui-dialog-layout > .content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-bottom: 20px;
+}
+
+/* Update this selector to target the class we added, instead of GWT's FlowPanel object name */
+.edit-permissions-dialog .wui-dialog-layout > .dialog-button-panel,
+.edit-user-information-dialog .wui-dialog-layout > .dialog-button-panel,
+.create-user-dialog .wui-dialog-layout > .dialog-button-panel {
+    flex-shrink: 0;
+    margin-top: 15px;
+}

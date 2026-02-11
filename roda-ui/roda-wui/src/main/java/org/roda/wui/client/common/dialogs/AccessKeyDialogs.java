@@ -8,10 +8,12 @@
 package org.roda.wui.client.common.dialogs;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.datepicker.client.DateBox;
 import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.accessKey.CreateAccessKeyRequest;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -100,17 +102,30 @@ public class AccessKeyDialogs {
     dialogBox.show();
   }
 
-  public static void showRegenerateAccessKeyDialog(String title, final AsyncCallback<Date> callback) {
+  public static void createAccessKeyDialog(String title, String tokenName, boolean create,
+                                           final AsyncCallback<CreateAccessKeyRequest> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     final Button cancelButton = new Button(messages.cancelButton());
     final Button confirmButton = new Button(messages.confirmButton());
     final FlowPanel layout = new FlowPanel();
     final FlowPanel header = new FlowPanel();
     final FlowPanel footer = new FlowPanel();
-    final Label expirationDateLabel = new Label("Expiration date");
-    final DateBox expirationDateBox = new DateBox();
-    final Label expirationDateErrorLabel = new Label("Invalid Date");
 
+    final Label tokenNameLabel = new Label(messages.accessKeyNameLabel());
+    final TextBox tokenNameTextBox = new TextBox();
+    final Label tokenNameTextBoxErrorLabel = new Label(messages.mandatoryField());
+
+    if (!create) {
+      tokenNameTextBox.setText(tokenName);
+      tokenNameTextBox.setEnabled(false);
+    }
+
+    final Label expirationDateLabel = new Label(messages.accessKeyExpirationDateLabel());
+    final DateBox expirationDateBox = new DateBox();
+    final Label expirationDateErrorLabel = new Label();
+
+    tokenNameTextBoxErrorLabel.addStyleName("form-label-error");
+    tokenNameTextBoxErrorLabel.setVisible(false);
     expirationDateErrorLabel.addStyleName("form-label-error");
     expirationDateErrorLabel.setVisible(false);
 
@@ -124,21 +139,51 @@ public class AccessKeyDialogs {
     dialogBox.setText(title);
     layout.add(header);
     layout.add(footer);
+
+    header.add(tokenNameLabel);
+    header.add(tokenNameTextBox);
+    header.add(tokenNameTextBoxErrorLabel);
+
     header.add(expirationDateLabel);
     header.add(expirationDateBox);
     header.add(expirationDateErrorLabel);
+
     footer.add(cancelButton);
     footer.add(confirmButton);
 
     confirmButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent clickEvent) {
-        Date selectedDate = expirationDateBox.getValue();
-        if (selectedDate == null || selectedDate.before(new Date())) {
-          expirationDateErrorLabel.setVisible(true);
+        boolean errors = false;
+        String name = tokenNameTextBox.getText();
+        if (create && (name == null || StringUtils.isBlank(name))) {
+          tokenNameTextBoxErrorLabel.setVisible(true);
+          errors = true;
         } else {
+          tokenNameTextBoxErrorLabel.setVisible(false);
+        }
+
+        Date selectedDate = expirationDateBox.getValue();
+        if (selectedDate == null) {
+          expirationDateErrorLabel.setVisible(true);
+          expirationDateErrorLabel.setText(messages.mandatoryField());
+          errors = true;
+        } else if (selectedDate.before(new Date())) {
+          expirationDateErrorLabel.setVisible(true);
+          expirationDateErrorLabel.setText(messages.accessKeyExpirationDateInThePast());
+          errors = true;
+        } else {
+          expirationDateErrorLabel.setVisible(false);
+        }
+
+        if (!errors) {
           dialogBox.hide();
-          callback.onSuccess(selectedDate);
+          CreateAccessKeyRequest request = new CreateAccessKeyRequest();
+          if (create) {
+            request.setName(tokenNameTextBox.getText());
+          }
+          request.setExpirationDate(selectedDate);
+          callback.onSuccess(request);
         }
       }
     });
@@ -160,6 +205,8 @@ public class AccessKeyDialogs {
     header.addStyleName("wui-dialog-message");
     footer.addStyleName("wui-dialog-layout-footer");
 
+    tokenNameLabel.addStyleName("form-label");
+    tokenNameTextBox.addStyleName("form-textbox form-textbox-small");
     expirationDateLabel.addStyleName("form-label");
     expirationDateBox.addStyleName("form-textbox form-textbox-small");
     confirmButton.addStyleName("btn btn-play");

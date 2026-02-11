@@ -148,6 +148,35 @@ public class BasicTablePanel<C> extends Composite {
     handleScrollChanges();
   }
 
+  public void removeSelectionModel() {
+    if (selectionModel != null) {
+      display.setSelectionModel(null);
+    }
+  }
+
+  /**
+   * Updates the table with new rows, clearing the previous data.
+   * * @param newRowItems An Iterator containing the new data to display.
+   */
+  public void updateData(Iterator<C> newRowItems) {
+    if (dataProvider != null) {
+      // Get the list managed by the provider
+      List<C> list = dataProvider.getList();
+
+      // Clear existing data
+      list.clear();
+
+      // Add new data
+      while (newRowItems.hasNext()) {
+        list.add(newRowItems.next());
+      }
+
+      // Note: You do not need to call refresh().
+      // Modifying the list returned by dataProvider.getList()
+      // automatically pushes the changes to the CellTable.
+    }
+  }
+
   public void handleScrollChanges() {
     if (displayScroll.getMaximumHorizontalScrollPosition() > 0) {
       double percent = displayScroll.getHorizontalScrollPosition() * 100F

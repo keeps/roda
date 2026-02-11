@@ -17,7 +17,6 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -71,7 +70,7 @@ public class EditRiskIncidence extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRole(this, callback);
     }
 
     @Override
@@ -84,51 +83,35 @@ public class EditRiskIncidence extends Composite {
       return "edit_riskincidence";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, EditRiskIncidence> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.RISK_INCIDENCE_ID, RodaConstants.RISK_INCIDENCE_RISK_ID, RodaConstants.RISK_INCIDENCE_DESCRIPTION,
     RodaConstants.RISK_INCIDENCE_STATUS, RodaConstants.RISK_INCIDENCE_SEVERITY,
     RodaConstants.RISK_INCIDENCE_DETECTED_BY, RodaConstants.RISK_INCIDENCE_DETECTED_ON,
     RodaConstants.RISK_INCIDENCE_MITIGATED_ON, RodaConstants.RISK_INCIDENCE_MITIGATED_BY,
     RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION);
-
-  private RiskIncidence incidence;
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
   Button buttonApply;
-
   @UiField
   Button buttonCancel;
-
   @UiField
   Label incidenceId;
-
   @UiField
   Label objectLabel;
-
   @UiField
   Anchor objectLink;
-
   @UiField
   Anchor riskLink;
-
   @UiField
   Label detectedOn, detectedBy;
-
   @UiField
   TextArea description;
-
   @UiField
   ListBox status, severity;
-
   @UiField
   TextArea mitigatedDescription;
+  private RiskIncidence incidence;
 
   /**
    * Create a new panel to edit incidence
@@ -225,6 +208,9 @@ public class EditRiskIncidence extends Composite {
     } else {
       Toast.showError(messages.editIncidenceFailure(caught.getMessage()));
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, EditRiskIncidence> {
   }
 
 }

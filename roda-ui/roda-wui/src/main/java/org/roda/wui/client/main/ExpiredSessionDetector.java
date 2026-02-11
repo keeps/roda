@@ -11,8 +11,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import com.google.gwt.user.client.Timer;
-import org.roda.wui.client.management.RecoverLogin;
-import org.roda.wui.client.management.Register;
+import org.roda.wui.client.management.members.RecoverLogin;
+import org.roda.wui.client.management.members.Register;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.tools.HistoryUtils;
 

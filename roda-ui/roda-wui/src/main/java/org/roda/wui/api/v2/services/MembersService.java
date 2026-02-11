@@ -15,11 +15,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.joda.time.DateTime;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -41,6 +44,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.generics.MetadataValue;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
+import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
@@ -57,8 +62,11 @@ import org.roda.core.data.v2.user.requests.UpdateUserRequest;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.LdapGroup;
+import org.roda.core.model.utils.LdapUtility;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.maintenance.ChangeRodaMemberStatusPlugin;
+import org.roda.core.repository.ldap.LdapGroupRepository;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
@@ -69,6 +77,8 @@ import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -81,6 +91,9 @@ public class MembersService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MembersService.class);
   private static final String RECAPTCHA_CODE_SECRET_PROPERTY = "ui.google.recaptcha.code.secret";
+
+  @Autowired
+  LdapGroupRepository ldapGroupRepository;
 
   private static List<String> getMemberUuidFromSelectedItems(SelectedItems<RODAMember> members)
     throws GenericException, RequestNotValidException {
@@ -202,8 +215,8 @@ public class MembersService {
     RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
   }
 
-  public Group retrieveGroup(String groupname) throws GenericException, NotFoundException {
-    return RodaCoreFactory.getModelService().retrieveGroup(groupname);
+  public Group retrieveGroup(String groupName) throws GenericException, NotFoundException {
+    return RodaCoreFactory.getModelService().retrieveGroup(groupName);
   }
 
   public Job changeActiveMembers(SelectedItems<RODAMember> selectedItems, boolean active, User user)
@@ -295,6 +308,91 @@ public class MembersService {
   public User confirmUserEmail(String username, String email, String emailConfirmationToken)
     throws InvalidTokenException, NotFoundException, GenericException {
     return RodaCoreFactory.getModelService().confirmUserEmail(username, email, emailConfirmationToken, true, true);
+  }
+
+  public User addGroupsToUser(String id, SelectedItemsRequest groups)
+    throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    if (groups instanceof SelectedItemsListRequest listRequest) {
+      User user = RodaCoreFactory.getModelService().retrieveUser(id);
+      Set<String> collect = listRequest.getIds().stream().map(m -> m.replace("group-", "")).collect(Collectors.toSet());
+      user.getGroups().addAll(collect);
+      RodaCoreFactory.getModelService().updateUser(user, null, true);
+      RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+      return user;
+    }
+
+    return new User();
+  }
+
+  public Group addMembersToGroup(String id, SelectedItemsRequest members)
+          throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException, IllegalOperationException {
+    if (members instanceof SelectedItemsListRequest listRequest) {
+      Set<String> collect = listRequest.getIds().stream().map(m -> m.replace("user-", "")).collect(Collectors.toSet());
+
+      collect.removeIf(p -> UserUtility.getLdapUtility().isProtectedUser(p));
+
+      if (collect.isEmpty()) {
+        throw new IllegalOperationException("All selected users are protected and cannot be added to the group");
+      }
+
+      Group group = RodaCoreFactory.getModelService().updateGroupMembers(id, collect, true, false);
+      RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+      return group;
+    }
+
+    return new Group();
+  }
+
+  public Set<Group> getGroupFromUser(String id) throws NotFoundException, GenericException {
+    Set<Group> groups = new HashSet<>();
+    RodaCoreFactory.getModelService().retrieveUser(id).getGroups().forEach(groupName -> {
+      try {
+        Group group = RodaCoreFactory.getModelService().retrieveGroup(groupName);
+        group.getUsers().clear();
+        groups.add(group);
+      } catch (GenericException | NotFoundException e) {
+        LOGGER.error("Error retrieving group {}", groupName, e);
+      }
+    });
+
+    return groups;
+  }
+
+  public Set<User> getGroupMembers(String id) throws NotFoundException, GenericException {
+    Set<User> members = new HashSet<>();
+    RodaCoreFactory.getModelService().retrieveGroup(id).getUsers().forEach(userId -> {
+      try {
+        User user = RodaCoreFactory.getModelService().retrieveUser(userId);
+        user.getGroups().clear();
+        user.setResetPasswordToken(null);
+        user.setResetPasswordTokenExpirationDate(null);
+        user.setEmailConfirmationToken(null);
+        user.setEmailConfirmationTokenExpirationDate(null);
+        members.add(user);
+      } catch (GenericException e) {
+        LOGGER.error("Error retrieving user {}", userId, e);
+      }
+    });
+
+    return members;
+  }
+
+  public User removeGroupFromUser(String id, String groupID)
+    throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    User user = RodaCoreFactory.getModelService().retrieveUser(id);
+    user.getGroups().remove(groupID);
+    RodaCoreFactory.getModelService().updateUser(user, null, true);
+    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+    return user;
+  }
+
+  public Group removeMemberFromGroup(String id, String userId)
+          throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    User user = RodaCoreFactory.getModelService().retrieveUser(userId);
+    user.getGroups().remove(id);
+    RodaCoreFactory.getModelService().updateUser(user, null, true);
+    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+    return RodaCoreFactory.getModelService().retrieveGroup(id);
   }
 
   public User updateUser(UpdateUserRequest request) throws GenericException, AlreadyExistsException, NotFoundException,

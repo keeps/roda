@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -2036,6 +2037,12 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   public Group updateGroup(Group group, boolean notify, boolean isHandlingEvent)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
     return mainModelService.updateGroup(group, notify, isHandlingEvent);
+  }
+
+  @Override
+  public Group updateGroupMembers(String id, Set<String> members, boolean notify, boolean isHandlingEvent)
+          throws GenericException, NotFoundException, AuthorizationDeniedException {
+    return mainModelService.updateGroupMembers(id, members, notify, isHandlingEvent);
   }
 
   @Override

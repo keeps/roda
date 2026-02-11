@@ -23,7 +23,6 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.v2.controller.RequestHandler;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.stream.FacetsCSVOutputStream;

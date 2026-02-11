@@ -7,67 +7,39 @@
  */
 package org.roda.wui.client.common.slider;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
-import org.roda.wui.client.common.actions.AipActions;
-import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
-import org.roda.wui.client.common.model.BrowseFileResponse;
 import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.management.distributed.ShowDistributedInstance;
-import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.services.Services;
-import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
-import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
 
 import config.i18n.client.ClientMessages;
 
@@ -78,72 +50,8 @@ public class InfoSliderHelper {
     // do nothing
   }
 
-  protected static <T extends IsIndexed> void updateInfoObjectSliderPanel(T object, SliderPanel slider) {
-    if (object instanceof IndexedAIP) {
-      updateInfoSliderPanel((IndexedAIP) object, slider);
-    } else if (object instanceof IndexedRepresentation) {
-      updateInfoSliderPanel((IndexedRepresentation) object, slider);
-    } else {
-      // do nothing
-    }
-  }
-
-  private static void updateInfoSliderPanel(IndexedAIP aip, SliderPanel infoSliderPanel) {
-    HashMap<String, Widget> values = new HashMap<>();
-
-    infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedAIP.class.getName())));
-
-    if (aip != null) {
-      if (StringUtils.isNotBlank(aip.getLevel())) {
-        values.put(messages.aipLevel(),
-          new InlineHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), true)));
-      }
-
-      if (StringUtils.isNotBlank(aip.getTitle())) {
-        values.put(messages.aipGenericTitle(), new InlineHTML(SafeHtmlUtils.fromString(aip.getTitle())));
-      }
-
-      if (aip.getDateInitial() != null || aip.getDateFinal() != null) {
-        values.put(messages.aipDates(), new InlineHTML(
-          SafeHtmlUtils.fromString(Humanize.getDatesText(aip.getDateInitial(), aip.getDateFinal(), true))));
-      }
-    }
-
-    populate(infoSliderPanel, values);
-  }
-
-  private static void updateInfoSliderPanel(IndexedRepresentation representation, SliderPanel infoSliderPanel) {
-    HashMap<String, Widget> values = new HashMap<>();
-
-    infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedRepresentation.class.getName())));
-
-    if (representation != null) {
-      if (StringUtils.isNotBlank(messages.representationType())) {
-        values.put(messages.representationType(),
-          new InlineHTML(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true)));
-      }
-
-      if (StringUtils.isNotBlank(messages.representationFiles())) {
-        values.put(messages.representationFiles(), new InlineHTML(SafeHtmlUtils.fromString(
-          messages.numberOfFiles(representation.getNumberOfDataFiles(), representation.getNumberOfDataFolders()))));
-      }
-
-      if (representation.getNumberOfDataFiles() + representation.getNumberOfDataFolders() > 0) {
-        values.put(messages.representationFiles(), new InlineHTML(SafeHtmlUtils.fromString(
-          messages.numberOfFiles(representation.getNumberOfDataFiles(), representation.getNumberOfDataFolders()))));
-      }
-
-      values.put(messages.representationOriginal(), new InlineHTML(SafeHtmlUtils.fromString(
-        representation.isOriginal() ? messages.originalRepresentation() : messages.alternativeRepresentation())));
-    }
-
-    populate(infoSliderPanel, values);
-  }
-
-  public static HashMap<String, Widget> getRepresentationInfoDetailsMap(BrowseRepresentationResponse response) {
-    HashMap<String, Widget> values = new HashMap<>();
+  public static Map<String, Widget> getRepresentationInfoDetailsMap(BrowseRepresentationResponse response) {
+    Map<String, Widget> values = new HashMap<>();
     IndexedRepresentation representation = response.getIndexedRepresentation();
 
     values.put(messages.representationId(), createIdHTML(response));
@@ -165,21 +73,8 @@ public class InfoSliderHelper {
     return values;
   }
 
-  public static void updateInfoSliderPanel(BrowseRepresentationResponse response, SliderPanel infoSliderPanel) {
-    IndexedRepresentation representation = response.getIndexedRepresentation();
-
-    HashMap<String, Widget> values = getRepresentationInfoDetailsMap(response);
-    infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedRepresentation.class.getName())));
-
-    addLinkIfCentralInstance(values, representation.getInstanceName(), representation.isLocalInstance(),
-      representation.getInstanceId());
-
-    populate(infoSliderPanel, values);
-  }
-
-  public static HashMap<String, Widget> getAipInfoDetailsMap(BrowseAIPResponse response) {
-    HashMap<String, Widget> values = new HashMap<>();
+  public static Map<String, Widget> getAipInfoDetailsMap(BrowseAIPResponse response) {
+    Map<String, Widget> values = new HashMap<>();
     IndexedAIP aip = response.getIndexedAIP();
 
     values.put(messages.itemId(), createIdHTML(response));
@@ -209,7 +104,6 @@ public class InfoSliderHelper {
       }
       values.put(messages.sipId(), sipIds);
     }
-
 
     if (response.getIndexedAIP().getIngestJobId() != null && !response.getIndexedAIP().getIngestJobId().isEmpty()) {
       FlowPanel jobIdsList = new FlowPanel();
@@ -257,8 +151,7 @@ public class InfoSliderHelper {
 
         if (throwable != null) {
           Toast.showError("Error fetching AIP jobs information");
-        }
-        else {
+        } else {
           jobIdsList.clear();
           jobIdsList.add(value);
         }
@@ -269,156 +162,8 @@ public class InfoSliderHelper {
     return values;
   }
 
-  public static void updateInfoSliderPanel(BrowseAIPResponse response, SliderPanel infoSliderPanel) {
-    IndexedAIP aip = response.getIndexedAIP();
-
-    HashMap<String, Widget> values = getAipInfoDetailsMap(response);
-    infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedAIP.class.getName())));
-
-    addLinkIfCentralInstance(values, response.getIndexedAIP().getInstanceName(),
-      response.getIndexedAIP().isLocalInstance(), aip.getInstanceId());
-
-    if (!response.getIndexedAIP().getPermissions().getUsers().equals(new Permissions().getUsers())
-      || !response.getIndexedAIP().getPermissions().getGroups().equals(new Permissions().getGroups())) {
-      values.put(messages.aipPermissionDetails(), createAipPermissionDetailsHTML(response.getIndexedAIP()));
-    }
-    populate(infoSliderPanel, values);
-  }
-
-  private static Widget createAipPermissionDetailsHTML(IndexedAIP aip) {
-    Permissions permissions = aip.getPermissions();
-
-    final String CSS_HAS_PERMISSION = "";
-    final String CSS_NO_PERMISSION = " slider-aip-permissions-table-icon-fade";
-
-    List<Entry<String, Set<Permissions.PermissionType>>> entryList = new ArrayList<>();
-    for (String username : new TreeSet<>(permissions.getUsernames())) {
-      entryList.add(new AbstractMap.SimpleEntry<>("u-" + username, permissions.getUserPermissions(username)));
-    }
-    for (String groupname : new TreeSet<>(permissions.getGroupnames())) {
-      entryList.add(new AbstractMap.SimpleEntry<>("g-" + groupname, permissions.getGroupPermissions(groupname)));
-    }
-
-    CellTable<Entry<String, Set<Permissions.PermissionType>>> table = new CellTable<>();
-    table.addStyleName("slider-aip-permissions-table");
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> userGroupIconColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        if (object.getKey().startsWith("u-")) {
-          return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>");
-        } else {
-          return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-users'></i>");
-        }
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> nameColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String name = object.getKey().substring(2);
-        return SafeHtmlUtils.fromSafeConstant(
-          "<span title='" + SafeHtmlUtils.htmlEscape(name) + "'>" + SafeHtmlUtils.htmlEscape(name) + "</span>");
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconReadColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String extraIconCss = object.getValue().contains(Permissions.PermissionType.READ) ? CSS_HAS_PERMISSION
-          : CSS_NO_PERMISSION;
-        return SafeHtmlUtils
-          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.READ)
-            + "' class='fa fa-eye" + extraIconCss + "'></i>");
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconCreateColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String extraIconCss = object.getValue().contains(Permissions.PermissionType.CREATE) ? CSS_HAS_PERMISSION
-          : CSS_NO_PERMISSION;
-        return SafeHtmlUtils
-          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.CREATE)
-            + "' class='fa fa-sitemap" + extraIconCss + "'></i>");
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconEditColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String extraIconCss = object.getValue().contains(Permissions.PermissionType.UPDATE) ? CSS_HAS_PERMISSION
-          : CSS_NO_PERMISSION;
-        return SafeHtmlUtils
-          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.UPDATE)
-            + "' class='fa fa-edit" + extraIconCss + "'></i>");
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconDeleteColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String extraIconCss = object.getValue().contains(Permissions.PermissionType.DELETE) ? CSS_HAS_PERMISSION
-          : CSS_NO_PERMISSION;
-        return SafeHtmlUtils
-          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.DELETE)
-            + "' class='fa fa-ban" + extraIconCss + "'></i>");
-      }
-    };
-
-    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconGrantColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
-      new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        String extraIconCss = object.getValue().contains(Permissions.PermissionType.GRANT) ? CSS_HAS_PERMISSION
-          : CSS_NO_PERMISSION;
-        return SafeHtmlUtils
-          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.GRANT)
-            + "' class='fa fa-unlock" + extraIconCss + "'></i>");
-      }
-    };
-
-    table.addColumn(userGroupIconColumn);
-    table.addColumn(nameColumn);
-    table.addColumn(iconReadColumn);
-    table.addColumn(iconCreateColumn);
-    table.addColumn(iconEditColumn);
-    table.addColumn(iconDeleteColumn);
-    table.addColumn(iconGrantColumn);
-
-    table.setColumnWidth(userGroupIconColumn, 23, Style.Unit.PX);
-    table.setColumnWidth(iconReadColumn, 23, Style.Unit.PX);
-    table.setColumnWidth(iconCreateColumn, 23, Style.Unit.PX);
-    table.setColumnWidth(iconEditColumn, 23, Style.Unit.PX);
-    table.setColumnWidth(iconDeleteColumn, 23, Style.Unit.PX);
-    table.setColumnWidth(iconGrantColumn, 23, Style.Unit.PX);
-
-    nameColumn.setCellStyleNames("nowrap slider-aip-permissions-table-name");
-
-    AipActions aipActions = AipActions.get();
-    if (aipActions.canAct(AipActions.AipAction.UPDATE_PERMISSIONS, aip).canAct()) {
-      table.addStyleName("slider-aip-permissions-table-with-grant");
-      SingleSelectionModel<Entry<String, Set<Permissions.PermissionType>>> selectionModel = new SingleSelectionModel<>(
-        item -> item.getKey().substring(2));
-      selectionModel.addSelectionChangeHandler(event -> aipActions.act(AipActions.AipAction.UPDATE_PERMISSIONS, aip));
-      table.setSelectionModel(selectionModel);
-    }
-
-    ListDataProvider<Entry<String, Set<Permissions.PermissionType>>> dataProvider = new ListDataProvider<>(entryList);
-    dataProvider.addDataDisplay(table);
-
-    return table;
-  }
-
-  public static HashMap<String, Widget> getFileInfoDetailsMap(IndexedFile file, List<String> riRules) {
-    HashMap<String, Widget> values = new HashMap<>();
+  public static Map<String, Widget> getFileInfoDetailsMap(IndexedFile file, List<String> riRules) {
+    Map<String, Widget> values = new HashMap<>();
 
     if (file != null) {
       String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
@@ -499,93 +244,6 @@ public class InfoSliderHelper {
       }
     }
     return values;
-  }
-
-  public static void createFileInfoSliderPanel(IndexedFile file, BrowseFileResponse response,
-    SliderPanel infoSliderPanel) {
-    HashMap<String, Widget> values = getFileInfoDetailsMap(file, response.getRepresentationInformationFields());
-    infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedFile.class.getName())));
-
-    Long risksCounter = response.getRiskCounterResponse().getResult();
-    Long preservationEventsCounter = response.getPreservationCounterResponse().getResult();
-
-    if (file != null) {
-      addLinkIfCentralInstance(values, file.getInstanceName(), file.isLocalInstance(), file.getInstanceId());
-
-      List<String> history = new ArrayList<>();
-      history.add(file.getAipId());
-      history.add(file.getRepresentationId());
-      history.addAll(file.getPath());
-      history.add(file.getId());
-
-      if (risksCounter >= 0) {
-        Anchor risksLink = new Anchor(messages.aipRiskIncidences(risksCounter),
-          HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, history));
-        values.put(messages.preservationRisks(), risksLink);
-      }
-
-      if (preservationEventsCounter >= 0) {
-        Anchor eventsLink = new Anchor(messages.aipEvents(preservationEventsCounter),
-          HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, file.getAipId(),
-            file.getRepresentationUUID(), file.getUUID()));
-        values.put(messages.preservationEvents(), eventsLink);
-      }
-
-      SafeUri uri = RestUtils.createTechnicalMetadataHTMLUri(file.getUUID());
-      RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
-
-      Anchor technicalInformationAnchor = new Anchor();
-      technicalInformationAnchor.setStyleName("clickable");
-      technicalInformationAnchor.setText(messages.showTechnicalMetadata());
-
-      // technicalInformation
-      try {
-        requestBuilder.sendRequest(null, new RequestCallback() {
-          @Override
-          public void onResponseReceived(Request request, Response response) {
-            if (response.getStatusCode() == 200) {
-              if (!response.getText().isEmpty()) {
-                values.put(messages.viewTechnicalInformation(), technicalInformationAnchor);
-                technicalInformationAnchor
-                  .addClickHandler(e -> Dialogs.showTechnicalMetadataInformation(messages.viewTechnicalMetadata(),
-                    messages.downloadButton(), messages.closeButton(), file, response.getText()));
-              }
-            } else {
-              values.put(messages.viewTechnicalInformation(), technicalInformationAnchor);
-              technicalInformationAnchor
-                .addClickHandler(e -> Dialogs.showTechnicalMetadataInformation(messages.viewTechnicalMetadata(),
-                  messages.downloadButton(), messages.closeButton(), file, null));
-            }
-            populate(infoSliderPanel, values);
-          }
-
-          @Override
-          public void onError(Request request, Throwable throwable) {
-            populate(infoSliderPanel, values);
-          }
-        });
-      } catch (RequestException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
-  private static void populate(SliderPanel infoSliderPanel, HashMap<String, Widget> values) {
-    for (Entry<String, Widget> entry : values.entrySet()) {
-      FlowPanel entryPanel = new FlowPanel();
-
-      Label keyLabel = new Label(entry.getKey());
-      Widget valueLabel = entry.getValue();
-
-      entryPanel.add(keyLabel);
-      entryPanel.add(valueLabel);
-      infoSliderPanel.addContent(entryPanel);
-
-      keyLabel.addStyleName("slider-info-entry-key");
-      valueLabel.addStyleName("slider-info-entry-value");
-      entryPanel.addStyleName("slider-info-entry");
-    }
   }
 
   private static FlowPanel createExtensionHTML(List<String> representationInformationFields, String extension) {
@@ -721,29 +379,5 @@ public class InfoSliderHelper {
       response.getRiRules().contains(RodaConstants.REPRESENTATION_TYPE));
 
     return panel;
-  }
-
-  public static void addLinkIfCentralInstance(Map<String, Widget> values, String instanceName, boolean localToInstance,
-    String instanceId) {
-    if (StringUtils.isNotBlank(instanceId)) {
-      String distributedMode = ConfigurationManager.getStringWithDefault(
-        RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
-      if (RodaConstants.DistributedModeType.CENTRAL.name().equals(distributedMode)) {
-        if (localToInstance) {
-          values.put(messages.distributedInstanceLabel(), new Label(instanceName));
-        } else {
-          Anchor anchor = new Anchor();
-          if (StringUtils.isNotBlank(instanceName)) {
-            anchor.setText(instanceName);
-          } else {
-            anchor.setText(instanceId);
-          }
-          anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, instanceId));
-          values.put(messages.distributedInstanceLabel(), anchor);
-        }
-      } else {
-        values.put(messages.itemInstanceId(), new Label(instanceId));
-      }
-    }
   }
 }
