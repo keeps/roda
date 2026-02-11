@@ -29,7 +29,7 @@ import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.management.Management;
-import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.management.members.MemberManagement;
 import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.Statistics;
 import org.roda.wui.client.management.UserLog;

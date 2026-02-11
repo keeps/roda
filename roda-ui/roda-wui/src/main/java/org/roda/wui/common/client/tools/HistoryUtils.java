@@ -45,10 +45,9 @@ import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
-import org.roda.wui.client.management.ShowGroup;
 import org.roda.wui.client.management.ShowLogEntry;
 import org.roda.wui.client.management.ShowNotification;
-import org.roda.wui.client.management.ShowUser;
+import org.roda.wui.client.management.members.ShowMember;
 import org.roda.wui.client.planning.ShowPreservationAgent;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.planning.ShowRisk;
@@ -412,7 +411,7 @@ public class HistoryUtils {
       path = HistoryUtils.getHistory(jobPath, ShowJobReport.RESOLVER.getHistoryToken(), report.getUUID());
     } else if (object instanceof RODAMember) {
       RODAMember member = (RODAMember) object;
-      HistoryUtils.newHistory(member.isUser() ? ShowUser.RESOLVER : ShowGroup.RESOLVER, member.getId());
+      HistoryUtils.newHistory(ShowMember.RESOLVER, member.getUUID());
     } else if (object instanceof IndexedPreservationAgent) {
       IndexedPreservationAgent agent = (IndexedPreservationAgent) object;
       HistoryUtils.newHistory(ShowPreservationAgent.RESOLVER, agent.getId());
