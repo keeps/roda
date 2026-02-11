@@ -39,7 +39,6 @@ import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
-import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -84,7 +83,7 @@ public class ShowRepresentationInformation extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRole(this, callback);
     }
 
     @Override
