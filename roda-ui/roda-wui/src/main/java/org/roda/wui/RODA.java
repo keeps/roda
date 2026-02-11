@@ -23,7 +23,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
   UserDetailsServiceAutoConfiguration.class})
 @ComponentScan(basePackages = {"org.roda.*"})
 @EnableJpaRepositories(basePackages = "org.roda.core.repository")
-@EntityScan(basePackages = "org.roda.core.entity")
+@EntityScan(basePackages = {"org.roda.core.entity", "org.roda.core.data.v2.jobs"})
 @ServletComponentScan
 @EnableScheduling
 public class RODA {

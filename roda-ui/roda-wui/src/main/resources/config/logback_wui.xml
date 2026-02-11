@@ -59,4 +59,11 @@
 	<!-- <level value="INFO" /> -->
 	<!-- <appender-ref ref="WUI_FILEOUT" /> -->
 	<!-- </logger> -->
+
+	<logger name="org.springframework" level="INFO" />
+	<logger name="org.hibernate" level="WARN" />
+	 <root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="WUI_FILEOUT" />
+	 </root>
 </included>

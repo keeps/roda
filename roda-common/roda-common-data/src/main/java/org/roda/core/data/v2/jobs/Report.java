@@ -17,11 +17,27 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.HasId;
 import org.roda.core.data.v2.ip.HasInstanceID;
 import org.roda.core.data.v2.ip.SIPInformation;
+import org.roda.core.data.v2.jpa.ReportListConverter;
+import org.roda.core.data.v2.jpa.StringListConverter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
+
+@Entity
+@Table(name = "job_reports", indexes = {@Index(name = "idx_report_job_id", columnList = "jobId")})
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Report implements IsModelObject, HasId, HasInstanceID {
   @Serial
@@ -32,39 +48,74 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
   public static final String NO_OUTCOME_OBJECT_ID = "NO_OUTCOME_ID";
   public static final String NO_OUTCOME_OBJECT_CLASS = "NO_OUTCOME_CLASS";
 
+  @Id
+  @Column(name = "id")
   private String id = "";
+  @Column(name = "job_id")
   private String jobId = "";
+  @Column(name = "source_object_id")
   private String sourceObjectId = NO_SOURCE_OBJECT_ID;
+  @Column(name = "source_object_class")
   private String sourceObjectClass = NO_SOURCE_OBJECT_CLASS;
+  @Column(name = "source_object_original_ids", columnDefinition = "TEXT")
+  @Convert(converter = StringListConverter.class)
   private List<String> sourceObjectOriginalIds = new ArrayList<>();
+  @Column(name = "source_object_original_name")
   private String sourceObjectOriginalName = "";
+  @Column(name = "outcome_object_id")
   private String outcomeObjectId = NO_OUTCOME_OBJECT_ID;
+  @Column(name = "outcome_object_class")
   private String outcomeObjectClass = NO_OUTCOME_OBJECT_CLASS;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "outcome_object_state")
   private AIPState outcomeObjectState = AIPState.getDefault();
 
+  @Column(name = "title")
   private String title = "";
+  @Column(name = "date_created")
+  @Temporal(TemporalType.TIMESTAMP)
   private Date dateCreated;
+  @Column(name = "date_updated")
+  @Temporal(TemporalType.TIMESTAMP)
   private Date dateUpdated;
+  @Column(name = "ingest_type")
   private String ingestType = "";
+  @Column(name = "completion_percentage")
   private Integer completionPercentage = 0;
+  @Column(name = "steps_completed")
   private Integer stepsCompleted = 0;
+  @Column(name = "total_steps")
   private Integer totalSteps = 0;
+  @Column(name = "plugin")
   private String plugin = "";
+  @Column(name = "plugin_name")
   private String pluginName = "";
+  @Column(name = "plugin_version")
   private String pluginVersion = "";
+  @Enumerated(EnumType.STRING)
+  @Column(name = "plugin_state")
   private PluginState pluginState = PluginState.RUNNING;
+  @Column(name = "plugin_is_mandatory")
   private Boolean pluginIsMandatory = true;
+  @Column(name = "plugin_details", columnDefinition = "TEXT")
   private String pluginDetails = "";
+  @Column(name = "html_plugin_details")
   private boolean htmlPluginDetails = false;
 
+  @Column(name = "instance_id")
   private String instanceId = null;
+  @Column(name = "transaction_id")
   private String transactionId = null;
 
+  @Transient
   @JsonIgnore
   private SIPInformation sipInformation = new SIPInformation();
 
+  @Column(name = "reports", columnDefinition = "TEXT")
+  @Convert(converter = ReportListConverter.class)
   private List<Report> reports = new ArrayList<>();
 
+  @Column(name = "line_separator")
   private String lineSeparator = "";
 
   public Report() {
@@ -106,6 +157,7 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
     this.transactionId = report.getTransactionId();
   }
 
+  @Transient
   @JsonIgnore
   @Override
   public int getClassVersion() {
