@@ -7,88 +7,78 @@
  */
 package org.roda.core.storage;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Date;
 
-import org.apache.commons.io.IOUtils;
 import org.roda.core.data.v2.ConsumesSkipableOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RangeConsumesOutputStream implements ConsumesSkipableOutputStream {
 
-  private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
-  private final Path directAccessPath;
-  private final String mediaType;
+  private static final Logger LOGGER = LoggerFactory.getLogger(RangeConsumesOutputStream.class);
 
-  public RangeConsumesOutputStream(Path directAccessPath, String mediaType) {
-    this.directAccessPath = directAccessPath;
+  private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
+  private final SeekableContentPayload payload;
+  private final String filename;
+  private final String mediaType;
+  private final Date lastModified;
+  private final long size;
+
+  public RangeConsumesOutputStream(SeekableContentPayload payload, String filename, Date lastModified, long size,
+      String mediaType) {
+    this.payload = payload;
+    this.filename = filename;
+    this.lastModified = lastModified;
+    this.size = size;
     this.mediaType = mediaType;
   }
 
-  public RangeConsumesOutputStream(Path directAccessPath) {
-    this(directAccessPath, DEFAULT_MIME_TYPE);
+  public RangeConsumesOutputStream(SeekableContentPayload payload, Binary binary) {
+    this(payload, binary, DEFAULT_MIME_TYPE);
+  }
+
+  public RangeConsumesOutputStream(SeekableContentPayload payload, Binary binary, String mediaType) {
+    this.payload = payload;
+    this.filename = binary.getStoragePath().getName();
+    this.lastModified = new Date(); // TODO missing information about binary last modified date
+    this.size = binary.getSizeInBytes();
+    this.mediaType = mediaType;
   }
 
   @Override
   public void consumeOutputStream(OutputStream out) throws IOException {
-    try (InputStream in = Files.newInputStream(directAccessPath)) {
-      IOUtils.copyLarge(in, out);
-    }
+    payload.writeTo(out, 0, getSize());
   }
 
   @Override
   public void consumeOutputStream(OutputStream out, int from, int len) throws IOException {
-    try (InputStream in = Files.newInputStream(directAccessPath)) {
-      IOUtils.copyLarge(in, out, from, len);
-    }
+    payload.writeTo(out, from, len);
   }
 
   @Override
   public void consumeOutputStream(OutputStream out, long from, long end) {
     try {
-      File file = directAccessPath.toFile();
-      byte[] buffer = new byte[1024];
-      try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r")) {
-        long pos = from;
-        randomAccessFile.seek(pos);
-        while (pos < end) {
-          randomAccessFile.read(buffer);
-          out.write(buffer);
-          pos += buffer.length;
-        }
-        out.flush();
-      }
+      payload.writeTo(out, from, end - from);
     } catch (IOException e) {
-      // ignore
+      LOGGER.warn("Error writing to output stream", e);
     }
   }
 
   @Override
   public Date getLastModified() {
-    try {
-      return new Date(Files.getLastModifiedTime(directAccessPath).toMillis());
-    } catch (IOException e) {
-      return null;
-    }
+    return lastModified;
   }
 
   @Override
   public long getSize() {
-    try {
-      return Files.size(directAccessPath);
-    } catch (IOException e) {
-      return -1;
-    }
+    return size;
   }
 
   @Override
   public String getFileName() {
-    return directAccessPath.getFileName().toString();
+    return filename;
   }
 
   @Override
