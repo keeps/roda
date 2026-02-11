@@ -417,6 +417,8 @@ public interface ClientMessages extends Messages {
 
   String cancelButton();
 
+  String updateButton();
+
   String revertButton();
 
   String removeButton();
@@ -1099,6 +1101,14 @@ public interface ClientMessages extends Messages {
   String userRemoveConfirmDialogTitle();
 
   String userRemoveConfirmDialogMessage();
+
+  String singleUserRemoveConfirmDialogTitle();
+
+  String singleGroupRemoveConfirmDialogTitle();
+
+  String singleUserRemoveConfirmDialogMessage(String username);
+
+  String singleGroupRemoveConfirmDialogMessage(String username);
 
   // Member management
 
@@ -2499,6 +2509,8 @@ public interface ClientMessages extends Messages {
 
   String createAccessKeyTitle();
 
+  String regenerateAccessKeyTitle();
+
   String showAccessKeyTitle();
 
   String editAccessKeyTitle();
@@ -2537,6 +2549,8 @@ public interface ClientMessages extends Messages {
 
   String accessKeySuccessfullyRegenerated();
 
+  String accessKeySuccessfullyDeleted();
+
   String accessKeySuccessfullyRevoked();
 
   String accessKeyDeleteConfirmationMessage();
@@ -2544,6 +2558,8 @@ public interface ClientMessages extends Messages {
   String accessKeyRevokeConfirmationMessage();
 
   String accessKeyRegenerateConfirmationMessage();
+
+  String accessKeyExpirationDateInThePast();
 
   /** Market **/
   String marketPluginsActionsTabLabel();
@@ -2639,6 +2655,61 @@ public interface ClientMessages extends Messages {
   String reasonCantActOnUser();
 
   String reasonCantActOnGroup();
+
+  // RODA Members - toolbar actions
+  String deactivateUserTitle();
+
+  String deactivateUserConfirmationMessage();
+
+  String activateUserTitle();
+
+  String activateUserConfirmationMessage();
+
+  // RODA Members - Members
+  String membersTabTitle();
+
+  String addNewGroupModalTitle();
+
+  String addToGroupButton();
+
+  String addNewMemberToGroupButton();
+
+  String groupSuccessfullyAdded();
+
+  String memberSuccessfullyAdded();
+
+  String addNewMemberToGroupTitle();
+
+  String addNewMemberAction();
+
+  String removeGroupConfirmationTitle();
+
+  String removeGroupConfirmationMessage(String group);
+
+  String groupSuccessfullyRemoved();
+
+  String removeMemberConfirmationMessage(String member);
+
+  String removeMemberConfirmationTitle();
+
+  String memberSuccessfullyRemoved();
+
+  // RODA Members - Permissions
+  String catalogueAndSearchGroupLabel();
+
+  String ingestPreservationActionsInternalActionsGroupLabel();
+
+  String administrationGroupLabel();
+
+  String planningGroupLabel();
+
+  String disposalGroupLabel();
+
+  String editPermissionsReadOnlyPermissionsText();
+
+  String permissionsUpdateWithSuccess();
+
+  String editPermissionsModalTitle();
 
   // ── Email viewer ──────────────────────────────────────────────────────────
 
