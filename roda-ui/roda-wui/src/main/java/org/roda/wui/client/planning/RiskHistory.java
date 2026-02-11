@@ -90,7 +90,7 @@ public class RiskHistory extends Composite {
   ListBox list;
 
   @UiField(provided = true)
-  RiskShowPanel oldRisk;
+  DetailsPanelRisk oldRisk;
   @UiField
   Button buttonRevert;
   @UiField
@@ -105,7 +105,7 @@ public class RiskHistory extends Composite {
     this.riskId = riskId;
     this.riskVersions = versions;
 
-    oldRisk = new RiskShowPanel("RiskHistory_riskIncidences");
+    oldRisk = new DetailsPanelRisk("RiskHistory_riskIncidences");
 
     initWidget(uiBinder.createAndBindUi(this));
     init();

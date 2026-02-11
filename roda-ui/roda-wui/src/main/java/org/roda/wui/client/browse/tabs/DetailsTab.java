@@ -14,6 +14,8 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.planning.DetailsPanelRepresentationInformation;
@@ -32,6 +34,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.planning.DetailsPanelRisk;
 
 /**
  * @author Carlos Afonso <cafonso@keep.pt>
@@ -75,6 +78,13 @@ public class DetailsTab extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     DetailsPanelTransferredResource detailsPanel = new DetailsPanelTransferredResource(resource);
+    content.add(detailsPanel);
+  }
+
+  public DetailsTab(IndexedRisk risk) {
+    initWidget(uiBinder.createAndBindUi(this));
+
+    DetailsPanelRisk detailsPanel = new DetailsPanelRisk(risk, "RiskShowPanel_riskIncidences");
     content.add(detailsPanel);
   }
 
