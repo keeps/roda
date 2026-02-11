@@ -124,8 +124,6 @@
                                 -Droda.home=${env.HOME}/.roda_local
                                 -Droda.environment.collect.version=false
                                 -Dgwt.codeServerPort=9876 -Xdebug
-                                <!-- Remove after upgrade to spring-boot 3-->
-                                -Dorg.springframework.boot.logging.LoggingSystem=none
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5007
                                 --add-opens java.base/java.util=ALL-UNNAMED
                                 --add-opens java.base/java.lang=ALL-UNNAMED
@@ -182,8 +180,6 @@
                                 -Droda.home=${env.HOME}/.roda_central
                                 -Droda.environment.collect.version=false
                                 -Dgwt.codeServerPort=9876 -Xdebug
-                                <!-- Remove after upgrade to spring-boot 3-->
-                                -Dorg.springframework.boot.logging.LoggingSystem=none
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5006
                                 --add-opens java.base/java.util=ALL-UNNAMED
                                 --add-opens java.base/java.lang=ALL-UNNAMED
@@ -238,9 +234,6 @@
                             </additionalClasspathElements>
                             <jvmArguments>
                                 -Dgwt.codeServerPort=9876 -Xdebug
-                                <!-- Remove after upgrade to spring-boot 3-->
-                                -Dorg.springframework.boot.logging.LoggingSystem=none
-                                <!-- Remove -->
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
                                 -Droda.environment.collect.version=false
                                 --add-opens java.base/java.util=ALL-UNNAMED

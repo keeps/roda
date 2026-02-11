@@ -21,6 +21,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "org.roda.core")
 @EnableJpaRepositories(basePackages = "org.roda.core.repository")
-@EntityScan(basePackages = "org.roda.core.entity")
+@EntityScan(basePackages = {"org.roda.core.entity", "org.roda.core.data.v2.jobs"})
 public class TestConfig {
 }

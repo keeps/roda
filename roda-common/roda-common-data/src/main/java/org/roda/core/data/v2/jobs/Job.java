@@ -22,14 +22,33 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.HasId;
 import org.roda.core.data.v2.ip.HasInstanceID;
 import org.roda.core.data.v2.ip.HasInstanceName;
+import org.roda.core.data.v2.jpa.JobStatsConverter;
+import org.roda.core.data.v2.jpa.JobUserDetailsListConverter;
+import org.roda.core.data.v2.jpa.ObjectMapConverter;
+import org.roda.core.data.v2.jpa.SelectedItemsConverter;
+import org.roda.core.data.v2.jpa.StringListConverter;
+import org.roda.core.data.v2.jpa.StringMapConverter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
+
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
+@Entity
+@Table(name = "jobs")
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_JOB)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -42,46 +61,79 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
     PENDING_APPROVAL, REJECTED, SCHEDULED;
   }
   // job identifier
+  @Id
+  @Column(name = "id")
   private String id = null;
   // job name
+  @Column(name = "name")
   private String name = null;
   // job creator
+  @Column(name = "username")
   private String username = null;
   // job start date
+  @Column(name = "start_date")
+  @Temporal(TemporalType.TIMESTAMP)
   private Date startDate = null;
   // job end date
+  @Column(name = "end_date")
+  @Temporal(TemporalType.TIMESTAMP)
   private Date endDate = null;
   // job state
+  @Enumerated(EnumType.STRING)
+  @Column(name = "state")
   private JOB_STATE state = null;
   // job state details
+  @Column(name = "state_details", columnDefinition = "TEXT")
   private String stateDetails = "";
 
   // job instance id
+  @Column(name = "instance_id")
   private String instanceId = null;
 
+  @Column(name = "job_users_details", columnDefinition = "TEXT")
+  @Convert(converter = JobUserDetailsListConverter.class)
   private List<JobUserDetails> jobUsersDetails = new ArrayList<>();
+  @Column(name = "instance_name")
   private String instanceName = null;
 
   // job statistics (total source objects, etc.)
+  @Column(name = "job_stats", columnDefinition = "TEXT")
+  @Convert(converter = JobStatsConverter.class)
   JobStats jobStats = new JobStats();
 
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
+  @Column(name = "plugin")
   private String plugin = null;
   // plugin type (e.g. ingest, maintenance, misc, etc.)
+  @Enumerated(EnumType.STRING)
+  @Column(name = "plugin_type")
   private PluginType pluginType = null;
   // plugin parameters
+  @Column(name = "plugin_parameters", columnDefinition = "TEXT")
+  @Convert(converter = StringMapConverter.class)
   private Map<String, String> pluginParameters = new HashMap<>();
 
   // objects to act upon (All, None, List, Filter, etc.)
+  @Column(name = "source_objects", columnDefinition = "TEXT")
+  @Convert(converter = SelectedItemsConverter.class)
   private SelectedItems<? extends IsRODAObject> sourceObjects = null;
+  @Column(name = "outcome_objects_class")
   private String outcomeObjectsClass = "";
 
+  @Column(name = "attachments_list", columnDefinition = "TEXT")
+  @Convert(converter = StringListConverter.class)
   private List<String> attachmentsList = new ArrayList<>();
 
+  @Column(name = "fields", columnDefinition = "TEXT")
+  @Convert(converter = ObjectMapConverter.class)
   private Map<String, Object> fields;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "priority")
   private JobPriority priority;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "parallelism")
   private JobParallelism parallelism;
 
   public Job() {
@@ -112,6 +164,7 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
     this.jobUsersDetails = job.getJobUsersDetails();
   }
 
+  @Transient
   @JsonIgnore
   @Override
   public int getClassVersion() {
