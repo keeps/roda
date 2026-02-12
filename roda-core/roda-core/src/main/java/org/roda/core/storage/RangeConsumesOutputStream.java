@@ -60,7 +60,7 @@ public class RangeConsumesOutputStream implements ConsumesSkipableOutputStream {
   @Override
   public void consumeOutputStream(OutputStream out, long from, long end) {
     try {
-      payload.writeTo(out, from, end - from);
+      payload.writeTo(out, from, end - from + 1);
     } catch (IOException e) {
       LOGGER.warn("Error writing to output stream", e);
     }
