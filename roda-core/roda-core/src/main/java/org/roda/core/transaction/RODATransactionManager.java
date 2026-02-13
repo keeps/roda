@@ -108,15 +108,10 @@ public class RODATransactionManager {
     try {
       plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
       reports = RODATransactionManagerUtils.getReportsForTransaction(plugin, transactionId, mainModelService);
-    } catch (PluginException e) {
-      LOGGER.error("[transactionId:{}] Plugin execution failed: {}", transactionId, e.getMessage(), e);
+    } catch (Exception e) {
+      LOGGER.error("[transactionId:{}] Error during plugin execution, rolling back transaction", transactionId, e);
       rollbackTransaction(transactionId);
-      throw e;
-    } catch (RODATransactionException e) {
-      LOGGER.error("[transactionId:{}] Failed to retrieve transaction reports, rolling back transaction. Error: {}",
-        transactionId, e.getMessage(), e);
-      rollbackTransaction(transactionId);
-      throw new PluginException("Failed to retrieve transaction reports, transaction was rolled back", e);
+      throw new PluginException("Error during plugin execution, transaction was rolled back", e);
     } finally {
       // remove locks if any
       PluginHelper.releaseObjectLock(plugin);
