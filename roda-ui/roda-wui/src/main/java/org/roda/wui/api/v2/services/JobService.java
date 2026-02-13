@@ -246,7 +246,7 @@ public class JobService {
   public StreamResponse retrieveJobAttachment(String jobId, String attachmentId) throws NotFoundException, GenericException {
     Path filePath = RodaCoreFactory.getJobAttachmentsDirectoryPath().resolve(jobId).resolve(attachmentId);
 
-    if (!RodaCoreFactory.getJobAttachmentsDirectoryPath().startsWith(filePath)) {
+    if (!filePath.startsWith(RodaCoreFactory.getJobAttachmentsDirectoryPath())) {
       throw new GenericException("Attempt to retrieve files outside the permitted scope");
     }
 
