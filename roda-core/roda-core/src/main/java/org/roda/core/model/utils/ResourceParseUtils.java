@@ -477,7 +477,7 @@ public class ResourceParseUtils {
     if (isDirectoryAcceptable(classToReturn)) {
       filtered = iterable;
     } else {
-      filtered = CloseableIterables.filter(iterable, p -> !p.isDirectory());
+      filtered = CloseableIterables.filter(iterable, p -> p != null && !p.isDirectory());
     }
 
     CloseableIterable<OptionalWithCause<R>> it;
