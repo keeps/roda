@@ -62,7 +62,9 @@ public class RangeConsumesOutputStream implements ConsumesSkipableOutputStream {
     try {
       payload.writeTo(out, from, end - from + 1);
     } catch (IOException e) {
-      LOGGER.warn("Error writing to output stream", e);
+      // This error occurs when web browser cancels stream
+      // Which can normally happen in HTTP streaming
+      LOGGER.trace("Error writing to output stream", e);
     }
   }
 
