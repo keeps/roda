@@ -186,6 +186,7 @@ import org.roda.core.util.RESTClientUtility;
 import org.roda.core.config.SpringContext;
 import org.roda.core.repository.job.JobRepository;
 import org.roda.core.repository.job.ReportRepository;
+import org.roda.core.repository.job.StepReportRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -213,6 +214,7 @@ public class DefaultModelService implements ModelService {
   // Lazy-loaded JPA repositories for hybrid Job/Report persistence
   private JobRepository jobRepository;
   private ReportRepository reportRepository;
+  private StepReportRepository stepReportRepository;
 
   /**
    * Lazily retrieves the JobRepository bean from Spring context.
@@ -232,6 +234,16 @@ public class DefaultModelService implements ModelService {
       reportRepository = SpringContext.getBean(ReportRepository.class);
     }
     return reportRepository;
+  }
+
+  /**
+   * Lazily retrieves the StepReportRepository bean from Spring context.
+   */
+  private StepReportRepository getStepReportRepository() {
+    if (stepReportRepository == null && SpringContext.isContextInitialized()) {
+      stepReportRepository = SpringContext.getBean(StepReportRepository.class);
+    }
+    return stepReportRepository;
   }
 
   /**

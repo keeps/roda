@@ -22,7 +22,6 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.HasId;
 import org.roda.core.data.v2.ip.HasInstanceID;
 import org.roda.core.data.v2.ip.HasInstanceName;
-import org.roda.core.data.v2.jpa.JobStatsConverter;
 import org.roda.core.data.v2.jpa.JobUserDetailsListConverter;
 import org.roda.core.data.v2.jpa.ObjectMapConverter;
 import org.roda.core.data.v2.jpa.SelectedItemsConverter;
@@ -96,10 +95,29 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
   @Column(name = "instance_name")
   private String instanceName = null;
 
-  // job statistics (total source objects, etc.)
-  @Column(name = "job_stats", columnDefinition = "TEXT")
-  @Convert(converter = JobStatsConverter.class)
-  JobStats jobStats = new JobStats();
+  // job statistics - expanded into separate columns
+  @Column(name = "stats_completion_percentage")
+  private int statsCompletionPercentage = 0;
+  @Column(name = "stats_source_objects_count")
+  private int statsSourceObjectsCount = 0;
+  @Column(name = "stats_source_objects_being_processed")
+  private int statsSourceObjectsBeingProcessed = 0;
+  @Column(name = "stats_source_objects_waiting_to_be_processed")
+  private int statsSourceObjectsWaitingToBeProcessed = 0;
+  @Column(name = "stats_source_objects_processed_with_success")
+  private int statsSourceObjectsProcessedWithSuccess = 0;
+  @Column(name = "stats_source_objects_processed_with_partial_success")
+  private int statsSourceObjectsProcessedWithPartialSuccess = 0;
+  @Column(name = "stats_source_objects_processed_with_failure")
+  private int statsSourceObjectsProcessedWithFailure = 0;
+  @Column(name = "stats_source_objects_processed_with_skipped")
+  private int statsSourceObjectsProcessedWithSkipped = 0;
+  @Column(name = "stats_outcome_objects_with_manual_intervention")
+  private int statsOutcomeObjectsWithManualIntervention = 0;
+
+  // Transient jobStats field for backwards compatibility with existing code
+  @Transient
+  private JobStats jobStats = null;
 
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
   @Column(name = "plugin")
@@ -258,11 +276,36 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
   }
 
   public JobStats getJobStats() {
+    // Build JobStats from individual columns for backwards compatibility
+    if (jobStats == null) {
+      jobStats = new JobStats();
+    }
+    jobStats.setCompletionPercentage(statsCompletionPercentage);
+    jobStats.setSourceObjectsCount(statsSourceObjectsCount);
+    jobStats.setSourceObjectsBeingProcessed(statsSourceObjectsBeingProcessed);
+    jobStats.setSourceObjectsWaitingToBeProcessed(statsSourceObjectsWaitingToBeProcessed);
+    jobStats.setSourceObjectsProcessedWithSuccess(statsSourceObjectsProcessedWithSuccess);
+    jobStats.setSourceObjectsProcessedWithPartialSuccess(statsSourceObjectsProcessedWithPartialSuccess);
+    jobStats.setSourceObjectsProcessedWithFailure(statsSourceObjectsProcessedWithFailure);
+    jobStats.setSourceObjectsProcessedWithSkipped(statsSourceObjectsProcessedWithSkipped);
+    jobStats.setOutcomeObjectsWithManualIntervention(statsOutcomeObjectsWithManualIntervention);
     return jobStats;
   }
 
   public void setJobStats(JobStats jobStats) {
     this.jobStats = jobStats;
+    // Sync to individual columns
+    if (jobStats != null) {
+      this.statsCompletionPercentage = jobStats.getCompletionPercentage();
+      this.statsSourceObjectsCount = jobStats.getSourceObjectsCount();
+      this.statsSourceObjectsBeingProcessed = jobStats.getSourceObjectsBeingProcessed();
+      this.statsSourceObjectsWaitingToBeProcessed = jobStats.getSourceObjectsWaitingToBeProcessed();
+      this.statsSourceObjectsProcessedWithSuccess = jobStats.getSourceObjectsProcessedWithSuccess();
+      this.statsSourceObjectsProcessedWithPartialSuccess = jobStats.getSourceObjectsProcessedWithPartialSuccess();
+      this.statsSourceObjectsProcessedWithFailure = jobStats.getSourceObjectsProcessedWithFailure();
+      this.statsSourceObjectsProcessedWithSkipped = jobStats.getSourceObjectsProcessedWithSkipped();
+      this.statsOutcomeObjectsWithManualIntervention = jobStats.getOutcomeObjectsWithManualIntervention();
+    }
   }
 
   public String getPlugin() {

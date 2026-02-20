@@ -17,20 +17,23 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.HasId;
 import org.roda.core.data.v2.ip.HasInstanceID;
 import org.roda.core.data.v2.ip.SIPInformation;
-import org.roda.core.data.v2.jpa.ReportListConverter;
 import org.roda.core.data.v2.jpa.StringListConverter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -111,9 +114,13 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
   @JsonIgnore
   private SIPInformation sipInformation = new SIPInformation();
 
-  @Column(name = "reports", columnDefinition = "TEXT")
-  @Convert(converter = ReportListConverter.class)
-  private List<Report> reports = new ArrayList<>();
+  @OneToMany(mappedBy = "parentReportId", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @OrderBy("stepOrder ASC")
+  private List<StepReport> stepReports = new ArrayList<>();
+
+  // Transient field for backwards compatibility with existing code that uses List<Report>
+  @Transient
+  private List<Report> reports = null;
 
   @Column(name = "line_separator")
   private String lineSeparator = "";
@@ -152,7 +159,8 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
     this.pluginIsMandatory = report.getPluginIsMandatory();
     this.pluginDetails = report.getPluginDetails();
     this.htmlPluginDetails = report.isHtmlPluginDetails();
-    this.reports = new ArrayList<>();
+    this.reports = null;
+    this.stepReports = new ArrayList<>();
     this.instanceId = report.getInstanceId();
     this.transactionId = report.getTransactionId();
   }
@@ -472,12 +480,25 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
       ReportUtils.calculatePluginState(getPluginState(), report.getPluginState(), report.getPluginIsMandatory()));
 
     if (!"".equals(report.getPluginDetails()) && !getPluginDetails().equals(report.getPluginDetails())) {
+      // Fix: avoid adding repeated line separators
+      String separator = (lineSeparator != null && !lineSeparator.isEmpty()) ? lineSeparator : "\n";
       setPluginDetails(
-        (!"".equals(getPluginDetails()) ? getPluginDetails() + lineSeparator : "") + report.getPluginDetails());
+        (!"".equals(getPluginDetails()) ? getPluginDetails() + separator : "") + report.getPluginDetails());
     }
     setOutcomeObjectState(report.getOutcomeObjectState());
 
+    // Add to both stepReports (JPA entity) and reports (backwards compatibility)
+    if (reports == null) {
+      reports = new ArrayList<>();
+    }
     reports.add(report);
+    
+    // Also add as StepReport
+    if (stepReports == null) {
+      stepReports = new ArrayList<>();
+    }
+    stepReports.add(new StepReport(report, this.id, stepReports.size()));
+    
     return this;
   }
 
@@ -497,13 +518,48 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
    * return newPluginState; }
    */
 
+  /**
+   * Get the step reports as a list of Report objects for backwards compatibility.
+   * If reports is null, builds it from stepReports.
+   */
   public List<Report> getReports() {
-    return reports;
+    if (reports == null && stepReports != null) {
+      reports = new ArrayList<>();
+      for (StepReport stepReport : stepReports) {
+        reports.add(stepReport.toReport());
+      }
+    }
+    return reports != null ? reports : new ArrayList<>();
   }
 
   public Report setReports(List<Report> reports) {
     this.reports = reports;
+    // Sync to stepReports
+    if (reports != null) {
+      this.stepReports = new ArrayList<>();
+      int order = 0;
+      for (Report report : reports) {
+        this.stepReports.add(new StepReport(report, this.id, order++));
+      }
+    }
     return this;
+  }
+
+  /**
+   * Get the underlying StepReport entities.
+   */
+  @JsonIgnore
+  public List<StepReport> getStepReports() {
+    return stepReports;
+  }
+
+  /**
+   * Set the underlying StepReport entities.
+   */
+  @JsonIgnore
+  public void setStepReports(List<StepReport> stepReports) {
+    this.stepReports = stepReports;
+    this.reports = null; // Reset cached reports
   }
 
   @JsonProperty("lineSeparator")
