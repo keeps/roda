@@ -300,7 +300,7 @@
                     <skip>true</skip>
                     <excludes>
                         <exclude>
-                            <groupId>org.project</groupId>
+                            <groupId>org.gwtproject</groupId>
                             <artifactId>gwt-dev</artifactId>
                         </exclude>
                     </excludes>
