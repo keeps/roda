@@ -107,6 +107,7 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${springboot.version}</version>
                         <configuration>
+                            <mainClass>org.roda.wui.RODA</mainClass>
                             <skip>false</skip>
                             <directories>
                                 <directory>${project.build.directory}/${project.build.finalName}</directory>
@@ -165,6 +166,7 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${springboot.version}</version>
                         <configuration>
+                            <mainClass>org.roda.wui.RODA</mainClass>
                             <skip>false</skip>
                             <directories>
                                 <directory>${project.build.directory}/${project.build.finalName}</directory>
@@ -223,6 +225,7 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${springboot.version}</version>
                         <configuration>
+                            <mainClass>org.roda.wui.RODA</mainClass>
                             <environmentVariables>
                                 <LDAP_SERVER_URL>ldap://localhost</LDAP_SERVER_URL>
                                 <LDAP_SERVER_PORT>1389</LDAP_SERVER_PORT>
@@ -288,6 +291,7 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${springboot.version}</version>
                         <configuration>
+                            <mainClass>org.roda.wui.RODA</mainClass>
                             <skip>false</skip>
                             <jvmArguments>
                                 -Dgwt.codeServerPort=9876 -Xdebug
