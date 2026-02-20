@@ -2965,8 +2965,9 @@ public class DefaultModelService implements ModelService {
     }
 
     // Delete job from DB
-    if (getJobRepository() != null && getJobRepository().existsById(job.getId())) {
-      getJobRepository().deleteById(job.getId());
+    JobRepository jobRepo = getJobRepository();
+    if (jobRepo != null && jobRepo.existsById(job.getId())) {
+      jobRepo.deleteById(job.getId());
     }
   }
 
@@ -2974,10 +2975,13 @@ public class DefaultModelService implements ModelService {
   public Job retrieveJob(String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     // Try to fetch from database first (for running jobs)
-    if (isJpaAvailable() && getJobRepository() != null) {
-      Optional<Job> dbJob = getJobRepository().findById(jobId);
-      if (dbJob.isPresent()) {
-        return dbJob.get();
+    if (isJpaAvailable()) {
+      JobRepository jobRepo = getJobRepository();
+      if (jobRepo != null) {
+        Optional<Job> dbJob = jobRepo.findById(jobId);
+        if (dbJob.isPresent()) {
+          return dbJob.get();
+        }
       }
     }
 
@@ -2998,13 +3002,17 @@ public class DefaultModelService implements ModelService {
   public CloseableIterable<OptionalWithCause<Report>> listJobReports(String jobId)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
     // Check if job exists in database (running job)
-    if (isJpaAvailable() && getJobRepository() != null && getJobRepository().existsById(jobId)) {
-      // Return reports from database
-      List<Report> dbReports = getReportRepository().findByJobId(jobId);
-      List<OptionalWithCause<Report>> wrappedReports = dbReports.stream()
-        .map(OptionalWithCause::of)
-        .collect(Collectors.toList());
-      return CloseableIterables.fromList(wrappedReports);
+    if (isJpaAvailable()) {
+      JobRepository jobRepo = getJobRepository();
+      ReportRepository reportRepo = getReportRepository();
+      if (jobRepo != null && reportRepo != null && jobRepo.existsById(jobId)) {
+        // Return reports from database
+        List<Report> dbReports = reportRepo.findByJobId(jobId);
+        List<OptionalWithCause<Report>> wrappedReports = dbReports.stream()
+          .map(OptionalWithCause::of)
+          .collect(Collectors.toList());
+        return CloseableIterables.fromList(wrappedReports);
+      }
     }
 
     // Fallback to storage
@@ -3021,14 +3029,18 @@ public class DefaultModelService implements ModelService {
     boolean deletedFromDb = false;
 
     // Try to delete from database first (for running jobs)
-    if (isJpaAvailable() && getJobRepository() != null && getJobRepository().existsById(jobId)) {
-      // Delete reports from DB
-      if (getReportRepository() != null) {
-        getReportRepository().deleteByJobId(jobId);
+    if (isJpaAvailable()) {
+      JobRepository jobRepo = getJobRepository();
+      ReportRepository reportRepo = getReportRepository();
+      if (jobRepo != null && jobRepo.existsById(jobId)) {
+        // Delete reports from DB
+        if (reportRepo != null) {
+          reportRepo.deleteByJobId(jobId);
+        }
+        // Delete job from DB
+        jobRepo.deleteById(jobId);
+        deletedFromDb = true;
       }
-      // Delete job from DB
-      getJobRepository().deleteById(jobId);
-      deletedFromDb = true;
     }
 
     // Also try to delete from storage (for archived jobs or cleanup)
@@ -3057,10 +3069,13 @@ public class DefaultModelService implements ModelService {
   public Report retrieveJobReport(String jobId, String jobReportId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     // Try to fetch from database first (for running jobs)
-    if (isJpaAvailable() && getReportRepository() != null) {
-      Optional<Report> dbReport = getReportRepository().findById(jobReportId);
-      if (dbReport.isPresent()) {
-        return dbReport.get();
+    if (isJpaAvailable()) {
+      ReportRepository reportRepo = getReportRepository();
+      if (reportRepo != null) {
+        Optional<Report> dbReport = reportRepo.findById(jobReportId);
+        if (dbReport.isPresent()) {
+          return dbReport.get();
+        }
       }
     }
 
@@ -3102,37 +3117,41 @@ public class DefaultModelService implements ModelService {
     }
 
     // Check if job exists in database (running job) - use DB for reports
-    if (isJpaAvailable() && getJobRepository() != null && getJobRepository().existsById(jobReport.getJobId())) {
-      try {
-        // Delete old report from DB if ID changed
-        if (oldId != null && getReportRepository() != null && getReportRepository().existsById(oldId)) {
-          getReportRepository().deleteById(oldId);
-          notifyJobReportDeleted(oldId);
+    if (isJpaAvailable()) {
+      JobRepository jobRepo = getJobRepository();
+      ReportRepository reportRepo = getReportRepository();
+      if (jobRepo != null && reportRepo != null && jobRepo.existsById(jobReport.getJobId())) {
+        try {
+          // Delete old report from DB if ID changed
+          if (oldId != null && reportRepo.existsById(oldId)) {
+            reportRepo.deleteById(oldId);
+            notifyJobReportDeleted(oldId);
+          }
+          // Save to database
+          reportRepo.save(jobReport);
+          // index it
+          notifyJobReportCreatedOrUpdated(jobReport, cachedJob).failOnError();
+        } catch (Exception e) {
+          LOGGER.error("Error creating/updating job report in database", e);
         }
-        // Save to database
-        getReportRepository().save(jobReport);
-        // index it
-        notifyJobReportCreatedOrUpdated(jobReport, cachedJob).failOnError();
-      } catch (Exception e) {
-        LOGGER.error("Error creating/updating job report in database", e);
+        return;
       }
-    } else {
-      // Fallback to storage persistence
-      try {
-        if (oldId != null) {
-          storage.deleteResource(ModelUtils.getJobReportStoragePath(jobReport.getJobId(), oldId));
-          notifyJobReportDeleted(oldId);
-        }
-
-        String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);
-        StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReport.getJobId(), jobReport.getId());
-        storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true, false, null);
-
-        // index it
-        notifyJobReportCreatedOrUpdated(jobReport, cachedJob).failOnError();
-      } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-        LOGGER.error("Error creating/updating job report in storage", e);
+    }
+    // Fallback to storage persistence
+    try {
+      if (oldId != null) {
+        storage.deleteResource(ModelUtils.getJobReportStoragePath(jobReport.getJobId(), oldId));
+        notifyJobReportDeleted(oldId);
       }
+
+      String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);
+      StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReport.getJobId(), jobReport.getId());
+      storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true, false, null);
+
+      // index it
+      notifyJobReportCreatedOrUpdated(jobReport, cachedJob).failOnError();
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error creating/updating job report in storage", e);
     }
   }
 
@@ -3153,37 +3172,41 @@ public class DefaultModelService implements ModelService {
     }
 
     // Check if job exists in database (running job) - use DB for reports
-    if (isJpaAvailable() && getJobRepository() != null && getJobRepository().existsById(jobReport.getJobId())) {
-      try {
-        // Delete old report from DB if ID changed
-        if (oldId != null && getReportRepository() != null && getReportRepository().existsById(oldId)) {
-          getReportRepository().deleteById(oldId);
-          notifyJobReportDeleted(oldId);
+    if (isJpaAvailable()) {
+      JobRepository jobRepo = getJobRepository();
+      ReportRepository reportRepo = getReportRepository();
+      if (jobRepo != null && reportRepo != null && jobRepo.existsById(jobReport.getJobId())) {
+        try {
+          // Delete old report from DB if ID changed
+          if (oldId != null && reportRepo.existsById(oldId)) {
+            reportRepo.deleteById(oldId);
+            notifyJobReportDeleted(oldId);
+          }
+          // Save to database
+          reportRepo.save(jobReport);
+          // index it
+          notifyJobReportCreatedOrUpdated(jobReport, indexJob).failOnError();
+        } catch (Exception e) {
+          LOGGER.error("Error creating/updating job report in database", e);
         }
-        // Save to database
-        getReportRepository().save(jobReport);
-        // index it
-        notifyJobReportCreatedOrUpdated(jobReport, indexJob).failOnError();
-      } catch (Exception e) {
-        LOGGER.error("Error creating/updating job report in database", e);
+        return;
       }
-    } else {
-      // Fallback to storage persistence
-      try {
-        if (oldId != null) {
-          storage.deleteResource(ModelUtils.getJobReportStoragePath(jobReport.getJobId(), oldId));
-          notifyJobReportDeleted(oldId);
-        }
-
-        String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);
-        StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReport.getJobId(), jobReport.getId());
-        storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true, false, null);
-
-        // index it
-        notifyJobReportCreatedOrUpdated(jobReport, indexJob).failOnError();
-      } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-        LOGGER.error("Error creating/updating job report in storage", e);
+    }
+    // Fallback to storage persistence
+    try {
+      if (oldId != null) {
+        storage.deleteResource(ModelUtils.getJobReportStoragePath(jobReport.getJobId(), oldId));
+        notifyJobReportDeleted(oldId);
       }
+
+      String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);
+      StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReport.getJobId(), jobReport.getId());
+      storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true, false, null);
+
+      // index it
+      notifyJobReportCreatedOrUpdated(jobReport, indexJob).failOnError();
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error creating/updating job report in storage", e);
     }
   }
 
