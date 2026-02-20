@@ -117,7 +117,7 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
 
   // Transient jobStats field for backwards compatibility with existing code
   @Transient
-  private JobStats jobStats = null;
+  private JobStats jobStats = new JobStats();
 
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
   @Column(name = "plugin")
@@ -174,7 +174,7 @@ public class Job implements IsModelObject, HasId, HasInstanceID, HasInstanceName
     this.pluginParameters = new HashMap<>(job.getPluginParameters());
     this.sourceObjects = job.getSourceObjects();
     if (sourceObjects instanceof SelectedItemsList) {
-      jobStats.setSourceObjectsCount(((SelectedItemsList<?>) sourceObjects).getIds().size());
+      getJobStats().setSourceObjectsCount(((SelectedItemsList<?>) sourceObjects).getIds().size());
     }
     this.instanceId = job.getInstanceId();
     this.instanceName = job.getInstanceName();
