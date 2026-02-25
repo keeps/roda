@@ -33,6 +33,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
@@ -79,8 +81,16 @@ import org.roda.core.index.schema.collections.RepresentationCollection;
 import org.roda.core.index.schema.collections.RiskCollection;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.lites.ParsedAIPLite;
+import org.roda.core.model.lites.ParsedDIPFileLite;
+import org.roda.core.model.lites.ParsedDIPLite;
+import org.roda.core.model.lites.ParsedFileLite;
+import org.roda.core.model.lites.ParsedLite;
+import org.roda.core.model.lites.ParsedPreservationMetadataLite;
+import org.roda.core.model.lites.ParsedRepresentationLite;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
@@ -1488,4 +1498,70 @@ public class IndexModelObserver implements ModelObserver {
     return deleteDocumentFromIndex(DisposalConfirmation.class, confirmationId);
   }
 
+  public ReturnWithExceptions<Void, ModelObserver> liteRODAObjectCreated(LiteRODAObject liteRODAObject) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    OptionalWithCause<IsRODAObject> liteObject = LiteRODAObjectFactory.get(model, liteRODAObject);
+    if (liteObject.isPresent()) {
+      IsRODAObject obj = liteObject.get();
+      if (obj instanceof AIP aip) {
+        ret.add(aipCreated(aip));
+      } else if (obj instanceof Representation rep) {
+        ret.add(representationCreated(rep));
+      } else if (obj instanceof File file) {
+        ret.add(fileCreated(file));
+      } else if (obj instanceof DIP dip) {
+        ret.add(dipCreated(dip, true));
+      } else if (obj instanceof DIPFile dipFile) {
+        ret.add(dipFileCreated(dipFile));
+      } else if (obj instanceof PreservationMetadata pm) {
+        ret.add(preservationMetadataCreated(pm));
+      }
+    }
+    return ret;
+  }
+
+  public ReturnWithExceptions<Void, ModelObserver> liteRODAObjectUpdated(LiteRODAObject liteRODAObject) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    OptionalWithCause<IsRODAObject> liteObject = LiteRODAObjectFactory.get(model, liteRODAObject);
+    if (liteObject.isPresent()) {
+      IsRODAObject obj = liteObject.get();
+      if (obj instanceof AIP aip) {
+        ret.add(aipUpdated(aip));
+      } else if (obj instanceof Representation rep) {
+        ret.add(representationUpdated(rep));
+      } else if (obj instanceof File file) {
+        ret.add(fileUpdated(file));
+      } else if (obj instanceof DIP dip) {
+        ret.add(dipUpdated(dip, true));
+      } else if (obj instanceof DIPFile dipFile) {
+        ret.add(dipFileUpdated(dipFile));
+      } else if (obj instanceof PreservationMetadata pm) {
+        ret.add(preservationMetadataUpdated(pm));
+      }
+    }
+    return ret;
+  }
+
+  public ReturnWithExceptions<Void, ModelObserver> liteRODAObjectDeleted(LiteRODAObject liteRODAObject) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    OptionalWithCause<ParsedLite> parsed = ParsedLite.parse(liteRODAObject);
+    if (parsed.isPresent()) {
+      ParsedLite lite = parsed.get();
+      if (lite instanceof ParsedAIPLite aip) {
+        ret.add(aipDeleted(aip.getId(), true));
+
+      } else if (lite instanceof ParsedRepresentationLite rep) {
+        ret.add(representationDeleted(rep.getAipId(), rep.getId(), true));
+      } else if (lite instanceof ParsedFileLite file) {
+        ret.add(fileDeleted(file.getAipId(), file.getRepresentationId(), file.getDirectoryPath(), file.getId(), true));
+      } else if (lite instanceof ParsedDIPLite dip) {
+        ret.add(dipDeleted(dip.getId(), true));
+      } else if (lite instanceof ParsedDIPFileLite dipFile) {
+        ret.add(dipFileDeleted(dipFile.getId(), dipFile.getDirectoryPath(), dipFile.getFileId()));
+      } else if (lite instanceof ParsedPreservationMetadataLite pm) {
+        ret.add(preservationMetadataDeleted(new PreservationMetadata(pm.getId(), pm.getType())));
+      }
+    }
+    return ret;
+  }
 }
