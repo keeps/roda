@@ -65,8 +65,8 @@ public class DeleteAIPPermissionTest {
   private static LdapUtilityTestHelper ldapUtilityTestHelper;
 
   @BeforeMethod
-  public static void setUp() throws Exception {
-    basePath = TestsHelper.createBaseTempDir(FileStorageServiceTest.class, true);
+  public void setUp() throws Exception {
+    basePath = TestsHelper.createBaseTempDir(this.getClass(), true);
     ldapUtilityTestHelper = new LdapUtilityTestHelper();
 
     RodaCoreFactory.instantiateTest(true, true, true, true, true, false, false, ldapUtilityTestHelper.getLdapUtility());
