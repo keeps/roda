@@ -320,7 +320,10 @@ public final class ModelUtils {
     }
     if (StringUtils.isNotBlank(fileId)) {
       path.add(fileId);
+    } else {
+      throw new RequestNotValidException("File ID cannot be null or blank");
     }
+
     return DefaultStoragePath.parse(path);
   }
 
