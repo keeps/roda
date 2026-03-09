@@ -1,5 +1,51 @@
 # Changelog
 
+## v5.7.14 (09/03/2026)
+#### New features 
+
+#### Bug fixes
+
+- Fix File Integrity Verifier plug-in
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v6.0.2 (23/01/2026)
+#### Enhancements 
+
+- Add configuration to setup an HTTP header when using the HTTPNotificationProcessor 58791d11da136d1d05d3bbfa1338434d80dc090d
+- Enhance support for representation status other than Original when ingesting a E-ARK SIP package be884ca54d358c7be71d7cd52c49b899c8925abd
+- Rename filesystem StorageService copy to export and mark as READ operation #3555
+- Update HTTPUtility with Bearer access token authentication GET and DELETE methods #3563
+- Skip Rollback on Validation Failure #3572
+- Refactor DIP/File actions #3576
+- Improve audit logs #3576
+- Add pagination to side bar card lists (Representation and Dissemination) #3577
+- Fix PT-PT translation bugs and update breadcrumb styling #3578 - Hide home button in header when user is not authenticated #3579
+
+#### Bug fixes
+- Fix techMD ingest validation, repeated representation techMD types, and align UI technical metadata visibility #3581
+-  Tests and fixes AIP delete permission checks on relatives, resolves incorrect nested iteration on transactional reports #3580
+- Fix technical metadata URN, File collision and Solr indexing inconsistencies #3561
+- Add UTF-8 encoding when downloading files with non-ASCII characteres 144c4c21d2f39458f2d73c10817dba8a4a45e04c
+- Storing the reason for created events https://github.com/keeps/roda/commit/aa4781eb89fec469ead45b67a9a9cfbdf762d205
+- Fixed incorrect HTTP error code when using REST-API and Bearer authentication 572bf3e65292ed92bc644f4c878ffdcc12b061bc
+- Fixed truncated iframe in BitstreamPreview #3524
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+
+---
+
 ## v5.7.13 (19/01/2026)
 #### Enhancements 
 - Added translations to access key management 
@@ -367,32 +413,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.3.1 (11/01/2024)
-#### Bug fixes:
-- Changed default permissions to old behaviour #3043
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.3.0 (14/12/2023)
-#### Enhancement:
-- Added tool tip to plugin license verification panel #2974
-#### New features:
-- Added permissions configuration for newly created AIPs #3032
-#### Bug fixes:
-- Unable to perform actions even having right permissions #2986
-- Ingest jobs created in RODA 4 cannot be accessed on the interface of RODA 5 #3037
-- Problem using index REST API without filter #2962
-#### Security:
-- Several dependency upgrades to fix security vulnerabilities
 
 ---
 
