@@ -35,10 +35,10 @@ import config.i18n.client.ClientMessages;
  * @author Alexandre Flores <aflores@keep.pt>
  */
 public class RepresentationDisseminationCardList extends ThumbnailCardList<IndexedDIP> {
-  public RepresentationDisseminationCardList(String aipId, String representationId, Sorter sorter, int cardsTotal) {
+  public RepresentationDisseminationCardList(String aipId, String representationUUID, Sorter sorter, int cardsTotal) {
     super(messages.someOfAObject(IndexedDIP.class.getName()),
       ConfigurationManager.getString(RodaConstants.UI_ICONS_CLASS, IndexedDIP.class.getSimpleName()), IndexedDIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_IDS, representationId)),
+      new Filter(new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, representationUUID)),
       new CardBuilder<IndexedDIP>() {
         @Override
         public ThumbnailCard constructCard(ClientMessages messages, IndexedDIP dip) {
