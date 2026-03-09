@@ -193,7 +193,7 @@ public class BrowseRepresentation extends Composite {
 
       // CARDS
       if (dipCounterResponse.getResult() > 0) {
-        this.disseminationCards.add(new RepresentationDisseminationCardList(aipId, repId, SorterUtils.representationDefault(), dipCounterResponse.getResult().intValue()));
+        this.disseminationCards.add(new RepresentationDisseminationCardList(aipId, repUUID, SorterUtils.representationDefault(), dipCounterResponse.getResult().intValue()));
       } else {
         this.sidePanel.setVisible(false);
       }
