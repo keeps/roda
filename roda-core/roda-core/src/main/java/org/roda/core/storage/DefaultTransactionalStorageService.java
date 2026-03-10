@@ -290,6 +290,11 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     NotFoundException {
     TransactionalStoragePathOperationLog operationLog;
     // if storage path is agent we need to register a create or update operation
+
+    if (mainStorageService.exists(storagePath)) {
+      throw new AlreadyExistsException("Binary already exists: " + storagePath);
+    }
+
     if (storagePath.getDirectoryPath() != null && !storagePath.getDirectoryPath().isEmpty()
       && storagePath.getDirectoryPath().getFirst().equals(RodaConstants.STORAGE_DIRECTORY_AGENTS)) {
       operationLog = registerOperation(storagePath, OperationType.CREATE_OR_UPDATE);
