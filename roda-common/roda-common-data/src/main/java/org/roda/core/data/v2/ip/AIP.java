@@ -51,10 +51,15 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   private Boolean ghost = null;
   private Boolean hasShallowFiles = false;
 
-  @Deprecated(forRemoval = true, since = "6.0.2")
+  /**
+   * @deprecated As of 6.0.2, going to be removed in 7.0.0.
+   */
   private AIPFormat format;
 
-  @Deprecated(forRemoval = true, since = "6.0.2")
+  /**
+   * @deprecated As of 6.0.2, going to be removed in 7.0.0.
+   */
+
   private List<Relationship> relationships;
 
   private Date createdOn = null;
@@ -270,40 +275,34 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   public void addTechnicalMetadata(TechnicalMetadata technicalMetadata) {
     if (!technicalMetadata.isFromAIP()) {
       for (Representation representation : this.representations) {
-        if (representation.getId().equals(technicalMetadata.getRepresentationId() )) {
-            representation.addTechnicalMetadata(technicalMetadata);
-            break;
+        if (representation.getId().equals(technicalMetadata.getRepresentationId())) {
+          representation.addTechnicalMetadata(technicalMetadata);
+          break;
         }
       }
     }
   }
 
-  @Deprecated(forRemoval = true, since = "6.0.2")
   public AIPFormat getFormat() {
     return format;
   }
 
-  @Deprecated(forRemoval = true, since = "6.0.2")
   public void setFormat(AIPFormat format) {
     this.format = format;
   }
 
-  @Deprecated(forRemoval = true, since = "6.0.2")
   public void setFormat(String name, String version) {
     this.format = new AIPFormat(name, version);
   }
 
-  @Deprecated(forRemoval = true, since = "6.0.2")
   public List<Relationship> getRelationships() {
     return relationships;
   }
 
-  @Deprecated(forRemoval = true, since = "6.0.2")
   public void setRelationships(List<Relationship> relationships) {
     this.relationships = relationships;
   }
 
-  @Deprecated(forRemoval = true, since = "6.0.2")
   public void addRelationship(Relationship relationship) {
     if (relationships == null) {
       relationships = new ArrayList<>();
