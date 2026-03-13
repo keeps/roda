@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+    <eventIdentifier>
+        <eventIdentifierType>URN</eventIdentifierType>
+        <eventIdentifierValue>urn:roda:premis:event:2decab05-8246-4753-9fe2-3617454757bd</eventIdentifierValue>
+    </eventIdentifier>
+    <eventType>format identification</eventType>
+    <eventDateTime>2026-02-06T17:17:44.496Z</eventDateTime>
+    <eventDetailInformation>
+        <eventDetail>Identified the object's file formats and versions using Siegfried.</eventDetail>
+    </eventDetailInformation>
+    <eventOutcomeInformation>
+        <eventOutcome>SUCCESS</eventOutcome>
+        <eventOutcomeDetail>
+            <eventOutcomeDetailNote>File formats were identified and recorded in PREMIS objects.</eventOutcomeDetailNote>
+        </eventOutcomeDetail>
+    </eventOutcomeInformation>
+    <linkingAgentIdentifier>
+        <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+        <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.base.characterization.SiegfriedPlugin@1.11.0</linkingAgentIdentifierValue>
+    </linkingAgentIdentifier>
+    <linkingAgentIdentifier>
+        <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+        <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+        <linkingAgentRole>implementer</linkingAgentRole>
+    </linkingAgentIdentifier>
+    <linkingObjectIdentifier>
+        <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+        <linkingObjectIdentifierValue>urn:roda:FILE:4e69b3bb-406d-3c13-bc4e-386791f27b9a</linkingObjectIdentifierValue>
+        <linkingObjectRole>source</linkingObjectRole>
+    </linkingObjectIdentifier>
+    <linkingObjectIdentifier>
+        <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+        <linkingObjectIdentifierValue>urn:roda:FILE:e8c301d4-9847-389f-aa28-77a3edb87289</linkingObjectIdentifierValue>
+        <linkingObjectRole>source</linkingObjectRole>
+    </linkingObjectIdentifier>
+    <linkingObjectIdentifier>
+        <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+        <linkingObjectIdentifierValue>urn:roda:FILE:7ddd5ebc-6cea-3905-a76f-702dd8cacdb2</linkingObjectIdentifierValue>
+        <linkingObjectRole>source</linkingObjectRole>
+    </linkingObjectIdentifier>
+    <linkingObjectIdentifier>
+        <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+        <linkingObjectIdentifierValue>urn:roda:FILE:dd39e79f-5f4b-3e95-85a7-f68f5e864ab1</linkingObjectIdentifierValue>
+        <linkingObjectRole>source</linkingObjectRole>
+    </linkingObjectIdentifier>
+</event>

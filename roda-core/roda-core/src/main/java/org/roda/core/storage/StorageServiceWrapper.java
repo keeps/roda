@@ -20,6 +20,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.ip.StoragePath;
 
 public class StorageServiceWrapper implements StorageService {
@@ -183,6 +184,14 @@ public class StorageServiceWrapper implements StorageService {
     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
     storageService.copy(fromService, fromStoragePath, toPath, resource, replaceExisting);
+  }
+
+  @Override
+  public void importObject(StorageService fromService, LiteRODAObject object, StoragePath toStoragePath,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException,
+    NotFoundException, RequestNotValidException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    storageService.importObject(fromService, object, toStoragePath, replaceExisting);
   }
 
   @Override

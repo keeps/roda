@@ -128,13 +128,14 @@
         <solr.version>9.10.0</solr.version>
         <pekko.version>1.1.4</pekko.version>
         <httpcomponents.version>5.5</httpcomponents.version>
-        <commons_ip2.version>2.10.0</commons_ip2.version>
+        <commons_ip2.version>2.11.2</commons_ip2.version>
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
         <springboot.version>3.4.10</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
         <logback.version>1.5.25</logback.version>
+        <mockito.version>5.18.0</mockito.version>
     </properties>
     <profiles>
         <profile>
@@ -299,7 +300,7 @@
                     <skip>true</skip>
                     <excludes>
                         <exclude>
-                            <groupId>org.project</groupId>
+                            <groupId>org.gwtproject</groupId>
                             <artifactId>gwt-dev</artifactId>
                         </exclude>
                     </excludes>
@@ -438,6 +439,21 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.20.0</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${springboot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
                 <version>6.1.0</version>
@@ -477,21 +493,6 @@
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>4.0.5</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
-                <artifactId>jackson-bom</artifactId>
-                <version>2.20.0</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <!-- Import dependency management from Spring Boot -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${springboot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.gwtproject</groupId>
@@ -760,19 +761,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.18.0</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-api-mockito2</artifactId>
-                <version>2.0.9</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-module-junit4</artifactId>
-                <version>1.7.4</version>
+                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
             <!-- REST API related dependencies - start -->
@@ -863,6 +852,11 @@
                 <groupId>org.apache.httpcomponents.client5</groupId>
                 <artifactId>httpclient5</artifactId>
                 <version>5.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5</artifactId>
+                <version>5.4</version>
             </dependency>
             <!-- Templating system dependencies -->
             <dependency>

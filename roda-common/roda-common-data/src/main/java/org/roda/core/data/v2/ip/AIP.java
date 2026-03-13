@@ -51,7 +51,15 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   private Boolean ghost = null;
   private Boolean hasShallowFiles = false;
 
+  /**
+   * @deprecated As of 6.0.2, going to be removed in 7.0.0.
+   */
   private AIPFormat format;
+
+  /**
+   * @deprecated As of 6.0.2, going to be removed in 7.0.0.
+   */
+
   private List<Relationship> relationships;
 
   private Date createdOn = null;
@@ -267,9 +275,9 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   public void addTechnicalMetadata(TechnicalMetadata technicalMetadata) {
     if (!technicalMetadata.isFromAIP()) {
       for (Representation representation : this.representations) {
-        if (representation.getId().equals(technicalMetadata.getRepresentationId() )) {
-            representation.addTechnicalMetadata(technicalMetadata);
-            break;
+        if (representation.getId().equals(technicalMetadata.getRepresentationId())) {
+          representation.addTechnicalMetadata(technicalMetadata);
+          break;
         }
       }
     }
