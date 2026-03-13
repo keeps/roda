@@ -51,7 +51,10 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   private Boolean ghost = null;
   private Boolean hasShallowFiles = false;
 
+  @Deprecated(forRemoval = true, since = "6.0.2")
   private AIPFormat format;
+
+  @Deprecated(forRemoval = true, since = "6.0.2")
   private List<Relationship> relationships;
 
   private Date createdOn = null;
@@ -275,26 +278,32 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     }
   }
 
+  @Deprecated(forRemoval = true, since = "6.0.2")
   public AIPFormat getFormat() {
     return format;
   }
 
+  @Deprecated(forRemoval = true, since = "6.0.2")
   public void setFormat(AIPFormat format) {
     this.format = format;
   }
 
+  @Deprecated(forRemoval = true, since = "6.0.2")
   public void setFormat(String name, String version) {
     this.format = new AIPFormat(name, version);
   }
 
+  @Deprecated(forRemoval = true, since = "6.0.2")
   public List<Relationship> getRelationships() {
     return relationships;
   }
 
+  @Deprecated(forRemoval = true, since = "6.0.2")
   public void setRelationships(List<Relationship> relationships) {
     this.relationships = relationships;
   }
 
+  @Deprecated(forRemoval = true, since = "6.0.2")
   public void addRelationship(Relationship relationship) {
     if (relationships == null) {
       relationships = new ArrayList<>();
