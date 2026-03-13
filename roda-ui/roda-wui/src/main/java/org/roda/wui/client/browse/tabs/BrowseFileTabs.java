@@ -29,6 +29,8 @@ import org.roda.wui.client.services.Services;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Widget;
 
+import java.util.Arrays;
+
 /**
  *
  * @author Alexandre Flores <aflores@keep.pt>
@@ -67,10 +69,16 @@ public class BrowseFileTabs extends Tabs {
       @Override
       public Widget buildTabWidget() {
         SearchWrapper riskIncidences = new SearchWrapper(false);
-        riskIncidences.createListAndSearchPanel(new ListBuilder<>(() -> new RiskIncidenceList(),
-          new AsyncTableCellOptions<>(RiskIncidence.class, "BrowseFile_riskIncidences")
-            .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, file.getId())))
-            .withJustActive(justActive).bindOpener()));
+        riskIncidences
+          .createListAndSearchPanel(
+            new ListBuilder<>(() -> new RiskIncidenceList(),
+              new AsyncTableCellOptions<>(RiskIncidence.class, "BrowseFile_riskIncidences")
+                .withFilter(new Filter(
+                  Arrays.asList(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, file.getId()),
+                    new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID,
+                      file.getRepresentationId()),
+                    new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, file.getAipId()))))
+                .withJustActive(justActive).bindOpener()));
         return riskIncidences;
       }
     });
