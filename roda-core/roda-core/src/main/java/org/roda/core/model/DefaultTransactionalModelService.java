@@ -2288,6 +2288,10 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public RiskIncidence createRiskIncidence(RiskIncidence riskIncidence, boolean commit)
     throws AlreadyExistsException, NotFoundException, AuthorizationDeniedException, GenericException {
+    if (riskIncidence.getRiskId() != null) {
+      riskIncidence.setId(IdUtils.createUUID());
+    }
+
     TransactionalModelOperationLog operationLog = operationRegistry
       .registerOperationForRiskIncidence(riskIncidence.getId(), OperationType.CREATE);
     try {
