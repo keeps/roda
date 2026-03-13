@@ -124,7 +124,7 @@
         <cas.client.version>4.0.4</cas.client.version>
         <swagger.version>2.2.41</swagger.version>
         <jackson.version>2.20.1</jackson.version>
-        <spring.version>6.2.11</spring.version>
+        <spring.version>6.2.17</spring.version>
         <solr.version>9.10.0</solr.version>
         <pekko.version>1.4.0</pekko.version>
         <httpcomponents.version>5.5</httpcomponents.version>
@@ -132,7 +132,7 @@
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
-        <springboot.version>3.4.10</springboot.version>
+        <springboot.version>3.5.11</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
         <logback.version>1.5.25</logback.version>
         <mockito.version>5.18.0</mockito.version>
