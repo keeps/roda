@@ -30,6 +30,8 @@ import org.roda.wui.client.common.search.SearchWrapper;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Widget;
 
+import java.util.Arrays;
+
 /**
  *
  * @author Alexandre Flores <aflores@keep.pt>
@@ -54,8 +56,8 @@ public class BrowseRepresentationTabs extends Tabs {
 
         ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
           new AsyncTableCellOptions<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
-            .withJustActive(justActive).withSummary(summary).bindOpener()
-            .withActionable(FileSearchWrapperActions.get(aip.getId(), representation.getId(), aip.getState(), aip.getPermissions())));
+            .withJustActive(justActive).withSummary(summary).bindOpener().withActionable(
+              FileSearchWrapperActions.get(aip.getId(), representation.getId(), aip.getState(), aip.getPermissions())));
 
         return new SearchWrapper(false).createListAndSearchPanel(fileListBuilder);
       }
@@ -94,8 +96,9 @@ public class BrowseRepresentationTabs extends Tabs {
         SearchWrapper riskIncidences = new SearchWrapper(false);
         riskIncidences.createListAndSearchPanel(new ListBuilder<>(() -> new RiskIncidenceList(),
           new AsyncTableCellOptions<>(RiskIncidence.class, "BrowseRepresentation_riskIncidences")
-            .withFilter(new Filter(
-              new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId())))
+            .withFilter(new Filter(Arrays.asList(
+              new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()),
+              new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, representation.getAipId()))))
             .withJustActive(justActive).bindOpener()));
         return riskIncidences;
       }
