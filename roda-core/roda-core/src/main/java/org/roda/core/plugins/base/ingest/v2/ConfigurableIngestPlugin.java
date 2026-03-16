@@ -43,7 +43,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
   static {
     // 2) virus check
-    steps.add(new IngestStep(AntivirusPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK, true, false,
+    steps.add(new IngestStep(AntivirusPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK, true, true,
       true, true));
     // 3) descriptive metadata validation
     steps.add(new IngestStep(DescriptiveMetadataValidationPlugin.class.getName(),
