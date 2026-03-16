@@ -64,7 +64,6 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.entity.transaction.TransactionalModelOperationLog;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.lites.ParsedAIPLite;
 import org.roda.core.model.lites.ParsedDIPFileLite;
@@ -165,6 +164,20 @@ public final class ModelUtils {
   public static StoragePath getRepresentationStoragePath(String aipId, String representationId)
     throws RequestNotValidException {
     return DefaultStoragePath.parse(getRepresentationPath(aipId, representationId));
+  }
+
+  public static StoragePath getMetsStoragePath(String aipId, String representationId) throws RequestNotValidException {
+
+    DefaultStoragePath metsOutputPath = null;
+
+    if (representationId != null) {
+      metsOutputPath = DefaultStoragePath.parse(build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representationId,
+        RodaConstants.STORAGE_METS_FILENAME));
+    }
+    else {
+      metsOutputPath = DefaultStoragePath.parse(build(getAIPPath(aipId), RodaConstants.STORAGE_METS_FILENAME));
+    }
+    return metsOutputPath;
   }
 
   private static List<String> getRepresentationMetadataPath(String aipId, String representationId) {

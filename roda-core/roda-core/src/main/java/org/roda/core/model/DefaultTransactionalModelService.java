@@ -2671,6 +2671,20 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public void createMetsFile(String aipId, String repID, ContentPayload metsPayload) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    TransactionalModelOperationLog operationLog = operationRegistry.registerUpdateOperationForAIP(aipId);
+    try {
+      getModelService().createMetsFile(aipId, repID, metsPayload);
+      operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
+    } catch (AlreadyExistsException | GenericException | RequestNotValidException | NotFoundException
+             | AuthorizationDeniedException e) {
+      operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
+  }
+
+  @Override
   public File createDocumentation(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
