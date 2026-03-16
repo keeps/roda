@@ -733,6 +733,10 @@ public final class RodaConstants {
   public static final String CONTROLLER_LOCAL_INSTANCE_PARAM = RODA_OBJECT_LOCAL_INSTANCE;
   public static final String CONTROLLER_LOCAL_INSTANCE_ID_PARAM = "localInstanceId";
   public static final String CONTROLLER_ACCESS_KEY_PARAM = RODA_OBJECT_ACCESS_KEY;
+  public static final String CONTROLLER_ACCESS_KEY_USERNAME_PARAM = "username";
+  public static final String CONTROLLER_ACCESS_KEY_ID_PARAM = "accessKeyId";
+  public static final String CONTROLLER_ACCESS_KEY_NAME_PARAM = "accessKeyName";
+  public static final String CONTROLLER_ACCESS_KEY_EXP_DATE_PARAM = "expirationDate";
 
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip, transferred_resource_original_name";
   public static final String CONTROLLER_SIP_PARAM = "sip";
