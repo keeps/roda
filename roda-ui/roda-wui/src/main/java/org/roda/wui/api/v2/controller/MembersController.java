@@ -335,7 +335,7 @@ public class MembersController implements MembersRestService, Exportable {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
@@ -360,7 +360,8 @@ public class MembersController implements MembersRestService, Exportable {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_USERNAME_PARAM,
+        username);
     }
   }
 
@@ -380,7 +381,8 @@ public class MembersController implements MembersRestService, Exportable {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_ID_PARAM,
+        accessKeyId);
     }
   }
 
@@ -414,7 +416,7 @@ public class MembersController implements MembersRestService, Exportable {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
@@ -437,8 +439,8 @@ public class MembersController implements MembersRestService, Exportable {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM,
-        regenerateAccessKeyRequest);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_ID_PARAM, id,
+        RodaConstants.CONTROLLER_ACCESS_KEY_EXP_DATE_PARAM, regenerateAccessKeyRequest.getExpirationDate());
     }
   }
 
@@ -465,8 +467,9 @@ public class MembersController implements MembersRestService, Exportable {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM,
-        accessKeyRequest);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_NAME_PARAM,
+        accessKeyRequest.getName(), RodaConstants.CONTROLLER_ACCESS_KEY_EXP_DATE_PARAM,
+        accessKeyRequest.getExpirationDate());
     }
   }
 
@@ -488,7 +491,8 @@ public class MembersController implements MembersRestService, Exportable {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
     } finally {
-      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_PARAM);
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_ID_PARAM,
+        accessKeyId);
     }
   }
 
