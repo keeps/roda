@@ -3671,6 +3671,22 @@ public class DefaultModelService implements ModelService {
     storage.createBinary(submissionStoragePath, new FSPathContentPayload(submissionPath), false);
   }
 
+  @Override
+  public void createMetsFile(String aipId, String repId, ContentPayload metsPayload) throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    StoragePath metsOutPut = null;
+
+    if (repId!=null) {
+      metsOutPut = ModelUtils.getMetsStoragePath(aipId, repId);
+    }
+    else {
+      metsOutPut = ModelUtils.getMetsStoragePath(aipId, null);
+    }
+    storage.createBinary(metsOutPut, metsPayload, false);
+
+  }
+
   private Directory getDocumentationDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getDocumentationStoragePath(aipId));
