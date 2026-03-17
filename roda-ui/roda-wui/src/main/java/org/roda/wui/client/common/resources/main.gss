@@ -7601,6 +7601,10 @@ td.datePickerMonth, td.datePickerYear {
 	max-width: 100%;
 }
 
+.value.ri-html-content {
+ 	white-space: pre-wrap;
+}
+
 .field .value.ri-description {
  	white-space: pre-wrap;
 }
