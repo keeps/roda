@@ -14,9 +14,11 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -33,6 +35,9 @@ import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.DefaultModelService;
+import org.roda.core.model.DefaultTransactionalModelService;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
@@ -41,7 +46,9 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,22 +62,22 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
   private boolean processedWithErrors = false;
 
+  public static String getStaticName() {
+    return "Restore records under disposal confirmation report";
+  }
+
+  public static String getStaticDescription() {
+    return "";
+  }
+
   @Override
   public String getVersionImpl() {
     return "1.0";
   }
 
-  public static String getStaticName() {
-    return "Restore records under disposal confirmation report";
-  }
-
   @Override
   public String getName() {
     return getStaticName();
-  }
-
-  public static String getStaticDescription() {
-    return "";
   }
 
   @Override
@@ -128,11 +135,18 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()))) {
         jobPluginInfo.setSourceObjectsCount(disposalConfirmation.getNumberOfAIPs().intValue());
+        StorageService disposalBinStorage = new FileStorageService(
+          RodaCoreFactory.getDisposalBinDirectoryPath().resolve(disposalConfirmation.getId()), false, null, false);
+
+        ModelService disposalBinModel = new DefaultModelService(disposalBinStorage, null,
+          RodaConstants.NodeType.REPLICA, UUID.randomUUID().toString());
+
         // Iterate over the AIP
         while (reader.ready()) {
           String aipEntryJson = reader.readLine();
 
-          processAipEntry(aipEntryJson, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo);
+          processAipEntry(aipEntryJson, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo,
+            disposalBinModel);
         }
       }
     } catch (RequestNotValidException | AuthorizationDeniedException | GenericException | NotFoundException
@@ -173,11 +187,11 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   private void processAipEntry(String aipEntryJson, DisposalConfirmation disposalConfirmation, IndexService index,
-    ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
+    ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo, ModelService disposalBinModel) {
     try {
       DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
         DisposalConfirmationAIPEntry.class);
-      processAIP(aipEntry, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo);
+      processAIP(aipEntry, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo, disposalBinModel);
     } catch (GenericException e) {
       LOGGER.error("Failed to process the AIP entry '{}': {}", aipEntryJson, e.getMessage(), e);
       processedWithErrors = true;
@@ -193,7 +207,8 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   private void processAIP(DisposalConfirmationAIPEntry aipEntry, DisposalConfirmation disposalConfirmation,
-    IndexService index, ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
+    IndexService index, ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo,
+    ModelService disposalBinModel) {
 
     LOGGER.debug("Processing AIP entry {}", aipEntry.getAipId());
 
@@ -205,8 +220,8 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
     try {
       // Copy AIP from disposal bin to storage
-      DisposalConfirmationPluginUtils.copyAIPFromDisposalBin(aipEntry.getAipId(), disposalConfirmation.getId(),
-        Collections.singletonList("-r"));
+      model.importObject(disposalBinModel, LiteRODAObjectFactory.get(AIP.class, aipEntry.getAipId()).orElseThrow(),
+        true);
 
       // reindex the AIP
       AIP aip = model.retrieveAIP(aipEntry.getAipId());
@@ -223,8 +238,8 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
       reportItem.setPluginDetails(outcomeText);
 
-    } catch (CommandException | RequestNotValidException | GenericException | NotFoundException
-      | AuthorizationDeniedException e) {
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+      | AlreadyExistsException e) {
       LOGGER.error("Failed to restore AIP '{}': {}", aipEntry.getAipId(), e.getMessage(), e);
       pluginState = PluginState.FAILURE;
       outcomeText = "AIP '" + aipEntry.getAipId()

@@ -171,10 +171,9 @@ public final class ModelUtils {
     DefaultStoragePath metsOutputPath = null;
 
     if (representationId != null) {
-      metsOutputPath = DefaultStoragePath.parse(build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representationId,
-        RodaConstants.STORAGE_METS_FILENAME));
-    }
-    else {
+      metsOutputPath = DefaultStoragePath.parse(build(getAIPPath(aipId),
+        RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representationId, RodaConstants.STORAGE_METS_FILENAME));
+    } else {
       metsOutputPath = DefaultStoragePath.parse(build(getAIPPath(aipId), RodaConstants.STORAGE_METS_FILENAME));
     }
     return metsOutputPath;
@@ -663,7 +662,7 @@ public final class ModelUtils {
   }
 
   public static StoragePath getTechnicalMetadataStoragePath(String aipId, String representationId,
-                                                            List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
+    List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
     List<String> path = build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_METADATA,
       RodaConstants.STORAGE_DIRECTORY_TECHNICAL);
     path.addAll(fileDirectoryPath);
@@ -1187,6 +1186,30 @@ public final class ModelUtils {
   public static StoragePath getDisposalConfirmationStoragePath(String disposalConfirmationId)
     throws RequestNotValidException {
     return DefaultStoragePath.parse(getDisposalConfirmationPath(disposalConfirmationId));
+  }
+
+  public static StoragePath getDisposalSchedulesFromDisposalConfirmationStoragePath(String disposalConfirmationId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(getDisposalConfirmationStoragePath(disposalConfirmationId),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME);
+  }
+
+  public static StoragePath getDisposalTransitiveHoldsFromDisposalConfirmationStoragePath(String disposalConfirmationId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(getDisposalConfirmationStoragePath(disposalConfirmationId),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME);
+  }
+
+  public static StoragePath getDisposalHoldsFromDisposalConfirmationStoragePath(String disposalConfirmationId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(getDisposalConfirmationStoragePath(disposalConfirmationId),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
+  }
+
+  public static StoragePath getDisposalAipsFromDisposalConfirmationStoragePath(String disposalConfirmationId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(getDisposalConfirmationStoragePath(disposalConfirmationId),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
   }
 
   public static StoragePath getDisposalConfirmationAIPsPath(String disposalConfirmationId)

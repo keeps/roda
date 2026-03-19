@@ -415,6 +415,17 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
+  public ReturnWithExceptions<Void, ModelObserver> aipOnHoldStatusUpdated(AIP aip, boolean status) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    // change AIP
+    Map<String, Object> updatedFields = new HashMap<>();
+    updatedFields.put(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, status);
+    SolrUtils.update(index, IndexedAIP.class, aip.getId(), updatedFields, (ModelObserver) this).addTo(ret);
+    return ret;
+  }
+
+  @Override
   public ReturnWithExceptions<Void, ModelObserver> aipUpdatedOn(AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 

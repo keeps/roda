@@ -12,13 +12,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -36,12 +40,16 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.DefaultModelService;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -49,7 +57,11 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StorageServiceUtils;
 import org.roda.core.storage.StringContentPayload;
+import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,10 +164,24 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()))) {
         jobPluginInfo.setSourceObjectsCount(disposalConfirmation.getNumberOfAIPs().intValue());
+
+        StorageService disposalBinStorage = new FileStorageService(
+          RodaCoreFactory.getDisposalBinDirectoryPath().resolve(disposalConfirmation.getId()), false, null, false);
+
+        if (disposalBinStorage.countResourcesUnderContainer(DefaultStoragePath.empty(), false) > 0) {
+          throw new RequestNotValidException("Disposal bin structure for disposal confirmation '"
+            + disposalConfirmation.getTitle() + "' (" + disposalConfirmationId
+            + ") already exists in storage. Please check the disposal bin and remove the existing structure before executing the plugin.");
+        }
+
+        ModelService disposalBinModel = new DefaultModelService(disposalBinStorage, null,
+          RodaConstants.NodeType.REPLICA, UUID.randomUUID().toString());
+
         // Iterate over the AIP
         while (reader.ready()) {
           String aipEntryJson = reader.readLine();
-          processAipEntry(aipEntryJson, disposalConfirmation, model, cachedJob, report, jobPluginInfo);
+          processAipEntry(aipEntryJson, disposalConfirmation, model, cachedJob, report, jobPluginInfo,
+            disposalBinModel);
         }
       }
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException
@@ -190,12 +216,12 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   private void processAipEntry(String aipEntryJson, DisposalConfirmation disposalConfirmation, ModelService model,
-    Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
+    Job cachedJob, Report report, JobPluginInfo jobPluginInfo, ModelService disposalBinModel) {
     try {
       DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
         DisposalConfirmationAIPEntry.class);
       AIP aip = model.retrieveAIP(aipEntry.getAipId());
-      processAIP(aip, disposalConfirmation, model, cachedJob, report, jobPluginInfo);
+      processAIP(aip, disposalConfirmation, model, cachedJob, report, jobPluginInfo, disposalBinModel);
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to process AIP entry '{}': {}", aipEntryJson, e.getMessage(), e);
       processedWithErrors = true;
@@ -211,7 +237,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   private void processAIP(AIP aip, DisposalConfirmation disposalConfirmation, ModelService model, Job cachedJob,
-    Report report, JobPluginInfo jobPluginInfo) {
+    Report report, JobPluginInfo jobPluginInfo, ModelService disposalBinModel) {
 
     LOGGER.debug("Processing AIP {}", aip.getId());
 
@@ -229,7 +255,10 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
         aip.setState(AIPState.DESTROY_PROCESSING);
         model.updateAIPState(aip, cachedJob.getUsername());
 
-        testAndExecuteCopyAIP2DisposalBin(aip, disposalConfirmation.getId());
+        disposalBinModel.importObject(model, LiteRODAObjectFactory.get(AIP.class, aip.getId()).orElseThrow(), false);
+
+        // testAndExecuteCopyAIP2DisposalBin(aip, disposalConfirmation.getId(),
+        // disposalBinModel);
 
         executeSetAIPMetadataInformation(aip, cachedJob.getUsername());
 
@@ -245,7 +274,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       }
 
       reportItem.setPluginDetails(outcomeText);
-    } catch (IOException | CommandException | RequestNotValidException | GenericException | AuthorizationDeniedException
+    } catch (IOException | RequestNotValidException | GenericException | AuthorizationDeniedException
       | NotFoundException | AlreadyExistsException e) {
       LOGGER.error("Failed to destroy AIP '{}': {}", aip.getId(), e.getMessage(), e);
       state = PluginState.FAILURE;
@@ -255,17 +284,16 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       processedWithErrors = true;
     }
 
-    model.createEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.DESTRUCTION, EVENT_DESCRIPTION,
-      null, null, state, outcomeText, "", cachedJob.getUsername(), true, null);
+    PreservationMetadata event = model.createEvent(aip.getId(), null, null, null,
+      RodaConstants.PreservationEventType.DESTRUCTION, EVENT_DESCRIPTION, null, null, state, outcomeText, "",
+      cachedJob.getUsername(), true, null);
 
     // copy the preservation event to the AIP in the disposal bin
-    // using the --ignore-existing flag in the rsync process, copying only the new
-    // preservation event, leaving the remaining AIP structure intact
     try {
-      DisposalConfirmationPluginUtils.copyAIPToDisposalBin(aip, disposalConfirmation.getId(),
-        Arrays.asList("-r", "--ignore-existing"));
-    } catch (RequestNotValidException | GenericException | CommandException e) {
-      LOGGER.error("Failed to copy preservation event: {}", e.getMessage(), e);
+      disposalBinModel.importObject(model, LiteRODAObjectFactory.get(event).orElseThrow(), false);
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+      | AlreadyExistsException e) {
+      throw new RuntimeException(e);
     }
 
     jobPluginInfo.incrementObjectsProcessed(state);
@@ -283,16 +311,6 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       model.deleteRepresentation(aip.getId(), representation.getId(), username);
     }
     aip.getRepresentations().clear();
-  }
-
-  private void testAndExecuteCopyAIP2DisposalBin(AIP aip, String disposalConfirmationId)
-    throws GenericException, CommandException, RequestNotValidException {
-    // test if the AIP was copied to disposal bin
-    if (!DisposalConfirmationPluginUtils.aipExistsInDisposalBin(aip.getId(), disposalConfirmationId)) {
-      // Copy AIP to disposal bin
-      DisposalConfirmationPluginUtils.copyAIPToDisposalBin(aip, disposalConfirmationId,
-        Collections.singletonList("-r"));
-    }
   }
 
   private void executeSetAIPMetadataInformation(AIP aip, String destructionBy) {

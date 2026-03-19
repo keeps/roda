@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -30,14 +29,8 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
-import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.rsync.RsyncUtils;
-import org.roda.core.util.CommandException;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -45,38 +38,6 @@ import org.roda.core.util.CommandException;
 public class DisposalConfirmationPluginUtils {
 
   private DisposalConfirmationPluginUtils() {
-  }
-
-  public static boolean aipExistsInDisposalBin(String aipId, String disposalConfirmationId) {
-    // disposal-bin/<disposalConfirmationId>/aip/<aipId>
-    Path disposalBinPath = RodaCoreFactory.getDisposalBinDirectoryPath().resolve(disposalConfirmationId)
-      .resolve(RodaConstants.CORE_AIP_FOLDER).resolve(aipId);
-
-    return FSUtils.exists(disposalBinPath);
-  }
-
-  public static void copyAIPToDisposalBin(AIP aip, String disposalConfirmationId, List<String> rsyncOptions)
-    throws RequestNotValidException, GenericException, CommandException {
-    StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
-    Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), aipStoragePath);
-
-    // disposal-bin/<disposalConfirmationId>/aip/<aipId>
-    Path disposalBinPath = RodaCoreFactory.getDisposalBinDirectoryPath().resolve(disposalConfirmationId)
-      .resolve(RodaConstants.CORE_AIP_FOLDER).resolve(aipStoragePath.getName());
-
-    RsyncUtils.executeRsync(aipPath, disposalBinPath, rsyncOptions);
-  }
-
-  public static void copyAIPFromDisposalBin(String aipId, String disposalConfirmationId, List<String> rsyncOptions)
-    throws RequestNotValidException, GenericException, CommandException {
-    StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aipId);
-    Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), aipStoragePath);
-
-    // disposal-bin/<disposalConfirmationId>/aip/<aipId>
-    Path disposalBinPath = RodaCoreFactory.getDisposalBinDirectoryPath().resolve(disposalConfirmationId)
-      .resolve(RodaConstants.CORE_AIP_FOLDER).resolve(aipStoragePath.getName());
-
-    RsyncUtils.executeRsync(disposalBinPath, aipPath, rsyncOptions);
   }
 
   public static DisposalConfirmation getDisposalConfirmation(String confirmationId, String title, long storageSize,
@@ -176,11 +137,5 @@ public class DisposalConfirmationPluginUtils {
 
     entry.setAipSize(totalSize);
     entry.setAipNumberOfFiles(totalOfDataFiles);
-  }
-
-  public static Path getDisposalConfirmationPath(String disposalConfirmationId) throws RequestNotValidException {
-    DefaultStoragePath confirmationPath = DefaultStoragePath
-      .parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
-    return FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
   }
 }

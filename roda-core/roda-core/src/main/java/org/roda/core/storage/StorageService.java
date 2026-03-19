@@ -20,6 +20,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.transaction.RODATransactionException;
 
 /**
  * <p>
@@ -356,9 +357,9 @@ public interface StorageService {
   void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource,
     boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
-
-  default void importObject(StorageService fromService, LiteRODAObject object, StoragePath toStoragePath, boolean replaceExisting)
-          throws AlreadyExistsException, GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+  default void importObject(StorageService fromService, LiteRODAObject object, StoragePath toStoragePath,
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, AuthorizationDeniedException,
+    NotFoundException, RequestNotValidException {
     throw new UnsupportedOperationException("Not supported yet.");
   };
 

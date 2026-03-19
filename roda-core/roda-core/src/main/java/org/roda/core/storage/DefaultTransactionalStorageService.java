@@ -49,11 +49,10 @@ import org.slf4j.LoggerFactory;
 public class DefaultTransactionalStorageService implements TransactionalStorageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTransactionalStorageService.class);
-
+  private final TransactionLogService transactionLogService;
   private StorageService stagingStorageService;
   private StorageService mainStorageService;
   private TransactionLog transaction;
-  private final TransactionLogService transactionLogService;
   private boolean isInitialized = false;
 
   public DefaultTransactionalStorageService(StorageService mainStorageService, StorageService stagingStorageService,
@@ -289,10 +288,16 @@ public class DefaultTransactionalStorageService implements TransactionalStorageS
     throws GenericException, AlreadyExistsException, RequestNotValidException, AuthorizationDeniedException,
     NotFoundException {
     TransactionalStoragePathOperationLog operationLog;
-    // if storage path is agent we need to register a create or update operation
 
-    if (mainStorageService.exists(storagePath)) {
-      throw new AlreadyExistsException("Binary already exists: " + storagePath);
+    try {
+      TransactionalStoragePathOperationLog anyDeletedStoragePathOperation = transactionLogService.getAnyDeletedStoragePathOperation(transaction.getId(),
+        storagePath.toString());
+      if (anyDeletedStoragePathOperation == null && mainStorageService.exists(storagePath)) {
+        throw new AlreadyExistsException("Binary already exists: " + storagePath);
+      }
+    } catch (RODATransactionException e) {
+      throw new GenericException("[transactionId:" + transaction.getId()
+        + "] Failed to create binary for storage path: " + storagePath, e);
     }
 
     if (storagePath.getDirectoryPath() != null && !storagePath.getDirectoryPath().isEmpty()

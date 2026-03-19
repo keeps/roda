@@ -73,9 +73,8 @@ import org.slf4j.LoggerFactory;
  */
 public class FileStorageService implements StorageService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageService.class);
-
   public static final String HISTORY_SUFFIX = "-history";
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageService.class);
   private static final String HISTORY_DATA_FOLDER = "data";
   private static final String HISTORY_METADATA_FOLDER = "metadata";
 
@@ -590,7 +589,7 @@ public class FileStorageService implements StorageService {
     }
 
     if (exists(toStoragePath)) {
-      if(replaceExisting) {
+      if (replaceExisting) {
         // workaround
         deleteResource(toStoragePath);
       } else {

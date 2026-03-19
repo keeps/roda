@@ -44,6 +44,8 @@ public interface ModelObservable {
 
     ReturnWithExceptionsWrapper notifyAipUpdatedOnChanged(AIP aip);
 
+    ReturnWithExceptionsWrapper notifyAipOnHoldStatusUpdated(AIP aip, boolean status);
+
     ReturnWithExceptionsWrapper notifyAipDestroyed(AIP aip);
 
     ReturnWithExceptionsWrapper notifyAipMoved(AIP aip, String oldParentId, String newParentId);

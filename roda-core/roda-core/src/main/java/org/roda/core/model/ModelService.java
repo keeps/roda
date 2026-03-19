@@ -143,6 +143,8 @@ public interface ModelService extends ModelObservable {
   AIP updateAIP(AIP aip, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException;
 
+  AIP updateAIPOnHoldStatus(AIP aip, boolean status) throws AuthorizationDeniedException, GenericException;
+
   AIP updateAIPState(AIP aip, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException;
 
@@ -164,8 +166,8 @@ public interface ModelService extends ModelObservable {
   Binary retrieveDescriptiveMetadataBinary(String aipId, String representationId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
-  Binary retrieveTechnicalMetadataBinary(String aipId, String representationId, List<String> fileDirectoryPath, String fileId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException ;
+  Binary retrieveTechnicalMetadataBinary(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
   DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
@@ -384,7 +386,7 @@ public interface ModelService extends ModelObservable {
   void createTechnicalMetadata(String aipId, String representationId, String metadataType, String fileId,
     ContentPayload payload, String createdBy, boolean notify) throws AuthorizationDeniedException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException;
-  
+
   void updateTechnicalMetadata(String aipId, String representationId, String metadataType, String fileId,
     ContentPayload payload, String createdBy, boolean notify) throws AuthorizationDeniedException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, GenericException;
@@ -703,9 +705,8 @@ public interface ModelService extends ModelObservable {
   void createSubmission(Path submissionPath, String aipId) throws AlreadyExistsException, GenericException,
     RequestNotValidException, NotFoundException, AuthorizationDeniedException;
 
-  void createMetsFile(String aipId, String repId, ContentPayload contentPayload)
-    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-    NotFoundException;
+  void createMetsFile(String aipId, String repId, ContentPayload contentPayload) throws RequestNotValidException,
+    GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException;
 
   File createDocumentation(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
@@ -821,17 +822,19 @@ public interface ModelService extends ModelObservable {
   DisposalConfirmation retrieveDisposalConfirmation(String disposalConfirmationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
-  void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold)
-    throws GenericException, RequestNotValidException;
+  void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold) throws GenericException,
+    RequestNotValidException, AuthorizationDeniedException, NotFoundException, AlreadyExistsException;
 
   void addDisposalHoldTransitiveEntry(String disposalConfirmationId, DisposalHold transitiveDisposalHold)
-    throws RequestNotValidException, GenericException;
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException,
+    AlreadyExistsException;
 
   void addDisposalScheduleEntry(String disposalConfirmationId, DisposalSchedule disposalSchedule)
-    throws RequestNotValidException, GenericException;
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException,
+    AlreadyExistsException;
 
-  void addAIPEntry(String disposalConfirmationId, DisposalConfirmationAIPEntry entry)
-    throws RequestNotValidException, GenericException;
+  void addAIPEntry(String disposalConfirmationId, DisposalConfirmationAIPEntry entry) throws RequestNotValidException,
+    GenericException, AuthorizationDeniedException, NotFoundException, AlreadyExistsException;
 
   DisposalConfirmation updateDisposalConfirmation(DisposalConfirmation disposalConfirmation)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
@@ -977,8 +980,9 @@ public interface ModelService extends ModelObservable {
 
   void exportAll(StorageService toStorage);
 
-  void importObject(ModelService fromModel, LiteRODAObject object, boolean replaceExisting) throws RequestNotValidException,
-    GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException;
+  void importObject(ModelService fromModel, LiteRODAObject object, boolean replaceExisting)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException;
 
   void exportObject(IsRODAObject object, StorageService toStorage, String... toPathPartials)
     throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,

@@ -115,7 +115,7 @@ public class DisposalConfirmationController implements DisposalConfirmationRestS
 
         // delegate and return
         return ApiUtils.okResponse(
-          disposalConfirmationService.createDisposalConfirmationReport(disposalConfirmationId, toPrint), null);
+          disposalConfirmationService.createDisposalConfirmationReport(requestContext.getModelService(), disposalConfirmationId, toPrint), null);
       }
     });
   }

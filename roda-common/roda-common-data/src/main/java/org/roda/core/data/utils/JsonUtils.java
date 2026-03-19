@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -46,6 +47,11 @@ public final class JsonUtils {
 
   private JsonUtils() {
     // do nothing
+  }
+
+  public static byte[] toByteArray(Object object) throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    return mapper.writeValueAsBytes(object);
   }
 
   public static <T> T readObjectFromFile(Path jsonFile, Class<T> objectClass) throws GenericException {

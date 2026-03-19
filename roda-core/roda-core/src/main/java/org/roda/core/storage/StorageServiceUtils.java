@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.transaction.RODATransactionException;
 
 /**
  * Storage Service related and independent utility class
@@ -113,14 +114,14 @@ public final class StorageServiceUtils {
    */
   public static void copyBetweenStorageServices(StorageService fromService, StoragePath fromStoragePath,
     StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity) throws GenericException,
-    RequestNotValidException, NotFoundException, AlreadyExistsException, AuthorizationDeniedException {
+          RequestNotValidException, NotFoundException, AlreadyExistsException, AuthorizationDeniedException {
     copyOrMoveBetweenStorageServices(fromService, fromStoragePath, toService, toStoragePath, rootEntity, true, false);
   }
 
   private static void copyOrMoveBetweenStorageServices(StorageService fromService, StoragePath fromStoragePath,
     StorageService toService, StoragePath toStoragePath, Class<? extends Entity> rootEntity, boolean copy, boolean sync)
-    throws GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException,
-    AuthorizationDeniedException {
+          throws GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException,
+          AuthorizationDeniedException {
     if (Container.class.isAssignableFrom(rootEntity)) {
       toService.createContainer(toStoragePath);
       boolean recursive = false;

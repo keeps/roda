@@ -32,7 +32,10 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,15 +119,17 @@ public class PermanentlyDeleteRecordsPlugin extends AbstractPlugin<DisposalConfi
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     PluginState state = PluginState.SUCCESS;
     try {
-      // disposal-bin/<disposalConfirmationId>/*
-      Path disposalBinPath = RodaCoreFactory.getDisposalBinDirectoryPath().resolve(confirmation.getId());
-      FSUtils.deletePath(disposalBinPath);
-
       confirmation.setState(DisposalConfirmationState.PERMANENTLY_DELETED);
 
       model.updateDisposalConfirmation(confirmation);
       reportItem.setPluginDetails("Records under disposal confirmation '" + confirmation.getTitle() + "' ("
         + confirmation.getId() + ") were deleted permanently");
+
+      StorageService disposalBinStorage = new FileStorageService(
+              RodaCoreFactory.getDisposalBinDirectoryPath().resolve(confirmation.getId()), false, null, false);
+
+      String storagePathAsString = disposalBinStorage.getStoragePathAsString(DefaultStoragePath.empty(), true);
+      FSUtils.deletePathQuietly(Path.of(storagePathAsString));
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
       LOGGER.error("Failed to permanently delete the records under disposal confirmation '{}' ({}): {}",
         confirmation.getTitle(), confirmation.getId(), e.getMessage(), e);

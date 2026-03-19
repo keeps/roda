@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.roda.core.common.ProvidesInputStream;
-import org.roda.core.storage.fs.FSUtils;
 
 public class InputStreamContentPayload implements ContentPayload {
 

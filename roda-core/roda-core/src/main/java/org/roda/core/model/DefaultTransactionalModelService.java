@@ -339,6 +339,19 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
+  public AIP updateAIPOnHoldStatus(AIP aip, boolean status) throws AuthorizationDeniedException, GenericException {
+    TransactionalModelOperationLog operationLog = operationRegistry.registerUpdateOperationForAIP(aip.getId());
+    try {
+      AIP ret = getModelService().updateAIPOnHoldStatus(aip, status);
+      operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
+      return ret;
+    } catch (GenericException | AuthorizationDeniedException e) {
+      operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
+      throw e;
+    }
+  }
+
+  @Override
   public AIP updateAIPState(AIP aip, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     TransactionalModelOperationLog operationLog = operationRegistry.registerUpdateOperationForAIP(aip.getId());
@@ -2671,14 +2684,14 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public void createMetsFile(String aipId, String repID, ContentPayload metsPayload) throws RequestNotValidException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+  public void createMetsFile(String aipId, String repID, ContentPayload metsPayload) throws RequestNotValidException,
+    GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     TransactionalModelOperationLog operationLog = operationRegistry.registerUpdateOperationForAIP(aipId);
     try {
       getModelService().createMetsFile(aipId, repID, metsPayload);
       operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
     } catch (AlreadyExistsException | GenericException | RequestNotValidException | NotFoundException
-             | AuthorizationDeniedException e) {
+      | AuthorizationDeniedException e) {
       operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
     }
@@ -3257,14 +3270,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   }
 
   @Override
-  public void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold)
-    throws GenericException, RequestNotValidException {
+  public void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold) throws GenericException,
+    RequestNotValidException, AuthorizationDeniedException, NotFoundException, AlreadyExistsException {
     TransactionalModelOperationLog operationLog = operationRegistry
       .registerOperationForDisposalConfirmation(disposalConfirmationId, OperationType.READ);
     try {
       getModelService().addDisposalHoldEntry(disposalConfirmationId, disposalHold);
       operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (GenericException | RequestNotValidException e) {
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
+      | AlreadyExistsException e) {
       operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
     }
@@ -3272,13 +3286,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public void addDisposalHoldTransitiveEntry(String disposalConfirmationId, DisposalHold transitiveDisposalHold)
-    throws RequestNotValidException, GenericException {
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException,
+    AlreadyExistsException {
     TransactionalModelOperationLog operationLog = operationRegistry
       .registerOperationForDisposalConfirmation(disposalConfirmationId, OperationType.READ);
     try {
       getModelService().addDisposalHoldTransitiveEntry(disposalConfirmationId, transitiveDisposalHold);
       operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (RequestNotValidException | GenericException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
+      | AlreadyExistsException e) {
       operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
     }
@@ -3286,13 +3302,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public void addDisposalScheduleEntry(String disposalConfirmationId, DisposalSchedule disposalSchedule)
-    throws RequestNotValidException, GenericException {
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException,
+    AlreadyExistsException {
     TransactionalModelOperationLog operationLog = operationRegistry
       .registerOperationForDisposalConfirmation(disposalConfirmationId, OperationType.UPDATE);
     try {
       getModelService().addDisposalScheduleEntry(disposalConfirmationId, disposalSchedule);
       operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (RequestNotValidException | GenericException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
+      | AlreadyExistsException e) {
       operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
     }
@@ -3300,13 +3318,15 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public void addAIPEntry(String disposalConfirmationId, DisposalConfirmationAIPEntry entry)
-    throws RequestNotValidException, GenericException {
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException {
     TransactionalModelOperationLog operationLog = operationRegistry
       .registerOperationForDisposalConfirmation(disposalConfirmationId, OperationType.UPDATE);
     try {
       getModelService().addAIPEntry(disposalConfirmationId, entry);
       operationRegistry.updateOperationState(operationLog, OperationState.SUCCESS);
-    } catch (RequestNotValidException | GenericException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
+      | AlreadyExistsException e) {
       operationRegistry.updateOperationState(operationLog, OperationState.FAILURE);
       throw e;
     }
@@ -4195,6 +4215,11 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public ReturnWithExceptionsWrapper notifyAipUpdatedOnChanged(AIP aip) {
     return getModelService().notifyAipUpdatedOnChanged(aip);
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyAipOnHoldStatusUpdated(AIP aip, boolean status) {
+    return getModelService().notifyAipOnHoldStatusUpdated(aip, status);
   }
 
   @Override
