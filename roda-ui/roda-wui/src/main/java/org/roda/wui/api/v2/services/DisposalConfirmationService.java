@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v2.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -41,8 +42,10 @@ import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateReq
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.base.disposal.confirmation.CreateDisposalConfirmationPlugin;
 import org.roda.core.plugins.base.disposal.confirmation.DeleteDisposalConfirmationPlugin;
@@ -50,6 +53,7 @@ import org.roda.core.plugins.base.disposal.confirmation.DestroyRecordsPlugin;
 import org.roda.core.plugins.base.disposal.confirmation.PermanentlyDeleteRecordsPlugin;
 import org.roda.core.plugins.base.disposal.confirmation.RestoreRecordsPlugin;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
@@ -153,99 +157,78 @@ public class DisposalConfirmationService {
     return data;
   }
 
-  public StreamResponse createDisposalConfirmationReport(String confirmationId, boolean isToPrint)
+  private String getExistingFileOrNull(String filePath) {
+    File file = new File(filePath);
+    return (file.exists() && file.isFile()) ? filePath : "/dev/null";
+  }
+
+  public StreamResponse createDisposalConfirmationReport(ModelService model, String confirmationId, boolean isToPrint)
     throws RODAException, IOException {
-    String jqCommandTemplate = RodaCoreFactory.getRodaConfigurationAsString(DISPOSAL_CONFIRMATION_COMMAND_PROPERTY);
 
-    Path metadataPath = getDisposalConfirmationMetadataPath(confirmationId);
-    Path aipsPath = getDisposalConfirmationAIPsPath(confirmationId);
-    Path schedulesPath = getDisposalConfirmationSchedulesPath(confirmationId);
-    Path holdsPath = getDisposalConfirmationHoldsPath(confirmationId);
+    StoragePath schedulesFromDisposalConfirmationStoragePath = ModelUtils.getDisposalSchedulesFromDisposalConfirmationStoragePath(confirmationId);
+    StoragePath holdsFromDisposalConfirmationStoragePath = ModelUtils.getDisposalHoldsFromDisposalConfirmationStoragePath(confirmationId);
+    StoragePath aipsFromDisposalConfirmationStoragePath = ModelUtils.getDisposalAipsFromDisposalConfirmationStoragePath(confirmationId);
 
-    Map<String, String> values = new HashMap<>();
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
+            ModelUtils.getDisposalConfirmationStoragePath(confirmationId),
+            RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
 
-    values.put(METADATA_FILE_PLACEHOLDER, metadataPath.toString());
-    values.put(AIPS_FILE_PLACEHOLDER, aipsPath.toString());
-    values.put(SCHEDULES_FILE_PLACEHOLDER, schedulesPath.toString());
-    values.put(HOLDS_FILE_PLACEHOLDER, holdsPath.toString());
+    try (DirectResourceAccess schedulesDirectAccess = model.getStorage().getDirectAccess(schedulesFromDisposalConfirmationStoragePath, false);
+         DirectResourceAccess aipsDirectAccess = model.getStorage().getDirectAccess(aipsFromDisposalConfirmationStoragePath, false);
+         DirectResourceAccess holdsDirectAccess = model.getStorage().getDirectAccess(holdsFromDisposalConfirmationStoragePath, false);
+         DirectResourceAccess metadataDirectAccess = model.getStorage().getDirectAccess(metadataStoragePath, false)
+    ) {
+      String jqCommandTemplate = RodaCoreFactory.getRodaConfigurationAsString(DISPOSAL_CONFIRMATION_COMMAND_PROPERTY);
 
-    String jqCommandParams = HandlebarsUtility.executeHandlebars(jqCommandTemplate, values);
+      Map<String, String> values = new HashMap<>();
 
-    List<String> jqCommand = new ArrayList<>();
-    Collections.addAll(jqCommand, jqCommandParams.split(" "));
+      values.put(METADATA_FILE_PLACEHOLDER, getExistingFileOrNull(metadataDirectAccess.getPath().toString()));
+      values.put(AIPS_FILE_PLACEHOLDER, getExistingFileOrNull(aipsDirectAccess.getPath().toString()));
+      values.put(SCHEDULES_FILE_PLACEHOLDER, getExistingFileOrNull(schedulesDirectAccess.getPath().toString()));
+      values.put(HOLDS_FILE_PLACEHOLDER, getExistingFileOrNull(holdsDirectAccess.getPath().toString()));
 
-    String output;
-    try {
-      output = CommandUtility.execute(jqCommand);
-    } catch (CommandException e) {
-      throw new RODAException(e);
-    }
-    TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
-    Map<String, Object> confirmationValues = new ObjectMapper().readValue(output, typeRef);
-    InputStream templateStream;
+      String jqCommandParams = HandlebarsUtility.executeHandlebars(jqCommandTemplate, values);
 
-    if (isToPrint) {
-      templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-        RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + DISPOSAL_CONFIRMATION_REPORT_PRINT_HBS);
-    } else {
-      templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-        RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + DISPOSAL_CONFIRMATION_REPORT_HBS);
-    }
+      List<String> jqCommand = new ArrayList<>();
+      Collections.addAll(jqCommand, jqCommandParams.split(" "));
 
-    String reportTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+      String output;
+      try {
+        output = CommandUtility.execute(jqCommand);
+      } catch (CommandException e) {
+        throw new RODAException(e);
+      }
+      TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
+      Map<String, Object> confirmationValues = new ObjectMapper().readValue(output, typeRef);
+      InputStream templateStream;
 
-    Handlebars handlebars = new Handlebars();
-    handlebars.registerHelper(HBS_DATEFORMAT_HELPER_NAME, (Helper<Long>) (value, options) -> {
-      ZonedDateTime date = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
-      return DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(date);
-    });
-    Template template = handlebars.compileInline(reportTemplate);
-    String apply = template.apply(confirmationValues);
+      if (isToPrint) {
+        templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+                RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + DISPOSAL_CONFIRMATION_REPORT_PRINT_HBS);
+      } else {
+        templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+                RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + DISPOSAL_CONFIRMATION_REPORT_HBS);
+      }
 
-    final ConsumesOutputStream stream = new DefaultConsumesOutputStream(confirmationId + HTML_EXTENSION,
-      RodaConstants.MEDIA_TYPE_TEXT_HTML, out -> {
+      String reportTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+
+      Handlebars handlebars = new Handlebars();
+      handlebars.registerHelper(HBS_DATEFORMAT_HELPER_NAME, (Helper<Long>) (value, options) -> {
+        ZonedDateTime date = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
+        return DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(date);
+      });
+      Template template = handlebars.compileInline(reportTemplate);
+      String apply = template.apply(confirmationValues);
+
+      final ConsumesOutputStream stream = new DefaultConsumesOutputStream(confirmationId + HTML_EXTENSION,
+              RodaConstants.MEDIA_TYPE_TEXT_HTML, out -> {
         PrintStream printStream = new PrintStream(out);
         printStream.print(apply);
         printStream.close();
       });
 
-    return new StreamResponse(stream);
-  }
-
-  private Path getDisposalConfirmationMetadataPath(String confirmationId) throws RequestNotValidException {
-    DefaultStoragePath confirmationPath = DefaultStoragePath
-      .parse(ModelUtils.getDisposalConfirmationStoragePath(confirmationId));
-
-    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
-
-    return entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
-  }
-
-  private Path getDisposalConfirmationAIPsPath(String confirmationId) throws RequestNotValidException {
-    DefaultStoragePath confirmationPath = DefaultStoragePath
-      .parse(ModelUtils.getDisposalConfirmationStoragePath(confirmationId));
-
-    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
-
-    return entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
-  }
-
-  private Path getDisposalConfirmationSchedulesPath(String confirmationId) throws RequestNotValidException {
-    DefaultStoragePath confirmationPath = DefaultStoragePath
-      .parse(ModelUtils.getDisposalConfirmationStoragePath(confirmationId));
-
-    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
-
-    return entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME);
-  }
-
-  private Path getDisposalConfirmationHoldsPath(String confirmationId) throws RequestNotValidException {
-    DefaultStoragePath confirmationPath = DefaultStoragePath
-      .parse(ModelUtils.getDisposalConfirmationStoragePath(confirmationId));
-
-    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
-
-    return entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
+      return new StreamResponse(stream);
+    }
   }
 
   public DisposalConfirmationForm retrieveDisposalConfirmationExtraBundle() {

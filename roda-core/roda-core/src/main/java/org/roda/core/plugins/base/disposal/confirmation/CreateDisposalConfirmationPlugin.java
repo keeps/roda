@@ -12,6 +12,7 @@ import static org.roda.core.data.common.RodaConstants.PLUGIN_PARAMS_DISPOSAL_CON
 import static org.roda.core.data.common.RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE;
 import static org.roda.core.data.common.RodaConstants.PreservationEventType;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -259,7 +260,8 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
             "was successfully assign to disposal confirmation", confirmationId, aip.getId());
 
           aipCounter++;
-        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException |
+                 AlreadyExistsException e) {
           LOGGER.error("Failed to assign AIP '{}' to disposal confirmation '{}': {}", aip.getId(), confirmationId,
             e.getMessage(), e);
           state = PluginState.FAILURE;
@@ -294,33 +296,32 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
             model.addDisposalScheduleEntry(confirmationId, disposalSchedule);
           }
         }
-      } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
+      } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
+        | AlreadyExistsException e) {
         LOGGER.error("Failed to create disposal schedules jsonl file", e);
         report.addPluginDetails("Failed to create jsonl with disposal schedules");
       }
 
       // Make disposal holds as a jsonl
       try {
-        FSUtils.createFile(DisposalConfirmationPluginUtils.getDisposalConfirmationPath(confirmationId),
-          RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME, true, true);
         for (String disposalHoldId : disposalHolds) {
           DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
           model.addDisposalHoldEntry(confirmationId, disposalHold);
         }
-      } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
+      } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException
+        | AlreadyExistsException e) {
         LOGGER.error("Failed to create disposal holds jsonl file", e);
         report.addPluginDetails("Failed to create jsonl with disposal holds");
       }
 
       // Make disposal holds transitive as a jsonl
       try {
-        FSUtils.createFile(DisposalConfirmationPluginUtils.getDisposalConfirmationPath(confirmationId),
-          RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME, true, true);
         for (String disposalHoldId : disposalHoldTransitives) {
           DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
           model.addDisposalHoldTransitiveEntry(confirmationId, disposalHold);
         }
-      } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
+      } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException
+        | AlreadyExistsException e) {
         LOGGER.error("Failed to create transitive disposal holds jsonl file", e);
         report.addPluginDetails("Failed to create jsonl with transitive disposal holds");
       }
@@ -409,7 +410,8 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           "was skipped from being assign to disposal confirmation due to incompatible disposal schedule",
           confirmationId, aip.getId());
       }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException |
+             AlreadyExistsException e) {
       LOGGER.error("Failed to assign AIP '{}' to disposal confirmation '{}': {}", child.getId(), confirmationId,
         e.getMessage(), e);
       state = PluginState.FAILURE;

@@ -12,9 +12,12 @@ import static org.roda.core.common.DownloadUtils.ZIP_MEDIA_TYPE;
 import static org.roda.core.common.DownloadUtils.ZIP_PATH_DELIMITER;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.SequenceInputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -43,12 +46,15 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.ProvidesInputStream;
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -165,6 +171,7 @@ import org.roda.core.storage.Directory;
 import org.roda.core.storage.EmptyClosableIterable;
 import org.roda.core.storage.Entity;
 import org.roda.core.storage.ExternalFileManifestContentPayload;
+import org.roda.core.storage.InputStreamContentPayload;
 import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
@@ -194,13 +201,11 @@ public class DefaultModelService implements ModelService {
   private final StorageService storage;
   private final EventsManager eventsManager;
   private final NodeType nodeType;
-  private String instanceId = "";
-  private Object logFileLock = new Object();
-
-  private long entryLogLineNumber = -1;
-
   // Observer
   private final List<ModelObserver> observers;
+  private String instanceId = "";
+  private Object logFileLock = new Object();
+  private long entryLogLineNumber = -1;
 
   public DefaultModelService(StorageService storage, EventsManager eventsManager, NodeType nodeType,
     String instanceId) {
@@ -213,6 +218,18 @@ public class DefaultModelService implements ModelService {
     if (RodaCoreFactory.checkIfWriteIsAllowed(nodeType)) {
       ensureAllContainersExist();
       ensureAllDirectoriesExist();
+    }
+  }
+
+  private static void clearSpecificIndexes(IndexService index, Class<IsRODAObject> objectClass,
+    IsModelObject rodaObject) throws AuthorizationDeniedException {
+    if (AIP.class.equals(objectClass)) {
+      List<String> ids = Arrays.asList(rodaObject.getId());
+      index.delete(IndexedRepresentation.class,
+        new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, ids)));
+      index.delete(IndexedFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_AIP_ID, ids)));
+      index.delete(IndexedPreservationEvent.class,
+        new Filter(new OneOfManyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, ids)));
     }
   }
 
@@ -615,6 +632,14 @@ public class DefaultModelService implements ModelService {
 
     AIP updatedAIP = updateAIPMetadata(aip, updatedBy);
     notifyAipUpdated(updatedAIP).failOnError();
+    return aip;
+  }
+
+  @Override
+  public AIP updateAIPOnHoldStatus(AIP aip, boolean status) throws AuthorizationDeniedException, GenericException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    notifyAipOnHoldStatusUpdated(aip, status).failOnError();
     return aip;
   }
 
@@ -3672,15 +3697,15 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public void createMetsFile(String aipId, String repId, ContentPayload metsPayload) throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+  public void createMetsFile(String aipId, String repId, ContentPayload metsPayload) throws RequestNotValidException,
+    GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     StoragePath metsOutPut = null;
 
-    if (repId!=null) {
+    if (repId != null) {
       metsOutPut = ModelUtils.getMetsStoragePath(aipId, repId);
-    }
-    else {
+    } else {
       metsOutPut = ModelUtils.getMetsStoragePath(aipId, null);
     }
     storage.createBinary(metsOutPut, metsPayload, false);
@@ -4546,51 +4571,131 @@ public class DefaultModelService implements ModelService {
   }
 
   @Override
-  public void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold)
-    throws GenericException, RequestNotValidException {
-    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
-    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
+  public void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold) throws GenericException,
+    RequestNotValidException, AuthorizationDeniedException, NotFoundException, AlreadyExistsException {
+    StoragePath confirmationStoragePath = ModelUtils
+      .getDisposalHoldsFromDisposalConfirmationStoragePath(disposalConfirmationId);
 
-    Path file = FSUtils.createFile(confirmationPath,
-      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME, true, true);
+    if (!storage.exists(confirmationStoragePath)) {
+      storage.createBinary(confirmationStoragePath, new StringContentPayload(JsonUtils.getJsonFromObject(disposalHold)),
+        false);
+    } else {
+      Binary binary = storage.getBinary(confirmationStoragePath);
 
-    JsonUtils.appendObjectToFile(disposalHold, file);
+      ProvidesInputStream streamProvider = () -> {
+        // We let the storage framework handle closing this when it finishes reading
+        InputStream originalStream = binary.getContent().createInputStream();
+        String jsonFromObject = JsonUtils.getJsonFromObject(disposalHold);
+        byte[] pojoBytes = jsonFromObject.getBytes(StandardCharsets.UTF_8);
+        byte[] newline = "\n".getBytes(StandardCharsets.UTF_8);
+
+        InputStream newlineStream = new ByteArrayInputStream(newline);
+        InputStream pojoStream = new ByteArrayInputStream(pojoBytes);
+
+        InputStream firstJoin = new SequenceInputStream(originalStream, newlineStream);
+        return new SequenceInputStream(firstJoin, pojoStream);
+      };
+
+      storage.updateBinaryContent(confirmationStoragePath, new InputStreamContentPayload(streamProvider), false, false,
+        false, null);
+    }
   }
 
   @Override
   public void addDisposalHoldTransitiveEntry(String disposalConfirmationId, DisposalHold transitiveDisposalHold)
-    throws RequestNotValidException, GenericException {
-    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
-    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException,
+    AlreadyExistsException {
+    StoragePath confirmationStoragePath = ModelUtils
+      .getDisposalTransitiveHoldsFromDisposalConfirmationStoragePath(disposalConfirmationId);
 
-    Path file = FSUtils.createFile(confirmationPath,
-      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME, true, true);
+    if (!storage.exists(confirmationStoragePath)) {
+      storage.createBinary(confirmationStoragePath,
+        new StringContentPayload(JsonUtils.getJsonFromObject(transitiveDisposalHold)), false);
+    } else {
+      Binary binary = storage.getBinary(confirmationStoragePath);
 
-    JsonUtils.appendObjectToFile(transitiveDisposalHold, file);
+      ProvidesInputStream streamProvider = () -> {
+        // We let the storage framework handle closing this when it finishes reading
+        InputStream originalStream = binary.getContent().createInputStream();
+        String jsonFromObject = JsonUtils.getJsonFromObject(transitiveDisposalHold);
+        byte[] pojoBytes = jsonFromObject.getBytes(StandardCharsets.UTF_8);
+        byte[] newline = "\n".getBytes(StandardCharsets.UTF_8);
+
+        InputStream newlineStream = new ByteArrayInputStream(newline);
+        InputStream pojoStream = new ByteArrayInputStream(pojoBytes);
+
+        InputStream firstJoin = new SequenceInputStream(originalStream, newlineStream);
+        return new SequenceInputStream(firstJoin, pojoStream);
+      };
+
+      storage.updateBinaryContent(confirmationStoragePath, new InputStreamContentPayload(streamProvider), false, false,
+        false, null);
+    }
   }
 
   @Override
   public void addDisposalScheduleEntry(String disposalConfirmationId, DisposalSchedule disposalSchedule)
-    throws RequestNotValidException, GenericException {
-    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
-    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException,
+    AlreadyExistsException {
 
-    Path file = FSUtils.createFile(confirmationPath,
-      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME, true, true);
+    StoragePath confirmationStoragePath = ModelUtils
+      .getDisposalSchedulesFromDisposalConfirmationStoragePath(disposalConfirmationId);
 
-    JsonUtils.appendObjectToFile(disposalSchedule, file);
+    if (!storage.exists(confirmationStoragePath)) {
+      storage.createBinary(confirmationStoragePath,
+        new StringContentPayload(JsonUtils.getJsonFromObject(disposalSchedule)), false);
+    } else {
+      Binary binary = storage.getBinary(confirmationStoragePath);
+
+      ProvidesInputStream streamProvider = () -> {
+        // We let the storage framework handle closing this when it finishes reading
+        InputStream originalStream = binary.getContent().createInputStream();
+        String jsonFromObject = JsonUtils.getJsonFromObject(disposalSchedule);
+        byte[] pojoBytes = jsonFromObject.getBytes(StandardCharsets.UTF_8);
+        byte[] newline = "\n".getBytes(StandardCharsets.UTF_8);
+
+        InputStream newlineStream = new ByteArrayInputStream(newline);
+        InputStream pojoStream = new ByteArrayInputStream(pojoBytes);
+
+        InputStream firstJoin = new SequenceInputStream(originalStream, newlineStream);
+        return new SequenceInputStream(firstJoin, pojoStream);
+      };
+
+      storage.updateBinaryContent(confirmationStoragePath, new InputStreamContentPayload(streamProvider), false, false,
+        false, null);
+    }
   }
 
   @Override
   public void addAIPEntry(String disposalConfirmationId, DisposalConfirmationAIPEntry entry)
-    throws RequestNotValidException, GenericException {
-    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
-    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException,
+    AlreadyExistsException {
+    StoragePath confirmationStoragePath = ModelUtils
+      .getDisposalAipsFromDisposalConfirmationStoragePath(disposalConfirmationId);
 
-    Path file = FSUtils.createFile(confirmationPath,
-      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME, true, true);
+    if (!storage.exists(confirmationStoragePath)) {
+      storage.createBinary(confirmationStoragePath, new StringContentPayload(JsonUtils.getJsonFromObject(entry)),
+        false);
+    } else {
+      Binary binary = storage.getBinary(confirmationStoragePath);
 
-    JsonUtils.appendObjectToFile(entry, file);
+      ProvidesInputStream streamProvider = () -> {
+        // We let the storage framework handle closing this when it finishes reading
+        InputStream originalStream = binary.getContent().createInputStream();
+        String jsonFromObject = JsonUtils.getJsonFromObject(entry);
+        byte[] pojoBytes = jsonFromObject.getBytes(StandardCharsets.UTF_8);
+        byte[] newline = "\n".getBytes(StandardCharsets.UTF_8);
+
+        InputStream newlineStream = new ByteArrayInputStream(newline);
+        InputStream pojoStream = new ByteArrayInputStream(pojoBytes);
+
+        InputStream firstJoin = new SequenceInputStream(originalStream, newlineStream);
+        return new SequenceInputStream(firstJoin, pojoStream);
+      };
+
+      storage.updateBinaryContent(confirmationStoragePath, new InputStreamContentPayload(streamProvider), false, false,
+        false, null);
+    }
   }
 
   @Override
@@ -4742,6 +4847,10 @@ public class DefaultModelService implements ModelService {
     return ret;
   }
 
+  /************************************
+   * Disposal bin related
+   ************************************/
+
   @Override
   public DisposalRules listDisposalRules()
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
@@ -4761,10 +4870,6 @@ public class DefaultModelService implements ModelService {
 
     return disposalRules;
   }
-
-  /************************************
-   * Disposal bin related
-   ************************************/
 
   /************************************
    * Distributed instances system related
@@ -5075,15 +5180,16 @@ public class DefaultModelService implements ModelService {
     }
     return wrapper;
   }
-  public ReturnWithExceptionsWrapper notifyLiteRodaObjectCreated(LiteRODAObject object){
+
+  public ReturnWithExceptionsWrapper notifyLiteRodaObjectCreated(LiteRODAObject object) {
     return notifyObserversSafely(observer -> observer.liteRODAObjectCreated(object));
   }
 
-  public ReturnWithExceptionsWrapper notifyLiteRodaObjectUpdated(LiteRODAObject object){
+  public ReturnWithExceptionsWrapper notifyLiteRodaObjectUpdated(LiteRODAObject object) {
     return notifyObserversSafely(observer -> observer.liteRODAObjectUpdated(object));
   }
 
-  public ReturnWithExceptionsWrapper notifyLiteRodaObjectDeleted(LiteRODAObject object){
+  public ReturnWithExceptionsWrapper notifyLiteRodaObjectDeleted(LiteRODAObject object) {
     return notifyObserversSafely(observer -> observer.liteRODAObjectUpdated(object));
   }
 
@@ -5100,6 +5206,11 @@ public class DefaultModelService implements ModelService {
   @Override
   public ReturnWithExceptionsWrapper notifyAipUpdatedOnChanged(AIP aip) {
     return notifyObserversSafely(observer -> observer.aipUpdatedOn(aip));
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyAipOnHoldStatusUpdated(AIP aip, boolean status) {
+    return notifyObserversSafely(observer -> observer.aipOnHoldStatusUpdated(aip, status));
   }
 
   @Override
@@ -5658,23 +5769,11 @@ public class DefaultModelService implements ModelService {
     }
   }
 
-  private static void clearSpecificIndexes(IndexService index, Class<IsRODAObject> objectClass,
-    IsModelObject rodaObject) throws AuthorizationDeniedException {
-    if (AIP.class.equals(objectClass)) {
-      List<String> ids = Arrays.asList(rodaObject.getId());
-      index.delete(IndexedRepresentation.class,
-        new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, ids)));
-      index.delete(IndexedFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_AIP_ID, ids)));
-      index.delete(IndexedPreservationEvent.class,
-        new Filter(new OneOfManyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, ids)));
-    }
-  }
-
   @Override
   public void exportAll(StorageService toStorage) {
     // TODO
   }
-  
+
   @Override
   public void importObject(ModelService fromModel, LiteRODAObject object, boolean replaceExisting)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,

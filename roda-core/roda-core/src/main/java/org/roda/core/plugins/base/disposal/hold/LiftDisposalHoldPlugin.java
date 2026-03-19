@@ -55,10 +55,6 @@ import org.slf4j.LoggerFactory;
  */
 public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(LiftDisposalHoldPlugin.class);
-
-  private String disposalHoldId;
-  private String details;
-
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
@@ -72,6 +68,17 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
       PluginParameter
         .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Details", PluginParameter.PluginParameterType.STRING)
         .isMandatory(false).withDescription("Details that will be used when creating event").build());
+  }
+
+  private String disposalHoldId;
+  private String details;
+
+  public static String getStaticName() {
+    return "Lift disposal hold";
+  }
+
+  public static String getStaticDescription() {
+    return "";
   }
 
   @Override
@@ -100,17 +107,9 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
     return "1.0";
   }
 
-  public static String getStaticName() {
-    return "Lift disposal hold";
-  }
-
   @Override
   public String getName() {
     return getStaticName();
-  }
-
-  public static String getStaticDescription() {
-    return "";
   }
 
   @Override
@@ -163,7 +162,28 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
   private void liftDisposalHold(IndexService index, ModelService model, Report report, Job cachedJob,
     JobPluginInfo jobPluginInfo) {
     report.addPluginDetails(details);
-    int count = 0;
+    long count = 0;
+
+    try {
+      DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
+      disposalHold.setState(DisposalHoldState.LIFTED);
+      disposalHold.setLiftedBy(cachedJob.getUsername());
+      disposalHold.setLiftedOn(new Date());
+      model.updateDisposalHold(disposalHold, cachedJob.getUsername(), details);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+      | IllegalOperationException e) {
+      Report reportItem = PluginHelper.initPluginReportItem(this, disposalHoldId, DisposalHold.class);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+      PluginState state = PluginState.FAILURE;
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      reportItem.setPluginState(state)
+        .setPluginDetails("Error lifting disposal hold '" + disposalHoldId + "': " + e.getMessage());
+      report.addReport(reportItem);
+      jobPluginInfo.setSourceObjectsCount(1);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+
+      return;
+    }
 
     try (IterableIndexResult<IndexedAIP> aipsToDelete = findAipsWithDisposalHold(index, disposalHoldId)) {
       for (IndexedAIP indexedAIP : aipsToDelete) {
@@ -175,18 +195,12 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
 
         try {
           AIP aip = model.retrieveAIP(indexedAIP.getId());
-          Pair<Boolean, String> outcome = DisposalHoldPluginUtils.disassociateDisposalHoldFromAIP(disposalHoldId, aip,
-            reportItem);
-          boolean lifted = outcome.getFirst();
-          outcomeText = outcome.getSecond();
-          processTransitiveAIP(model, index, cachedJob, aip.getId(), disposalHoldId, jobPluginInfo, report);
-          model.updateAIP(aip, cachedJob.getUsername());
-          if (lifted) {
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          } else {
-            jobPluginInfo.incrementObjectsProcessedWithSkipped();
-          }
+          long children = processTransitiveAIP(model, index, cachedJob, aip.getId(), disposalHoldId, jobPluginInfo, report);
+          model.updateAIPOnHoldStatus(aip, model.onDisposalHold(aip.getId()));
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
           reportItem.setPluginState(state);
+          outcomeText = "";
+          count += children;
         } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
           outcomeText = "Error lifting disposal hold" + disposalHoldId + " from AIP " + indexedAIP.getId();
           LOGGER.error("Error lifting disposal hold '{}' from '{}': {}", disposalHoldId, indexedAIP.getId(),
@@ -210,16 +224,8 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
 
         count++;
       }
-      jobPluginInfo.setSourceObjectsCount(count);
-
-      DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
-      disposalHold.setState(DisposalHoldState.LIFTED);
-      disposalHold.setLiftedBy(cachedJob.getUsername());
-      disposalHold.setLiftedOn(new Date());
-      model.updateDisposalHold(disposalHold, cachedJob.getUsername(), details);
-
-    } catch (IOException | GenericException | RequestNotValidException | NotFoundException
-      | AuthorizationDeniedException | IllegalOperationException e) {
+      jobPluginInfo.setSourceObjectsCount((int) count);
+    } catch (IOException | GenericException | RequestNotValidException e) {
       LOGGER.error("Error getting AIPs to delete", e);
     }
   }
@@ -231,7 +237,7 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
     return index.findAll(IndexedAIP.class, aipsFilter, false, List.of(RodaConstants.INDEX_UUID));
   }
 
-  private void processTransitiveAIP(ModelService model, IndexService index, Job cachedJob, String aipId, String holdId,
+  private Long processTransitiveAIP(ModelService model, IndexService index, Job cachedJob, String aipId, String holdId,
     JobPluginInfo jobPluginInfo, Report report) throws GenericException, NotFoundException, RequestNotValidException {
     IterableIndexResult<IndexedAIP> results = DisposalHoldPluginUtils.getTransitivesHoldsAIPs(index, aipId);
 
@@ -245,12 +251,10 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
       try {
         AIP aipChildren = model.retrieveAIP(indexedAIP.getId());
         LOGGER.debug("Processing transitive AIP {}", aipId);
-        outcomeText = DisposalHoldPluginUtils.disassociateTransitiveDisposalHoldFromAIP(disposalHoldId, aipChildren, reportItem);
-        model.updateAIP(aipChildren, cachedJob.getUsername());
-        reportItem.setPluginState(state)
-          .addPluginDetails("transitive Disposal hold '" + holdId + " was successfully lifting to AIP '" + aipId + "'");
+        model.updateAIPOnHoldStatus(aipChildren, model.onDisposalHold(aipChildren.getId()));
+        reportItem.setPluginState(state);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
-
+        outcomeText = "";
       } catch (AuthorizationDeniedException e) {
         state = PluginState.FAILURE;
         outcomeText = "Can't retrieve AIP " + aipId + " for lifting transitive hold " + holdId + ".";
@@ -271,6 +275,8 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
     }
+
+    return results.getTotalCount();
   }
 
   @Override

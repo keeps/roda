@@ -95,6 +95,14 @@ public class DisposalPolicyAssociationTab extends Composite {
       return false;
     }
 
+    if (!aip.getDisposalHoldsId().isEmpty()) {
+      return false;
+    }
+
+    if (!aip.getTransitiveDisposalHoldsId().isEmpty()) {
+      return false;
+    }
+
     return !StringUtils.isNotBlank(aip.getDisposalScheduleId());
   }
 
