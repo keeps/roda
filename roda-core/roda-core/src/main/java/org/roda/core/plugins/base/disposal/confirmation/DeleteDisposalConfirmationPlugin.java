@@ -10,6 +10,7 @@ package org.roda.core.plugins.base.disposal.confirmation;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -159,9 +160,9 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
       Binary binary = model.getBinary(confirmation,
         RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
 
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()))) {
-        while (reader.ready()) {
-          String aipEntryJson = reader.readLine();
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream(), StandardCharsets.UTF_8))) {
+        String aipEntryJson;
+        while ((aipEntryJson = reader.readLine()) != null) {
           DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
             DisposalConfirmationAIPEntry.class);
 
