@@ -10,6 +10,7 @@ package org.roda.core.plugins.base.disposal.confirmation;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Date;
@@ -133,7 +134,8 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       Binary binary = model.getBinary(disposalConfirmation,
         RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
 
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()))) {
+      try (BufferedReader reader = new BufferedReader(
+        new InputStreamReader(binary.getContent().createInputStream(), StandardCharsets.UTF_8))) {
         jobPluginInfo.setSourceObjectsCount(disposalConfirmation.getNumberOfAIPs().intValue());
         StorageService disposalBinStorage = new FileStorageService(
           RodaCoreFactory.getDisposalBinDirectoryPath().resolve(disposalConfirmation.getId()), false, null, false);
@@ -142,9 +144,8 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
           RodaConstants.NodeType.REPLICA, UUID.randomUUID().toString());
 
         // Iterate over the AIP
-        while (reader.ready()) {
-          String aipEntryJson = reader.readLine();
-
+        String aipEntryJson;
+        while ((aipEntryJson = reader.readLine()) != null) {
           processAipEntry(aipEntryJson, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo,
             disposalBinModel);
         }

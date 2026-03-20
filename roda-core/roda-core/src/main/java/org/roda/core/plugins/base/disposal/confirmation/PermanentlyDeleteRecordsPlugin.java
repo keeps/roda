@@ -25,6 +25,7 @@ import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.DefaultModelService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
@@ -33,6 +34,7 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
@@ -128,8 +130,8 @@ public class PermanentlyDeleteRecordsPlugin extends AbstractPlugin<DisposalConfi
       StorageService disposalBinStorage = new FileStorageService(
               RodaCoreFactory.getDisposalBinDirectoryPath().resolve(confirmation.getId()), false, null, false);
 
-      String storagePathAsString = disposalBinStorage.getStoragePathAsString(DefaultStoragePath.empty(), true);
-      FSUtils.deletePathQuietly(Path.of(storagePathAsString));
+      DirectResourceAccess directAccess = disposalBinStorage.getDirectAccess(DefaultStoragePath.empty());
+      FSUtils.deletePathQuietly(directAccess.getPath());
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
       LOGGER.error("Failed to permanently delete the records under disposal confirmation '{}' ({}): {}",
         confirmation.getTitle(), confirmation.getId(), e.getMessage(), e);

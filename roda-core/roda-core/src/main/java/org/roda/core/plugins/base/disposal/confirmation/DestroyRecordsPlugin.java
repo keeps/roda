@@ -162,7 +162,8 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       Binary binary = model.getBinary(disposalConfirmation,
         RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
 
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()))) {
+      try (BufferedReader reader = new BufferedReader(
+        new InputStreamReader(binary.getContent().createInputStream(), StandardCharsets.UTF_8))) {
         jobPluginInfo.setSourceObjectsCount(disposalConfirmation.getNumberOfAIPs().intValue());
 
         StorageService disposalBinStorage = new FileStorageService(
@@ -178,8 +179,8 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
           RodaConstants.NodeType.REPLICA, UUID.randomUUID().toString());
 
         // Iterate over the AIP
-        while (reader.ready()) {
-          String aipEntryJson = reader.readLine();
+        String aipEntryJson;
+        while ((aipEntryJson = reader.readLine()) != null) {
           processAipEntry(aipEntryJson, disposalConfirmation, model, cachedJob, report, jobPluginInfo,
             disposalBinModel);
         }
@@ -256,9 +257,6 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
         model.updateAIPState(aip, cachedJob.getUsername());
 
         disposalBinModel.importObject(model, LiteRODAObjectFactory.get(AIP.class, aip.getId()).orElseThrow(), false);
-
-        // testAndExecuteCopyAIP2DisposalBin(aip, disposalConfirmation.getId(),
-        // disposalBinModel);
 
         executeSetAIPMetadataInformation(aip, cachedJob.getUsername());
 

@@ -165,27 +165,27 @@ public class DisposalConfirmationService {
   public StreamResponse createDisposalConfirmationReport(ModelService model, String confirmationId, boolean isToPrint)
     throws RODAException, IOException {
 
-    StoragePath schedulesFromDisposalConfirmationStoragePath = ModelUtils.getDisposalSchedulesFromDisposalConfirmationStoragePath(confirmationId);
-    StoragePath holdsFromDisposalConfirmationStoragePath = ModelUtils.getDisposalHoldsFromDisposalConfirmationStoragePath(confirmationId);
-    StoragePath aipsFromDisposalConfirmationStoragePath = ModelUtils.getDisposalAipsFromDisposalConfirmationStoragePath(confirmationId);
+    StoragePath disposalConfirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(confirmationId);
 
-    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
-            ModelUtils.getDisposalConfirmationStoragePath(confirmationId),
-            RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
-
-    try (DirectResourceAccess schedulesDirectAccess = model.getStorage().getDirectAccess(schedulesFromDisposalConfirmationStoragePath, false);
-         DirectResourceAccess aipsDirectAccess = model.getStorage().getDirectAccess(aipsFromDisposalConfirmationStoragePath, false);
-         DirectResourceAccess holdsDirectAccess = model.getStorage().getDirectAccess(holdsFromDisposalConfirmationStoragePath, false);
-         DirectResourceAccess metadataDirectAccess = model.getStorage().getDirectAccess(metadataStoragePath, false)
-    ) {
+    try (DirectResourceAccess disposalConfirmationDirectAccess = model.getStorage()
+      .getDirectAccess(disposalConfirmationStoragePath, true)) {
       String jqCommandTemplate = RodaCoreFactory.getRodaConfigurationAsString(DISPOSAL_CONFIRMATION_COMMAND_PROPERTY);
+
+      Path schedulesDirectAccess = disposalConfirmationDirectAccess.getPath()
+        .resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME);
+      Path holdsDirectAccess = disposalConfirmationDirectAccess.getPath()
+        .resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
+      Path metadataDirectAccess = disposalConfirmationDirectAccess.getPath()
+        .resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
+      Path aipsDirectAccess = disposalConfirmationDirectAccess.getPath()
+        .resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
 
       Map<String, String> values = new HashMap<>();
 
-      values.put(METADATA_FILE_PLACEHOLDER, getExistingFileOrNull(metadataDirectAccess.getPath().toString()));
-      values.put(AIPS_FILE_PLACEHOLDER, getExistingFileOrNull(aipsDirectAccess.getPath().toString()));
-      values.put(SCHEDULES_FILE_PLACEHOLDER, getExistingFileOrNull(schedulesDirectAccess.getPath().toString()));
-      values.put(HOLDS_FILE_PLACEHOLDER, getExistingFileOrNull(holdsDirectAccess.getPath().toString()));
+      values.put(METADATA_FILE_PLACEHOLDER, getExistingFileOrNull(metadataDirectAccess.toString()));
+      values.put(AIPS_FILE_PLACEHOLDER, getExistingFileOrNull(aipsDirectAccess.toString()));
+      values.put(SCHEDULES_FILE_PLACEHOLDER, getExistingFileOrNull(schedulesDirectAccess.toString()));
+      values.put(HOLDS_FILE_PLACEHOLDER, getExistingFileOrNull(holdsDirectAccess.toString()));
 
       String jqCommandParams = HandlebarsUtility.executeHandlebars(jqCommandTemplate, values);
 
@@ -203,11 +203,12 @@ public class DisposalConfirmationService {
       InputStream templateStream;
 
       if (isToPrint) {
-        templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-                RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + DISPOSAL_CONFIRMATION_REPORT_PRINT_HBS);
+        templateStream = RodaCoreFactory
+          .getConfigurationFileAsStream(RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/"
+            + DISPOSAL_CONFIRMATION_REPORT_PRINT_HBS);
       } else {
         templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-                RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + DISPOSAL_CONFIRMATION_REPORT_HBS);
+          RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + DISPOSAL_CONFIRMATION_REPORT_HBS);
       }
 
       String reportTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
@@ -221,11 +222,11 @@ public class DisposalConfirmationService {
       String apply = template.apply(confirmationValues);
 
       final ConsumesOutputStream stream = new DefaultConsumesOutputStream(confirmationId + HTML_EXTENSION,
-              RodaConstants.MEDIA_TYPE_TEXT_HTML, out -> {
-        PrintStream printStream = new PrintStream(out);
-        printStream.print(apply);
-        printStream.close();
-      });
+        RodaConstants.MEDIA_TYPE_TEXT_HTML, out -> {
+          PrintStream printStream = new PrintStream(out);
+          printStream.print(apply);
+          printStream.close();
+        });
 
       return new StreamResponse(stream);
     }
