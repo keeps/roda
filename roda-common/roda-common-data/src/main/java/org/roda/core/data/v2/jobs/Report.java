@@ -573,10 +573,11 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
 
   @JsonIgnore
   public Report getLastRunPlugin() {
-    int size = reports.size();
+    List<Report> reportsList = getReports();
+    int size = reportsList.size();
     if (size == 0)
       return null;
-    return reports.get(size - 1);
+    return reportsList.get(size - 1);
   }
 
   @Override

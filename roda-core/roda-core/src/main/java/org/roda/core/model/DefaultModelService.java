@@ -3038,22 +3038,7 @@ public class DefaultModelService implements ModelService {
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    boolean deletedFromDb = false;
-
-    // Try to delete from database first (for running jobs)
-    if (isJpaAvailable()) {
-      JobRepository jobRepo = getJobRepository();
-      ReportRepository reportRepo = getReportRepository();
-      if (jobRepo != null && jobRepo.existsById(jobId)) {
-        // Delete reports from DB
-        if (reportRepo != null) {
-          reportRepo.deleteByJobId(jobId);
-        }
-        // Delete job from DB
-        jobRepo.deleteById(jobId);
-        deletedFromDb = true;
-      }
-    }
+    boolean deletedFromDb = isDeletedFromDb(jobId);
 
     // Also try to delete from storage (for archived jobs or cleanup)
     try {
@@ -3075,6 +3060,26 @@ public class DefaultModelService implements ModelService {
 
     // remove it from index
     notifyJobDeleted(jobId).failOnError();
+  }
+
+  private boolean isDeletedFromDb(String jobId) {
+    boolean deletedFromDb = false;
+
+    // Try to delete from database first (for running jobs)
+    if (isJpaAvailable()) {
+      JobRepository jobRepo = getJobRepository();
+      ReportRepository reportRepo = getReportRepository();
+      if (jobRepo != null && jobRepo.existsById(jobId)) {
+        // Delete reports from DB
+        if (reportRepo != null) {
+          reportRepo.deleteByJobId(jobId);
+        }
+        // Delete job from DB
+        jobRepo.deleteById(jobId);
+        deletedFromDb = true;
+      }
+    }
+    return deletedFromDb;
   }
 
   @Override

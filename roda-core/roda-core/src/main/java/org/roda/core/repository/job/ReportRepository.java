@@ -8,8 +8,10 @@
 package org.roda.core.repository.job;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.roda.core.data.v2.jobs.Report;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +26,27 @@ import org.springframework.transaction.annotation.Transactional;
 public interface ReportRepository extends JpaRepository<Report, String> {
 
   /**
-   * Find all reports associated with a given job ID.
+   * Find a report by its ID, eagerly fetching step reports to avoid
+   * LazyInitializationException when accessed outside a transaction.
+   *
+   * @param id
+   *          the report ID
+   * @return optional containing the report if found
+   */
+  @Override
+  @EntityGraph(attributePaths = "stepReports")
+  Optional<Report> findById(String id);
+
+  /**
+   * Find all reports associated with a given job ID, eagerly fetching step
+   * reports to avoid LazyInitializationException when accessed outside a
+   * transaction.
    *
    * @param jobId
    *          the job ID to search for
    * @return list of reports for the specified job
    */
+  @EntityGraph(attributePaths = "stepReports")
   List<Report> findByJobId(String jobId);
 
   /**
