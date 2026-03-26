@@ -11,7 +11,10 @@ import org.fusesource.restygwt.client.Method;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 
@@ -34,7 +37,6 @@ public class MethodCallThrowableTreatment {
   private MethodCallThrowableTreatment() {
     // empty constructor
   }
-  // TODO: Add more common failures
 
   public static Throwable treatCommonFailures(Method method, Throwable throwable) {
     final JSONValue parse = JSONParser.parseStrict(method.getResponse().getText());
@@ -63,7 +65,13 @@ public class MethodCallThrowableTreatment {
       if (throwableMessage.equals("Validation error")) {
         ValidationReport details = VALIDATION_REPORT_MAPPER.read(parse.isObject().get("objectDetails").toString());
         throwable = new ValidationException(details);
+      } else {
+        throwable = new RequestNotValidException(throwableDetails);
       }
+    } else if (method.getResponse().getStatusCode() == Response.SC_METHOD_NOT_ALLOWED) {
+      throwable = new NotImplementedException(throwableDetails);
+    } else if (method.getResponse().getStatusCode() == Response.SC_INTERNAL_SERVER_ERROR) {
+      throwable = new GenericException(throwableDetails);
     }
 
     return throwable;
