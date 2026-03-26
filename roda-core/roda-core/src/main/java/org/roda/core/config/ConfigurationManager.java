@@ -410,6 +410,9 @@ public class ConfigurationManager {
     String envKey = "RODA_" + key.toUpperCase().replace('.', '_');
     String value = System.getenv(envKey);
     if (value == null) {
+      value = System.getProperty(envKey);
+    }
+    if (value == null) {
       value = rodaConfiguration.getString(key, defaultValue);
 
       if (value.startsWith("${env:")) {
