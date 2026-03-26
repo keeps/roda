@@ -30,7 +30,7 @@ import jakarta.mail.internet.MimeMultipart;
 
 public class ConfigurableEmailUtility {
 
-  private static final List<String> DEFAULT_PROPERTIES = Arrays.asList("host", "port", "auth", "starttls.enable");
+  private static final List<String> DEFAULT_PROPERTIES = Arrays.asList("auth", "starttls.enable");
   private String protocol;
   private String user;
   private String password;
@@ -88,6 +88,12 @@ public class ConfigurableEmailUtility {
 
   private void createSessionParameters() {
     boolean hasAuth = false;
+
+    String port = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.email.port", "1025");
+    props.put("mail.smtp.port", port);
+
+    String host = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.email.host", "localhost");
+    props.put("mail.smtp.host", host);
 
     String properties = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "properties");
     List<String> propertyList = new ArrayList<>(DEFAULT_PROPERTIES);

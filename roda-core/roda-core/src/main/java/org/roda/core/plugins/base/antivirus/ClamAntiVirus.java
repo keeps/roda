@@ -136,10 +136,10 @@ public class ClamAntiVirus implements AntiVirus {
 
       LOGGER.debug("Executing virus scan in {}", path);
 
-      String clamavBin = RodaCoreFactory.getRodaConfiguration()
-        .getString("core.plugins.internal.virus_check.clamav.bin", "clamscan");
-      String clamavParams = RodaCoreFactory.getRodaConfiguration()
-        .getString("core.plugins.internal.virus_check.clamav.params", "-ri");
+      String clamavBin = RodaCoreFactory.getConfigurationManager()
+        .getConfigurationString("core.plugins.internal.virus_check.clamav.bin", "clamscan");
+      String clamavParams = RodaCoreFactory.getConfigurationManager()
+        .getConfigurationString("core.plugins.internal.virus_check.clamav.params", "-ri");
 
       List<String> command = new ArrayList<>();
       command.add(clamavBin);
@@ -160,8 +160,8 @@ public class ClamAntiVirus implements AntiVirus {
 
   @Override
   public String getVersion() {
-    String clamavGetVersion = RodaCoreFactory.getRodaConfiguration()
-      .getString("core.plugins.internal.virus_check.clamav.get_version", "clamscan --version");
+    String clamavGetVersion = RodaCoreFactory.getConfigurationManager()
+            .getConfigurationString("core.plugins.internal.virus_check.clamav.get_version", "clamscan --version");
     List<String> command = new ArrayList<>(Arrays.asList(clamavGetVersion.split(" ")));
     try {
       String executeOutput = CommandUtility.execute(command, false);

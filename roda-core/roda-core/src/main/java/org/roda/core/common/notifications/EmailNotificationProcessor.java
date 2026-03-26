@@ -98,7 +98,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
 
       for (String recipient : recipients) {
         String modifiedBody = getUpdatedMessageBody(model, notification, recipient, template, scope);
-        String host = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "host");
+        String host = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.email.host", "127.0.0.1");
         if (StringUtils.isNotBlank(host)) {
           LOGGER.debug("Sending email ...");
           emailUtility.sendMail(recipient, modifiedBody);
@@ -111,7 +111,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
       }
     } catch (IOException | MessagingException | GenericException e) {
       processedNotification.setState(NotificationState.FAILED);
-      LOGGER.debug("Error sending e-mail: {}", e.getMessage());
+      LOGGER.error("Error sending e-mail: {}", e.getMessage());
     }
     return processedNotification;
   }
