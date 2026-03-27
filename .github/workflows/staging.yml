@@ -36,12 +36,6 @@ jobs:
         run: mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RODA_CORE_SOLR_TYPE: CLOUD
-          RODA_CORE_SOLR_CLOUD_URLS: localhost:2181
-          SIEGFRIED_MODE: standalone
-          LDAP_SERVER_URL: ldap://localhost
-          LDAP_SERVER_PORT: 1389
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/roda_core_db
       - name: Copy target to docker context
         run: |
           mkdir -p docker/target
