@@ -11,43 +11,6 @@ jobs:
     env:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
 
-    services:
-      zookeeper:
-        image: zookeeper:3.9.1-jre-17
-        ports:
-          - 2181:2181
-      solr:
-        image: solr:9
-        ports:
-          - 8983:8983
-        env:
-          ZK_HOST: zookeeper:2181
-        options: -e cloud
-      postgres:
-        image: postgres:17
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: roda
-          POSTGRES_DB: roda_core_db
-      mailhog:
-        image: mailhog/mailhog:v1.0.1
-        ports:
-          - 1025:1025
-      openldap:
-        image: docker.io/bitnamilegacy/openldap:2.6
-        ports:
-          - 1389:1389
-          - 1636:1636
-        env:
-          BITNAMI_DEBUG: true
-          LDAP_ROOT: dc=roda,dc=org
-          LDAP_SKIP_DEFAULT_TREE: yes
-          LDAP_ADMIN_USERNAME: admin
-          LDAP_ADMIN_PASSWORD: roda
-          LDAP_EXTRA_SCHEMAS: cosine,inetorgperson,nis,pbkdf2
-
     steps:
       - uses: actions/checkout@v6
         with:
@@ -67,20 +30,8 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
-      - name: Set up GO
-        uses: actions/setup-go@v6
-        with:
-          go-version: "^1.22.1"
-          check-latest: true
-      - name: Install siegfried
-        run: |
-          go install github.com/richardlehane/siegfried/cmd/sf@latest
-          sf -update
-      - name: Install clamdscan mock
-        run: |
-          sudo cp .github/workflows/bin/clamscan /usr/bin/clamscan
-          sudo cp .github/workflows/bin/clamscan /usr/bin/clamdscan
-          sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan
+      - name: Install clamdscan
+        run: sudo apt-get install clamdscan -y
       - name: Run tests & install
         run: mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
         env:
