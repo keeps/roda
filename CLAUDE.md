@@ -88,6 +88,15 @@ roda/
 4. **GitHub account with PAT** — required for GitHub Packages dependency resolution
 
 **Configure Maven for GitHub Packages** (`~/.m2/settings.xml`):
+
+The easiest way is to set the environment variables and run the provided script:
+```bash
+export GITHUB_MAVEN_USER=YOUR_GITHUB_USERNAME
+export GITHUB_MAVEN_PASSWORD=YOUR_GITHUB_PAT
+./scripts/setup_maven_settings.sh
+```
+
+Alternatively, create `~/.m2/settings.xml` manually:
 ```xml
 <settings>
   <servers>
