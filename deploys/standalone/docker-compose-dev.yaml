@@ -108,6 +108,22 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
+  dbgate:
+    image: dbgate/dbgate
+    restart: always
+    ports:
+      - 8082:3000
+    volumes:
+      - dbgate-data:/root/.dbgate
+    environment:
+      CONNECTIONS: pgsql
+      LABEL_pgsql: Postgres
+      SERVER_pgsql: postgres
+      USER_pgsql: admin
+      PASSWORD_pgsql: roda
+      PORT_pgsql: 5432
+      ENGINE_pgsql: postgres@dbgate-plugin-postgres
+
 volumes:
   zookeeper_data:
   zookeeper_datalog:
@@ -115,3 +131,4 @@ volumes:
   clam_data:
   siegfried_data:
   pg_data:
+  dbgate-data:
