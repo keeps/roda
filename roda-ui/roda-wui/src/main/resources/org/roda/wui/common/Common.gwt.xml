@@ -12,4 +12,5 @@
 	<!--  <inherits name="org.gwtwidgets.WidgetLibrary" /> -->
 	<!-- Specify the cascade stylesheet -->
 	<!-- <stylesheet src="Common.css"/> -->
+	<inherits name="jakarta.persistence.Persistence" />
 </module>
