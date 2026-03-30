@@ -121,7 +121,7 @@
         <roda.temporary.repository>${user.dir}</roda.temporary.repository>
         <java_version>21</java_version>
         <gwt.version>2.12.2</gwt.version>
-        <cas.client.version>4.0.4</cas.client.version>
+        <cas.client.version>4.1.0</cas.client.version>
         <swagger.version>2.2.41</swagger.version>
         <jackson.version>2.20.1</jackson.version>
         <spring.version>6.2.17</spring.version>
@@ -132,7 +132,7 @@
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
-        <springboot.version>3.5.11</springboot.version>
+        <springboot.version>3.5.12</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
         <logback.version>1.5.25</logback.version>
         <mockito.version>5.18.0</mockito.version>
