@@ -11,14 +11,6 @@
 
     <name>codeserver</name>
 
-    <repositories>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/keeps/*</url>
-        </repository>
-    </repositories>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <rodaPath>..</rodaPath>
@@ -70,9 +62,9 @@
             <classifier>sources</classifier>
         </dependency>
         <dependency>
-            <groupId>org.fusesource.restygwt</groupId>
+            <groupId>org.roda-community</groupId>
             <artifactId>restygwt</artifactId>
-            <version>2.2.12-keeps</version>
+            <version>2.2.12</version>
         </dependency>
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
