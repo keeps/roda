@@ -463,7 +463,7 @@
             <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.fusesource.restygwt</groupId>
+            <groupId>org.roda-community</groupId>
             <artifactId>restygwt</artifactId>
         </dependency>
         <dependency>
