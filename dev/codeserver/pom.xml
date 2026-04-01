@@ -46,7 +46,7 @@
             <version>${roda.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.ekotrope</groupId>
+            <groupId>org.roda-community</groupId>
             <artifactId>gwt-completablefuture</artifactId>
             <version>1.0.1</version>
         </dependency>
