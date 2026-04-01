@@ -19,7 +19,10 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.browse.BrowseTop;
+import org.roda.wui.client.management.ShowLogEntry;
+import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.disposal.DisposalDestroyedRecords;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
@@ -27,6 +30,7 @@ import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -347,6 +351,21 @@ public class BreadcrumbUtils {
       path.add(r.getUUID());
       SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(r.getName());
       ret.add(new BreadcrumbItem(breadcrumbLabel, r.getName(), path));
+    }
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getLogEntryBreadcrumbs(LogEntry logEntry) {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.activityLogTitle()),
+            messages.activityLogTitle(), UserLog.RESOLVER.getHistoryPath()));
+
+    if (logEntry != null) {
+      List<String> path = new ArrayList<>(ShowLogEntry.RESOLVER.getHistoryPath());
+      path.add(logEntry.getUUID());
+      String label = StringUtils.isNotBlank(logEntry.getId()) ? logEntry.getId() : logEntry.getUUID();
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
 
     return ret;
