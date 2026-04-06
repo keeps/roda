@@ -1,0 +1,12 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="SingleTest" verbose="1">
+	<listeners>
+		<listener class-name="org.roda.core.RodaContainersLifecycleListener" />
+	</listeners>
+	<test name="single" preserve-order="true">
+		<classes>
+			<class name="org.roda.core.index.IndexServiceTest" />
+		</classes>
+	</test>
+</suite>

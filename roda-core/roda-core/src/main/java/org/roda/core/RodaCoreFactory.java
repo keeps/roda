@@ -1045,7 +1045,11 @@ public class RodaCoreFactory {
       zkChroot = Optional.empty();
     }
 
-    CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot).build();
+    int zkClientTimeout = getRodaConfiguration().getInt("core.solr.cloud.zk.client.timeout_ms", 600000);
+    int zkConnectTimeout = getRodaConfiguration().getInt("core.solr.cloud.zk.connect.timeout_ms", 300000);
+    CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot)
+      .withZkClientTimeout(zkClientTimeout, TimeUnit.MILLISECONDS)
+      .withZkConnectTimeout(zkConnectTimeout, TimeUnit.MILLISECONDS).build();
 
     waitForSolrCluster(cloudSolrClient);
 
@@ -1089,7 +1093,8 @@ public class RodaCoreFactory {
       cloudSolrClient.connect(connectTimeout, TimeUnit.MILLISECONDS);
       LOGGER.info("Connected to Solr Cloud");
     } catch (TimeoutException e) {
-      throw new GenericException("Could not connect to Solr Cloud", e);
+      LOGGER.warn("Timed out waiting for Solr Cloud live nodes (will retry): {}", e.getMessage());
+      return false;
     }
 
     ClusterState clusterState = cloudSolrClient.getClusterState();
@@ -1418,7 +1423,7 @@ public class RodaCoreFactory {
   private static void indexUsersAndGroupsFromLDAP() throws GenericException {
     for (User user : getModelService().listUsers()) {
       getModelService().notifyUserUpdated(user).failOnError();
-      if (INSTANTIATE_SOLR) {
+      if (INSTANTIATE_SOLR && getIndexService() != null) {
         try {
           PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), getModelService(), getIndexService(), true);
         } catch (ValidationException | NotFoundException | RequestNotValidException | AuthorizationDeniedException
