@@ -416,7 +416,7 @@ After changing `roda-core`, run `mvn install -Pcore -DskipTests` before building
 
 1. **GitHub Packages auth is required.** Maven build will fail without a valid `~/.m2/settings.xml` with a GitHub PAT having `read:packages`.
 
-2. **Always start Docker services before running tests.** Tests are integration tests — they need live Solr, PostgreSQL, ZooKeeper, and LDAP.
+2. **Always start Docker services before running tests.** Tests use Testcontainers (auto-starts ZooKeeper, Solr, PostgreSQL, LDAP, Mailpit, ClamAV, Siegfried). The Docker daemon must be running. In the Claude Code cloud environment, start it with: `service docker start` (may print an ulimit warning — that is harmless).
 
 3. **Use the correct Maven profile.**
    - Skip UI/GWT: use `-Pcore`
@@ -436,3 +436,78 @@ After changing `roda-core`, run `mvn install -Pcore -DskipTests` before building
 9. **PREMIS metadata is mandatory.** Every preservation action must record a PREMIS event in the AIP's metadata. Follow existing plugin implementations as examples.
 
 10. **Commit signing.** Commits should be GPG-signed per the project's contribution guidelines. See: https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits
+
+---
+
+## Claude Code Cloud Environment — Quick Reference
+
+This section captures environment-specific quirks for running in the Claude Code remote container.
+
+### Docker Setup
+
+Docker daemon is installed but may not be running at session start:
+
+```bash
+# Check if Docker is running
+docker ps
+
+# If not running, start it (the ulimit warning is harmless):
+service docker start
+
+# Verify
+docker ps  # should show empty table, not an error
+```
+
+### Build Commands (Cloud Environment)
+
+Maven Central access may be blocked by a proxy. Always use **offline mode** (`-o`) or the local repo when possible. The proxy is pre-configured via `JAVA_TOOL_OPTIONS` env var.
+
+```bash
+# Step 1: Build and install core modules (no tests, no GWT)
+mvn install -Pcore -DskipTests -Denforcer.skip=true
+
+# Step 2: Run a single test class to verify (fast validation)
+mvn -pl roda-core/roda-core-tests test -Pcore \
+  -Dtestng.groups="travis" \
+  -Denforcer.skip=true \
+  -Dsurefire.suiteXmlFiles=testng-single.xml \
+  -o
+
+# Step 3: Run full CI test suite
+mvn -Pcore -Dtestng.groups="travis" -Denforcer.skip=true \
+  clean org.jacoco:jacoco-maven-plugin:prepare-agent test
+```
+
+### Single-Test Shortcut
+
+`roda-core/roda-core-tests/testng-single.xml` targets only `IndexServiceTest`. Edit the `<class name="...">` element to point at any test class you want to run in isolation.
+
+### Test Infrastructure (Testcontainers)
+
+Tests use `TestContainersManager` (singleton) to start containers once per JVM. The `RodaContainersLifecycleListener` triggers it via `testng.xml`. Containers started:
+
+| Service     | Image                     |
+|-------------|---------------------------|
+| ZooKeeper   | zookeeper:3.9.1-jre-17    |
+| Solr        | solr:9                    |
+| PostgreSQL  | postgres:17               |
+| Mailpit     | axllent/mailpit:latest    |
+| ClamAV      | clamav/clamav:1.5.2       |
+| Siegfried   | keeps/siegfried:v1.11.0   |
+
+**Important**: On Linux, Solr registers its container IP in ZooKeeper. Bridge network IPs (`172.x.x.x`) are directly routable from the host — no port mapping is needed for the CloudSolrClient to reach Solr live nodes.
+
+### ZooKeeper / Solr Connection Notes
+
+- `zkConnectTimeout` defaults to 15 s in SolrJ. If the ZK session is not established within that window, `SolrZkClient` calls `ZooKeeper.close()`, which **hangs indefinitely** (sends CLOSESESSION but has no threads left to receive the response).
+- The fix is in `RodaCoreFactory.instantiateSolr()`: `withZkConnectTimeout(300000, MILLISECONDS)` is set on the builder.
+- `TestContainersManager` also sets `System.setProperty("zkConnectTimeout", "300000")` as belt-and-suspenders.
+
+### Pre-PR Checklist
+
+Before pushing/creating a PR:
+1. `service docker start` (if not already running)
+2. `mvn install -Pcore -DskipTests -Denforcer.skip=true` — compile all modules
+3. Run a targeted single test to validate the change area
+4. Run full CI test suite if the change is broad
+5. Verify no Checkstyle violations (they are enforced in CI)

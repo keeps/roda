@@ -29,7 +29,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <argLine>-Droda.environment.collect.version=false</argLine>
+                            <argLine>-Droda.environment.collect.version=false -Dhttp.nonProxyHosts=localhost|127.0.0.1|172.*|192.*|169.254.169.254|metadata.google.internal|*.svc.cluster.local|*.local|*.googleapis.com|*.google.com</argLine>
                             <useSystemClassLoader>true</useSystemClassLoader>
                             <useManifestOnlyJar>false</useManifestOnlyJar>
                             <suiteXmlFiles>

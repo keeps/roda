@@ -56,6 +56,8 @@ public class TestContainersManager {
     // ZooKeeper — exposed so that the RODA CloudSolrClient can connect
     zookeeper = new GenericContainer<>(DockerImageName.parse("zookeeper:3.9.1-jre-17")).withNetwork(network)
       .withNetworkAliases("zookeeper").withExposedPorts(2181)
+      .withEnv("ZOO_TICK_TIME", "10000")
+      .withEnv("ZOO_CFG_EXTRA", "maxSessionTimeout=600000")
       .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(60)));
     zookeeper.start();
     LOGGER.info("ZooKeeper started at {}:{}", zookeeper.getHost(), zookeeper.getMappedPort(2181));
@@ -66,9 +68,16 @@ public class TestContainersManager {
     // the container's bridge-network IP. On Linux (CI and most developer
     // machines) this IP is directly reachable from the Docker host, so the
     // CloudSolrClient can connect without any additional port mapping.
+    //
+    // Wait for the log message that Solr emits immediately after registering
+    // the live node in ZooKeeper. This log fires AFTER ZkController.registerLiveNode(),
+    // so by the time this wait strategy succeeds, the live node is already
+    // present in ZooKeeper and RodaCoreFactory.connect() will find it instantly.
+    // Using a log-based strategy avoids any HTTP proxy interference.
     solr = new GenericContainer<>(DockerImageName.parse("solr:9")).withNetwork(network)
-      .withEnv("ZK_HOST", "zookeeper:2181").withExposedPorts(8983).waitingFor(Wait.forHttp("/solr/admin/info/system")
-        .forPort(8983).forStatusCode(200).withStartupTimeout(Duration.ofMinutes(3)));
+      .withEnv("ZK_HOST", "zookeeper:2181").withExposedPorts(8983)
+      .waitingFor(Wait.forLogMessage(".*Register node as live in ZooKeeper.*", 1)
+        .withStartupTimeout(Duration.ofMinutes(3)));
     solr.start();
     LOGGER.info("Solr started at {}:{}", solr.getHost(), solr.getMappedPort(8983));
 
@@ -144,6 +153,15 @@ public class TestContainersManager {
 
     System.setProperty("RODA_CORE_EMAIL_HOST", mailpit.getHost());
     System.setProperty("RODA_CORE_EMAIL_PORT", mailpit.getMappedPort(1025).toString());
+
+    // Give Solr Cloud more time to establish its ZooKeeper connection in
+    // environments where ZkClient session establishment is slow.
+    System.setProperty("RODA_CORE_SOLR_CLOUD_CONNECT_TIMEOUT_MS", "300000");
+    // Increase ZK connect timeout so SolrZkClient does not call ZooKeeper.close()
+    // before the session is established (the close() hangs indefinitely when there
+    // are no background ZK threads left to process the CLOSESESSION response).
+    System.setProperty("RODA_CORE_SOLR_CLOUD_ZK_CONNECT_TIMEOUT_MS", "300000");
+    System.setProperty("zkConnectTimeout", "300000");
 
     System.setProperty("RODA_CORE_PLUGINS_INTERNAL_VIRUS_CHECK_CLAMAV_PARAMS", "-m --stream -c /tmp/clamd.conf");
 
