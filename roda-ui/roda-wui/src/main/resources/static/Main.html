@@ -82,6 +82,13 @@
     <!-- UTIF.js (client-side TIFF decoder) -->
     <script src="js/utif/UTIF.js" type="text/javascript"></script>
 
+    <!-- Email viewer: browser bundles produced by frontend-maven-plugin -->
+    <!-- DOMPurify: sanitises email HTML bodies before inserting into DOM -->
+    <script src="webjars/dompurify/dist/purify.min.js" type="text/javascript"></script>
+    <!-- MSGReader: Outlook .msg decoder; exposes window.MSGReader -->
+    <script src="js/msgreader/MsgReader.js" type="text/javascript"></script>
+    <!-- EmlParseJs: RFC 822 .eml parser; exposes window.EmlParseJs -->
+    <script src="js/emlparser/EmlParseJs.js" type="text/javascript"></script>
 </head>
 <body id="main">
 <a href="#content"></a>

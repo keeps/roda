@@ -1,0 +1,15 @@
+{
+  "name": "roda-wui-js-bundles",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Build-time entry points for npm packages that have no browser UMD build. Bundled to browser IIFEs by esbuild via frontend-maven-plugin.",
+  "dependencies": {
+    "@kenjiuno/msgreader": "1.11.0",
+    "eml-parse-js": "1.1.15",
+    "buffer": "^6.0.3",
+    "string_decoder": "^1.3.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.1"
+  }
+}
