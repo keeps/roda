@@ -111,6 +111,7 @@
                             <directories>
                                 <directory>${project.build.directory}/${project.build.finalName}</directory>
                             </directories>
+
                             <environmentVariables>
                                 <LDAP_SERVER_URL>ldap://localhost</LDAP_SERVER_URL>
                                 <LDAP_SERVER_PORT>1389</LDAP_SERVER_PORT>
@@ -136,7 +137,8 @@
                         <extensions>true</extensions>
                         <configuration>
                             <moduleName>${gwt.module.main}</moduleName>
-                            <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
+                            <webappDirectory>${project.build.directory}/${project.build.finalName}/static</webappDirectory>
+                            <launcherDir>${project.build.directory}/${project.build.finalName}/static</launcherDir>
 
                             <classpathScope>compile+runtime</classpathScope>
                             <skipCompilation>false</skipCompilation>
@@ -192,7 +194,8 @@
                         <extensions>true</extensions>
                         <configuration>
                             <moduleName>${gwt.module.main}</moduleName>
-                            <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
+                            <webappDirectory>${project.build.directory}/${project.build.finalName}/static</webappDirectory>
+                            <launcherDir>${project.build.directory}/${project.build.finalName}/static</launcherDir>
 
                             <classpathScope>compile+runtime</classpathScope>
                             <skipCompilation>false</skipCompilation>
@@ -248,7 +251,8 @@
                         <extensions>true</extensions>
                         <configuration>
                             <moduleName>${gwt.module.main}</moduleName>
-                            <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
+                            <webappDirectory>${project.build.directory}/${project.build.finalName}/static</webappDirectory>
+                            <launcherDir>${project.build.directory}/${project.build.finalName}/static</launcherDir>
                             <classpathScope>test</classpathScope>
                             <skipCompilation>false</skipCompilation>
                             <draftCompile>true</draftCompile>
@@ -294,7 +298,8 @@
                         <extensions>true</extensions>
                         <configuration>
                             <moduleName>${gwt.module.portal}</moduleName>
-                            <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
+                            <webappDirectory>${project.build.directory}/${project.build.finalName}/static</webappDirectory>
+                            <launcherDir>${project.build.directory}/${project.build.finalName}/static</launcherDir>
 
                             <skipCompilation>false</skipCompilation>
                             <draftCompile>true</draftCompile>
