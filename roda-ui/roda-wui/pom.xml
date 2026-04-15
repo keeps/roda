@@ -563,11 +563,11 @@
             <version>4.3.0</version>
         </dependency>
 
-        <!-- PDF.JS: https://github.com/webjars/pdf-js/ -->
+        <!-- PDF.JS -->
         <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>pdf-js</artifactId>
-            <version>5.3.31</version>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>pdfjs-dist</artifactId>
+            <version>5.5.207</version>
         </dependency>
 
         <!-- File upload -->
