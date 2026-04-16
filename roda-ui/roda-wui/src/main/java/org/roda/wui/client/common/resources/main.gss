@@ -5476,6 +5476,91 @@ td.datePickerMonth, td.datePickerYear {
     max-height: 600px;
 }
 
+.viewRepresentationEmailFilePreview {
+    width: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+.viewRepresentationEmailFilePreview .email-header {
+    margin-bottom: 12px;
+}
+
+.viewRepresentationEmailFilePreview .email-field {
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.viewRepresentationEmailFilePreview .email-label {
+    font-weight: bold;
+    color: #555;
+    margin-right: 4px;
+}
+
+.viewRepresentationEmailFilePreview .email-value {
+    color: #222;
+    word-break: break-word;
+}
+
+.viewRepresentationEmailFilePreview .email-divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 12px 0;
+}
+
+.viewRepresentationEmailFilePreview .email-body {
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    padding: 12px;
+    background: #fff;
+    word-wrap: break-word;
+}
+
+.viewRepresentationEmailFilePreview .email-body-text {
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 13px;
+    margin: 0;
+}
+
+.viewRepresentationEmailFilePreview .email-body-empty {
+    color: #999;
+    font-style: italic;
+}
+
+.viewRepresentationEmailFilePreview .email-attachments {
+    margin-top: 16px;
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+}
+
+.viewRepresentationEmailFilePreview .email-attachments-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+    margin: 0 0 8px 0;
+}
+
+.viewRepresentationEmailFilePreview .email-attachments-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.viewRepresentationEmailFilePreview .email-attachments-list li {
+    padding: 4px 0;
+    font-size: 13px;
+}
+
+.viewRepresentationEmailFilePreview .email-attachment-size {
+    color: #888;
+    font-size: 12px;
+}
+
 .viewRepresentationAudioFilePreview {
     max-width: 100%;
     /*max-width: 300px;*/

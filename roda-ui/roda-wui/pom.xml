@@ -639,7 +639,7 @@
             <!-- HTML sanitizer — prevents XSS from email body content -->
             <groupId>org.webjars.npm</groupId>
             <artifactId>dompurify</artifactId>
-            <version>3.2.6</version>
+            <version>3.4.0</version>
         </dependency>
         <!-- / Email viewer -->
         <!-- Spring boot -->

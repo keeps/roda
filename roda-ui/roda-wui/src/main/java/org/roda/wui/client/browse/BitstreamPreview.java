@@ -58,7 +58,6 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private static final String VIEWER_TYPE_HTML = "html";
   private static final String VIEWER_TYPE_PDF = "pdf";
   private static final String VIEWER_TYPE_IMAGE = "image";
-  private static final String VIEWER_TYPE_TIFF = "tiff";
   private static final String VIEWER_TYPE_EMAIL = "email";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -255,11 +254,6 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       }
     });
 
-  }
-
-  private void tiffPreview() {
-    TiffViewer tiffViewer = new TiffViewer(bitstreamDownloadUri);
-    panel.add(tiffViewer);
   }
 
   private void emailPreview() {

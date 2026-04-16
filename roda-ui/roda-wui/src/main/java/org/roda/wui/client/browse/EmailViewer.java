@@ -57,6 +57,8 @@ public class EmailViewer extends Composite {
     panel.addAttachHandler(event -> {
       if (event.isAttached()) {
         renderEmail(panel.getElement(), fileUrl, fmt);
+      } else {
+        revokeObjectUrls();
       }
     });
   }
@@ -99,6 +101,20 @@ public class EmailViewer extends Composite {
   }
 
   /**
+   * Revokes all Blob object-URLs created during rendering to free memory.
+   * Called when the widget is detached from the DOM.
+   */
+  private native void revokeObjectUrls() /*-{
+    var urls = this.__emailViewerObjUrls;
+    if (urls) {
+      for (var i = 0; i < urls.length; i++) {
+        $wnd.URL.revokeObjectURL(urls[i]);
+      }
+      this.__emailViewerObjUrls = [];
+    }
+  }-*/;
+
+  /**
    * Fetches the email file and renders it inside {@code container}.
    *
    * <p>
@@ -118,10 +134,22 @@ public class EmailViewer extends Composite {
    */
   private native void renderEmail(Element container, String url, String fmt) /*-{
     var self = this;
+    self.__emailViewerObjUrls = [];
+    var objUrls = self.__emailViewerObjUrls;
+
+    function escapeHtml(str) {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     function onError(msg) {
       container.innerHTML =
-        '<p class="errormessage">Unable to render email: ' + msg + '</p>';
+        '<p class="errormessage">Unable to render email: ' + escapeHtml(String(msg)) + '</p>';
       self.@org.roda.wui.client.browse.EmailViewer::handleFailure()();
     }
 
@@ -133,9 +161,6 @@ public class EmailViewer extends Composite {
       if ($wnd.DOMPurify) {
         return $wnd.DOMPurify.sanitize(html, {
           FORBID_TAGS: ['script', 'style', 'base', 'link', 'meta'],
-          FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus',
-                        'onblur', 'onchange', 'onsubmit', 'onreset', 'onselect',
-                        'onkeydown', 'onkeyup', 'onkeypress'],
           ADD_DATA_URI_TAGS: ['img']
         });
       }
@@ -143,16 +168,6 @@ public class EmailViewer extends Composite {
       var tmp = $doc.createElement('div');
       tmp.innerHTML = html;
       return tmp.textContent || tmp.innerText || '';
-    }
-
-    function escapeHtml(str) {
-      if (str == null) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
     }
 
     function formatSize(bytes) {
@@ -201,7 +216,9 @@ public class EmailViewer extends Composite {
           bytes[i] = binary.charCodeAt(i);
         }
         var blob = new $wnd.Blob([bytes], {type: mimeType});
-        return $wnd.URL.createObjectURL(blob);
+        var url = $wnd.URL.createObjectURL(blob);
+        objUrls.push(url);
+        return url;
       } catch (e) {
         return null;
       }
@@ -355,6 +372,7 @@ public class EmailViewer extends Composite {
                 var attBlob = new $wnd.Blob([attData.content],
                   {type: 'application/octet-stream'});
                 pAtt._objUrl = $wnd.URL.createObjectURL(attBlob);
+                objUrls.push(pAtt._objUrl);
               }
             } catch (attErr) {
               // Leave _objUrl null; attachment will be listed without a link.
