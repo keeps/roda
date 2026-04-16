@@ -23,21 +23,55 @@
   var _cssLoaded   = false;
 
   /* ------------------------------------------------------------------ */
+  /* Scoped CSS loading                                                   */
+  /* ------------------------------------------------------------------ */
+
+  /*
+   * pdf_viewer.css contains global :root rules (CSS custom properties,
+   * color-scheme, dark-mode media queries) that leak into the host page.
+   * We fetch the CSS text, replace every `:root` selector with
+   * `.rodaPdfViewer` so all declarations are scoped to our container,
+   * then inject the result as a <style> element.
+   *
+   * All PDF.js elements are descendants of .rodaPdfViewer, so custom
+   * properties defined there are still inherited by .pdfViewer, .page,
+   * .textLayer, etc.
+   */
+  async function loadScopedViewerCss(baseUrl) {
+    try {
+      var response = await fetch(baseUrl + 'webjars/pdfjs-dist/web/pdf_viewer.css');
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      var css = await response.text();
+
+      /* Scope :root declarations to .rodaPdfViewer */
+      css = css.replace(/:root\b/g, '.rodaPdfViewer');
+
+      var style = document.createElement('style');
+      style.setAttribute('data-roda-pdfjs-css', '');
+      style.textContent = css;
+      document.head.appendChild(style);
+    } catch (e) {
+      console.warn('[RodaPdfViewer] Could not scope pdf_viewer.css; falling back to global link.', e);
+      var link = document.createElement('link');
+      link.rel  = 'stylesheet';
+      link.href = baseUrl + 'webjars/pdfjs-dist/web/pdf_viewer.css';
+      link.setAttribute('data-roda-pdfjs-css', '');
+      document.head.appendChild(link);
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Library loading                                                      */
   /* ------------------------------------------------------------------ */
 
   async function getLibs(baseUrl) {
     if (_pdfjs && _pdfjsViewer) return { pdfjs: _pdfjs, pdfjsViewer: _pdfjsViewer };
 
-    /* Load pdf_viewer.css once — needed for text-layer CSS custom props */
+    /* Load pdf_viewer.css once, scoped so it does not leak into the app */
     if (!_cssLoaded) {
       _cssLoaded = true;
-      if (!document.querySelector('link[data-roda-pdfjs-css]')) {
-        var link = document.createElement('link');
-        link.rel  = 'stylesheet';
-        link.href = baseUrl + 'webjars/pdfjs-dist/web/pdf_viewer.css';
-        link.setAttribute('data-roda-pdfjs-css', '');
-        document.head.appendChild(link);
+      if (!document.querySelector('style[data-roda-pdfjs-css]')) {
+        await loadScopedViewerCss(baseUrl);
       }
     }
 
