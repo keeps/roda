@@ -1,32 +1,53 @@
 /**
  * RODA PDF Viewer
  *
- * Manual canvas + TextLayer rendering using only build/pdf.mjs (no PDFViewer
- * component).  Pages flow in normal document order so the browser's own
- * window scroll moves through them; the toolbar and search bar are sticky.
- * In fullscreen the viewer element becomes the scroll container instead.
+ * Uses the PDF.js high-level components (PDFViewer + PDFFindController) from
+ * web/pdf_viewer.mjs — exactly the same approach as the official demo at
+ * https://mozilla.github.io/pdf.js/web/viewer.html.
  *
- * Search highlighting is done directly in the DOM text layers (no PDFFindController).
- * All styles are scoped inside .rodaPdfViewer in main.gss — pdf_viewer.css is
- * NOT loaded globally, which avoids the :root variable pollution.
+ * pdf_viewer.css is loaded once from the webjar so that the text layer CSS
+ * custom properties (--total-scale-factor, --font-height, etc.) work correctly.
+ *
+ * All styles for our toolbar / search bar / sidebar live in main.gss under
+ * .rodaPdfViewer.  The page/textLayer/highlight CSS comes from pdf_viewer.css.
  */
 (function (global) {
   'use strict';
 
   /* Map<HTMLElement, ViewerState> */
   var viewers = new Map();
-  var _lib = null;   /* cached build/pdf.mjs module */
+
+  /* Cached ES-module handles */
+  var _pdfjs       = null;   /* build/pdf.mjs          */
+  var _pdfjsViewer = null;   /* web/pdf_viewer.mjs     */
+  var _cssLoaded   = false;
 
   /* ------------------------------------------------------------------ */
   /* Library loading                                                      */
   /* ------------------------------------------------------------------ */
 
-  async function getLib(baseUrl) {
-    if (_lib) return _lib;
-    _lib = await import(baseUrl + 'webjars/pdfjs-dist/build/pdf.mjs');
-    _lib.GlobalWorkerOptions.workerSrc =
+  async function getLibs(baseUrl) {
+    if (_pdfjs && _pdfjsViewer) return { pdfjs: _pdfjs, pdfjsViewer: _pdfjsViewer };
+
+    /* Load pdf_viewer.css once — needed for text-layer CSS custom props */
+    if (!_cssLoaded) {
+      _cssLoaded = true;
+      if (!document.querySelector('link[data-roda-pdfjs-css]')) {
+        var link = document.createElement('link');
+        link.rel  = 'stylesheet';
+        link.href = baseUrl + 'webjars/pdfjs-dist/web/pdf_viewer.css';
+        link.setAttribute('data-roda-pdfjs-css', '');
+        document.head.appendChild(link);
+      }
+    }
+
+    _pdfjs       = await import(baseUrl + 'webjars/pdfjs-dist/build/pdf.mjs');
+    _pdfjsViewer = await import(baseUrl + 'webjars/pdfjs-dist/web/pdf_viewer.mjs');
+
+    _pdfjs.GlobalWorkerOptions.workerSrc =
       baseUrl + 'webjars/pdfjs-dist/build/pdf.worker.mjs';
-    return _lib;
+
+    return { pdfjs: _pdfjs, pdfjsViewer: _pdfjsViewer };
   }
 
   /* ------------------------------------------------------------------ */
@@ -38,21 +59,19 @@
       viewerEl:            viewerEl,
       fileUrl:             fileUrl,
       baseUrl:             baseUrl,
-      /* document */
+      /* PDF.js components */
       pdfDoc:              null,
-      scale:               1.5,
-      rotation:            0,
+      pdfViewer:           null,
+      findController:      null,
+      eventBus:            null,
+      linkService:         null,
+      /* page info */
       currentPage:         1,
       totalPages:          0,
-      /* lazy rendering */
-      renderTasks:         new Map(),   /* pageNum → RenderTask */
-      renderedPages:       new Set(),
-      pageEls:             [],          /* index = pageNum - 1 */
-      pageObserver:        null,
       /* search */
       searchQuery:         null,
-      searchMarks:         [],          /* [{pageNum, el}] */
-      searchIndex:         -1,
+      searchMatchCurrent:  0,
+      searchMatchTotal:    0,
       searchDebounceTimer: null,
       /* sidebar */
       sidebarMode:         null,
@@ -67,7 +86,7 @@
       fullscreenBtnEl:     null,
       /* DOM refs */
       toolbarEl:           null,
-      pagesEl:             null,
+      scrollContainerEl:   null,
       sidebarEl:           null,
       sidebarContentEl:    null,
       pageInputEl:         null,
@@ -75,7 +94,6 @@
       searchBarEl:         null,
       searchInputEl:       null,
       searchCountEl:       null,
-      scrollHandler:       null,
     };
   }
 
@@ -112,7 +130,7 @@
   function buildDOM(state) {
     var viewer = state.viewerEl;
 
-    /* Loading indicator (removed once doc loads) */
+    /* Loading indicator */
     var loading = mk('div', 'rodaPdfLoading');
     loading.textContent = 'Loading document\u2026';
     viewer.appendChild(loading);
@@ -142,7 +160,7 @@
     g2.appendChild(pageCount);
     g2.appendChild(toolbarBtn('fa-chevron-right', 'Next page',     function () { nextPage(state); }));
 
-    /* Group 3: search (before zoom) */
+    /* Group 3: search */
     var g3 = mk('div', 'rodaPdfBtnGroup');
     g3.appendChild(toolbarBtn('fa-search', 'Search in document',
       function () { toggleSearch(state); }));
@@ -160,8 +178,6 @@
 
     /* Group 6: view modes (right-aligned) */
     var g6 = mk('div', 'rodaPdfBtnGroup rodaPdfBtnGroupRight');
-    g6.appendChild(toolbarBtn('fa-play-circle', 'Presentation mode',
-      function () { togglePresentation(state); }));
     var fsBtn = toolbarBtn('fa-expand', 'Fullscreen', function () {
       if (document.fullscreenElement === state.viewerEl) {
         document.exitFullscreen().catch(function () {});
@@ -216,24 +232,31 @@
     searchInput.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
         clearTimeout(state.searchDebounceTimer);
-        if (state.searchQuery) {
-          e.shiftKey ? prevSearchMatch(state) : nextSearchMatch(state);
-        } else {
-          performSearch(state);
-        }
+        e.shiftKey ? prevSearchMatch(state) : nextSearchMatch(state);
       } else if (e.key === 'Escape') {
         closeSearch(state);
       }
     });
 
-    /* ---- Content area: sidebar + pages ---- */
+    /* ---- Content area: sidebar + scroll container ---- */
     var content        = mk('div', 'rodaPdfContent');
     var sidebar        = mk('div', 'rodaPdfSidebar');
     var sidebarContent = mk('div', 'rodaPdfSidebarContent');
     sidebar.appendChild(sidebarContent);
-    var pagesEl = mk('div', 'rodaPdfPages');
+
+    /*
+     * PDFViewer requires its container to be position:absolute.
+     * We wrap it in a position:relative element that takes up the
+     * remaining space, and make the actual scroll container absolute inside it.
+     */
+    var scrollWrapper    = mk('div', 'rodaPdfScrollWrapper');
+    var scrollContainer  = mk('div', 'rodaPdfScrollContainer');
+    var pdfViewerDiv     = mk('div', 'pdfViewer');
+    scrollContainer.appendChild(pdfViewerDiv);
+    scrollWrapper.appendChild(scrollContainer);
+
     content.appendChild(sidebar);
-    content.appendChild(pagesEl);
+    content.appendChild(scrollWrapper);
 
     viewer.appendChild(toolbar);
     viewer.appendChild(searchBar);
@@ -241,7 +264,7 @@
 
     /* Store refs */
     state.toolbarEl        = toolbar;
-    state.pagesEl          = pagesEl;
+    state.scrollContainerEl = scrollContainer;
     state.sidebarEl        = sidebar;
     state.sidebarContentEl = sidebarContent;
     state.pageInputEl      = pageInput;
@@ -252,215 +275,13 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Page placeholders + lazy observer                                   */
-  /* ------------------------------------------------------------------ */
-
-  async function buildPageList(state) {
-    /* Compute fit-width scale now that DOM is laid out */
-    var availW = state.pagesEl.clientWidth || state.viewerEl.clientWidth || 800;
-    var firstPage = await state.pdfDoc.getPage(1);
-    var vp1 = firstPage.getViewport({ scale: 1, rotation: state.rotation });
-    state.scale = Math.max(0.25, (availW - 20) / vp1.width);
-
-    var vp = firstPage.getViewport({ scale: state.scale, rotation: state.rotation });
-    var w  = Math.floor(vp.width);
-    var h  = Math.floor(vp.height);
-
-    state.pageEls = [];
-    for (var i = 1; i <= state.totalPages; i++) {
-      var pageEl = mk('div', 'rodaPdfPage');
-      pageEl.dataset.pageNum = i;
-      pageEl.style.width  = w + 'px';
-      pageEl.style.height = h + 'px';
-      state.pagesEl.appendChild(pageEl);
-      state.pageEls.push(pageEl);
-    }
-
-    setupPageObserver(state);
-  }
-
-  function setupPageObserver(state) {
-    if (state.pageObserver) {
-      state.pageObserver.disconnect();
-      state.pageObserver = null;
-    }
-    /* root:null = viewport; use viewerEl as root when fullscreen */
-    var root = (document.fullscreenElement === state.viewerEl)
-      ? state.viewerEl : null;
-
-    state.pageObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        var num = parseInt(entry.target.dataset.pageNum, 10);
-        if (!state.renderedPages.has(num)) renderPage(state, num);
-      });
-    }, { root: root, rootMargin: '300px 0px', threshold: 0 });
-
-    state.pageEls.forEach(function (el) { state.pageObserver.observe(el); });
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* Page rendering (canvas + text layer)                                */
-  /* ------------------------------------------------------------------ */
-
-  async function renderPage(state, num) {
-    var pageEl = state.pageEls[num - 1];
-    if (!pageEl || !state.pdfDoc) return;
-
-    /* Cancel in-progress render for this slot */
-    var prev = state.renderTasks.get(num);
-    if (prev) { try { prev.cancel(); } catch (e) {} state.renderTasks.delete(num); }
-
-    pageEl.innerHTML = '';
-    state.renderedPages.delete(num);
-
-    var lib, page;
-    try {
-      lib  = await getLib(state.baseUrl);
-      page = await state.pdfDoc.getPage(num);
-    } catch (e) { return; }
-
-    var viewport = page.getViewport({ scale: state.scale, rotation: state.rotation });
-    var w = Math.floor(viewport.width);
-    var h = Math.floor(viewport.height);
-
-    /* Correct placeholder dimensions (may differ from estimate if page sizes vary) */
-    pageEl.style.width  = w + 'px';
-    pageEl.style.height = h + 'px';
-
-    /* High-DPI canvas */
-    var dpr    = window.devicePixelRatio || 1;
-    var canvas = mk('canvas', 'rodaPdfCanvas');
-    canvas.width        = Math.floor(w * dpr);
-    canvas.height       = Math.floor(h * dpr);
-    canvas.style.width  = w + 'px';
-    canvas.style.height = h + 'px';
-    pageEl.appendChild(canvas);
-
-    var ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-
-    var renderTask = page.render({ canvasContext: ctx, viewport: viewport });
-    state.renderTasks.set(num, renderTask);
-
-    try {
-      await renderTask.promise;
-    } catch (e) {
-      if (e && e.name === 'RenderingCancelledException') return;
-      return;
-    }
-    state.renderTasks.delete(num);
-
-    /* Text layer */
-    var textDiv = mk('div', 'rodaPdfTextLayer');
-    textDiv.style.width  = w + 'px';
-    textDiv.style.height = h + 'px';
-    /* --total-scale-factor is consumed by the span transform formula in our CSS.
-       Since left/top are already percent of the viewport, 1 is correct here. */
-    textDiv.style.setProperty('--total-scale-factor', '1');
-    pageEl.appendChild(textDiv);
-
-    try {
-      await buildTextLayer(lib, page, viewport, textDiv);
-    } catch (e) { /* non-fatal — canvas still works */ }
-
-    state.renderedPages.add(num);
-
-    /* Apply active search highlights to the freshly rendered text layer */
-    if (state.searchQuery) {
-      var newMarks = applyHighlightsToLayer(state.searchQuery, textDiv, pageEl);
-      newMarks.forEach(function (el) {
-        insertMarkSorted(state.searchMarks, num, el);
-      });
-      updateSearchCount(state);
-    }
-  }
-
-  async function buildTextLayer(lib, page, viewport, container) {
-    /* pdf.js v5 uses a class-based TextLayer API */
-    if (lib.TextLayer) {
-      var tl = new lib.TextLayer({
-        textContentSource: page.streamTextContent(),
-        container:         container,
-        viewport:          viewport,
-      });
-      await tl.render();
-    } else if (lib.renderTextLayer) {
-      /* fallback for older builds */
-      var textContent = await page.getTextContent();
-      var task = lib.renderTextLayer({
-        textContentSource: textContent,
-        container:         container,
-        viewport:          viewport,
-      });
-      await task.promise;
-    }
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* Re-render all pages (on scale / rotation change)                   */
-  /* ------------------------------------------------------------------ */
-
-  function rerenderAll(state) {
-    if (!state.pdfDoc) return;
-    var savedPage = state.currentPage;
-
-    /* Cancel in-progress renders */
-    state.renderTasks.forEach(function (t) { try { t.cancel(); } catch (e) {} });
-    state.renderTasks.clear();
-    state.renderedPages.clear();
-    state.searchMarks = [];
-    state.searchIndex = -1;
-
-    /* Clear page content; update placeholder heights from page 1 estimate */
-    state.pdfDoc.getPage(1).then(function (page) {
-      var vp = page.getViewport({ scale: state.scale, rotation: state.rotation });
-      var w  = Math.floor(vp.width);
-      var h  = Math.floor(vp.height);
-      state.pageEls.forEach(function (el) {
-        el.innerHTML      = '';
-        el.style.width    = w + 'px';
-        el.style.height   = h + 'px';
-      });
-      setupPageObserver(state);
-      /* Scroll back to the same page after layout settles */
-      requestAnimationFrame(function () { scrollToPage(state, savedPage); });
-    });
-  }
-
-  /* ------------------------------------------------------------------ */
   /* Navigation                                                           */
   /* ------------------------------------------------------------------ */
 
-  function scrollToPage(state, n) {
-    var pageEl = state.pageEls[n - 1];
-    if (!pageEl) return;
-
-    var toolbarH = state.toolbarEl ? state.toolbarEl.offsetHeight : 40;
-    var searchH  = (state.searchBarEl &&
-                    !state.searchBarEl.classList.contains('rodaPdfSearchBarHidden'))
-                   ? (state.searchBarEl.offsetHeight || 36) : 0;
-    var overhead = toolbarH + searchH + 8;
-
-    if (document.fullscreenElement === state.viewerEl) {
-      /* scroll inside the fullscreen element */
-      state.viewerEl.scrollTo({ top: pageEl.offsetTop - overhead, behavior: 'smooth' });
-    } else {
-      var absTop = pageEl.getBoundingClientRect().top + window.scrollY - overhead;
-      window.scrollTo({ top: absTop, behavior: 'smooth' });
-    }
-  }
-
   function goToPage(state, n) {
-    if (!state.pdfDoc) return;
+    if (!state.pdfViewer) return;
     n = Math.max(1, Math.min(n, state.totalPages));
-    state.currentPage = n;
-    updatePageDisplay(state);
-    if (state.presentationMode) {
-      renderPresentationPage(state, n);
-    } else {
-      scrollToPage(state, n);
-    }
+    state.pdfViewer.currentPageNumber = n;
   }
 
   function prevPage(state) { goToPage(state, state.currentPage - 1); }
@@ -475,67 +296,37 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Scroll tracking — update currentPage indicator as user scrolls     */
-  /* ------------------------------------------------------------------ */
-
-  function setupScrollTracking(state) {
-    var ticking = false;
-    state.scrollHandler = function () {
-      if (!ticking) {
-        requestAnimationFrame(function () { trackCurrentPage(state); ticking = false; });
-        ticking = true;
-      }
-    };
-    /* Also listen on the viewer element when in fullscreen */
-    window.addEventListener('scroll', state.scrollHandler, { passive: true });
-    state.viewerEl.addEventListener('scroll', state.scrollHandler, { passive: true });
-  }
-
-  function trackCurrentPage(state) {
-    var toolbarH = state.toolbarEl ? state.toolbarEl.offsetHeight : 40;
-    var best = 1, bestScore = -Infinity;
-    state.pageEls.forEach(function (el, idx) {
-      var rect = el.getBoundingClientRect();
-      var vis = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, toolbarH);
-      if (vis > bestScore) { bestScore = vis; best = idx + 1; }
-    });
-    if (best !== state.currentPage) {
-      state.currentPage = best;
-      updatePageDisplay(state);
-    }
-  }
-
-  /* ------------------------------------------------------------------ */
   /* Zoom                                                                 */
   /* ------------------------------------------------------------------ */
 
   function zoomIn(state) {
-    state.scale = Math.min(state.scale * 1.25, 5.0);
-    rerenderAll(state);
+    if (!state.pdfViewer) return;
+    state.pdfViewer.currentScale = Math.min(state.pdfViewer.currentScale * 1.25, 5.0);
   }
 
   function zoomOut(state) {
-    state.scale = Math.max(state.scale / 1.25, 0.25);
-    rerenderAll(state);
+    if (!state.pdfViewer) return;
+    state.pdfViewer.currentScale = Math.max(state.pdfViewer.currentScale / 1.25, 0.25);
   }
 
   function fitWidth(state) {
-    if (!state.pdfDoc) return;
-    var availW = state.pagesEl ? state.pagesEl.clientWidth : state.viewerEl.clientWidth;
-    if (!availW) return;
-    state.pdfDoc.getPage(1).then(function (page) {
-      var vp1 = page.getViewport({ scale: 1, rotation: state.rotation });
-      state.scale = Math.max(0.25, (availW - 20) / vp1.width);
-      rerenderAll(state);
-    });
+    if (!state.pdfViewer) return;
+    state.pdfViewer.currentScaleValue = 'page-width';
   }
 
   /* ------------------------------------------------------------------ */
   /* Rotation                                                             */
   /* ------------------------------------------------------------------ */
 
-  function rotateCW(state)  { state.rotation = (state.rotation + 90)  % 360; rerenderAll(state); }
-  function rotateCCW(state) { state.rotation = (state.rotation + 270) % 360; rerenderAll(state); }
+  function rotateCW(state) {
+    if (!state.pdfViewer) return;
+    state.pdfViewer.pagesRotation = (state.pdfViewer.pagesRotation + 90) % 360;
+  }
+
+  function rotateCCW(state) {
+    if (!state.pdfViewer) return;
+    state.pdfViewer.pagesRotation = (state.pdfViewer.pagesRotation + 270) % 360;
+  }
 
   /* ------------------------------------------------------------------ */
   /* Search                                                               */
@@ -552,190 +343,78 @@
   }
 
   function closeSearch(state) {
-    clearHighlights(state);
     state.searchQuery = null;
     if (state.searchInputEl) state.searchInputEl.value = '';
-    updateSearchCount(state);
     if (state.searchBarEl) state.searchBarEl.classList.add('rodaPdfSearchBarHidden');
-  }
-
-  function escapeRegex(s) {
-    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
-  function escapeHtml(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    updateSearchCount(state, null);
+    /* Tell PDFFindController to clear highlights */
+    if (state.eventBus) {
+      state.eventBus.dispatch('findbarclose', { source: null });
+    }
   }
 
   function performSearch(state) {
-    clearHighlights(state);
     var query = state.searchInputEl ? state.searchInputEl.value.trim() : '';
     state.searchQuery = query || null;
-    state.searchMarks = [];
-    state.searchIndex = -1;
 
-    if (!query) { updateSearchCount(state); return; }
+    if (!state.eventBus) return;
 
-    /* Highlight all rendered text layers */
-    state.pageEls.forEach(function (pageEl, idx) {
-      var pn = idx + 1;
-      var tl = pageEl.querySelector('.rodaPdfTextLayer');
-      if (!tl) return;
-      applyHighlightsToLayer(query, tl, pageEl).forEach(function (el) {
-        state.searchMarks.push({ pageNum: pn, el: el });
-      });
-    });
-
-    updateSearchCount(state);
-    if (state.searchMarks.length > 0) {
-      state.searchIndex = 0;
-      focusSearchMatch(state);
+    if (!query) {
+      updateSearchCount(state, null);
+      state.eventBus.dispatch('findbarclose', { source: null });
+      return;
     }
-  }
 
-  /* Returns the first text node inside el (depth-first) */
-  function firstTextNode(el) {
-    for (var c = el.firstChild; c; c = c.nextSibling) {
-      if (c.nodeType === 3 && c.textContent.length > 0) return c;
-      if (c.nodeType === 1) { var n = firstTextNode(c); if (n) return n; }
-    }
-    return null;
-  }
-
-  /*
-   * Highlight all occurrences of query inside a rendered text layer.
-   *
-   * Instead of modifying span.innerHTML (which disturbs the scaleX transforms
-   * that PDF.js sets on each span), we use the Range API to locate the exact
-   * rendered rectangle of each match and overlay a positioned <div> on top of
-   * the page element.  The page element is the positioning context
-   * (position:relative) so the divs stay put as the user scrolls.
-   *
-   * Returns an array of highlight div elements created.
-   */
-  function applyHighlightsToLayer(query, textLayerEl, pageEl) {
-    var marks    = [];
-    var regex    = new RegExp(escapeRegex(query), 'gi');
-    var pageRect = pageEl.getBoundingClientRect();
-    var spans    = textLayerEl.querySelectorAll('span');
-
-    spans.forEach(function (span) {
-      var text = span.textContent;
-      if (!text) return;
-      regex.lastIndex = 0;
-      if (!regex.test(text)) return;
-
-      var textNode = firstTextNode(span);
-      regex.lastIndex = 0;
-      var m;
-      while ((m = regex.exec(text)) !== null) {
-        if (m[0].length === 0) { regex.lastIndex++; continue; }
-
-        var rects = [];
-        if (textNode && textNode.textContent === text) {
-          /* Exact match: use Range to get sub-string pixel rects */
-          try {
-            var range = document.createRange();
-            range.setStart(textNode, m.index);
-            range.setEnd(textNode, m.index + m[0].length);
-            rects = Array.from(range.getClientRects());
-          } catch (e) { /* fall through to span-rect fallback */ }
-        }
-        if (!rects.length) {
-          /* Fallback: highlight the entire span */
-          rects = [span.getBoundingClientRect()];
-        }
-
-        rects.forEach(function (rect) {
-          if (rect.width < 1 && rect.height < 1) return;
-          var hl = mk('div', 'rodaPdfHighlight');
-          hl.style.left   = (rect.left   - pageRect.left) + 'px';
-          hl.style.top    = (rect.top    - pageRect.top)  + 'px';
-          hl.style.width  = rect.width   + 'px';
-          hl.style.height = rect.height  + 'px';
-          pageEl.appendChild(hl);
-          marks.push(hl);
-        });
-      }
+    state.eventBus.dispatch('find', {
+      source:          null,
+      type:            '',       /* new search */
+      query:           query,
+      highlightAll:    true,
+      caseSensitive:   false,
+      entireWord:      false,
+      findPrevious:    false,
+      matchDiacritics: true,
     });
-    return marks;
-  }
-
-  /* Insert a mark into state.searchMarks in page-number order */
-  function insertMarkSorted(marks, pageNum, el) {
-    var insertAt = marks.length;
-    for (var i = marks.length - 1; i >= 0; i--) {
-      if (marks[i].pageNum <= pageNum) { insertAt = i + 1; break; }
-      if (i === 0) insertAt = 0;
-    }
-    marks.splice(insertAt, 0, { pageNum: pageNum, el: el });
-  }
-
-  function clearHighlights(state) {
-    if (!state.viewerEl) return;
-    state.viewerEl.querySelectorAll('div.rodaPdfHighlight').forEach(function (el) {
-      el.remove();
-    });
-    state.searchMarks = [];
-    state.searchIndex = -1;
   }
 
   function nextSearchMatch(state) {
     if (!state.searchQuery) { performSearch(state); return; }
-    if (!state.searchMarks.length) return;
-    state.searchIndex = (state.searchIndex + 1) % state.searchMarks.length;
-    focusSearchMatch(state);
+    if (!state.eventBus) return;
+    state.eventBus.dispatch('find', {
+      source:          null,
+      type:            'again',
+      query:           state.searchQuery,
+      highlightAll:    true,
+      caseSensitive:   false,
+      entireWord:      false,
+      findPrevious:    false,
+      matchDiacritics: true,
+    });
   }
 
   function prevSearchMatch(state) {
     if (!state.searchQuery) { performSearch(state); return; }
-    if (!state.searchMarks.length) return;
-    state.searchIndex = (state.searchIndex - 1 + state.searchMarks.length) % state.searchMarks.length;
-    focusSearchMatch(state);
-  }
-
-  function focusSearchMatch(state) {
-    if (state.searchIndex < 0 || state.searchIndex >= state.searchMarks.length) return;
-    var match = state.searchMarks[state.searchIndex];
-
-    /* Deselect all, select current */
-    state.searchMarks.forEach(function (m) {
-      m.el.classList.remove('rodaPdfHighlightSelected');
+    if (!state.eventBus) return;
+    state.eventBus.dispatch('find', {
+      source:          null,
+      type:            'again',
+      query:           state.searchQuery,
+      highlightAll:    true,
+      caseSensitive:   false,
+      entireWord:      false,
+      findPrevious:    true,
+      matchDiacritics: true,
     });
-    match.el.classList.add('rodaPdfHighlightSelected');
-
-    /* Scroll so the selected highlight is visible */
-    var rect     = match.el.getBoundingClientRect();
-    var toolbarH = state.toolbarEl ? state.toolbarEl.offsetHeight : 40;
-    var searchH  = (state.searchBarEl &&
-                    !state.searchBarEl.classList.contains('rodaPdfSearchBarHidden'))
-                   ? (state.searchBarEl.offsetHeight || 36) : 0;
-    var overhead = toolbarH + searchH;
-    if (rect.top < overhead + 20 || rect.bottom > window.innerHeight - 20) {
-      /* Scroll the highlight element into view with header offset */
-      var absTop = rect.top + (
-        document.fullscreenElement === state.viewerEl
-          ? state.viewerEl.scrollTop
-          : window.scrollY
-      ) - overhead - 40;
-      if (document.fullscreenElement === state.viewerEl) {
-        state.viewerEl.scrollTo({ top: absTop, behavior: 'smooth' });
-      } else {
-        window.scrollTo({ top: absTop, behavior: 'smooth' });
-      }
-    }
-    updateSearchCount(state);
   }
 
-  function updateSearchCount(state) {
+  function updateSearchCount(state, matchesCount) {
     if (!state.searchCountEl) return;
-    if (!state.searchQuery) {
+    if (!matchesCount || !state.searchQuery) {
       state.searchCountEl.textContent = '';
-    } else if (!state.searchMarks.length) {
+    } else if (matchesCount.total === 0) {
       state.searchCountEl.textContent = 'Not found';
     } else {
-      var idx = state.searchIndex >= 0 ? state.searchIndex + 1 : '?';
-      state.searchCountEl.textContent = idx + ' / ' + state.searchMarks.length;
+      state.searchCountEl.textContent = matchesCount.current + ' / ' + matchesCount.total;
     }
   }
 
@@ -774,6 +453,7 @@
   /* Thumbnails */
 
   function buildThumbs(state) {
+    if (!state.pdfDoc) return;
     var container = mk('div', 'rodaPdfThumbs');
     state.sidebarContentEl.appendChild(container);
 
@@ -803,10 +483,10 @@
 
   async function renderThumb(state, num) {
     var wrap = state.thumbEls.get(num);
-    if (!wrap || wrap.querySelector('canvas')) return;
+    if (!wrap || wrap.querySelector('canvas') || !state.pdfDoc) return;
     try {
       var page     = await state.pdfDoc.getPage(num);
-      var viewport = page.getViewport({ scale: 0.22, rotation: state.rotation });
+      var viewport = page.getViewport({ scale: 0.22, rotation: 0 });
       var canvas   = mk('canvas', 'rodaPdfThumbCanvas');
       canvas.width  = Math.ceil(viewport.width);
       canvas.height = Math.ceil(viewport.height);
@@ -823,6 +503,7 @@
   /* Outline */
 
   async function buildOutline(state) {
+    if (!state.pdfDoc) return;
     var outline = await state.pdfDoc.getOutline();
     if (!outline || !outline.length) {
       var empty = mk('p', 'rodaPdfOutlineEmpty');
@@ -860,94 +541,6 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Presentation mode (custom canvas overlay, one page at a time)       */
-  /* ------------------------------------------------------------------ */
-
-  function togglePresentation(state) {
-    state.presentationMode ? exitPresentation(state) : enterPresentation(state);
-  }
-
-  function enterPresentation(state) {
-    if (!state.pdfDoc) return;
-    state.presentationMode = true;
-
-    var overlay  = mk('div', 'rodaPdfPresOverlay');
-    var canvas   = mk('canvas', 'rodaPdfPresCanvas');
-    var counter  = mk('div', 'rodaPdfPresCounter');
-    var closeBtn = mk('button', 'rodaPdfPresClose');
-    closeBtn.type = 'button'; closeBtn.title = 'Exit presentation (Esc)';
-    closeBtn.appendChild(icon('fa-times'));
-    closeBtn.addEventListener('click', function () { exitPresentation(state); });
-
-    var prevBtn = mk('button', 'rodaPdfPresNav rodaPdfPresPrev');
-    prevBtn.type = 'button'; prevBtn.title = 'Previous page';
-    prevBtn.appendChild(icon('fa-chevron-left'));
-    prevBtn.addEventListener('click', function () { goToPage(state, state.currentPage - 1); });
-
-    var nextBtn = mk('button', 'rodaPdfPresNav rodaPdfPresNext');
-    nextBtn.type = 'button'; nextBtn.title = 'Next page';
-    nextBtn.appendChild(icon('fa-chevron-right'));
-    nextBtn.addEventListener('click', function () { goToPage(state, state.currentPage + 1); });
-
-    overlay.appendChild(canvas);
-    overlay.appendChild(counter);
-    overlay.appendChild(closeBtn);
-    overlay.appendChild(prevBtn);
-    overlay.appendChild(nextBtn);
-    state.viewerEl.appendChild(overlay);
-
-    state.keyHandler = function (e) {
-      switch (e.key) {
-        case 'Escape':                          exitPresentation(state);                    break;
-        case 'ArrowRight': case 'ArrowDown': case ' ':
-          e.preventDefault(); goToPage(state, state.currentPage + 1);                      break;
-        case 'ArrowLeft':  case 'ArrowUp':
-          e.preventDefault(); goToPage(state, state.currentPage - 1);                      break;
-      }
-    };
-    document.addEventListener('keydown', state.keyHandler);
-
-    var fsReq = state.viewerEl.requestFullscreen || state.viewerEl.webkitRequestFullscreen;
-    if (fsReq) fsReq.call(state.viewerEl).catch(function () {});
-
-    renderPresentationPage(state, state.currentPage);
-  }
-
-  async function renderPresentationPage(state, n) {
-    var overlay = state.viewerEl.querySelector('.rodaPdfPresOverlay');
-    if (!overlay) return;
-    var canvas  = overlay.querySelector('.rodaPdfPresCanvas');
-    var counter = overlay.querySelector('.rodaPdfPresCounter');
-
-    n = Math.max(1, Math.min(n, state.totalPages));
-    state.currentPage = n;
-    updatePageDisplay(state);
-    if (counter) counter.textContent = n + ' \u2044 ' + state.totalPages;
-
-    var page  = await state.pdfDoc.getPage(n);
-    var vp1   = page.getViewport({ scale: 1.0, rotation: state.rotation });
-    var availW = overlay.clientWidth  - 100;
-    var availH = overlay.clientHeight -  60;
-    var scale  = Math.min(availW / vp1.width, availH / vp1.height);
-    var vp     = page.getViewport({ scale: scale, rotation: state.rotation });
-
-    canvas.width  = Math.ceil(vp.width);
-    canvas.height = Math.ceil(vp.height);
-    await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-  }
-
-  function exitPresentation(state) {
-    state.presentationMode = false;
-    var overlay = state.viewerEl.querySelector('.rodaPdfPresOverlay');
-    if (overlay) overlay.remove();
-    if (state.keyHandler) {
-      document.removeEventListener('keydown', state.keyHandler);
-      state.keyHandler = null;
-    }
-    if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
-  }
-
-  /* ------------------------------------------------------------------ */
   /* Fullscreen                                                           */
   /* ------------------------------------------------------------------ */
 
@@ -969,41 +562,96 @@
 
     buildDOM(state);
 
+    var loadingEl = viewerEl.querySelector('.rodaPdfLoading');
+
     /* Fullscreen change handler */
     state.fsChangeHandler = function () {
       var inFs = document.fullscreenElement === state.viewerEl;
-      /* Toggle fullscreen button icon/title */
       if (state.fullscreenBtnEl) {
         var iconEl = state.fullscreenBtnEl.querySelector('i');
         if (iconEl) iconEl.className = 'fa ' + (inFs ? 'fa-compress' : 'fa-expand');
         state.fullscreenBtnEl.title = inFs ? 'Exit fullscreen' : 'Fullscreen';
       }
-      /* Class on viewer drives CSS overflow for element-level scroll */
       state.viewerEl.classList.toggle('rodaPdfViewerFs', inFs);
-      /* Re-setup intersection observer (root changes) */
-      if (state.pageObserver) setupPageObserver(state);
-      /* Exit presentation if fullscreen closed via Esc */
-      if (!inFs && state.presentationMode) exitPresentation(state);
     };
     document.addEventListener('fullscreenchange', state.fsChangeHandler);
 
-    var loadingEl = viewerEl.querySelector('.rodaPdfLoading');
-
     try {
-      var lib     = await getLib(baseUrl);
-      var loadDoc = lib.getDocument({
+      var libs = await getLibs(baseUrl);
+      var pdfjs = libs.pdfjs;
+      var pdfjsViewer = libs.pdfjsViewer;
+
+      /* Create PDF.js high-level components */
+      var eventBus     = new pdfjsViewer.EventBus();
+      var linkService  = new pdfjsViewer.PDFLinkService({ eventBus: eventBus });
+      var findController = new pdfjsViewer.PDFFindController({
+        linkService:                 linkService,
+        eventBus:                    eventBus,
+        updateMatchesCountOnProgress: false,
+      });
+
+      var pdfViewer = new pdfjsViewer.PDFViewer({
+        container:      state.scrollContainerEl,
+        eventBus:       eventBus,
+        linkService:    linkService,
+        findController: findController,
+      });
+
+      linkService.setViewer(pdfViewer);
+
+      state.eventBus       = eventBus;
+      state.linkService    = linkService;
+      state.findController = findController;
+      state.pdfViewer      = pdfViewer;
+
+      /* EventBus listeners */
+      eventBus._on('pagechanging', function (evt) {
+        state.currentPage = evt.pageNumber;
+        updatePageDisplay(state);
+      });
+
+      eventBus._on('scalechanging', function (evt) {
+        /* keep scale in sync if needed in future */
+      });
+
+      eventBus._on('pagesloaded', function (evt) {
+        /* Initial fit-to-width */
+        pdfViewer.currentScaleValue = 'page-width';
+        state.totalPages = evt.pagesCount;
+        state.currentPage = pdfViewer.currentPageNumber || 1;
+        updatePageDisplay(state);
+      });
+
+      eventBus._on('updatefindmatchescount', function (evt) {
+        updateSearchCount(state, evt.matchesCount);
+      });
+
+      eventBus._on('updatefindcontrolstate', function (evt) {
+        /* FindState: 0=Found, 1=NotFound, 2=Wrapped, 3=Pending */
+        if (evt.state === 1 /* NotFound */) {
+          updateSearchCount(state, { current: 0, total: 0 });
+        } else if (evt.matchesCount) {
+          updateSearchCount(state, evt.matchesCount);
+        }
+      });
+
+      /* Load the PDF document */
+      var loadDoc = pdfjs.getDocument({
         url:        fileUrl,
         cMapUrl:    baseUrl + 'webjars/pdfjs-dist/cmaps/',
         cMapPacked: true,
       });
+
       var pdfDoc = await loadDoc.promise;
       state.pdfDoc     = pdfDoc;
       state.totalPages = pdfDoc.numPages;
 
       if (loadingEl) loadingEl.remove();
 
-      await buildPageList(state);
-      setupScrollTracking(state);
+      pdfViewer.setDocument(pdfDoc);
+      linkService.setDocument(pdfDoc);
+      findController.setDocument(pdfDoc);
+
       updatePageDisplay(state);
 
     } catch (err) {
@@ -1026,16 +674,15 @@
     clearTimeout(state.searchDebounceTimer);
     cancelThumbs(state);
 
-    if (state.pageObserver)    state.pageObserver.disconnect();
-    if (state.keyHandler)      document.removeEventListener('keydown', state.keyHandler);
     if (state.fsChangeHandler) document.removeEventListener('fullscreenchange', state.fsChangeHandler);
-    if (state.scrollHandler) {
-      window.removeEventListener('scroll', state.scrollHandler);
-      viewerEl.removeEventListener('scroll', state.scrollHandler);
-    }
+    if (state.keyHandler)      document.removeEventListener('keydown', state.keyHandler);
 
-    state.renderTasks.forEach(function (t) { try { t.cancel(); } catch (e) {} });
-    if (state.pdfDoc) state.pdfDoc.destroy();
+    if (state.pdfViewer) {
+      try { state.pdfViewer.setDocument(null); } catch (e) {}
+    }
+    if (state.pdfDoc) {
+      try { state.pdfDoc.destroy(); } catch (e) {}
+    }
 
     viewers.delete(viewerEl);
   }
