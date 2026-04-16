@@ -130,6 +130,9 @@
   function buildDOM(state) {
     var viewer = state.viewerEl;
 
+    /* The viewer element must be a flex column so content fills it */
+    viewer.style.cssText += ';display:flex;flex-direction:column;';
+
     /* Loading indicator */
     var loading = mk('div', 'rodaPdfLoading');
     loading.textContent = 'Loading document\u2026';
@@ -240,6 +243,7 @@
 
     /* ---- Content area: sidebar + scroll container ---- */
     var content        = mk('div', 'rodaPdfContent');
+    content.style.cssText = 'position:relative;flex:1;display:flex;overflow:hidden;';
     var sidebar        = mk('div', 'rodaPdfSidebar');
     var sidebarContent = mk('div', 'rodaPdfSidebarContent');
     sidebar.appendChild(sidebarContent);
@@ -252,6 +256,15 @@
     var scrollWrapper    = mk('div', 'rodaPdfScrollWrapper');
     var scrollContainer  = mk('div', 'rodaPdfScrollContainer');
     var pdfViewerDiv     = mk('div', 'pdfViewer');
+
+    /*
+     * PDFViewer requires the container to have position:absolute (it checks
+     * via getComputedStyle). Set this as an inline style so it is guaranteed
+     * to be present regardless of CSS class loading order or GWT compilation.
+     */
+    scrollWrapper.style.cssText   = 'position:relative;flex:1;min-width:0;overflow:hidden;';
+    scrollContainer.style.cssText = 'position:absolute;overflow:auto;top:0;right:0;bottom:0;left:0;outline:none;';
+
     scrollContainer.appendChild(pdfViewerDiv);
     scrollWrapper.appendChild(scrollContainer);
 
