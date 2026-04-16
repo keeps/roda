@@ -368,7 +368,7 @@
 
     /* Apply active search highlights to the freshly rendered text layer */
     if (state.searchQuery) {
-      var newMarks = applyHighlightsToLayer(state.searchQuery, textDiv);
+      var newMarks = applyHighlightsToLayer(state.searchQuery, textDiv, pageEl);
       newMarks.forEach(function (el) {
         insertMarkSorted(state.searchMarks, num, el);
       });
@@ -581,7 +581,7 @@
       var pn = idx + 1;
       var tl = pageEl.querySelector('.rodaPdfTextLayer');
       if (!tl) return;
-      applyHighlightsToLayer(query, tl).forEach(function (el) {
+      applyHighlightsToLayer(query, tl, pageEl).forEach(function (el) {
         state.searchMarks.push({ pageNum: pn, el: el });
       });
     });
@@ -593,35 +593,70 @@
     }
   }
 
-  /* Returns array of <mark> elements created */
-  function applyHighlightsToLayer(query, textLayerEl) {
-    var marks  = [];
-    var regex  = new RegExp(escapeRegex(query), 'gi');
-    var spans  = textLayerEl.querySelectorAll('span');
+  /* Returns the first text node inside el (depth-first) */
+  function firstTextNode(el) {
+    for (var c = el.firstChild; c; c = c.nextSibling) {
+      if (c.nodeType === 3 && c.textContent.length > 0) return c;
+      if (c.nodeType === 1) { var n = firstTextNode(c); if (n) return n; }
+    }
+    return null;
+  }
+
+  /*
+   * Highlight all occurrences of query inside a rendered text layer.
+   *
+   * Instead of modifying span.innerHTML (which disturbs the scaleX transforms
+   * that PDF.js sets on each span), we use the Range API to locate the exact
+   * rendered rectangle of each match and overlay a positioned <div> on top of
+   * the page element.  The page element is the positioning context
+   * (position:relative) so the divs stay put as the user scrolls.
+   *
+   * Returns an array of highlight div elements created.
+   */
+  function applyHighlightsToLayer(query, textLayerEl, pageEl) {
+    var marks    = [];
+    var regex    = new RegExp(escapeRegex(query), 'gi');
+    var pageRect = pageEl.getBoundingClientRect();
+    var spans    = textLayerEl.querySelectorAll('span');
+
     spans.forEach(function (span) {
-      /* Skip if already has marks (don't double-wrap) */
-      if (span.querySelector('mark')) return;
       var text = span.textContent;
       if (!text) return;
       regex.lastIndex = 0;
       if (!regex.test(text)) return;
 
-      /* Rebuild innerHTML with match positions wrapped in <mark> */
-      var html = '';
-      var last = 0;
+      var textNode = firstTextNode(span);
       regex.lastIndex = 0;
       var m;
       while ((m = regex.exec(text)) !== null) {
-        html += escapeHtml(text.slice(last, m.index));
-        html += '<mark class="rodaPdfHighlight">' + escapeHtml(m[0]) + '</mark>';
-        last  = m.index + m[0].length;
-        if (m[0].length === 0) { regex.lastIndex++; } /* avoid infinite loop on empty match */
+        if (m[0].length === 0) { regex.lastIndex++; continue; }
+
+        var rects = [];
+        if (textNode && textNode.textContent === text) {
+          /* Exact match: use Range to get sub-string pixel rects */
+          try {
+            var range = document.createRange();
+            range.setStart(textNode, m.index);
+            range.setEnd(textNode, m.index + m[0].length);
+            rects = Array.from(range.getClientRects());
+          } catch (e) { /* fall through to span-rect fallback */ }
+        }
+        if (!rects.length) {
+          /* Fallback: highlight the entire span */
+          rects = [span.getBoundingClientRect()];
+        }
+
+        rects.forEach(function (rect) {
+          if (rect.width < 1 && rect.height < 1) return;
+          var hl = mk('div', 'rodaPdfHighlight');
+          hl.style.left   = (rect.left   - pageRect.left) + 'px';
+          hl.style.top    = (rect.top    - pageRect.top)  + 'px';
+          hl.style.width  = rect.width   + 'px';
+          hl.style.height = rect.height  + 'px';
+          pageEl.appendChild(hl);
+          marks.push(hl);
+        });
       }
-      html += escapeHtml(text.slice(last));
-      span.innerHTML = html;
-      span.querySelectorAll('mark.rodaPdfHighlight').forEach(function (mk_) {
-        marks.push(mk_);
-      });
     });
     return marks;
   }
@@ -637,15 +672,9 @@
   }
 
   function clearHighlights(state) {
-    /* Restore span text by unwrapping all mark elements */
     if (!state.viewerEl) return;
-    var marks = state.viewerEl.querySelectorAll('.rodaPdfTextLayer mark.rodaPdfHighlight');
-    marks.forEach(function (m) {
-      var parent = m.parentNode;
-      if (parent) {
-        parent.replaceChild(document.createTextNode(m.textContent), m);
-        parent.normalize();
-      }
+    state.viewerEl.querySelectorAll('div.rodaPdfHighlight').forEach(function (el) {
+      el.remove();
     });
     state.searchMarks = [];
     state.searchIndex = -1;
@@ -675,11 +704,25 @@
     });
     match.el.classList.add('rodaPdfHighlightSelected');
 
-    /* Scroll so the selected mark is visible */
+    /* Scroll so the selected highlight is visible */
     var rect     = match.el.getBoundingClientRect();
     var toolbarH = state.toolbarEl ? state.toolbarEl.offsetHeight : 40;
-    if (rect.top < toolbarH + 20 || rect.bottom > window.innerHeight - 20) {
-      scrollToPage(state, match.pageNum);
+    var searchH  = (state.searchBarEl &&
+                    !state.searchBarEl.classList.contains('rodaPdfSearchBarHidden'))
+                   ? (state.searchBarEl.offsetHeight || 36) : 0;
+    var overhead = toolbarH + searchH;
+    if (rect.top < overhead + 20 || rect.bottom > window.innerHeight - 20) {
+      /* Scroll the highlight element into view with header offset */
+      var absTop = rect.top + (
+        document.fullscreenElement === state.viewerEl
+          ? state.viewerEl.scrollTop
+          : window.scrollY
+      ) - overhead - 40;
+      if (document.fullscreenElement === state.viewerEl) {
+        state.viewerEl.scrollTo({ top: absTop, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: absTop, behavior: 'smooth' });
+      }
     }
     updateSearchCount(state);
   }
