@@ -674,7 +674,8 @@ public class EmailViewer extends Composite {
                 pAtt._objUrl = $wnd.URL.createObjectURL(attBlob);
                 objUrls.push(pAtt._objUrl);
               }
-            } catch (attErr) { /* leave _objUrl null */ }
+            } catch (attErr) { // leave _objUrl null
+            }
             processedAtts.push(pAtt);
           }
 
