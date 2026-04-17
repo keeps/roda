@@ -49,10 +49,13 @@ import com.google.gwt.user.client.ui.FlowPanel;
  * {@code contentDocument} to restore blocked images. When the user confirms
  * image loading, the blocked {@code src} values are restored inside the
  * existing {@code srcdoc} iframe and the iframe is then swapped for a
- * {@code blob:} URL iframe. A {@code blob:} URL frame has its own opaque
- * origin and does not inherit the parent page's Content-Security-Policy,
- * ensuring that external images are not blocked by CSP after the user
- * explicitly opts in.
+ * <em>non-sandboxed</em> {@code blob:} URL iframe. Chrome inherits the
+ * parent page's CSP into sandboxed iframes (even {@code blob:} ones), so
+ * the replacement frame must have no {@code sandbox} attribute. A
+ * non-sandboxed {@code blob:} frame carries no response headers and therefore
+ * has no CSP of its own, allowing external images to load. This is safe
+ * because the HTML has already been DOMPurify-sanitised, removing all
+ * {@code <script>} elements and event handlers.
  * </p>
  *
  * <p>
@@ -340,11 +343,15 @@ public class EmailViewer extends Composite {
     //
     // Step 1 — restore data-blocked-src → src inside the existing srcdoc
     //          iframe (requires allow-same-origin).
-    // Step 2 — swap the srcdoc iframe for a blob: URL iframe.
+    // Step 2 — swap the srcdoc iframe for a non-sandboxed blob: URL iframe.
     //
-    // A blob: URL frame has its own opaque origin and does NOT inherit the
-    // parent page's Content-Security-Policy, so external images that would
-    // be blocked by CSP in the srcdoc frame load freely after the swap.
+    // Chrome inherits the parent page's CSP into sandboxed iframes, even
+    // blob: URL ones, so keeping sandbox on the replacement frame still blocks
+    // external images via img-src 'self'.  Removing the sandbox attribute
+    // breaks the inheritance: a non-sandboxed blob: frame has no CSP of its
+    // own (blob URLs carry no response headers) and does not inherit the
+    // embedder's CSP.  This is safe because the HTML has already been
+    // DOMPurify-sanitised, removing all <script> elements and event handlers.
 
     function restoreImages(iframe) {
       try {
@@ -358,17 +365,16 @@ public class EmailViewer extends Composite {
         }
 
         // Serialise the now-restored document and create a blob URL.
-        // A blob: URL frame does not inherit the parent CSP, so external
-        // images are no longer blocked after the navigation.
         var restoredHtml = doc.documentElement.outerHTML;
         var blob = new $wnd.Blob([restoredHtml], {type: 'text/html'});
         var blobUrl = $wnd.URL.createObjectURL(blob);
         objUrls.push(blobUrl);
 
-        // Build replacement iframe (no allow-same-origin needed for blob frames).
+        // Build replacement iframe WITHOUT sandbox so that Chrome does not
+        // inherit the parent page's CSP — external images can then load.
+        // Scripts are absent because DOMPurify removed them during sanitisation.
         var newIframe = $doc.createElement('iframe');
         newIframe.className = iframe.className;
-        newIframe.setAttribute('sandbox', 'allow-popups allow-popups-to-escape-sandbox');
         newIframe.style.cssText = iframe.style.cssText;
         newIframe.src = blobUrl;
 
@@ -379,8 +385,8 @@ public class EmailViewer extends Composite {
           iframe.parentNode.replaceChild(newIframe, iframe);
         }
       } catch (e) {
-        // Fallback: plain src restore in the srcdoc frame (may still be
-        // blocked by CSP but better than nothing).
+        // Fallback: plain src restore in the srcdoc frame (CSP may still
+        // block the images, but better than nothing).
         try {
           var doc2 = iframe.contentDocument || iframe.contentWindow.document;
           var blocked2 = doc2.querySelectorAll('img[data-blocked-src]');
