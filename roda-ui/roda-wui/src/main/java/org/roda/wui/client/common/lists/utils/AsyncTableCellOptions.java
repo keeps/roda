@@ -73,8 +73,10 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     facets = FacetFactory.getFacets(listId);
     summary = AsyncTableCell.messages.searchResults();
     fieldsToReturn = Collections.emptyList();
-    initialPageSize = AsyncTableCell.DEFAULT_INITIAL_PAGE_SIZE;
-    pageSizeIncrement = AsyncTableCell.DEFAULT_PAGE_SIZE_INCREMENT;
+    initialPageSize = ConfigurationManager.getInt(AsyncTableCell.DEFAULT_INITIAL_PAGE_SIZE,
+      RodaConstants.UI_LISTS_PROPERTY, listId, RodaConstants.UI_LISTS_PAGE_SIZE_INITIAL);
+    pageSizeIncrement = ConfigurationManager.getInt(AsyncTableCell.DEFAULT_PAGE_SIZE_INCREMENT,
+      RodaConstants.UI_LISTS_PROPERTY, listId, RodaConstants.UI_LISTS_PAGE_SIZE_INCREMENT);
     checkboxSelectionListeners = new ArrayList<>();
     indexResultValueChangeHandlers = new ArrayList<>();
     extraStyleNames = new ArrayList<>();

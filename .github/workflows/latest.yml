@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
-
     steps:
       - uses: actions/checkout@v6
         with:
@@ -45,10 +44,83 @@ jobs:
         run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Copy target to docker context
+      - name: Prepare JAR for artifact upload
         run: |
-          mkdir -p docker/target
-          cp -r roda-ui/roda-wui/target/roda-wui-$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout).jar docker/target
+          mkdir -p /tmp/roda-jar
+          cp roda-ui/roda-wui/target/roda-wui-*.jar /tmp/roda-jar/
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: roda-jar
+          path: /tmp/roda-jar/
+          retention-days: 1
+
+  docker:
+    runs-on: ${{ matrix.runner }}
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v6
+      - name: Prepare platform tag
+        run: echo "platform_tag=$(echo "${{ matrix.platform }}" | tr '/' '-')" >> $GITHUB_ENV
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: roda-jar
+          path: docker/target
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/keeps/roda
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          context: docker
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          sbom: true
+          provenance: mode=max
+          outputs: type=image,name=ghcr.io/keeps/roda,push-by-digest=true,name-canonical=true,push=true
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ env.platform_tag }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    runs-on: ubuntu-latest
+    needs: docker
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Login to GitHub Container Registry
@@ -62,16 +134,20 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build docker image
-        uses: docker/build-push-action@v7
-        with:
-          push: true
-          context: docker
-          tags: |
-            ghcr.io/keeps/roda:latest
-            keeps/roda:latest
-          sbom: true
-          provenance: mode=max
+      - name: Create manifest list and push to GHCR
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create \
+            -t ghcr.io/keeps/roda:latest \
+            $(printf 'ghcr.io/keeps/roda@sha256:%s ' *)
+      - name: Create manifest list and push to DockerHub
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create \
+            -t keeps/roda:latest \
+            $(printf 'ghcr.io/keeps/roda@sha256:%s ' *)
+      - name: Inspect image
+        run: docker buildx imagetools inspect ghcr.io/keeps/roda:latest
       - name: Trigger KEEPS GitLab CI/CD
         run: |
           curl -X POST \

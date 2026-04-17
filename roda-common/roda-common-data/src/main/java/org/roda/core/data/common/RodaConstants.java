@@ -170,6 +170,9 @@ public final class RodaConstants {
   public static final String UI_LISTS_COLUMNS_DEFAULTSORTLIST_COLUMNNAME = "defaultSortList.columnName";
   public static final String UI_LISTS_COLUMNS_DEFAULTSORTLIST_ASCENDING = "defaultSortList.ascending";
 
+  public static final String UI_LISTS_PAGE_SIZE_INITIAL = "pageSize.initial";
+  public static final String UI_LISTS_PAGE_SIZE_INCREMENT = "pageSize.increment";
+
   public static final String UI_ICONS_CLASS = "ui.icons.class";
   public static final String UI_SERVICE_DROPFOLDER_URL = "ui.service.dropfolder.url";
   public static final String UI_SERVICE_CAS_URL = "ui.service.cas.url";
