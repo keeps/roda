@@ -9,11 +9,18 @@ package org.roda.wui.client.browse;
 
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * GWT widget that renders an email message file (.msg or .eml) entirely in the
@@ -66,6 +73,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
  * </p>
  */
 public class EmailViewer extends Composite {
+
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private final FlowPanel panel;
   private final Command onPreviewFailure;
@@ -124,6 +133,174 @@ public class EmailViewer extends Composite {
     onPreviewFailure.execute();
   }
 
+  // ── i18n bridges ──────────────────────────────────────────────────────────
+  // These thin wrappers expose ClientMessages strings to JSNI callers.
+
+  private String emailViewerSubject() {
+    return messages.emailViewerSubject();
+  }
+
+  private String emailViewerFrom() {
+    return messages.emailViewerFrom();
+  }
+
+  private String emailViewerTo() {
+    return messages.emailViewerTo();
+  }
+
+  private String emailViewerCc() {
+    return messages.emailViewerCc();
+  }
+
+  private String emailViewerDate() {
+    return messages.emailViewerDate();
+  }
+
+  private String emailViewerNoBody() {
+    return messages.emailViewerNoBody();
+  }
+
+  private String emailViewerAttachments(int count) {
+    return messages.emailViewerAttachments(count);
+  }
+
+  private String emailViewerBannerText(int count) {
+    return messages.emailViewerBannerText(count);
+  }
+
+  private String emailViewerShowImages() {
+    return messages.emailViewerShowImages();
+  }
+
+  // ── Instance JSNI helpers ─────────────────────────────────────────────────
+
+  /**
+   * Returns {@code true} if {@code email} is in the localStorage trusted-sender
+   * list ({@code roda_email_trusted_senders}).
+   */
+  private native boolean isTrustedSender(String email) /*-{
+    if (!email) return false;
+    try {
+      var lc = email.toLowerCase();
+      var raw = $wnd.localStorage.getItem('roda_email_trusted_senders');
+      var list = raw ? JSON.parse(raw) : [];
+      for (var i = 0; i < list.length; i++) {
+        if (list[i] === lc) return true;
+      }
+    } catch (e) {}
+    return false;
+  }-*/;
+
+  /**
+   * Adds {@code email} (lower-cased) to the localStorage trusted-sender list.
+   */
+  private native void nativeTrustSender(String email) /*-{
+    if (!email) return;
+    try {
+      var lc = email.toLowerCase();
+      var raw = $wnd.localStorage.getItem('roda_email_trusted_senders');
+      var list = raw ? JSON.parse(raw) : [];
+      for (var i = 0; i < list.length; i++) {
+        if (list[i] === lc) return;
+      }
+      list.push(lc);
+      $wnd.localStorage.setItem('roda_email_trusted_senders', JSON.stringify(list));
+    } catch (e) {}
+  }-*/;
+
+  /**
+   * Restores all {@code data-blocked-src} attributes to {@code src} inside the
+   * given srcdoc iframe and triggers an iframe height recalculation.
+   */
+  private native void restoreImages(Element iframe) /*-{
+    try {
+      var doc = iframe.contentDocument || iframe.contentWindow.document;
+      var blocked = doc.querySelectorAll('img[data-blocked-src]');
+      for (var i = 0; i < blocked.length; i++) {
+        blocked[i].setAttribute('src', blocked[i].getAttribute('data-blocked-src'));
+        blocked[i].removeAttribute('data-blocked-src');
+      }
+      iframe.addEventListener('load', function() {
+        try {
+          var body = iframe.contentDocument.body;
+          if (body) iframe.style.height = (body.scrollHeight + 24) + 'px';
+        } catch (e2) {}
+      });
+    } catch (e) {}
+  }-*/;
+
+  /**
+   * Shows a RODA-styled {@link DialogBox} that lets the user load blocked
+   * external images either once or always for the given sender.
+   *
+   * @param domainsStr
+   *          comma-separated list of blocked domains
+   * @param senderKey
+   *          lower-cased sender email address used for the trust list
+   * @param iframe
+   *          the srcdoc iframe whose blocked images will be restored
+   * @param banner
+   *          the blocking notification banner to dismiss after confirmation
+   */
+  private void showTrustDialog(String domainsStr, String senderKey, Element iframe, Element banner) {
+    final DialogBox dialogBox = new DialogBox(false, true);
+    dialogBox.setText(messages.emailViewerExternalImagesTitle());
+
+    FlowPanel layout = new FlowPanel();
+    layout.addStyleName("wui-dialog-layout");
+
+    HTML messageLabel = new HTML(messages.emailViewerExternalImagesMessage());
+    messageLabel.addStyleName("wui-dialog-message");
+    layout.add(messageLabel);
+
+    if (domainsStr != null && !domainsStr.isEmpty()) {
+      SafeHtmlBuilder sb = new SafeHtmlBuilder();
+      sb.appendHtmlConstant("<ul class=\"email-viewer-domain-list\">");
+      for (String domain : domainsStr.split(",")) {
+        sb.appendHtmlConstant("<li>");
+        sb.appendEscaped(domain.trim());
+        sb.appendHtmlConstant("</li>");
+      }
+      sb.appendHtmlConstant("</ul>");
+      layout.add(new HTML(sb.toSafeHtml()));
+    }
+
+    FlowPanel footer = new FlowPanel();
+    footer.addStyleName("wui-dialog-layout-footer");
+
+    Button cancelBtn = new Button(messages.cancelButton());
+    cancelBtn.addStyleName("btn btn-link");
+    cancelBtn.addClickHandler(e -> dialogBox.hide());
+
+    Button onceBtn = new Button(messages.emailViewerLoadImagesOnce());
+    onceBtn.addStyleName("btn btn-play");
+    onceBtn.addClickHandler(e -> {
+      restoreImages(iframe);
+      banner.removeFromParent();
+      dialogBox.hide();
+    });
+
+    Button alwaysBtn = new Button(messages.emailViewerAlwaysTrustSender());
+    alwaysBtn.addStyleName("btn btn-play");
+    alwaysBtn.addClickHandler(e -> {
+      nativeTrustSender(senderKey);
+      restoreImages(iframe);
+      banner.removeFromParent();
+      dialogBox.hide();
+    });
+
+    footer.add(cancelBtn);
+    footer.add(onceBtn);
+    footer.add(alwaysBtn);
+    layout.add(footer);
+
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+    dialogBox.setWidget(layout);
+    dialogBox.center();
+    dialogBox.show();
+  }
+
   /**
    * Fetches the email file and renders it inside {@code container}.
    *
@@ -138,6 +315,15 @@ public class EmailViewer extends Composite {
    */
   private native void renderEmail(Element container, String url, String fmt) /*-{
     var self = this;
+
+    // ── i18n strings collected once at the top ─────────────────────────────
+    var i18nSubject     = self.@org.roda.wui.client.browse.EmailViewer::emailViewerSubject()();
+    var i18nFrom        = self.@org.roda.wui.client.browse.EmailViewer::emailViewerFrom()();
+    var i18nTo          = self.@org.roda.wui.client.browse.EmailViewer::emailViewerTo()();
+    var i18nCc          = self.@org.roda.wui.client.browse.EmailViewer::emailViewerCc()();
+    var i18nDate        = self.@org.roda.wui.client.browse.EmailViewer::emailViewerDate()();
+    var i18nNoBody      = self.@org.roda.wui.client.browse.EmailViewer::emailViewerNoBody()();
+    var i18nShowImages  = self.@org.roda.wui.client.browse.EmailViewer::emailViewerShowImages()();
 
     // ── Utilities ──────────────────────────────────────────────────────────
 
@@ -172,38 +358,6 @@ public class EmailViewer extends Composite {
         + '</div>';
     }
 
-    // ── Trusted-sender helpers (localStorage) ──────────────────────────────
-
-    function getTrustedSenders() {
-      try {
-        var raw = $wnd.localStorage.getItem('roda_email_trusted_senders');
-        return raw ? JSON.parse(raw) : [];
-      } catch (e) { return []; }
-    }
-
-    function isTrustedSender(email) {
-      if (!email) return false;
-      var lc = email.toLowerCase();
-      var list = getTrustedSenders();
-      for (var i = 0; i < list.length; i++) {
-        if (list[i] === lc) return true;
-      }
-      return false;
-    }
-
-    function trustSender(email) {
-      if (!email) return;
-      try {
-        var lc = email.toLowerCase();
-        var list = getTrustedSenders();
-        for (var i = 0; i < list.length; i++) {
-          if (list[i] === lc) return;
-        }
-        list.push(lc);
-        $wnd.localStorage.setItem('roda_email_trusted_senders', JSON.stringify(list));
-      } catch (e) {}
-    }
-
     // Extract bare email address from "Display Name <addr>" or plain addr.
     function extractEmail(addr) {
       if (!addr) return '';
@@ -222,7 +376,6 @@ public class EmailViewer extends Composite {
     function makePlaceholder(w, h) {
       var pw = (w && parseInt(w, 10) > 0) ? Math.min(parseInt(w, 10), 600) : 40;
       var ph = (h && parseInt(h, 10) > 0) ? Math.min(parseInt(h, 10), 400) : 40;
-      // Grey rect + crossed lines to mimic a "broken image" icon
       var cx = pw / 2, cy = ph / 2;
       var r  = Math.min(pw, ph) * 0.18;
       var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + pw + '" height="' + ph + '">'
@@ -253,7 +406,7 @@ public class EmailViewer extends Composite {
         return tmp.textContent || tmp.innerText || '';
       }
 
-      if (!isTrustedSender(senderKey)) {
+      if (!self.@org.roda.wui.client.browse.EmailViewer::isTrustedSender(Ljava/lang/String;)(senderKey)) {
         $wnd.DOMPurify.addHook('afterSanitizeAttributes', function(node) {
           if (node.nodeName !== 'IMG') return;
           var src = node.getAttribute('src');
@@ -275,7 +428,7 @@ public class EmailViewer extends Composite {
         ADD_ATTR:          ['data-blocked-src']
       });
 
-      if (!isTrustedSender(senderKey)) {
+      if (!self.@org.roda.wui.client.browse.EmailViewer::isTrustedSender(Ljava/lang/String;)(senderKey)) {
         $wnd.DOMPurify.removeHooks('afterSanitizeAttributes');
       }
 
@@ -319,91 +472,6 @@ public class EmailViewer extends Composite {
       return iframe;
     }
 
-    // ── Image restoration ──────────────────────────────────────────────────
-    //
-    // CSP spec §3.3.3: blob: URL documents inherit the CSP of their creator.
-    // There is therefore no client-side iframe trick that can bypass img-src.
-    // Instead, the server-side CSP allows img-src https: so that external
-    // images can load after the user explicitly consents.  The privacy gate
-    // is enforced by the DOMPurify hook that replaces src with a placeholder
-    // by default; this function simply undoes that replacement.
-    //
-    // allow-same-origin on the srcdoc iframe lets us access contentDocument.
-
-    function restoreImages(iframe) {
-      try {
-        var doc = iframe.contentDocument || iframe.contentWindow.document;
-        var blocked = doc.querySelectorAll('img[data-blocked-src]');
-        for (var i = 0; i < blocked.length; i++) {
-          blocked[i].setAttribute('src', blocked[i].getAttribute('data-blocked-src'));
-          blocked[i].removeAttribute('data-blocked-src');
-        }
-        // Resize the iframe to fit the newly loaded images.
-        iframe.addEventListener('load', function() {
-          try {
-            var body = iframe.contentDocument.body;
-            if (body) iframe.style.height = (body.scrollHeight + 24) + 'px';
-          } catch (e2) {}
-        });
-      } catch (e) {}
-    }
-
-    // ── Trust modal ────────────────────────────────────────────────────────
-
-    function showTrustModal(domains, senderKey, iframe, banner) {
-      var overlay = $doc.createElement('div');
-      overlay.className = 'email-trust-modal-overlay';
-
-      var modal = $doc.createElement('div');
-      modal.className = 'email-trust-modal';
-
-      var items = '';
-      for (var i = 0; i < domains.length; i++) {
-        items += '<li>' + escapeHtml(domains[i]) + '</li>';
-      }
-
-      modal.innerHTML =
-          '<h4 class="email-trust-modal-title">External images blocked</h4>'
-        + '<p class="email-trust-modal-desc">'
-        + 'Images from the following domains are blocked to protect your privacy:</p>'
-        + '<ul class="email-trust-modal-domains">' + items + '</ul>'
-        + '<div class="email-trust-modal-actions">'
-        + '<button class="email-trust-btn email-trust-btn-cancel">Cancel</button>'
-        + '<button class="email-trust-btn email-trust-btn-once">Load once</button>'
-        + '<button class="email-trust-btn email-trust-btn-always">Always trust sender</button>'
-        + '</div>';
-
-      overlay.appendChild(modal);
-      $doc.body.appendChild(overlay);
-
-      function closeModal() {
-        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      }
-
-      // Close on backdrop click.
-      overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) closeModal();
-      });
-
-      modal.querySelector('.email-trust-btn-cancel')
-           .addEventListener('click', closeModal);
-
-      modal.querySelector('.email-trust-btn-once')
-           .addEventListener('click', function() {
-             restoreImages(iframe);
-             if (banner && banner.parentNode) banner.parentNode.removeChild(banner);
-             closeModal();
-           });
-
-      modal.querySelector('.email-trust-btn-always')
-           .addEventListener('click', function() {
-             trustSender(senderKey);
-             restoreImages(iframe);
-             if (banner && banner.parentNode) banner.parentNode.removeChild(banner);
-             closeModal();
-           });
-    }
-
     // ── Blocking banner ────────────────────────────────────────────────────
 
     function buildBanner(iframe, senderKey, detectedDomains) {
@@ -413,17 +481,19 @@ public class EmailViewer extends Composite {
       }
       if (domains.length === 0) return;
 
+      var domainsStr = domains.join(',');
+      var bannerText = self.@org.roda.wui.client.browse.EmailViewer::emailViewerBannerText(I)(domains.length);
+
       var banner = $doc.createElement('div');
       banner.className = 'email-image-banner';
 
       var text = $doc.createElement('span');
       text.className = 'email-image-banner-text';
-      text.innerHTML = '<i class="fa fa-eye-slash"></i> External images from '
-        + domains.length + ' domain' + (domains.length === 1 ? '' : 's') + ' blocked.';
+      text.innerHTML = '<i class="fa fa-eye-slash"></i> ' + escapeHtml(bannerText);
 
       var btn = $doc.createElement('button');
       btn.className = 'email-image-banner-btn';
-      btn.textContent = 'Show images';
+      btn.textContent = i18nShowImages;
 
       banner.appendChild(text);
       banner.appendChild(btn);
@@ -434,7 +504,7 @@ public class EmailViewer extends Composite {
       }
 
       btn.addEventListener('click', function() {
-        showTrustModal(domains, senderKey, iframe, banner);
+        self.@org.roda.wui.client.browse.EmailViewer::showTrustDialog(Ljava/lang/String;Ljava/lang/String;Lcom/google/gwt/dom/client/Element;Lcom/google/gwt/dom/client/Element;)(domainsStr, senderKey, iframe, banner);
       });
     }
 
@@ -495,11 +565,11 @@ public class EmailViewer extends Composite {
       // Header
       var headerDiv = $doc.createElement('div');
       headerDiv.className = 'email-header';
-      headerDiv.innerHTML = buildHeaderField('Subject', subject)
-        + buildHeaderField('From',    from)
-        + buildHeaderField('To',      to)
-        + buildHeaderField('CC',      cc)
-        + buildHeaderField('Date',    date);
+      headerDiv.innerHTML = buildHeaderField(i18nSubject, subject)
+        + buildHeaderField(i18nFrom, from)
+        + buildHeaderField(i18nTo,   to)
+        + buildHeaderField(i18nCc,   cc)
+        + buildHeaderField(i18nDate, date);
       container.appendChild(headerDiv);
 
       var divider = $doc.createElement('hr');
@@ -517,7 +587,8 @@ public class EmailViewer extends Composite {
         bodyContent = '<pre style="white-space:pre-wrap;font-family:monospace;'
           + 'font-size:13px;margin:0;">' + escapeHtml(bodyText) + '</pre>';
       } else {
-        bodyContent = '<p style="color:#999;font-style:italic;">(no body)</p>';
+        bodyContent = '<p style="color:#999;font-style:italic;">'
+          + escapeHtml(i18nNoBody) + '</p>';
       }
 
       var iframe = buildBodyIframe(bodyContent);
@@ -530,10 +601,10 @@ public class EmailViewer extends Composite {
 
       // Attachments
       if (attachments && attachments.length > 0) {
+        var attTitle = self.@org.roda.wui.client.browse.EmailViewer::emailViewerAttachments(I)(attachments.length);
         var attDiv = $doc.createElement('div');
         attDiv.className = 'email-attachments';
-        var attHtml = '<h4 class="email-attachments-title">Attachments ('
-          + attachments.length + ')</h4>'
+        var attHtml = '<h4 class="email-attachments-title">' + escapeHtml(attTitle) + '</h4>'
           + '<ul class="email-attachments-list">';
         for (var i = 0; i < attachments.length; i++) {
           var att    = attachments[i];

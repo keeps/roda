@@ -2639,4 +2639,32 @@ public interface ClientMessages extends Messages {
   String reasonCantActOnUser();
 
   String reasonCantActOnGroup();
+
+  // ── Email viewer ──────────────────────────────────────────────────────────
+
+  String emailViewerSubject();
+
+  String emailViewerFrom();
+
+  String emailViewerTo();
+
+  String emailViewerCc();
+
+  String emailViewerDate();
+
+  String emailViewerNoBody();
+
+  String emailViewerAttachments(int count);
+
+  String emailViewerBannerText(int count);
+
+  String emailViewerShowImages();
+
+  String emailViewerExternalImagesTitle();
+
+  String emailViewerExternalImagesMessage();
+
+  String emailViewerLoadImagesOnce();
+
+  String emailViewerAlwaysTrustSender();
 }
