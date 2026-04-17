@@ -357,45 +357,37 @@ public class EmailViewer extends Composite {
       try {
         var doc = iframe.contentDocument || iframe.contentWindow.document;
 
-        // Restore every blocked image src.
-        var blocked = doc.querySelectorAll('img[data-blocked-src]');
+        // Clone the document element to a DETACHED node.
+        // Restoring src attributes on detached nodes does not trigger resource
+        // loads, avoiding CSP violations in the live sandboxed srcdoc iframe.
+        var clone = doc.documentElement.cloneNode(true);
+        var blocked = clone.querySelectorAll('img[data-blocked-src]');
         for (var i = 0; i < blocked.length; i++) {
           blocked[i].setAttribute('src', blocked[i].getAttribute('data-blocked-src'));
           blocked[i].removeAttribute('data-blocked-src');
         }
 
-        // Serialise the now-restored document and create a blob URL.
-        var restoredHtml = doc.documentElement.outerHTML;
+        // Serialise the clone (with restored src values) and create a blob URL.
+        var restoredHtml = '<!DOCTYPE html>' + clone.outerHTML;
         var blob = new $wnd.Blob([restoredHtml], {type: 'text/html'});
         var blobUrl = $wnd.URL.createObjectURL(blob);
         objUrls.push(blobUrl);
 
-        // Build replacement iframe WITHOUT sandbox so that Chrome does not
-        // inherit the parent page's CSP — external images can then load.
-        // Scripts are absent because DOMPurify removed them during sanitisation.
+        // Build replacement iframe WITHOUT sandbox.
+        // Chrome inherits the parent CSP into sandboxed iframes; a
+        // non-sandboxed blob: frame has no own CSP (blob URLs carry no response
+        // headers) and does not inherit the embedder's CSP, so external images
+        // load freely.  Scripts are absent: DOMPurify removed them earlier.
         var newIframe = $doc.createElement('iframe');
         newIframe.className = iframe.className;
         newIframe.style.cssText = iframe.style.cssText;
         newIframe.src = blobUrl;
-
-        // Mirror the current height; images will adjust naturally once loaded.
         newIframe.style.height = iframe.style.height || '400px';
 
         if (iframe.parentNode) {
           iframe.parentNode.replaceChild(newIframe, iframe);
         }
-      } catch (e) {
-        // Fallback: plain src restore in the srcdoc frame (CSP may still
-        // block the images, but better than nothing).
-        try {
-          var doc2 = iframe.contentDocument || iframe.contentWindow.document;
-          var blocked2 = doc2.querySelectorAll('img[data-blocked-src]');
-          for (var j = 0; j < blocked2.length; j++) {
-            blocked2[j].setAttribute('src', blocked2[j].getAttribute('data-blocked-src'));
-            blocked2[j].removeAttribute('data-blocked-src');
-          }
-        } catch (e2) {}
-      }
+      } catch (e) {}
     }
 
     // ── Trust modal ────────────────────────────────────────────────────────
