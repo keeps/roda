@@ -290,6 +290,7 @@ public class EmailViewer extends Composite {
 
     function buildBodyIframe(bodyContent) {
       var fullDoc = '<!DOCTYPE html><html><head><meta charset="utf-8">'
+        + '<base target="_blank" rel="noopener noreferrer">'
         + '<style>'
         + 'html,body{margin:0;padding:8px;box-sizing:border-box;}'
         + 'body{font-family:Arial,sans-serif;font-size:14px;'
