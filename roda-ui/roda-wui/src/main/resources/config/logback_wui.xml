@@ -62,6 +62,8 @@
 
 	<logger name="org.springframework" level="INFO" />
 	<logger name="org.hibernate" level="WARN" />
+	<!-- Suppress noisy WARN logged when browsers probe /.well-known/appspecific/... -->
+	<logger name="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver" level="ERROR" />
 	 <root level="INFO">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="WUI_FILEOUT" />

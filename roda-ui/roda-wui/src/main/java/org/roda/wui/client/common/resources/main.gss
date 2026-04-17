@@ -9282,3 +9282,290 @@ wui-disposal-hold-data .form-textbox {
     display: block;
     margin-bottom: 0.5em;
 }
+
+/* ============================================================
+   RODA PDF Viewer  (manual canvas + TextLayer, window scroll)
+   ============================================================ */
+
+.rodaPdfViewer {
+    position: relative;
+    background: #3a3a3a;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    min-height: 400px;
+}
+
+.rodaPdfViewerFs {
+    height: 100vh;
+}
+
+/* Toolbar sticks to the top on both window scroll and fullscreen element scroll */
+
+.rodaPdfToolbar {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 4px 8px;
+    background: #474747;
+    border-bottom: 1px solid #2a2a2a;
+    gap: 2px;
+    min-height: 40px;
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.rodaPdfBtnGroup {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+}
+
+.rodaPdfBtnGroupRight {
+    margin-left: auto;
+}
+
+.rodaPdfBtn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #d0d0d0;
+    padding: 4px 9px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 13px;
+    line-height: 1;
+    min-width: 28px;
+}
+
+.rodaPdfBtn:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.25);
+    color: #ffffff;
+}
+
+.rodaPdfPageInput {
+    width: 38px;
+    text-align: center;
+    padding: 2px 4px;
+    background: #2e2e2e;
+    border: 1px solid #666;
+    color: #e0e0e0;
+    border-radius: 3px;
+    font-size: 12px;
+    margin: 0 2px;
+}
+
+.rodaPdfPageCount {
+    color: #999;
+    font-size: 12px;
+    padding: 0 4px;
+    white-space: nowrap;
+}
+
+.rodaPdfSep {
+    display: block;
+    width: 1px;
+    height: 20px;
+    background: rgba(255,255,255,0.18);
+    margin: 0 6px;
+    flex-shrink: 0;
+}
+
+/* --- Search bar --- */
+
+.rodaPdfSearchBar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: #3d3d3d;
+    border-bottom: 1px solid #2a2a2a;
+    min-height: 36px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.rodaPdfSearchBarHidden {
+    display: none;
+}
+
+.rodaPdfSearchInput {
+    flex: 1;
+    max-width: 260px;
+    padding: 3px 7px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 3px;
+    color: #eee;
+    font-size: 13px;
+    outline: none;
+}
+
+.rodaPdfSearchInput:focus {
+    border-color: #888;
+    background: #1a1a1a;
+}
+
+.rodaPdfSearchCount {
+    color: #aaa;
+    font-size: 12px;
+    min-width: 64px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* --- Content area: sidebar + scroll wrapper --- */
+
+.rodaPdfContent {
+    position: relative;
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/*
+ * Wrapper that is a flex child (takes remaining width).
+ * The actual PDFViewer container inside is position:absolute — that is
+ * required by PDFViewer.
+ */
+.rodaPdfScrollWrapper {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* PDFViewer container: must be position:absolute per PDF.js requirement */
+.rodaPdfScrollContainer {
+    position: absolute;
+    overflow: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    outline: none;
+}
+
+/* --- Sidebar --- */
+
+.rodaPdfSidebar {
+    width: 0;
+    overflow: hidden;
+    background: #535353;
+    flex-shrink: 0;
+    transition: width 0.2s ease;
+    overflow-y: auto;
+}
+
+.rodaPdfSidebarOpen {
+    width: 192px;
+    overflow-y: auto;
+    border-right: 1px solid #2a2a2a;
+}
+
+.rodaPdfSidebarContent {
+    padding: 8px 6px;
+}
+
+/* Thumbnails */
+
+.rodaPdfThumbs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.rodaPdfThumb {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border: 2px solid transparent;
+    border-radius: 3px;
+}
+
+.rodaPdfThumb:hover {
+    border-color: #aaa;
+    background: rgba(255,255,255,0.08);
+}
+
+.rodaPdfThumbActive {
+    border-color: #6af;
+    background: rgba(100,170,255,0.12);
+}
+
+.rodaPdfThumbCanvas {
+    max-width: 160px;
+    display: block;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.6);
+}
+
+.rodaPdfThumbLabel {
+    color: #bbb;
+    font-size: 11px;
+}
+
+/* Outline */
+
+.rodaPdfOutlineList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rodaPdfOutlineItem {
+    padding: 1px 0;
+}
+
+.rodaPdfOutlineLink {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 12px;
+    display: block;
+    padding: 2px 4px;
+    border-radius: 2px;
+    line-height: 1.4;
+}
+
+.rodaPdfOutlineLink:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    text-decoration: none;
+}
+
+.rodaPdfOutlineItem .rodaPdfOutlineList {
+    padding-left: 12px;
+}
+
+.rodaPdfOutlineEmpty {
+    color: #999;
+    font-style: italic;
+    font-size: 12px;
+    padding: 12px 4px;
+    margin: 0;
+}
+
+/* Loading / error */
+
+.rodaPdfLoading {
+    color: #bbb;
+    text-align: center;
+    padding: 48px 20px;
+    font-size: 15px;
+}
+
+.rodaPdfError {
+    color: #f88;
+    text-align: center;
+    padding: 48px 20px;
+    font-size: 13px;
+}
+
