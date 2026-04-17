@@ -274,6 +274,7 @@ public class EmailViewer extends Composite {
 
     Button onceBtn = new Button(messages.emailViewerLoadImagesOnce());
     onceBtn.addStyleName("btn btn-play");
+    onceBtn.getElement().getStyle().setMarginRight(10, com.google.gwt.dom.client.Style.Unit.PX);
     onceBtn.addClickHandler(e -> {
       restoreImages(iframe);
       banner.removeFromParent();
