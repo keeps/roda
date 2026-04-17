@@ -46,16 +46,13 @@ import com.google.gwt.user.client.ui.FlowPanel;
  * using the {@code srcdoc} attribute with
  * {@code sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin"}.
  * The {@code allow-same-origin} token lets the parent frame access
- * {@code contentDocument} to restore blocked images. When the user confirms
- * image loading, the blocked {@code src} values are restored inside the
- * existing {@code srcdoc} iframe and the iframe is then swapped for a
- * <em>non-sandboxed</em> {@code blob:} URL iframe. Chrome inherits the
- * parent page's CSP into sandboxed iframes (even {@code blob:} ones), so
- * the replacement frame must have no {@code sandbox} attribute. A
- * non-sandboxed {@code blob:} frame carries no response headers and therefore
- * has no CSP of its own, allowing external images to load. This is safe
- * because the HTML has already been DOMPurify-sanitised, removing all
- * {@code <script>} elements and event handlers.
+ * {@code contentDocument} to restore blocked image {@code src} attributes
+ * when the user consents. Per CSP Level 3 §3.3.3, {@code blob:} URL
+ * documents inherit the CSP of their creator, so there is no client-side
+ * iframe trick that can bypass {@code img-src}. Instead, the server-side
+ * CSP permits {@code img-src https:}, enabling external images to load
+ * after explicit user consent while the JavaScript DOMPurify hook still
+ * blocks them by default for untrusted senders.
  * </p>
  *
  * <p>
@@ -86,8 +83,6 @@ public class EmailViewer extends Composite {
     panel.addAttachHandler(event -> {
       if (event.isAttached()) {
         renderEmail(panel.getElement(), fileUrl, fmt);
-      } else {
-        revokeObjectUrls();
       }
     });
   }
@@ -130,20 +125,6 @@ public class EmailViewer extends Composite {
   }
 
   /**
-   * Revokes all Blob object-URLs created during rendering to free memory.
-   * Called when the widget is detached from the DOM.
-   */
-  private native void revokeObjectUrls() /*-{
-    var urls = this.__emailViewerObjUrls;
-    if (urls) {
-      for (var i = 0; i < urls.length; i++) {
-        $wnd.URL.revokeObjectURL(urls[i]);
-      }
-      this.__emailViewerObjUrls = [];
-    }
-  }-*/;
-
-  /**
    * Fetches the email file and renders it inside {@code container}.
    *
    * <p>
@@ -157,8 +138,6 @@ public class EmailViewer extends Composite {
    */
   private native void renderEmail(Element container, String url, String fmt) /*-{
     var self = this;
-    self.__emailViewerObjUrls = [];
-    var objUrls = self.__emailViewerObjUrls;
 
     // ── Utilities ──────────────────────────────────────────────────────────
 
@@ -341,52 +320,30 @@ public class EmailViewer extends Composite {
 
     // ── Image restoration ──────────────────────────────────────────────────
     //
-    // Step 1 — restore data-blocked-src → src inside the existing srcdoc
-    //          iframe (requires allow-same-origin).
-    // Step 2 — swap the srcdoc iframe for a non-sandboxed blob: URL iframe.
+    // CSP spec §3.3.3: blob: URL documents inherit the CSP of their creator.
+    // There is therefore no client-side iframe trick that can bypass img-src.
+    // Instead, the server-side CSP allows img-src https: so that external
+    // images can load after the user explicitly consents.  The privacy gate
+    // is enforced by the DOMPurify hook that replaces src with a placeholder
+    // by default; this function simply undoes that replacement.
     //
-    // Chrome inherits the parent page's CSP into sandboxed iframes, even
-    // blob: URL ones, so keeping sandbox on the replacement frame still blocks
-    // external images via img-src 'self'.  Removing the sandbox attribute
-    // breaks the inheritance: a non-sandboxed blob: frame has no CSP of its
-    // own (blob URLs carry no response headers) and does not inherit the
-    // embedder's CSP.  This is safe because the HTML has already been
-    // DOMPurify-sanitised, removing all <script> elements and event handlers.
+    // allow-same-origin on the srcdoc iframe lets us access contentDocument.
 
     function restoreImages(iframe) {
       try {
         var doc = iframe.contentDocument || iframe.contentWindow.document;
-
-        // Clone the document element to a DETACHED node.
-        // Restoring src attributes on detached nodes does not trigger resource
-        // loads, avoiding CSP violations in the live sandboxed srcdoc iframe.
-        var clone = doc.documentElement.cloneNode(true);
-        var blocked = clone.querySelectorAll('img[data-blocked-src]');
+        var blocked = doc.querySelectorAll('img[data-blocked-src]');
         for (var i = 0; i < blocked.length; i++) {
           blocked[i].setAttribute('src', blocked[i].getAttribute('data-blocked-src'));
           blocked[i].removeAttribute('data-blocked-src');
         }
-
-        // Serialise the clone (with restored src values) and create a blob URL.
-        var restoredHtml = '<!DOCTYPE html>' + clone.outerHTML;
-        var blob = new $wnd.Blob([restoredHtml], {type: 'text/html'});
-        var blobUrl = $wnd.URL.createObjectURL(blob);
-        objUrls.push(blobUrl);
-
-        // Build replacement iframe WITHOUT sandbox.
-        // Chrome inherits the parent CSP into sandboxed iframes; a
-        // non-sandboxed blob: frame has no own CSP (blob URLs carry no response
-        // headers) and does not inherit the embedder's CSP, so external images
-        // load freely.  Scripts are absent: DOMPurify removed them earlier.
-        var newIframe = $doc.createElement('iframe');
-        newIframe.className = iframe.className;
-        newIframe.style.cssText = iframe.style.cssText;
-        newIframe.src = blobUrl;
-        newIframe.style.height = iframe.style.height || '400px';
-
-        if (iframe.parentNode) {
-          iframe.parentNode.replaceChild(newIframe, iframe);
-        }
+        // Resize the iframe to fit the newly loaded images.
+        iframe.addEventListener('load', function() {
+          try {
+            var body = iframe.contentDocument.body;
+            if (body) iframe.style.height = (body.scrollHeight + 24) + 'px';
+          } catch (e2) {}
+        });
       } catch (e) {}
     }
 
@@ -507,9 +464,7 @@ public class EmailViewer extends Composite {
         var bytes  = new $wnd.Uint8Array(binary.length);
         for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
         var blob   = new $wnd.Blob([bytes], {type: mimeType});
-        var u      = $wnd.URL.createObjectURL(blob);
-        objUrls.push(u);
-        return u;
+        return $wnd.URL.createObjectURL(blob);
       } catch (e) { return null; }
     }
 
@@ -670,7 +625,6 @@ public class EmailViewer extends Composite {
                 var attBlob = new $wnd.Blob([attData.content],
                   {type: 'application/octet-stream'});
                 pAtt._objUrl = $wnd.URL.createObjectURL(attBlob);
-                objUrls.push(pAtt._objUrl);
               }
             } catch (attErr) { // leave _objUrl null
             }
