@@ -260,15 +260,21 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void pdfPreview() {
+    final FlowPanel viewerPanel = new FlowPanel();
+    viewerPanel.setStyleName("rodaPdfViewer");
 
-    String viewerPdf = GWT.getHostPageBaseURL() + "webjars/pdf-js/web/viewer.html" + "?file="
-      + encode(GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString()) + "#" + viewers.getOptions();
+    final String fileUrl = GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString();
+    final String baseUrl = GWT.getHostPageBaseURL();
 
-    final Frame frame = new Frame(viewerPdf);
-    frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
+    viewerPanel.addAttachHandler(event -> {
+      if (event.isAttached()) {
+        JavascriptUtils.initRodaPdfViewer(viewerPanel.getElement(), fileUrl, baseUrl);
+      } else {
+        JavascriptUtils.destroyRodaPdfViewer(viewerPanel.getElement());
+      }
+    });
 
-    panel.add(frame);
-    frame.setStyleName("viewRepresentationPDFFilePreview");
+    panel.add(viewerPanel);
   }
 
   private void textPreview() {
@@ -402,10 +408,6 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
     }
     panel.add(frame);
-  }
-
-  private String encode(String string) {
-    return string.replace("?", "%3F").replace("=", "%3D");
   }
 
   private void errorPreview() {

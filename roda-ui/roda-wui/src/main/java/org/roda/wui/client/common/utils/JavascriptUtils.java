@@ -59,6 +59,18 @@ public class JavascriptUtils {
     });
   }-*/;
 
+  public static native void initRodaPdfViewer(JavaScriptObject container, String fileUrl, String baseUrl) /*-{
+    if ($wnd.RodaPdfViewer) {
+      $wnd.RodaPdfViewer.init(container, fileUrl, baseUrl);
+    }
+  }-*/;
+
+  public static native void destroyRodaPdfViewer(JavaScriptObject container) /*-{
+    if ($wnd.RodaPdfViewer) {
+      $wnd.RodaPdfViewer.destroy(container);
+    }
+  }-*/;
+
   public static native void slideToggle(String selector) /*-{
     $wnd.jQuery(selector).click(function() {
       $wnd.jQuery(this).next().slideToggle(300, function() {
