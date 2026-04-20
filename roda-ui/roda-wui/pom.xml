@@ -615,6 +615,33 @@
             <artifactId>filesaver.js</artifactId>
             <version>2.0.4</version>
         </dependency>
+        <!-- Email viewer -->
+        <!-- Note: jars below may take a few hours to propagate to Maven Central after deployment -->
+        <dependency>
+            <!-- Outlook .msg reader — CommonJS only; bundled to browser IIFE by frontend-maven-plugin -->
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>github-com-HiraokaHyperTools-msgreader</artifactId>
+            <version>1.11.0</version>
+        </dependency>
+        <dependency>
+            <!-- RFC 822 .eml parser — browser UMD bundle served directly from webjars path -->
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>github-com-MQpeng-eml-parse-js</artifactId>
+            <version>1.1.15</version>
+        </dependency>
+        <dependency>
+            <!-- Base64 codec — required by eml-parse-js UMD bundle as window.Base64 -->
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>js-base64</artifactId>
+            <version>3.7.7</version>
+        </dependency>
+        <dependency>
+            <!-- HTML sanitizer — prevents XSS from email body content -->
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>dompurify</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+        <!-- / Email viewer -->
         <!-- Spring boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -679,6 +706,71 @@
                     <release>21</release>
                     <encoding>UTF-8</encoding>
                 </configuration>
+            </plugin>
+            <!--
+              Bundles @kenjiuno/msgreader (CommonJS, no browser build) into a
+              browser-compatible IIFE using esbuild.  All transitive npm deps
+              (iconv-lite, @kenjiuno/decompressrtf) are inlined by esbuild's
+              bundler.  The output lands in target/classes/static/js/msgreader/
+              and is served by Spring Boot at /js/msgreader/MsgReader.js.
+            -->
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.15.1</version>
+                <configuration>
+                    <workingDirectory>${project.basedir}/src/main/js</workingDirectory>
+                    <!-- Keep Node.js binary out of src/ -->
+                    <installDirectory>${project.build.directory}/frontend</installDirectory>
+                    <nodeVersion>v22.14.0</nodeVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-node-and-npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                    </execution>
+                    <execution>
+                        <id>npm-install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <!-- default goal is 'install' -->
+                    </execution>
+                    <execution>
+                        <id>bundle-msgreader-for-browser</id>
+                        <goals>
+                            <goal>npx</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>esbuild entry.js
+                                --bundle
+                                --global-name=MSGReader
+                                --format=iife
+                                --platform=browser
+                                --outfile=${project.build.outputDirectory}/static/js/msgreader/MsgReader.js</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>bundle-emlparser-for-browser</id>
+                        <goals>
+                            <goal>npx</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>esbuild entry-eml.js
+                                --bundle
+                                --global-name=EmlParseJs
+                                --format=iife
+                                --platform=browser
+                                --outfile=${project.build.outputDirectory}/static/js/emlparser/EmlParseJs.js</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
