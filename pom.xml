@@ -920,7 +920,7 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>1.80</version>
+                <version>1.84</version>
             </dependency>
             <!-- mguimaraes: 2022-12-15 -->
             <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
