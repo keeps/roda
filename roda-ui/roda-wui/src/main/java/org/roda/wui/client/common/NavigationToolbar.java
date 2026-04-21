@@ -20,6 +20,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils.ProcessRelativeItem;
@@ -231,6 +232,10 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
   public void updateBreadcrumb(TransferredResource transferredResource) {
     breadcrumb.updatePath(BreadcrumbUtils.getTransferredResourceBreadcrumbs(transferredResource));
+  }
+
+  public void updateBreadcrumb(IndexedRisk risk) {
+    breadcrumb.updatePath(BreadcrumbUtils.getRiskBreadCrumbs(risk));
   }
 
   public void updateBreadcrumbPath(BreadcrumbItem... items) {
