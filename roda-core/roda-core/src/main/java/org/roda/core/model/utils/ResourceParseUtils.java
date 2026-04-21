@@ -37,6 +37,9 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -387,7 +390,14 @@ public class ResourceParseUtils {
       }
       ids.add(fileName.replace(RodaConstants.PREMIS_SUFFIX, ""));
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
-    } else {
+    } else if (classToReturn.equals(DisposalSchedule.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getDisposalScheduleId(storagePath)));
+    } else if (classToReturn.equals(DisposalHold.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getDisposalHoldId(storagePath)));
+    } else if (classToReturn.equals(DisposalRule.class)) {
+      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getDisposalRuleId(storagePath)));
+    }
+    else {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, fileName));
     }
 

@@ -1,0 +1,170 @@
+package org.roda.wui.client.common.actions;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.SelectedItemsUtils;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
+import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import config.i18n.client.ClientMessages;
+
+/**
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
+ */
+
+public class IndexedAIPDisposalScheduleSearchWrapperActions extends AbstractActionable<IndexedAIP> {
+  private static final IndexedAIPDisposalScheduleSearchWrapperActions INSTANCE = new IndexedAIPDisposalScheduleSearchWrapperActions();
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final Set<DisposalScheduleAction> POSSIBLE_ACTIONS_ON_DISPOSAL_SCHEDULE = new HashSet<>(
+    Collections.singletonList(DisposalScheduleAction.DISASSOCIATE));
+
+  private IndexedAIPDisposalScheduleSearchWrapperActions() {
+  }
+
+  public static IndexedAIPDisposalScheduleSearchWrapperActions get() {
+    return INSTANCE;
+  }
+
+  @Override
+  public Action<IndexedAIP>[] getActions() {
+    return DisposalScheduleAction.values();
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
+    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
+    if (object.getObject() != null || object.getObjects() != null) {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_DISPOSAL_SCHEDULE.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonInvalidContext());
+    } else {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
+    }
+  }
+
+  @Override
+  public void act(Action<IndexedAIP> action, IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
+    if (DisposalScheduleAction.DISASSOCIATE.equals(action)) {
+      disassociate(objectToSelectedItems(aip, IndexedAIP.class), callback);
+    } else {
+      unsupportedAction(action, callback);
+    }
+  }
+
+  @Override
+  public void act(Action<IndexedAIP> action, SelectedItems<IndexedAIP> items, AsyncCallback<ActionImpact> callback) {
+    if (DisposalScheduleAction.DISASSOCIATE.equals(action)) {
+      disassociate(items, callback);
+    } else {
+      unsupportedAction(action, callback);
+    }
+  }
+
+  private void disassociate(SelectedItems<IndexedAIP> items, AsyncCallback<ActionImpact> callback) {
+    ClientSelectedItemsUtils.size(IndexedAIP.class, items, new ActionNoAsyncCallback<Long>(callback) {
+      @Override
+      public void onSuccess(final Long size) {
+        Dialogs.showConfirmDialog(messages.disassociateDisposalScheduleDialogTitle(),
+          messages.disassociateDisposalScheduleDialogMessage(size.intValue()), messages.dialogNo(),
+          messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
+            @Override
+            public void onSuccess(Boolean result) {
+              if (result) {
+                Services services = new Services("Disassociate disposal schedule from AIP", "job");
+                services
+                  .disposalScheduleResource(
+                    s -> s.disassociatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(items)))
+                  .whenComplete((job, throwable) -> {
+                    if (throwable != null) {
+                      callback.onFailure(throwable);
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    } else {
+                      Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                        @Override
+                        public void onFailure(Throwable caught) {
+                          Toast.showInfo(messages.runningInBackgroundTitle(),
+                            messages.runningInBackgroundDescription());
+
+                          Timer timer = new Timer() {
+                            @Override
+                            public void run() {
+                              doActionCallbackUpdated();
+                            }
+                          };
+
+                          timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                        }
+
+                        @Override
+                        public void onSuccess(final Void nothing) {
+                          doActionCallbackNone();
+                          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                        }
+                      });
+                    }
+                  });
+              } else {
+                doActionCallbackNone();
+              }
+            }
+          });
+      }
+    });
+  }
+
+  @Override
+  public ActionableBundle<IndexedAIP> createActionsBundle() {
+    ActionableBundle<IndexedAIP> disposalScheduleActionableBundle = new ActionableBundle<>();
+
+    ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
+    managementGroup.addButton(messages.disassociateDisposalScheduleButton(), DisposalScheduleAction.DISASSOCIATE,
+      ActionImpact.UPDATED, "fas fa-calendar");
+
+    disposalScheduleActionableBundle.addGroup(managementGroup);
+    return disposalScheduleActionableBundle;
+  }
+
+  @Override
+  public Action<IndexedAIP> actionForName(String name) {
+    return null;
+  }
+
+  public enum DisposalScheduleAction implements Action<IndexedAIP> {
+    DISASSOCIATE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE);
+
+    private List<String> methods;
+
+    DisposalScheduleAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
+  }
+}

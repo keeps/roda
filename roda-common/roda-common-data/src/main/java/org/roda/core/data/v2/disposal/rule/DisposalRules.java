@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.disposal.rule;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +24,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalRules implements RODAObjectList<DisposalRule> {
 
+  @Serial
+  private static final long serialVersionUID = 5273072223178069428L;
   private List<DisposalRule> disposalRuleList;
 
   public DisposalRules() {

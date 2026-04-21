@@ -72,7 +72,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
   /**
    * Add a consumer to be called when the actionable widget is generated, the
-   * integer parameter will have the number of buttons the uer can act on.
+   * integer parameter will have the number of buttons the user can act on.
    */
   public ActionableWidgetBuilder<T> withWidgetCreatedHandler(Consumer<Integer> widgetCreatedHandler) {
     this.widgetCreatedHandler = widgetCreatedHandler;
@@ -166,6 +166,13 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     }
 
     return createGroupedActionsMenu(actionableBundle, objects, ungroupedActions);
+  }
+
+  public FlowPanel buildUngroupedActions(ActionableObject<T> objects,
+                                         List<Actionable.Action<T>> ungroupedActions) {
+    ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
+
+    return createGroupedActionsMenu(actionableBundle, objects, ungroupedActions, true);
   }
 
   // Internal (GUI elements creation)
@@ -319,7 +326,12 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
   }
 
   private FlowPanel createGroupedActionsMenu(ActionableBundle<T> actionableBundle, ActionableObject<T> objects,
-    List<Actionable.Action<T>> ungroupedActions) {
+                                             List<Actionable.Action<T>> ungroupedActions) {
+    return createGroupedActionsMenu(actionableBundle, objects, ungroupedActions, false);
+  }
+
+  private FlowPanel createGroupedActionsMenu(ActionableBundle<T> actionableBundle, ActionableObject<T> objects,
+    List<Actionable.Action<T>> ungroupedActions, boolean hideGroups) {
     FlowPanel panel = new FlowPanel();
     panel.addStyleName("groupedActionableMenu");
 
@@ -328,6 +340,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     int addedButtonCount = 0;
 
     boolean firstGroup = true;
+
     for (ActionableGroup<T> actionGroup : actionableBundle.getGroups()) {
       FlowPanel groupPanel = null;
       FlowPanel buttonsPanel = new FlowPanel();
@@ -369,13 +382,18 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
           if (!firstGroup) {
             SimplePanel verticalDivider = new SimplePanel();
             verticalDivider.addStyleName("verticalDivider");
-            panel.add(verticalDivider);
+            if (!hideGroups) {
+              panel.add(verticalDivider);
+            }
           } else {
             firstGroup = false;
           }
-          panel.add(groupPanel);
-          groupPanel.add(groupButton);
-          groupPanel.add(anchorPanel);
+
+          if (!hideGroups) {
+            panel.add(groupPanel);
+            groupPanel.add(groupButton);
+            groupPanel.add(anchorPanel);
+          }
           popupPanel.add(buttonsPanel);
           break;
         }
@@ -413,7 +431,9 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
             if (!firstGroup) {
               SimplePanel verticalDivider = new SimplePanel();
               verticalDivider.addStyleName("verticalDivider");
-              panel.add(verticalDivider);
+              if (!hideGroups) {
+                panel.add(verticalDivider);
+              }
             } else {
               firstGroup = false;
             }

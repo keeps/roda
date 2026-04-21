@@ -1136,6 +1136,10 @@ button:after {
     content: "\e3c9";
 }
 
+.btn-edit-order:after {
+    content: "\eb61";
+}
+
 .btn-key:after {
     content: "\e73c";
 }
@@ -3565,6 +3569,10 @@ td.datePickerMonth, td.datePickerYear {
     content: "\f023";
 }
 
+.tagIconGavel .gwt-Label:before {
+    content: "\e90e";
+}
+
 .tagIconClock .gwt-Label:before {
     @mixin fontawesome();
     content: "\e900";
@@ -4977,6 +4985,13 @@ td.datePickerMonth, td.datePickerYear {
 .wui-dialog-layout {
     padding: 10px;
     max-width: 60vw;
+}
+
+.wui-dialog-layout .wui-dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
 }
 
 .gwt-DialogBox.wui-dialog-confirm .wui-dialog-layout,
@@ -9741,8 +9756,6 @@ wui-disposal-hold-data .form-textbox {
     font-size: 13px;
 }
 
-
-
 /* Container and Search */
 .permissions-dashboard {
     width: 100%;
@@ -9854,33 +9867,3 @@ wui-disposal-hold-data .form-textbox {
     user-select: none;
 }
 
-/* Add max-height so the dialog knows when to stop growing and start scrolling */
-.edit-permissions-dialog .wui-dialog-layout,
-.edit-user-information-dialog .wui-dialog-layout,
-.create-user-dialog .wui-dialog-layout {
-    width: 80vw;
-    max-width: 80vw !important;
-    max-height: 85vh; /* ADD THIS: Keeps the dialog within the monitor height */
-
-    /* Use flexbox to ensure internal scrolling works correctly */
-    display: flex;
-    flex-direction: column;
-}
-
-/* This will now work because we added content.addStyleName("content") in Java */
-.edit-permissions-dialog .wui-dialog-layout > .content,
-.edit-user-information-dialog .wui-dialog-layout > .content,
-.create-user-dialog .wui-dialog-layout > .content {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
-    padding-bottom: 20px;
-}
-
-/* Update this selector to target the class we added, instead of GWT's FlowPanel object name */
-.edit-permissions-dialog .wui-dialog-layout > .dialog-button-panel,
-.edit-user-information-dialog .wui-dialog-layout > .dialog-button-panel,
-.create-user-dialog .wui-dialog-layout > .dialog-button-panel {
-    flex-shrink: 0;
-    margin-top: 15px;
-}

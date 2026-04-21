@@ -54,6 +54,9 @@ import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -97,6 +100,9 @@ import org.roda.core.plugins.base.maintenance.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexActionLogPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexDIPPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexDisposalConfirmationPlugin;
+import org.roda.core.plugins.base.maintenance.reindex.ReindexDisposalHoldPlugin;
+import org.roda.core.plugins.base.maintenance.reindex.ReindexDisposalRulePlugin;
+import org.roda.core.plugins.base.maintenance.reindex.ReindexDisposalSchedulePlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexIncidencePlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexJobPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexNotificationPlugin;
@@ -731,6 +737,9 @@ public final class PluginHelper {
     list.add(IndexedPreservationAgent.class);
     list.add(DIP.class);
     list.add(DisposalConfirmation.class);
+    list.add(DisposalSchedule.class);
+    list.add(DisposalHold.class);
+    list.add(DisposalRule.class);
     return list;
   }
 
@@ -1605,6 +1614,12 @@ public final class PluginHelper {
       return ReindexDIPPlugin.class.getName();
     } else if (reindexClass.equals(DisposalConfirmation.class)) {
       return ReindexDisposalConfirmationPlugin.class.getName();
+    } else if (reindexClass.equals(DisposalSchedule.class)) {
+      return ReindexDisposalSchedulePlugin.class.getName();
+    } else if (reindexClass.equals(DisposalHold.class)) {
+      return ReindexDisposalHoldPlugin.class.getName();
+    } else if (reindexClass.equals(DisposalRule.class)) {
+      return ReindexDisposalRulePlugin.class.getName();
     } else {
       throw new NotFoundException("No reindex plugin available");
     }

@@ -11,5 +11,9 @@ package org.roda.core.data.v2.disposal.hold;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public enum DisposalHoldState {
-  ACTIVE, LIFTED
+  ACTIVE, LIFTED;
+
+  public static DisposalHoldState getDefault() {
+    return ACTIVE;
+  }
 }

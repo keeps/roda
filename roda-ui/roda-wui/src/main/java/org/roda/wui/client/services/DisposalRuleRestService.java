@@ -8,9 +8,10 @@
 package org.roda.wui.client.services;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.fusesource.restygwt.client.DirectRestService;
+import org.roda.core.data.v2.disposal.rule.ChangeOrderRequest;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreviewRequest;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.api.v2.exceptions.model.ErrorResponseMessage;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
  */
 @Tag(name = "Disposal rules")
 @RequestMapping(path = "../api/v2/disposal/rules")
-public interface DisposalRuleRestService extends DirectRestService {
+public interface DisposalRuleRestService extends RODAEntityRestService<DisposalRule> {
   @RequestMapping(method = RequestMethod.GET, path = "", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "List disposal rules", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DisposalRules.class)))})
@@ -74,4 +75,11 @@ public interface DisposalRuleRestService extends DirectRestService {
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Job applyDisposalRules(
     @Parameter(description = "If true, overrides manually associated disposal schedules.", content = @Content(schema = @Schema(implementation = boolean.class, defaultValue = "false"))) @RequestParam(name = "overrideManualAssociations", required = false, defaultValue = "false") boolean overrideManualAssociations);
+
+  @RequestMapping(method = RequestMethod.POST, path = "/updateOrder")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(summary = "Updates disposal rule order", description = "Updates disposal rule order", responses = {
+          @ApiResponse(responseCode = "204", description = "Resource updated")})
+  Void changeDisposalRuleOrder(
+          @Parameter(name = "changeOrderRequest", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) ChangeOrderRequest request);
 }

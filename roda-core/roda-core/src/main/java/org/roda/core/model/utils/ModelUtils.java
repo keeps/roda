@@ -32,6 +32,7 @@ import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
@@ -718,6 +719,18 @@ public final class ModelUtils {
     return jobPath.getName().replace(RodaConstants.JOB_FILE_EXTENSION, "");
   }
 
+  public static String getDisposalScheduleId(StoragePath disposalSchedulePath) {
+    return disposalSchedulePath.getName().replace(RodaConstants.DISPOSAL_SCHEDULE_FILE_EXTENSION, "");
+  }
+
+  public static String getDisposalHoldId(StoragePath disposalHoldPath) {
+    return disposalHoldPath.getName().replace(RodaConstants.DISPOSAL_HOLD_FILE_EXTENSION, "");
+  }
+
+  public static String getDisposalRuleId(StoragePath disposalRulePath) {
+    return disposalRulePath.getName().replace(RodaConstants.DISPOSAL_RULE_FILE_EXTENSION, "");
+  }
+
   public static StoragePath getJobReportContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB_REPORT);
   }
@@ -1051,6 +1064,8 @@ public final class ModelUtils {
       return getDisposalScheduleContainerPath();
     } else if (clazz.equals(DisposalHold.class)) {
       return getDisposalHoldContainerPath();
+    } else if (clazz.equals(DisposalRule.class)) {
+      return getDisposalRuleContainerPath();
     } else if (clazz.equals(DisposalConfirmation.class)) {
       return getDisposalConfirmationContainerPath();
     } else if (clazz.equals(DistributedInstance.class)) {

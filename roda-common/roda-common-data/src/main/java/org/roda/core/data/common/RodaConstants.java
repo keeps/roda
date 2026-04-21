@@ -10,8 +10,12 @@ package org.roda.core.data.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
+import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
+import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 
 public final class RodaConstants {
@@ -932,6 +936,9 @@ public final class RodaConstants {
   public static final String INDEX_DIP_FILE = "DIPFile";
   public static final String INDEX_REPRESENTATION_INFORMATION = "RepresentationInformation";
   public static final String INDEX_DISPOSAL_CONFIRMATION = "DisposalConfirmation";
+  public static final String INDEX_DISPOSAL_SCHEDULE = "DisposalSchedule";
+  public static final String INDEX_DISPOSAL_HOLD = "DisposalHold";
+  public static final String INDEX_DISPOSAL_RULE = "DisposalRule";
 
   /*
    * INDEXED CLASSES
@@ -946,7 +953,10 @@ public final class RodaConstants {
       "org.roda.core.data.v2.risks.RiskIncidence", "org.roda.core.data.v2.ri.RepresentationInformation",
       "org.roda.core.data.v2.ip.TransferredResource", "org.roda.core.data.v2.user.User",
       "org.roda.core.data.v2.user.Group", "org.roda.core.data.v2.user.RODAMember",
-      "org.roda.core.data.v2.ip.disposal.DisposalConfirmation", "org.roda.core.data.v2.user.RodaPrincipal",
+      "org.roda.core.data.v2.disposal.hold.DisposalHold",
+      "org.roda.core.data.v2.disposal.schedule.DisposalSchedule",
+      "org.roda.core.data.v2.disposal.rule.DisposalRule",
+      "org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation", "org.roda.core.data.v2.user.RodaPrincipal",
       "org.roda.core.data.v2.ip.AIP", "org.roda.core.data.v2.risks.Risk", "org.roda.core.events.pekko.CRDTWrapper",
       "org.roda.core.data.v2.ip.DIP", "org.roda.core.data.v2.ip.metadata.DescriptiveMetadata",
       "org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry",
@@ -1307,8 +1317,32 @@ public final class RodaConstants {
   public static final String DISPOSAL_CONFIRMATION_EXTRA_INFO = "extraInformation";
   public static final String DISPOSAL_CONFIRMATION_STORAGE_SIZE = "size";
 
+  public static final String DISPOSAL_SCHEDULE_TITLE = "title";
+  public static final String DISPOSAL_SCHEDULE_DESCRIPTION = "description";
+  public static final String DISPOSAL_SCHEDULE_MANDATE = "mandate";
+  public static final String DISPOSAL_SCHEDULE_SCOPE_NOTES = "scopeNotes";
+  public static final String DISPOSAL_SCHEDULE_STATE = "state";
+  public static final String DISPOSAL_SCHEDULE_ACTION = "action";
+  public static final String DISPOSAL_SCHEDULE_RETENTION_PERIOD_INTERVAL_CODE =  "retentionPeriodIntervalCode";
+  public static final String DISPOSAL_SCHEDULE_RETENTION_PERIOD_DURATION = "retentionPeriodDuration";
+
+  public static final String DISPOSAL_HOLD_TITLE = "title";
+  public static final String DISPOSAL_HOLD_DESCRIPTION = "description";
+  public static final String DISPOSAL_HOLD_MANDATE = "mandate";
+  public static final String DISPOSAL_HOLD_SCOPE_NOTES = "scopeNotes";
+  public static final String DISPOSAL_HOLD_STATE = "state";
+
+  public static final String DISPOSAL_RULE_ORDER = "order";
+  public static final String DISPOSAL_RULE_TITLE = "title";
+  public static final String DISPOSAL_RULE_DESCRIPTION = "description";
+  public static final String DISPOSAL_RULE_SELECTION_METHOD = "selectionMethod";
+  public static final String DISPOSAL_RULE_CONDITION_KEY = "conditionKey";
+  public static final String DISPOSAL_RULE_CONDITION_VALUE = "conditionvalue";
+  public static final String DISPOSAL_RULE_SCHEDULE_ID = "scheduleId";
+
   /* Disposal related parameters */
   public static final String DISPOSAL_HOLD_FILE_EXTENSION = ".json";
+  public static final String DISPOSAL_RULE_FILE_EXTENSION = ".json";
 
   /* Distributed related parameters */
   public static final String DISTRIBUTED_INSTANCE_FILE_EXTENSION = ".json";
@@ -2169,6 +2203,7 @@ public final class RodaConstants {
 
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_RULE = "org.roda.wui.api.v2.controller.DisposalRuleController.createDisposalRule";
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_RULE = "org.roda.wui.api.v2.controller.DisposalRuleController.updateDisposalRule";
+  public static final String PERMISSION_METHOD_DELETE_DISPOSAL_RULE = "org.roda.wui.api.v2.controller.DisposalRuleController.deleteDisposalRule";
 
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE = "org.roda.wui.api.v2.controller.DisposalScheduleController.createDisposalSchedule";
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE = "org.roda.wui.api.v2.controller.DisposalScheduleController.updateDisposalSchedule";

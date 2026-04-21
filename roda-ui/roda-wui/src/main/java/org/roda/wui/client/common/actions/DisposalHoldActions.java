@@ -1,198 +1,72 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
 package org.roda.wui.client.common.actions;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.utils.SelectedItemsUtils;
-import org.roda.core.data.v2.disposal.hold.DisposalHold;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
-import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
-import org.roda.wui.client.common.actions.model.ActionableBundle;
-import org.roda.wui.client.common.actions.model.ActionableGroup;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.process.InternalProcess;
-import org.roda.wui.client.services.Services;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.widgets.Toast;
 
 /**
- * @author Tiago Fraga <tfraga@keep.pt>
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
-  private static final DisposalHoldActions INSTANCE = new DisposalHoldActions();
+
+public class DisposalHoldActions {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static final Set<DisposalHoldAction> POSSIBLE_ACTIONS_ON_DISPOSAL_HOLD = new HashSet<>(
-    Arrays.asList(DisposalHoldAction.DISASSOCIATE));
-  private DisposalHold disposalHold;
 
-  public DisposalHoldActions() {
+  private DisposalHoldActions() {
+    // private constructor to prevent instantiation
   }
 
-  public DisposalHoldActions(DisposalHold disposalHold) {
-    this.disposalHold = disposalHold;
-  }
+  public static void lift(DisposalHold hold, AsyncCallback<Actionable.ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.liftDisposalHoldDialogTitle(), messages.liftDisposalHoldDialogMessage(1),
+      messages.cancelButton(), messages.confirmButton(), new ActionAsyncCallback<Boolean>(callback) {
+        @Override
+        public void onFailure(Throwable throwable) {
+          callback.onSuccess(Actionable.ActionImpact.NONE);
+        }
 
-  public static DisposalHoldActions get() {
-    return INSTANCE;
-  }
+        @Override
+        public void onSuccess(Boolean confirm) {
+          if (confirm) {
+            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
+              new AsyncCallback<String>() {
+                @Override
+                public void onFailure(Throwable throwable) {
+                  // do nothing
+                }
 
-  @Override
-  public Action<IndexedAIP>[] getActions() {
-    return DisposalHoldActions.DisposalHoldAction.values();
-  }
+                @Override
+                public void onSuccess(String details) {
+                  Services services = new Services("Lift disposal hold", "job");
 
-  @Override
-  public Action<IndexedAIP> actionForName(String name) {
-    return DisposalHoldActions.DisposalHoldAction.valueOf(name);
-  }
-
-  @Override
-  public CanActResult userCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
-    return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
-  }
-
-  @Override
-  public CanActResult contextCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
-    if (object.getObject() != null || object.getObjects() != null) {
-      return new CanActResult(POSSIBLE_ACTIONS_ON_DISPOSAL_HOLD.contains(action), CanActResult.Reason.CONTEXT,
-        messages.reasonInvalidContext());
-    } else {
-      return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonNoObjectSelected());
-    }
-  }
-
-  @Override
-  public void act(Action<IndexedAIP> action, IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    if (DisposalHoldAction.DISASSOCIATE.equals(action)) {
-      disassociate(objectToSelectedItems(aip, IndexedAIP.class), callback);
-    } else {
-      unsupportedAction(action, callback);
-    }
-  }
-
-  @Override
-  public void act(Action<IndexedAIP> action, SelectedItems<IndexedAIP> aips, AsyncCallback<ActionImpact> callback) {
-    if (DisposalHoldAction.DISASSOCIATE.equals(action)) {
-      disassociate(aips, callback);
-    } else {
-      unsupportedAction(action, callback);
-    }
-  }
-
-  private void disassociate(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
-      @Override
-      public void onSuccess(final Long size) {
-        Dialogs.showConfirmDialog(messages.disassociateDisposalHoldDialogTitle(),
-          messages.disassociateDisposalHoldDialogMessage(size.intValue()), messages.dialogNo(), messages.dialogYes(),
-          new ActionNoAsyncCallback<Boolean>(callback) {
-            @Override
-            public void onSuccess(Boolean result) {
-              if (result) {
-                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
-                  new ActionNoAsyncCallback<String>(callback) {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
-
-                    @Override
-                    public void onSuccess(String details) {
-                      DisassociateDisposalHoldRequest request = new DisassociateDisposalHoldRequest();
-                      request.setClear(false);
-                      request.setDetails(details);
-                      request.setSelectedItems(SelectedItemsUtils.convertToRESTRequest(aips));
-                      Services services = new Services("Lift disposal hold", "job");
-                      services.disposalHoldResource(s -> s.disassociateDisposalHold(request, disposalHold.getId()))
-                        .whenComplete((job, throwable) -> {
-                          if (throwable != null) {
-                            callback.onFailure(throwable);
-                            HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                          } else {
-                            Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-
-                              @Override
-                              public void onFailure(Throwable caught) {
-                                Toast.showInfo(messages.runningInBackgroundTitle(),
-                                  messages.runningInBackgroundDescription());
-
-                                Timer timer = new Timer() {
-                                  @Override
-                                  public void run() {
-                                    doActionCallbackUpdated();
-                                  }
-                                };
-
-                                timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                              }
-
-                              @Override
-                              public void onSuccess(final Void nothing) {
-                                doActionCallbackNone();
-                                HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                              }
-                            });
+                  services.disposalHoldResource(s -> s.liftDisposalHold(hold.getUUID(), details))
+                    .whenComplete((job, throwable) -> {
+                      if (throwable != null) {
+                        AsyncCallbackUtils.defaultFailureTreatment(throwable);
+                      } else {
+                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.updateDisposalHoldMessage());
+                        Timer timer = new Timer() {
+                          @Override
+                          public void run() {
+                            callback.onSuccess(Actionable.ActionImpact.UPDATED);
                           }
-                        });
-                    }
-                  });
-              } else {
-                doActionCallbackNone();
-              }
-            }
-          });
-      }
-    });
+                        };
+
+                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                      }
+                    });
+                }
+              });
+          }
+        }
+      });
   }
-
-  @Override
-  public ActionableBundle<IndexedAIP> createActionsBundle() {
-    ActionableBundle<IndexedAIP> disposalHoldActionableBundle = new ActionableBundle<>();
-
-    ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
-    managementGroup.addButton(messages.disassociateDisposalHoldButton(), DisposalHoldAction.DISASSOCIATE,
-      ActionImpact.UPDATED, "btn-lift-hold");
-
-    disposalHoldActionableBundle.addGroup(managementGroup);
-    return disposalHoldActionableBundle;
-  }
-
-  public enum DisposalHoldAction implements Action<IndexedAIP> {
-    DISASSOCIATE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD);
-
-    private final List<String> methods;
-
-    DisposalHoldAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
-  }
-
 }

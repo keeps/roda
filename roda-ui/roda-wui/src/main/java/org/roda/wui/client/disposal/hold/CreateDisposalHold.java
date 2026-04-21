@@ -9,22 +9,24 @@ package org.roda.wui.client.disposal.hold;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.wui.client.common.CreateOrUpdateDisposalHoldActionsToolbar;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
-import org.roda.wui.client.services.Services;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -58,49 +60,55 @@ public class CreateDisposalHold extends Composite {
     }
   };
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static CreateDisposalHold.MyUiBinder uiBinder = GWT.create(CreateDisposalHold.MyUiBinder.class);
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
   @UiField
-  Button buttonApply;
+  FocusPanel keyboardFocus;
   @UiField
-  Button buttonCancel;
-  @UiField(provided = true)
-  DisposalHoldDataPanel disposalHoldDataPanel;
-  private DisposalHold disposalHold;
+  NavigationToolbar<DisposalHold> navigationToolbar;
+  @UiField
+  CreateOrUpdateDisposalHoldActionsToolbar actionsToolbar;
+  @UiField
+  TitlePanel title;
+  @UiField
+  FlowPanel disposalHoldDataPanel;
 
   public CreateDisposalHold(DisposalHold disposalHold) {
-    this.disposalHold = disposalHold;
-    this.disposalHoldDataPanel = new DisposalHoldDataPanel(disposalHold, false);
-
     initWidget(uiBinder.createAndBindUi(this));
-  }
 
-  @UiHandler("buttonApply")
-  void buttonApplyHandler(ClickEvent e) {
-    if (disposalHoldDataPanel.isValid()) {
-      disposalHold = disposalHoldDataPanel.getDisposalHold();
-      Services services = new Services("Create disposal hold", "create");
-      services.disposalHoldResource(s -> s.createDisposalHold(disposalHold))
-        .whenComplete((disposalHold1, throwable) -> {
-          if (throwable != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(throwable);
-          } else {
-            HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-          }
-        });
-    }
+    // 1. Create the panel and keep a reference
+    DisposalHoldDataPanel dataPanel = new DisposalHoldDataPanel(disposalHold, false);
+    disposalHoldDataPanel.add(dataPanel);
 
-  }
+    navigationToolbar.withoutButtons().build();
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getCreateDisposalHoldBreadcrumbs());
 
-  @UiHandler("buttonCancel")
-  void buttonCancelHandler(ClickEvent e) {
-    cancel();
-  }
+    actionsToolbar.setLabel(messages.showDisposalHoldTitle());
 
-  private void cancel() {
-    HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+    // 2. Give the toolbar the panel so it can check validity
+    actionsToolbar.setDataPanel(dataPanel);
+    actionsToolbar.setIsCreate(true);
+
+    // 3. Pass the shared object
+    actionsToolbar.setObjectAndBuild(disposalHold, null, new AsyncCallback<Actionable.ActionImpact>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
+
+      @Override
+      public void onSuccess(Actionable.ActionImpact result) {
+        // Redirect user or show success message if result == ActionImpact.UPDATED
+      }
+    });
+
+    title.setText(messages.newDisposalHoldTitle());
+    title.setIconClass("DisposalHold");
+
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse");
   }
 
   interface MyUiBinder extends UiBinder<Widget, CreateDisposalHold> {
   }
-
 }
