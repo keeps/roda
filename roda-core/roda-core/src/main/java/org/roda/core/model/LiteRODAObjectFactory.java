@@ -195,6 +195,12 @@ public final class LiteRODAObjectFactory {
       ret = getIndexedPreservationAgent(object);
     } else if (object instanceof DisposalHold) {
       ret = get(DisposalHold.class, Arrays.asList(object.getId()), false);
+    } else if (object instanceof DisposalSchedule) {
+      ret = get(DisposalSchedule.class, Arrays.asList(object.getId()), false);
+    } else if (object instanceof DisposalHold) {
+      ret = get(DisposalHold.class, Arrays.asList(object.getId()), false);
+    } else if (object instanceof DisposalRule) {
+      ret = get(DisposalRule.class, Arrays.asList(object.getId()), false);
     }
 
     if (!ret.isPresent()) {

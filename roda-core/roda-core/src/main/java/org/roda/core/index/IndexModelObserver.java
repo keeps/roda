@@ -37,6 +37,8 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -1507,6 +1509,36 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationDeleted(String confirmationId, boolean commit) {
     return deleteDocumentFromIndex(DisposalConfirmation.class, confirmationId);
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> disposalScheduleCreatedOrUpdated(DisposalSchedule schedule) {
+    return SolrUtils.create2(index, model, this, DisposalSchedule.class, schedule);
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> disposalScheduleDeleted(String scheduleId, boolean commit) {
+    return deleteDocumentFromIndex(DisposalSchedule.class, scheduleId);
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> disposalHoldCreatedOrUpdated(DisposalHold hold) {
+    return SolrUtils.create2(index, model, this, DisposalHold.class, hold);
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> disposalHoldDeleted(String holdId, boolean commit) {
+    return deleteDocumentFromIndex(DisposalHold.class, holdId);
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> disposalRuleCreatedOrUpdated(DisposalRule rule) {
+    return SolrUtils.create2(index, model, this, DisposalRule.class, rule);
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> disposalRuleDeleted(String ruleId, boolean commit) {
+    return deleteDocumentFromIndex(DisposalRule.class, ruleId);
   }
 
   public ReturnWithExceptions<Void, ModelObserver> liteRODAObjectCreated(LiteRODAObject liteRODAObject) {

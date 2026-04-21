@@ -8,10 +8,16 @@
 package org.roda.core.data.v2.disposal.schedule;
 
 import java.io.Serial;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.HasId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DisposalSchedule implements IsModelObject, HasId {
+public class DisposalSchedule implements IsModelObject, IsIndexed, HasId {
   @Serial
   private static final long serialVersionUID = -2870778207871507847L;
   private static final int VERSION = 1;
@@ -53,6 +59,10 @@ public class DisposalSchedule implements IsModelObject, HasId {
   private String updatedBy = null;
 
   private DisposalScheduleState state;
+
+  private Map<String, Object> fields = new HashMap<>();
+
+  private boolean usedInDisposalRule = false;
 
   public DisposalSchedule() {
     super();
@@ -221,6 +231,14 @@ public class DisposalSchedule implements IsModelObject, HasId {
     this.state = state;
   }
 
+  public boolean isUsedInDisposalRule() {
+    return usedInDisposalRule;
+  }
+
+  public void setUsedInDisposalRule(boolean usedInDisposalRule) {
+    this.usedInDisposalRule = usedInDisposalRule;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -254,5 +272,40 @@ public class DisposalSchedule implements IsModelObject, HasId {
       + retentionPeriodIntervalCode + ", retentionPeriodDuration=" + retentionPeriodDuration + ", destroyedTimestamp="
       + firstTimeUsed + ", numberOfAIPUnder=" + apiCounter + ", createdOn=" + createdOn + ", createdBy='" + createdBy
       + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", state=" + state + '}';
+  }
+
+  @JsonIgnore
+  @Override
+  public String getUUID() {
+    return getId();
+  }
+
+  @Override
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "title", "description", "mandate", "scopeNotes", "actionCode",
+      "retentionTriggerElementId", "retentionPeriodIntervalCode", "retentionPeriodDuration", "createdOn", "createdBy",
+      "updatedOn", "updatedBy", "state");
+  }
+
+  @Override
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, title, description, mandate, scopeNotes, actionCode, retentionTriggerElementId,
+      retentionPeriodIntervalCode, retentionPeriodDuration, createdOn, createdBy, updatedOn, updatedBy, state);
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return Arrays.asList(RodaConstants.INDEX_UUID);
+  }
+
+  @Override
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  @Override
+  public void setFields(Map<String, Object> fields) {
+    fields.entrySet().stream().filter(p -> p.getValue() != null)
+      .forEach(e -> this.fields.put(e.getKey(), e.getValue()));
   }
 }

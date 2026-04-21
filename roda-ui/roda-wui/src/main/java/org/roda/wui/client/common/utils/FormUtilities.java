@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.InlineHTML;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.wui.client.common.RichTextToolbar;
@@ -595,6 +597,21 @@ public class FormUtilities {
   public static void addIfNotBlank(FlowPanel panel, String label, String value) {
     if (StringUtils.isNotBlank(value)) {
       panel.add(buildField(label, new InlineHTML(SafeHtmlUtils.htmlEscape(value))));
+    }
+  }
+
+  public static void addIfNotBlank(FlowPanel panel, String label, SafeHtml value) {
+    if (StringUtils.isNotBlank(value.asString())) {
+      panel.add(buildField(label, new InlineHTML(value)));
+    }
+  }
+
+  public static void addIfNotBlank(FlowPanel panel, String label, String value, String styles, ClickHandler clickHandler) {
+    if (StringUtils.isNotBlank(value)) {
+      InlineHTML inlineHTML = new InlineHTML(SafeHtmlUtils.htmlEscape(value));
+      inlineHTML.addStyleName(styles);
+      inlineHTML.addClickHandler(clickHandler);
+      panel.add(buildField(label, inlineHTML));
     }
   }
 

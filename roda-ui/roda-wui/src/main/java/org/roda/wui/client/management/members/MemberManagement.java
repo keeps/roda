@@ -66,7 +66,7 @@ public class MemberManagement extends Composite {
     ListBuilder<RODAMember> rodaMemberListBuilder = new ListBuilder<>(() -> new RodaMemberList(),
       new AsyncTableCellOptions<>(RODAMember.class, "MemberManagement_rodaMembers")
         .withSummary(messages.usersAndGroupsTitle()).bindOpener()
-        .withSearchPlaceholder(messages.usersAndGroupsSearchPlaceHolder()).withActionable(RODAMemberActions.get()));
+        .withActionable(RODAMemberActions.get()));
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(rodaMemberListBuilder);
 
@@ -114,7 +114,4 @@ public class MemberManagement extends Composite {
 
   interface MyUiBinder extends UiBinder<Widget, MemberManagement> {
   }
-
-
-
 }
