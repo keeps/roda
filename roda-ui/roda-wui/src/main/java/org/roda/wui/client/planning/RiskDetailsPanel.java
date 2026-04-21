@@ -9,6 +9,7 @@
 package org.roda.wui.client.planning;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
@@ -23,10 +24,10 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
 
 import config.i18n.client.ClientMessages;
 
@@ -100,20 +101,13 @@ public class RiskDetailsPanel extends GenericMetadataCardPanel<Risk> {
     if (categories == null || categories.isEmpty()) {
       return;
     }
+    List<SafeHtml> safeHtmlCategories = categories.stream().filter(StringUtils::isNotBlank)
+      .map(category -> SafeHtmlUtils
+        .fromSafeConstant("<span class='label-info'>" + SafeHtmlUtils.htmlEscape(category) + "</span>"))
+      .collect(Collectors.toList());
 
-    FlowPanel categoriesPanel = new FlowPanel();
-
-    for (String category : categories) {
-      if (StringUtils.isBlank(category)) {
-        continue;
-      }
-
-      categoriesPanel.add(new InlineHTML(
-        "<span class='label label-info btn-separator-right'>" + SafeHtmlUtils.htmlEscape(category) + "</span>"));
-    }
-
-    if (categoriesPanel.getWidgetCount() > 0) {
-      buildField(messages.riskCategories()).withWidget(categoriesPanel).build();
+    if (!safeHtmlCategories.isEmpty()) {
+      buildField(messages.riskCategories()).withMultipleHtmlBadges(safeHtmlCategories).build();
     }
   }
 
