@@ -2810,7 +2810,7 @@ public class DefaultModelService implements ModelService {
 
   @Override
   public Group updateGroupMembers(String id, Set<String> members, boolean notify, boolean isHandlingEvent)
-          throws AuthorizationDeniedException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
     boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(nodeType);
 
     if (!writeIsAllowed && !isHandlingEvent) {
@@ -2819,7 +2819,7 @@ public class DefaultModelService implements ModelService {
     Group group = UserUtility.getLdapUtility().getGroup(id);
     group.getUsers().addAll(members);
 
-    for (String member: members) {
+    for (String member : members) {
       User user = UserUtility.getLdapUtility().getUser(member);
       user.getGroups().add(id);
       notifyUserUpdated(user).failOnError();
@@ -4510,6 +4510,7 @@ public class DefaultModelService implements ModelService {
     String disposalHoldAsJson = JsonUtils.getJsonFromObject(newDisposalHold);
     StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(newDisposalHold.getId());
     storage.createBinary(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false);
+    notifyDisposalHoldCreatedOrUpdated(newDisposalHold).failOnError();
 
     return newDisposalHold;
   }
@@ -4560,6 +4561,7 @@ public class DefaultModelService implements ModelService {
 
     storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true, false,
       null);
+    notifyDisposalHoldCreatedOrUpdated(currentDisposalHold).failOnError();
 
     createRepositoryEvent(PreservationEventType.UPDATE, "Update disposal hold", PluginState.SUCCESS, "", details, "",
       true, null);
@@ -4577,6 +4579,7 @@ public class DefaultModelService implements ModelService {
     if (disposalHold.getFirstTimeUsed() == null) {
       StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
       storage.deleteResource(disposalHoldPath);
+      notifyDisposalHoldDeleted(disposalHoldId, false);
     } else {
       throw new IllegalOperationException("Error deleting disposal hold: " + disposalHold.getId()
         + ". Reason: One or more AIPs where associated under this disposal hold");
@@ -4709,6 +4712,7 @@ public class DefaultModelService implements ModelService {
     String disposalScheduleAsJson = JsonUtils.getJsonFromObject(disposalSchedule);
     StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalSchedule.getId());
     storage.createBinary(disposalSchedulePath, new StringContentPayload(disposalScheduleAsJson), false);
+    notifyDisposalScheduleCreatedOrUpdated(disposalSchedule).failOnError();
 
     return disposalSchedule;
   }
@@ -4754,6 +4758,7 @@ public class DefaultModelService implements ModelService {
     StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(currentDisposalSchedule.getId());
     storage.updateBinaryContent(disposalSchedulePath, new StringContentPayload(disposalScheduleAsJson), false, false,
       false, null);
+    notifyDisposalScheduleCreatedOrUpdated(currentDisposalSchedule).failOnError();
 
     return currentDisposalSchedule;
   }
@@ -4813,7 +4818,7 @@ public class DefaultModelService implements ModelService {
     // if so, block the action and keep the disposal schedule
     if (retrieveDisposalSchedule(disposalScheduleId).getFirstTimeUsed() != null) {
       throw new IllegalOperationException("Error deleting disposal schedule: " + disposalScheduleId
-        + ". Reason: One or more AIPs where destroyed under this disposal schedule");
+        + ". Reason: This disposal schedule was already associated to an AIP or used to destroy on ore more AIP");
     }
 
     // check if the disposal schedule is being used in a disposal rule
@@ -4831,6 +4836,7 @@ public class DefaultModelService implements ModelService {
     }
 
     storage.deleteResource(disposalSchedulePath);
+    notifyDisposalScheduleDeleted(disposalScheduleId, false).failOnError();
   }
 
   /**********************************
@@ -5079,6 +5085,7 @@ public class DefaultModelService implements ModelService {
     String disposalRuleAsJson = JsonUtils.getJsonFromObject(disposalRule);
     StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRule.getId());
     storage.createBinary(disposalRulePath, new StringContentPayload(disposalRuleAsJson), false);
+    notifyDisposalRuleCreatedOrUpdated(disposalRule).failOnError();
 
     return disposalRule;
   }
@@ -5095,6 +5102,7 @@ public class DefaultModelService implements ModelService {
     StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRule.getId());
     storage.updateBinaryContent(disposalRulePath, new StringContentPayload(disposalRuleAsJson), false, false, false,
       null);
+    notifyDisposalRuleCreatedOrUpdated(disposalRule).failOnError();
 
     return disposalRule;
   }
@@ -5106,6 +5114,7 @@ public class DefaultModelService implements ModelService {
 
     StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRuleId);
     storage.deleteResource(disposalRulePath);
+    notifyDisposalRuleDeleted(disposalRuleId, false);
 
     DisposalRules disposalRules = listDisposalRules();
     int index = 0;
@@ -5761,6 +5770,36 @@ public class DefaultModelService implements ModelService {
   @Override
   public ReturnWithExceptionsWrapper notifyDisposalConfirmationDeleted(String disposalConfirmationId, boolean commit) {
     return notifyObserversSafely(observer -> observer.disposalConfirmationDeleted(disposalConfirmationId, commit));
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalScheduleCreatedOrUpdated(DisposalSchedule schedule) {
+    return notifyObserversSafely(observer -> observer.disposalScheduleCreatedOrUpdated(schedule));
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalScheduleDeleted(String disposalScheduleId, boolean commit) {
+    return notifyObserversSafely(observer -> observer.disposalScheduleDeleted(disposalScheduleId, commit));
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalHoldCreatedOrUpdated(DisposalHold hold) {
+    return notifyObserversSafely(observer -> observer.disposalHoldCreatedOrUpdated(hold));
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalHoldDeleted(String disposalHoldId, boolean commit) {
+    return notifyObserversSafely(observer -> observer.disposalHoldDeleted(disposalHoldId, commit));
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalRuleCreatedOrUpdated(DisposalRule rule) {
+    return notifyObserversSafely(observer -> observer.disposalRuleCreatedOrUpdated(rule));
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalRuleDeleted(String disposalRuleId, boolean commit) {
+    return notifyObserversSafely(observer -> observer.disposalRuleDeleted(disposalRuleId, commit));
   }
 
   /************************************

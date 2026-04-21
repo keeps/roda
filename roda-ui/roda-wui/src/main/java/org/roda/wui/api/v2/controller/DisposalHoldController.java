@@ -8,7 +8,10 @@
 package org.roda.wui.api.v2.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
@@ -16,17 +19,25 @@ import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHolds;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
+import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
+import org.roda.core.data.v2.index.CountRequest;
+import org.roda.core.data.v2.index.FindRequest;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
 import org.roda.core.data.v2.ip.disposalhold.UpdateDisposalHoldRequest;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.v2.exceptions.RESTException;
 import org.roda.wui.api.v2.services.DisposalHoldService;
+import org.roda.wui.api.v2.services.IndexService;
 import org.roda.wui.api.v2.utils.CommonServicesUtils;
 import org.roda.wui.client.services.DisposalHoldRestService;
 import org.roda.wui.common.RequestControllerAssistant;
 import org.roda.wui.common.model.RequestContext;
+import org.roda.wui.common.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +51,11 @@ import com.google.json.JsonSanitizer;
 @RestController
 @RequestMapping(path = "/api/v2/disposal/holds")
 public class DisposalHoldController implements DisposalHoldRestService {
+  @Autowired
+  HttpServletRequest request;
+
+  @Autowired
+  IndexService indexService;
 
   @Autowired
   DisposalHoldService disposalHoldService;
@@ -188,5 +204,30 @@ public class DisposalHoldController implements DisposalHoldRestService {
         return requestContext.getModelService().listDisposalHoldsAssociation(aipId);
       }
     });
+  }
+
+  @Override
+  public DisposalHold findByUuid(String uuid, String localeString) {
+    return indexService.retrieve(DisposalHold.class, uuid, new ArrayList<>());
+  }
+
+  @Override
+  public IndexResult<DisposalHold> find(@RequestBody FindRequest findRequest, String localeString) {
+    return indexService.find(DisposalHold.class, findRequest, localeString);
+  }
+
+  @Override
+  public LongResponse count(@RequestBody CountRequest countRequest) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
+      return new LongResponse(indexService.count(DisposalHold.class, countRequest));
+    } else {
+      return new LongResponse(-1L);
+    }
+  }
+
+  @Override
+  public List<String> suggest(@RequestBody SuggestRequest suggestRequest) {
+    return indexService.suggest(suggestRequest, DisposalHold.class);
   }
 }

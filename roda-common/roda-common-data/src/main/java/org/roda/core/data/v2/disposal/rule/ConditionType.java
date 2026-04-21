@@ -11,5 +11,9 @@ package org.roda.core.data.v2.disposal.rule;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public enum ConditionType {
-  IS_CHILD_OF, METADATA_FIELD
+  IS_CHILD_OF, METADATA_FIELD;
+
+  public static ConditionType getDefault() {
+    return IS_CHILD_OF;
+  }
 }

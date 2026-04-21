@@ -16,6 +16,9 @@ import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.REST;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -171,6 +174,12 @@ public class Services implements DirectRestService {
       service = GWT.create(AuditLogRestService.class);
     } else if (DIPFile.class.getName().equals(objectClassString)) {
       service = GWT.create(DIPFileRestService.class);
+    } else if (DisposalSchedule.class.getName().equals(objectClassString)) {
+      service = GWT.create(DisposalScheduleRestService.class);
+    } else if (DisposalHold.class.getName().equals(objectClassString)) {
+      service = GWT.create(DisposalHoldRestService.class);
+    } else if (DisposalRule.class.getName().equals(objectClassString)) {
+      service = GWT.create(DisposalRuleRestService.class);
     } else {
       String error = objectClassString + " not supported";
       Toast.showError(error);

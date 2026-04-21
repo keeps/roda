@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.services;
 
-import org.fusesource.restygwt.client.DirectRestService;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
@@ -33,7 +32,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(name = "Disposal schedules")
 @RequestMapping(path = "../api/v2/disposal/schedules")
-public interface DisposalScheduleRestService extends DirectRestService {
+public interface DisposalScheduleRestService extends RODAEntityRestService<DisposalSchedule> {
 
   @RequestMapping(method = RequestMethod.GET, path = "", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "List disposal schedules", responses = {

@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.storage.client.Storage;
 
 import config.i18n.client.ClientMessages;
 
@@ -32,15 +33,14 @@ import config.i18n.client.ClientMessages;
 public class Tabs extends Composite {
   protected static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static Tabs.MyUiBinder uiBinder = GWT.create(Tabs.MyUiBinder.class);
-
+  private final Map<Widget, TabContentBuilder> tabs;
   @UiField
   FlowPanel tabButtons;
   @UiField
   SimplePanel tabContentWrapper;
-
   private Widget selectedTab;
-  private final Map<Widget, TabContentBuilder> tabs;
   private TabContentBuilder defaultContent;
+  private String storageKey = null;
 
   public Tabs() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -53,6 +53,24 @@ public class Tabs extends Composite {
       }
     };
     selectTab(null);
+  }
+
+  public void setStorageKey(String storageKey) {
+    this.storageKey = storageKey;
+
+    // Immediately attempt to restore the saved tab index
+    Storage sessionStorage = Storage.getSessionStorageIfSupported();
+    if (sessionStorage != null) {
+      String savedIndexStr = sessionStorage.getItem(storageKey);
+      if (savedIndexStr != null) {
+        try {
+          int activeIndex = Integer.parseInt(savedIndexStr);
+          selectTabByIndex(activeIndex);
+        } catch (NumberFormatException e) {
+          // If parsing fails, it safely ignores and keeps the default tab
+        }
+      }
+    }
   }
 
   public void setDefaultContent(TabContentBuilder tabContentBuilder) {
@@ -110,6 +128,14 @@ public class Tabs extends Composite {
           selectedTab = tabButtonContainer;
           tab.getKey().addStyleName("tabSelected");
           tabContentWrapper.setWidget(tab.getValue().buildTabWidget());
+
+          if (storageKey != null) {
+            Storage sessionStorage = Storage.getSessionStorageIfSupported();
+            if (sessionStorage != null) {
+              sessionStorage.setItem(storageKey, String.valueOf(getSelectedTabIndex()));
+            }
+          }
+
         } else {
           tab.getKey().removeStyleName("tabSelected");
         }
@@ -138,6 +164,36 @@ public class Tabs extends Composite {
     if (index >= 0 && index < tabButtons.getWidgetCount()) {
       Widget tabToSelect = tabButtons.getWidget(index);
       selectTab(tabToSelect);
+    }
+  }
+
+  // --- NEW: Add the onLoad method ---
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+
+    // 1. Dynamically generate a unique key based on the child class (e.g.,
+    // "org.roda...DisposalPolicyTabs_ActiveIndex")
+    if (this.storageKey == null) {
+      this.storageKey = this.getClass().getName() + "_ActiveIndex";
+    }
+
+    // 2. Restore the saved index now that the tabs are built and the widget is
+    // attached
+    Storage sessionStorage = Storage.getSessionStorageIfSupported();
+    if (sessionStorage != null) {
+      String savedIndexStr = sessionStorage.getItem(storageKey);
+      if (savedIndexStr != null) {
+        try {
+          int activeIndex = Integer.parseInt(savedIndexStr);
+          // Only select if the saved index is valid for the current number of tabs
+          if (activeIndex >= 0 && activeIndex < tabButtons.getWidgetCount()) {
+            selectTabByIndex(activeIndex);
+          }
+        } catch (NumberFormatException e) {
+          // Defaults gracefully if parsing fails
+        }
+      }
     }
   }
 

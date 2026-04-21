@@ -9,22 +9,25 @@ package org.roda.wui.client.disposal.schedule;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.wui.client.common.CreateOrUpdateDisposalScheduleActionsToolbar;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
-import org.roda.wui.client.services.Services;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -39,7 +42,7 @@ public class CreateDisposalSchedule extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      CreateDisposalSchedule createDisposalSchedule = new CreateDisposalSchedule(new DisposalSchedule());
+      CreateDisposalSchedule createDisposalSchedule = new CreateDisposalSchedule();
       callback.onSuccess(createDisposalSchedule);
     }
 
@@ -59,48 +62,52 @@ public class CreateDisposalSchedule extends Composite {
     }
   };
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static CreateDisposalSchedule.MyUiBinder uiBinder = GWT.create(CreateDisposalSchedule.MyUiBinder.class);
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
   @UiField
-  Button buttonSave;
+  FocusPanel keyboardFocus;
   @UiField
-  Button buttonCancel;
-  @UiField(provided = true)
-  DisposalScheduleDataPanel disposalScheduleDataPanel;
-  private DisposalSchedule disposalSchedule;
+  NavigationToolbar<DisposalRule> navigationToolbar;
+  @UiField
+  CreateOrUpdateDisposalScheduleActionsToolbar actionsToolbar;
+  @UiField
+  TitlePanel title;
+  @UiField
+  FlowPanel disposalScheduleDataPanel;
 
-  public CreateDisposalSchedule(DisposalSchedule disposalSchedule) {
-    this.disposalSchedule = disposalSchedule;
-
-    this.disposalScheduleDataPanel = new DisposalScheduleDataPanel(disposalSchedule, false);
-    this.disposalScheduleDataPanel.setDisposalSchedule(disposalSchedule);
-
+  public CreateDisposalSchedule() {
     initWidget(uiBinder.createAndBindUi(this));
-  }
 
-  @UiHandler("buttonSave")
-  void buttonApplyHandler(ClickEvent e) {
-    if (disposalScheduleDataPanel.isValid()) {
-      disposalSchedule = disposalScheduleDataPanel.getDisposalSchedule();
+    DisposalScheduleDataPanel dataPanel = new DisposalScheduleDataPanel(new DisposalSchedule(), false);
+    disposalScheduleDataPanel.add(dataPanel);
 
-      Services services = new Services("Create disposal schedule", "create");
-      services.disposalScheduleResource(s -> s.createDisposalSchedule(disposalSchedule))
-        .whenComplete((created, throwable) -> {
-          if (throwable != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(throwable);
-          } else {
-            HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-          }
-        });
-    }
-  }
+    navigationToolbar.withoutButtons().build();
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getCreateDisposalScheduleBreadcrumbs());
 
-  @UiHandler("buttonCancel")
-  void buttonCancelHandler(ClickEvent e) {
-    cancel();
-  }
+    actionsToolbar.setLabel(messages.showDisposalScheduleTitle());
 
-  private void cancel() {
-    HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+    // 2. Give the toolbar the panel so it can check validity
+    actionsToolbar.setDataPanel(dataPanel);
+    actionsToolbar.setIsCreate(true);
+
+    // 3. Pass the shared object
+    actionsToolbar.setObjectAndBuild(new DisposalSchedule(), null, new AsyncCallback<Actionable.ActionImpact>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
+
+      @Override
+      public void onSuccess(Actionable.ActionImpact result) {
+        // Redirect user or show success message if result == ActionImpact.UPDATED
+      }
+    });
+
+    title.setText(messages.newDisposalScheduleTitle());
+    title.setIconClass("DisposalSchedule");
+
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse");
   }
 
   interface MyUiBinder extends UiBinder<Widget, CreateDisposalSchedule> {

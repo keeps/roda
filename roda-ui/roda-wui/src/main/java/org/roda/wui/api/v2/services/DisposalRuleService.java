@@ -8,8 +8,13 @@
 package org.roda.wui.api.v2.services;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -18,6 +23,7 @@ import org.roda.core.data.exceptions.DisposalRuleNotValidException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.disposal.rule.ChangeOrderRequest;
 import org.roda.core.data.v2.disposal.rule.ConditionType;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.rule.DisposalRules;
@@ -26,7 +32,9 @@ import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -79,6 +87,73 @@ public class DisposalRuleService {
       new SelectedItemsFilter<>(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())),
         IndexedAIP.class.getName(), true),
       ApplyDisposalRulesPlugin.class, user, pluginParameters, "Could not execute apply disposal rules to repository");
+  }
+
+  public void changeDisposalRuleOrder(RequestContext context, ChangeOrderRequest request)
+    throws AuthorizationDeniedException, RequestNotValidException, IOException, GenericException, NotFoundException {
+    ModelService modelService = context.getModelService();
+    DisposalRules disposalRules = modelService.listDisposalRules();
+
+    SelectedItems<DisposalRule> disposalRuleSelectedItems = CommonServicesUtils.convertSelectedItems(request.getItems(),
+      DisposalRule.class);
+    if (disposalRuleSelectedItems instanceof SelectedItemsList<DisposalRule> itemsList) {
+      Set<String> selectedIds = new HashSet<>(itemsList.getIds());
+
+      List<DisposalRule> selectedRules = new ArrayList<>();
+      List<DisposalRule> remainingRules = new ArrayList<>();
+
+      for (DisposalRule rule : disposalRules.getObjects()) {
+        if (selectedIds.contains(rule.getId())) {
+          selectedRules.add(rule);
+        } else {
+          remainingRules.add(rule);
+        }
+      }
+
+      // 3. Calculate the 0-based insertion index
+      int targetIndex = 0;
+
+      switch (request.getPosition()) {
+        case TOP:
+          break;
+        case BOTTOM:
+          targetIndex = remainingRules.size();
+          break;
+        case POSITION:
+          // Convert the 1-based UI position to a 0-based list index
+          targetIndex = request.getNewOrder() - 1;
+
+          // Safety bounds checks
+          if (targetIndex < 0) {
+            targetIndex = 0;
+          } else if (targetIndex > remainingRules.size()) {
+            targetIndex = remainingRules.size();
+          }
+          break;
+      }
+
+      // 4. Insert the selected block into the remaining list
+      remainingRules.addAll(targetIndex, selectedRules);
+
+      // 5. Reassign the "order" integer and collect the ones that actually changed
+      List<DisposalRule> rulesToUpdate = new ArrayList<>();
+
+      for (int i = 0; i < remainingRules.size(); i++) {
+        DisposalRule rule = remainingRules.get(i);
+        int newExpectedOrder = i; // 1-based ordering for the database
+
+        // Only update if the order actually changed to save database/index calls
+        if (rule.getOrder() == null || rule.getOrder() != newExpectedOrder) {
+          rule.setOrder(newExpectedOrder);
+          rulesToUpdate.add(rule);
+        }
+      }
+
+      // 6. Save the updated rules to your IndexService / Database
+      for (DisposalRule rule : rulesToUpdate) {
+        context.getModelService().updateDisposalRule(rule, context.getUser().getName());
+      }
+    }
   }
 
   public void validateDisposalRule(DisposalRule disposalRule, ModelService model)

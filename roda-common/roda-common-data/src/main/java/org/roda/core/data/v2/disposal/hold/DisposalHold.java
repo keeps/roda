@@ -7,7 +7,12 @@
  */
 package org.roda.core.data.v2.disposal.hold;
 
+import java.io.Serial;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
@@ -15,6 +20,8 @@ import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.HasId;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -22,8 +29,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLD)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DisposalHold implements IsModelObject {
+public class DisposalHold implements IsIndexed, IsModelObject, HasId {
 
+  @Serial
   private static final long serialVersionUID = 8291490773422089586L;
 
   private String id;
@@ -56,6 +64,8 @@ public class DisposalHold implements IsModelObject {
   private Long aipCounter;
 
   private DisposalHoldState state;
+
+  private Map<String, Object> fields = new HashMap<>();
 
   public DisposalHold() {
     super();
@@ -241,5 +251,39 @@ public class DisposalHold implements IsModelObject {
       + ", originatedOn=" + originatedOn + ", originatedBy='" + originatedBy + '\'' + ", liftedOn=" + liftedOn
       + ", liftedBy='" + liftedBy + '\'' + ", firstTimeUsed=" + firstTimeUsed + ", aipCounter=" + aipCounter
       + ", state=" + state + '}';
+  }
+
+  @JsonIgnore
+  @Override
+  public String getUUID() {
+    return getId();
+  }
+
+  @Override
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "title", "description", "mandate", "scopeNotes", "createOn", "createBy", "updatedOn",
+      "updatedBy", "originatedOn", "originatedBy", "liftedOn", "liftedBy", "firstTimeUsed", "state");
+  }
+
+  @Override
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, title, description, mandate, scopeNotes, createdOn, createdBy, updatedOn, updatedBy,
+      originatedOn, originatedBy, liftedOn, liftedBy, firstTimeUsed, state);
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return List.of();
+  }
+
+  @Override
+  public Map<String, Object> getFields() {
+    return this.fields;
+  }
+
+  @Override
+  public void setFields(Map<String, Object> fields) {
+    fields.entrySet().stream().filter(p -> p.getValue() != null)
+      .forEach(e -> this.fields.put(e.getKey(), e.getValue()));
   }
 }

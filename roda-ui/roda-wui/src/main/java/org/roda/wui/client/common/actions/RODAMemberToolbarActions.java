@@ -26,7 +26,6 @@ import org.roda.wui.client.common.dialogs.AccessKeyDialogs;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RODAMembersDialogs;
 import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.management.members.MemberManagement;
 import org.roda.wui.client.management.members.tabs.PermissionsPanel;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -43,9 +42,6 @@ import java.util.Set;
 
 public class RODAMemberToolbarActions extends AbstractActionable<RODAMember> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private static final Set<RODAMemberAction> POSSIBLE_ACTIONS_ON_USER = new HashSet<>(
-    Arrays.asList(RODAMemberAction.ACTIVATE, RODAMemberAction.DEACTIVATE, RODAMemberAction.REMOVE));
 
   private static final Set<RODAMemberAction> POSSIBLE_ACTIONS_ON_GROUP = new HashSet<>(
     Arrays.asList(RODAMemberAction.EDIT, RODAMemberAction.EDIT_PERMISSIONS, RODAMemberAction.REMOVE,

@@ -29,6 +29,9 @@ import org.roda.core.index.schema.collections.AIPCollection;
 import org.roda.core.index.schema.collections.DIPCollection;
 import org.roda.core.index.schema.collections.DIPFileCollection;
 import org.roda.core.index.schema.collections.DisposalConfirmationCollection;
+import org.roda.core.index.schema.collections.DisposalHoldCollection;
+import org.roda.core.index.schema.collections.DisposalRuleCollection;
+import org.roda.core.index.schema.collections.DisposalScheduleCollection;
 import org.roda.core.index.schema.collections.FileCollection;
 import org.roda.core.index.schema.collections.JobCollection;
 import org.roda.core.index.schema.collections.JobReportCollection;
@@ -45,10 +48,6 @@ import org.roda.core.index.schema.collections.TransferredResourceCollection;
 import org.roda.core.model.ModelService;
 
 public final class SolrCollectionRegistry {
-
-  private SolrCollectionRegistry() {
-
-  }
 
   private static final Map<Class<? extends IsIndexed>, SolrCollection<? extends IsIndexed, ? extends IsModelObject>> REGISTRY = new HashMap<>();
   private static final Map<Class<? extends IsModelObject>, Class<? extends IsIndexed>> MODEL_TO_INDEX = new HashMap<>();
@@ -79,7 +78,14 @@ public final class SolrCollectionRegistry {
 
     register(new RepresentationInformationCollection());
 
+    register(new DisposalScheduleCollection());
+    register(new DisposalHoldCollection());
+    register(new DisposalRuleCollection());
     register(new DisposalConfirmationCollection());
+  }
+
+  private SolrCollectionRegistry() {
+
   }
 
   public static <T extends IsIndexed, M extends IsModelObject> void register(SolrCollection<T, M> collection) {
@@ -138,9 +144,9 @@ public final class SolrCollectionRegistry {
     return fromSolrDocument(indexClass, doc, Collections.emptyList());
   }
 
-  public static <I extends IsIndexed, M extends IsModelObject> SolrInputDocument toSolrDocument(Class<I> indexClass, ModelService model,
-    M object, IndexingAdditionalInfo utils) throws GenericException, NotSupportedException, RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException {
+  public static <I extends IsIndexed, M extends IsModelObject> SolrInputDocument toSolrDocument(Class<I> indexClass,
+    ModelService model, M object, IndexingAdditionalInfo utils) throws GenericException, NotSupportedException,
+    RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     SolrCollection<I, M> solrCollection = get(indexClass);
     if (solrCollection != null) {
       return solrCollection.toSolrDocument(model, object, utils);
@@ -150,9 +156,9 @@ public final class SolrCollectionRegistry {
     }
   }
 
-  public static <I extends IsIndexed, M extends IsModelObject> SolrInputDocument toSolrDocument(Class<I> indexClass, ModelService model,
-    M object) throws GenericException, NotSupportedException, RequestNotValidException, NotFoundException,
-    AuthorizationDeniedException {
+  public static <I extends IsIndexed, M extends IsModelObject> SolrInputDocument toSolrDocument(Class<I> indexClass,
+    ModelService model, M object) throws GenericException, NotSupportedException, RequestNotValidException,
+    NotFoundException, AuthorizationDeniedException {
     return toSolrDocument(indexClass, model, object, IndexingAdditionalInfo.empty());
   }
 

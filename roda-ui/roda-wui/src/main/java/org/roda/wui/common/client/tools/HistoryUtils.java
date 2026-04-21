@@ -14,9 +14,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.codec.language.bm.Rule;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -41,6 +45,9 @@ import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.ShowPreservationEvent;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
+import org.roda.wui.client.disposal.hold.ShowDisposalHold;
+import org.roda.wui.client.disposal.rule.ShowDisposalRule;
+import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -441,6 +448,15 @@ public class HistoryUtils {
       DisposalConfirmation confirmationMetadata = (DisposalConfirmation) object;
       path = HistoryUtils.getHistory(ShowDisposalConfirmation.RESOLVER.getHistoryPath(),
         confirmationMetadata.getUUID());
+    } else if (object instanceof DisposalSchedule) {
+      DisposalSchedule schedule = (DisposalSchedule) object;
+      path = HistoryUtils.getHistory(ShowDisposalSchedule.RESOLVER.getHistoryPath(), schedule.getUUID());
+    } else if (object instanceof DisposalHold) {
+      DisposalHold hold = (DisposalHold) object;
+      path = HistoryUtils.getHistory(ShowDisposalHold.RESOLVER.getHistoryPath(), hold.getUUID());
+    } else if (object instanceof DisposalRule) {
+      DisposalRule rule = (DisposalRule) object;
+      path = HistoryUtils.getHistory(ShowDisposalRule.RESOLVER.getHistoryPath(), rule.getUUID());
     } else {
       Toast.showError("Resolve of class not supported: " + object.getClass().getName());
     }

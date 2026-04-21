@@ -62,15 +62,12 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
   // buttons on the right side
   @UiField
-  AccessibleFocusPanel infoSidebarButton;
-  @UiField
   FlowPanel toolbarPanel;
   private boolean requireControlKeyModifier = true;
   private boolean requireShiftKeyModifier = false;
   private boolean requireAltKeyModifier = false;
   private boolean skipButtonSetup = false;
   private T currentObject = null;
-  private Permissions permissions = null;
   private Map<Actionable.ActionImpact, Runnable> handlers = new EnumMap<>(Actionable.ActionImpact.class);
   private AsyncCallback<Actionable.ActionImpact> handler = new NoAsyncCallback<Actionable.ActionImpact>() {
     @Override
@@ -103,18 +100,12 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   }
 
   public NavigationToolbar<T> withPermissions(Permissions permissions) {
-    this.permissions = permissions;
     return this;
   }
 
   public NavigationToolbar<T> withAlternativeStyle(boolean useAltStyle) {
     toolbarPanel.setStyleDependentName("alt", useAltStyle);
     return this;
-  }
-
-  public AccessibleFocusPanel getInfoSidebarButton() {
-    infoSidebarButton.setVisible(true);
-    return infoSidebarButton;
   }
 
   public NavigationToolbar<T> withModifierKeys(boolean requireControlKeyModifier, boolean requireShiftKeyModifier,
@@ -129,7 +120,6 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     previousButton.setVisible(false);
     nextButton.setVisible(false);
     pageInformation.setVisible(false);
-    infoSidebarButton.setVisible(false);
   }
 
   public void build() {
@@ -145,6 +135,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
       int index = ListSelectionUtils.getIndex(currentObject.getClass().getName()) + 1;
       long total = ListSelectionUtils.getTotal(currentObject.getClass().getName());
+
       pageInformation.setHTML("<span>" + NumberFormat.getDecimalFormat().format(index) + "</span> / <span>"
         + NumberFormat.getDecimalFormat().format(total) + "</span>");
 

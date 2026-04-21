@@ -15,6 +15,7 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
+import org.roda.wui.client.GenericDataPanel;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -42,7 +43,7 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
-public class DisposalScheduleDataPanel extends Composite implements HasValueChangeHandlers<DisposalSchedule> {
+public class DisposalScheduleDataPanel extends Composite implements GenericDataPanel<DisposalSchedule>, HasValueChangeHandlers<DisposalSchedule> {
 
   public static final String IS_WRONG = "isWrong";
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -300,6 +301,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
    *
    * @return true if valid
    */
+  @Override
   public boolean isValid() {
     List<String> errorList = new ArrayList<>();
 
@@ -441,6 +443,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
     ValueChangeEvent.fire(this, getValue());
   }
 
+  @Override
   public DisposalSchedule getValue() {
     return getDisposalSchedule();
   }

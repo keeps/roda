@@ -14,9 +14,9 @@ import org.roda.core.data.v2.IsRODAObject;
 
 public interface RODAObjectList<T extends IsRODAObject> extends Serializable {
 
-  public List<T> getObjects();
+  List<T> getObjects();
 
-  public void setObjects(List<T> objects);
+  void setObjects(List<T> objects);
 
-  public void addObject(T object);
+  void addObject(T object);
 }

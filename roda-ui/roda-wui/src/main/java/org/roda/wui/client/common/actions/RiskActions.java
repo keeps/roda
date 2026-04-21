@@ -124,7 +124,6 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   @Override
   public CanActResult userCanAct(Action<IndexedRisk> action, SelectedItems<IndexedRisk> objects) {
     return new CanActResult(hasPermissions(action), CanActResult.Reason.USER, messages.reasonUserLacksPermission());
-
   }
 
   @Override

@@ -25,7 +25,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -195,7 +194,8 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
 
         try {
           AIP aip = model.retrieveAIP(indexedAIP.getId());
-          long children = processTransitiveAIP(model, index, cachedJob, aip.getId(), disposalHoldId, jobPluginInfo, report);
+          long children = processTransitiveAIP(model, index, cachedJob, aip.getId(), disposalHoldId, jobPluginInfo,
+            report);
           model.updateAIPOnHoldStatus(aip, model.onDisposalHold(aip.getId()));
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           reportItem.setPluginState(state);

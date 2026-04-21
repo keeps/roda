@@ -11,5 +11,9 @@ package org.roda.core.data.v2.disposal.schedule;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public enum RetentionPeriodIntervalCode {
-  NO_RETENTION_PERIOD, DAYS, WEEKS, MONTHS, YEARS
+  NO_RETENTION_PERIOD, DAYS, WEEKS, MONTHS, YEARS;
+
+  public static RetentionPeriodIntervalCode getDefault() {
+    return NO_RETENTION_PERIOD;
+  }
 }

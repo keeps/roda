@@ -40,6 +40,9 @@ import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
@@ -322,6 +325,30 @@ public class IndexService {
     return ret;
   }
 
+  public ReturnWithExceptions<Void, ModelObserver> reindexDisposalSchedule(DisposalSchedule schedule) {
+    ReturnWithExceptions<Void, ModelObserver> ret = RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseReturn(nodeType);
+    if (ret.isEmpty()) {
+      ret = observer.disposalScheduleCreatedOrUpdated(schedule);
+    }
+    return ret;
+  }
+
+  public ReturnWithExceptions<Void, ModelObserver> reindexDisposalHold(DisposalHold hold) {
+    ReturnWithExceptions<Void, ModelObserver> ret = RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseReturn(nodeType);
+    if (ret.isEmpty()) {
+      ret = observer.disposalHoldCreatedOrUpdated(hold);
+    }
+    return ret;
+  }
+
+  public ReturnWithExceptions<Void, ModelObserver> reindexDisposalRule(DisposalRule rule) {
+    ReturnWithExceptions<Void, ModelObserver> ret = RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseReturn(nodeType);
+    if (ret.isEmpty()) {
+      ret = observer.disposalRuleCreatedOrUpdated(rule);
+    }
+    return ret;
+  }
+
   public ReturnWithExceptions<Void, ModelObserver> reindexAIPPreservationEvents(AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseReturn(nodeType);
     if (ret.isEmpty()) {
@@ -519,6 +546,12 @@ public class IndexService {
       return reindexDIPFile(DIPFile.class.cast(object));
     } else if (DisposalConfirmation.class.equals(objectClass)) {
       return reindexDisposalConfirmation(DisposalConfirmation.class.cast(object));
+    } else if (DisposalSchedule.class.equals(objectClass)) {
+      return reindexDisposalSchedule(DisposalSchedule.class.cast(object));
+    } else if (DisposalHold.class.equals(objectClass)) {
+      return reindexDisposalHold(DisposalHold.class.cast(object));
+    } else if (DisposalRule.class.equals(objectClass)) {
+      return reindexDisposalRule(DisposalRule.class.cast(object));
     } else {
       LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getName());
       ReturnWithExceptions<Void, ModelObserver> exceptions = new ReturnWithExceptions<>();

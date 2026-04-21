@@ -11,5 +11,9 @@ package org.roda.core.data.v2.disposal.schedule;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public enum DisposalScheduleState {
-  ACTIVE, INACTIVE
+  ACTIVE, INACTIVE;
+
+  public static DisposalScheduleState getDefault() {
+    return ACTIVE;
+  }
 }

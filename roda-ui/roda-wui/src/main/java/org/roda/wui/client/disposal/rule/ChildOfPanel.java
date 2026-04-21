@@ -160,8 +160,18 @@ public class ChildOfPanel extends Composite implements HasValueChangeHandlers<Pa
 
   private Pair<String, String> getChildOfFields() {
     Pair<String, String> childOfFields = new Pair<>();
+
     childOfFields.setFirst(pluginParameterPanel.getValue());
     childOfFields.setSecond(pluginParameterPanel.getAipTitle());
+
+    if (pluginParameterPanel.getValue() == null) {
+      childOfFields.setFirst(aipId);
+    }
+
+    if (pluginParameterPanel.getAipTitle() == null) {
+      childOfFields.setSecond(aipName);
+    }
+
     return childOfFields;
   }
 

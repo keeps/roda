@@ -12,6 +12,9 @@ import java.util.List;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -154,6 +157,18 @@ public interface ModelObserver {
     DisposalConfirmation confirmation);
 
   public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationDeleted(String confirmationId, boolean commit);
+
+  ReturnWithExceptions<Void, ModelObserver> disposalScheduleCreatedOrUpdated(DisposalSchedule schedule);
+
+  ReturnWithExceptions<Void, ModelObserver> disposalScheduleDeleted(String scheduleId, boolean commit);
+
+  ReturnWithExceptions<Void, ModelObserver> disposalHoldCreatedOrUpdated(DisposalHold hold);
+
+  ReturnWithExceptions<Void, ModelObserver> disposalHoldDeleted(String holdId, boolean commit);
+
+  ReturnWithExceptions<Void, ModelObserver> disposalRuleCreatedOrUpdated(DisposalRule rule);
+
+  ReturnWithExceptions<Void, ModelObserver> disposalRuleDeleted(String ruleId, boolean commit);
 
   public ReturnWithExceptions<Void, ModelObserver> liteRODAObjectCreated(LiteRODAObject liteRODAObject);
 

@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.services;
 
-import org.fusesource.restygwt.client.DirectRestService;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHolds;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
@@ -39,7 +38,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Disposal holds")
 @RequestMapping(path = "../api/v2/disposal/holds")
-public interface DisposalHoldRestService extends DirectRestService {
+public interface DisposalHoldRestService extends RODAEntityRestService<DisposalHold> {
 
   @RequestMapping(method = RequestMethod.GET, path = "", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "List disposal holds", responses = {

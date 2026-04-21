@@ -2041,7 +2041,7 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
 
   @Override
   public Group updateGroupMembers(String id, Set<String> members, boolean notify, boolean isHandlingEvent)
-          throws GenericException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, NotFoundException, AuthorizationDeniedException {
     return mainModelService.updateGroupMembers(id, members, notify, isHandlingEvent);
   }
 
@@ -4488,6 +4488,36 @@ public class DefaultTransactionalModelService implements TransactionalModelServi
   @Override
   public ReturnWithExceptionsWrapper notifyDisposalConfirmationDeleted(String disposalConfirmationId, boolean commit) {
     return getModelService().notifyDisposalConfirmationDeleted(disposalConfirmationId, commit);
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalScheduleCreatedOrUpdated(DisposalSchedule schedule) {
+    return getModelService().notifyDisposalScheduleCreatedOrUpdated(schedule);
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalScheduleDeleted(String disposalScheduleId, boolean commit) {
+    return getModelService().notifyDisposalScheduleDeleted(disposalScheduleId, commit);
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalHoldCreatedOrUpdated(DisposalHold hold) {
+    return getModelService().notifyDisposalHoldCreatedOrUpdated(hold);
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalHoldDeleted(String disposalHoldId, boolean commit) {
+    return getModelService().notifyDisposalHoldDeleted(disposalHoldId, commit);
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalRuleCreatedOrUpdated(DisposalRule rule) {
+    return getModelService().notifyDisposalRuleCreatedOrUpdated(rule);
+  }
+
+  @Override
+  public ReturnWithExceptionsWrapper notifyDisposalRuleDeleted(String disposalRuleId, boolean commit) {
+    return getModelService().notifyDisposalRuleDeleted(disposalRuleId, commit);
   }
 
   @Override

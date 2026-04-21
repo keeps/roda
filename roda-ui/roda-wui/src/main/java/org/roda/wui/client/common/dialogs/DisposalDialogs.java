@@ -7,9 +7,17 @@
  */
 package org.roda.wui.client.common.dialogs;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
+import com.google.gwt.user.client.ui.RadioButton;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHolds;
+import org.roda.core.data.v2.disposal.rule.ChangeOrderRequest;
+import org.roda.core.data.v2.disposal.rule.OrderPositions;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
@@ -37,13 +45,102 @@ import com.google.gwt.view.client.SingleSelectionModel;
 
 import config.i18n.client.ClientMessages;
 
-;
-
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class DisposalDialogs {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  public static void reOrderDisposalRules(String title, String message, AsyncCallback<ChangeOrderRequest> callback) {
+    IntegerBox positionInput;
+    final DialogBox dialogBox = new DialogBox(false, true);
+    dialogBox.setHTML(title);
+    dialogBox.addStyleName("create-group-dialog");
+
+    final FlowPanel layout = new FlowPanel();
+
+    dialogBox.addStyleName("wui-dialog-prompt");
+    layout.addStyleName("wui-dialog-layout");
+
+    final FlowPanel buttonPanel = new FlowPanel();
+    final Button cancelButton = new Button(messages.cancelButton());
+    final Button saveButton = new Button(messages.saveButton());
+    buttonPanel.add(cancelButton);
+    buttonPanel.add(saveButton);
+
+    final FlowPanel content = new FlowPanel();
+    content.addStyleName("wui-dialog-content");
+
+
+    HTML messageLabel = new HTML(message);
+    messageLabel.addStyleName("wui-dialog-message");
+    layout.add(messageLabel);
+
+    // Create Radio Buttons in the same group
+    RadioButton moveTopRadio = new RadioButton("destinationGroup", messages.moveToTop());
+    RadioButton moveBottomRadio = new RadioButton("destinationGroup", messages.moveToBottom());
+    RadioButton movePosRadio = new RadioButton("destinationGroup", messages.moveToPositionNumber());
+
+    moveTopRadio.setValue(true); // Default selection
+
+    // Input box for specific position
+    positionInput = new IntegerBox();
+    positionInput.setWidth("50px");
+    positionInput.setEnabled(false); // Disabled by default until radio is clicked
+
+    // Handler to toggle the input box based on radio selection
+    ClickHandler radioClickHandler = event -> positionInput.setEnabled(movePosRadio.getValue());
+    moveTopRadio.addClickHandler(radioClickHandler);
+    moveBottomRadio.addClickHandler(radioClickHandler);
+    movePosRadio.addClickHandler(radioClickHandler);
+
+    HorizontalPanel posPanel = new HorizontalPanel();
+    posPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+    posPanel.add(movePosRadio);
+    posPanel.add(positionInput);
+
+    content.add(moveTopRadio);
+    content.add(moveBottomRadio);
+    content.add(posPanel);
+
+    layout.add(content);
+    layout.add(buttonPanel);
+    dialogBox.setWidget(layout);
+
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+
+    cancelButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+        callback.onFailure(null);
+      }
+    });
+
+    saveButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        ChangeOrderRequest changeOrderRequest = new ChangeOrderRequest();
+        dialogBox.hide();
+        if (moveTopRadio.getValue()) {
+          changeOrderRequest.setPosition(OrderPositions.TOP);
+        } else if (moveBottomRadio.getValue()) {
+          changeOrderRequest.setPosition(OrderPositions.BOTTOM);
+        } else {
+          changeOrderRequest.setPosition(OrderPositions.POSITION);
+          changeOrderRequest.setNewOrder(positionInput.getValue() != null ? positionInput.getValue() : 1);
+        }
+        callback.onSuccess(changeOrderRequest);
+      }
+    });
+
+    cancelButton.addStyleName("btn btn-link");
+    saveButton.addStyleName("pull-right btn btn-play");
+
+    dialogBox.center();
+    dialogBox.show();
+  }
 
   public static void showDisposalHoldSelection(String title, DisposalHolds holds,
     final AsyncCallback<DisposalHoldDialogResult> callback) {
