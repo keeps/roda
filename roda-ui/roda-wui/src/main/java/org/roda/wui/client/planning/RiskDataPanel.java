@@ -16,31 +16,19 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskMitigationProperties;
 import org.roda.wui.client.common.IncrementalList;
+import org.roda.wui.client.common.forms.GenericDataForm;
+import org.roda.wui.client.common.forms.GenericDataPanel;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.services.RiskRestService;
 import org.roda.wui.client.services.Services;
-import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
@@ -50,329 +38,257 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria
  *
  */
-public class RiskDataPanel extends Composite implements HasValueChangeHandlers<Risk> {
+public class RiskDataPanel extends Composite implements HasValueChangeHandlers<Risk>, GenericDataPanel<Risk> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  @UiField
-  Label id;
-  @UiField
-  TextBox idBox;
-  @UiField
-  TextBox name;
-  @UiField
-  TextArea description;
-  @UiField
-  DateBox identifiedOn;
-  @UiField(provided = true)
-  SearchSuggestBox<IndexedRisk> identifiedBy;
-  @UiField(provided = true)
-  IncrementalList categories;
-  @UiField
-  TextArea notes;
-  @UiField
-  ListBox preMitigationProbability;
-  @UiField
-  ListBox preMitigationImpact;
-  @UiField
-  Label preMitigationSeverityKey;
-  @UiField
-  HTML preMitigationSeverityValue;
-  @UiField
-  TextArea preMitigationNotes;
-  @UiField
-  ListBox posMitigationProbability;
-  @UiField
-  ListBox posMitigationImpact;
-  @UiField
-  Label posMitigationSeverityKey;
-  @UiField
-  HTML posMitigationSeverityValue;
-  @UiField
-  TextArea posMitigationNotes;
-  @UiField
-  TextArea mitigationStrategy;
-  @UiField
-  Label mitigationOwnerTypeKey;
-  @UiField
-  TextBox mitigationOwnerType;
-  @UiField(provided = true)
-  SearchSuggestBox<IndexedRisk> mitigationOwner;
-  @UiField
-  TextBox mitigationRelatedEventIdentifierType;
-  @UiField
-  TextBox mitigationRelatedEventIdentifierValue;
-  @SuppressWarnings("unused")
-  private ClientLogger logger = new ClientLogger(getClass().getName());
-  private boolean editmode;
-  private boolean changed = false;
-  private boolean checked = false;
+  private final GenericDataForm<Risk> form;
+  private final boolean editmode;
+  private final Button saveButton;
+  private final Button cancelButton;
+  private final FlowPanel actionsPanel;
+  private DateBox identifiedOn;
+  private SearchSuggestBox<IndexedRisk> identifiedBy;
+  private IncrementalList categories;
+  private SearchSuggestBox<IndexedRisk> mitigationOwner;
+  private ListBox preMitigationProbability;
+  private ListBox preMitigationImpact;
+  private HTML preMitigationSeverityValue;
+  private ListBox postMitigationProbability;
+  private ListBox postMitigationImpact;
+  private HTML postMitigationSeverityValue;
+  private FlowPanel postMitigationSeverityRow;
   private int severityLowLimit;
   private int severityHighLimit;
-  private int probabilitiesSize;
-  private int impactsSize;
   private Date createdOn;
   private String createdBy;
 
   /**
    * Create a new user data panel
    *
-   * @param editmode
-   *          if user name should be editable
    * @param risk
    *          the risk to use
    *
    */
-  public RiskDataPanel(final IndexedRisk risk, final boolean editmode) {
-    categories = new IncrementalList(true);
-    identifiedBy = new SearchSuggestBox<>(IndexedRisk.class, RodaConstants.RISK_IDENTIFIED_BY, false);
-    mitigationOwner = new SearchSuggestBox<>(IndexedRisk.class, RodaConstants.RISK_MITIGATION_OWNER, false);
+  public RiskDataPanel(IndexedRisk risk, boolean editmode) {
+    this.editmode = editmode;
+    this.form = new GenericDataForm<>();
 
-    initWidget(uiBinder.createAndBindUi(this));
+    saveButton = new Button(messages.saveButton());
+    saveButton.addStyleName("btn btn-primary btn-play");
+
+    cancelButton = new Button(messages.cancelButton());
+    cancelButton.addStyleName("btn btn-link");
+
+    actionsPanel = new FlowPanel();
+    actionsPanel.addStyleName("alignButtonsPanel");
+    actionsPanel.add(saveButton);
+    actionsPanel.add(cancelButton);
+    actionsPanel.setVisible(false);
+
+    initWidget(form);
 
     Services services = new Services("Retrieve risk mitigation properties", "get");
-    services.riskResource(RiskRestService::retrieveRiskMitigationProperties)
-      .whenComplete((riskMitigationProperties, throwable) -> {
-        if (throwable == null) {
-          init(editmode, riskMitigationProperties, risk);
+    services.riskResource(RiskRestService::retrieveRiskMitigationProperties).whenComplete((properties, throwable) -> {
+      if (throwable == null) {
+        if (editmode) {
+          initEditMode(risk, properties);
+        } else {
+          initCreateMode(properties);
         }
-      });
+
+      }
+    });
   }
 
-  public void init(boolean editmode, RiskMitigationProperties mitigationProperties, IndexedRisk risk) {
-    severityLowLimit = mitigationProperties.getSeverityLowLimit();
-    severityHighLimit = mitigationProperties.getSeverityHighLimit();
+  private void initCreateMode(RiskMitigationProperties properties) {
+    Risk risk = new Risk();
 
-    List<String> probabilities = mitigationProperties.getProbabilities();
-    probabilitiesSize = probabilities.size();
-    for (int i = probabilitiesSize - 1; i >= 0; i--) {
-      posMitigationProbability.addItem(messages.riskMitigationProbability(probabilities.get(i)));
-      preMitigationProbability.addItem(messages.riskMitigationProbability(probabilities.get(i)));
-    }
+    initMitigationLimits(properties);
+    form.addTextField(messages.riskIdentifier(), Risk::getId, Risk::setId, false);
+    addCommonEditableFields(properties);
+    form.addCustomWidget(actionsPanel);
+    form.setModel(risk);
 
-    List<String> impacts = mitigationProperties.getImpacts();
-    impactsSize = impacts.size();
-    for (int i = impactsSize - 1; i >= 0; i--) {
-      posMitigationImpact.addItem(messages.riskMitigationImpact(impacts.get(i)));
-      preMitigationImpact.addItem(messages.riskMitigationImpact(impacts.get(i)));
-    }
+    updatePreMitigationSeverity();
+    updatePostMitigationSeverity();
+  }
 
-    preMitigationProbability.setSelectedIndex(probabilitiesSize - 1);
-    preMitigationImpact.setSelectedIndex(impactsSize - 1);
-    posMitigationProbability.setSelectedIndex(probabilitiesSize - 1);
-    posMitigationImpact.setSelectedIndex(impactsSize - 1);
+  private void initEditMode(IndexedRisk indexedRisk, RiskMitigationProperties properties) {
+    Risk risk = new Risk(indexedRisk);
 
-    this.editmode = editmode;
-    super.setVisible(true);
+    createdOn = indexedRisk.getCreatedOn();
+    createdBy = indexedRisk.getCreatedBy();
+
+    initMitigationLimits(properties);
+    form.addReadOnlyField(messages.riskIdentifier(), Risk::getId, false);
+    addCommonEditableFields(properties);
+    form.addCustomWidget(actionsPanel);
+    form.setModel(risk);
+
+    updatePreMitigationSeverity();
+    updatePostMitigationSeverity();
+  }
+
+  private void initMitigationLimits(RiskMitigationProperties properties) {
+    severityLowLimit = properties.getSeverityLowLimit();
+    severityHighLimit = properties.getSeverityHighLimit();
+  }
+
+  private void addCommonEditableFields(RiskMitigationProperties properties) {
+    form.addTextField(messages.riskName(), Risk::getName, Risk::setName, true);
+    form.addTextArea(messages.riskDescription(), Risk::getDescription, Risk::setDescription, false);
+    addIdentifiedOnField();
+    addIdentifiedByField();
+    addCategoriesField();
+    form.addTextArea(messages.riskNotes(), Risk::getNotes, Risk::setNotes, false);
+    addPreMitigationSection(properties);
+    addMitigationSection();
+    addPostMitigationSection(properties);
+  }
+
+  private void addPreMitigationSection(RiskMitigationProperties properties) {
+    addSectionTitle(messages.riskPreMitigation());
+
+    preMitigationProbability = createMitigationListBox(properties.getProbabilities(), true);
+    form.addListBox(messages.riskPreMitigationProbability(), preMitigationProbability,
+      r -> String.valueOf(r.getPreMitigationProbability()),
+      (r, value) -> r.setPreMitigationProbability(parseInt(value)), true);
+
+    preMitigationImpact = createMitigationListBox(properties.getImpacts(), false);
+    form.addListBox(messages.riskPreMitigationImpact(), preMitigationImpact,
+      r -> String.valueOf(r.getPreMitigationImpact()), (r, value) -> r.setPreMitigationImpact(parseInt(value)), true);
+
+    preMitigationSeverityValue = new HTML();
+    form.addCustomWidget(createSeverityRow(messages.riskPreMitigationSeverity(), preMitigationSeverityValue));
+
+    preMitigationProbability.addChangeHandler(event -> updatePreMitigationSeverity());
+    preMitigationImpact.addChangeHandler(event -> updatePreMitigationSeverity());
+
+    form.addTextArea(messages.riskPreMitigationNotes(), Risk::getPreMitigationNotes, Risk::setPreMitigationNotes,
+      false);
+  }
+
+  private void addPostMitigationSection(RiskMitigationProperties properties) {
+    addSectionTitle(messages.riskPostMitigation());
+
+    postMitigationProbability = createMitigationListBox(properties.getProbabilities(), true);
+    form.addListBox(messages.riskPostMitigationProbability(), postMitigationProbability,
+      r -> String.valueOf(r.getPostMitigationProbability()),
+      (r, value) -> r.setPostMitigationProbability(parseInt(value)), true);
+
+    postMitigationImpact = createMitigationListBox(properties.getImpacts(), false);
+    form.addListBox(messages.riskPostMitigationImpact(), postMitigationImpact,
+      r -> String.valueOf(r.getPostMitigationImpact()), (r, value) -> r.setPostMitigationImpact(parseInt(value)), true);
+
+    postMitigationSeverityValue = new HTML();
+    postMitigationSeverityRow = createSeverityRow(messages.riskPostMitigationSeverity(), postMitigationSeverityValue);
+    form.addCustomWidget(postMitigationSeverityRow);
+
+    postMitigationProbability.addChangeHandler(event -> updatePostMitigationSeverity());
+    postMitigationImpact.addChangeHandler(event -> updatePostMitigationSeverity());
+
+    form.addTextArea(messages.riskPostMitigationNotes(), Risk::getPostMitigationNotes, Risk::setPostMitigationNotes,
+      false);
+  }
+
+  private void addMitigationSection() {
+    addSectionTitle(messages.riskMitigation());
+
+    form.addTextArea(messages.riskMitigationStrategy(), Risk::getMitigationStrategy, Risk::setMitigationStrategy,
+      false);
+
+    mitigationOwner = new SearchSuggestBox<>(IndexedRisk.class, RodaConstants.RISK_MITIGATION_OWNER, false);
+    form.addSearchSuggestField(messages.riskMitigationOwner(), mitigationOwner, Risk::getMitigationOwner,
+      Risk::setMitigationOwner, false);
+  }
+
+  private void addIdentifiedOnField() {
+    identifiedOn = new DateBox();
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     identifiedOn.setFormat(dateFormat);
     identifiedOn.getDatePicker().setYearArrowsVisible(true);
     identifiedOn.setFireNullValues(true);
-    identifiedOn.setValue(new Date());
 
-    ChangeHandler changeHandler = new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        RiskDataPanel.this.onChange();
-      }
-    };
-
-    KeyUpHandler keyUpHandler = new KeyUpHandler() {
-
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        onChange();
-      }
-    };
-
-    ChangeHandler changePreMitigationHandler = new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-
-        int probability = getIndex(preMitigationProbability.getSelectedIndex(), probabilitiesSize);
-        int impact = getIndex(preMitigationImpact.getSelectedIndex(), impactsSize);
-
-        preMitigationSeverityKey.setVisible(true);
-        preMitigationSeverityValue.setVisible(true);
-        int severity = probability * impact;
-        preMitigationSeverityValue
-          .setHTML(HtmlSnippetUtils.getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
-
-        RiskDataPanel.this.onChange();
-      }
-    };
-
-    ChangeHandler changePosMitigationHandler = new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-
-        int probability = getIndex(posMitigationProbability.getSelectedIndex(), probabilitiesSize);
-        int impact = getIndex(posMitigationImpact.getSelectedIndex(), impactsSize);
-
-        posMitigationSeverityKey.setVisible(true);
-        posMitigationSeverityValue.setVisible(true);
-        int severity = probability * impact;
-        posMitigationSeverityValue
-          .setHTML(HtmlSnippetUtils.getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
-
-        RiskDataPanel.this.onChange();
-      }
-    };
-
-    name.addChangeHandler(changeHandler);
-    name.addKeyUpHandler(keyUpHandler);
-    description.addChangeHandler(changeHandler);
-    description.addKeyUpHandler(keyUpHandler);
-    description.setVisibleLines(6);
-
-    identifiedOn.addValueChangeHandler(new ValueChangeHandler<Date>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<Date> event) {
-        onChange();
-      }
-    });
-
-    ValueChangeHandler<String> valueChangeHandler = new ValueChangeHandler<String>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        RiskDataPanel.this.onChange();
-      }
-    };
-
-    categories.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<List<String>> event) {
-        RiskDataPanel.this.onChange();
-      }
-    });
-
-    identifiedBy.addValueChangeHandler(valueChangeHandler);
-    notes.addChangeHandler(changeHandler);
-    notes.setVisibleLines(6);
-
-    preMitigationProbability.addChangeHandler(changePreMitigationHandler);
-    preMitigationProbability.addKeyUpHandler(keyUpHandler);
-    preMitigationImpact.addChangeHandler(changePreMitigationHandler);
-    preMitigationImpact.addKeyUpHandler(keyUpHandler);
-    preMitigationNotes.addChangeHandler(changeHandler);
-    preMitigationNotes.setVisibleLines(6);
-
-    posMitigationProbability.addChangeHandler(changePosMitigationHandler);
-    posMitigationProbability.addKeyUpHandler(keyUpHandler);
-    posMitigationImpact.addChangeHandler(changePosMitigationHandler);
-    posMitigationImpact.addKeyUpHandler(keyUpHandler);
-    posMitigationNotes.addChangeHandler(changeHandler);
-    posMitigationNotes.setVisibleLines(6);
-
-    mitigationStrategy.addChangeHandler(changeHandler);
-    mitigationStrategy.setVisibleLines(6);
-    mitigationOwnerType.addChangeHandler(changeHandler);
-    mitigationOwner.addValueChangeHandler(valueChangeHandler);
-    mitigationRelatedEventIdentifierType.addChangeHandler(changeHandler);
-    mitigationRelatedEventIdentifierValue.addChangeHandler(changeHandler);
-
-    if (!editmode) {
-      posMitigationSeverityKey.setVisible(false);
-      posMitigationSeverityValue.setVisible(false);
-      preMitigationSeverityValue
-        .setHTML(HtmlSnippetUtils.getSeverityDefinition(0, severityLowLimit, severityHighLimit));
-      this.id.setVisible(false);
-    } else {
-      this.idBox.setVisible(false);
-      setRisk(risk);
-    }
-
-    // FIXME it must be visible later
-    mitigationOwnerTypeKey.setVisible(false);
-    mitigationOwnerType.setVisible(false);
-    mitigationRelatedEventIdentifierType.setVisible(false);
-    mitigationRelatedEventIdentifierValue.setVisible(false);
+    form.addDateField(messages.riskIdentifiedOn(), identifiedOn, Risk::getIdentifiedOn, Risk::setIdentifiedOn, true);
   }
 
+  private void addIdentifiedByField() {
+    identifiedBy = new SearchSuggestBox<>(IndexedRisk.class, RodaConstants.RISK_IDENTIFIED_BY, false);
+
+    form.addSearchSuggestField(messages.riskIdentifiedBy(), identifiedBy, Risk::getIdentifiedBy, Risk::setIdentifiedBy,
+      true);
+  }
+
+  private void addCategoriesField() {
+    categories = new IncrementalList(true);
+
+    form.addIncrementalListField(messages.riskCategories(), categories, Risk::getCategories, Risk::setCategories, true);
+  }
+
+  /**
+   *  user data panel has been changed
+   *
+   * @return changed
+   */
+  public boolean isChanged() {
+    return form.isChanged();
+  }
+
+  @Override
   public boolean isValid() {
-    boolean valid = true;
+    boolean valid = form.isValid();
 
-    if (name.getText().length() == 0) {
-      valid = false;
-      name.addStyleName("isWrong");
-    } else {
-      name.removeStyleName("isWrong");
-    }
-
-    if (identifiedOn.getValue() == null || identifiedOn.getValue().after(new Date())) {
-      valid = false;
+    if (identifiedOn.getValue() != null && identifiedOn.getValue().after(new Date())) {
       identifiedOn.addStyleName("isWrong");
+      valid = false;
     } else {
       identifiedOn.removeStyleName("isWrong");
     }
-
-    if (identifiedBy.getValue().length() == 0) {
-      valid = false;
-      identifiedBy.addStyleName("isWrong");
-    } else {
-      identifiedBy.removeStyleName("isWrong");
-    }
-
-    if (categories.getTextBoxesValue() == null || categories.getTextBoxesValue().isEmpty()) {
-      valid = false;
-      categories.addStyleName("isWrong");
-    } else {
-      categories.removeStyleName("isWrong");
-    }
-
-    checked = true;
     return valid;
   }
 
-  public Risk getRisk() {
-    Risk risk = new Risk();
-    if (idBox.isVisible() && idBox.getText() != null && !"".equals(idBox.getText())) {
-      risk.setId(idBox.getText());
-    }
-    risk.setName(name.getText());
-    risk.setDescription(description.getText());
-    risk.setIdentifiedOn(identifiedOn.getValue());
-    risk.setIdentifiedBy(identifiedBy.getValue());
-    risk.setCategories(categories.getTextBoxesValue());
-    risk.setNotes(notes.getText());
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Risk> handler) {
+    return form.addValueChangeHandler(handler);
+  }
 
-    int preProbability = getIndex(preMitigationProbability.getSelectedIndex(), probabilitiesSize);
-    int preImpact = getIndex(preMitigationImpact.getSelectedIndex(), impactsSize);
+  public void setSaveHandler(Runnable onSave) {
+    actionsPanel.setVisible(true);
+    saveButton.addClickHandler(event -> {
+      if (isValid()) {
+        onSave.run();
+      }
+    });
+  }
 
-    int preSeverity = preProbability * preImpact;
-    risk.setPreMitigationProbability(preProbability);
-    risk.setPreMitigationImpact(preImpact);
+  public void setCancelHandler(Runnable onCancel) {
+    actionsPanel.setVisible(true);
+    cancelButton.addClickHandler(event -> onCancel.run());
+  }
+
+  @Override
+  public Risk getValue() {
+    Risk risk = form.getValue();
+
+    int preSeverity = risk.getPreMitigationProbability() * risk.getPreMitigationImpact();
     risk.setPreMitigationSeverity(preSeverity);
     risk.setPreMitigationSeverityLevel(
       HtmlSnippetUtils.getSeverityLevel(preSeverity, severityLowLimit, severityHighLimit));
-    risk.setPreMitigationNotes(preMitigationNotes.getText());
 
-    int posProbability = getIndex(posMitigationProbability.getSelectedIndex(), probabilitiesSize);
-    int posImpact = getIndex(posMitigationImpact.getSelectedIndex(), impactsSize);
+    int postProbability = risk.getPostMitigationProbability();
+    int postImpact = risk.getPostMitigationImpact();
 
-    risk.setPostMitigationProbability(posProbability);
-    risk.setPostMitigationImpact(posImpact);
-    if (posProbability == 0 && posImpact == 0) {
+    if (postProbability == 0 && postImpact == 0) {
       risk.setPostMitigationSeverity(preSeverity);
       risk.setPostMitigationSeverityLevel(
         HtmlSnippetUtils.getSeverityLevel(preSeverity, severityLowLimit, severityHighLimit));
     } else {
-      int posSeverity = posProbability * posImpact;
-      risk.setPostMitigationSeverity(posSeverity);
+      int postSeverity = postProbability * postImpact;
+      risk.setPostMitigationSeverity(postSeverity);
       risk.setPostMitigationSeverityLevel(
-        HtmlSnippetUtils.getSeverityLevel(posSeverity, severityLowLimit, severityHighLimit));
+        HtmlSnippetUtils.getSeverityLevel(postSeverity, severityLowLimit, severityHighLimit));
     }
-    risk.setPostMitigationNotes(posMitigationNotes.getText());
-
-    risk.setMitigationStrategy(mitigationStrategy.getText());
-    risk.setMitigationOwnerType(mitigationOwnerType.getText());
-    risk.setMitigationOwner(mitigationOwner.getValue());
-    risk.setMitigationRelatedEventIdentifierType(mitigationRelatedEventIdentifierType.getText());
-    risk.setMitigationRelatedEventIdentifierValue(mitigationRelatedEventIdentifierValue.getText());
 
     if (editmode) {
       risk.setCreatedOn(createdOn);
@@ -382,117 +298,67 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     return risk;
   }
 
-  public void setRisk(IndexedRisk risk) {
-    this.id.setText(risk.getId());
-    this.name.setText(risk.getName());
-    this.description.setText(risk.getDescription());
-    this.identifiedOn.setValue(risk.getIdentifiedOn());
-    this.identifiedBy.setValue(risk.getIdentifiedBy());
-    this.categories.setTextBoxList(risk.getCategories());
-    this.notes.setText(risk.getNotes());
+  private void addSectionTitle(String text) {
+    Label label = new Label(text);
+    label.addStyleName("h4");
+    form.addCustomWidget(label);
+  }
 
-    int preProbability = getIndex(risk.getPreMitigationProbability(), probabilitiesSize);
-    int preImpact = getIndex(risk.getPreMitigationImpact(), impactsSize);
-
-    this.preMitigationProbability.setSelectedIndex(preProbability);
-    this.preMitigationImpact.setSelectedIndex(preImpact);
-    this.preMitigationNotes.setText(risk.getPreMitigationNotes());
-
-    this.preMitigationSeverityKey.setVisible(true);
-    this.preMitigationSeverityValue.setVisible(true);
-    int preSeverity = risk.getPreMitigationSeverity();
-    this.preMitigationSeverityValue
-      .setHTML(HtmlSnippetUtils.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
-
-    int probability = getIndex(risk.getPostMitigationProbability(), probabilitiesSize);
-    int impact = getIndex(risk.getPostMitigationImpact(), impactsSize);
-
-    this.posMitigationProbability.setSelectedIndex(probability);
-    this.posMitigationImpact.setSelectedIndex(impact);
-    this.posMitigationNotes.setText(risk.getPostMitigationNotes());
-
-    if (probability != 0 || impact != 0) {
-      this.posMitigationSeverityKey.setVisible(true);
-      this.posMitigationSeverityValue.setVisible(true);
-      int posSeverity = risk.getPostMitigationSeverity();
-      this.posMitigationSeverityValue
-        .setHTML(HtmlSnippetUtils.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
-    } else {
-      this.posMitigationSeverityKey.setVisible(false);
-      this.posMitigationSeverityValue.setVisible(false);
+  private ListBox createMitigationListBox(List<String> values, boolean probability) {
+    ListBox listBox = new ListBox();
+    for (int i = values.size() - 1; i >= 0; i--) {
+      String label = probability ? messages.riskMitigationProbability(values.get(i))
+        : messages.riskMitigationImpact(values.get(i));
+      listBox.addItem(label, String.valueOf(i));
     }
-
-    this.mitigationStrategy.setText(risk.getMitigationStrategy());
-    this.mitigationOwnerType.setText(risk.getMitigationOwnerType());
-    this.mitigationOwner.setValue(risk.getMitigationOwner());
-    this.mitigationRelatedEventIdentifierType.setText(risk.getMitigationRelatedEventIdentifierType());
-    this.mitigationRelatedEventIdentifierValue.setText(risk.getMitigationRelatedEventIdentifierValue());
-
-    this.createdOn = risk.getCreatedOn();
-    this.createdBy = risk.getCreatedBy();
+    return listBox;
   }
 
-  public void clear() {
-    name.setText("");
-    description.setText("");
-    identifiedBy.setValue("");
-    categories.clearTextBoxes();
-    notes.setText("");
+  private FlowPanel createSeverityRow(String labelText, HTML severityValue) {
+    FlowPanel row = new FlowPanel();
+    row.addStyleName("generic-form-field");
 
-    preMitigationProbability.setSelectedIndex(probabilitiesSize - 1);
-    preMitigationImpact.setSelectedIndex(impactsSize - 1);
-    preMitigationNotes.setText("");
+    Label label = new Label(labelText);
+    label.addStyleName("form-label");
 
-    posMitigationProbability.setSelectedIndex(probabilitiesSize - 1);
-    posMitigationImpact.setSelectedIndex(impactsSize - 1);
-    posMitigationNotes.setText("");
+    FlowPanel input = new FlowPanel();
+    input.addStyleName("generic-form-field-input-panel full_width");
+    input.add(severityValue);
 
-    mitigationStrategy.setText("");
-    mitigationOwnerType.setText("");
-    mitigationOwner.setValue("");
-    mitigationRelatedEventIdentifierType.setText("");
-    mitigationRelatedEventIdentifierValue.setText("");
+    FlowPanel left = new FlowPanel();
+    left.addStyleName("generic-form-field-left-panel");
+    left.add(label);
+    left.add(input);
+
+    row.add(left);
+    return row;
   }
 
-  private int getIndex(int mitigationField, int fieldsSize) {
-    return fieldsSize - mitigationField - 1;
+  private void updatePreMitigationSeverity() {
+    int severity = getSelectedInt(preMitigationProbability) * getSelectedInt(preMitigationImpact);
+    preMitigationSeverityValue
+      .setHTML(HtmlSnippetUtils.getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
   }
 
-  /**
-   * Is user data panel editable, i.e. on create user mode
-   *
-   * @return true if editable
-   */
-  public boolean isEditmode() {
-    return editmode;
-  }
+  private void updatePostMitigationSeverity() {
+    int probability = getSelectedInt(postMitigationProbability);
+    int impact = getSelectedInt(postMitigationImpact);
+    int severity = probability * impact;
 
-  /**
-   * Is user data panel has been changed
-   *
-   * @return changed
-   */
-  public boolean isChanged() {
-    return changed;
-  }
+    boolean showPostSeverity = editmode || probability != 0 || impact != 0;
+    postMitigationSeverityRow.setVisible(showPostSeverity);
 
-  @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Risk> handler) {
-    return addHandler(handler, ValueChangeEvent.getType());
-  }
-
-  protected void onChange() {
-    changed = true;
-    if (checked) {
-      isValid();
+    if (showPostSeverity) {
+      postMitigationSeverityValue
+        .setHTML(HtmlSnippetUtils.getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
     }
-    ValueChangeEvent.fire(this, getValue());
   }
 
-  public Risk getValue() {
-    return getRisk();
+  private int getSelectedInt(ListBox listBox) {
+    return parseInt(listBox.getSelectedValue());
   }
 
-  interface MyUiBinder extends UiBinder<Widget, RiskDataPanel> {
+  private int parseInt(String value) {
+    return value != null && !value.isEmpty() ? Integer.parseInt(value) : 0;
   }
 }

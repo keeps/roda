@@ -10,7 +10,7 @@
 			<g:FlowPanel addStyleNames="col_10 content">
 				<common:TitlePanel text="{messages.riskHistoryTitle}" iconClass="IndexedRisk" />
 				<g:ListBox ui:field="list" />
-				<p:DetailsPanelRisk ui:field="oldRisk" />
+				<p:RiskDetailsPanel ui:field="oldRisk" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

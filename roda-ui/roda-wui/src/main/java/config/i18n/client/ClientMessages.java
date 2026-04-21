@@ -986,6 +986,10 @@ public interface ClientMessages extends Messages {
 
   String riskRemoveSuccessMessage(Long size);
 
+  String riskUpdatedTitle();
+
+  String riskUpdatedMessage();
+
   String riskHistoryLabel(String versionKey, Date createdDate);
 
   String severityLevel(@Select SeverityLevel level);
@@ -1347,6 +1351,7 @@ public interface ClientMessages extends Messages {
   String representationInformationFiles(@PluralCount int size, String link);
 
   String representationInformationFilesAssociations();
+
   /****** Descriptive Metadata ****/
 
   String metadataType();

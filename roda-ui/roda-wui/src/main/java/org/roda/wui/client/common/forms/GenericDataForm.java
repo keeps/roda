@@ -1,9 +1,14 @@
 package org.roda.wui.client.common.forms;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.wui.client.common.IncrementalList;
+import org.roda.wui.client.common.search.SearchSuggestBox;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -14,16 +19,8 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.TextBoxBase;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.datepicker.client.DateBox;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -235,6 +232,84 @@ public class GenericDataForm<T> extends Composite implements GenericDataPanel<T>
     return searchField;
   }
 
+  // --- DATE FIELD ---
+
+  public FlowPanel addDateField(String labelText, DateBox dateBox, Function<T, Date> getter, BiConsumer<T, Date> setter,
+    boolean mandatory) {
+
+    FlowPanel searchField = createFieldContainer(labelText, mandatory);
+    FlowPanel inputPanel = (FlowPanel) ((FlowPanel) searchField.getWidget(0)).getWidget(1);
+
+    dateBox.addStyleName("form-textbox form-textbox-small");
+
+    inputPanel.add(dateBox);
+    fieldsContainer.add(searchField);
+
+    dateBox.addValueChangeHandler(event -> onChange());
+
+    bindings.add(new DateBoxBinding(labelText, searchField, dateBox, getter, setter, mandatory));
+    return searchField;
+  }
+
+  // --- SEARCH SUGGEST FIELD ---
+
+  public <S extends IsIndexed> FlowPanel addSearchSuggestField(String labelText, SearchSuggestBox<S> suggestBox,
+    Function<T, String> getter, BiConsumer<T, String> setter, boolean mandatory) {
+
+    FlowPanel searchField = createFieldContainer(labelText, mandatory);
+    FlowPanel inputPanel = (FlowPanel) ((FlowPanel) searchField.getWidget(0)).getWidget(1);
+
+    suggestBox.addStyleName("form-textbox");
+
+    inputPanel.add(suggestBox);
+    fieldsContainer.add(searchField);
+
+    suggestBox.addValueChangeHandler(event -> onChange());
+
+    bindings.add(new SearchSuggestBoxBinding<>(labelText, searchField, suggestBox, getter, setter, mandatory));
+    return searchField;
+  }
+
+  // --- INCREMENTAL LIST FIELD ---
+
+  public FlowPanel addIncrementalListField(String labelText, IncrementalList list, Function<T, List<String>> getter,
+    BiConsumer<T, List<String>> setter, boolean mandatory) {
+
+    FlowPanel searchField = createFieldContainer(labelText, mandatory);
+    FlowPanel inputPanel = (FlowPanel) ((FlowPanel) searchField.getWidget(0)).getWidget(1);
+
+    inputPanel.add(list);
+    fieldsContainer.add(searchField);
+
+    list.addValueChangeHandler(event -> onChange());
+
+    bindings.add(new IncrementalListBinding(labelText, searchField, list, getter, setter, mandatory));
+    return searchField;
+  }
+
+  private FlowPanel createFieldContainer(String labelText, boolean mandatory) {
+    FlowPanel searchField = new FlowPanel();
+    searchField.addStyleName("generic-form-field");
+
+    FlowPanel leftPanel = new FlowPanel();
+    leftPanel.addStyleName("generic-form-field-left-panel");
+
+    Label label = new Label(labelText);
+    if (mandatory) {
+      label.setText(labelText + " *");
+    }
+    label.addStyleName("form-label");
+
+    FlowPanel inputPanel = new FlowPanel();
+    inputPanel.addStyleName("generic-form-field-input-panel full_width");
+
+    leftPanel.add(label);
+    leftPanel.add(inputPanel);
+    searchField.add(leftPanel);
+
+    return searchField;
+  }
+
   protected void onChange() {
     changed = true;
     ValueChangeEvent.fire(this, getValue());
@@ -391,7 +466,8 @@ public class GenericDataForm<T> extends Composite implements GenericDataPanel<T>
 
     @Override
     public boolean validate() {
-      if (!container.isVisible() || !widget.isEnabled()) return true; // SKIP IF HIDDEN
+      if (!container.isVisible() || !widget.isEnabled())
+        return true; // SKIP IF HIDDEN
 
       // FIX: Changed <= 0 to < 0 since index 0 is now a valid selection!
       boolean isBlank = widget.getSelectedIndex() < 0 || widget.getSelectedValue().trim().isEmpty();
@@ -441,6 +517,188 @@ public class GenericDataForm<T> extends Composite implements GenericDataPanel<T>
 
     @Override
     public boolean validate() {
+      return true;
+    }
+  }
+
+  private class DateBoxBinding implements FormBinding<T> {
+    private final String labelText;
+    private final FlowPanel container;
+    private final DateBox widget;
+    private final Function<T, Date> getter;
+    private final BiConsumer<T, Date> setter;
+    private final boolean mandatory;
+
+    DateBoxBinding(String labelText, FlowPanel container, DateBox widget, Function<T, Date> getter,
+      BiConsumer<T, Date> setter, boolean mandatory) {
+      this.labelText = labelText;
+      this.container = container;
+      this.widget = widget;
+      this.getter = getter;
+      this.setter = setter;
+      this.mandatory = mandatory;
+    }
+
+    @Override
+    public String getLabelText() {
+      return labelText;
+    }
+
+    @Override
+    public String getRegexErrorMessage() {
+      return null;
+    }
+
+    @Override
+    public void refreshFromModel(T model) {
+      widget.setValue(getter.apply(model));
+    }
+
+    @Override
+    public void flushToModel(T model) {
+      if (!container.isVisible() || !widget.isEnabled()) {
+        return;
+      }
+      setter.accept(model, widget.getValue());
+    }
+
+    @Override
+    public boolean validate() {
+      if (!container.isVisible() || !widget.isEnabled()) {
+        return true;
+      }
+
+      Date value = widget.getValue();
+      if (mandatory && value == null) {
+        widget.addStyleName("isWrong");
+        return false;
+      }
+
+      widget.removeStyleName("isWrong");
+      return true;
+    }
+  }
+
+  private class SearchSuggestBoxBinding<S extends IsIndexed> implements FormBinding<T> {
+    private final String labelText;
+    private final FlowPanel container;
+    private final SearchSuggestBox<S> widget;
+    private final Function<T, String> getter;
+    private final BiConsumer<T, String> setter;
+    private final boolean mandatory;
+
+    SearchSuggestBoxBinding(String labelText, FlowPanel container, SearchSuggestBox<S> widget,
+      Function<T, String> getter, BiConsumer<T, String> setter, boolean mandatory) {
+      this.labelText = labelText;
+      this.container = container;
+      this.widget = widget;
+      this.getter = getter;
+      this.setter = setter;
+      this.mandatory = mandatory;
+    }
+
+    @Override
+    public String getLabelText() {
+      return labelText;
+    }
+
+    @Override
+    public String getRegexErrorMessage() {
+      return null;
+    }
+
+    @Override
+    public void refreshFromModel(T model) {
+      String value = getter.apply(model);
+      widget.setValue(value != null ? value : "");
+    }
+
+    @Override
+    public void flushToModel(T model) {
+      if (!container.isVisible()) {
+        return;
+      }
+      setter.accept(model, widget.getValue());
+    }
+
+    @Override
+    public boolean validate() {
+      if (!container.isVisible()) {
+        return true;
+      }
+
+      String value = widget.getValue();
+      boolean isBlank = value == null || value.trim().isEmpty();
+
+      if (mandatory && isBlank) {
+        widget.addStyleName("isWrong");
+        return false;
+      }
+
+      widget.removeStyleName("isWrong");
+      return true;
+    }
+  }
+
+  private class IncrementalListBinding implements FormBinding<T> {
+    private final String labelText;
+    private final FlowPanel container;
+    private final IncrementalList widget;
+    private final Function<T, List<String>> getter;
+    private final BiConsumer<T, List<String>> setter;
+    private final boolean mandatory;
+
+    IncrementalListBinding(String labelText, FlowPanel container, IncrementalList widget,
+      Function<T, List<String>> getter, BiConsumer<T, List<String>> setter, boolean mandatory) {
+      this.labelText = labelText;
+      this.container = container;
+      this.widget = widget;
+      this.getter = getter;
+      this.setter = setter;
+      this.mandatory = mandatory;
+    }
+
+    @Override
+    public String getLabelText() {
+      return labelText;
+    }
+
+    @Override
+    public String getRegexErrorMessage() {
+      return null;
+    }
+
+    @Override
+    public void refreshFromModel(T model) {
+      List<String> value = getter.apply(model);
+      if (value != null) {
+        widget.setTextBoxList(value);
+      } else {
+        widget.clearTextBoxes();
+      }
+    }
+
+    @Override
+    public void flushToModel(T model) {
+      if (!container.isVisible()) {
+        return;
+      }
+      setter.accept(model, widget.getTextBoxesValue());
+    }
+
+    @Override
+    public boolean validate() {
+      if (!container.isVisible()) {
+        return true;
+      }
+
+      List<String> value = widget.getTextBoxesValue();
+      if (mandatory && (value == null || value.isEmpty())) {
+        widget.addStyleName("isWrong");
+        return false;
+      }
+
+      widget.removeStyleName("isWrong");
       return true;
     }
   }
