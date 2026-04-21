@@ -252,7 +252,7 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
     ActionableBundle<IndexedRisk> formatActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionableGroup<IndexedRisk> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
+    ActionableGroup<IndexedRisk> managementGroup = new ActionableGroup<>(messages.manage(), "btn-edit");
     managementGroup.addButton(messages.riskHistoryButton(), IndexedRiskAction.HISTORY, ActionImpact.NONE,
       "btn-history");
     managementGroup.addButton(messages.newButton(), IndexedRiskAction.NEW, ActionImpact.UPDATED, "btn-plus-circle");
