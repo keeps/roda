@@ -16,53 +16,42 @@ import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.browse.BrowseTop;
+import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.disposal.DisposalConfirmations;
+import org.roda.wui.client.disposal.DisposalDestroyedRecords;
 import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.disposal.hold.CreateDisposalHold;
 import org.roda.wui.client.disposal.hold.EditDisposalHold;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
+import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.disposal.rule.CreateDisposalRule;
 import org.roda.wui.client.disposal.rule.EditDisposalRule;
 import org.roda.wui.client.disposal.rule.ShowDisposalRule;
 import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
 import org.roda.wui.client.disposal.schedule.EditDisposalSchedule;
+import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
+import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
+import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.ShowLogEntry;
 import org.roda.wui.client.management.ShowNotification;
 import org.roda.wui.client.management.UserLog;
-import org.roda.wui.client.browse.PreservationEvents;
-import org.roda.wui.client.disposal.DisposalDestroyedRecords;
-import org.roda.wui.client.disposal.policy.DisposalPolicy;
-import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
-import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
-import org.roda.wui.client.ingest.transfer.IngestTransfer;
-import org.roda.wui.client.management.members.CreateGroup;
-import org.roda.wui.client.management.members.CreateUser;
-import org.roda.wui.client.management.members.EditGroup;
-import org.roda.wui.client.management.members.EditUser;
-import org.roda.wui.client.planning.agents.PreservationAgents;
-import org.roda.wui.client.planning.RiskRegister;
-import org.roda.wui.client.planning.agents.ShowPreservationAgent;
-import org.roda.wui.client.planning.ShowRisk;
-import org.roda.wui.client.management.members.MemberManagement;
-import org.roda.wui.client.management.members.ShowMember;
+import org.roda.wui.client.management.members.*;
 import org.roda.wui.client.planning.RepresentationInformationNetwork;
+import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
+import org.roda.wui.client.planning.ShowRisk;
+import org.roda.wui.client.planning.agents.PreservationAgents;
+import org.roda.wui.client.planning.agents.ShowPreservationAgent;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -392,6 +381,21 @@ public class BreadcrumbUtils {
     return ret;
   }
 
+  public static List<BreadcrumbItem> getRiskBreadCrumbs(IndexedRisk risk) {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.riskRegisterTitle()),
+      messages.riskRegisterTitle(), RiskRegister.RESOLVER.getHistoryPath()));
+
+    if (risk != null) {
+      List<String> path = new ArrayList<>(ShowRisk.RESOLVER.getHistoryPath());
+      String label = StringUtils.isNotBlank(risk.getName()) ? risk.getName() : risk.getId();
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
+    }
+
+    return ret;
+  }
+
   public static List<BreadcrumbItem> getLogEntryBreadcrumbs(LogEntry logEntry) {
     List<BreadcrumbItem> ret = new ArrayList<>();
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.activityLogTitle()), messages.activityLogTitle(),
@@ -431,21 +435,6 @@ public class BreadcrumbUtils {
       List<String> path = new ArrayList<>(ShowRepresentationInformation.RESOLVER.getHistoryPath());
       path.add(ri.getUUID());
       String label = ri.getName() != null ? ri.getName() : ri.getId();
-      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
-    }
-
-    return ret;
-  }
-
-  public static List<BreadcrumbItem> getRiskBreadCrumbs(IndexedRisk risk) {
-    List<BreadcrumbItem> ret = new ArrayList<>();
-
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.riskRegisterTitle()),
-      messages.riskRegisterTitle(), RiskRegister.RESOLVER.getHistoryPath()));
-
-    if (risk != null) {
-      List<String> path = new ArrayList<>(ShowRisk.RESOLVER.getHistoryPath());
-      String label = StringUtils.isNotBlank(risk.getName()) ? risk.getName() : risk.getId();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
 
