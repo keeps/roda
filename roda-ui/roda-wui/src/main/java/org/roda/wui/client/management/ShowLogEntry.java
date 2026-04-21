@@ -12,35 +12,35 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.wui.client.browse.tabs.BrowseLogEntryTabs;
+import org.roda.wui.client.common.ActionsToolbar;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.InternalLogEntryList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -90,51 +90,15 @@ public class ShowLogEntry extends Composite {
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   @UiField
-  Label logIdLabel;
+  FocusPanel keyboardFocus;
   @UiField
-  Label logIdValue;
+  NavigationToolbar<LogEntry> navigationToolbar;
   @UiField
-  Label logReasonLabel;
+  ActionsToolbar actionsToolbar;
   @UiField
-  Label logReasonValue;
+  TitlePanel title;
   @UiField
-  Label logComponentLabel;
-  @UiField
-  Label logComponentValue;
-  @UiField
-  Label logMethodLabel;
-  @UiField
-  Label logMethodValue;
-  @UiField
-  Label logAddressLabel;
-  @UiField
-  Label logAddressValue;
-  @UiField
-  Label logDatetimeLabel;
-  @UiField
-  Label logDatetimeValue;
-  @UiField
-  Label logDurationValue;
-  @UiField
-  Label logRelatedObjectLabel;
-  @UiField
-  Label logRelatedObjectValue;
-  @UiField
-  Label logUsernameLabel;
-  @UiField
-  Label logUsernameValue;
-  @UiField
-  Label logParametersLabel;
-  @UiField
-  FlowPanel logParametersValue;
-  @UiField
-  Label logStateLabel;
-  @UiField
-  HTML logStateValue;
-  @UiField
-  Label logInstanceIdLabel;
-  @UiField
-  Label logInstanceIdValue;
+  BrowseLogEntryTabs browseTab;
   @UiField
   SimplePanel expandedAuditLogs;
   @UiField
@@ -145,65 +109,14 @@ public class ShowLogEntry extends Composite {
    */
   public ShowLogEntry(LogEntry logEntry) {
     initWidget(uiBinder.createAndBindUi(this));
+    navigationToolbar.withoutButtons().build();
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getLogEntryBreadcrumbs(logEntry));
 
-    logIdValue.setText(logEntry.getId());
-    logIdLabel.setVisible(StringUtils.isNotBlank(logEntry.getId()));
-    logIdValue.setVisible(StringUtils.isNotBlank(logEntry.getId()));
-
-    logReasonValue.setText(logEntry.getAuditLogRequestHeaders().getReason());
-    logReasonLabel.setVisible(StringUtils.isNotBlank(logEntry.getAuditLogRequestHeaders().getReason()));
-    logReasonValue.setVisible(StringUtils.isNotBlank(logEntry.getAuditLogRequestHeaders().getReason()));
-
-    logInstanceIdValue.setText(logEntry.getInstanceId());
-    logInstanceIdLabel.setVisible(StringUtils.isNotBlank(logEntry.getInstanceId()));
-    logInstanceIdValue.setVisible(StringUtils.isNotBlank(logEntry.getInstanceId()));
-
-    logComponentValue.setText(logEntry.getActionComponent());
-    logComponentLabel.setVisible(StringUtils.isNotBlank(logEntry.getActionComponent()));
-    logComponentValue.setVisible(StringUtils.isNotBlank(logEntry.getActionComponent()));
-
-    logMethodValue.setText(logEntry.getActionMethod());
-    logMethodLabel.setVisible(StringUtils.isNotBlank(logEntry.getActionMethod()));
-    logMethodValue.setVisible(StringUtils.isNotBlank(logEntry.getActionMethod()));
-
-    logAddressValue.setText(logEntry.getAddress());
-    logAddressLabel.setVisible(StringUtils.isNotBlank(logEntry.getAddress()));
-    logAddressValue.setVisible(StringUtils.isNotBlank(logEntry.getAddress()));
-
-    logDatetimeValue.setText(Humanize.formatDateTime(logEntry.getDatetime()));
-    logDatetimeLabel.setVisible(logEntry.getDatetime() != null);
-    logDatetimeValue.setVisible(logEntry.getDatetime() != null);
-
-    logDurationValue.setText(Humanize.durationMillisToShortDHMS(logEntry.getDuration()));
-
-    logRelatedObjectValue.setText(logEntry.getRelatedObjectID());
-    logRelatedObjectLabel.setVisible(StringUtils.isNotBlank(logEntry.getRelatedObjectID()));
-    logRelatedObjectValue.setVisible(StringUtils.isNotBlank(logEntry.getRelatedObjectID()));
-
-    logUsernameValue.setText(logEntry.getUsername());
-    logUsernameLabel.setVisible(StringUtils.isNotBlank(logEntry.getUsername()));
-    logUsernameValue.setVisible(StringUtils.isNotBlank(logEntry.getUsername()));
-
-    List<LogEntryParameter> parameters = logEntry.getParameters();
-
-    if (parameters != null && !parameters.isEmpty()) {
-      for (LogEntryParameter par : parameters) {
-        HTML parPanel = new HTML();
-        parPanel.setHTML(SafeHtmlUtils.fromString(messages.logParameter(par.getName(), par.getValue())));
-        logParametersValue.add(parPanel);
-      }
-      logParametersLabel.setVisible(true);
-      logParametersValue.setVisible(true);
-    } else {
-      logParametersLabel.setVisible(false);
-      logParametersValue.setVisible(false);
-    }
-
-    logStateValue.setHTML(HtmlSnippetUtils.getLogEntryStateHtml(logEntry.getState()));
-    logStateLabel.setVisible(logEntry.getState() != null);
-    logStateValue.setVisible(logEntry.getState() != null);
-
-    expandedAuditLogsList.setVisible(false);
+    actionsToolbar.setLabel(messages.showLogEntryTitle());
+    browseTab.init(logEntry);
+    title.setText(StringUtils.isNotBlank(logEntry.getId()) ? logEntry.getId() : logEntry.getUUID());
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse browse-file browse_main_panel");
 
     if (logEntry.getAuditLogRequestHeaders() != null) {
       Label relatedAuditLogs = new Label();
@@ -212,16 +125,17 @@ public class ShowLogEntry extends Composite {
       expandedAuditLogs.add(relatedAuditLogs);
 
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.LOG_REQUEST_HEADER_UUID,
-        logEntry.getAuditLogRequestHeaders().getUuid()));
+              logEntry.getAuditLogRequestHeaders().getUuid()));
 
       ListBuilder<LogEntry> auditLogListBuilder = new ListBuilder<>(() -> new InternalLogEntryList(),
-        new AsyncTableCellOptions<>(LogEntry.class, "AuditLogs_triggeredLogs").withFilter(filter)
-          .withSummary(messages.listOfAIPs()).bindOpener());
+              new AsyncTableCellOptions<>(LogEntry.class, "AuditLogs_triggeredLogs").withFilter(filter)
+                      .withSummary(messages.listOfAIPs()).bindOpener());
 
       SearchWrapper aipsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(auditLogListBuilder);
       expandedAuditLogsList.setWidget(aipsSearchWrapper);
       expandedAuditLogsList.setVisible(true);
     }
+
   }
 
   interface MyUiBinder extends UiBinder<Widget, ShowLogEntry> {

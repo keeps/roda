@@ -1,97 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:common="urn:import:org.roda.wui.client.common">
+			 xmlns:common="urn:import:org.roda.wui.client.common"
+			 xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
-		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_12 content">
-				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
-					<g:FlowPanel addStyleNames="row full_width no_padding">
-						<g:FlowPanel addStyleNames="wui-data-panel">
-							<common:TitlePanel text="{messages.showLogEntryTitle}" iconClass="LogEntry" />
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logIdLabel">
-									<ui:text from='{messages.logEntryIdentifier}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="logIdValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logReasonLabel">
-									<ui:text from='{messages.logEntryReason}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="logReasonValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logInstanceIdLabel">
-									<ui:text from='{messages.logEntryInstanceId}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="logInstanceIdValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logComponentLabel">
-									<ui:text from='{messages.logEntryComponent}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="logComponentValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logMethodLabel">
-									<ui:text from='{messages.logEntryMethod}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="logMethodValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logAddressLabel">
-									<ui:text from='{messages.logEntryAddress}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="logAddressValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logDatetimeLabel">
-									<ui:text from='{messages.logEntryDatetime}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="logDatetimeValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logDurationLabel">
-									<ui:text from='{messages.logEntryDuration}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="logDurationValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logRelatedObjectLabel">
-									<ui:text from='{messages.logEntryRelatedObject}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="logRelatedObjectValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logUsernameLabel">
-									<ui:text from='{messages.logEntryUsername}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="logUsernameValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logParametersLabel">
-									<ui:text from='{messages.logEntryParameters}' />
-								</g:Label>
-								<g:FlowPanel styleName="value" ui:field="logParametersValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="logStateLabel">
-									<ui:text from='{messages.logEntryState}' />
-								</g:Label>
-								<g:HTML styleName="value" ui:field="logStateValue" />
-							</g:FlowPanel>
-							<g:FlowPanel>
-								<g:SimplePanel ui:field="expandedAuditLogs" />
-								<g:SimplePanel ui:field="expandedAuditLogsList" />
-							</g:FlowPanel>
-						</g:FlowPanel>
+	<g:FocusPanel ui:field="keyboardFocus">
+		<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
+
+			<common:NavigationToolbar ui:field="navigationToolbar" />
+
+			<common:ActionsToolbar ui:field="actionsToolbar" />
+
+			<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
+				<g:FlowPanel addStyleNames="col_12 content">
+
+					<common:TitlePanel ui:field="title" text="{messages.showLogEntryTitle}" iconClass="LogEntry" />
+					<tabs:BrowseLogEntryTabs ui:field="browseTab"/>
+					<g:FlowPanel>
+						<g:SimplePanel ui:field="expandedAuditLogs" />
+						<g:SimplePanel ui:field="expandedAuditLogsList" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
-	</g:FlowPanel>
+	</g:FocusPanel>
 </ui:UiBinder>

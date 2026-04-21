@@ -11,8 +11,10 @@ import java.util.List;
 
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.model.BrowseRepresentationResponse;
+import org.roda.wui.client.management.DetailsPanelLogEntry;
 import org.roda.wui.client.ingest.transfer.DetailsPanelTransferredResource;
 import org.roda.wui.client.planning.DetailsPanelAIP;
 import org.roda.wui.client.planning.DetailsPanelFile;
@@ -62,6 +64,12 @@ public class DetailsTab extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     DetailsPanelTransferredResource detailsPanel = new DetailsPanelTransferredResource(resource);
+    content.add(detailsPanel);
+  }
+
+  public DetailsTab(LogEntry logEntry) {
+    initWidget(uiBinder.createAndBindUi(this));
+    DetailsPanelLogEntry detailsPanel = new DetailsPanelLogEntry(logEntry);
     content.add(detailsPanel);
   }
 
