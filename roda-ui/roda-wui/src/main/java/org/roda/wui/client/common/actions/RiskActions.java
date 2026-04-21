@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
@@ -25,6 +26,7 @@ import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.CreateRisk;
 import org.roda.wui.client.planning.EditRisk;
+import org.roda.wui.client.planning.RiskDataPanel;
 import org.roda.wui.client.planning.RiskHistory;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.services.Services;
@@ -58,21 +60,12 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
     this.hasHistory = hasHistory;
   }
 
-  public enum IndexedRiskAction implements Action<IndexedRisk> {
-    NEW(RodaConstants.PERMISSION_METHOD_CREATE_RISK), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_RISK),
-    START_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_RISK),
-    REFRESH(), HISTORY(RodaConstants.PERMISSION_METHOD_RETRIEVE_RISK_VERSIONS);
+  public static RiskActions get() {
+    return INSTANCE_NO_HISTORY;
+  }
 
-    private List<String> methods;
-
-    IndexedRiskAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
+  public static RiskActions getWithHistory() {
+    return INSTANCE_WITH_HISTORY;
   }
 
   @Override
@@ -83,14 +76,6 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   @Override
   public IndexedRiskAction actionForName(String name) {
     return IndexedRiskAction.valueOf(name);
-  }
-
-  public static RiskActions get() {
-    return INSTANCE_NO_HISTORY;
-  }
-
-  public static RiskActions getWithHistory() {
-    return INSTANCE_WITH_HISTORY;
   }
 
   @Override
@@ -266,5 +251,22 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
 
     formatActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
     return formatActionableBundle;
+  }
+
+  public enum IndexedRiskAction implements Action<IndexedRisk> {
+    NEW(RodaConstants.PERMISSION_METHOD_CREATE_RISK), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_RISK),
+    START_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_RISK),
+    REFRESH(), HISTORY(RodaConstants.PERMISSION_METHOD_RETRIEVE_RISK_VERSIONS);
+
+    private List<String> methods;
+
+    IndexedRiskAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 }

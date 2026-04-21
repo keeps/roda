@@ -16,11 +16,11 @@ import com.google.gwt.user.client.ui.DialogBox;
  */
 public class ClosableDialog extends DialogBox {
 
-  ClosableDialog() {
+  public ClosableDialog() {
     super();
   }
 
-  ClosableDialog(boolean autoHide, boolean modal) {
+  public ClosableDialog(boolean autoHide, boolean modal) {
     super(autoHide, modal);
   }
 

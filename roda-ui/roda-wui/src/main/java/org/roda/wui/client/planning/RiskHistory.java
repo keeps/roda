@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.metadata.ResourceVersion;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskVersions;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -90,7 +91,7 @@ public class RiskHistory extends Composite {
   ListBox list;
 
   @UiField(provided = true)
-  DetailsPanelRisk oldRisk;
+  RiskDetailsPanel oldRisk;
   @UiField
   Button buttonRevert;
   @UiField
@@ -105,7 +106,7 @@ public class RiskHistory extends Composite {
     this.riskId = riskId;
     this.riskVersions = versions;
 
-    oldRisk = new DetailsPanelRisk("RiskHistory_riskIncidences");
+    oldRisk = new RiskDetailsPanel();
 
     initWidget(uiBinder.createAndBindUi(this));
     init();
@@ -118,8 +119,7 @@ public class RiskHistory extends Composite {
         if (throwable != null) {
           AsyncCallbackUtils.defaultFailureTreatment(throwable);
         } else {
-          RiskHistory.this.oldRisk.clear();
-          RiskHistory.this.oldRisk.init(result);
+          RiskHistory.this.oldRisk.setData(result);
         }
       });
     });

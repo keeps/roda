@@ -29,10 +29,9 @@ public class BrowseRiskActionsToolbar extends BrowseObjectActionsToolbar<Indexed
     if (object.hasVersions()) {
       riskActions = RiskActions.getWithHistory();
     }
-    this.actions
-      .add(new ActionableWidgetBuilder<IndexedRisk>(riskActions).buildGroupedListWithObjects(
-        new ActionableObject<>(object), List.of(RiskActions.IndexedRiskAction.EDIT,
-          RiskActions.IndexedRiskAction.REMOVE, RiskActions.IndexedRiskAction.START_PROCESS),
+    this.actions.add(
+      new ActionableWidgetBuilder<>(riskActions).buildGroupedListWithObjects(new ActionableObject<>(object),
+        List.of(RiskActions.IndexedRiskAction.REMOVE, RiskActions.IndexedRiskAction.START_PROCESS),
         List.of(RiskActions.IndexedRiskAction.START_PROCESS)));
   }
 

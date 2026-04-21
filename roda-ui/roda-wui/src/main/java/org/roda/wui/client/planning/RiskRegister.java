@@ -46,7 +46,8 @@ import config.i18n.client.ClientMessages;
  */
 public class RiskRegister extends Composite {
 
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static RiskRegister instance = null;  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -68,24 +69,13 @@ public class RiskRegister extends Composite {
       return "riskregister";
     }
   };
-
-  private static RiskRegister instance = null;
-
-  interface MyUiBinder extends UiBinder<Widget, RiskRegister> {
-  }
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   @UiField
   FlowPanel riskRegisterDescription;
-
   @UiField(provided = true)
   SearchWrapper riskSearch;
-
   @UiField
   FlowPanel contentFlowPanel;
-
   /**
    * Create a risk register page
    */
@@ -133,15 +123,20 @@ public class RiskRegister extends Composite {
       ShowRisk.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateRisk.RESOLVER.getHistoryToken())) {
       CreateRisk.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(EditRisk.RESOLVER.getHistoryToken())) {
-      EditRisk.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(RiskHistory.RESOLVER.getHistoryToken())) {
       RiskHistory.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
       CreateActionJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(EditRisk.RESOLVER.getHistoryToken())) {
+      EditRisk.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
       HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }
+
+  interface MyUiBinder extends UiBinder<Widget, RiskRegister> {
+  }
+
+
 }

@@ -7,36 +7,30 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.core.data.v2.risks.Risk;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoActionsToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -44,26 +38,21 @@ import config.i18n.client.ClientMessages;
 public class EditRisk extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
-
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        Services service = new Services("Retrieve indexed risk", "get");
-        String riskId = historyTokens.get(0);
+        Services services = new Services("Retrieve indexed risk", "get");
 
-        service.rodaEntityRestService(s -> s.findByUuid(riskId, LocaleInfo.getCurrentLocale().getLocaleName()),
-          IndexedRisk.class).whenComplete((value, error) -> {
-            if (error != null) {
-              callback.onFailure(error);
-            } else if (value != null) {
-              EditRisk editRisk = new EditRisk(value);
-              callback.onSuccess(editRisk);
+        services
+          .rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0), LocaleInfo.getCurrentLocale().getLocaleName()),
+            IndexedRisk.class)
+          .whenComplete((risk, throwable) -> {
+            if (throwable != null) {
+              callback.onFailure(throwable);
+            } else {
+              callback.onSuccess(new EditRisk(risk));
             }
           });
-
-      } else {
-        HistoryUtils.newHistory(RiskRegister.RESOLVER);
-        callback.onSuccess(null);
       }
     }
 
@@ -82,119 +71,64 @@ public class EditRisk extends Composite {
       return "edit_risk";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, EditRisk> {
-  }
-
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_ID,
-    RodaConstants.RISK_NAME, RodaConstants.RISK_DESCRIPTION, RodaConstants.RISK_IDENTIFIED_ON,
-    RodaConstants.RISK_IDENTIFIED_BY, RodaConstants.RISK_CATEGORIES, RodaConstants.RISK_NOTES,
-    RodaConstants.RISK_PRE_MITIGATION_PROBABILITY, RodaConstants.RISK_PRE_MITIGATION_IMPACT,
-    RodaConstants.RISK_PRE_MITIGATION_SEVERITY, RodaConstants.RISK_POST_MITIGATION_PROBABILITY,
-    RodaConstants.RISK_POST_MITIGATION_IMPACT, RodaConstants.RISK_POST_MITIGATION_SEVERITY,
-    RodaConstants.RISK_PRE_MITIGATION_NOTES, RodaConstants.RISK_POST_MITIGATION_NOTES,
-    RodaConstants.RISK_MITIGATION_STRATEGY, RodaConstants.RISK_MITIGATION_OWNER,
-    RodaConstants.RISK_MITIGATION_OWNER_TYPE, RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE,
-    RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE);
-
-  private Risk risk;
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private int incidences = 0;
+  @UiField
+  FocusPanel keyboardFocus;
 
   @UiField
-  Button buttonApply;
+  NavigationToolbar<IndexedRisk> navigationToolbar;
 
   @UiField
-  Button buttonRemove;
+  FlowPanel riskDataPanel;
 
   @UiField
-  Button buttonCancel;
+  NoActionsToolbar actionsToolbar;
 
-  @UiField(provided = true)
-  RiskDataPanel riskDataPanel;
+  @UiField
+  TitlePanel title;
 
   /**
-   * Create a new panel to create a user
+   * Create a panel to edit Risk
    *
-   * @param user
-   *          the user to create
+   * @param risk
+   *
    */
   public EditRisk(IndexedRisk risk) {
-    this.risk = risk;
-    this.incidences = risk.getIncidencesCount();
-    this.riskDataPanel = new RiskDataPanel(risk, true);
     initWidget(uiBinder.createAndBindUi(this));
-  }
+    RiskDataPanel dataPanel = new RiskDataPanel(risk, true);
+    riskDataPanel.add(dataPanel);
 
-  @UiHandler("buttonApply")
-  void buttonApplyHandler(ClickEvent e) {
-    if (riskDataPanel.isChanged() && riskDataPanel.isValid()) {
-      Services services = new Services("Edit indexed risk", "update");
-      final String riskId = risk.getId();
-      risk = riskDataPanel.getRisk();
-      risk.setId(riskId);
-
-      services.riskResource(s -> s.updateRisk(risk)).whenComplete((value, error) -> {
-        if (error != null) {
-          errorMessage(error);
+    dataPanel.setSaveHandler(() -> {
+      Services services = new Services("Update risk", "update");
+      services.riskResource(s -> s.updateRisk(dataPanel.getValue())).whenComplete((updated, throwable) -> {
+        if (throwable != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
         } else {
-          HistoryUtils.newHistory(ShowRisk.RESOLVER, riskId);
+          Toast.showInfo(messages.riskUpdatedTitle(), messages.riskUpdatedMessage());
+          HistoryUtils.newHistory(ShowRisk.RESOLVER, updated.getUUID());
         }
       });
-    } else {
-      HistoryUtils.newHistory(ShowRisk.RESOLVER, risk.getId());
-    }
+    });
+
+    dataPanel.setCancelHandler(() -> HistoryUtils.newHistory(ShowRisk.RESOLVER, risk.getUUID()));
+
+    navigationToolbar.withoutButtons().build();
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getEditRiskBreadCrumbs(risk));
+
+    actionsToolbar.setLabel(messages.editRiskTitle());
+    actionsToolbar.build();
+
+    title.setText(StringUtils.isNotBlank(risk.getName()) ? risk.getName() : risk.getId());
+    title.setIconClass("IndexedRisk");
+    title.addStyleName("mb-20");
+
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse");
   }
 
-  @UiHandler("buttonRemove")
-  void buttonRemoveHandler(ClickEvent e) {
-    Services service = new Services("Remove risk", "remove");
-    service.riskResource(s -> s.deleteRisk(new SelectedItemsListRequest(Collections.singletonList(risk.getUUID()))))
-      .whenComplete((value, error) -> {
-        if (error != null) {
-          HistoryUtils.newHistory(InternalProcess.RESOLVER);
-        } else if (value != null) {
-          Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              Timer timer = new Timer() {
-                @Override
-                public void run() {
-                  HistoryUtils.newHistory(RiskRegister.RESOLVER);
-                }
-              };
-
-              timer.schedule(RodaConstants.ACTION_TIMEOUT);
-            }
-
-            @Override
-            public void onSuccess(final Void nothing) {
-              HistoryUtils.newHistory(ShowJob.RESOLVER, value.getId());
-            }
-          });
-        }
-      });
-  }
-
-  @UiHandler("buttonCancel")
-  void buttonCancelHandler(ClickEvent e) {
-    cancel();
-  }
-
-  private void cancel() {
-    HistoryUtils.newHistory(ShowRisk.RESOLVER, risk.getId());
-  }
-
-  private void errorMessage(Throwable caught) {
-    if (caught instanceof NotFoundException) {
-      Toast.showError(messages.editRiskNotFound(risk.getName()));
-      cancel();
-    } else {
-      AsyncCallbackUtils.defaultFailureTreatment(caught);
-    }
+  interface MyUiBinder extends UiBinder<Widget, EditRisk> {
   }
 
 }

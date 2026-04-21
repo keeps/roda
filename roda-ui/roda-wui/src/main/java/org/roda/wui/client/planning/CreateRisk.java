@@ -9,9 +9,14 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoActionsToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -19,20 +24,17 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
 public class CreateRisk extends Composite {
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -57,23 +59,32 @@ public class CreateRisk extends Composite {
       return "create_risk";
     }
   };
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
   @UiField
-  Button buttonApply;
+  FocusPanel keyboardFocus;
+
   @UiField
-  Button buttonCancel;
-  @UiField(provided = true)
-  RiskDataPanel riskDataPanel;
+  NavigationToolbar<IndexedRisk> navigationToolbar;
+
+  @UiField
+  FlowPanel riskDataPanel;
+
+  @UiField
+  NoActionsToolbar actionsToolbar;
+
+  @UiField
+  TitlePanel title;
 
   public CreateRisk() {
-    this.riskDataPanel = new RiskDataPanel(null, false);
     initWidget(uiBinder.createAndBindUi(this));
-  }
 
-  @UiHandler("buttonApply")
-  void buttonApplyHandler(ClickEvent e) {
-    if (riskDataPanel.isValid()) {
-      Risk risk = riskDataPanel.getRisk();
+    RiskDataPanel dataPanel = new RiskDataPanel(null, false);
+    riskDataPanel.add(dataPanel);
+
+    dataPanel.setSaveHandler(() -> {
+      Risk risk = dataPanel.getValue();
       Services services = new Services("Create a risk", "create");
       services.riskResource(s -> s.createRisk(risk)).whenComplete((created, throwable) -> {
         if (throwable != null) {
@@ -83,16 +94,22 @@ public class CreateRisk extends Composite {
           HistoryUtils.newHistory(ShowRisk.RESOLVER, created.getUUID());
         }
       });
-    }
-  }
+    });
 
-  @UiHandler("buttonCancel")
-  void buttonCancelHandler(ClickEvent e) {
-    cancel();
-  }
+    dataPanel.setCancelHandler(() -> HistoryUtils.newHistory(RiskRegister.RESOLVER));
 
-  private void cancel() {
-    HistoryUtils.newHistory(RiskRegister.RESOLVER);
+    navigationToolbar.withoutButtons().build();
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getCreateRiskBreadCrumbs());
+
+    actionsToolbar.setLabel(messages.newRiskTitle());
+    actionsToolbar.build();
+
+    title.setText(messages.newRiskTitle());
+    title.setIconClass("IndexedRisk");
+    title.addStyleName("mb-20");
+
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse");
   }
 
   interface MyUiBinder extends UiBinder<Widget, CreateRisk> {

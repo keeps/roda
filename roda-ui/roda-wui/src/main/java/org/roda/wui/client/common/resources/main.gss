@@ -10014,6 +10014,25 @@ wui-disposal-hold-data .form-textbox {
     flex: 1;
 }
 
+.generic-data-panel .incremental-list-vertical {
+    width: 100%;
+    max-width: 100%;
+}
+
+.generic-data-panel .incremental-list-vertical .incremental-list-layout {
+    width: 100%;
+}
+
+.generic-data-panel .incremental-list-vertical .removable-textbox {
+    width: 100%;
+}
+
+.generic-data-panel .incremental-list-vertical .removable-textbox .form-textbox.form-textbox-medium {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 32px;
+}
+
 
 /* ============================================================
    GENERIC STACKED FIELD (Label on top, Input below)
