@@ -21,6 +21,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.management.ShowLogEntry;
 import org.roda.wui.client.management.UserLog;
@@ -30,6 +31,8 @@ import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.management.members.MemberManagement;
 import org.roda.wui.client.management.members.ShowMember;
+import org.roda.wui.client.planning.RepresentationInformationNetwork;
+import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -383,6 +386,23 @@ public class BreadcrumbUtils {
       List<String> path = new ArrayList<>(ShowNotification.RESOLVER.getHistoryPath());
       path.add(notification.getUUID());
       String label = StringUtils.isNotBlank(notification.getId()) ? notification.getId() : notification.getUUID();
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
+    }
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getRepresentationInformationBreadCrumbs(RepresentationInformation ri){
+    List<BreadcrumbItem> ret = new ArrayList<>();
+    ret.add(new BreadcrumbItem(
+            SafeHtmlUtils.fromSafeConstant(messages.representationInformationTitle()),
+            messages.representationInformationTitle(),
+            RepresentationInformationNetwork.RESOLVER.getHistoryPath()));
+
+    if (ri != null) {
+      List<String> path = new ArrayList<>(ShowRepresentationInformation.RESOLVER.getHistoryPath());
+      path.add(ri.getUUID());
+      String label = ri.getName() != null ? ri.getName() : ri.getId();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
 

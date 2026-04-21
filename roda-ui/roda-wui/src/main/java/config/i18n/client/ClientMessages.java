@@ -1018,6 +1018,10 @@ public interface ClientMessages extends Messages {
 
   String detailsCreatedBy();
 
+  String detailsUpdatedOn();
+
+  String detailsUpdatedBy();
+
   String detailsModifiedOn();
 
   String detailsModifiedBy();
@@ -1322,10 +1326,15 @@ public interface ClientMessages extends Messages {
 
   String representationInformationIntellectualEntities(@PluralCount int size, String link);
 
+  String representationInformationIntellectualEntitiesAssociations();
+
   String representationInformationRepresentations(@PluralCount int size, String link);
+
+  String representationInformationRepresentationsAssociations();
 
   String representationInformationFiles(@PluralCount int size, String link);
 
+  String representationInformationFilesAssociations();
   /****** Descriptive Metadata ****/
 
   String metadataType();
