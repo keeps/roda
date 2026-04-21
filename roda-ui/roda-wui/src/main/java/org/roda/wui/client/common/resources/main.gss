@@ -2581,6 +2581,7 @@ td.datePickerMonth, td.datePickerYear {
 .main .wui-breadcrumbPanel .breadcrumb-root {
     color: COLOR_PRIMARY;
     font-weight: bold;
+    max-width: none !important;
 }
 
 .main .wui-breadcrumbPanel .breadcrumb-last {

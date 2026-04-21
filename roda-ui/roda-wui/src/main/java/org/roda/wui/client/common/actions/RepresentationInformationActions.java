@@ -45,8 +45,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
-import javax.naming.Context;
-
 public class RepresentationInformationActions extends AbstractActionable<RepresentationInformation> {
   private static final RepresentationInformationActions INSTANCE = new RepresentationInformationActions();
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -328,7 +326,7 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
     ActionableBundle<RepresentationInformation> formatActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionableGroup<RepresentationInformation> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
+    ActionableGroup<RepresentationInformation> managementGroup = new ActionableGroup<>(messages.manage(), "btn-edit");
     managementGroup.addButton(messages.newButton(), RepresentationInformationAction.NEW, ActionImpact.UPDATED,
       "btn-plus-circle");
     managementGroup.addButton(messages.createNewRepresentationInformation(),
