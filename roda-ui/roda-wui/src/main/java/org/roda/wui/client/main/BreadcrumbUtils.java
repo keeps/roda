@@ -374,6 +374,21 @@ public class BreadcrumbUtils {
     return ret;
   }
 
+  public static List<BreadcrumbItem> getNotificationBreadcrumbs(Notification notification) {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.notificationsTitle()),
+      messages.notificationsTitle(), NotificationRegister.RESOLVER.getHistoryPath()));
+
+    if (notification != null) {
+      List<String> path = new ArrayList<>(ShowNotification.RESOLVER.getHistoryPath());
+      path.add(notification.getUUID());
+      String label = StringUtils.isNotBlank(notification.getId()) ? notification.getId() : notification.getUUID();
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
+    }
+
+    return ret;
+  }
+
   public static List<BreadcrumbItem> getDipBreadcrumbs(IndexedDIP dip, DIPFile dipFile,
     List<DIPFile> dipFileAncestors) {
     List<BreadcrumbItem> ret = new ArrayList<>();

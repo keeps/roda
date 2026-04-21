@@ -714,6 +714,18 @@ pre code {
     border-radius: 4px;
 }
 
+.notification-body-content pre > code {
+    overflow: visible;
+}
+
+.notification-body-content pre code {
+  max-height: none;
+}
+
+.notification-body-content {
+  overflow: visible;
+}
+
 .error {
     color: #D20707;
 }

@@ -42,10 +42,14 @@ public class JavascriptUtils {
   }-*/;
 
   public static native void runHighlighter(JavaScriptObject parent) /*-{
-    $wnd.jQuery(parent).find('pre code').each(function(i, block) {
+  $wnd.jQuery(parent).find('pre code').each(function(i, block) {
+    if ($wnd.hljs && $wnd.hljs.highlightElement) {
+      $wnd.hljs.highlightElement(block);
+    } else if ($wnd.hljs && $wnd.hljs.highlightBlock) {
       $wnd.hljs.highlightBlock(block);
-    });
-  }-*/;
+    }
+  });
+}-*/;
 
   public static native void runHighlighterOn(JavaScriptObject parent) /*-{
     $wnd.jQuery(parent).each(function(i, block) {

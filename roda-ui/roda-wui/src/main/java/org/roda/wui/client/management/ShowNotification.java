@@ -10,31 +10,29 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.wui.client.browse.tabs.BrowseNotificationsTabs;
+import org.roda.wui.client.common.ActionsToolbar;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -96,89 +94,30 @@ public class ShowNotification extends Composite {
     RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS, RodaConstants.NOTIFICATION_STATE);
 
   @UiField
-  Label notificationId;
-
+  TitlePanel title;
   @UiField
-  Label notificationSubject;
-
+  ActionsToolbar actionsToolbar;
   @UiField
-  HTML notificationBody;
-
+  NavigationToolbar<Notification> navigationToolbar;
   @UiField
-  Label notificationSentOn;
-
+  FocusPanel keyboardFocus;
   @UiField
-  Label notificationFromUser;
+  BrowseNotificationsTabs browseTab;
 
-  @UiField
-  Label notificationIsAcknowledged;
-
-  @UiField
-  Label acknowledgedUsersKey;
-
-  @UiField
-  HTML acknowledgedUsersValue;
-
-  @UiField
-  Label stateLabel;
-
-  @UiField
-  HTML stateValue;
-
-  @UiField
-  Label notAcknowledgedUsersKey;
-
-  @UiField
-  HTML notAcknowledgedUsersValue;
-
-  @UiField
-  Button buttonCancel;
-
-  /**
-   * Create a new panel to view a notification
-   *
-   */
   public ShowNotification(Notification notification) {
     initWidget(uiBinder.createAndBindUi(this));
+    navigationToolbar.withoutButtons().build();
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getNotificationBreadcrumbs(notification));
 
-    notificationId.setText(notification.getId());
-    notificationSubject.setText(notification.getSubject());
-    notificationBody.setHTML(notification.getBody());
-    notificationSentOn.setText(Humanize.formatDateTime(notification.getSentOn()));
-    notificationFromUser.setText(notification.getFromUser());
-    notificationIsAcknowledged
-      .setText(messages.isAcknowledged(Boolean.toString(notification.isAcknowledged()).toLowerCase()));
-    acknowledgedUsersKey.setVisible(false);
-    notAcknowledgedUsersKey.setVisible(false);
+    actionsToolbar.setLabel(messages.notificationTitle());
+    actionsToolbar.setTagsVisible(false);
 
-    List<String> recipientUsers = new ArrayList<>(notification.getRecipientUsers());
+    title.setText(StringUtils.isNotBlank(notification.getSubject()) ? notification.getSubject() : notification.getId());
 
-    for (String user : notification.getAcknowledgedUsers().keySet()) {
-      String ackDate = notification.getAcknowledgedUsers().get(user);
-      acknowledgedUsersKey.setVisible(true);
-      acknowledgedUsersValue.setHTML(SafeHtmlUtils.fromSafeConstant(
-        acknowledgedUsersValue.getHTML() + "<p>" + user + " <span class='small-and-gray'> " + ackDate + "</span></p>"));
-      recipientUsers.remove(user);
-    }
+    browseTab.init(notification);
 
-    for (String user : recipientUsers) {
-      notAcknowledgedUsersKey.setVisible(true);
-      notAcknowledgedUsersValue
-        .setHTML(SafeHtmlUtils.fromSafeConstant(notAcknowledgedUsersValue.getHTML() + "<p>" + user + "</p>"));
-    }
-
-    stateValue.setHTML(HtmlSnippetUtils.getNotificationStateHTML(notification.getState()));
-    stateLabel.setVisible(notification.getState() != null);
-    stateValue.setVisible(notification.getState() != null);
-  }
-
-  @UiHandler("buttonCancel")
-  void handleButtonCancel(ClickEvent e) {
-    cancel();
-  }
-
-  private void cancel() {
-    HistoryUtils.newHistory(NotificationRegister.RESOLVER);
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse browse-file browse_main_panel");
   }
 
 }
