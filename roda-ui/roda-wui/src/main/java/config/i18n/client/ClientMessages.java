@@ -76,6 +76,14 @@ public interface ClientMessages extends Messages {
 
   String editRiskTitle();
 
+  String editRiskDetailsTitle();
+
+  String editRiskPreMitigationTitle();
+
+  String editRiskMitigationTitle();
+
+  String editRiskPostMitigationTitle();
+
   String showRiskTitle();
 
   String riskIncidencesTitle();
@@ -974,6 +982,10 @@ public interface ClientMessages extends Messages {
 
   String riskRemoveSuccessMessage(Long size);
 
+  String riskUpdatedTitle();
+
+  String riskUpdatedMessage();
+
   String riskHistoryLabel(String versionKey, Date createdDate);
 
   String severityLevel(@Select SeverityLevel level);
@@ -1228,6 +1240,8 @@ public interface ClientMessages extends Messages {
 
   String riskNotes();
 
+  String riskDetails();
+
   String riskPreMitigation();
 
   String riskPreMitigationProbability();
@@ -1335,6 +1349,7 @@ public interface ClientMessages extends Messages {
   String representationInformationFiles(@PluralCount int size, String link);
 
   String representationInformationFilesAssociations();
+
   /****** Descriptive Metadata ****/
 
   String metadataType();

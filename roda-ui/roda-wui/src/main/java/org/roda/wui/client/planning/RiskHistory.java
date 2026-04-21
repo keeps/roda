@@ -105,7 +105,7 @@ public class RiskHistory extends Composite {
     this.riskId = riskId;
     this.riskVersions = versions;
 
-    oldRisk = new DetailsPanelRisk("RiskHistory_riskIncidences");
+    oldRisk = new DetailsPanelRisk();
 
     initWidget(uiBinder.createAndBindUi(this));
     init();

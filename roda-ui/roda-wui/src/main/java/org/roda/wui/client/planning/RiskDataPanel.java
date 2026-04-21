@@ -34,13 +34,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
@@ -102,6 +96,19 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   TextBox mitigationRelatedEventIdentifierType;
   @UiField
   TextBox mitigationRelatedEventIdentifierValue;
+
+  @UiField
+  FlowPanel detailsSection;
+
+  @UiField
+  FlowPanel preMitigationSection;
+
+  @UiField
+  FlowPanel mitigationSection;
+
+  @UiField
+  FlowPanel postMitigationSection;
+
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
   private boolean editmode;
@@ -113,6 +120,15 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   private int impactsSize;
   private Date createdOn;
   private String createdBy;
+  private final RiskSectionMode sectionMode;
+
+  public enum RiskSectionMode {
+    DETAILS, PRE_MITIGATION, MITIGATION, POST_MITIGATION, FULL;
+
+    public static RiskSectionMode getDefault() {
+      return FULL;
+    }
+  }
 
   /**
    * Create a new user data panel
@@ -123,10 +139,11 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
    *          the risk to use
    *
    */
-  public RiskDataPanel(final IndexedRisk risk, final boolean editmode) {
+  public RiskDataPanel(final IndexedRisk risk, final boolean editmode, final RiskSectionMode riskSectionMode) {
     categories = new IncrementalList(true);
     identifiedBy = new SearchSuggestBox<>(IndexedRisk.class, RodaConstants.RISK_IDENTIFIED_BY, false);
     mitigationOwner = new SearchSuggestBox<>(IndexedRisk.class, RodaConstants.RISK_MITIGATION_OWNER, false);
+    sectionMode = riskSectionMode;
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -291,6 +308,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     mitigationOwnerType.setVisible(false);
     mitigationRelatedEventIdentifierType.setVisible(false);
     mitigationRelatedEventIdentifierValue.setVisible(false);
+
+    applySectionMode();
   }
 
   public boolean isValid() {
@@ -380,6 +399,15 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     }
 
     return risk;
+  }
+
+  private void applySectionMode() {
+    boolean full = sectionMode == RiskSectionMode.getDefault();
+
+    detailsSection.setVisible(full | sectionMode == RiskSectionMode.DETAILS);
+    preMitigationSection.setVisible(full | sectionMode == RiskSectionMode.PRE_MITIGATION);
+    mitigationSection.setVisible(full | sectionMode == RiskSectionMode.MITIGATION);
+    postMitigationSection.setVisible(full | sectionMode == RiskSectionMode.POST_MITIGATION);
   }
 
   public void setRisk(IndexedRisk risk) {

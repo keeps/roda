@@ -66,7 +66,7 @@ public class CreateRisk extends Composite {
   RiskDataPanel riskDataPanel;
 
   public CreateRisk() {
-    this.riskDataPanel = new RiskDataPanel(null, false);
+    this.riskDataPanel = new RiskDataPanel(null, false, RiskDataPanel.RiskSectionMode.getDefault());
     initWidget(uiBinder.createAndBindUi(this));
   }
 
