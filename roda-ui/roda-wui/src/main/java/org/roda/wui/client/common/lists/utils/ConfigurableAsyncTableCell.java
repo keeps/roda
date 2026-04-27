@@ -29,6 +29,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.lists.utils.ColumnOptions.RenderingHint;
+import org.roda.wui.client.common.utils.AipTitleBatchFetcher;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -104,6 +105,9 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
     });
     DEFAULT_COLUMNS_FIELDS.put("default_IndexedAIP_hasrepresentations",
       Arrays.asList(RodaConstants.AIP_HAS_REPRESENTATIONS));
+
+    DEFAULT_COLUMNS_FIELDS.put("default_IndexedAIP_parent",
+      Arrays.asList(RodaConstants.AIP_PARENT_ID, RodaConstants.AIP_ANCESTORS, RodaConstants.AIP_LEVEL));
 
     /********************************************
      * Representations
@@ -322,7 +326,13 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
       SafeHtml htmlHeader;
       List<String> sortBy = c.getSortBy();
 
-      if (name.startsWith("default_")) {
+      if ("default_IndexedAIP_parent".equals(name)) {
+        @SuppressWarnings("unchecked")
+        CellTable<IndexedAIP> aipTable = (CellTable<IndexedAIP>) display;
+        column = (Column<T, ?>) createAipParentColumn(aipTable);
+        htmlHeader = messages.defaultColumnHeader(name);
+        sortBy = Collections.emptyList();
+      } else if (name.startsWith("default_")) {
         // is a default column
         column = (Column<T, ?>) DEFAULT_COLUMNS.get(name);
         htmlHeader = header.equals(name) ? messages.defaultColumnHeader(name) : SafeHtmlUtils.fromString(header);
@@ -400,6 +410,70 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
     return createSorter(columnSortList, columnSortingKeyMap);
+  }
+
+  private static Column<IndexedAIP, SafeHtml> createAipParentColumn(CellTable<IndexedAIP> table) {
+    return new Column<IndexedAIP, SafeHtml>(new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(IndexedAIP aip) {
+        if (aip == null) {
+          return SafeHtmlUtils.EMPTY_SAFE_HTML;
+        }
+
+        String parentId = aip.getParentID();
+        if (parentId == null) {
+          return SafeHtmlUtils.EMPTY_SAFE_HTML;
+        }
+
+        List<String> ancestors = aip.getAncestors();
+        if (ancestors == null || ancestors.isEmpty()) {
+          ancestors = Collections.singletonList(parentId);
+        }
+
+        AipTitleBatchFetcher fetcher = AipTitleBatchFetcher.getInstance();
+
+        // Always queue a background re-fetch; redraw fires only if a value changed.
+        fetcher.requestTitles(ancestors, table);
+
+        boolean allCached = true;
+        for (String uuid : ancestors) {
+          if (!fetcher.isCached(uuid)) {
+            allCached = false;
+            break;
+          }
+        }
+
+        if (!allCached) {
+          return SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-spinner fa-spin\"></i>");
+        }
+
+        // ancestors[0] = direct parent, ancestors[last] = root; reverse for breadcrumb
+        List<String> orderedAncestors = new ArrayList<>(ancestors);
+        Collections.reverse(orderedAncestors);
+        StringBuilder tooltip = new StringBuilder();
+        for (String uuid : orderedAncestors) {
+          if (tooltip.length() > 0) {
+            tooltip.append(" / ");
+          }
+          String t = fetcher.getCachedTitle(uuid);
+          tooltip.append(t != null && !t.isEmpty() ? t : uuid);
+        }
+
+        String parentTitle = fetcher.getCachedTitle(parentId);
+        String parentLevel = fetcher.getCachedLevel(parentId);
+        SafeHtml levelIcon = DescriptionLevelUtils.getElementLevelIconSafeHtml(parentLevel, false);
+
+        return new SafeHtmlBuilder()
+          .appendHtmlConstant("<span title='")
+          .appendEscaped(tooltip.toString())
+          .appendHtmlConstant("'>")
+          .append(levelIcon)
+          .appendHtmlConstant("&nbsp;")
+          .appendEscaped(parentTitle != null ? parentTitle : parentId)
+          .appendHtmlConstant("</span>")
+          .toSafeHtml();
+      }
+    };
   }
 
 }
