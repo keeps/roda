@@ -432,6 +432,9 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
 
         AipTitleBatchFetcher fetcher = AipTitleBatchFetcher.getInstance();
 
+        // Always queue a background re-fetch; redraw fires only if a value changed.
+        fetcher.requestTitles(ancestors, table);
+
         boolean allCached = true;
         for (String uuid : ancestors) {
           if (!fetcher.isCached(uuid)) {
@@ -441,7 +444,6 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
         }
 
         if (!allCached) {
-          fetcher.requestTitles(ancestors, table);
           return SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-spinner fa-spin\"></i>");
         }
 

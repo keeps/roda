@@ -28,32 +28,25 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.Timer;
 
 /**
- * Session-scoped singleton that batches AIP title lookups by UUID and caches
- * results with a TTL. Callers register a {@link CellTable} to be redrawn once
- * the batch resolves so that {@code Column.getValue()} can re-run against the
- * warm cache and return the final SafeHtml.
+ * Session-scoped singleton that batches AIP title lookups by UUID using a
+ * stale-while-revalidate strategy: cached values are returned immediately while
+ * a background re-fetch is always queued. {@link CellTable#redraw()} is called
+ * only when a fetched value differs from the cached one, so the display
+ * self-corrects after any Solr update without flickering on unchanged data.
  */
 public class AipTitleBatchFetcher {
 
-  private static long cacheTtlMs = 10_000L;
   private static final int BATCH_DELAY_MS = 50;
-  private static final int CLEANUP_INTERVAL_MS = 60 * 1000;
 
   private static AipTitleBatchFetcher instance;
 
   private static final class CacheEntry {
     final String title;
     final String level;
-    final long timestamp;
 
     CacheEntry(String title, String level) {
       this.title = title;
       this.level = level;
-      this.timestamp = System.currentTimeMillis();
-    }
-
-    boolean isExpired() {
-      return System.currentTimeMillis() - timestamp > cacheTtlMs;
     }
   }
 
@@ -61,7 +54,6 @@ public class AipTitleBatchFetcher {
   private final Set<String> pendingUuids = new HashSet<>();
   private final Set<CellTable<IndexedAIP>> pendingTables = new HashSet<>();
   private Timer batchTimer;
-  private Timer cleanupTimer;
 
   private AipTitleBatchFetcher() {
   }
@@ -73,41 +65,32 @@ public class AipTitleBatchFetcher {
     return instance;
   }
 
-  public static void setCacheTtlMs(long ttlMs) {
-    cacheTtlMs = ttlMs;
-  }
-
-  /** Returns true only if a non-expired entry exists for this UUID. */
+  /** Returns true if a cached entry exists for this UUID. */
   public boolean isCached(String uuid) {
-    CacheEntry e = cache.get(uuid);
-    return e != null && !e.isExpired();
+    return cache.containsKey(uuid);
   }
 
-  /** Returns the cached title, or {@code null} if absent or expired. */
+  /** Returns the cached title, or {@code null} if not yet fetched. */
   public String getCachedTitle(String uuid) {
     CacheEntry e = cache.get(uuid);
-    return (e != null && !e.isExpired()) ? e.title : null;
+    return e != null ? e.title : null;
   }
 
-  /** Returns the cached description level, or {@code null} if absent or expired. */
+  /** Returns the cached description level, or {@code null} if not yet fetched. */
   public String getCachedLevel(String uuid) {
     CacheEntry e = cache.get(uuid);
-    return (e != null && !e.isExpired()) ? e.level : null;
+    return e != null ? e.level : null;
   }
 
   /**
-   * Queues any uncached UUIDs for the next batch fetch and registers
-   * {@code table} to be redrawn once the batch completes. Safe to call
-   * repeatedly from {@code Column.getValue()}.
+   * Queues {@code uuids} for a background re-fetch and registers {@code table}
+   * to be redrawn if any fetched value differs from the cached one. Always
+   * called from {@code Column.getValue()} — even on cache hits — so that stale
+   * data is corrected automatically after Solr updates.
    */
   public void requestTitles(List<String> uuids, CellTable<IndexedAIP> table) {
     pendingTables.add(table);
-
-    for (String uuid : uuids) {
-      if (!isCached(uuid)) {
-        pendingUuids.add(uuid);
-      }
-    }
+    pendingUuids.addAll(uuids);
 
     if (batchTimer == null && !pendingUuids.isEmpty()) {
       batchTimer = new Timer() {
@@ -129,7 +112,6 @@ public class AipTitleBatchFetcher {
     pendingTables.clear();
 
     if (toFetch.isEmpty()) {
-      tablesToRedraw.forEach(CellTable::redraw);
       return;
     }
 
@@ -143,32 +125,24 @@ public class AipTitleBatchFetcher {
       .aipResource(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()))
       .whenComplete((result, throwable) -> {
         if (throwable == null && result != null) {
+          boolean anyChanged = false;
           for (IndexedAIP aip : result.getResults()) {
-            cache.put(aip.getUUID(), new CacheEntry(aip.getTitle() != null ? aip.getTitle() : "", aip.getLevel()));
+            String newTitle = aip.getTitle() != null ? aip.getTitle() : "";
+            String newLevel = aip.getLevel();
+            CacheEntry existing = cache.get(aip.getUUID());
+            if (existing == null || !newTitle.equals(existing.title) || !equalOrBothNull(newLevel, existing.level)) {
+              anyChanged = true;
+            }
+            cache.put(aip.getUUID(), new CacheEntry(newTitle, newLevel));
           }
-          ensureCleanupTimer();
+          if (anyChanged) {
+            tablesToRedraw.forEach(CellTable::redraw);
+          }
         }
-        tablesToRedraw.forEach(CellTable::redraw);
       });
   }
 
-  private void ensureCleanupTimer() {
-    if (cleanupTimer == null) {
-      cleanupTimer = new Timer() {
-        @Override
-        public void run() {
-          evictExpired();
-        }
-      };
-      cleanupTimer.scheduleRepeating(CLEANUP_INTERVAL_MS);
-    }
-  }
-
-  private void evictExpired() {
-    cache.entrySet().removeIf(e -> e.getValue().isExpired());
-    if (cache.isEmpty() && cleanupTimer != null) {
-      cleanupTimer.cancel();
-      cleanupTimer = null;
-    }
+  private static boolean equalOrBothNull(String a, String b) {
+    return a == null ? b == null : a.equals(b);
   }
 }
