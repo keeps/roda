@@ -11,11 +11,8 @@ import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -26,7 +23,8 @@ import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
 
 public class ListSelectionStateMappers {
-
+  private static final IndexedPreservationEventMapper indexedPreservationEventMapper = GWT
+    .create(IndexedPreservationEventMapper.class);
   private static final ClientLogger logger = new ClientLogger(ListSelectionUtils.class.getName());
   private static IndexedAIPMapper indexedAIPMapper = GWT.create(IndexedAIPMapper.class);
   private static IndexedRepresentationMapper indexedRepresentationMapper = GWT
@@ -61,6 +59,8 @@ public class ListSelectionStateMappers {
       ret = dipFileMapper.write((ListSelectionState<DIPFile>) object);
     } else if (IndexedReport.class.getName().equals(objectClass)) {
       ret = indexedReportMapper.write((ListSelectionState<IndexedReport>) object);
+    } else if (IndexedPreservationEvent.class.getName().equals(objectClass)) {
+      ret = indexedPreservationEventMapper.write((ListSelectionState<IndexedPreservationEvent>) object);
     } else if (DisposalHold.class.getName().equals(objectClass)) {
       ret = disposalHoldMapper.write((ListSelectionState<DisposalHold>) object);
     } else if (DisposalSchedule.class.getName().equals(objectClass)) {
@@ -93,6 +93,8 @@ public class ListSelectionStateMappers {
       state = (ListSelectionState<T>) dipFileMapper.read(json);
     } else if (IndexedReport.class.getName().equals(objectClass)) {
       state = (ListSelectionState<T>) indexedReportMapper.read(json);
+    } else if (IndexedPreservationEvent.class.getName().equals(objectClass)) {
+      state = (ListSelectionState<T>) indexedPreservationEventMapper.read(json);
     } else if (DisposalHold.class.getName().equals(objectClass)) {
       state = (ListSelectionState<T>) disposalHoldMapper.read(json);
     } else if (DisposalSchedule.class.getName().equals(objectClass)) {
@@ -109,6 +111,10 @@ public class ListSelectionStateMappers {
       state = null;
     }
     return state;
+  }
+
+  // IndexedPreservationEvent
+  public interface IndexedPreservationEventMapper extends ObjectMapper<ListSelectionState<IndexedPreservationEvent>> {
   }
 
   // IndexedAIP

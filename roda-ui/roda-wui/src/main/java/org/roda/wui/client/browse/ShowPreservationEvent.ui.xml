@@ -1,98 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:common="urn:import:org.roda.wui.client.common">
+             xmlns:common="urn:import:org.roda.wui.client.common"
+             xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs">
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
-	<g:FlowPanel styleName="preservationEvent" addStyleNames="wrapper skip_padding">
-		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content" ui:field="contentFlowPanel">
-				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
-					<g:FlowPanel addStyleNames="row full_width no_padding">
-						<g:FlowPanel addStyleNames="wui-data-panel">
-							<common:TitlePanel text="{messages.preservationEventTitle}"
-								iconClass="IndexedPreservationEvent" />
-							<g:FlowPanel>
-								<g:FlowPanel styleName="field">
-									<g:Label styleName="label">
-										<ui:text from='{messages.preservationEventId}' />
-									</g:Label>
-									<g:Label styleName="value" ui:field="eventIdValue" />
-								</g:FlowPanel>
-								<g:FlowPanel styleName="field">
-									<g:Label styleName="label">
-										<ui:text from='{messages.preservationEventType}' />
-									</g:Label>
-									<g:Label styleName="value" ui:field="eventTypeLabel" />
-								</g:FlowPanel>
-								<g:FlowPanel styleName="field">
-									<g:Label styleName="label">
-										<ui:text from='{messages.preservationEventDetail}' />
-									</g:Label>
-									<g:Label styleName="value" ui:field="eventDetailLabel" />
-								</g:FlowPanel>
-
-								<g:FlowPanel styleName="field">
-									<g:Label styleName="label">
-										<ui:text from='{messages.preservationEventDatetime}' />
-									</g:Label>
-									<g:Label styleName="value" ui:field="eventDatetimeLabel" />
-								</g:FlowPanel>
-
-								<g:FlowPanel styleName="field">
-									<g:Label styleName="label">
-										<ui:text from='{messages.preservationEventOutcome}' />
-									</g:Label>
-									<g:Label styleName="value" ui:field="eventOutcomeLabel" />
-								</g:FlowPanel>
-
-								<g:FlowPanel styleName="field">
-									<!-- AGENTS -->
-									<g:Label styleName="h4" ui:field="agentsHeader">
-										<ui:text from='{messages.preservationEventAgentsHeader}' />
-									</g:Label>
-									<g:FlowPanel ui:field="agentsPanel" />
-								</g:FlowPanel>
-
-								<g:FlowPanel styleName="field">
-									<!-- LINKING SOURCE OBJECTS -->
-									<g:Label styleName="h4" ui:field="sourceObjectsHeader">
-										<ui:text from='{messages.preservationEventSourceObjectsHeader}' />
-									</g:Label>
-									<g:FlowPanel ui:field="sourceObjectsPanel" />
-								</g:FlowPanel>
-
-								<g:FlowPanel styleName="field">
-									<!-- LINKING OUTCOME OBJECTS -->
-									<g:Label styleName="h4" ui:field="outcomeObjectsHeader">
-										<ui:text from='{messages.preservationEventOutcomeObjectsHeader}' />
-									</g:Label>
-									<g:FlowPanel ui:field="outcomeObjectsPanel" />
-								</g:FlowPanel>
-
-								<g:FlowPanel styleName="field">
-									<!-- OUTCOME DETAIL -->
-									<g:Label styleName="h4" ui:field="outcomeDetailHeader">
-										<ui:text from='{messages.preservationEventOutcomeDetailHeader}' />
-									</g:Label>
-								</g:FlowPanel>
-
-								<g:HTML ui:field="eventOutcomeDetails">
-								</g:HTML>
-
-							</g:FlowPanel>
-						</g:FlowPanel>
-					</g:FlowPanel>
-				</g:FlowPanel>
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
-					</g:FlowPanel>
-				</g:FlowPanel>
-			</g:FlowPanel>
-		</g:FlowPanel>
-	</g:FlowPanel>
+    <g:FocusPanel ui:field="focusPanel">
+        <g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
+            <common:NavigationToolbar ui:field="navigationToolbar"/>
+            <common:BrowsePreservationEventActionsToolbar ui:field="actionsToolbar"/>
+            <g:FlowPanel addStyleNames="row full_width skip_padding">
+                <g:FlowPanel addStyleNames="col_12 content">
+                    <common:TitlePanel ui:field="title" text="{messages.preservationEventTitle}"
+                                       iconClass="IndexedPreservationEvent"/>
+                    <tabs:BrowsePreservationEventTabs ui:field="tabs"/>
+                </g:FlowPanel>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FocusPanel>
 </ui:UiBinder>

@@ -7,12 +7,7 @@
  */
 package org.roda.wui.api.v2.services;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
@@ -21,7 +16,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ConsumesOutputStream;
-import org.roda.core.data.v2.DefaultConsumesOutputStream;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.StreamResponse;
 import org.roda.core.data.v2.index.FindRequest;
@@ -42,16 +36,11 @@ import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.util.IdUtils;
-import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.model.RequestContext;
-import org.roda.wui.common.server.ServerTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import gov.loc.premis.v3.EventComplexType;
-import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
-import gov.loc.premis.v3.LinkingObjectIdentifierComplexType;
-import gov.loc.premis.v3.StringPlusAuthority;
+import gov.loc.premis.v3.*;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -258,8 +247,7 @@ public class PreservationEventService {
       }
 
       if (preservationEvent.getFileUUID() != null) {
-        IndexedFile file = indexService.retrieve(IndexedFile.class, preservationEvent.getFileUUID(),
-          new ArrayList<>());
+        IndexedFile file = indexService.retrieve(IndexedFile.class, preservationEvent.getFileUUID(), new ArrayList<>());
         fileId = file.getId();
         directoryFilePath = file.getPath();
       }
@@ -281,20 +269,38 @@ public class PreservationEventService {
     return new StreamResponse(stream);
   }
 
-  public StreamResponse retrievePreservationEventDetails(IndexedPreservationEvent preservationEvent,
-    RequestContext context, String language)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+  public Map<String, String> retrievePreservationEventDetails(IndexedPreservationEvent preservationEvent,
+    RequestContext context) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    GenericException, ValidationException {
+
     Binary binary = getPreservationEventBinary(preservationEvent, context);
-    final String filename = binary.getStoragePath().getName() + HTML_EXT;
-    final String htmlEvent = HTMLUtils.preservationMetadataEventToHtml(binary, true, ServerTools.parseLocale(language));
+    EventComplexType eventComplexType = PremisV3Utils.binaryToEvent(binary.getContent(), false);
 
-    final ConsumesOutputStream stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_TEXT_HTML,
-      out -> {
-        PrintStream printStream = new PrintStream(out);
-        printStream.print(htmlEvent);
-        printStream.close();
-      });
+    String outcomeDetailNote = "";
 
-    return new StreamResponse(stream);
+    if (eventComplexType.getEventOutcomeInformation() != null) {
+      List<String> notes = new ArrayList<>();
+
+      for (EventOutcomeInformationComplexType info : eventComplexType.getEventOutcomeInformation()) {
+        if (info.getEventOutcomeDetail() == null) {
+          continue;
+        }
+
+        for (EventOutcomeDetailComplexType detail : info.getEventOutcomeDetail()) {
+          if (detail.getEventOutcomeDetailNote() != null) {
+            for (String note : detail.getEventOutcomeDetailNote()) {
+              if (note != null && !note.isBlank()) {
+                notes.add(note.trim());
+              }
+            }
+          }
+        }
+      }
+      outcomeDetailNote = String.join("\n", notes);
+    }
+
+    Map<String, String> details = new HashMap<>();
+    details.put("outcomeDetailNote", outcomeDetailNote);
+    return details;
   }
 }

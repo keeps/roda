@@ -9,6 +9,7 @@ package org.roda.wui.api.v2.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -38,13 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -165,22 +160,23 @@ public class PreservationEventController implements PreservationEventRestService
     });
   }
 
-  @GetMapping(path = "/{id}/details/html", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-  @Operation(summary = "Gets preservation event details in HTML format", responses = {
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StreamingResponseBody.class))),
+  @GetMapping(path = "/{id}/details", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Gets preservation event details in structured JSON format", responses = {
+    @ApiResponse(responseCode = "200", description = "OK"),
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  public ResponseEntity<StreamingResponseBody> getPreservationEventsDetails(
+  public ResponseEntity<Map<String, String>> getPreservationEventsDetails(
     @Parameter(description = "The id of the preservation event", required = true) @PathVariable(name = "id") String id,
-    @Parameter(description = "language", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String locale,
     @RequestHeader HttpHeaders headers) {
 
-    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<StreamingResponseBody>>() {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<ResponseEntity<Map<String, String>>>() {
       @Override
-      public ResponseEntity<StreamingResponseBody> process(RequestContext requestContext,
+      public ResponseEntity<Map<String, String>> process(RequestContext requestContext,
         RequestControllerAssistant controllerAssistant) throws RODAException, RESTException {
+
         controllerAssistant.setRelatedObjectId(id);
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM, id);
+
         IndexedPreservationEvent preservationEvent = indexService.retrieve(IndexedPreservationEvent.class, id,
           new ArrayList<>());
 
@@ -188,11 +184,10 @@ public class PreservationEventController implements PreservationEventRestService
           controllerAssistant.checkObjectPermissions(requestContext.getUser(),
             SelectedItemsList.create(IndexedAIP.class, preservationEvent.getAipID()));
         }
+        Map<String, String> details = preservationEventService.retrievePreservationEventDetails(preservationEvent,
+          requestContext);
 
-        StreamResponse response = preservationEventService.retrievePreservationEventDetails(preservationEvent,
-          requestContext, locale);
-
-        return ApiUtils.okResponse(response);
+        return ResponseEntity.ok(details);
       }
     });
   }
@@ -200,7 +195,6 @@ public class PreservationEventController implements PreservationEventRestService
   @Override
   public ResponseEntity<StreamingResponseBody> exportToCSV(String findRequestString) {
     // delegate
-    return ApiUtils.okResponse(
-      indexService.exportToCSV(findRequestString, IndexedPreservationEvent.class));
+    return ApiUtils.okResponse(indexService.exportToCSV(findRequestString, IndexedPreservationEvent.class));
   }
 }

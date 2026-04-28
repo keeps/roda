@@ -16,8 +16,15 @@ import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
-import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -28,6 +35,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.PreservationEvents;
+import org.roda.wui.client.browse.ShowPreservationEvent;
 import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.disposal.DisposalDestroyedRecords;
 import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
@@ -50,10 +58,15 @@ import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.ShowLogEntry;
 import org.roda.wui.client.management.ShowNotification;
 import org.roda.wui.client.management.UserLog;
-import org.roda.wui.client.management.members.*;
+import org.roda.wui.client.management.members.CreateGroup;
+import org.roda.wui.client.management.members.CreateUser;
+import org.roda.wui.client.management.members.EditGroup;
+import org.roda.wui.client.management.members.EditUser;
 import org.roda.wui.client.planning.*;
 import org.roda.wui.client.planning.agents.PreservationAgents;
 import org.roda.wui.client.planning.agents.ShowPreservationAgent;
+import org.roda.wui.client.management.members.MemberManagement;
+import org.roda.wui.client.management.members.ShowMember;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.CreateDefaultJob;
 import org.roda.wui.client.process.CreateSelectedJob;
@@ -456,6 +469,21 @@ public class BreadcrumbUtils {
       path.add(risk.getUUID());
 
       String label = StringUtils.isNotBlank(risk.getName()) ? risk.getName() : risk.getId();
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
+    }
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getPreservationEventBreadCrumbs(IndexedPreservationEvent preservationEvent) {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.preservationEventsTitle()),
+      messages.preservationEventsTitle(), PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
+
+    if (preservationEvent != null) {
+      List<String> path = new ArrayList<>(ShowPreservationEvent.RESOLVER.getHistoryPath());
+      String label = StringUtils.isNotBlank(preservationEvent.getId()) ? preservationEvent.getId() : preservationEvent.getUUID();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
 
