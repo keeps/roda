@@ -25,16 +25,17 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.*;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.RestUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.*;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -85,7 +86,7 @@ public class ShowPreservationEvent extends Composite {
   private IndexedPreservationEvent preservationEvent;
   private List<IndexedPreservationAgent> agents;
   private PreservationEventsLinkingObjects linkingObjects;
-  private SafeHtml eventOutcomeDetailsHtml;
+  private String eventOutcomeDetailText;
 
   @UiField
   NavigationToolbar<IndexedPreservationEvent> navigationToolbar;
@@ -116,47 +117,31 @@ public class ShowPreservationEvent extends Composite {
     return ListUtils.concat(RESOLVER.getHistoryPath(), id);
   }
 
-  private void getEventDetailsHTML(final AsyncCallback<SafeHtml> callback) {
-    SafeUri uri = RestUtils.createPreservationEventDetailsUri(eventId);
+  private void getEventDetails(final AsyncCallback<String> callback) {
+    SafeUri uri = RestUtils.createPreservationEventDetailsJsonUri(eventId);
 
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
+    requestBuilder.setHeader("Accept", "application/json");
+
     try {
       requestBuilder.sendRequest(null, new RequestCallback() {
-
         @Override
         public void onResponseReceived(Request request, Response response) {
           if (200 == response.getStatusCode()) {
-
-            String html = response.getText();
-
-            SafeHtmlBuilder b = new SafeHtmlBuilder();
-            b.append(SafeHtmlUtils.fromSafeConstant("<div class='eventHTML'>"));
-            b.append(SafeHtmlUtils.fromTrustedString(html));
-            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-            SafeHtml safeHtml = b.toSafeHtml();
-
-            callback.onSuccess(safeHtml);
-          } else {
-            String text = response.getText();
-            String message;
             try {
-              RestErrorOverlayType error = (RestErrorOverlayType) JsonUtils.safeEval(text);
-              message = error.getMessage();
-            } catch (IllegalArgumentException e) {
-              message = text;
+              JSONObject json = JSONParser.parseStrict(response.getText()).isObject();
+              String outcomeDetailNote = "";
+              if (json != null && json.get("outcomeDetailNote") != null
+                && json.get("outcomeDetailNote").isString() != null) {
+                outcomeDetailNote = json.get("outcomeDetailNote").isString().stringValue();
+              }
+
+              callback.onSuccess(outcomeDetailNote);
+            } catch (Exception e) {
+              callback.onFailure(e);
             }
-
-            SafeHtmlBuilder b = new SafeHtmlBuilder();
-
-            // error message
-            b.append(SafeHtmlUtils.fromSafeConstant("<div class='error'>"));
-            b.append(messages.preservationEventDetailsTransformToHTMLError());
-            b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
-            b.append(SafeHtmlUtils.fromString(message));
-            b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
-            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-
-            callback.onSuccess(b.toSafeHtml());
+          } else {
+            callback.onFailure(new RuntimeException(response.getText()));
           }
         }
 
@@ -191,7 +176,7 @@ public class ShowPreservationEvent extends Composite {
   }
 
   private void loadEventDetailsHtml() {
-    getEventDetailsHTML(new AsyncCallback<SafeHtml>() {
+    getEventDetails(new AsyncCallback<String>() {
       @Override
       public void onFailure(Throwable caught) {
         if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
@@ -200,8 +185,8 @@ public class ShowPreservationEvent extends Composite {
       }
 
       @Override
-      public void onSuccess(SafeHtml result) {
-        eventOutcomeDetailsHtml = result;
+      public void onSuccess(String result) {
+        eventOutcomeDetailText = result;
         initView();
       }
     });
@@ -212,7 +197,7 @@ public class ShowPreservationEvent extends Composite {
     title.setText(StringUtils.isNotBlank(preservationEvent.getEventType()) ? preservationEvent.getEventType()
       : preservationEvent.getId());
 
-    tabs.init(preservationEvent, agents, linkingObjects, eventOutcomeDetailsHtml);
+    tabs.init(preservationEvent, agents, linkingObjects, eventOutcomeDetailText);
 
     if (actionsToolbar != null) {
       actionsToolbar.setLabel(messages.preservationEventTitle());

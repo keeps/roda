@@ -103,7 +103,7 @@ public class DetailsTab extends Composite {
     content.add(detailsPanel);
   }
 
-  public DetailsTab(IndexedPreservationEvent event, SafeHtml outcomeDetails){
+  public DetailsTab(IndexedPreservationEvent event, String outcomeDetails){
     initWidget(uiBinder.createAndBindUi(this));
     DetailsPanelPreservationEvent detailsPanel = new DetailsPanelPreservationEvent(event, outcomeDetails);
     content.add(detailsPanel);

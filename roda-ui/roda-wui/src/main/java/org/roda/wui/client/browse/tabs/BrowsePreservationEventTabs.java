@@ -3,7 +3,6 @@ package org.roda.wui.client.browse.tabs;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.safehtml.shared.UriUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -17,8 +16,8 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -29,10 +28,10 @@ public class BrowsePreservationEventTabs extends Tabs {
   private IndexedPreservationEvent event;
   private List<IndexedPreservationAgent> agents;
   private PreservationEventsLinkingObjects linkingObjects;
-  private SafeHtml outcomeDetails;
+  private String outcomeDetails;
 
   public void init(IndexedPreservationEvent event, List<IndexedPreservationAgent> agents,
-    PreservationEventsLinkingObjects linkingObjects, SafeHtml outcomeDetails) {
+    PreservationEventsLinkingObjects linkingObjects, String outcomeDetails) {
 
     this.event = event;
     this.agents = agents;

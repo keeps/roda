@@ -1,17 +1,18 @@
 package org.roda.wui.client.browse;
 
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.StringUtils;
+
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
+
 import config.i18n.client.ClientMessages;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.jobs.PluginState;
-import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.StringUtils;
 
 public class DetailsPanelPreservationEvent extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -26,12 +27,12 @@ public class DetailsPanelPreservationEvent extends Composite {
   @UiField
   FlowPanel outcomeDetailsPanel;
 
-  public DetailsPanelPreservationEvent(IndexedPreservationEvent event, SafeHtml outcomeDetails) {
+  public DetailsPanelPreservationEvent(IndexedPreservationEvent event, String outcomeDetails) {
     initWidget(uiBinder.createAndBindUi(this));
     init(event, outcomeDetails);
   }
 
-  private void init(IndexedPreservationEvent event, SafeHtml outcomeDetails) {
+  private void init(IndexedPreservationEvent event, String outcomeDetails) {
     if (event == null) {
       return;
     }
@@ -40,7 +41,7 @@ public class DetailsPanelPreservationEvent extends Composite {
 
     if (event.getEventDateTime() != null) {
       detailsPanel.add(buildField(messages.preservationEventDatetime(),
-              new InlineHTML(SafeHtmlUtils.htmlEscape(Humanize.formatDateTime(event.getEventDateTime())))));
+        new InlineHTML(SafeHtmlUtils.htmlEscape(Humanize.formatDateTime(event.getEventDateTime())))));
     }
 
     Widget outcomeWidget = buildOutcomeWidget(event.getEventOutcome());
@@ -48,7 +49,7 @@ public class DetailsPanelPreservationEvent extends Composite {
       detailsPanel.add(buildField(messages.preservationEventOutcome(), outcomeWidget));
     }
 
-    if (outcomeDetails != null && StringUtils.isNotBlank(outcomeDetails.asString())) {
+    if (StringUtils.isNotBlank(outcomeDetails)) {
       outcomeDetailsPanel.clear();
       outcomeDetailsPanel.add(new HTML(outcomeDetails));
       outcomeDetailsSection.setVisible(true);
