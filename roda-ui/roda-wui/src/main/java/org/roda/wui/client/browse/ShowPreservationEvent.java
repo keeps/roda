@@ -187,6 +187,7 @@ public class ShowPreservationEvent extends Composite {
       @Override
       public void onSuccess(String result) {
         eventOutcomeDetailText = result;
+        preservationEvent.setEventDetail(result);
         initView();
       }
     });

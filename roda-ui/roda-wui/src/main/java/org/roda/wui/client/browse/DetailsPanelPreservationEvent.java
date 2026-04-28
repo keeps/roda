@@ -21,12 +21,6 @@ public class DetailsPanelPreservationEvent extends Composite {
   @UiField
   FlowPanel detailsPanel;
 
-  @UiField
-  FlowPanel outcomeDetailsSection;
-
-  @UiField
-  FlowPanel outcomeDetailsPanel;
-
   public DetailsPanelPreservationEvent(IndexedPreservationEvent event, String outcomeDetails) {
     initWidget(uiBinder.createAndBindUi(this));
     init(event, outcomeDetails);
@@ -50,11 +44,9 @@ public class DetailsPanelPreservationEvent extends Composite {
     }
 
     if (StringUtils.isNotBlank(outcomeDetails)) {
-      outcomeDetailsPanel.clear();
-      outcomeDetailsPanel.add(new HTML(outcomeDetails));
-      outcomeDetailsSection.setVisible(true);
-    } else {
-      outcomeDetailsSection.setVisible(false);
+      InlineHTML outcomeDetailValue = new InlineHTML(SafeHtmlUtils.htmlEscape(outcomeDetails));
+      outcomeDetailValue.addStyleName("code-pre");
+      detailsPanel.add(buildField(messages.preservationEventOutcomeDetailHeader(), outcomeDetailValue));
     }
   }
 

@@ -10,19 +10,5 @@
         <g:FlowPanel addStyleNames="details-panel-section">
             <g:FlowPanel ui:field="detailsPanel" addStyleNames="descriptiveMetadata"/>
         </g:FlowPanel>
-
-        <g:FlowPanel ui:field="outcomeDetailsSection"
-                     addStyleNames="details-panel-section"
-                     visible="false">
-            <g:FlowPanel addStyleNames="details-panel-section-header">
-                <g:HTML styleName="form-separator">
-                    <ui:text from="{messages.preservationEventOutcomeDetailHeader}"/>
-                </g:HTML>
-            </g:FlowPanel>
-
-            <g:FlowPanel ui:field="outcomeDetailsPanel"
-                         addStyleNames="details-panel-rich-content"/>
-        </g:FlowPanel>
-
     </g:FlowPanel>
 </ui:UiBinder>
