@@ -7027,6 +7027,61 @@ td.datePickerMonth, td.datePickerYear {
     margin-right: 150px;
 }
 
+.risk-edit-dialog .wui-dialog-layout-risk {
+    background: white;
+    width: 960px;
+    max-width: calc(100vw - 32px);
+    padding: 0;
+    display: flex;                                        
+    flex-direction: column;
+}
+
+.risk-edit-dialog .wui-dialog-scrollable-content {
+    max-height: 65vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 20px 8px;
+}
+
+.risk-edit-dialog .risk-edit-dialog-footer{
+    padding: 12px 20px 16px;
+    background: white;
+}
+
+.risk-edit-dialog .wui-dialog-layout-risk .form-textbox,
+.risk-edit-dialog .wui-dialog-layout-risk .form-selectbox {
+    background-color: COLOR_GREY_VERYLIGHTEST;
+    border: 1px solid transparent;
+    border-bottom: 1px solid COLOR_GREY_LIGHT;
+    border-left: none;
+    border-radius: 0;
+    box-sizing: border-box;
+}
+
+.risk-edit-dialog .wui-dialog-layout-risk .incremental-list-vertical,
+.risk-edit-dialog .wui-dialog-layout-risk .incremental-list-layout,
+.risk-edit-dialog .wui-dialog-layout-risk .removable-textbox {
+    width: 100%;
+    max-width: none;
+}
+
+.risk-details-sections {
+    display: flex;
+    flex-direction: column;
+}
+
+.risk-details-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.risk-details-section .form-separator {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 3em -15px 0 -15px !important;
+}
+
+
 /**********************************************
 				COOKIES MESSAGE
 ************************************************/

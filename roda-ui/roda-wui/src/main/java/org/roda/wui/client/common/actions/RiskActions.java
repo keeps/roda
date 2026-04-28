@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
@@ -25,6 +26,7 @@ import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.CreateRisk;
 import org.roda.wui.client.planning.EditRisk;
+import org.roda.wui.client.planning.RiskDataPanel;
 import org.roda.wui.client.planning.RiskHistory;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.services.Services;
@@ -46,7 +48,9 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
     Arrays.asList(IndexedRiskAction.NEW, IndexedRiskAction.REFRESH));
 
   private static final Set<IndexedRiskAction> POSSIBLE_ACTIONS_ON_SINGLE_RISK = new HashSet<>(
-    Arrays.asList(IndexedRiskAction.REMOVE, IndexedRiskAction.START_PROCESS, IndexedRiskAction.EDIT));
+    Arrays.asList(IndexedRiskAction.REMOVE, IndexedRiskAction.START_PROCESS, IndexedRiskAction.EDIT,
+      RiskActions.IndexedRiskAction.EDIT_DETAILS, RiskActions.IndexedRiskAction.EDIT_PRE_MITIGATION,
+      RiskActions.IndexedRiskAction.EDIT_MITIGATION, RiskActions.IndexedRiskAction.EDIT_POST_MITIGATION));
   // also HISTORY, but that one also depends on having history
 
   private static final Set<IndexedRiskAction> POSSIBLE_ACTIONS_ON_MULTIPLE_RISKS = new HashSet<>(
@@ -61,7 +65,11 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   public enum IndexedRiskAction implements Action<IndexedRisk> {
     NEW(RodaConstants.PERMISSION_METHOD_CREATE_RISK), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_RISK),
     START_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_RISK),
-    REFRESH(), HISTORY(RodaConstants.PERMISSION_METHOD_RETRIEVE_RISK_VERSIONS);
+    EDIT_DETAILS(RodaConstants.PERMISSION_METHOD_UPDATE_RISK),
+    EDIT_PRE_MITIGATION(RodaConstants.PERMISSION_METHOD_UPDATE_RISK),
+    EDIT_MITIGATION(RodaConstants.PERMISSION_METHOD_UPDATE_RISK),
+    EDIT_POST_MITIGATION(RodaConstants.PERMISSION_METHOD_UPDATE_RISK), REFRESH(),
+    HISTORY(RodaConstants.PERMISSION_METHOD_RETRIEVE_RISK_VERSIONS);
 
     private List<String> methods;
 
@@ -152,6 +160,14 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
       startProcess(objectToSelectedItems(object, IndexedRisk.class), callback);
     } else if (IndexedRiskAction.EDIT.equals(action)) {
       edit(object, callback);
+    } else if (IndexedRiskAction.EDIT_DETAILS.equals(action)) {
+      editSection(object, RiskDataPanel.RiskSectionMode.DETAILS, callback);
+    } else if (IndexedRiskAction.EDIT_PRE_MITIGATION.equals(action)) {
+      editSection(object, RiskDataPanel.RiskSectionMode.PRE_MITIGATION, callback);
+    } else if (IndexedRiskAction.EDIT_MITIGATION.equals(action)) {
+      editSection(object, RiskDataPanel.RiskSectionMode.MITIGATION, callback);
+    } else if (IndexedRiskAction.EDIT_POST_MITIGATION.equals(action)) {
+      editSection(object, RiskDataPanel.RiskSectionMode.POST_MITIGATION, callback);
     } else if (IndexedRiskAction.HISTORY.equals(action)) {
       history(object, callback);
     } else {
@@ -243,8 +259,36 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   }
 
   private void edit(IndexedRisk object, AsyncCallback<ActionImpact> callback) {
-    callback.onSuccess(ActionImpact.NONE);
-    HistoryUtils.newHistory(EditRisk.RESOLVER, object.getId());
+    openEditRiskDialog(object, RiskDataPanel.RiskSectionMode.getDefault(), callback);
+  }
+
+  private void editSection(IndexedRisk object, RiskDataPanel.RiskSectionMode riskSectionMode,
+    AsyncCallback<ActionImpact> callback) {
+    openEditRiskDialog(object, riskSectionMode, callback);
+  }
+
+  private void openEditRiskDialog(IndexedRisk object, RiskDataPanel.RiskSectionMode mode,
+    AsyncCallback<ActionImpact> callback) {
+    EditRisk riskDialog = new EditRisk(object, mode, new AsyncCallback<Risk>() {
+      @Override
+      public void onSuccess(Risk updatedRisk) {
+        Services services = new Services("Edit indexed risk", "update");
+        services.riskResource(s -> s.updateRisk(updatedRisk)).whenComplete((value, error) -> {
+          if (error != null) {
+            callback.onFailure(error);
+          } else {
+            callback.onSuccess(ActionImpact.UPDATED);
+          }
+        });
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        callback.onSuccess(ActionImpact.NONE);
+      }
+    });
+
+    riskDialog.showAndCenter();
   }
 
   @Override
@@ -260,12 +304,21 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
     managementGroup.addButton(messages.removeButton(), IndexedRiskAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
     managementGroup.addButton(messages.refreshButton(), IndexedRiskAction.REFRESH, ActionImpact.UPDATED, "btn-refresh");
 
+    // EDIT SECTIONS
+    ActionableGroup<IndexedRisk> editGroup = new ActionableGroup<>(messages.editButton(), "btn-edit");
+    editGroup.addButton(messages.riskDetails(), IndexedRiskAction.EDIT_DETAILS, ActionImpact.UPDATED, "btn-edit");
+    editGroup.addButton(messages.riskPreMitigation(), IndexedRiskAction.EDIT_PRE_MITIGATION, ActionImpact.UPDATED,
+      "btn-edit");
+    editGroup.addButton(messages.riskMitigation(), IndexedRiskAction.EDIT_MITIGATION, ActionImpact.UPDATED, "btn-edit");
+    editGroup.addButton(messages.riskPostMitigation(), IndexedRiskAction.EDIT_POST_MITIGATION, ActionImpact.UPDATED,
+      "btn-edit");
+
     // PRESERVATION
     ActionableGroup<IndexedRisk> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
     preservationGroup.addButton(messages.newProcessPreservation(), IndexedRiskAction.START_PROCESS,
       ActionImpact.UPDATED, "btn-play");
 
-    formatActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
+    formatActionableBundle.addGroup(managementGroup).addGroup(editGroup).addGroup(preservationGroup);
     return formatActionableBundle;
   }
 }

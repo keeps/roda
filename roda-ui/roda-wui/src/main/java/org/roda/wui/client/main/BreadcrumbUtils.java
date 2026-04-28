@@ -19,12 +19,15 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.browse.BrowseTop;
+import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.ShowLogEntry;
+import org.roda.wui.client.management.ShowNotification;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.disposal.DisposalDestroyedRecords;
@@ -365,6 +368,21 @@ public class BreadcrumbUtils {
     return ret;
   }
 
+  public static List<BreadcrumbItem> getRiskBreadCrumbs(IndexedRisk risk) {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.riskRegisterTitle()),
+      messages.riskRegisterTitle(), RiskRegister.RESOLVER.getHistoryPath()));
+
+    if (risk != null) {
+      List<String> path = new ArrayList<>(ShowRisk.RESOLVER.getHistoryPath());
+      String label = StringUtils.isNotBlank(risk.getName()) ? risk.getName() : risk.getId();
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
+    }
+
+    return ret;
+  }
+
   public static List<BreadcrumbItem> getLogEntryBreadcrumbs(LogEntry logEntry) {
     List<BreadcrumbItem> ret = new ArrayList<>();
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.activityLogTitle()),
@@ -406,21 +424,6 @@ public class BreadcrumbUtils {
       List<String> path = new ArrayList<>(ShowRepresentationInformation.RESOLVER.getHistoryPath());
       path.add(ri.getUUID());
       String label = ri.getName() != null ? ri.getName() : ri.getId();
-      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
-    }
-
-    return ret;
-  }
-
-  public static List<BreadcrumbItem> getRiskBreadCrumbs(IndexedRisk risk) {
-    List<BreadcrumbItem> ret = new ArrayList<>();
-
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.riskRegisterTitle()),
-      messages.riskRegisterTitle(), RiskRegister.RESOLVER.getHistoryPath()));
-
-    if (risk != null) {
-      List<String> path = new ArrayList<>(ShowRisk.RESOLVER.getHistoryPath());
-      String label = StringUtils.isNotBlank(risk.getName()) ? risk.getName() : risk.getId();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
 

@@ -8,140 +8,133 @@
 
 package org.roda.wui.client.planning;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.InlineHTML;
+import java.util.List;
+
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.wui.client.common.ActionsToolbar;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.RiskActions;
+import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.ingest.transfer.DetailsPanelTransferredResource;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.*;
 
 import config.i18n.client.ClientMessages;
-
-import java.util.List;
 
 /**
  * @author Luis Faria
  *
  */
-public class DetailsPanelRisk extends Composite implements HasValueChangeHandlers<Risk> {
+public class DetailsPanelRisk extends Composite {
 
+  private final AsyncCallback<Actionable.ActionImpact> actionCallback;
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   @UiField
+  ActionsToolbar riskActionsPanel;
+
+  @UiField
   FlowPanel detailsPanel;
 
+  @UiField
+  FlowPanel preMitigationPanel;
+
+  @UiField
+  FlowPanel mitigationPanel;
+
+  @UiField
+  FlowPanel postMitigationPanel;
 
   public DetailsPanelRisk() {
-    initWidget(uiBinder.createAndBindUi(this));
+    this(new IndexedRisk(), null);
   }
 
-  public DetailsPanelRisk(String listId) {
+  public DetailsPanelRisk(IndexedRisk risk, AsyncCallback<Actionable.ActionImpact> callback) {
     initWidget(uiBinder.createAndBindUi(this));
-  }
-
-  public DetailsPanelRisk(Risk risk, String listId) {
-    initWidget(uiBinder.createAndBindUi(this));
+    this.actionCallback = callback;
+    initEditActions(risk);
     init(risk);
   }
 
   public void init(Risk risk) {
-    // riskId.setText(risk.getId());
-    addIfNotBlank(messages.riskIdentifier(), risk.getId());
-    addIfNotBlank(messages.riskName(), risk.getName());
-    addIfNotBlank(messages.riskDescription(), risk.getDescription());
-    addIfNotBlank(messages.riskIdentifiedOn(), Humanize.formatDate(risk.getIdentifiedOn()));
-    addIfNotBlank(messages.riskIdentifiedBy(), risk.getIdentifiedBy());
-    addIfNotBlank(messages.riskNotes(), risk.getNotes());
+    addIfNotBlank(detailsPanel, messages.riskIdentifier(), risk.getId());
+    addIfNotBlank(detailsPanel, messages.riskName(), risk.getName());
+    addIfNotBlank(detailsPanel, messages.riskDescription(), risk.getDescription());
+    addIfNotBlank(detailsPanel, messages.riskIdentifiedOn(), Humanize.formatDate(risk.getIdentifiedOn()));
+    addIfNotBlank(detailsPanel, messages.riskIdentifiedBy(), risk.getIdentifiedBy());
+    addIfNotBlankMultiline(detailsPanel, messages.riskNotes(), risk.getNotes());
 
-    addCategoriesField(risk.getCategories());
+    addCategoriesField(detailsPanel, risk.getCategories());
 
     addMitigationTermsFields(risk);
+    addIfNotBlankMultiline(preMitigationPanel, messages.riskPreMitigationNotes(), risk.getPreMitigationNotes());
 
-    // Pre-mitigation notes (termos vêm async abaixo)
-    addIfNotBlank(messages.riskPreMitigationNotes(), risk.getPreMitigationNotes());
+    addIfNotBlankMultiline(mitigationPanel, messages.riskMitigationStrategy(), risk.getMitigationStrategy());
+    addIfNotBlank(mitigationPanel, messages.riskMitigationOwner(), risk.getMitigationOwner());
 
-    // Post-mitigation notes
-    addIfNotBlank(messages.riskPostMitigationNotes(), risk.getPostMitigationNotes());
-
-    // Mitigation metadata
-    addIfNotBlank(messages.riskMitigationStrategy(), risk.getMitigationStrategy());
-    addIfNotBlank(messages.riskMitigationOwner(), risk.getMitigationOwner());
+    addIfNotBlankMultiline(postMitigationPanel, messages.riskPostMitigationNotes(), risk.getPostMitigationNotes());
 
   }
 
-  // public void clear() {
-  // riskId.setText("");
-  // riskName.setText("");
-  // riskDescriptionKey.setVisible(false);
-  // riskDescriptionValue.setText("");
-  // riskIdentifiedOn.setText("");
-  // riskIdentifiedBy.setText("");
-  // riskCategories.clear();
-  // riskNotesKey.setVisible(false);
-  // riskNotesValue.setText("");
-  //
-  // riskPreMitigationProbability.setText("");
-  // riskPreMitigationImpact.setText("");
-  // riskPreMitigationSeverity.setText("");
-  // riskPreMitigationNotesKey.setVisible(false);
-  // riskPreMitigationNotesValue.setText("");
-  //
-  // riskPosMitigationKey.setVisible(false);
-  // riskPosMitigationProbabilityKey.setVisible(false);
-  // riskPosMitigationProbability.setText("");
-  // riskPosMitigationImpactKey.setVisible(false);
-  // riskPosMitigationImpact.setText("");
-  // riskPosMitigationSeverityKey.setVisible(false);
-  // riskPosMitigationSeverity.setText("");
-  // riskPosMitigationNotesKey.setVisible(false);
-  // riskPosMitigationNotesValue.setText("");
-  //
-  // riskMitigationKey.setVisible(false);
-  // riskMitigationStrategyKey.setVisible(false);
-  // riskMitigationStrategyValue.setText("");
-  // riskMitigationOwnerTypeKey.setVisible(false);
-  // riskMitigationOwnerTypeValue.setText("");
-  // riskMitigationOwnerKey.setVisible(false);
-  // riskMitigationOwnerValue.setText("");
-  // riskMitigationRelatedEventIdentifierTypeKey.setVisible(false);
-  // riskMitigationRelatedEventIdentifierTypeValue.setText("");
-  // riskMitigationRelatedEventIdentifierValueKey.setVisible(false);
-  // riskMitigationRelatedEventIdentifierValueValue.setText("");
-  // }
+  public void initEditActions(IndexedRisk risk) {
+    RiskActions riskActions = risk.hasVersions() ? RiskActions.getWithHistory() : RiskActions.get();
+
+    ActionableWidgetBuilder<IndexedRisk> builder = new ActionableWidgetBuilder<>(riskActions);
+
+    if (actionCallback != null) {
+      builder.withActionCallback(actionCallback);
+    }
+
+    FlowPanel editActionMenu = builder
+      .buildGroupedListWithObjects(new ActionableObject<>(risk),
+        List.of(RiskActions.IndexedRiskAction.EDIT_DETAILS, RiskActions.IndexedRiskAction.EDIT_PRE_MITIGATION,
+          RiskActions.IndexedRiskAction.EDIT_MITIGATION, RiskActions.IndexedRiskAction.EDIT_POST_MITIGATION),
+        List.of());
+
+    riskActionsPanel.setActionableMenu(editActionMenu, true);
+    riskActionsPanel.setTagsVisible(false);
+    riskActionsPanel.setLabelVisible(false);
+  }
 
   public void clear() {
     detailsPanel.clear();
   }
 
-  private void addIfNotBlank(String label, String value) {
+  private void addIfNotBlank(FlowPanel panel, String label, String value) {
     if (StringUtils.isNotBlank(value)) {
-      detailsPanel.add(buildField(label, new InlineHTML(SafeHtmlUtils.htmlEscape(value))));
+      panel.add(buildField(label, new InlineHTML(SafeHtmlUtils.htmlEscape(value))));
     }
   }
 
-  private void addCategoriesField(List<String> categories) {
+  private void addIfNotBlankMultiline(FlowPanel panel, String label, String value) {
+    if (StringUtils.isNotBlank(value)) {
+      InlineHTML html = new InlineHTML(SafeHtmlUtils.htmlEscape(value));
+      html.addStyleName("text-area-whitespace-wrap");
+      panel.add(buildField(label, html));
+    }
+  }
+
+  private void addField(FlowPanel target, String label, Widget valueWidget) {
+    target.add(buildField(label, valueWidget));
+  }
+
+  private void addCategoriesField(FlowPanel panel, List<String> categories) {
     if (categories == null || categories.isEmpty()) {
       return;
     }
 
     FlowPanel categoriesPanel = new FlowPanel();
-    categoriesPanel.addStyleName("risk-categories");
     for (String category : categories) {
       if (StringUtils.isBlank(category)) {
         continue;
@@ -152,7 +145,7 @@ public class DetailsPanelRisk extends Composite implements HasValueChangeHandler
     }
 
     if (categoriesPanel.getWidgetCount() > 0) {
-      detailsPanel.add(buildField(messages.riskCategories(), categoriesPanel));
+      addField(panel, messages.riskCategories(), categoriesPanel);
     }
   }
 
@@ -172,11 +165,6 @@ public class DetailsPanelRisk extends Composite implements HasValueChangeHandler
     return field;
   }
 
-  @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Risk> handler) {
-    return addHandler(handler, ValueChangeEvent.getType());
-  }
-
   private void addMitigationTermsFields(Risk risk) {
     final int preSeverity = risk.getPreMitigationSeverity();
     final int posSeverity = risk.getPostMitigationSeverity();
@@ -190,23 +178,21 @@ public class DetailsPanelRisk extends Composite implements HasValueChangeHandler
       int severityLowLimit = terms.getSeverityLowLimit();
       int severityHighLimit = terms.getSeverityHighLimit();
 
-      addIfNotBlank(messages.riskPreMitigationProbability(),
+      addIfNotBlank(preMitigationPanel, messages.riskPreMitigationProbability(),
         messages.riskMitigationProbability(terms.getPreMitigationProbability().replace(' ', '_')));
-      addIfNotBlank(messages.riskPreMitigationImpact(),
+      addIfNotBlank(preMitigationPanel, messages.riskPreMitigationImpact(),
         messages.riskMitigationImpact(terms.getPreMitigationImpact().replace(' ', '_')));
 
-      InlineHTML preSeverityHtml = new InlineHTML(
-        HtmlSnippetUtils.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
-      detailsPanel.add(buildField(messages.riskPreMitigationSeverity(), preSeverityHtml));
+      addField(preMitigationPanel, messages.riskPreMitigationSeverity(),
+        new InlineHTML(HtmlSnippetUtils.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit)));
 
-      addIfNotBlank(messages.riskPostMitigationProbability(),
+      addIfNotBlank(postMitigationPanel, messages.riskPostMitigationProbability(),
         messages.riskMitigationProbability(terms.getPosMitigationProbability().replace(' ', '_')));
-      addIfNotBlank(messages.riskPostMitigationImpact(),
+      addIfNotBlank(postMitigationPanel, messages.riskPostMitigationImpact(),
         messages.riskMitigationImpact(terms.getPosMitigationImpact().replace(' ', '_')));
 
-      InlineHTML posSeverityHtml = new InlineHTML(
-        HtmlSnippetUtils.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
-      detailsPanel.add(buildField(messages.riskPostMitigationSeverity(), posSeverityHtml));
+      addField(postMitigationPanel, messages.riskPostMitigationSeverity(),
+        new InlineHTML(HtmlSnippetUtils.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit)));
     });
   }
 

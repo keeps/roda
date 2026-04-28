@@ -11,20 +11,18 @@ import java.util.List;
 
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.model.BrowseRepresentationResponse;
-import org.roda.wui.client.planning.DetailsPanelRepresentationInformation;
-import org.roda.wui.client.management.DetailsPanelNotification;
-import org.roda.wui.client.management.DetailsPanelLogEntry;
 import org.roda.wui.client.ingest.transfer.DetailsPanelTransferredResource;
+import org.roda.wui.client.management.DetailsPanelLogEntry;
+import org.roda.wui.client.management.DetailsPanelNotification;
 import org.roda.wui.client.planning.DetailsPanelAIP;
 import org.roda.wui.client.planning.DetailsPanelFile;
 import org.roda.wui.client.planning.DetailsPanelRepresentation;
+import org.roda.wui.client.planning.DetailsPanelRepresentationInformation;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -34,7 +32,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.client.planning.DetailsPanelRisk;
 
 /**
  * @author Carlos Afonso <cafonso@keep.pt>
@@ -67,7 +64,7 @@ public class DetailsTab extends Composite {
     content.add(detailsPanel);
   }
 
-  public DetailsTab(RepresentationInformation ri){
+  public DetailsTab(RepresentationInformation ri) {
     initWidget(uiBinder.createAndBindUi(this));
 
     DetailsPanelRepresentationInformation detailsPanel = new DetailsPanelRepresentationInformation(ri);
@@ -78,13 +75,6 @@ public class DetailsTab extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     DetailsPanelTransferredResource detailsPanel = new DetailsPanelTransferredResource(resource);
-    content.add(detailsPanel);
-  }
-
-  public DetailsTab(IndexedRisk risk) {
-    initWidget(uiBinder.createAndBindUi(this));
-
-    DetailsPanelRisk detailsPanel = new DetailsPanelRisk(risk, "RiskShowPanel_riskIncidences");
     content.add(detailsPanel);
   }
 
