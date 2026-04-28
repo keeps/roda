@@ -8897,6 +8897,26 @@ span.code {
     margin: 3em -15px 0 -15px !important;
 }
 
+.details-panel-sections {
+    display: flex;
+    flex-direction: column;
+}
+
+.details-panel-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.details-panel-section-header .form-separator {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 3em -15px 0 -15px !important;
+}
+
+.details-panel-rich-content {
+    margin-top: 0.5rem;
+}
+
 /******************************
   Disposal Tabs
  ******************************/

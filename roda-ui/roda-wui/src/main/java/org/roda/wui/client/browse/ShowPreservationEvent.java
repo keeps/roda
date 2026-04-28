@@ -10,63 +10,37 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.LinkingObjectUtils;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationEventsLinkingObjects;
-import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.wui.client.browse.tabs.BrowsePreservationEventTabs;
+import org.roda.wui.client.common.BrowsePreservationEventActionsToolbar;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.PreservationEventActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.SidebarUtils;
-import org.roda.wui.client.ingest.transfer.IngestTransfer;
-import org.roda.wui.client.planning.ShowPreservationAgent;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.RestErrorOverlayType;
-import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.tools.*;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.*;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -107,545 +81,39 @@ public class ShowPreservationEvent extends Composite {
   };
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private final ActionableWidgetBuilder<IndexedPreservationEvent> actionableWidgetBuilder;
-  private final PreservationEventActions preservationEventActions;
   private final String eventId;
-  @UiField
-  Label eventIdValue;
-  @UiField
-  Label eventDatetimeLabel;
-  @UiField
-  Label eventTypeLabel;
-  @UiField
-  Label eventDetailLabel;
-  @UiField
-  Label agentsHeader;
-  @UiField
-  FlowPanel agentsPanel;
-  @UiField
-  Label sourceObjectsHeader;
-  @UiField
-  FlowPanel sourceObjectsPanel;
-  @UiField
-  Label outcomeObjectsHeader;
-  @UiField
-  FlowPanel outcomeObjectsPanel;
-  @UiField
-  Label eventOutcomeLabel;
-  @UiField
-  Label outcomeDetailHeader;
-  @UiField
-  HTML eventOutcomeDetails;
-  @UiField
-  SimplePanel actionsSidebar;
-  @UiField
-  FlowPanel sidebarFlowPanel;
-  @UiField
-  FlowPanel contentFlowPanel;
   private IndexedPreservationEvent preservationEvent;
   private List<IndexedPreservationAgent> agents;
   private PreservationEventsLinkingObjects linkingObjects;
+  private SafeHtml eventOutcomeDetailsHtml;
+
+  @UiField
+  NavigationToolbar<IndexedPreservationEvent> navigationToolbar;
+
+  @UiField
+  FocusPanel focusPanel;
+
+  @UiField
+  BrowsePreservationEventActionsToolbar actionsToolbar;
+
+  @UiField
+  TitlePanel title;
+
+  @UiField
+  BrowsePreservationEventTabs tabs;
 
   public ShowPreservationEvent(final String eventId) {
     this.eventId = eventId;
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    preservationEventActions = PreservationEventActions.get();
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(preservationEventActions).withBackButton();
-
-    Services services = new Services("Retrieve preservation event", "get");
-
-    services
-      .rodaEntityRestService(s -> s.findByUuid(eventId, LocaleInfo.getCurrentLocale().getLocaleName()),
-        IndexedPreservationEvent.class)
-      .thenCompose(event -> services.preservationEventsResource(s -> s.getPreservationAgents(event.getId()))
-        .thenCompose(indexedPreservationAgents -> services
-          .preservationEventsResource(s -> s.getLinkingIdentifierObjects(event.getId()))
-          .whenComplete((linkingObjectsResult, throwable) -> {
-            if (throwable != null) {
-              if (throwable instanceof NotFoundException) {
-                Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
-                HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(throwable);
-              }
-            } else {
-              this.preservationEvent = event;
-              this.agents = indexedPreservationAgents;
-              this.linkingObjects = linkingObjectsResult;
-              viewAction();
-            }
-          })));
+    focusPanel.setFocus(true);
+    focusPanel.addStyleName("browse browse-file browse_main_panel");
+    navigationToolbar.withoutButtons().build();
+    loadPreservationEvent();
   }
 
   public static final List<String> getViewItemHistoryToken(String id) {
     return ListUtils.concat(RESOLVER.getHistoryPath(), id);
-  }
-
-  public void viewAction() {
-    eventIdValue.setText(preservationEvent.getId());
-    eventTypeLabel.setText(preservationEvent.getEventType());
-    eventDetailLabel.setText(preservationEvent.getEventDetail());
-    eventDatetimeLabel.setText(Humanize.formatDateTime(preservationEvent.getEventDateTime()));
-
-    // AGENTS
-    boolean hasAgents = false;
-
-    for (IndexedPreservationAgent agent : agents) {
-      FlowPanel layout = createAgentPanel(agent);
-      agentsPanel.add(layout);
-      hasAgents = true;
-    }
-
-    agentsHeader.setVisible(hasAgents);
-
-    // Source objects
-    boolean showSourceObjects = false;
-    for (LinkingIdentifier sourceObjectId : linkingObjects.getSourceObjectIds()) {
-      if (sourceObjectId.getRoles() != null
-        && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)
-        && (RodaConstants.URN_TYPE.equalsIgnoreCase(sourceObjectId.getType())
-          || RodaConstants.URI_TYPE.equalsIgnoreCase(sourceObjectId.getType()))) {
-        addObjectPanel(sourceObjectId, linkingObjects, sourceObjectsPanel);
-        showSourceObjects = true;
-      }
-    }
-    sourceObjectsHeader.setVisible(showSourceObjects);
-    sourceObjectsPanel.setVisible(showSourceObjects);
-
-    // Outcome objects
-    boolean showOutcomeObjects = false;
-    for (LinkingIdentifier outcomeObjectId : linkingObjects.getOutcomeObjectIds()) {
-      if (outcomeObjectId.getRoles() != null
-        && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)
-        && (RodaConstants.URN_TYPE.equalsIgnoreCase(outcomeObjectId.getType())
-          || RodaConstants.URI_TYPE.equalsIgnoreCase(outcomeObjectId.getType()))) {
-        addObjectPanel(outcomeObjectId, linkingObjects, outcomeObjectsPanel);
-        showOutcomeObjects = true;
-      }
-    }
-
-    outcomeObjectsHeader.setVisible(showOutcomeObjects);
-    outcomeObjectsPanel.setVisible(showOutcomeObjects);
-
-    // OUTCOME DETAIL
-    PluginState eventOutcome = PluginState.valueOf(preservationEvent.getEventOutcome());
-    eventOutcomeLabel.setText(messages.pluginStateMessage(eventOutcome));
-    if (PluginState.SUCCESS.equals(eventOutcome)) {
-      eventOutcomeLabel.setStyleName("label-success");
-    } else if (PluginState.FAILURE.equals(eventOutcome)) {
-      eventOutcomeLabel.setStyleName("label-danger");
-    } else if (PluginState.PARTIAL_SUCCESS.equals(eventOutcome) || PluginState.SKIPPED.equals(eventOutcome)) {
-      eventOutcomeLabel.setStyleName("label-warning");
-    }
-
-    getEventDetailsHTML(new AsyncCallback<SafeHtml>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
-          Toast.showError(messages.errorLoadingPreservationEventDetails(caught.getMessage()));
-        }
-      }
-
-      @Override
-      public void onSuccess(SafeHtml result) {
-        eventOutcomeDetails.setHTML(result);
-        outcomeDetailHeader.setVisible(!result.asString().isEmpty());
-      }
-    });
-
-    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, preservationEventActions.hasAnyRoles());
-    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(preservationEvent)));
-  }
-
-  private void addObjectPanel(LinkingIdentifier object, PreservationEventsLinkingObjects linkingObjects,
-    FlowPanel objectsPanel) {
-    FlowPanel layout = new FlowPanel();
-    layout.addStyleName("panel");
-    String idValue = object.getValue();
-
-    if (RodaConstants.URN_TYPE.equalsIgnoreCase(object.getType())) {
-      RODA_TYPE type = LinkingObjectUtils.getLinkingIdentifierType(idValue);
-
-      if (type == RODA_TYPE.TRANSFERRED_RESOURCE) {
-        addTransferredResourcePanel(linkingObjects, layout, idValue);
-      } else if (type == RODA_TYPE.FILE) {
-        addFilePanel(linkingObjects, layout, idValue);
-      } else if (type == RODA_TYPE.REPRESENTATION) {
-        addRepresentationPanel(linkingObjects, layout, idValue);
-      } else if (type == RODA_TYPE.AIP) {
-        addAipPanel(linkingObjects, layout, idValue);
-      }
-    } else if (RodaConstants.URI_TYPE.equalsIgnoreCase(object.getType())) {
-      addUriPanel(layout, idValue);
-    }
-
-    objectsPanel.add(layout);
-  }
-
-  private void addUriPanel(FlowPanel layout, String idValue) {
-    FlowPanel heading = new FlowPanel();
-    heading.addStyleName("panel-heading");
-    layout.add(heading);
-    FlowPanel body = new FlowPanel();
-    body.addStyleName("panel-body");
-    layout.add(body);
-
-    Label header = new Label(messages.uriLinkingIdentifierTitle());
-    header.addStyleName("panel-title");
-    header.addStyleName("h5");
-    heading.add(header);
-
-    Label titleLabel = new Label(messages.genericTitle());
-    titleLabel.addStyleName("label");
-    Anchor link = new Anchor(idValue, UriUtils.fromString(idValue).asString());
-    link.getElement().setAttribute("target", "_blank");
-
-    body.add(titleLabel);
-    body.add(link);
-  }
-
-  private FlowPanel createAgentPanel(IndexedPreservationAgent agent) {
-    FlowPanel layout = new FlowPanel();
-    layout.addStyleName("panel");
-
-    FlowPanel heading = new FlowPanel();
-    heading.addStyleName("panel-heading");
-    layout.add(heading);
-    FlowPanel body = new FlowPanel();
-    body.addStyleName("panel-body");
-    layout.add(body);
-
-    if (StringUtils.isNotBlank(agent.getName())) {
-      Label nameValue = new Label(agent.getName());
-      nameValue.addStyleName("panel-title");
-      heading.add(nameValue);
-    } else {
-      Label idValue = new Label(agent.getId());
-      idValue.addStyleName("panel-title");
-      heading.add(idValue);
-    }
-
-    if (StringUtils.isNotBlank(agent.getId())) {
-      Label idLabel = new Label(messages.preservationEventAgentIdentifier());
-      idLabel.addStyleName("label");
-      Label idValue = new Label(agent.getId());
-      idValue.addStyleName("value");
-      body.add(idLabel);
-      body.add(idValue);
-    }
-
-    if (!agent.getRoles().isEmpty()) {
-      Label rolesLabel = new Label(messages.preservationEventAgentRoles());
-      rolesLabel.addStyleName("label");
-      // TODO humanize list
-      Label rolesValue = new Label(StringUtils.join(agent.getRoles(), ", "));
-      rolesValue.addStyleName("value");
-      body.add(rolesLabel);
-      body.add(rolesValue);
-    }
-
-    if (StringUtils.isNotBlank(agent.getType())) {
-      Label typeLabel = new Label(messages.preservationEventAgentType());
-      typeLabel.addStyleName("label");
-      Label typeValue = new Label(agent.getType());
-      typeValue.addStyleName("value");
-      body.add(typeLabel);
-      body.add(typeValue);
-    }
-
-    if (StringUtils.isNotBlank(agent.getVersion())) {
-      Label versionLabel = new Label(messages.preservationEventAgentVersion());
-      versionLabel.addStyleName("label");
-      Label versionValue = new Label(agent.getVersion());
-      versionValue.addStyleName("value");
-      body.add(versionLabel);
-      body.add(versionValue);
-    }
-
-    if (StringUtils.isNotBlank(agent.getNote())) {
-      Label noteLabel = new Label(messages.preservationEventAgentNote());
-      noteLabel.addStyleName("label");
-      Label noteValue = new Label(agent.getNote());
-      noteValue.addStyleName("value");
-      body.add(noteLabel);
-      body.add(noteValue);
-    }
-
-    if (StringUtils.isNotBlank(agent.getExtension())) {
-      Label extensionLabel = new Label(messages.preservationEventAgentExtension());
-      extensionLabel.addStyleName("label");
-      Label extensionValue = new Label(agent.getExtension());
-      extensionValue.addStyleName("value");
-      body.add(extensionLabel);
-      body.add(extensionValue);
-    }
-
-    FlowPanel footer = new FlowPanel();
-    footer.addStyleName("panel-footer");
-    layout.add(footer);
-
-    Anchor link = new Anchor(messages.inspectPreservationAgent(),
-      HistoryUtils.createHistoryHashLink(ShowPreservationAgent.RESOLVER, agent.getId()));
-
-    link.addStyleName("btn");
-    footer.add(link);
-    return layout;
-  }
-
-  private void addAipPanel(PreservationEventsLinkingObjects bundle, FlowPanel layout, String idValue) {
-    FlowPanel heading = new FlowPanel();
-    heading.addStyleName("panel-heading");
-    layout.add(heading);
-    FlowPanel body = new FlowPanel();
-    body.addStyleName("panel-body");
-    layout.add(body);
-
-    Label header = new Label(messages.intellectualEntity());
-    header.addStyleName("panel-title");
-    header.addStyleName("h5");
-    heading.add(header);
-
-    IndexedAIP iAIP = bundle.getAips().get(idValue);
-
-    if (iAIP != null) {
-      Label titleLabel = new Label(messages.genericTitle());
-      titleLabel.addStyleName("label");
-      Label titleValue = new Label(iAIP.getTitle());
-      titleValue.addStyleName("value");
-
-      body.add(titleLabel);
-      body.add(titleValue);
-
-      FlowPanel footer = new FlowPanel();
-      footer.addStyleName("panel-footer");
-      layout.add(footer);
-
-      Anchor link = new Anchor(messages.inspectIntellectualEntity(),
-        HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(iAIP.getId())));
-      footer.add(link);
-
-      link.addStyleName("btn");
-
-    } else {
-      Label idLabel = new Label(messages.identifierNotFound());
-      idLabel.addStyleName("label");
-      String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
-      Label identValue = new Label(path);
-      identValue.addStyleName("value");
-
-      body.add(idLabel);
-      body.add(identValue);
-    }
-  }
-
-  private void addRepresentationPanel(PreservationEventsLinkingObjects bundle, FlowPanel layout, String idValue) {
-    FlowPanel heading = new FlowPanel();
-    heading.addStyleName("panel-heading");
-    layout.add(heading);
-    FlowPanel body = new FlowPanel();
-    body.addStyleName("panel-body");
-    layout.add(body);
-
-    Label header = new Label(messages.showRepresentationExtended());
-    header.addStyleName("panel-title");
-    header.addStyleName("h5");
-    heading.add(header);
-
-    IndexedRepresentation irep = bundle.getRepresentations().get(idValue);
-
-    if (irep != null) {
-      Label originalLabel = new Label(messages.representationStatus());
-      originalLabel.addStyleName("label");
-
-      List<String> translatedStates = new ArrayList<>();
-      for (String state : irep.getRepresentationStates()) {
-        translatedStates.add(messages.statusLabel(state));
-      }
-
-      Label originalValue = new Label(StringUtils.prettyPrint(translatedStates));
-      originalValue.addStyleName("value");
-
-      body.add(originalLabel);
-      body.add(originalValue);
-
-      Anchor link = new Anchor(messages.inspectRepresentation(),
-        HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(irep.getAipId(), irep.getId())));
-
-      link.addStyleName("btn");
-
-      FlowPanel footer = new FlowPanel();
-      footer.addStyleName("panel-footer");
-      layout.add(footer);
-
-      footer.add(link);
-    } else {
-      Label idLabel = new Label(messages.identifierNotFound());
-      idLabel.addStyleName("label");
-      Label identValue = new Label(idValue);
-      identValue.addStyleName("value");
-
-      body.add(idLabel);
-      body.add(identValue);
-    }
-  }
-
-  private void addFilePanel(PreservationEventsLinkingObjects bundle, FlowPanel layout, String idValue) {
-    FlowPanel heading = new FlowPanel();
-    heading.addStyleName("panel-heading");
-    layout.add(heading);
-    FlowPanel body = new FlowPanel();
-    body.addStyleName("panel-body");
-    layout.add(body);
-
-    Label header = new Label(messages.showFileExtended());
-    header.addStyleName("panel-title");
-    header.addStyleName("h5");
-    heading.add(header);
-
-    IndexedFile ifile = bundle.getFiles().get(idValue);
-
-    if (ifile != null) {
-      Label nameLabel = new Label(messages.fileName());
-      nameLabel.addStyleName("label");
-      Label nameValue = new Label(
-        StringUtils.isNotBlank(ifile.getOriginalName()) ? ifile.getOriginalName() : ifile.getId());
-      nameValue.addStyleName("value");
-
-      Label pathLabel = null;
-      Label pathValue = null;
-      List<String> filePath = ifile.getPath();
-      if (filePath != null && !filePath.isEmpty()) {
-        pathLabel = new Label(messages.filePath());
-        pathLabel.addStyleName("label");
-        pathValue = new Label(StringUtils.join(filePath, "/"));
-        pathValue.addStyleName("value");
-      }
-
-      Label formatLabel = new Label(messages.fileFormat());
-      formatLabel.addStyleName("label");
-      FileFormat fileFormat = ifile.getFileFormat();
-
-      String version = fileFormat.getFormatDesignationVersion() != null ? fileFormat.getFormatDesignationVersion() : "";
-      String name = fileFormat.getFormatDesignationName() != null ? fileFormat.getFormatDesignationName() : "Unknown";
-      Label formatValue = new Label(name + " " + version);
-      formatValue.addStyleName("value");
-
-      Label mimetypeLabel = new Label(messages.fileMimetype());
-      mimetypeLabel.addStyleName("label");
-      String fileMimetype = fileFormat.getMimeType();
-
-      String mimetype = fileMimetype != null ? fileMimetype : "";
-      Label mimetypeValue = new Label(mimetype);
-      mimetypeValue.addStyleName("value");
-
-      Label pronomLabel = new Label(messages.filePronom());
-      pronomLabel.addStyleName("label");
-      String filePronom = fileFormat.getPronom();
-
-      String pronom = filePronom != null ? filePronom : "";
-      Label pronomValue = new Label(pronom);
-      pronomValue.addStyleName("value");
-
-      Label sizeLabel = new Label(messages.fileSize());
-      sizeLabel.addStyleName("label");
-      Label sizeValue = new Label(Humanize.readableFileSize(ifile.getSize()));
-      sizeValue.addStyleName("value");
-
-      body.add(nameLabel);
-      body.add(nameValue);
-      if (pathValue != null) {
-        body.add(pathLabel);
-        body.add(pathValue);
-      }
-      body.add(formatLabel);
-      body.add(formatValue);
-      if (StringUtils.isNotBlank(fileMimetype)) {
-        body.add(mimetypeLabel);
-        body.add(mimetypeValue);
-      }
-      if (StringUtils.isNotBlank(filePronom)) {
-        body.add(pronomLabel);
-        body.add(pronomValue);
-      }
-      body.add(sizeLabel);
-      body.add(sizeValue);
-
-      FlowPanel footer = new FlowPanel();
-      footer.addStyleName("panel-footer");
-      layout.add(footer);
-
-      Anchor link = new Anchor(messages.inspectFile(), HistoryUtils.createHistoryHashLink(
-        HistoryUtils.getHistoryBrowse(ifile.getAipId(), ifile.getRepresentationId(), filePath, ifile.getId())));
-
-      link.addStyleName("btn");
-      footer.add(link);
-
-    } else {
-      Label idLabel = new Label(messages.identifierNotFound());
-      idLabel.addStyleName("label");
-      String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
-      Label identValue = new Label(path);
-      identValue.addStyleName("value");
-
-      body.add(idLabel);
-      body.add(identValue);
-    }
-  }
-
-  private void addTransferredResourcePanel(PreservationEventsLinkingObjects bundle, FlowPanel layout, String idValue) {
-    FlowPanel heading = new FlowPanel();
-    heading.addStyleName("panel-heading");
-    layout.add(heading);
-    FlowPanel body = new FlowPanel();
-    body.addStyleName("panel-body");
-    layout.add(body);
-
-    Label header = new Label(messages.showTransferredResourceExtended());
-    header.addStyleName("panel-title");
-    header.addStyleName("h5");
-    heading.add(header);
-
-    TransferredResource tr = bundle.getTransferredResources().get(idValue);
-
-    if (tr != null) {
-      Label nameLabel = new Label(messages.transferredResourceName());
-      nameLabel.addStyleName("label");
-      Label nameValue = new Label(tr.getName());
-      nameValue.addStyleName("value");
-
-      Label pathLabel = new Label(messages.transferredResourcePath());
-      pathLabel.addStyleName("label");
-      Label pathValue = new Label(tr.getFullPath());
-      pathValue.addStyleName("value");
-
-      body.add(nameLabel);
-      body.add(nameValue);
-      body.add(pathLabel);
-      body.add(pathValue);
-
-      FlowPanel footer = new FlowPanel();
-      footer.addStyleName("panel-footer");
-      layout.add(footer);
-
-      Anchor link = new Anchor(messages.inspectTransferredResource(),
-        HistoryUtils.createHistoryHashLink(IngestTransfer.RESOLVER, tr.getUUID()));
-      link.addStyleName("btn");
-
-      footer.add(link);
-
-    } else {
-      Label idLabel = new Label(messages.identifierNotFound());
-      idLabel.addStyleName("label");
-      String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
-      Label identValue = new Label(path);
-      identValue.addStyleName("value");
-
-      body.add(idLabel);
-      body.add(identValue);
-    }
   }
 
   private void getEventDetailsHTML(final AsyncCallback<SafeHtml> callback) {
@@ -699,6 +167,65 @@ public class ShowPreservationEvent extends Composite {
       });
     } catch (RequestException e) {
       callback.onFailure(e);
+    }
+  }
+
+  private void loadPreservationEvent() {
+    Services services = new Services("Retrieve preservation event", "get");
+
+    services.rodaEntityRestService(s -> s.findByUuid(eventId, LocaleInfo.getCurrentLocale().getLocaleName()),
+      IndexedPreservationEvent.class).thenCompose(event -> {
+        this.preservationEvent = event;
+        return services.preservationEventsResource(s -> s.getPreservationAgents(event.getId()));
+      }).thenCompose(indexedPreservationAgents -> {
+        this.agents = indexedPreservationAgents;
+        return services.preservationEventsResource(s -> s.getLinkingIdentifierObjects(preservationEvent.getId()));
+      }).whenComplete((linkingObjectsResult, throwable) -> {
+        if (throwable != null) {
+          handleLoadFailure(throwable);
+        } else {
+          this.linkingObjects = linkingObjectsResult;
+          loadEventDetailsHtml();
+        }
+      });
+  }
+
+  private void loadEventDetailsHtml() {
+    getEventDetailsHTML(new AsyncCallback<SafeHtml>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
+          Toast.showError(messages.errorLoadingPreservationEventDetails(caught.getMessage()));
+        }
+      }
+
+      @Override
+      public void onSuccess(SafeHtml result) {
+        eventOutcomeDetailsHtml = result;
+        initView();
+      }
+    });
+  }
+
+  private void initView() {
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getPreservationEventBreadCrumbs(preservationEvent));
+    title.setText(StringUtils.isNotBlank(preservationEvent.getEventType()) ? preservationEvent.getEventType()
+      : preservationEvent.getId());
+
+    tabs.init(preservationEvent, agents, linkingObjects, eventOutcomeDetailsHtml);
+
+    if (actionsToolbar != null) {
+      actionsToolbar.setLabel(messages.preservationEventTitle());
+      actionsToolbar.setObjectAndBuild(preservationEvent, null, null);
+    }
+  }
+
+  private void handleLoadFailure(Throwable throwable) {
+    if (throwable instanceof NotFoundException) {
+      Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
+      HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
+    } else {
+      AsyncCallbackUtils.defaultFailureTreatment(throwable);
     }
   }
 

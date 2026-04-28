@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+
+    <g:FlowPanel addStyleNames="details-panel-sections">
+
+        <g:FlowPanel addStyleNames="details-panel-section">
+            <g:FlowPanel ui:field="detailsPanel" addStyleNames="descriptiveMetadata"/>
+        </g:FlowPanel>
+
+        <g:FlowPanel ui:field="outcomeDetailsSection"
+                     addStyleNames="details-panel-section"
+                     visible="false">
+            <g:FlowPanel addStyleNames="details-panel-section-header">
+                <g:HTML styleName="form-separator">
+                    <ui:text from="{messages.preservationEventOutcomeDetailHeader}"/>
+                </g:HTML>
+            </g:FlowPanel>
+
+            <g:FlowPanel ui:field="outcomeDetailsPanel"
+                         addStyleNames="details-panel-rich-content"/>
+        </g:FlowPanel>
+
+    </g:FlowPanel>
+</ui:UiBinder>

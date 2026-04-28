@@ -19,12 +19,17 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.browse.BrowseTop;
+import org.roda.wui.client.browse.ShowPreservationEvent;
+import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.ShowLogEntry;
+import org.roda.wui.client.management.ShowNotification;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.disposal.DisposalDestroyedRecords;
@@ -367,8 +372,8 @@ public class BreadcrumbUtils {
 
   public static List<BreadcrumbItem> getLogEntryBreadcrumbs(LogEntry logEntry) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.activityLogTitle()),
-            messages.activityLogTitle(), UserLog.RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.activityLogTitle()), messages.activityLogTitle(),
+      UserLog.RESOLVER.getHistoryPath()));
 
     if (logEntry != null) {
       List<String> path = new ArrayList<>(ShowLogEntry.RESOLVER.getHistoryPath());
@@ -395,12 +400,10 @@ public class BreadcrumbUtils {
     return ret;
   }
 
-  public static List<BreadcrumbItem> getRepresentationInformationBreadCrumbs(RepresentationInformation ri){
+  public static List<BreadcrumbItem> getRepresentationInformationBreadCrumbs(RepresentationInformation ri) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(
-            SafeHtmlUtils.fromSafeConstant(messages.representationInformationTitle()),
-            messages.representationInformationTitle(),
-            RepresentationInformationNetwork.RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.representationInformationTitle()),
+      messages.representationInformationTitle(), RepresentationInformationNetwork.RESOLVER.getHistoryPath()));
 
     if (ri != null) {
       List<String> path = new ArrayList<>(ShowRepresentationInformation.RESOLVER.getHistoryPath());
@@ -421,6 +424,21 @@ public class BreadcrumbUtils {
     if (risk != null) {
       List<String> path = new ArrayList<>(ShowRisk.RESOLVER.getHistoryPath());
       String label = StringUtils.isNotBlank(risk.getName()) ? risk.getName() : risk.getId();
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
+    }
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getPreservationEventBreadCrumbs(IndexedPreservationEvent preservationEvent) {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.preservationEventsTitle()),
+      messages.preservationEventsTitle(), PreservationEvents.BROWSE_RESOLVER.getHistoryPath()));
+
+    if (preservationEvent != null) {
+      List<String> path = new ArrayList<>(ShowPreservationEvent.RESOLVER.getHistoryPath());
+      String label = StringUtils.isNotBlank(preservationEvent.getId()) ? preservationEvent.getId() : preservationEvent.getUUID();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
 
@@ -513,8 +531,8 @@ public class BreadcrumbUtils {
 
   public static List<BreadcrumbItem> getRODAMemberBreadcrumbs(RODAMember user) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.usersAndGroupsTitle()), messages.usersAndGroupsTitle(),
-      MemberManagement.RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.usersAndGroupsTitle()),
+      messages.usersAndGroupsTitle(), MemberManagement.RESOLVER.getHistoryPath()));
 
     if (user != null) {
       List<String> path = new ArrayList<>(ShowMember.RESOLVER.getHistoryPath());
