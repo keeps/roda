@@ -2,51 +2,57 @@ package org.roda.wui.client.browse;
 
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
-public class DetailsPanelPreservationEvent extends Composite {
+public class DetailsPanelPreservationEvent extends GenericMetadataCardPanel<IndexedPreservationEvent> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  @UiField
-  FlowPanel detailsPanel;
+  private final String outcomeDetails;
 
   public DetailsPanelPreservationEvent(IndexedPreservationEvent event, String outcomeDetails) {
-    initWidget(uiBinder.createAndBindUi(this));
-    init(event, outcomeDetails);
+    this.outcomeDetails = outcomeDetails;
+    setData(event);
   }
 
-  private void init(IndexedPreservationEvent event, String outcomeDetails) {
+  @Override
+  protected FlowPanel createHeaderWidget(IndexedPreservationEvent preservationEvent) {
+    return null;
+  }
+
+  @Override
+  protected void buildFields(IndexedPreservationEvent event) {
     if (event == null) {
       return;
     }
-    addIfNotBlank(detailsPanel, messages.preservationEventId(), event.getId());
-    addIfNotBlank(detailsPanel, messages.preservationEventType(), event.getEventType());
+
+    buildField(messages.preservationEventId()).withValue(event.getId()).build();
+    buildField(messages.preservationEventType()).withValue(event.getEventType()).build();
 
     if (event.getEventDateTime() != null) {
-      detailsPanel.add(buildField(messages.preservationEventDatetime(),
-        new InlineHTML(SafeHtmlUtils.htmlEscape(Humanize.formatDateTime(event.getEventDateTime())))));
+      buildField(messages.preservationEventDatetime()).withValue(Humanize.formatDateTime(event.getEventDateTime()))
+        .build();
     }
 
     Widget outcomeWidget = buildOutcomeWidget(event.getEventOutcome());
     if (outcomeWidget != null) {
-      detailsPanel.add(buildField(messages.preservationEventOutcome(), outcomeWidget));
+      buildField(messages.preservationEventOutcome()).withWidget(outcomeWidget).build();
     }
 
     if (StringUtils.isNotBlank(outcomeDetails)) {
       InlineHTML outcomeDetailValue = new InlineHTML(SafeHtmlUtils.htmlEscape(outcomeDetails));
       outcomeDetailValue.addStyleName("code-pre");
-      detailsPanel.add(buildField(messages.preservationEventOutcomeDetailHeader(), outcomeDetailValue));
+      buildField(messages.preservationEventOutcomeDetailHeader()).withWidget(outcomeDetailValue).build();
     }
   }
 
@@ -78,29 +84,4 @@ public class DetailsPanelPreservationEvent extends Composite {
     }
   }
 
-  private void addIfNotBlank(FlowPanel panel, String label, String value) {
-    if (StringUtils.isNotBlank(value)) {
-      panel.add(buildField(label, new InlineHTML(SafeHtmlUtils.htmlEscape(value))));
-    }
-  }
-
-  private FlowPanel buildField(String labelText, Widget valueWidget) {
-    FlowPanel field = new FlowPanel();
-    field.setStyleName("field");
-
-    Label label = new Label(labelText);
-    label.setStyleName("label");
-
-    FlowPanel value = new FlowPanel();
-    value.setStyleName("value");
-    value.add(valueWidget);
-
-    field.add(label);
-    field.add(value);
-    return field;
-  }
-
-  interface MyUiBinder extends UiBinder<Widget, DetailsPanelPreservationEvent> {
-    Widget createAndBindUi(DetailsPanelPreservationEvent preservationEventPanel);
-  }
 }

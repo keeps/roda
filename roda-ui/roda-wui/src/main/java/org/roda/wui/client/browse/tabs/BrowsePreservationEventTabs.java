@@ -9,16 +9,26 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.*;
+import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.PreservationEventsLinkingObjects;
+import org.roda.wui.client.browse.DetailsPanelPreservationEvent;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
-import org.roda.wui.client.planning.ShowPreservationAgent;
+import org.roda.wui.client.planning.agents.ShowPreservationAgent;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.UriUtils;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class BrowsePreservationEventTabs extends Tabs {
 
@@ -39,7 +49,7 @@ public class BrowsePreservationEventTabs extends Tabs {
       ;
       @Override
       public Widget buildTabWidget() {
-        return new DetailsTab(event, outcomeDetails);
+        return new DetailsPanelPreservationEvent(event, outcomeDetails);
       }
     });
 
