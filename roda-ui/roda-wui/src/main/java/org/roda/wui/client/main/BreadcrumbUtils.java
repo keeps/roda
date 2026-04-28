@@ -434,7 +434,7 @@ public class BreadcrumbUtils {
     List<BreadcrumbItem> ret = new ArrayList<>();
 
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.preservationEventsTitle()),
-      messages.preservationEventsTitle(), PreservationEvents.BROWSE_RESOLVER.getHistoryPath()));
+      messages.preservationEventsTitle(), PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
 
     if (preservationEvent != null) {
       List<String> path = new ArrayList<>(ShowPreservationEvent.RESOLVER.getHistoryPath());
