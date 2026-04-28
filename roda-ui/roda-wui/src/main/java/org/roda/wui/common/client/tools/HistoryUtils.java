@@ -22,12 +22,7 @@ import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.IndexedJob;
@@ -38,11 +33,7 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.browse.BrowseDIP;
-import org.roda.wui.client.browse.BrowseFile;
-import org.roda.wui.client.browse.BrowseRepresentation;
-import org.roda.wui.client.browse.BrowseTop;
-import org.roda.wui.client.browse.ShowPreservationEvent;
+import org.roda.wui.client.browse.*;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
@@ -424,23 +415,7 @@ public class HistoryUtils {
       HistoryUtils.newHistory(ShowPreservationAgent.RESOLVER, agent.getId());
     } else if (object instanceof IndexedPreservationEvent) {
       IndexedPreservationEvent preservationEvent = (IndexedPreservationEvent) object;
-
-      String eventId = preservationEvent.getId();
-      String aipUUID = preservationEvent.getAipID();
-      String representationUUID = preservationEvent.getRepresentationUUID();
-      String fileUUID = preservationEvent.getFileUUID();
-
-      if (StringUtils.isNotBlank(fileUUID)) {
-        path = HistoryUtils.getHistory(ShowPreservationEvent.RESOLVER.getHistoryPath(), aipUUID, representationUUID,
-          fileUUID, eventId);
-      } else if (StringUtils.isNotBlank(representationUUID)) {
-        path = HistoryUtils.getHistory(ShowPreservationEvent.RESOLVER.getHistoryPath(), aipUUID, representationUUID,
-          eventId);
-      } else if (StringUtils.isNotBlank(aipUUID)) {
-        path = HistoryUtils.getHistory(ShowPreservationEvent.RESOLVER.getHistoryPath(), aipUUID, eventId);
-      } else {
-        path = HistoryUtils.getHistory(ShowPreservationEvent.RESOLVER.getHistoryPath(), eventId);
-      }
+      path = HistoryUtils.getHistory(ShowPreservationEvent.RESOLVER.getHistoryPath(), preservationEvent.getId());
     } else if (object instanceof LogEntry) {
       LogEntry logEntry = (LogEntry) object;
       HistoryUtils.newHistory(ShowLogEntry.RESOLVER, logEntry.getUUID());

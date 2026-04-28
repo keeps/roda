@@ -314,13 +314,8 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b);
   }
 
-  public static SafeUri createPreservationEventDetailsUri(String eventId) {
-    // api/v2/preservation/events/{id}/details/html?lang={lang}
-    String b = RodaConstants.API_REST_V2_PRESERVATION_EVENTS + URL.encodeQueryString(eventId)
-      + RodaConstants.API_REST_V2_PRESERVATION_EVENTS_DETAILS_HTML + RodaConstants.API_QUERY_START
-      + RodaConstants.API_QUERY_KEY_LANG + RodaConstants.API_QUERY_ASSIGN_SYMBOL
-      + LocaleInfo.getCurrentLocale().getLocaleName();
-
+  public static SafeUri createPreservationEventDetailsJsonUri(String eventId) {
+    String b = RodaConstants.API_REST_V2_PRESERVATION_EVENTS + URL.encodeQueryString(eventId) + "/details";
     return UriUtils.fromSafeConstant(b);
   }
 

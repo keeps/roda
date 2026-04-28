@@ -9,13 +9,16 @@ package org.roda.wui.client.browse.tabs;
 
 import java.util.List;
 
+import com.google.gwt.safehtml.shared.SafeHtml;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.wui.client.browse.DetailsPanelPreservationEvent;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.planning.DetailsPanelRepresentationInformation;
@@ -97,6 +100,12 @@ public class DetailsTab extends Composite {
   public DetailsTab(LogEntry logEntry) {
     initWidget(uiBinder.createAndBindUi(this));
     DetailsPanelLogEntry detailsPanel = new DetailsPanelLogEntry(logEntry);
+    content.add(detailsPanel);
+  }
+
+  public DetailsTab(IndexedPreservationEvent event, String outcomeDetails){
+    initWidget(uiBinder.createAndBindUi(this));
+    DetailsPanelPreservationEvent detailsPanel = new DetailsPanelPreservationEvent(event, outcomeDetails);
     content.add(detailsPanel);
   }
 

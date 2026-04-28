@@ -57,7 +57,7 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<IndexedPreservationEvent> options) {
-    options.withFieldsToReturn(fieldsToReturn);
+    options.withFieldsToReturn(fieldsToReturn).bindOpener();
   }
 
   @Override
