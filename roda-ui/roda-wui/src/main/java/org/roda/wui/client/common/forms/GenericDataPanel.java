@@ -1,4 +1,4 @@
-package org.roda.wui.client;
+package org.roda.wui.client.common.forms;
 
 /**
  *

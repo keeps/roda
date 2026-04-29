@@ -17,10 +17,10 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.wui.common.client.ClientLogger;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
-import org.roda.wui.common.client.ClientLogger;
 
 public class ListSelectionStateMappers {
 

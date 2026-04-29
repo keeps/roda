@@ -7,10 +7,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -23,6 +22,7 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.FormUtilities;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import java.util.List;
@@ -65,7 +65,8 @@ public class RODAMemberDetailsPanel extends Composite {
     actionsToolbar.setTagsVisible(false);
     actionsToolbar.setActionableMenu(new ActionableWidgetBuilder<RODAMember>(RODAMemberToolbarActions.get())
       .withActionCallback(localCallback).buildGroupedListWithObjects(new ActionableObject<>(member),
-        List.of(RODAMemberAction.EDIT), List.of(RODAMemberAction.EDIT)),
+        List.of(RODAMemberAction.EDIT, RODAMemberAction.CHANGE_PASSWORD),
+        List.of(RODAMemberAction.EDIT, RODAMemberAction.CHANGE_PASSWORD)),
       true);
 
     init(member);
@@ -75,7 +76,7 @@ public class RODAMemberDetailsPanel extends Composite {
     Services services = new Services("Get updated member details", "get");
 
     if (member.isUser()) {
-      services.membersResource(s -> s.getUser(member.getUUID())).whenComplete((updatedUser, err) -> {
+      services.membersResource(s -> s.getUser(member.getId())).whenComplete((updatedUser, err) -> {
         if (err != null) {
           Toast.showError("Unable to fetch updated user details");
         } else if (updatedUser != null) {
@@ -85,7 +86,7 @@ public class RODAMemberDetailsPanel extends Composite {
         }
       });
     } else {
-      services.membersResource(s -> s.getUser(member.getUUID())).whenComplete((updatedGroup, err) -> {
+      services.membersResource(s -> s.getUser(member.getId())).whenComplete((updatedGroup, err) -> {
         if (err != null) {
           Toast.showError("Unable to fetch updated group details");
         } else if (updatedGroup != null) {
@@ -112,23 +113,30 @@ public class RODAMemberDetailsPanel extends Composite {
     FormUtilities.addIfNotBlank(detailsPanel, messages.fullname(), user.getFullName());
     FormUtilities.addIfNotBlank(detailsPanel, messages.email(), user.getEmail());
 
-    FlowPanel topPanel = new FlowPanel();
-    FlowPanel status = new FlowPanel();
-    Label statusLabel = new Label();
-    statusLabel.addStyleName("label");
-    statusLabel.setText(messages.showUserStatusLabel());
-    status.add(statusLabel);
-    HTML statusValue = new HTML();
-    statusValue.addStyleName("value");
-    statusValue.setHTML(HtmlSnippetUtils.getUserStateHtml(user));
-    status.add(statusValue);
-    status.addStyleName("field");
-    topPanel.addStyleName("descriptiveMetadata");
-    topPanel.add(status);
-    detailsPanel.add(topPanel);
+    FormUtilities.addIfNotBlank(detailsPanel, messages.showUserStatusLabel(), HtmlSnippetUtils.getUserStateHtml(user));
 
     if (!user.getExtra().isEmpty()) {
-      HtmlSnippetUtils.createExtraShow(detailsPanel, user.getExtra(), false);
+      String pendingSeparatorLabel = null;
+
+      for (MetadataValue extra : user.getExtra()) {
+        if ("separator".equals(extra.getOptions().get("type"))) {
+          // Store the separator label but do not render it yet
+          pendingSeparatorLabel = HtmlSnippetUtils.getMetadataValueLabel(extra);
+        } else {
+          String value = extra.get("value");
+          // Check if this field actually has a value
+          if (StringUtils.isNotBlank(value)) {
+
+            // If we have a pending separator, render it NOW before the field
+            if (pendingSeparatorLabel != null) {
+              FormUtilities.addSeparator(detailsPanel, pendingSeparatorLabel);
+              pendingSeparatorLabel = null; // Clear it so it doesn't render again
+            }
+
+            FormUtilities.addIfNotBlank(detailsPanel, HtmlSnippetUtils.getMetadataValueLabel(extra), value);
+          }
+        }
+      }
     }
   }
 

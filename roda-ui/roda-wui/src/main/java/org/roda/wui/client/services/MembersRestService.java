@@ -53,11 +53,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "../api/v2/members")
 public interface MembersRestService extends RODAEntityRestService<RODAMember> {
 
+  @RequestMapping(path = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get user", description = "Gets a particular user", responses = {
+          @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
+          @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  RODAMember getMember(@Parameter(description = "The member identifier") @PathVariable(name = "id") String name);
+
   @RequestMapping(path = "/users/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get user", description = "Gets a particular user", responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  RODAMember getUser(@Parameter(description = "The user identifier") @PathVariable(name = "id") String name);
+  User getUser(@Parameter(description = "The user identifier") @PathVariable(name = "id") String name);
 
   @RequestMapping(path = "/users/authenticated", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get authenticated user", description = "Gets the authenticated user", responses = {
@@ -129,7 +135,7 @@ public interface MembersRestService extends RODAEntityRestService<RODAMember> {
   @Operation(summary = "Update group", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Group.class))), description = "Updates a group", responses = {
     @ApiResponse(responseCode = "200", description = "OK"),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  Void updateGroup(
+  Group updateGroup(
     @Parameter(name = "group", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) Group modifiedGroup);
 
   @RequestMapping(path = "/users/{id}/addGroup", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)

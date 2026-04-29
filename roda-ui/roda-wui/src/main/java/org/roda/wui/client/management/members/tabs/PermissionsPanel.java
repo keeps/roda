@@ -87,7 +87,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
     // 1. Fetch the absolute latest member data (to get freshly edited roles)
     Services userServices = new Services("Get updated member", "get");
-    userServices.membersResource(s -> s.getUser(member.getUUID())).whenComplete(this::handleMemberRefresh);
+    userServices.membersResource(s -> s.getUser(member.getId())).whenComplete(this::handleMemberRefresh);
   }
 
   private void handleMemberRefresh(RODAMember updatedMember, Throwable error) {

@@ -13,12 +13,11 @@ import java.util.Optional;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.wui.client.GenericDataPanel;
+import org.roda.wui.client.common.forms.GenericDataPanel;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.labels.Tag;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import org.roda.wui.client.disposal.rule.DisposalRuleDataPanel;
 
 /**
  *

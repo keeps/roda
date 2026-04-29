@@ -79,7 +79,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.NamingException;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -274,7 +273,7 @@ public class MembersController implements MembersRestService, Exportable {
   }
 
   @Override
-  public RODAMember getUser(String name) {
+  public RODAMember getMember(String name) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
@@ -289,6 +288,26 @@ public class MembersController implements MembersRestService, Exportable {
         return membersService.retrieveGroup(name.substring("group-".length()));
       }
 
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USERNAME_PARAM, name);
+    }
+  }
+
+  @Override
+  public User getUser(String name) {
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(requestContext.getUser());
+
+      return membersService.retrieveUser(name);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
@@ -617,7 +636,7 @@ public class MembersController implements MembersRestService, Exportable {
   }
 
   @Override
-  public Void updateGroup(@RequestBody Group modifiedGroup) {
+  public Group updateGroup(@RequestBody Group modifiedGroup) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -626,7 +645,7 @@ public class MembersController implements MembersRestService, Exportable {
       // check user permissions
       controllerAssistant.checkRoles(requestContext.getUser());
       // delegate
-      membersService.updateGroup(modifiedGroup);
+      return membersService.updateGroup(modifiedGroup);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw new RESTException(e);
@@ -634,7 +653,6 @@ public class MembersController implements MembersRestService, Exportable {
       // register action
       controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_GROUP_PARAM, modifiedGroup);
     }
-    return null;
   }
 
   @Override
@@ -721,7 +739,7 @@ public class MembersController implements MembersRestService, Exportable {
     } finally {
       // register action
       controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_GROUP_PARAM, id,
-              RodaConstants.CONTROLLER_USER_PARAM, userId);
+        RodaConstants.CONTROLLER_USER_PARAM, userId);
     }
   }
 
@@ -786,7 +804,7 @@ public class MembersController implements MembersRestService, Exportable {
     } finally {
       // register action
       controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USER_PARAM,
-        requestContext.getUser());
+        requestContext.getUser().getFullName());
     }
   }
 
@@ -808,7 +826,7 @@ public class MembersController implements MembersRestService, Exportable {
     } finally {
       // register action
       controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_USER_PARAM,
-        userOperations.getUser());
+        userOperations.getUser().getFullName());
     }
   }
 
@@ -997,7 +1015,7 @@ public class MembersController implements MembersRestService, Exportable {
   }
 
   @Override
-  public List<String> suggest(SuggestRequest suggestRequest) {
+  public List<String> suggest(@RequestBody SuggestRequest suggestRequest) {
     return indexService.suggest(suggestRequest, RODAMember.class);
   }
 

@@ -32,8 +32,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.client.GenericDataPanel;
-import org.roda.wui.client.disposal.schedule.DisposalScheduleDataPanel;
+import org.roda.wui.client.common.forms.GenericDataPanel;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>

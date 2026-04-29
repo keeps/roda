@@ -145,7 +145,7 @@ public class Register extends Composite {
   }
 
   void setExtra(Set<MetadataValue> b) {
-    this.userDataPanel.setUserExtra(b);
+    //this.userDataPanel.setUserExtra(b);
   }
 
   @UiHandler("buttonApply")

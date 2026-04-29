@@ -46,6 +46,10 @@ import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
+import org.roda.wui.client.management.members.CreateGroup;
+import org.roda.wui.client.management.members.CreateUser;
+import org.roda.wui.client.management.members.EditGroup;
+import org.roda.wui.client.management.members.EditUser;
 import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.planning.ShowRisk;
 import org.roda.wui.client.management.members.MemberManagement;
@@ -525,6 +529,51 @@ public class BreadcrumbUtils {
     return breadcrumbLabel;
   }
 
+  public static List<BreadcrumbItem> getRODAMembersBreadcrumbs() {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.usersAndGroupsTitle()),
+      messages.usersAndGroupsTitle(), MemberManagement.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getCreateUserBreadcrumbs() {
+    List<BreadcrumbItem> ret = getRODAMembersBreadcrumbs();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.createUserTitle()), messages.createUserTitle(),
+      CreateUser.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getCreateGroupBreadcrumbs() {
+    List<BreadcrumbItem> ret = getRODAMembersBreadcrumbs();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.createGroupTitle()), messages.createGroupTitle(),
+      CreateGroup.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getEditMemberBreadcrumbs(RODAMember member) {
+    List<BreadcrumbItem> ret = getRODAMemberBreadcrumbs(member);
+
+    if (member.isUser()) {
+      List<String> path = new ArrayList<>(EditUser.RESOLVER.getHistoryPath());
+      path.add(member.getId());
+
+      ret.add(
+        new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.editUserTitle()), messages.editUserTitle(), path));
+    } else {
+      List<String> path = new ArrayList<>(EditGroup.RESOLVER.getHistoryPath());
+      path.add(member.getId());
+
+      ret.add(
+        new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.editGroupTitle()), messages.editGroupTitle(), path));
+    }
+    return ret;
+  }
+
   public static List<BreadcrumbItem> getRODAMemberBreadcrumbs(RODAMember user) {
     List<BreadcrumbItem> ret = new ArrayList<>();
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.usersAndGroupsTitle()),
@@ -533,7 +582,7 @@ public class BreadcrumbUtils {
     if (user != null) {
       List<String> path = new ArrayList<>(ShowMember.RESOLVER.getHistoryPath());
       path.add(user.getUUID());
-      String label = user.getId();
+      String label = user.getFullName();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
 

@@ -15,7 +15,7 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
-import org.roda.wui.client.GenericDataPanel;
+import org.roda.wui.client.common.forms.GenericDataPanel;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;

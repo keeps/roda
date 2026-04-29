@@ -39,8 +39,8 @@ public class ShowMember extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String username = historyTokens.get(0);
-        Services services = new Services("Get User", "get");
-        services.membersResource(s -> s.getUser(username)).whenComplete((member, error) -> {
+        Services services = new Services("Get Member", "get");
+        services.membersResource(s -> s.getMember(username)).whenComplete((member, error) -> {
           if (member != null) {
             ShowMember showMember = new ShowMember(member);
             callback.onSuccess(showMember);
@@ -132,7 +132,7 @@ public class ShowMember extends Composite {
       () -> HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath()));
 
     // Change this to use the DOM Swap refresh method instead of HistoryUtils
-    handlers.put(Actionable.ActionImpact.UPDATED, () -> refreshToolbar(member.getUUID(), member.isUser()));
+    handlers.put(Actionable.ActionImpact.UPDATED, () -> refreshToolbar(member.getId(), member.isUser()));
   }
 
   private void refreshToolbar(String id, boolean isUser) {
