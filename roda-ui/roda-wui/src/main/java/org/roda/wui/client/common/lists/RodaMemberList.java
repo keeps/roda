@@ -107,8 +107,8 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     activeColumn.setSortable(true);
 
     addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"), false, false, 3);
-    addColumn(nameColumn, messages.userIdentifier(), true, false);
     addColumn(fullNameColumn, messages.userFullName(), true, false);
+    addColumn(nameColumn, messages.userIdentifier(), true, false);
     addColumn(groupsColumn, messages.userGroups(), true, false);
     addColumn(activeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-check-circle'></i>"), false, false, 3);
 

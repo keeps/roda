@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.management.members;
 
+import com.google.gwt.user.client.ui.Widget;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.shared.GWT;
@@ -45,6 +46,8 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
     changed = false;
 
     editLayout = new FlowPanel();
+
+    // Initialize Widgets
     editPassword = new PasswordTextBox();
     editPasswordRepeat = new PasswordTextBox();
     editPasswordLabel = new Label(messages.password());
@@ -53,10 +56,9 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
     editPasswordRepeatLabel.addStyleName("form-label");
     editPasswordNote = new Label(messages.passwordNote());
 
-    editLayout.add(editPasswordLabel);
-    editLayout.add(editPassword);
-    editLayout.add(editPasswordRepeatLabel);
-    editLayout.add(editPasswordRepeat);
+    // Build the layout using the generic form structure
+    editLayout.add(createFieldRow(editPasswordLabel, editPassword));
+    editLayout.add(createFieldRow(editPasswordRepeatLabel, editPasswordRepeat));
 
     editButton = new Button(messages.userDataChangePassword());
     editButton.addClickHandler(new ClickHandler() {
@@ -70,11 +72,11 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
     });
 
     if (editmode) {
-      FlowPanel editButtonPanel = new FlowPanel();
       Label passwordLabel = new Label(messages.password());
       passwordLabel.addStyleName("form-label");
-      editButtonPanel.add(passwordLabel);
-      editButtonPanel.add(editButton);
+
+      // Wrap the button in the same generic form structure
+      FlowPanel editButtonPanel = createFieldRow(passwordLabel, editButton);
       setWidget(editButtonPanel);
       buttonMode = true;
     } else {
@@ -97,19 +99,39 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
     editPassword.addStyleName("password-input");
     editPassword.addStyleName("form-textbox");
     editPassword.getElement().setTitle(messages.password());
-    // WCAGUtilities.getInstance().makeAccessible(editPassword.getParent().getElement());
 
     editPasswordRepeat.addStyleName("password-input");
     editPasswordRepeat.addStyleName("form-textbox");
     editPasswordRepeat.getElement().setTitle(messages.password());
-    // WCAGUtilities.getInstance().makeAccessible(editPasswordRepeat.getParent().getElement());
 
     editPasswordNote.addStyleName("password-note");
-    // WCAGUtilities.getInstance().makeAccessible(editPasswordNote.getParent().getElement());
 
     editButton.addStyleName("password-button");
     editButton.addStyleName("btn");
     editButton.addStyleName("btn-play");
+  }
+
+  /**
+   * Helper method to structure custom widgets exactly like the GenericDataForm
+   * text boxes.
+   */
+  private FlowPanel createFieldRow(Widget labelWidget, Widget inputWidget) {
+    FlowPanel searchField = new FlowPanel();
+    searchField.addStyleName("search-field");
+
+    FlowPanel leftPanel = new FlowPanel();
+    leftPanel.addStyleName("search-field-left-panel");
+
+    FlowPanel inputPanel = new FlowPanel();
+    inputPanel.addStyleName("search-field-input-panel full_width");
+
+    // Assemble the DOM
+    inputPanel.add(inputWidget);
+    leftPanel.add(labelWidget);
+    leftPanel.add(inputPanel);
+    searchField.add(leftPanel);
+
+    return searchField;
   }
 
   public boolean isChanged() {
@@ -181,5 +203,4 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
-
 }
