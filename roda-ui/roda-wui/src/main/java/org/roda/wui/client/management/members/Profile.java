@@ -122,7 +122,7 @@ public class Profile extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    userDataPanel.setUsernameReadOnly(true);
+    //userDataPanel.setUsernameReadOnly(true);
   }
 
   private SecureString getPassword() {

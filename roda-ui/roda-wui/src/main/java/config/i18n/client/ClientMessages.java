@@ -2773,4 +2773,16 @@ public interface ClientMessages extends Messages {
   String disposalRuleSuccessfullyCreated();
 
   String disposalRuleSuccessfullyUpdated();
+
+  String userSuccessfullyCreated();
+
+  String userSuccessfullyUpdated();
+
+  String groupSuccessfullyCreated();
+
+  String groupSuccessfullyUpdated();
+
+  String failedToUpdateGroup();
+
+  String failedToUpdateUser();
 }

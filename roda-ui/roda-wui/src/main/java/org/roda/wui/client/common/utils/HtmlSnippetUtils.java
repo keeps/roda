@@ -549,6 +549,10 @@ public class HtmlSnippetUtils {
     }
   }
 
+  public static String getMetadataValueLabel(MetadataValue metadataValue) {
+    return getFieldLabel(metadataValue);
+  }
+
   public static void createExtraShow(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle) {
     FlowPanel lastSeparator = null;
     boolean hasFields = false;

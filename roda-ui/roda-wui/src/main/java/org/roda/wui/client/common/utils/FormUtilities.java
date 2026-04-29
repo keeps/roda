@@ -41,6 +41,7 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 
 import config.i18n.client.ClientMessages;
@@ -62,7 +63,7 @@ public class FormUtilities {
   }
 
   public static void create(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle,
-    final Callable<Void> onChange) {
+                            final Callable<Void> onChange) {
     if (bundle != null) {
       for (MetadataValue mv : bundle) {
         boolean mandatory = mv.get("mandatory") != null && "true".equalsIgnoreCase(mv.get("mandatory"));
@@ -110,6 +111,34 @@ public class FormUtilities {
     }
   }
 
+  /**
+   * Helper method to construct the standardized DOM structure for every generated field.
+   */
+  private static void assembleFormRow(FlowPanel layout, Widget labelWidget, Widget inputWidget, Widget descriptionWidget, Widget errorWidget) {
+    layout.addStyleName("generic-form-field");
+
+    FlowPanel leftPanel = new FlowPanel();
+    leftPanel.addStyleName("generic-form-field-left-panel");
+
+    FlowPanel inputPanel = new FlowPanel();
+    inputPanel.addStyleName("generic-form-field-input-panel full_width");
+
+    // Assemble components
+    inputPanel.add(inputWidget);
+    leftPanel.add(labelWidget);
+    leftPanel.add(inputPanel);
+
+    if (descriptionWidget != null) {
+      leftPanel.add(descriptionWidget);
+    }
+
+    if (errorWidget != null) {
+      leftPanel.add(errorWidget);
+    }
+
+    layout.add(leftPanel);
+  }
+
   private static String getFieldLabel(MetadataValue mv) {
     String result = mv.getId();
     String rawLabel = mv.get("label");
@@ -146,13 +175,15 @@ public class FormUtilities {
   }
 
   private static void addTextField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-    final boolean mandatory, final Callable<Void> onChange) {
+                                   final boolean mandatory, final Callable<Void> onChange) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
     if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
+      mvLabel.setText(mvLabel.getText() + "*");
     }
+
     // Field
     final TextBox mvText = new TextBox();
     mvText.setTitle(mvLabel.getText());
@@ -174,35 +205,36 @@ public class FormUtilities {
       }
     });
 
-    layout.add(mvLabel);
-    layout.add(mvText);
-
     // Description
+    Label mvDescription = null;
     String description = mv.get("description");
     if (description != null && description.length() > 0) {
-      Label mvDescription = new Label(description);
+      mvDescription = new Label(description);
       mvDescription.addStyleName("form-help");
-      layout.add(mvDescription);
     }
 
+    // Error
+    Label errorLabel = null;
     if (mv.get("error") != null && !"".equals(mv.get("error").trim())) {
-      Label errorLabel = new Label(mv.get("error"));
+      errorLabel = new Label(mv.get("error"));
       errorLabel.addStyleName("form-label-error");
-      layout.add(errorLabel);
       mvText.addStyleName("isWrong");
     }
 
+    assembleFormRow(layout, mvLabel, mvText, mvDescription, errorLabel);
     panel.add(layout);
   }
 
   private static void addTextArea(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-    final boolean mandatory, final Callable<Void> onChange) {
+                                  final boolean mandatory, final Callable<Void> onChange) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
     if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
+      mvLabel.setText(mvLabel.getText() + "*");
     }
+
     // Field
     final TextArea mvText = new TextArea();
     mvText.setTitle(mvLabel.getText());
@@ -224,37 +256,37 @@ public class FormUtilities {
       }
     });
 
-    layout.add(mvLabel);
-    layout.add(mvText);
-
     // Description
+    Label mvDescription = null;
     String description = mv.get("description");
     if (description != null && description.length() > 0) {
-      Label mvDescription = new Label(description);
+      mvDescription = new Label(description);
       mvDescription.addStyleName("form-help");
-      layout.add(mvDescription);
     }
 
+    // Error
+    Label errorLabel = null;
     if (mv.get("error") != null && !"".equalsIgnoreCase(mv.get("error").trim())) {
-      Label errorLabel = new Label(mv.get("error"));
+      errorLabel = new Label(mv.get("error"));
       errorLabel.addStyleName("form-label-error");
-      layout.add(errorLabel);
       mvText.addStyleName("isWrong");
     }
 
+    assembleFormRow(layout, mvLabel, mvText, mvDescription, errorLabel);
     panel.add(layout);
   }
 
   private static void addRichTextArea(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-    final boolean mandatory, final Callable<Void> onChange) {
+                                      final boolean mandatory, final Callable<Void> onChange) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
     if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
+      mvLabel.setText(mvLabel.getText() + "*");
     }
 
-    // Field
+    // Field wrapped with toolbar
     final FlowPanel fieldLayout = new FlowPanel();
 
     final RichTextArea mvText = new RichTextArea();
@@ -282,34 +314,36 @@ public class FormUtilities {
     fieldLayout.add(toolbar);
     fieldLayout.add(mvText);
 
-    layout.add(mvLabel);
-    layout.add(fieldLayout);
-
     // Description
+    Label mvDescription = null;
     String description = mv.get("description");
     if (description != null && description.length() > 0) {
-      Label mvDescription = new Label(description);
+      mvDescription = new Label(description);
       mvDescription.addStyleName("form-help");
-      layout.add(mvDescription);
     }
 
+    // Error
+    Label errorLabel = null;
     if (mv.get("error") != null && !"".equalsIgnoreCase(mv.get("error").trim())) {
-      Label errorLabel = new Label(mv.get("error"));
+      errorLabel = new Label(mv.get("error"));
       errorLabel.addStyleName("form-label-error");
-      layout.add(errorLabel);
       mvText.addStyleName("isWrong");
     }
+
+    assembleFormRow(layout, mvLabel, fieldLayout, mvDescription, errorLabel);
     panel.add(layout);
   }
 
   private static void addList(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, final boolean mandatory,
-    final Callable<Void> onChange) {
+                              final Callable<Void> onChange) {
     // Top Label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
     if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
+      mvLabel.setText(mvLabel.getText() + "*");
     }
+
     // Field
     final ListBox mvList = new ListBox();
     mvList.setTitle(mvLabel.getText());
@@ -411,7 +445,7 @@ public class FormUtilities {
         }
 
         if (mandatory && (mvList.getSelectedValue() == null || "".equalsIgnoreCase(mvList.getSelectedValue().trim()))) {
-          mvList.removeStyleName("isWrong");
+          mvList.addStyleName("isWrong"); // Added isWrong logic here for empty list selection
         }
       }
     });
@@ -421,35 +455,37 @@ public class FormUtilities {
       mv.set("value", mvList.getSelectedValue());
     }
 
-    layout.add(mvLabel);
-    layout.add(mvList);
-
     // Description
+    Label mvDescription = null;
     String description = mv.get("description");
     if (description != null && description.length() > 0) {
-      Label mvDescription = new Label(description);
+      mvDescription = new Label(description);
       mvDescription.addStyleName("form-help");
-      layout.add(mvDescription);
     }
 
+    // Error
+    Label errorLabel = null;
     if (mv.get("error") != null && !"".equals(mv.get("error").trim())) {
-      Label errorLabel = new Label(mv.get("error"));
+      errorLabel = new Label(mv.get("error"));
       errorLabel.addStyleName("form-label-error");
-      layout.add(errorLabel);
       mvList.addStyleName("isWrong");
     }
+
+    assembleFormRow(layout, mvLabel, mvList, mvDescription, errorLabel);
     panel.add(layout);
   }
 
   private static void addDatePicker(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-    final boolean mandatory, final Callable<Void> onChange) {
+                                    final boolean mandatory, final Callable<Void> onChange) {
     // Top label
     final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
     if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
+      mvLabel.setText(mvLabel.getText() + "*");
     }
+
     // Field
     final DateBox mvDate = new DateBox();
     mvDate.setTitle(mvLabel.getText());
@@ -490,7 +526,6 @@ public class FormUtilities {
     });
 
     mvDate.getTextBox().addValueChangeHandler(new ValueChangeHandler<String>() {
-
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
         FormUtilities.callOnChange(onChange);
@@ -508,23 +543,23 @@ public class FormUtilities {
       }
     });
 
-    layout.add(mvLabel);
-    layout.add(mvDate);
-
     // Description
+    Label mvDescription = null;
     String description = mv.get("description");
     if (description != null && description.length() > 0) {
-      Label mvDescription = new Label(description);
+      mvDescription = new Label(description);
       mvDescription.addStyleName("form-help");
-      layout.add(mvDescription);
     }
 
+    // Error
+    Label errorLabel = null;
     if (mv.get("error") != null && !"".equals(mv.get("error").trim())) {
-      Label errorLabel = new Label(mv.get("error"));
+      errorLabel = new Label(mv.get("error"));
       errorLabel.addStyleName("form-label-error");
-      layout.add(errorLabel);
       mvDate.addStyleName("isWrong");
     }
+
+    assembleFormRow(layout, mvLabel, mvDate, mvDescription, errorLabel);
     panel.add(layout);
   }
 
@@ -615,10 +650,14 @@ public class FormUtilities {
     }
   }
 
+  public static void addSeparator(FlowPanel panel, String label) {
+    panel.add(buildSeparator(label));
+  }
+
   public static FlowPanel buildSeparator(String text) {
     FlowPanel separator = new FlowPanel();
     separator.addStyleName("form-separator");
-    Label separatorLabel = new Label(messages.groups());
+    Label separatorLabel = new Label(text);
     separatorLabel.addStyleName("separator-label");
     separator.add(separatorLabel);
 

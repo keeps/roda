@@ -271,9 +271,10 @@ public class MembersService {
     return newGroup;
   }
 
-  public void updateGroup(Group group) throws GenericException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().updateGroup(group, true);
+  public Group updateGroup(Group group) throws GenericException, NotFoundException, AuthorizationDeniedException {
+    Group updatedGroup = RodaCoreFactory.getModelService().updateGroup(group, true);
     RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+    return updatedGroup;
   }
 
   public void deleteGroup(String groupname) throws GenericException, AuthorizationDeniedException {

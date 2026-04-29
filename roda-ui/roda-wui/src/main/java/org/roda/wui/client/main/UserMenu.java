@@ -121,7 +121,7 @@ public class UserMenu extends Composite {
       registerItem.addStyleName("user_menu_item_register");
       menu.addItem(registerItem);
     } else {
-      MenuItem userItem = customMenuItem("fa fa-user", user.getName(), "navigationMenu-item-label", userMenu, null);
+      MenuItem userItem = customMenuItem("fa fa-user", user.getFullName(), "navigationMenu-item-label", userMenu, null);
       userItem.addStyleName("user_menu_item");
       menu.addItem(userItem);
     }

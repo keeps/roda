@@ -9,7 +9,7 @@
         </g:FlowPanel>
         <g:FlowPanel addStyleNames="cardBody">
             <g:FlowPanel addStyleNames="row full_width skip_padding">
-                <g:FlowPanel ui:field="detailsPanel"/>
+                <g:FlowPanel ui:field="detailsPanel" addStyleNames="descriptiveMetadata"/>
             </g:FlowPanel>
         </g:FlowPanel>
     </g:FlowPanel>
