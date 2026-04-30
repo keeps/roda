@@ -1980,6 +1980,8 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_SUGGEST_FIELD = "suggestField";
   public static final String SEARCH_FIELD_TYPE_SUGGEST_PARTIAL = "suggestPartial";
   public static final String SEARCH_FIELD_TYPE_CONTROLLED = "controlled";
+  public static final String SEARCH_FIELD_NESTED_TYPE = "nestedType";
+  public static final String SEARCH_FIELD_NESTED_PARENT_TYPE = "nestedParentType";
   public static final String SEARCH_WITH_PREFILTER_HANDLER = "$prefilter";
   public static final String SEARCH_WITH_SAVED_HANDLER = "$savedSearch";
 
