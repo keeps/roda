@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
@@ -28,6 +29,9 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.browse.BrowseTop;
+import org.roda.wui.client.disposal.DisposalConfirmations;
+import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
+import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.disposal.hold.CreateDisposalHold;
 import org.roda.wui.client.disposal.hold.EditDisposalHold;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
@@ -728,6 +732,35 @@ public class BreadcrumbUtils {
     }
 
     return title;
+  }
+
+  public static List<BreadcrumbItem> getDisposalConfirmationBreadcrumbs() {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.disposalConfirmationsTitle()),
+      messages.disposalConfirmationsTitle(), DisposalConfirmations.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getDisposalConfirmationBreadcrumbs(DisposalConfirmation confirmation) {
+    List<BreadcrumbItem> ret = getDisposalConfirmationBreadcrumbs();
+
+    List<String> path = new ArrayList<>(ShowDisposalConfirmation.RESOLVER.getHistoryPath());
+    path.add(confirmation.getId());
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(confirmation.getTitle()), confirmation.getTitle(), path));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getCreateDisposalConfirmationBreadcrumbs() {
+    List<BreadcrumbItem> ret = getDisposalConfirmationBreadcrumbs();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.createDisposalConfirmationTitle()),
+      messages.createDisposalConfirmationTitle(), CreateDisposalConfirmation.RESOLVER.getHistoryPath()));
+
+    return ret;
   }
 
   private static final List<String> getViewItemEventsHistoryToken(String id) {

@@ -1,89 +1,72 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
 package org.roda.wui.client.disposal.confirmations;
 
-import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
-import org.roda.core.data.v2.disposal.schedule.RetentionPeriodCalculation;
-import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
-import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationCreateRequest;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationForm;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoActionsToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.actions.DisposalCreateConfirmationDestroyActions;
-import org.roda.wui.client.common.actions.DisposalCreateConfirmationReviewActions;
-import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
-import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
-import org.roda.wui.client.common.lists.utils.ListBuilder;
-import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.disposal.DisposalConfirmations;
+import org.roda.wui.client.disposal.confirmations.data.panels.DisposalConfirmationDataPanel;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
 /**
- * @author Miguel Guimarães <mguimaraes@keep.pt>
+ * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class CreateDisposalConfirmation extends Composite {
 
-  private static final DateTimeFormat formatter = DateTimeFormat.getFormat(RodaConstants.SIMPLE_DATE_FORMATTER);
-
-  private static final Filter SHOW_RECORDS_TO_REVIEW = new Filter(
-    new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.REVIEW.name()),
-    new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()),
-    new DateIntervalFilterParameter(RodaConstants.AIP_OVERDUE_DATE, RodaConstants.AIP_OVERDUE_DATE, null,
-      formatter.parse(formatter.format(new Date()))),
-    new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Boolean.FALSE.toString()),
-    new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID));
-
-  private static final Filter SHOW_RECORDS_TO_DESTROY = new Filter(
-    new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.DESTROY.name()),
-    new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()),
-    new DateIntervalFilterParameter(RodaConstants.AIP_OVERDUE_DATE, RodaConstants.AIP_OVERDUE_DATE, null,
-      formatter.parse(formatter.format(new Date()))),
-    new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Boolean.FALSE.toString()),
-    new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID));
-
-  private static final Filter SHOW_RECORDS_WITH_RETENTION_PERIOD_ERRORS = new Filter(new SimpleFilterParameter(
-    RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.ERROR.name()));
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static CreateDisposalConfirmation.MyUiBinder uiBinder = GWT
-    .create(CreateDisposalConfirmation.MyUiBinder.class);
-  private static CreateDisposalConfirmation instance;
+  // --- IN-MEMORY TRANSFER VARIABLE ---
+  private static SelectedItems<IndexedAIP> pendingSelection;
+  // -----------------------------------
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
-    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      getInstance().resolve(historyTokens, callback);
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      // Safety check: if pendingSelection is null, it means the user hit F5 on this
+      // page.
+      // We bounce them back to the Overdue Records page because the context is lost.
+      if (pendingSelection == null) {
+        HistoryUtils.newHistory(OverdueRecords.RESOLVER);
+        callback.onSuccess(null);
+        return;
+      }
+
+      CreateDisposalConfirmation confirmation = new CreateDisposalConfirmation(pendingSelection);
+
+      // Clear the static variable immediately so it doesn't leak or accidentally get
+      // reused
+      pendingSelection = null;
+
+      callback.onSuccess(confirmation);
     }
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRole(this, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {DisposalConfirmations.RESOLVER}, false, callback);
     }
 
     @Override
@@ -93,113 +76,72 @@ public class CreateDisposalConfirmation extends Composite {
 
     @Override
     public String getHistoryToken() {
-      return "create_confirmation";
+      return "create";
     }
   };
-  @UiField(provided = true)
-  SearchWrapper overdueRecordsSearch;
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
-  FlowPanel createDisposalConfirmationDescription;
-
+  FocusPanel keyboardFocus;
   @UiField
-  RadioButton destroyScheduleOpt;
-
+  NavigationToolbar<DisposalConfirmation> navigationToolbar;
   @UiField
-  RadioButton reviewScheduleOpt;
-
+  NoActionsToolbar actionsToolbar;
   @UiField
-  RadioButton retentionCalculationFailedOpt;
-
+  TitlePanel title;
   @UiField
-  FlowPanel content;
-  private SelectedItems<IndexedAIP> selected = null;
-  private final AsyncCallback<Actionable.ActionImpact> listActionableCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
-    @Override
-    public void onSuccess(Actionable.ActionImpact impact) {
-      if (impact.equals(Actionable.ActionImpact.UPDATED)) {
-        selected = overdueRecordsSearch.getSelectedItems(IndexedAIP.class);
-      }
-    }
-  };
-
-  /**
-   * Create a new panel to create a disposal confirmation
-   */
-  private CreateDisposalConfirmation() {
-    ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-      new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
-        .withFilter(SHOW_RECORDS_TO_DESTROY).withActionable(DisposalCreateConfirmationDestroyActions.get())
-        .withActionableCallback(listActionableCallback).withJustActive(true).bindOpener());
-    overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
-
+  FlowPanel dataPanel;
+  public CreateDisposalConfirmation(final SelectedItems<IndexedAIP> selectedItems) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    configureDisposalAction();
+    DisposalConfirmationDataPanel confirmationDataPanel = new DisposalConfirmationDataPanel();
+    confirmationDataPanel.setDisposalConfirmation(new DisposalConfirmation());
+    dataPanel.add(confirmationDataPanel);
 
-    createDisposalConfirmationDescription.add(new HTMLWidgetWrapper("CreateDisposalConfirmationDescription.html"));
-  }
+    confirmationDataPanel.setSaveHandler(() -> {
+      DisposalConfirmation value = confirmationDataPanel.getValue();
+      DisposalConfirmationCreateRequest request = new DisposalConfirmationCreateRequest(value.getTitle(), selectedItems,
+        new DisposalConfirmationForm(confirmationDataPanel.getDisposalConfirmationExtra()));
+      Services services = new Services("Create disposal confirmation", "create");
+      services.disposalConfirmationResource(s -> s.createDisposalConfirmation(request))
+        .whenComplete((job, throwable) -> {
+          if (throwable != null) {
+            HistoryUtils.newHistory(InternalProcess.RESOLVER);
+          } else {
+            Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
-  public static CreateDisposalConfirmation getInstance() {
-    if (instance == null) {
-      instance = new CreateDisposalConfirmation();
-    }
+              @Override
+              public void onFailure(Throwable caught) {
+                Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
+              }
 
-    return instance;
-  }
-
-  public SelectedItems<IndexedAIP> getSelected() {
-    return selected;
-  }
-
-  public void clear() {
-    instance = null;
-    selected = null;
-  }
-
-  private void configureDisposalAction() {
-    destroyScheduleOpt.setText(messages.disposalConfirmationShowRecordsToDestroy());
-    destroyScheduleOpt.addValueChangeHandler(valueChangeEvent -> {
-      ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-        new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
-          .withFilter(SHOW_RECORDS_TO_DESTROY).withActionable(DisposalCreateConfirmationDestroyActions.get())
-          .withActionableCallback(listActionableCallback).withJustActive(true).bindOpener());
-      content.remove(overdueRecordsSearch);
-      overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
-      content.add(overdueRecordsSearch);
+              @Override
+              public void onSuccess(final Void nothing) {
+                HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+              }
+            });
+          }
+        });
     });
 
-    reviewScheduleOpt.setText(messages.disposalConfirmationShowRecordsToReview());
-    reviewScheduleOpt.addValueChangeHandler(valueChangeEvent -> {
-      ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-        new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
-          .withFilter(SHOW_RECORDS_TO_REVIEW).withActionable(DisposalCreateConfirmationReviewActions.get())
-          .withActionableCallback(listActionableCallback).withJustActive(true).bindOpener());
-      content.remove(overdueRecordsSearch);
-      overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
-      content.add(overdueRecordsSearch);
-    });
+    confirmationDataPanel.setCancelHandler(() -> HistoryUtils.newHistory(OverdueRecords.RESOLVER));
 
-    retentionCalculationFailedOpt.setText(messages.disposalConfirmationShowRecordsRetentionPeriodCalculationError());
-    retentionCalculationFailedOpt.addValueChangeHandler(valueChangeEvent -> {
-      ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-        new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
-          .withFilter(SHOW_RECORDS_WITH_RETENTION_PERIOD_ERRORS).withJustActive(true).bindOpener());
-      content.remove(overdueRecordsSearch);
-      overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
-      content.add(overdueRecordsSearch);
-    });
+    navigationToolbar.withoutButtons().build();
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getCreateDisposalConfirmationBreadcrumbs());
+
+    actionsToolbar.setLabel(messages.showDisposalConfirmationTitle());
+    actionsToolbar.build();
+
+    title.setText(messages.createDisposalConfirmationTitle());
+    title.setIconClass("DisposalConfirmations");
+    title.addStyleName("mb-20");
+
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse");
   }
 
-  private void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.isEmpty()) {
-      callback.onSuccess(this);
-    } else {
-      String basePage = historyTokens.remove(0);
-      if (CreateDisposalConfirmationDataPanel.RESOLVER.getHistoryToken().equals(basePage)) {
-        CreateDisposalConfirmationDataPanel.RESOLVER.resolve(historyTokens, callback);
-      }
-    }
+  public static void setPendingSelection(SelectedItems<IndexedAIP> selection) {
+    pendingSelection = selection;
   }
 
   interface MyUiBinder extends UiBinder<Widget, CreateDisposalConfirmation> {

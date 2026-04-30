@@ -7,7 +7,6 @@ import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.wui.client.common.actions.DisposalHoldSearchWrapperActions;
-import org.roda.wui.client.common.actions.DisposalRuleAction;
 import org.roda.wui.client.common.actions.DisposalRuleSearchWrapperActions;
 import org.roda.wui.client.common.actions.DisposalScheduleSearchWrapperActions;
 import org.roda.wui.client.common.lists.DisposalHoldList;

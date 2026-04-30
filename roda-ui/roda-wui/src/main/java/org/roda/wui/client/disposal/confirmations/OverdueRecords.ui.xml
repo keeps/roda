@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:common="urn:import:org.roda.wui.client.common"
+             xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+    <g:FlowPanel styleName="wui-overdue-records" addStyleNames="wrapper skip_padding">
+
+        <g:FlowPanel addStyleNames="row full_width skip_padding">
+            <g:FlowPanel addStyleNames="content">
+                <common:TitlePanel text="{messages.disposalPolicyOverdueRecordsTitle}"
+                                   iconClass="DisposalConfirmations"/>
+
+                <g:FlowPanel addStyleNames="page-description" ui:field="createDisposalConfirmationDescription"/>
+
+                <tabs:DisposalOverdueRecordsTabs ui:field="browseTab"/>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>

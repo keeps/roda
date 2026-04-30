@@ -75,21 +75,16 @@ public class ShowDisposalHold extends Composite {
     }
   };
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static ShowDisposalHold instance = null;
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   @UiField
   FocusPanel keyboardFocus;
-
   @UiField
   NavigationToolbar<DisposalHold> navigationToolbar;
-
   @UiField
   DisposalHoldActionsToolbar actionsToolbar;
-  //
   @UiField
   TitlePanel title;
-
   @UiField
   DisposalHoldTabs browseTab;
 

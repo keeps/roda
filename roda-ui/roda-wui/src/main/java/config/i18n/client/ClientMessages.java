@@ -2153,6 +2153,8 @@ public interface ClientMessages extends Messages {
 
   String showDisposalScheduleTitle();
 
+  String showDisposalConfirmationTitle();
+
   String disposalConfirmationTitle();
 
   String disposalConfirmationCreationDate();
@@ -2789,4 +2791,6 @@ public interface ClientMessages extends Messages {
   String disposalScheduleSuccessfullyCreated();
 
   String disposalScheduleSuccessfullyUpdated();
+
+  String disposalPolicyOverdueRecordsTitle();
 }

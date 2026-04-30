@@ -181,7 +181,7 @@ public class FormUtilities {
     mvLabel.addStyleName("form-label");
     if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
-      mvLabel.setText(mvLabel.getText() + "*");
+      mvLabel.setText(mvLabel.getText());
     }
 
     // Field
@@ -232,7 +232,7 @@ public class FormUtilities {
     mvLabel.addStyleName("form-label");
     if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
-      mvLabel.setText(mvLabel.getText() + "*");
+      mvLabel.setText(mvLabel.getText());
     }
 
     // Field
@@ -341,7 +341,7 @@ public class FormUtilities {
     mvLabel.addStyleName("form-label");
     if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
-      mvLabel.setText(mvLabel.getText() + "*");
+      mvLabel.setText(mvLabel.getText());
     }
 
     // Field
@@ -483,7 +483,7 @@ public class FormUtilities {
     mvLabel.addStyleName("form-label");
     if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
-      mvLabel.setText(mvLabel.getText() + "*");
+      mvLabel.setText(mvLabel.getText());
     }
 
     // Field
@@ -587,10 +587,10 @@ public class FormUtilities {
         if (mandatory && (value == null || value.trim().isEmpty())) {
           String labels = mv.get("l");
           errors.add(messages.isAMandatoryField(labels));
-          mv.set("error", messages.mandatoryField());
-        } else {
-          mv.set("error", null);
-        }
+          //mv.set("error", messages.mandatoryField());
+        } //else {
+          //mv.set("error", null);
+        //}
       }
     }
 

@@ -7,38 +7,33 @@
  */
 package org.roda.wui.client.disposal.confirmations;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.google.gwt.user.client.ui.FocusPanel;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.wui.client.browse.tabs.DisposalConfirmationTabs;
+import org.roda.wui.client.common.DisposalConfirmationActionsToolbar;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.DisposalConfirmationReportActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.disposal.DisposalConfirmations;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -47,12 +42,24 @@ import config.i18n.client.ClientMessages;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class ShowDisposalConfirmation extends Composite {
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static ShowDisposalConfirmation instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      getInstance().resolve(historyTokens, callback);
+      if (historyTokens.size() == 1) {
+        String confirmationId = historyTokens.get(0);
+        Services services = new Services("Retrieve disposal hold", "get");
+        services
+          .disposalConfirmationResource(
+            s -> s.findByUuid(confirmationId, LocaleInfo.getCurrentLocale().getLocaleName()))
+          .whenComplete((confirmation, throwable) -> {
+            if (throwable != null) {
+              AsyncCallbackUtils.defaultFailureTreatment(throwable);
+            } else {
+              ShowDisposalConfirmation panel = new ShowDisposalConfirmation(confirmation);
+              callback.onSuccess(panel);
+            }
+          });
+      }
     }
 
     @Override
@@ -70,68 +77,49 @@ public class ShowDisposalConfirmation extends Composite {
       return "confirmation";
     }
   };
-  private static ShowDisposalConfirmation.MyUiBinder uiBinder = GWT.create(ShowDisposalConfirmation.MyUiBinder.class);
-  @UiField
-  SimplePanel actionsSidebar;
-  @UiField
-  FlowPanel contentFlowPanel;
-  @UiField
-  FlowPanel sidebarFlowPanel;
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private ShowDisposalConfirmation() {
+  @UiField
+  FocusPanel keyboardFocus;
+  @UiField
+  NavigationToolbar<DisposalConfirmation> navigationToolbar;
+  @UiField
+  DisposalConfirmationActionsToolbar actionsToolbar;
+  @UiField
+  TitlePanel title;
+  @UiField
+  DisposalConfirmationTabs browseTab;
+
+  private Map<Actionable.ActionImpact, Runnable> handlers = new HashMap<>();
+  private AsyncCallback<Actionable.ActionImpact> handler = new NoAsyncCallback<Actionable.ActionImpact>() {
+    @Override
+    public void onSuccess(Actionable.ActionImpact result) {
+      if (handlers.containsKey(result)) {
+        handlers.get(result).run();
+      }
+    }
+  };
+
+  private ShowDisposalConfirmation(DisposalConfirmation confirmation) {
     initWidget(uiBinder.createAndBindUi(this));
-  }
 
-  public static ShowDisposalConfirmation getInstance() {
-    if (instance == null) {
-      instance = new ShowDisposalConfirmation();
-    }
-    return instance;
-  }
+    handlers.put(Actionable.ActionImpact.DESTROYED, () -> HistoryUtils.newHistory(DisposalConfirmations.RESOLVER));
 
-  void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 1) {
-      String confirmationId = historyTokens.get(0);
-      Services services = new Services("Retrieve the disposal confirmation", "get");
-      services.rodaEntityRestService(s -> s.findByUuid(confirmationId, LocaleInfo.getCurrentLocale().getLocaleName()),
-        DisposalConfirmation.class).whenComplete((disposalConfirmation, throwable) -> {
-          if (throwable != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(throwable);
-          } else {
-            SafeUri uri = RestUtils.createDisposalConfirmationHTMLUri(disposalConfirmation.getId(), false);
-            RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
-            try {
-              requestBuilder.sendRequest(null, new RequestCallback() {
+    navigationToolbar.withObject(confirmation);
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getDisposalConfirmationBreadcrumbs(confirmation));
+    navigationToolbar.build();
 
-                @Override
-                public void onResponseReceived(Request request, Response response) {
-                  if (200 == response.getStatusCode()) {
-                    final DisposalConfirmationReportActions confirmationActions = DisposalConfirmationReportActions
-                      .get();
-                    instance = new ShowDisposalConfirmation();
-                    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
-                    instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions)
-                      .withBackButton().buildListWithObjects(new ActionableObject<>(disposalConfirmation)));
-                    HTML reportHtml = new HTML(SafeHtmlUtils.fromSafeConstant(response.getText()));
-                    instance.contentFlowPanel.add(reportHtml);
-                    callback.onSuccess(instance);
-                  }
-                }
+    actionsToolbar.setLabel(messages.showDisposalConfirmationTitle());
+    actionsToolbar.setObjectAndBuild(confirmation, null, handler);
 
-                @Override
-                public void onError(Request request, Throwable throwable) {
-                  callback.onFailure(throwable);
-                }
-              });
-            } catch (RequestException e) {
-              callback.onFailure(e);
-            }
-          }
-        });
-    } else {
-      HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
-      callback.onSuccess(null);
-    }
+    title.setText(confirmation.getTitle());
+    title.setIconClass("DisposalConfirmations");
+
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse");
+
+    browseTab.init(confirmation);
   }
 
   interface MyUiBinder extends UiBinder<Widget, ShowDisposalConfirmation> {

@@ -13,7 +13,6 @@ import java.util.Optional;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.wui.client.common.forms.GenericDataPanel;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.labels.Tag;
 
@@ -29,7 +28,6 @@ public abstract class BrowseObjectActionsToolbar<T extends IsIndexed> extends Ac
   protected Permissions actionPermissions;
   protected AsyncCallback<Actionable.ActionImpact> actionCallback;
   protected AIPState state;
-  private GenericDataPanel<T> dataPanel;
 
   public void setObjectAndBuild(T object, AIPState state, Permissions permissions,
     AsyncCallback<Actionable.ActionImpact> actionCallback) {

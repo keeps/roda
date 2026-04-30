@@ -24,7 +24,7 @@ import config.i18n.client.ClientMessages;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class DisposalScheduleDataPanel extends Composite
-  implements GenericDataPanel<DisposalSchedule>, HasValueChangeHandlers<DisposalSchedule> {
+        implements GenericDataPanel<DisposalSchedule>, HasValueChangeHandlers<DisposalSchedule> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private final GenericDataForm<DisposalSchedule> form;
@@ -52,7 +52,7 @@ public class DisposalScheduleDataPanel extends Composite
 
     // 2. Wrap buttons in a FlowPanel for spacing
     FlowPanel actionsPanel = new FlowPanel();
-    actionsPanel.addStyleName("alignButtonsPanel"); // Uses your existing CSS spacing
+    actionsPanel.addStyleName("alignButtonsPanel");
     actionsPanel.add(saveButton);
     actionsPanel.add(cancelButton);
 
@@ -66,17 +66,18 @@ public class DisposalScheduleDataPanel extends Composite
   private void initEditMode(DisposalSchedule disposalSchedule) {
     form.addTextField(messages.disposalScheduleTitle(), DisposalSchedule::getTitle, DisposalSchedule::setTitle, true);
     form.addTextField(messages.disposalScheduleDescription(), DisposalSchedule::getDescription,
-      DisposalSchedule::setDescription, false);
+            DisposalSchedule::setDescription, false);
     form.addTextArea(messages.disposalScheduleMandate(), DisposalSchedule::getMandate, DisposalSchedule::setMandate,
-      false);
+            false);
     form.addTextArea(messages.disposalScheduleNotes(), DisposalSchedule::getScopeNotes, DisposalSchedule::setScopeNotes,
-      false);
+            false);
 
     form.addReadOnlyField(messages.disposalActionLabel(),
-      s -> messages.disposalScheduleActionCode(s.getActionCode().toString()), false);
+            s -> messages.disposalScheduleActionCode(s.getActionCode().toString()), false);
+
     if (!DisposalActionCode.RETAIN_PERMANENTLY.equals(disposalSchedule.getActionCode())) {
       form.addReadOnlyField(messages.disposalScheduleRetentionTriggerElementId(),
-        s -> DisposalScheduleUtils.getI18nRetentionTriggerIdentifier(s.getRetentionTriggerElementId()), false);
+              s -> DisposalScheduleUtils.getI18nRetentionTriggerIdentifier(s.getRetentionTriggerElementId()), false);
       form.addReadOnlyField(messages.disposalScheduleRetentionPeriodDuration(), s -> {
         if (!DisposalActionCode.RETAIN_PERMANENTLY.equals(s.getActionCode())) {
           String retentionPeriod;
@@ -84,7 +85,7 @@ public class DisposalScheduleDataPanel extends Composite
             retentionPeriod = messages.retentionPeriod(0, s.getRetentionPeriodIntervalCode().toString());
           } else {
             retentionPeriod = messages.retentionPeriod(s.getRetentionPeriodDuration(),
-              s.getRetentionPeriodIntervalCode().toString());
+                    s.getRetentionPeriodIntervalCode().toString());
           }
           return retentionPeriod;
         } else {
@@ -99,116 +100,96 @@ public class DisposalScheduleDataPanel extends Composite
   private void initCreateMode(DisposalSchedule disposalSchedule) {
     form.addTextField(messages.disposalScheduleTitle(), DisposalSchedule::getTitle, DisposalSchedule::setTitle, true);
     form.addTextField(messages.disposalScheduleDescription(), DisposalSchedule::getDescription,
-      DisposalSchedule::setDescription, false);
+            DisposalSchedule::setDescription, false);
     form.addTextArea(messages.disposalScheduleMandate(), DisposalSchedule::getMandate, DisposalSchedule::setMandate,
-      false);
+            false);
     form.addTextArea(messages.disposalScheduleNotes(), DisposalSchedule::getScopeNotes, DisposalSchedule::setScopeNotes,
-      false);
+            false);
 
     // 4. Actions (ListBox)
     ListBox actionList = new ListBox();
-    actionList.addItem("", "");
     for (DisposalActionCode code : DisposalActionCode.values()) {
       actionList.addItem(messages.disposalScheduleAction(code.name()), code.name());
     }
     FlowPanel actionRow = form.addListBox(messages.disposalActionLabel(), actionList,
-      s -> s.getActionCode() != null ? s.getActionCode().name() : "",
-      (s, val) -> s.setActionCode(getDisposalActionCode(val)), true);
+            s -> s.getActionCode() != null ? s.getActionCode().name() : "",
+            (s, val) -> s.setActionCode(getDisposalActionCode(val)), true);
 
     // 5. Trigger Element (ListBox)
     ListBox triggerList = new ListBox();
-    triggerList.addItem("", "");
     for (Pair<String, String> p : DisposalScheduleUtils.getElementsFromConfig()) {
       triggerList.addItem(p.getSecond(), p.getFirst());
     }
     FlowPanel triggerRow = form.addListBox(messages.disposalScheduleRetentionTriggerElementId(), triggerList,
-      DisposalSchedule::getRetentionTriggerElementId, DisposalSchedule::setRetentionTriggerElementId, true);
+            DisposalSchedule::getRetentionTriggerElementId, DisposalSchedule::setRetentionTriggerElementId, true);
 
     // 6. Interval (ListBox)
     ListBox intervalList = new ListBox();
-    intervalList.addItem("", "");
     for (RetentionPeriodIntervalCode code : RetentionPeriodIntervalCode.values()) {
       intervalList.addItem(messages.disposalScheduleRetentionPeriodIntervalValue(code.name()), code.name());
     }
     FlowPanel intervalRow = form.addListBox(messages.disposalScheduleRetentionPeriodInterval(), intervalList,
-      s -> s.getRetentionPeriodIntervalCode() != null ? s.getRetentionPeriodIntervalCode().name() : "",
-      (s, val) -> s.setRetentionPeriodIntervalCode(getRetentionPeriodIntervalCode(val)), true);
+            s -> s.getRetentionPeriodIntervalCode() != null ? s.getRetentionPeriodIntervalCode().name() : "",
+            (s, val) -> s.setRetentionPeriodIntervalCode(getRetentionPeriodIntervalCode(val)), true);
 
     // 7. Duration (TextBox with Number Validation)
     TextBox durationBox = new TextBox();
     FlowPanel durationRow = form.addTextBoxBase(messages.disposalScheduleRetentionPeriodDuration(), durationBox,
-      s -> s.getRetentionPeriodDuration() != null ? String.valueOf(s.getRetentionPeriodDuration()) : "", (s, val) -> {
-        if (val != null && !val.isEmpty())
-          s.setRetentionPeriodDuration(Integer.parseInt(val));
-        else
-          s.setRetentionPeriodDuration(null);
-      }, true, false, "^[1-9]\\d*$", messages.numberIsRequired());
+            s -> s.getRetentionPeriodDuration() != null ? String.valueOf(s.getRetentionPeriodDuration()) : "", (s, val) -> {
+              if (val != null && !val.isEmpty())
+                s.setRetentionPeriodDuration(Integer.parseInt(val));
+              else
+                s.setRetentionPeriodDuration(null);
+            }, true, false, "^[1-9]\\d*$", messages.numberIsRequired());
 
     // --- DEPENDENCY VISIBILITY LOGIC ---
 
-    // Initial state
     actionRow.setVisible(!editMode);
-    triggerRow.setVisible(false);
-    intervalRow.setVisible(false);
-    durationRow.setVisible(false);
 
-    actionList.addChangeHandler(event -> {
-      String val = actionList.getSelectedValue();
-      if (val.isEmpty() || DisposalActionCode.RETAIN_PERMANENTLY.name().equals(val)) {
+    Runnable evaluateVisibility = () -> {
+      String actionVal = actionList.getSelectedValue();
+
+      // If action is RETAIN PERMANENTLY, hide the downstream fields
+      if (DisposalActionCode.RETAIN_PERMANENTLY.name().equals(actionVal)) {
         triggerRow.setVisible(false);
-        triggerList.setSelectedIndex(0);
-
         intervalRow.setVisible(false);
-        intervalList.setSelectedIndex(0);
-
         durationRow.setVisible(false);
+
+        // Reset the UI fields so they are clean if the user switches back
+        if (triggerList.getItemCount() > 0) triggerList.setSelectedIndex(0);
+        if (intervalList.getItemCount() > 0) intervalList.setSelectedIndex(0);
         durationBox.setText("");
       } else {
         triggerRow.setVisible(true);
+        intervalRow.setVisible(true);
+        durationRow.setVisible(true);
+
+        String intervalVal = intervalList.getSelectedValue();
+        if (RetentionPeriodIntervalCode.NO_RETENTION_PERIOD.name().equals(intervalVal)) {
+          durationBox.setEnabled(false);
+          durationBox.setText("");
+          durationBox.addStyleName("wui-cursor-not-allowed");
+        } else {
+          durationBox.setEnabled(true);
+          durationBox.removeStyleName("wui-cursor-not-allowed");
+        }
       }
-    });
+    };
 
-    triggerList.addChangeHandler(event -> {
-      boolean show = !triggerList.getSelectedValue().isEmpty();
-      intervalRow.setVisible(show);
-      intervalList.setSelectedIndex(0);
-
-      durationRow.setVisible(show);
-      durationBox.setText("");
-    });
-
-    intervalList.addChangeHandler(event -> {
-      if (RetentionPeriodIntervalCode.NO_RETENTION_PERIOD.name().equals(intervalList.getSelectedValue())) {
-        durationBox.setEnabled(false);
-        durationBox.setText("");
-        durationBox.addStyleName("wui-cursor-not-allowed");
-      } else {
-        durationBox.setEnabled(true);
-        durationBox.removeStyleName("wui-cursor-not-allowed");
-      }
-    });
+    // Attach listeners
+    actionList.addChangeHandler(event -> evaluateVisibility.run());
+    intervalList.addChangeHandler(event -> evaluateVisibility.run());
 
     if (disposalSchedule != null) {
       form.setModel(disposalSchedule);
-
-      // Manually trigger the visibility evaluation if data exists
-      if (!editMode && disposalSchedule.getActionCode() != null) {
-        boolean notPermanent = disposalSchedule.getActionCode() != DisposalActionCode.RETAIN_PERMANENTLY;
-        triggerRow.setVisible(notPermanent);
-        intervalRow.setVisible(notPermanent && triggerList.getSelectedIndex() > 0);
-        durationRow.setVisible(notPermanent && intervalList.getSelectedIndex() > 0);
-
-        if (disposalSchedule.getRetentionPeriodIntervalCode() == RetentionPeriodIntervalCode.NO_RETENTION_PERIOD) {
-          durationBox.setEnabled(false);
-          durationBox.addStyleName("wui-cursor-not-allowed");
-        }
+      if (actionList.getItemCount() > 0) {
+        evaluateVisibility.run();
       }
     }
   }
 
   private DisposalActionCode getDisposalActionCode(String string) {
-    if (string == null || string.isEmpty())
-      return null;
+    if (string == null || string.isEmpty()) return null;
     switch (string) {
       case "RETAIN_PERMANENTLY":
         return DisposalActionCode.RETAIN_PERMANENTLY;
@@ -220,8 +201,7 @@ public class DisposalScheduleDataPanel extends Composite
   }
 
   private RetentionPeriodIntervalCode getRetentionPeriodIntervalCode(String string) {
-    if (string == null || string.isEmpty())
-      return null;
+    if (string == null || string.isEmpty()) return null;
     switch (string) {
       case "NO_RETENTION_PERIOD":
         return RetentionPeriodIntervalCode.NO_RETENTION_PERIOD;
@@ -238,10 +218,6 @@ public class DisposalScheduleDataPanel extends Composite
     }
   }
 
-  /**
-   * Defines what happens when the Save button is clicked. It automatically
-   * validates the form before executing the runnable.
-   */
   public void setSaveHandler(Runnable onSave) {
     saveButton.addClickHandler(event -> {
       if (isValid()) {
@@ -250,16 +226,22 @@ public class DisposalScheduleDataPanel extends Composite
     });
   }
 
-  /**
-   * Defines what happens when the Cancel button is clicked.
-   */
   public void setCancelHandler(Runnable onCancel) {
     cancelButton.addClickHandler(event -> onCancel.run());
   }
 
   @Override
   public DisposalSchedule getValue() {
-    return form.getValue();
+    DisposalSchedule schedule = form.getValue();
+
+    // GUARANTEE CLEAN MODEL: If RETAIN_PERMANENTLY is selected, actively clear out the dependent fields
+    if (DisposalActionCode.RETAIN_PERMANENTLY.equals(schedule.getActionCode())) {
+      schedule.setRetentionTriggerElementId(null);
+      schedule.setRetentionPeriodIntervalCode(null);
+      schedule.setRetentionPeriodDuration(null);
+    }
+
+    return schedule;
   }
 
   @Override

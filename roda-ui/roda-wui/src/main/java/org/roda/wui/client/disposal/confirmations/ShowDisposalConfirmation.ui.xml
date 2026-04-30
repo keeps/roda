@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:common="urn:import:org.roda.wui.client.common"
+             xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs">
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
-	<g:FlowPanel styleName="wui-show-disposal-confirmation" addStyleNames="wrapper skip_padding">
+    <g:FocusPanel ui:field="keyboardFocus">
+        <g:FlowPanel styleName="browse wui-show-disposal-confirmation" addStyleNames="wrapper skip_padding">
+            <common:NavigationToolbar ui:field="navigationToolbar"/>
 
-		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content" ui:field="contentFlowPanel">
-			</g:FlowPanel>
+            <common:DisposalConfirmationActionsToolbar ui:field="actionsToolbar"/>
 
-			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
-					</g:FlowPanel>
-				</g:FlowPanel>
-			</g:FlowPanel>
-		</g:FlowPanel>
-	</g:FlowPanel>
+            <g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
+                <g:FlowPanel addStyleNames="col_12 content">
+                    <common:TitlePanel ui:field="title"/>
+
+                    <tabs:DisposalConfirmationTabs ui:field="browseTab"/>
+                </g:FlowPanel>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FocusPanel>
 </ui:UiBinder>

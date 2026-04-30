@@ -7,33 +7,6 @@
  */
 package org.roda.wui.client.common.actions;
 
-import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION;
-import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION;
-import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION;
-import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION;
-import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
-import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
-import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
-import org.roda.wui.client.common.actions.model.ActionableBundle;
-import org.roda.wui.client.common.actions.model.ActionableGroup;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
-import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.services.Services;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.widgets.Toast;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -43,19 +16,45 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.disposal.DisposalConfirmations;
+import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.RestUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION;
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION;
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION;
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION;
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class DisposalConfirmationReportActions extends AbstractActionable<DisposalConfirmation> {
-  private static final DisposalConfirmationReportActions INSTANCE = new DisposalConfirmationReportActions();
+public class DisposalConfirmationToolbarActions extends AbstractActionable<DisposalConfirmation> {
+  private static final DisposalConfirmationToolbarActions INSTANCE = new DisposalConfirmationToolbarActions();
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_PENDING = new HashSet<>(
     Arrays.asList(DisposalConfirmationReportAction.PRINT, DisposalConfirmationReportAction.DESTROY,
-      DisposalConfirmationReportAction.DELETE_REPORT));
+      DisposalConfirmationReportAction.WITHDRAW));
 
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_APPROVED = new HashSet<>(
     Arrays.asList(DisposalConfirmationReportAction.PRINT, DisposalConfirmationReportAction.REMOVE_FROM_BIN,
@@ -68,10 +67,10 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_EXECUTION_FAILED = new HashSet<>(
     Arrays.asList(DisposalConfirmationReportAction.RE_EXECUTE, DisposalConfirmationReportAction.RECOVER_STATE));
 
-  private DisposalConfirmationReportActions() {
+  private DisposalConfirmationToolbarActions() {
   }
 
-  public static DisposalConfirmationReportActions get() {
+  public static DisposalConfirmationToolbarActions get() {
     return INSTANCE;
   }
 
@@ -128,7 +127,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     AsyncCallback<ActionImpact> callback) {
     if (DisposalConfirmationReportAction.DESTROY.equals(action)) {
       DisposalConfirmationActionsUtils.destroyDisposalConfirmationContent(object, callback);
-    } else if (DisposalConfirmationReportAction.DELETE_REPORT.equals(action)) {
+    } else if (DisposalConfirmationReportAction.WITHDRAW.equals(action)) {
       deleteDisposalConfirmationReport(object, callback);
     } else if (DisposalConfirmationReportAction.REMOVE_FROM_BIN.equals(action)) {
       DisposalConfirmationActionsUtils.permanentlyDeleteDisposalConfirmationReport(object, callback);
@@ -199,12 +198,10 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
                             Toast.showInfo(messages.deleteConfirmationReportSuccessTitle(),
                               messages.deleteConfirmationReportSuccessMessage());
                             doActionCallbackDestroyed();
-                            HistoryUtils.newHistory(ShowDisposalConfirmation.RESOLVER);
                           }
 
                           @Override
                           public void onSuccess(final Void nothing) {
-                            doActionCallbackNone();
                             HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
                           }
                         });
@@ -223,32 +220,32 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   public ActionableBundle<DisposalConfirmation> createActionsBundle() {
     ActionableBundle<DisposalConfirmation> confirmationActionableBundle = new ActionableBundle<>();
 
+    // DISPOSAL CONFIRMATION
+    ActionableGroup<DisposalConfirmation> confirmationGroup = new ActionableGroup<>(
+            messages.sidebarDisposalConfirmationTitle());
+    confirmationGroup.addButton(messages.printButton(), DisposalConfirmationReportAction.PRINT, ActionImpact.NONE,
+            "btn-print");
+    confirmationGroup.addButton(messages.deleteDisposalConfirmationReport(),
+            DisposalConfirmationReportAction.WITHDRAW, ActionImpact.DESTROYED, "btn-undo");
+    confirmationGroup.addButton(messages.reExecuteDisposalDestroyActionButton(),
+            DisposalConfirmationReportAction.RE_EXECUTE, ActionImpact.UPDATED, "btn-play-circle");
+    confirmationGroup.addButton(messages.recoverDisposalConfirmationExecutionFailedButton(),
+            DisposalConfirmationReportAction.RECOVER_STATE, ActionImpact.UPDATED, "btn-history");
+
     // SCHEDULE
     ActionableGroup<DisposalConfirmation> scheduleGroup = new ActionableGroup<>(
       messages.sidebarDisposalScheduleTitle());
     scheduleGroup.addButton(messages.applyDisposalScheduleButton(), DisposalConfirmationReportAction.DESTROY,
       ActionImpact.UPDATED, "btn-trash-alt");
 
-    // DISPOSAL CONFIRMATION
-    ActionableGroup<DisposalConfirmation> confirmationGroup = new ActionableGroup<>(
-      messages.sidebarDisposalConfirmationTitle());
-    confirmationGroup.addButton(messages.printButton(), DisposalConfirmationReportAction.PRINT, ActionImpact.NONE,
-      "btn-print");
-    confirmationGroup.addButton(messages.deleteDisposalConfirmationReport(),
-      DisposalConfirmationReportAction.DELETE_REPORT, ActionImpact.DESTROYED, "btn-remove");
-    confirmationGroup.addButton(messages.reExecuteDisposalDestroyActionButton(),
-      DisposalConfirmationReportAction.RE_EXECUTE, ActionImpact.UPDATED, "btn-play-circle");
-    confirmationGroup.addButton(messages.recoverDisposalConfirmationExecutionFailedButton(),
-      DisposalConfirmationReportAction.RECOVER_STATE, ActionImpact.UPDATED, "btn-history");
-
     // DISPOSAL BIN
     ActionableGroup<DisposalConfirmation> disposalBinGroup = new ActionableGroup<>(messages.sidebarDisposalBinTitle());
     disposalBinGroup.addButton(messages.permanentlyDeleteFromBinButton(),
-      DisposalConfirmationReportAction.REMOVE_FROM_BIN, ActionImpact.DESTROYED, "btn-eraser");
+      DisposalConfirmationReportAction.REMOVE_FROM_BIN, ActionImpact.DESTROYED, "btn-delete-forever");
     disposalBinGroup.addButton(messages.restoreFromBinButton(), DisposalConfirmationReportAction.RESTORE_FROM_BIN,
-      ActionImpact.UPDATED, "btn-history");
+      ActionImpact.UPDATED, "btn-restore");
 
-    confirmationActionableBundle.addGroup(scheduleGroup).addGroup(confirmationGroup).addGroup(disposalBinGroup);
+    confirmationActionableBundle.addGroup(confirmationGroup).addGroup(scheduleGroup).addGroup(disposalBinGroup);
 
     return confirmationActionableBundle;
   }
@@ -256,7 +253,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   public enum DisposalConfirmationReportAction implements Action<DisposalConfirmation> {
     PRINT(PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT),
     DESTROY(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
-    DELETE_REPORT(PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION),
+    WITHDRAW(PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION),
     REMOVE_FROM_BIN(PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION),
     RESTORE_FROM_BIN(PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION),
     RE_EXECUTE(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),

@@ -95,7 +95,7 @@ public class DisposalRuleActions {
         @Override
         public void onSuccess(Boolean confirm) {
           if (confirm) {
-            Services services = new Services("Delete disposal rule", "deletion");
+            Services services = new Services("Delete disposal rule", "delete");
             services.disposalRuleResource(s -> s.deleteDisposalRule(rule.getId())).whenComplete((unused, throwable) -> {
               if (throwable != null) {
                 AsyncCallbackUtils.defaultFailureTreatment(throwable);
