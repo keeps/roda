@@ -22,7 +22,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.disposal.Disposal;
 import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.disposal.DisposalDestroyedRecords;
-import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
+import org.roda.wui.client.disposal.confirmations.OverdueRecords;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
@@ -227,7 +227,7 @@ public class Header extends Composite {
       createCommand(DisposalConfirmations.RESOLVER.getHistoryPath()));
     disposalConfirmation.addStyleName("disposal_confirmation_item");
     overdueActions = disposalMenu.addItem(messages.title("overdue_actions"),
-      createCommand(CreateDisposalConfirmation.RESOLVER.getHistoryPath()));
+      createCommand(OverdueRecords.RESOLVER.getHistoryPath()));
     overdueActions.addStyleName("overdue_actions_item");
     disposalDestroyedRecords = disposalMenu.addItem(messages.title("disposal_destroyed_records"),
       createCommand(DisposalDestroyedRecords.RESOLVER.getHistoryPath()));

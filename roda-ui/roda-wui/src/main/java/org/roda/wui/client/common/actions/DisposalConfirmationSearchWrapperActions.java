@@ -7,29 +7,26 @@
  */
 package org.roda.wui.client.common.actions;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.roda.core.data.common.RodaConstants;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
-import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
+import org.roda.wui.client.disposal.confirmations.OverdueRecords;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
-import config.i18n.client.ClientMessages;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class DisposalConfirmationActions extends AbstractActionable<DisposalConfirmation> {
+public class DisposalConfirmationSearchWrapperActions extends AbstractActionable<DisposalConfirmation> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<Action<DisposalConfirmation>> POSSIBLE_ACTIONS_WITHOUT_OBJECT_SELECTED = new HashSet<>(
@@ -39,15 +36,11 @@ public class DisposalConfirmationActions extends AbstractActionable<DisposalConf
   private static final Set<Action<DisposalConfirmation>> POSSIBLE_ACTIONS_FOR_APPROVED = new HashSet<>(
     Arrays.asList(DisposalConfirmationAction.PERM_DELETE, DisposalConfirmationAction.RESTORE));
 
-  private DisposalConfirmationActions() {
+  private DisposalConfirmationSearchWrapperActions() {
     // Singleton
   }
 
-  private static class SingletonHelper {
-    private static final DisposalConfirmationActions INSTANCE = new DisposalConfirmationActions();
-  }
-
-  public static DisposalConfirmationActions getInstance() {
+  public static DisposalConfirmationSearchWrapperActions getInstance() {
     return SingletonHelper.INSTANCE;
   }
 
@@ -132,7 +125,7 @@ public class DisposalConfirmationActions extends AbstractActionable<DisposalConf
   // ACTIONS
   private void newConfirmation(AsyncCallback<ActionImpact> callback) {
     callback.onSuccess(ActionImpact.NONE);
-    HistoryUtils.newHistory(CreateDisposalConfirmation.RESOLVER);
+    HistoryUtils.newHistory(OverdueRecords.RESOLVER);
   }
 
   @Override
@@ -140,7 +133,8 @@ public class DisposalConfirmationActions extends AbstractActionable<DisposalConf
     ActionableBundle<DisposalConfirmation> confirmationActionableBundle = new ActionableBundle<>();
 
     // management
-    ActionableGroup<DisposalConfirmation> actionsGroup = new ActionableGroup<>(messages.sidebarDisposalConfirmationTitle());
+    ActionableGroup<DisposalConfirmation> actionsGroup = new ActionableGroup<>(
+      messages.sidebarDisposalConfirmationTitle());
     actionsGroup.addButton(messages.newDisposalConfirmationButton(), DisposalConfirmationAction.NEW,
       ActionImpact.UPDATED, "btn-plus-circle");
     actionsGroup.addButton(messages.applyDisposalScheduleButton(), DisposalConfirmationAction.DESTROY,
@@ -159,21 +153,7 @@ public class DisposalConfirmationActions extends AbstractActionable<DisposalConf
     return confirmationActionableBundle;
   }
 
-  public enum DisposalConfirmationAction implements Action<DisposalConfirmation> {
-    NEW(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION),
-    DESTROY(RodaConstants.PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
-    PERM_DELETE(RodaConstants.PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION),
-    RESTORE(RodaConstants.PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION);
-
-    private final List<String> methods;
-
-    DisposalConfirmationAction(String... methods) {
-      this.methods = Arrays.asList(methods);
-    }
-
-    @Override
-    public List<String> getMethods() {
-      return this.methods;
-    }
+  private static class SingletonHelper {
+    private static final DisposalConfirmationSearchWrapperActions INSTANCE = new DisposalConfirmationSearchWrapperActions();
   }
 }

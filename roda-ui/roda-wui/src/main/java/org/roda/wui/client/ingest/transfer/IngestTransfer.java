@@ -176,26 +176,6 @@ public class IngestTransfer extends Composite {
     }
   };
 
-  private IngestTransfer(final TransferredResource resource) {
-    this.resource = resource;
-
-    if (resource.isFile()) {
-      resourceSearch = new TransferredResourceSearch();
-    } else {
-      resourceSearch = new TransferredResourceSearch("IngestTransfer_transferredResources",
-        new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, resource.getRelativePath())),
-        TransferredResourceActions.get(resource), actionCallback);
-    }
-
-    initWidget(uiBinder.createAndBindUi(this));
-
-    objectToolbar.setObjectAndBuild(resource, null, null);
-
-    ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
-
-    draw();
-  }
-
   private IngestTransfer() {
     this.resource = null;
 

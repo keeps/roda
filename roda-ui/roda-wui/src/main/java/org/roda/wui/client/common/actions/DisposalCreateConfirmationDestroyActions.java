@@ -26,7 +26,7 @@ import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogResult;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmationDataPanel;
+import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.services.DisposalScheduleRestService;
@@ -134,7 +134,8 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
             public void onSuccess(Boolean result) {
               if (result) {
                 doActionCallbackUpdated();
-                HistoryUtils.newHistory(CreateDisposalConfirmationDataPanel.RESOLVER);
+                CreateDisposalConfirmation.setPendingSelection(selectedItemsList);
+                HistoryUtils.newHistory(CreateDisposalConfirmation.RESOLVER);
               } else {
                 doActionCallbackNone();
               }

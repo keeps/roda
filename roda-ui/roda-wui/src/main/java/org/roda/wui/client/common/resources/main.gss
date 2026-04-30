@@ -1193,7 +1193,7 @@ button:after {
 }
 
 .btn-print:after {
-    content: "\e935";
+    content: "\e8ad";
 }
 
 .btn-refresh:after {
@@ -1331,6 +1331,10 @@ button:after {
 
 .ma-pageview:after {
     content: "\e87a";
+}
+
+.btn-undo:after {
+    content: "\e166";
 }
 
 .ma-tune:after {

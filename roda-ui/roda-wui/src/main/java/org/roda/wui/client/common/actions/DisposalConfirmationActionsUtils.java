@@ -134,20 +134,18 @@ public class DisposalConfirmationActionsUtils {
                     public void onFailure(Throwable caught) {
                       Toast.showInfo(messages.deleteConfirmationReportSuccessTitle(),
                         messages.deleteConfirmationReportSuccessMessage());
-                      doActionCallbackUpdated();
-                      HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
+                      doActionCallbackDestroyed();
                     }
 
                     @Override
                     public void onSuccess(final Void nothing) {
-                      doActionCallbackUpdated();
                       HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
                     }
                   });
                 }
               });
           } else {
-            doActionCallbackNone();
+            callback.onSuccess(Actionable.ActionImpact.NONE);
           }
         }
       });

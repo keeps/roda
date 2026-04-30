@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.DisposalConfirmationActions;
+import org.roda.wui.client.common.actions.DisposalConfirmationSearchWrapperActions;
 import org.roda.wui.client.common.lists.DisposalConfirmationList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -71,7 +71,7 @@ public class DisposalConfirmations extends Composite {
    */
   public DisposalConfirmations() {
 
-    final DisposalConfirmationActions confirmationActions = DisposalConfirmationActions.getInstance();
+    final DisposalConfirmationSearchWrapperActions confirmationActions = DisposalConfirmationSearchWrapperActions.getInstance();
 
     ListBuilder<DisposalConfirmation> disposalConfirmationListBuilder = new ListBuilder<>(
       () -> new DisposalConfirmationList(),

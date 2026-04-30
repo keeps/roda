@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.disposal.confirmations.OverdueRecords;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -23,6 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class Disposal {
+  private static Disposal instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -47,8 +49,12 @@ public class Disposal {
       return "disposal";
     }
   };
+  private boolean initialized;
+  private HTMLWidgetWrapper page;
 
-  private static Disposal instance = null;
+  private Disposal() {
+    initialized = false;
+  }
 
   /**
    * Get the singleton instance
@@ -62,19 +68,13 @@ public class Disposal {
     return instance;
   }
 
-  private boolean initialized;
-
-  private HTMLWidgetWrapper page;
-
-  private Disposal() {
-    initialized = false;
-  }
-
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
       callback.onSuccess(page);
     } else if (historyTokens.get(0).equals(DisposalPolicy.RESOLVER.getHistoryToken())) {
       DisposalPolicy.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(OverdueRecords.RESOLVER.getHistoryToken())) {
+      OverdueRecords.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(DisposalConfirmations.RESOLVER.getHistoryToken())) {
       DisposalConfirmations.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(DisposalDestroyedRecords.RESOLVER.getHistoryToken())) {
