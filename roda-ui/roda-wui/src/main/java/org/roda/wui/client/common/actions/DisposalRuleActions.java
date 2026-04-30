@@ -18,6 +18,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
+import org.roda.wui.client.disposal.rule.CreateDisposalRule;
 import org.roda.wui.client.disposal.rule.EditDisposalRule;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
@@ -37,6 +38,11 @@ public class DisposalRuleActions {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private DisposalRuleActions() {
+  }
+
+  public static void newRule(AsyncCallback<Actionable.ActionImpact> callback) {
+    HistoryUtils.newHistory(CreateDisposalRule.RESOLVER.getHistoryPath());
+    callback.onSuccess(Actionable.ActionImpact.NONE);
   }
 
   public static void applyDisposalRulesAction() {
@@ -126,8 +132,7 @@ public class DisposalRuleActions {
                 AsyncCallbackUtils.defaultFailureTreatment(throwable);
                 callback.onSuccess(Actionable.ActionImpact.NONE);
               } else {
-                Toast.showInfo(messages.showDisposalRuleTitle(),
-                  messages.updateDisposalRuleOrderSuccessMessage());
+                Toast.showInfo(messages.showDisposalRuleTitle(), messages.updateDisposalRuleOrderSuccessMessage());
                 Timer timer = new Timer() {
                   @Override
                   public void run() {

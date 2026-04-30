@@ -35,6 +35,6 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP> {
   public SelectAipDialog(String title, Filter filter, boolean justActive, boolean exportCsvVisible) {
     super(title,
       new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(), new AsyncTableCellOptions<>(IndexedAIP.class, listId)
-        .withSummary(messages.selectAipSearchResults()).withJustActive(justActive).withFilter(filter)));
+              .withCsvDownloadButtonVisibility(exportCsvVisible).withSummary(messages.selectAipSearchResults()).withJustActive(justActive).withFilter(filter)));
   }
 }

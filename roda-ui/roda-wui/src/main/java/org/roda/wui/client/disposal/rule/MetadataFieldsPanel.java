@@ -7,18 +7,6 @@
  */
 package org.roda.wui.client.disposal.rule;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.MissingResourceException;
-
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.disposal.rule.ConditionType;
-import org.roda.core.data.v2.disposal.rule.DisposalRule;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.wui.common.client.tools.ConfigurationManager;
-import org.roda.wui.common.client.tools.StringUtils;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -34,8 +22,18 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.disposal.rule.ConditionType;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.MissingResourceException;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -62,10 +60,12 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
 
   @UiField
   TextBox fieldValue;
+
   private String conditionKey;
   private int selectedConditionIndex;
   private boolean changed = false;
   private boolean checked = false;
+
   public MetadataFieldsPanel(String conditionKey, String conditionValue, boolean editMode, DisposalRule disposalRule) {
     initWidget(uiBinder.createAndBindUi(this));
 

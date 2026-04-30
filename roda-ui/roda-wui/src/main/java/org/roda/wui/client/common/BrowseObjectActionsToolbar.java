@@ -52,14 +52,6 @@ public abstract class BrowseObjectActionsToolbar<T extends IsIndexed> extends Ac
     buildActions();
   }
 
-  public void setDataPanel(GenericDataPanel<T> dataPanel) {
-    this.dataPanel = dataPanel;
-  }
-
-  public GenericDataPanel<T> getDataPanel() {
-    return this.dataPanel;
-  }
-
   protected abstract void buildIcon();
 
   protected abstract void buildTags();

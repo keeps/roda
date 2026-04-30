@@ -58,6 +58,7 @@ public class DisposalRule implements IsModelObject, IsIndexed, HasId, Comparable
 
   public DisposalRule() {
     super();
+    type = ConditionType.IS_CHILD_OF;
   }
 
   @Override

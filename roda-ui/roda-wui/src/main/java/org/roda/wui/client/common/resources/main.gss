@@ -983,6 +983,10 @@ pre code {
     text-overflow: ellipsis;
 }
 
+.btn-slim {
+padding: 8px !important;
+}
+
 .btn-block {
 	width: 100%;
 }
@@ -1325,6 +1329,10 @@ button:after {
     content: "\e97a";
 }
 
+.ma-pageview:after {
+    content: "\e87a";
+}
+
 .ma-tune:after {
     content: "\e429";
 }
@@ -1647,7 +1655,13 @@ button:after {
 }
 
 .selectAipResultsPanel {
-    max-height: 60vh;
+    width: 800px;
+    max-height: 400px;
+    overflow-x: hidden !important; /* Hides the horizontal scrollbar entirely */
+    overflow-y: auto !important;   /* Adds a vertical scrollbar ONLY when content exceeds 400px */
+    margin-top: 20px;
+    margin-bottom: 20px;
+    /*max-height: 60vh; */
 }
 
 .wui-dialog-layout .table-empty {
@@ -7261,7 +7275,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .ri-dialog .ri-dialog-list-scroll {
     width: 800px;
-    height: 400px;
+    max-height: 400px;
     overflow-x: hidden !important; /* Hides the horizontal scrollbar entirely */
     overflow-y: auto !important;   /* Adds a vertical scrollbar ONLY when content exceeds 400px */
     margin-top: 20px;
@@ -9976,6 +9990,15 @@ wui-disposal-hold-data .form-textbox {
       color: #666666;
       width: 250px;
 }
+
+.generic-form-field-input-panel .form-listbox {
+    border:none;
+    margin-left: -4px;
+    font-size: 14px;
+    color: black;
+    flex: 1;
+}
+
 
 /* ============================================================
    GENERIC STACKED FIELD (Label on top, Input below)

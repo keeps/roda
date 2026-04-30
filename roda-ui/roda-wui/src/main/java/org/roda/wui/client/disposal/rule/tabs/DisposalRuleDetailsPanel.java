@@ -98,7 +98,7 @@ public class DisposalRuleDetailsPanel extends Composite {
           HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, rule.getDisposalScheduleId());
         }
       });
-    FormUtilities.addIfNotBlank(detailsPanel, messages.showUserStatusLabel(), HtmlSnippetUtils.getDisposalRuleTypeHtml(rule));
+    FormUtilities.addIfNotBlank(detailsPanel, messages.disposalRuleType(), HtmlSnippetUtils.getDisposalRuleTypeHtml(rule));
 
 
     if (rule.getType().equals(ConditionType.IS_CHILD_OF)) {
@@ -115,7 +115,7 @@ public class DisposalRuleDetailsPanel extends Composite {
 
       String conditionTxt = rule.getConditionKey() + " " + messages.disposalRuleConditionOperator() + " "
         + rule.getConditionValue();
-      FormUtilities.addIfNotBlank(detailsPanel, messages.disposalRuleType(), SafeHtmlUtils.fromString(conditionTxt));
+      FormUtilities.addIfNotBlank(detailsPanel, messages.disposalRuleCondition(), SafeHtmlUtils.fromString(conditionTxt));
     }
   }
 

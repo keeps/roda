@@ -2785,4 +2785,8 @@ public interface ClientMessages extends Messages {
   String failedToUpdateGroup();
 
   String failedToUpdateUser();
+
+  String disposalScheduleSuccessfullyCreated();
+
+  String disposalScheduleSuccessfullyUpdated();
 }

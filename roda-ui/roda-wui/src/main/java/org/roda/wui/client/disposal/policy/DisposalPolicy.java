@@ -7,8 +7,13 @@
  */
 package org.roda.wui.client.disposal.policy;
 
-import java.util.List;
-
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.roda.wui.client.browse.tabs.DisposalPolicyTabs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.disposal.Disposal;
@@ -17,7 +22,6 @@ import org.roda.wui.client.disposal.hold.EditDisposalHold;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
 import org.roda.wui.client.disposal.rule.CreateDisposalRule;
 import org.roda.wui.client.disposal.rule.EditDisposalRule;
-import org.roda.wui.client.disposal.rule.OrderDisposalRules;
 import org.roda.wui.client.disposal.rule.ShowDisposalRule;
 import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
 import org.roda.wui.client.disposal.schedule.EditDisposalSchedule;
@@ -27,13 +31,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -108,8 +106,6 @@ public class DisposalPolicy extends Composite {
       ShowDisposalRule.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(EditDisposalRule.RESOLVER.getHistoryToken())) {
       EditDisposalRule.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.get(0).equals(OrderDisposalRules.RESOLVER.getHistoryToken())) {
-      OrderDisposalRules.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     }
   }
 

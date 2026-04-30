@@ -7,31 +7,32 @@
  */
 package org.roda.wui.client.disposal.schedule;
 
-import java.util.List;
-
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
-import org.roda.core.data.v2.disposal.rule.DisposalRule;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
-import org.roda.wui.client.common.CreateOrUpdateDisposalScheduleActionsToolbar;
-import org.roda.wui.client.common.NavigationToolbar;
-import org.roda.wui.client.common.TitlePanel;
-import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.disposal.policy.DisposalPolicy;
-import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
-
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoActionsToolbar;
+import org.roda.wui.client.common.TitlePanel;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.disposal.policy.DisposalPolicy;
+import org.roda.wui.client.disposal.schedule.data.panels.DisposalScheduleDataPanel;
+import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
+import java.util.List;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -69,7 +70,7 @@ public class CreateDisposalSchedule extends Composite {
   @UiField
   NavigationToolbar<DisposalRule> navigationToolbar;
   @UiField
-  CreateOrUpdateDisposalScheduleActionsToolbar actionsToolbar;
+  NoActionsToolbar actionsToolbar;
   @UiField
   TitlePanel title;
   @UiField
@@ -81,30 +82,32 @@ public class CreateDisposalSchedule extends Composite {
     DisposalScheduleDataPanel dataPanel = new DisposalScheduleDataPanel(new DisposalSchedule(), false);
     disposalScheduleDataPanel.add(dataPanel);
 
+    dataPanel.setSaveHandler(() -> {
+      Services services = new Services("Create disposal schedule", "create");
+      services.disposalScheduleResource(s -> s.createDisposalSchedule(dataPanel.getValue()))
+        .whenComplete((created, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            Toast.showInfo(messages.showDisposalScheduleTitle(), messages.disposalScheduleSuccessfullyCreated());
+            HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, created.getId());
+          }
+        });
+    });
+
+    dataPanel.setCancelHandler(() -> HistoryUtils.newHistory(DisposalPolicy.RESOLVER));
+
     navigationToolbar.withoutButtons().build();
     navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getCreateDisposalScheduleBreadcrumbs());
 
     actionsToolbar.setLabel(messages.showDisposalScheduleTitle());
 
-    // 2. Give the toolbar the panel so it can check validity
-    actionsToolbar.setDataPanel(dataPanel);
-    actionsToolbar.setIsCreate(true);
-
     // 3. Pass the shared object
-    actionsToolbar.setObjectAndBuild(new DisposalSchedule(), null, new AsyncCallback<Actionable.ActionImpact>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(Actionable.ActionImpact result) {
-        // Redirect user or show success message if result == ActionImpact.UPDATED
-      }
-    });
+    actionsToolbar.build();
 
     title.setText(messages.newDisposalScheduleTitle());
     title.setIconClass("DisposalSchedule");
+    title.addStyleName("mb-20");
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");

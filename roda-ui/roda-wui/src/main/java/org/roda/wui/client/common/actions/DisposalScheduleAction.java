@@ -12,11 +12,9 @@ import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 
 public enum DisposalScheduleAction implements Actionable.Action<DisposalSchedule> {
   NEW(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE),
-  SAVE(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE),
   REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_DISPOSAL_SCHEDULE),
   DISASSOCIATE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE),
-  EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE),
-  UPDATE(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE);
+  EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE);
 
   private final List<String> methods;
 
