@@ -17,6 +17,7 @@ import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationState;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldAssociation;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.generics.MetadataValue;
@@ -71,7 +72,6 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.UIObject;
 
 import config.i18n.client.ClientMessages;
@@ -146,6 +146,18 @@ public class HtmlSnippetUtils {
       }
 
       b.append(SafeHtmlUtils.fromString(messages.disposalScheduleState(disposalSchedule.getState().toString())));
+      b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      ret = b.toSafeHtml();
+    }
+    return ret;
+  }
+
+  public static SafeHtml getDisposalRuleTypeHtml(DisposalRule disposalRule) {
+    SafeHtml ret = null;
+    if (disposalRule != null && disposalRule.getType() != null) {
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO));
+      b.append(SafeHtmlUtils.fromString(messages.disposalRuleTypeValue(disposalRule.getType().toString())));
       b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
       ret = b.toSafeHtml();
     }
@@ -537,6 +549,10 @@ public class HtmlSnippetUtils {
     }
   }
 
+  public static String getMetadataValueLabel(MetadataValue metadataValue) {
+    return getFieldLabel(metadataValue);
+  }
+
   public static void createExtraShow(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle) {
     FlowPanel lastSeparator = null;
     boolean hasFields = false;
@@ -723,9 +739,9 @@ public class HtmlSnippetUtils {
 
     switch (state) {
       case "Deleted":
-       response = OPEN_SPAN_CLASS_LABEL_DANGER + messages.sipDeleted() + CLOSE_SPAN;
+        response = OPEN_SPAN_CLASS_LABEL_DANGER + messages.sipDeleted() + CLOSE_SPAN;
         break;
-      }
+    }
 
     return response;
   }

@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.RODAMemberActions;
+import org.roda.wui.client.common.actions.RODAMemberSearchWrapperActions;
 import org.roda.wui.client.common.lists.RodaMemberList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -35,7 +35,11 @@ import config.i18n.client.ClientMessages;
 public class MemberManagement extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MemberManagement instance = null;
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  @UiField
+  FlowPanel memberManagementDescription;
+  @UiField(provided = true)
+  SearchWrapper searchWrapper;  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -57,16 +61,11 @@ public class MemberManagement extends Composite {
       return "user";
     }
   };
-  @UiField
-  FlowPanel memberManagementDescription;
-  @UiField(provided = true)
-  SearchWrapper searchWrapper;
   public MemberManagement() {
 
     ListBuilder<RODAMember> rodaMemberListBuilder = new ListBuilder<>(() -> new RodaMemberList(),
       new AsyncTableCellOptions<>(RODAMember.class, "MemberManagement_rodaMembers")
-        .withSummary(messages.usersAndGroupsTitle()).bindOpener()
-        .withSearchPlaceholder(messages.usersAndGroupsSearchPlaceHolder()).withActionable(RODAMemberActions.get()));
+        .withSummary(messages.usersAndGroupsTitle()).bindOpener().withActionable(RODAMemberSearchWrapperActions.get()));
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(rodaMemberListBuilder);
 
@@ -97,11 +96,21 @@ public class MemberManagement extends Composite {
     if (historyTokens.isEmpty()) {
       callback.onSuccess(this);
     } else if (historyTokens.size() == 1) {
-      HistoryUtils.newHistory(RESOLVER);
-      callback.onSuccess(null);
+      if (historyTokens.get(0).equals(CreateUser.RESOLVER.getHistoryToken())) {
+        CreateUser.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(CreateGroup.RESOLVER.getHistoryToken())) {
+        CreateGroup.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else {
+        HistoryUtils.newHistory(RESOLVER);
+        callback.onSuccess(null);
+      }
     } else if (historyTokens.size() == 2) {
       if (historyTokens.get(0).equals(ShowMember.RESOLVER.getHistoryToken())) {
         ShowMember.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(EditGroup.RESOLVER.getHistoryToken())) {
+        EditGroup.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(EditUser.RESOLVER.getHistoryToken())) {
+        EditUser.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else {
         HistoryUtils.newHistory(RESOLVER);
         callback.onSuccess(null);
@@ -114,7 +123,4 @@ public class MemberManagement extends Composite {
 
   interface MyUiBinder extends UiBinder<Widget, MemberManagement> {
   }
-
-
-
 }

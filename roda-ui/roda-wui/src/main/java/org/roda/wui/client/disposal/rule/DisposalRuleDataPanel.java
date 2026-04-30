@@ -22,6 +22,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.wui.client.common.forms.GenericDataPanel;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -53,7 +54,7 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
-public class DisposalRuleDataPanel extends Composite implements HasValueChangeHandlers<DisposalRule> {
+public class DisposalRuleDataPanel extends Composite implements GenericDataPanel<DisposalRule>, HasValueChangeHandlers<DisposalRule> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static DisposalRuleDataPanel.MyUiBinder uiBinder = GWT.create(DisposalRuleDataPanel.MyUiBinder.class);
@@ -301,7 +302,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
   public boolean isValid() {
     List<String> errorList = new ArrayList<>();
-    if (title.getText().length() == 0) {
+    if (title.getText().isEmpty()) {
       title.addStyleName("isWrong");
       titleError.setText(messages.mandatoryField());
       titleError.setVisible(true);
@@ -312,7 +313,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       titleError.setVisible(false);
     }
 
-    if (disposalSchedulesList.getSelectedValue().length() == 0) {
+    if (disposalSchedulesList.getSelectedValue().isEmpty()) {
       disposalSchedulesList.addStyleName("isWrong");
       disposalSchedulesListError.setText(messages.mandatoryField());
       disposalSchedulesListError.setVisible(true);
@@ -323,7 +324,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       disposalSchedulesListError.setVisible(false);
     }
 
-    if (conditionTypeList.getSelectedValue().length() == 0) {
+    if (conditionTypeList.getSelectedValue().isEmpty()) {
       conditionTypeList.addStyleName("isWrong");
       conditionTypeListError.setText(messages.mandatoryField());
       conditionTypeListError.setVisible(true);

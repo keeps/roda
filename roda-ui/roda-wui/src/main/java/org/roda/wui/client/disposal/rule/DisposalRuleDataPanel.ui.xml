@@ -58,8 +58,7 @@
 				<g:FlowPanel styleName="wui-disposal-rules-aip-preview">
 					<g:FlowPanel ui:field="previewAIPListHeader">
 					</g:FlowPanel>
-					<g:SimplePanel ui:field="previewAIPListCard"
-						addStyleNames="card representationsCard" />
+					<g:SimplePanel ui:field="previewAIPListCard"/>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

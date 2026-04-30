@@ -14,8 +14,6 @@ import java.util.List;
 
 import org.roda.core.data.v2.IsRODAObject;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
 public class SelectedItemsList<T extends IsRODAObject> implements SelectedItems<T> {
 
   @Serial

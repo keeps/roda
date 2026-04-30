@@ -1408,7 +1408,7 @@ public interface ClientMessages extends Messages {
 
   String permissionAssignedUsersEmpty();
 
-  String listOfAIPs();
+    String listOfAIPs();
 
   String listOfRepresentations();
 
@@ -2105,6 +2105,12 @@ public interface ClientMessages extends Messages {
 
   String disposalScheduleUsedInRule();
 
+  String disposalScheduleRemoveConfirmDialogTitle();
+
+  String disposalScheduleRemoveConfirmDialogMessage();
+
+  String disposalScheduleRemovedWithSuccess();
+
   String disposalHoldIdentifier();
 
   String disposalHoldTitle();
@@ -2665,6 +2671,8 @@ public interface ClientMessages extends Messages {
 
   String reasonCantActOnGroup();
 
+  String reasonHoldAlreadyLifted();
+
   // RODA Members - toolbar actions
   String deactivateUserTitle();
 
@@ -2747,4 +2755,34 @@ public interface ClientMessages extends Messages {
   String emailViewerLoadImagesOnce();
 
   String emailViewerAlwaysTrustSender();
+
+  String disposalHoldSuccessfullyCreated();
+
+  String disposalHoldSuccessfullyUpdated();
+
+  String updateDisposalRuleOrderSuccessMessage();
+
+  String moveToTop();
+
+  String moveToBottom();
+
+  String moveToPositionNumber();
+
+  String disposalRuleChangeOrderMessage();
+
+  String disposalRuleSuccessfullyCreated();
+
+  String disposalRuleSuccessfullyUpdated();
+
+  String userSuccessfullyCreated();
+
+  String userSuccessfullyUpdated();
+
+  String groupSuccessfullyCreated();
+
+  String groupSuccessfullyUpdated();
+
+  String failedToUpdateGroup();
+
+  String failedToUpdateUser();
 }

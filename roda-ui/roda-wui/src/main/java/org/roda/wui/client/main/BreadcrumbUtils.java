@@ -12,6 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -19,17 +22,34 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.browse.BrowseTop;
+import org.roda.wui.client.disposal.hold.CreateDisposalHold;
+import org.roda.wui.client.disposal.hold.EditDisposalHold;
+import org.roda.wui.client.disposal.hold.ShowDisposalHold;
+import org.roda.wui.client.disposal.rule.CreateDisposalRule;
+import org.roda.wui.client.disposal.rule.EditDisposalRule;
+import org.roda.wui.client.disposal.rule.ShowDisposalRule;
+import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
+import org.roda.wui.client.disposal.schedule.EditDisposalSchedule;
+import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.ShowLogEntry;
+import org.roda.wui.client.management.ShowNotification;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.disposal.DisposalDestroyedRecords;
+import org.roda.wui.client.disposal.policy.DisposalPolicy;
+import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
+import org.roda.wui.client.management.members.CreateGroup;
+import org.roda.wui.client.management.members.CreateUser;
+import org.roda.wui.client.management.members.EditGroup;
+import org.roda.wui.client.management.members.EditUser;
 import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.planning.ShowRisk;
 import org.roda.wui.client.management.members.MemberManagement;
@@ -367,8 +387,8 @@ public class BreadcrumbUtils {
 
   public static List<BreadcrumbItem> getLogEntryBreadcrumbs(LogEntry logEntry) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.activityLogTitle()),
-            messages.activityLogTitle(), UserLog.RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.activityLogTitle()), messages.activityLogTitle(),
+      UserLog.RESOLVER.getHistoryPath()));
 
     if (logEntry != null) {
       List<String> path = new ArrayList<>(ShowLogEntry.RESOLVER.getHistoryPath());
@@ -395,12 +415,10 @@ public class BreadcrumbUtils {
     return ret;
   }
 
-  public static List<BreadcrumbItem> getRepresentationInformationBreadCrumbs(RepresentationInformation ri){
+  public static List<BreadcrumbItem> getRepresentationInformationBreadCrumbs(RepresentationInformation ri) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(
-            SafeHtmlUtils.fromSafeConstant(messages.representationInformationTitle()),
-            messages.representationInformationTitle(),
-            RepresentationInformationNetwork.RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.representationInformationTitle()),
+      messages.representationInformationTitle(), RepresentationInformationNetwork.RESOLVER.getHistoryPath()));
 
     if (ri != null) {
       List<String> path = new ArrayList<>(ShowRepresentationInformation.RESOLVER.getHistoryPath());
@@ -511,17 +529,192 @@ public class BreadcrumbUtils {
     return breadcrumbLabel;
   }
 
+  public static List<BreadcrumbItem> getRODAMembersBreadcrumbs() {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.usersAndGroupsTitle()),
+      messages.usersAndGroupsTitle(), MemberManagement.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getCreateUserBreadcrumbs() {
+    List<BreadcrumbItem> ret = getRODAMembersBreadcrumbs();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.createUserTitle()), messages.createUserTitle(),
+      CreateUser.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getCreateGroupBreadcrumbs() {
+    List<BreadcrumbItem> ret = getRODAMembersBreadcrumbs();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.createGroupTitle()), messages.createGroupTitle(),
+      CreateGroup.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getEditMemberBreadcrumbs(RODAMember member) {
+    List<BreadcrumbItem> ret = getRODAMemberBreadcrumbs(member);
+
+    if (member.isUser()) {
+      List<String> path = new ArrayList<>(EditUser.RESOLVER.getHistoryPath());
+      path.add(member.getId());
+
+      ret.add(
+        new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.editUserTitle()), messages.editUserTitle(), path));
+    } else {
+      List<String> path = new ArrayList<>(EditGroup.RESOLVER.getHistoryPath());
+      path.add(member.getId());
+
+      ret.add(
+        new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.editGroupTitle()), messages.editGroupTitle(), path));
+    }
+    return ret;
+  }
+
   public static List<BreadcrumbItem> getRODAMemberBreadcrumbs(RODAMember user) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.usersAndGroupsTitle()), messages.usersAndGroupsTitle(),
-      MemberManagement.RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.usersAndGroupsTitle()),
+      messages.usersAndGroupsTitle(), MemberManagement.RESOLVER.getHistoryPath()));
 
     if (user != null) {
       List<String> path = new ArrayList<>(ShowMember.RESOLVER.getHistoryPath());
       path.add(user.getUUID());
-      String label = user.getId();
+      String label = user.getFullName();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getDisposalPolicyBreadcrumbs() {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.disposalPolicyTitle()),
+      messages.disposalPolicyTitle(), DisposalPolicy.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getCreateDisposalScheduleBreadcrumbs() {
+    List<BreadcrumbItem> ret = getDisposalPolicyBreadcrumbs();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.newDisposalScheduleTitle()),
+      messages.newDisposalScheduleTitle(), CreateDisposalSchedule.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getEditDisposalScheduleBreadcrumbs(DisposalSchedule schedule) {
+    List<BreadcrumbItem> ret = getDisposalScheduleBreadcrumbs(schedule);
+
+    List<String> path = new ArrayList<>(EditDisposalSchedule.RESOLVER.getHistoryPath());
+    path.add(schedule.getId());
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.editDisposalScheduleTitle()),
+      messages.editDisposalScheduleTitle(), path));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getDisposalScheduleBreadcrumbs(DisposalSchedule schedule) {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.disposalPolicyTitle()),
+      messages.disposalPolicyTitle(), DisposalPolicy.RESOLVER.getHistoryPath()));
+
+    if (schedule != null) {
+      StringBuilder b = new StringBuilder();
+      b.append("<i class='far fa-calendar'></i>");
+      b.append("&nbsp;");
+      b.append(schedule.getTitle());
+      SafeHtml safeHtml = SafeHtmlUtils.fromSafeConstant(b.toString());
+
+      List<String> path = new ArrayList<>(ShowDisposalSchedule.RESOLVER.getHistoryPath());
+      path.add(schedule.getId());
+      String label = schedule.getTitle();
+      ret.add(new BreadcrumbItem(safeHtml, label, path));
+    }
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getCreateDisposalHoldBreadcrumbs() {
+    List<BreadcrumbItem> ret = getDisposalPolicyBreadcrumbs();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.newDisposalHoldTitle()),
+      messages.newDisposalHoldTitle(), CreateDisposalHold.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getDisposalHoldBreadcrumbs(DisposalHold hold) {
+    List<BreadcrumbItem> ret = getDisposalPolicyBreadcrumbs();
+
+    if (hold != null) {
+      StringBuilder b = new StringBuilder();
+      b.append("<i class='fas fa-lock'></i>");
+      b.append("&nbsp;");
+      b.append(hold.getTitle());
+      SafeHtml safeHtml = SafeHtmlUtils.fromSafeConstant(b.toString());
+
+      List<String> path = new ArrayList<>(ShowDisposalHold.RESOLVER.getHistoryPath());
+      path.add(hold.getId());
+      String label = hold.getTitle();
+      ret.add(new BreadcrumbItem(safeHtml, label, path));
+    }
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getEditDisposalHoldBreadcrumbs(DisposalHold hold) {
+    List<BreadcrumbItem> ret = getDisposalHoldBreadcrumbs(hold);
+
+    List<String> path = new ArrayList<>(EditDisposalHold.RESOLVER.getHistoryPath());
+    path.add(hold.getId());
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.editDisposalHoldTitle()),
+      messages.editDisposalHoldTitle(), path));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getDisposalRuleBreadcrumbs(DisposalRule rule) {
+    List<BreadcrumbItem> ret = getDisposalPolicyBreadcrumbs();
+
+    if (rule != null) {
+      StringBuilder b = new StringBuilder();
+      b.append("<i class='fas fa-gavel'></i>");
+      b.append("&nbsp;");
+      b.append(rule.getTitle());
+      SafeHtml safeHtml = SafeHtmlUtils.fromSafeConstant(b.toString());
+
+      List<String> path = new ArrayList<>(ShowDisposalRule.RESOLVER.getHistoryPath());
+      path.add(rule.getId());
+      String label = rule.getTitle();
+      ret.add(new BreadcrumbItem(safeHtml, label, path));
+    }
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getEditDisposalRuleBreadcrumbs(DisposalRule rule) {
+    List<BreadcrumbItem> ret = getDisposalRuleBreadcrumbs(rule);
+
+    List<String> path = new ArrayList<>(EditDisposalRule.RESOLVER.getHistoryPath());
+    path.add(rule.getId());
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.editDisposalRuleTitle()),
+      messages.editDisposalRuleTitle(), path));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getCreateDisposalRuleBreadcrumbs() {
+    List<BreadcrumbItem> ret = getDisposalPolicyBreadcrumbs();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.newDisposalRuleTitle()),
+      messages.newDisposalRuleTitle(), CreateDisposalRule.RESOLVER.getHistoryPath()));
 
     return ret;
   }

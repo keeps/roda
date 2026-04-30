@@ -27,7 +27,7 @@ public class Tag extends Composite {
 
   public enum TagStyle {
     DEFAULT, SUCCESS, FAILURE, WARNING_LIGHT, DANGER_LIGHT, NEUTRAL, MONO, ICON_CALENDAR, ICON_LOCK, ICON_CLOCK,
-    BORDER_BLACK, BORDER_DANGER;
+    ICON_GAVEL, BORDER_BLACK, BORDER_DANGER;
 
     private static String toStyleName(TagStyle tagStyle) {
       switch (tagStyle) {
@@ -45,6 +45,8 @@ public class Tag extends Composite {
           return "tagGrey";
         case ICON_CALENDAR:
           return "tagIconCalendar";
+        case ICON_GAVEL:
+          return "tagIconGavel";
         case ICON_LOCK:
           return "tagIconLock";
         case ICON_CLOCK:

@@ -7,6 +7,9 @@
  */
 package org.roda.wui.client.common.lists.pagination;
 
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -14,51 +17,24 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.wui.common.client.ClientLogger;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
-import org.roda.wui.common.client.ClientLogger;
 
 public class ListSelectionStateMappers {
 
-  // IndexedAIP
-  public interface IndexedAIPMapper extends ObjectMapper<ListSelectionState<IndexedAIP>> {
-  }
-
+  private static final ClientLogger logger = new ClientLogger(ListSelectionUtils.class.getName());
   private static IndexedAIPMapper indexedAIPMapper = GWT.create(IndexedAIPMapper.class);
-
-  // IndexedRepresentation
-  public interface IndexedRepresentationMapper extends ObjectMapper<ListSelectionState<IndexedRepresentation>> {
-  }
-
   private static IndexedRepresentationMapper indexedRepresentationMapper = GWT
     .create(IndexedRepresentationMapper.class);
-
-  // IndexedFile
-  public interface IndexedFileMapper extends ObjectMapper<ListSelectionState<IndexedFile>> {
-  }
-
   private static IndexedFileMapper indexedFileMapper = GWT.create(IndexedFileMapper.class);
-
-  // IndexedDIP
-  public interface IndexedDIPMapper extends ObjectMapper<ListSelectionState<IndexedDIP>> {
-  }
-
   private static IndexedDIPMapper indexedDIPMapper = GWT.create(IndexedDIPMapper.class);
-
-  // DIPFile
-  public interface DIPFileMapper extends ObjectMapper<ListSelectionState<DIPFile>> {
-  }
-
   private static DIPFileMapper dipFileMapper = GWT.create(DIPFileMapper.class);
-
-  // Job report
-  public interface IndexedReportMapper extends ObjectMapper<ListSelectionState<IndexedReport>> {
-  }
-
   private static IndexedReportMapper indexedReportMapper = GWT.create(IndexedReportMapper.class);
-
-  private static final ClientLogger logger = new ClientLogger(ListSelectionUtils.class.getName());
+  private static DisposalHoldMapper disposalHoldMapper = GWT.create(DisposalHoldMapper.class);
+  private static DisposalScheduleMapper disposalScheduleMapper = GWT.create(DisposalScheduleMapper.class);
+  private static DisposalRuleMapper disposalRuleMapper = GWT.create(DisposalRuleMapper.class);
 
   private ListSelectionStateMappers() {
     // do nothing
@@ -79,13 +55,18 @@ public class ListSelectionStateMappers {
       ret = dipFileMapper.write((ListSelectionState<DIPFile>) object);
     } else if (IndexedReport.class.getName().equals(objectClass)) {
       ret = indexedReportMapper.write((ListSelectionState<IndexedReport>) object);
+    } else if (DisposalHold.class.getName().equals(objectClass)) {
+      ret = disposalHoldMapper.write((ListSelectionState<DisposalHold>) object);
+    } else if (DisposalSchedule.class.getName().equals(objectClass)) {
+      ret = disposalScheduleMapper.write((ListSelectionState<DisposalSchedule>) object);
+    } else if (DisposalRule.class.getName().equals(objectClass)) {
+      ret = disposalRuleMapper.write((ListSelectionState<DisposalRule>) object);
     } else {
       ret = null;
     }
     return ret;
   }
 
-  @SuppressWarnings("unchecked")
   public static <T extends IsIndexed> ListSelectionState<T> getObject(String objectClass, String json) {
     ListSelectionState<T> state;
     if (IndexedAIP.class.getName().equals(objectClass)) {
@@ -100,10 +81,52 @@ public class ListSelectionStateMappers {
       state = (ListSelectionState<T>) dipFileMapper.read(json);
     } else if (IndexedReport.class.getName().equals(objectClass)) {
       state = (ListSelectionState<T>) indexedReportMapper.read(json);
+    } else if (DisposalHold.class.getName().equals(objectClass)) {
+      state = (ListSelectionState<T>) disposalHoldMapper.read(json);
+    } else if (DisposalSchedule.class.getName().equals(objectClass)) {
+      state = (ListSelectionState<T>) disposalScheduleMapper.read(json);
+    } else if (DisposalRule.class.getName().equals(objectClass)) {
+      state = (ListSelectionState<T>) disposalRuleMapper.read(json);
     } else {
       state = null;
     }
     return state;
+  }
+
+  // IndexedAIP
+  public interface IndexedAIPMapper extends ObjectMapper<ListSelectionState<IndexedAIP>> {
+  }
+
+  // IndexedRepresentation
+  public interface IndexedRepresentationMapper extends ObjectMapper<ListSelectionState<IndexedRepresentation>> {
+  }
+
+  // IndexedFile
+  public interface IndexedFileMapper extends ObjectMapper<ListSelectionState<IndexedFile>> {
+  }
+
+  // IndexedDIP
+  public interface IndexedDIPMapper extends ObjectMapper<ListSelectionState<IndexedDIP>> {
+  }
+
+  // DIPFile
+  public interface DIPFileMapper extends ObjectMapper<ListSelectionState<DIPFile>> {
+  }
+
+  // Job report
+  public interface IndexedReportMapper extends ObjectMapper<ListSelectionState<IndexedReport>> {
+  }
+
+  // Disposal hold
+  public interface DisposalHoldMapper extends ObjectMapper<ListSelectionState<DisposalHold>> {
+  }
+
+  // Disposal schedule
+  public interface DisposalScheduleMapper extends ObjectMapper<ListSelectionState<DisposalSchedule>> {
+  }
+
+  // Disposal rule
+  public interface DisposalRuleMapper extends ObjectMapper<ListSelectionState<DisposalRule>> {
   }
 
 }

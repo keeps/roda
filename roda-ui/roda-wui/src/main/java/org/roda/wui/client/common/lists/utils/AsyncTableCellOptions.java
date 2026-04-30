@@ -121,7 +121,6 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
   }
 
   public AsyncTableCellOptions<T> withJustActive(boolean justActive) {
-
     this.justActive = justActive;
     return this;
   }

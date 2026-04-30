@@ -10,10 +10,6 @@ package org.roda.core.data.v2.representation;
 import java.io.Serial;
 import java.io.Serializable;
 
-import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
-import io.swagger.v3.oas.annotations.media.Schema;
-import org.roda.core.data.v2.generics.select.SelectedItemsFilterRequest;
-import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 
 /**

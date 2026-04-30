@@ -1,0 +1,14 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <g:FlowPanel addStyleNames="mb-20">
+        <g:FlowPanel addStyleNames="roda6Card">
+            <g:FlowPanel addStyleNames="generic-data-panel">
+                <g:HTML ui:field="errors" visible="false" />
+
+                <g:FlowPanel ui:field="fieldsContainer" addStyleNames="generic-data-panel-fields" />
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>

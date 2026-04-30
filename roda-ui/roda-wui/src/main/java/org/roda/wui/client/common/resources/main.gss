@@ -1136,6 +1136,14 @@ button:after {
     content: "\e3c9";
 }
 
+.btn-edit-order:after {
+    content: "\eb61";
+}
+
+.btn-password:after {
+    content: "\f042";
+}
+
 .btn-key:after {
     content: "\e73c";
 }
@@ -3565,6 +3573,10 @@ td.datePickerMonth, td.datePickerYear {
     content: "\f023";
 }
 
+.tagIconGavel .gwt-Label:before {
+    content: "\e90e";
+}
+
 .tagIconClock .gwt-Label:before {
     @mixin fontawesome();
     content: "\e900";
@@ -4803,12 +4815,14 @@ td.datePickerMonth, td.datePickerYear {
     flex: 1;
     display: flex;
     gap: 16px;
+    align-items: flex-start;
 }
 
 
 .search-field {
     margin-right: 20px;
-    height: 35px;
+    min-height: 35px;
+    height: auto;
 }
 
 .search-field-warning {
@@ -4852,7 +4866,7 @@ td.datePickerMonth, td.datePickerYear {
 .search-field-left-panel .search-field-input-panel {
     display: flex;
     gap: 8px;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .search-field-left-panel .search-field-input-panel .gwt-Label {
@@ -4977,6 +4991,13 @@ td.datePickerMonth, td.datePickerYear {
 .wui-dialog-layout {
     padding: 10px;
     max-width: 60vw;
+}
+
+.wui-dialog-layout .wui-dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
 }
 
 .gwt-DialogBox.wui-dialog-confirm .wui-dialog-layout,
@@ -9741,8 +9762,6 @@ wui-disposal-hold-data .form-textbox {
     font-size: 13px;
 }
 
-
-
 /* Container and Search */
 .permissions-dashboard {
     width: 100%;
@@ -9854,33 +9873,137 @@ wui-disposal-hold-data .form-textbox {
     user-select: none;
 }
 
-/* Add max-height so the dialog knows when to stop growing and start scrolling */
-.edit-permissions-dialog .wui-dialog-layout,
-.edit-user-information-dialog .wui-dialog-layout,
-.create-user-dialog .wui-dialog-layout {
-    width: 80vw;
-    max-width: 80vw !important;
-    max-height: 85vh; /* ADD THIS: Keeps the dialog within the monitor height */
+.gwt-DialogBox.wui-dialog-confirm .wui-dialog-layout, .gwt-DialogBox.wui-dialog-information .wui-dialog-layout, .gwt-DialogBox.wui-dialog-prompt .wui-dialog-layout {
+  max-width: 95vw;
+}
 
-    /* Use flexbox to ensure internal scrolling works correctly */
+.edit-permissions-dialog .wui-dialog-layout, .edit-user-information-dialog .wui-dialog-layout, .create-user-dialog .wui-dialog-layout {
+  width: 80vw;
+  max-width: 80vw !important;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-permissions-dialog .wui-dialog-layout > .content, .edit-user-information-dialog .wui-dialog-layout > .content, .create-user-dialog .wui-dialog-layout > .content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-bottom: 20px;
+}
+
+.edit-permissions-dialog .wui-dialog-layout > .dialog-button-panel, .edit-user-information-dialog .wui-dialog-layout > .dialog-button-panel, .create-user-dialog .wui-dialog-layout > .dialog-button-panel {
+  flex-shrink: 0;
+  margin-top: 15px;
+}
+
+/* ============================================================
+   GENERIC FORM FIELD STRUCTURE
+   ============================================================ */
+.generic-data-panel {
+    min-height: auto;
+}
+
+.generic-data-panel-fields {
     display: flex;
     flex-direction: column;
 }
 
-/* This will now work because we added content.addStyleName("content") in Java */
-.edit-permissions-dialog .wui-dialog-layout > .content,
-.edit-user-information-dialog .wui-dialog-layout > .content,
-.create-user-dialog .wui-dialog-layout > .content {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
-    padding-bottom: 20px;
+.generic-form-field {
+    display: flex;
+    max-width: 750px;
+    margin-right: 20px;
+    min-height: 35px; /* Allows the row to grow for TextAreas */
+    height: auto;
 }
 
-/* Update this selector to target the class we added, instead of GWT's FlowPanel object name */
-.edit-permissions-dialog .wui-dialog-layout > .dialog-button-panel,
-.edit-user-information-dialog .wui-dialog-layout > .dialog-button-panel,
-.create-user-dialog .wui-dialog-layout > .dialog-button-panel {
-    flex-shrink: 0;
-    margin-top: 15px;
+.generic-form-field .form-textbox {
+    font-size: 14px;
+    color: black;
+    flex: 1;
+}
+
+.generic-form-field.full_width {
+    margin-right: 0px;
+}
+
+.generic-form-field-left-panel {
+    flex: 1;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start; /* Keeps the label at the top for tall inputs */
+    width: 100%;
+}
+
+.generic-form-field-input-panel {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start; /* Prevents upward overflow for tall inputs */
+}
+
+.generic-form-field-input-panel.full_width {
+    width: 100%;
+}
+
+/* Ensure child textboxes expand correctly within the new layout */
+.generic-form-field-input-panel .form-textbox {
+    background-color: #FAFAFA;
+    border-bottom: 1px solid #D9D9D9;
+    border-left: none;
+    flex: 1;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.generic-data-panel-fields .form-separator {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0 -15px 0 -15px !important;
+}
+
+.generic-data-panel-fields .form-readonly-value {
+    padding-top: 5px; /* Adjust to align with the labels */
+    font-size: 14px;
+    color: black;
+    flex: 1;
+}
+
+.generic-data-panel-fields .form-label {
+    font-size: 14px;
+      font-weight: 300;
+      color: #666666;
+      width: 250px;
+}
+
+/* ============================================================
+   GENERIC STACKED FIELD (Label on top, Input below)
+   ============================================================ */
+.generic-stacked-field {
+    display: flex;
+    flex-direction: column;
+    max-width: 750px;
+    margin-bottom: 15px; /* Spacing between the fields */
+}
+
+/* Override the 250px fixed width from the side-by-side layout */
+.generic-stacked-field .form-label {
+    width: auto;
+    margin-bottom: 4px; /* Small gap between label and password box */
+    font-size: 14px;
+    font-weight: 300;
+    color: #666666;
+}
+
+/* Ensure the password box inherits the exact same generic look */
+.generic-stacked-field .form-textbox {
+    background-color: #FAFAFA;
+    border: none;
+    border-bottom: 1px solid #D9D9D9;
+    font-size: 14px;
+    color: black;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px; /* Slightly taller padding for standalone look */
 }

@@ -8,11 +8,15 @@
 package org.roda.core.data.v2.disposal.rule;
 
 import java.io.Serial;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.HasId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_RULE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRule> {
+public class DisposalRule implements IsModelObject, IsIndexed, HasId, Comparable<DisposalRule> {
 
   private static final int VERSION = 1;
   @Serial
@@ -49,6 +53,8 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
   private String createdBy = null;
   private Date updatedOn = null;
   private String updatedBy = null;
+
+  private Map<String, Object> fields;
 
   public DisposalRule() {
     super();
@@ -200,5 +206,38 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
   @Override
   public int compareTo(DisposalRule otherRule) {
     return Integer.compare(this.getOrder(), otherRule.getOrder());
+  }
+
+  @JsonIgnore
+  @Override
+  public String getUUID() {
+    return getId();
+  }
+
+  @Override
+  public List<String> toCsvHeaders() {
+    return Arrays.asList("id", "title", "description", "type", "conditionKey", "conditionValue", "disposalScheduleId",
+      "disposalScheduleName", "order", "createdOn", "createdBy", "updatedOn", "updatedBy");
+  }
+
+  @Override
+  public List<Object> toCsvValues() {
+    return Arrays.asList(id, title, description, type, conditionKey, conditionValue, disposalScheduleId,
+      disposalScheduleName, order, createdOn, createdBy, updatedOn, updatedBy);
+  }
+
+  @Override
+  public List<String> liteFields() {
+    return List.of();
+  }
+
+  @Override
+  public Map<String, Object> getFields() {
+    return this.fields;
+  }
+
+  @Override
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 }

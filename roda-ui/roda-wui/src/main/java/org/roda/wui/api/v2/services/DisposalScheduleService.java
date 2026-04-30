@@ -50,7 +50,7 @@ public class DisposalScheduleService {
 
   public DisposalSchedule retrieveDisposalSchedule(ModelService model, String id)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    return model.retrieveDisposalSchedule(id);
+      return model.retrieveDisposalSchedule(id);
   }
 
   public DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule, RequestContext requestContext)
