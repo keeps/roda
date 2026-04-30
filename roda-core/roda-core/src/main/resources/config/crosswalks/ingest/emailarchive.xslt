@@ -15,17 +15,19 @@
   <xsl:template match="*:emailArchive">
     <!-- Mailbox-level fields (parent AIP) -->
 
-    <!-- title: custodian name used as primary display title; emailAddress as fallback -->
-    <xsl:choose>
-      <xsl:when test="normalize-space(*:custodian/text()) != ''">
-        <field name="title"><xsl:value-of select="normalize-space(*:custodian/text())"/></field>
-        <field name="title_txt"><xsl:value-of select="normalize-space(*:custodian/text())"/></field>
-      </xsl:when>
-      <xsl:when test="normalize-space(*:emailAddress/text()) != ''">
-        <field name="title"><xsl:value-of select="normalize-space(*:emailAddress/text())"/></field>
-        <field name="title_txt"><xsl:value-of select="normalize-space(*:emailAddress/text())"/></field>
-      </xsl:when>
-    </xsl:choose>
+    <!-- title: "Custodian <email> (dateStart / dateEnd)" -->
+    <xsl:variable name="titleDateRange">
+      <xsl:if test="normalize-space(*:dateStart/text()) != '' or normalize-space(*:dateEnd/text()) != ''">
+        <xsl:value-of select="concat(' (', normalize-space(*:dateStart/text()), ' / ', normalize-space(*:dateEnd/text()), ')')"/>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="titleValue">
+      <xsl:value-of select="concat(normalize-space(*:custodian/text()), ' &lt;', normalize-space(*:emailAddress/text()), '&gt;', $titleDateRange)"/>
+    </xsl:variable>
+    <xsl:if test="normalize-space($titleValue) != ''">
+      <field name="title"><xsl:value-of select="$titleValue"/></field>
+      <field name="title_txt"><xsl:value-of select="$titleValue"/></field>
+    </xsl:if>
 
     <!-- level is always "item" for an email mailbox archive -->
     <field name="level">item</field>
