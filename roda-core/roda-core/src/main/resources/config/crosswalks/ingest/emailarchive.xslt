@@ -61,6 +61,7 @@
         <xsl:for-each select="*:email">
           <doc>
             <field name="content_type">email</field>
+            <field name="state">ACTIVE</field>
             <xsl:if test="normalize-space(*:messageId/text()) != ''">
               <field name="messageId_s"><xsl:value-of select="normalize-space(*:messageId/text())"/></field>
             </xsl:if>
