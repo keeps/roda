@@ -14,6 +14,22 @@
 
   <xsl:template match="*:emailArchive">
     <!-- Mailbox-level fields (parent AIP) -->
+
+    <!-- title: custodian name used as primary display title; emailAddress as fallback -->
+    <xsl:choose>
+      <xsl:when test="normalize-space(*:custodian/text()) != ''">
+        <field name="title"><xsl:value-of select="normalize-space(*:custodian/text())"/></field>
+        <field name="title_txt"><xsl:value-of select="normalize-space(*:custodian/text())"/></field>
+      </xsl:when>
+      <xsl:when test="normalize-space(*:emailAddress/text()) != ''">
+        <field name="title"><xsl:value-of select="normalize-space(*:emailAddress/text())"/></field>
+        <field name="title_txt"><xsl:value-of select="normalize-space(*:emailAddress/text())"/></field>
+      </xsl:when>
+    </xsl:choose>
+
+    <!-- level is always "item" for an email mailbox archive -->
+    <field name="level">item</field>
+
     <xsl:if test="normalize-space(*:custodian/text()) != ''">
       <field name="custodian_txt"><xsl:value-of select="normalize-space(*:custodian/text())"/></field>
     </xsl:if>
