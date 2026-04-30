@@ -22,6 +22,8 @@ public class SearchField implements Serializable {
   private Tree<String> terms;
   private String suggestField;
   private boolean suggestPartial;
+  private String nestedType;
+  private String nestedParentType;
 
   public SearchField() {
     super();
@@ -115,10 +117,26 @@ public class SearchField implements Serializable {
     this.suggestPartial = suggestPartial;
   }
 
+  public String getNestedType() {
+    return nestedType;
+  }
+
+  public void setNestedType(String nestedType) {
+    this.nestedType = nestedType;
+  }
+
+  public String getNestedParentType() {
+    return nestedParentType;
+  }
+
+  public void setNestedParentType(String nestedParentType) {
+    this.nestedParentType = nestedParentType;
+  }
+
   @Override
   public String toString() {
     return "SearchField [id=" + id + ", searchFields=" + searchFields + ", label=" + label + ", type=" + type
       + ", fixed=" + fixed + ", terms=" + terms + ", suggestField=" + suggestField + ", suggestPartial="
-      + suggestPartial + "]";
+      + suggestPartial + ", nestedType=" + nestedType + ", nestedParentType=" + nestedParentType + "]";
   }
 }

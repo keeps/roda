@@ -9,16 +9,20 @@ package org.roda.wui.client.common.search;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
+import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
+import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -398,6 +402,31 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
             }
           }
         }
+      }
+
+      // Group nested-type fields into ParentWhichFilterParameter block-join queries
+      Map<String, List<FilterParameter>> nestedGroups = new LinkedHashMap<>();
+      Iterator<Map.Entry<String, FilterParameter>> it = advancedSearchFilters.entrySet().iterator();
+      while (it.hasNext()) {
+        Map.Entry<String, FilterParameter> entry = it.next();
+        SearchField sf = advancedSearchFieldsPanel.getSearchField(entry.getKey());
+        if (sf != null && sf.getNestedType() != null && sf.getNestedParentType() != null) {
+          String groupKey = sf.getNestedType() + "\0" + sf.getNestedParentType();
+          nestedGroups.computeIfAbsent(groupKey, k -> new ArrayList<>()).add(entry.getValue());
+          it.remove();
+        }
+      }
+
+      for (Map.Entry<String, List<FilterParameter>> entry : nestedGroups.entrySet()) {
+        String[] parts = entry.getKey().split("\0", 2);
+        String nestedType = parts[0];
+        String nestedParentType = parts[1];
+        List<FilterParameter> childFilters = new ArrayList<>(entry.getValue());
+        childFilters.add(new SimpleFilterParameter("content_type", nestedType));
+        FilterParameter childrenFilter = childFilters.size() == 1 ? childFilters.get(0)
+          : new AndFiltersParameters(childFilters);
+        parameters.add(new ParentWhichFilterParameter(new SimpleFilterParameter("content_type", nestedParentType),
+          childrenFilter));
       }
 
       parameters.addAll(advancedSearchFilters.values());
