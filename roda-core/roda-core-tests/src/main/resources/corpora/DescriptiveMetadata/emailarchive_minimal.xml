@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<emailArchive xmlns="https://roda-community.org/schemas/emailarchive/v1">
+  <custodian>Jane Doe</custodian>
+  <emailAddress>jane.doe@example.org</emailAddress>
+
+  <email>
+    <messageId>&lt;only-email@example.org&gt;</messageId>
+    <subject>Hello World</subject>
+    <sender>sender@example.org</sender>
+    <recipients>jane.doe@example.org</recipients>
+    <sentDate>2022-05-10T14:30:00Z</sentDate>
+    <hasAttachments>false</hasAttachments>
+    <filePath>Inbox/msg_0001.eml</filePath>
+  </email>
+</emailArchive>

@@ -91,6 +91,17 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
         }
 
         searchField.setSuggestPartial(suggestPartial);
+
+        String nestedType = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_NESTED_TYPE);
+        String nestedParentType = ConfigurationManager.getString(fieldPrefix,
+          RodaConstants.SEARCH_FIELD_NESTED_PARENT_TYPE);
+        if (nestedType != null) {
+          searchField.setNestedType(nestedType);
+        }
+        if (nestedParentType != null) {
+          searchField.setNestedParentType(nestedParentType);
+        }
+
         searchFields.add(searchField);
       }
     }
@@ -202,6 +213,10 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
           new SearchSuggestBox<>(IndexedFile.class, searchField.getSuggestField(), searchField.isSuggestPartial()));
       }
     }
+  }
+
+  public SearchField getSearchField(String id) {
+    return searchFields.get(id);
   }
 
   @Override
