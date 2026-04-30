@@ -7,13 +7,12 @@
  */
 package org.roda.wui.common.client.tools;
 
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import org.roda.core.data.common.RodaConstants;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsDate;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.TimeZone;
@@ -21,41 +20,34 @@ import com.google.gwt.i18n.client.TimeZone;
 import config.i18n.client.ClientMessages;
 
 public class Humanize {
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   public static final long ONE_SECOND = 1000;
   public static final long SECONDS = 60;
   public static final long ONE_MINUTE = ONE_SECOND * 60;
-  public static final long MINUTES = 60;
   public static final long ONE_HOUR = ONE_MINUTE * 60;
-  public static final long HOURS = 24;
   public static final long ONE_DAY = ONE_HOUR * 24;
-
+  public static final long MINUTES = 60;
+  public static final long HOURS = 24;
+  private static final long CIVIL_DATE_UI_SAFE_TIME_SHIFT_MILLIS = 12 * 60 * 60 * 1000;
   public static final String BYTES = "B";
   public static final String KILOBYTES = "KB";
   public static final String MEGABYTES = "MB";
   public static final String GIGABYTES = "GB";
   public static final String TERABYTES = "TB";
   public static final String PETABYTES = "PB";
-
   public static final String[] UNITS = new String[] {BYTES, KILOBYTES, MEGABYTES, GIGABYTES, TERABYTES, PETABYTES};
-
   public static final double BYTES_IN_KILOBYTES = 1024L;
   public static final double BYTES_IN_MEGABYTES = 1048576L;
   public static final double BYTES_IN_GIGABYTES = 1073741824L;
   public static final double BYTES_IN_TERABYTES = 1099511627776L;
   public static final double BYTES_IN_PETABYTES = 1125899906842624L;
-
   public static final double[] BYTES_IN_UNITS = {1, BYTES_IN_KILOBYTES, BYTES_IN_MEGABYTES, BYTES_IN_GIGABYTES,
     BYTES_IN_TERABYTES, BYTES_IN_PETABYTES};
-
-  protected static final NumberFormat SMALL_NUMBER_FORMAT = NumberFormat.getFormat("0.#");
-  protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getFormat("#");
-
   public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd");
   public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss z");
-
   public static final boolean FORMAT_UTC = false;
+  protected static final NumberFormat SMALL_NUMBER_FORMAT = NumberFormat.getFormat("0.#");
+  protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getFormat("#");
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Humanize() {
     // do nothing
@@ -97,23 +89,19 @@ public class Humanize {
     if (dateInitial == null && dateFinal == null) {
       return extendedDate ? messages.titleDatesEmpty() : messages.simpleDatesEmpty();
     } else if (dateInitial != null && dateFinal == null) {
-      String dateInitialString = formatDate(dateInitial, extendedDate);
+      String dateInitialString = formatCivilDate(dateInitial, extendedDate);
       return extendedDate ? messages.titleDatesNoFinal(dateInitialString)
         : messages.simpleDatesNoFinal(dateInitialString);
     } else if (dateInitial == null) {
-      String dateFinalString = formatDate(dateFinal, extendedDate);
+      String dateFinalString = formatCivilDate(dateFinal, extendedDate);
       return extendedDate ? messages.titleDatesNoInitial(dateFinalString)
         : messages.simpleDatesNoInitial(dateFinalString);
     } else {
-      String dateInitialString = formatDate(dateInitial, extendedDate);
-      String dateFinalString = formatDate(dateFinal, extendedDate);
+      String dateInitialString = formatCivilDate(dateInitial, extendedDate);
+      String dateFinalString = formatCivilDate(dateFinal, extendedDate);
       return extendedDate ? messages.titleDates(dateInitialString, dateFinalString)
         : messages.simpleDates(dateInitialString, dateFinalString);
     }
-  }
-
-  public enum DHMSFormat {
-    LONG, SHORT;
   }
 
   public static String durationInDHMS(Date start, Date end, DHMSFormat format) {
@@ -212,7 +200,18 @@ public class Humanize {
       DATE_TIME_FORMAT);
   }
 
+  public static String formatCivilDate(Date date, boolean extended) {
+    String formatPropertyName = extended ? RodaConstants.UI_DATE_FORMAT_TITLE : RodaConstants.UI_DATE_FORMAT_SIMPLE;
+    Date displayDate = new Date(date.getTime() + CIVIL_DATE_UI_SAFE_TIME_SHIFT_MILLIS);
+    return applyDateTimeFormat(displayDate, ConfigurationManager.getString(formatPropertyName), DATE_FORMAT, true);
+  }
+
   private static String applyDateTimeFormat(Date date, String stringFormat, DateTimeFormat defaultValue) {
+    return applyDateTimeFormat(date, stringFormat, defaultValue, false);
+  }
+
+  private static String applyDateTimeFormat(Date date, String stringFormat, DateTimeFormat defaultValue,
+    boolean forceUtc) {
     DateTimeFormat format;
 
     if (stringFormat != null) {
@@ -232,10 +231,32 @@ public class Humanize {
       format = defaultValue;
     }
 
-    if (ConfigurationManager.getBoolean(FORMAT_UTC, RodaConstants.UI_DATE_TIME_FORMAT_UTC)) {
+    if (forceUtc || ConfigurationManager.getBoolean(FORMAT_UTC, RodaConstants.UI_DATE_TIME_FORMAT_UTC)) {
       return format.format(date, TimeZone.createTimeZone(0));
     }
 
     return format.format(date);
+  }
+
+  public static Date parseCivilDate(String civilDate) {
+    if (civilDate == null || civilDate.trim().isEmpty()) {
+      return null;
+    }
+
+    String[] parts = civilDate.trim().split("-");
+    if (parts.length != 3) {
+      return null;
+    }
+
+    int year = Integer.parseInt(parts[0]);
+    int month = Integer.parseInt(parts[1]);
+    int day = Integer.parseInt(parts[2]);
+
+    // avoid local timezone, month - 1 adapts civil month to JavaScript month
+    return new Date((long) JsDate.UTC(year, month - 1, day, 0, 0, 0, 0));
+  }
+
+  public enum DHMSFormat {
+    LONG, SHORT;
   }
 }

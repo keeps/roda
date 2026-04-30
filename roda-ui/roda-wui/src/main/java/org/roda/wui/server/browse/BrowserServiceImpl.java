@@ -343,6 +343,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
       IndexResult<T> result = Browser.find(classToReturn, filter, sorter, sublist, facets, user, justActive,
         fieldsToReturn);
+
       return I18nUtility.translate(result, classToReturn, localeString);
     } catch (RuntimeException e) {
       LOGGER.error("Unexpected error in find", e);

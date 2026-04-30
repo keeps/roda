@@ -4058,6 +4058,11 @@ td.datePickerMonth, td.datePickerYear {
     vertical-align: top;
 }
 
+.search-field-left-panel .form-textbox-date {
+    width: 125px;
+    max-width: none;
+}
+
 .searchAdvancedPanelButtons {
     height: 30px;
 }
