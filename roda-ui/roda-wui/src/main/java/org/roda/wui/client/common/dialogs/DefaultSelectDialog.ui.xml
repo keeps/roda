@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists.utils">
+             xmlns:commonsearch="urn:import:org.roda.wui.client.common.search">
 
-	<ui:style>
-		.emptyParentButton {
-		margin-right: 10px;
-		}
-	</ui:style>
+    <ui:style>
+        .emptyParentButton {
+        margin-right: 10px;
+        }
+    </ui:style>
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
 	<g:FlowPanel addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="wui-dialog-layout">

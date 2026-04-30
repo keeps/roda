@@ -13,9 +13,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.client.disposal.hold.CreateDisposalHold;
-import org.roda.wui.client.disposal.hold.EditDisposalHold;
-import org.roda.wui.common.client.tools.HistoryUtils;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -81,7 +78,7 @@ public class DisposalHoldSearchWrapperActions extends AbstractActionable<Disposa
   @Override
   public void act(Action<DisposalHold> action, DisposalHold hold, AsyncCallback<ActionImpact> callback) {
     if (DisposalHoldAction.EDIT.equals(action)) {
-      edit(hold, callback);
+      DisposalHoldActions.edit(hold, callback);
     } else if (DisposalHoldAction.LIFT.equals(action)) {
       DisposalHoldActions.lift(hold, callback);
     } else {
@@ -92,7 +89,7 @@ public class DisposalHoldSearchWrapperActions extends AbstractActionable<Disposa
   @Override
   public void act(Action<DisposalHold> action, AsyncCallback<ActionImpact> callback) {
     if (DisposalHoldAction.NEW.equals(action)) {
-      newDisposalHold(callback);
+      DisposalHoldActions.newDisposalHold(callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -118,16 +115,4 @@ public class DisposalHoldSearchWrapperActions extends AbstractActionable<Disposa
   public Action<DisposalHold> actionForName(String name) {
     return null;
   }
-
-  private void newDisposalHold(AsyncCallback<ActionImpact> callback) {
-    HistoryUtils.newHistory(CreateDisposalHold.RESOLVER.getHistoryPath());
-    callback.onSuccess(ActionImpact.UPDATED);
-  }
-
-  private void edit(DisposalHold hold, AsyncCallback<ActionImpact> callback) {
-    HistoryUtils.newHistory(EditDisposalHold.RESOLVER, hold.getId());
-    callback.onSuccess(ActionImpact.UPDATED);
-  }
-
-
 }

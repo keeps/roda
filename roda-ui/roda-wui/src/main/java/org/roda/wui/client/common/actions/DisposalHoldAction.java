@@ -12,9 +12,7 @@ import org.roda.core.data.v2.disposal.hold.DisposalHold;
 
 public enum DisposalHoldAction implements Actionable.Action<DisposalHold> {
   NEW(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_HOLD),
-  SAVE(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_HOLD),
   EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_HOLD),
-  UPDATE(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_HOLD),
   LIFT(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD),
   DISASSOCIATE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD);
 

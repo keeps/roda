@@ -7,33 +7,33 @@
  */
 package org.roda.wui.client.disposal.rule;
 
-import java.util.List;
-
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
-import org.roda.core.data.v2.disposal.rule.DisposalRule;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
-import org.roda.wui.client.common.CreateOrUpdateDisposalRuleActionsToolbar;
-import org.roda.wui.client.common.NavigationToolbar;
-import org.roda.wui.client.common.TitlePanel;
-import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.disposal.policy.DisposalPolicy;
-import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.client.services.DisposalScheduleRestService;
-import org.roda.wui.client.services.Services;
-import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
-
 import config.i18n.client.ClientMessages;
+import org.roda.core.data.v2.disposal.rule.DisposalRule;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoActionsToolbar;
+import org.roda.wui.client.common.TitlePanel;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.disposal.policy.DisposalPolicy;
+import org.roda.wui.client.disposal.rule.data.panels.DisposalRuleDataPanel;
+import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.services.DisposalScheduleRestService;
+import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
+import java.util.List;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -83,7 +83,7 @@ public class EditDisposalRule extends Composite {
   @UiField
   NavigationToolbar<DisposalRule> navigationToolbar;
   @UiField
-  CreateOrUpdateDisposalRuleActionsToolbar actionsToolbar;
+  NoActionsToolbar actionsToolbar;
   @UiField
   TitlePanel title;
   @UiField
@@ -97,30 +97,32 @@ public class EditDisposalRule extends Composite {
     DisposalRuleDataPanel dataPanel = new DisposalRuleDataPanel(disposalRule, disposalSchedules, true);
     disposalRuleDataPanel.add(dataPanel);
 
+    dataPanel.setSaveHandler(() -> {
+      Services services = new Services("Update disposal rule", "update");
+      services.disposalRuleResource(s -> s.updateDisposalRule(dataPanel.getValue()))
+        .whenComplete((updated, throwable) -> {
+          if (throwable != null) {
+            Toast.showError(throwable);
+          } else {
+            Toast.showInfo(messages.disposalRulesTitle(), messages.disposalRuleSuccessfullyUpdated());
+            HistoryUtils.newHistory(ShowDisposalRule.RESOLVER, updated.getId());
+          }
+        });
+    });
+
+    dataPanel.setCancelHandler(() -> HistoryUtils.newHistory(ShowDisposalRule.RESOLVER, disposalRule.getId()));
+
     navigationToolbar.withoutButtons().build();
     navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getEditDisposalRuleBreadcrumbs(disposalRule));
 
     actionsToolbar.setLabel(messages.showDisposalRuleTitle());
 
-    // 2. Give the toolbar the panel so it can check validity
-    actionsToolbar.setDataPanel(dataPanel);
-    actionsToolbar.setIsCreate(false);
-
     // 3. Pass the shared object
-    actionsToolbar.setObjectAndBuild(disposalRule, null, new AsyncCallback<Actionable.ActionImpact>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
+    actionsToolbar.build();
 
-      @Override
-      public void onSuccess(Actionable.ActionImpact result) {
-        // Redirect user or show success message if result == ActionImpact.UPDATED
-      }
-    });
-
-    title.setText(messages.editDisposalRuleTitle());
+    title.setText(disposalRule.getTitle());
     title.setIconClass("DisposalRule");
+    title.addStyleName("mb-20");
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");

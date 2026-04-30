@@ -14,32 +14,29 @@ import com.google.gwt.user.client.ui.FocusPanel;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
-import org.roda.wui.client.common.CreateOrUpdateDisposalRuleActionsToolbar;
-import org.roda.wui.client.common.CreateOrUpdateDisposalScheduleActionsToolbar;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoActionsToolbar;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
-import org.roda.wui.client.disposal.rule.DisposalRuleDataPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.client.disposal.schedule.data.panels.DisposalScheduleDataPanel;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.common.client.widgets.Toast;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -92,15 +89,11 @@ public class EditDisposalSchedule extends Composite {
   @UiField
   NavigationToolbar<DisposalRule> navigationToolbar;
   @UiField
-  CreateOrUpdateDisposalScheduleActionsToolbar actionsToolbar;
+  NoActionsToolbar actionsToolbar;
   @UiField
   TitlePanel title;
   @UiField
   FlowPanel disposalScheduleDataPanel;
-
-  public EditDisposalSchedule() {
-    initWidget(uiBinder.createAndBindUi(this));
-  }
 
   public EditDisposalSchedule(DisposalSchedule disposalSchedule) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -109,30 +102,32 @@ public class EditDisposalSchedule extends Composite {
     DisposalScheduleDataPanel dataPanel = new DisposalScheduleDataPanel(disposalSchedule, true);
     disposalScheduleDataPanel.add(dataPanel);
 
+    dataPanel.setSaveHandler(() -> {
+      Services services = new Services("Update disposal schedule", "update");
+      services.disposalScheduleResource(s -> s.updateDisposalSchedule(dataPanel.getValue()))
+        .whenComplete((updated, throwable) -> {
+          if (throwable != null) {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
+          } else {
+            Toast.showInfo(messages.disposalScheduleTitle(), messages.disposalScheduleSuccessfullyUpdated());
+            HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, updated.getId());
+          }
+        });
+    });
+
+    dataPanel.setCancelHandler(() -> HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, disposalSchedule.getId()));
+
     navigationToolbar.withoutButtons().build();
     navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getEditDisposalScheduleBreadcrumbs(disposalSchedule));
 
     actionsToolbar.setLabel(messages.showDisposalRuleTitle());
 
-    // 2. Give the toolbar the panel so it can check validity
-    actionsToolbar.setDataPanel(dataPanel);
-    actionsToolbar.setIsCreate(false);
-
     // 3. Pass the shared object
-    actionsToolbar.setObjectAndBuild(disposalSchedule, null, new AsyncCallback<Actionable.ActionImpact>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
+    actionsToolbar.build();
 
-      @Override
-      public void onSuccess(Actionable.ActionImpact result) {
-        // Redirect user or show success message if result == ActionImpact.UPDATED
-      }
-    });
-
-    title.setText(messages.editDisposalScheduleTitle());
+    title.setText(disposalSchedule.getTitle());
     title.setIconClass("DisposalSchedule");
+    title.addStyleName("mb-20");
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");

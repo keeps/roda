@@ -10,7 +10,10 @@ import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.disposal.hold.CreateDisposalHold;
+import org.roda.wui.client.disposal.hold.EditDisposalHold;
 import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 /**
@@ -22,6 +25,16 @@ public class DisposalHoldActions {
 
   private DisposalHoldActions() {
     // private constructor to prevent instantiation
+  }
+
+  public static void newDisposalHold(AsyncCallback<Actionable.ActionImpact> callback) {
+    HistoryUtils.newHistory(CreateDisposalHold.RESOLVER.getHistoryPath());
+    callback.onSuccess(Actionable.ActionImpact.UPDATED);
+  }
+
+  public static void edit(DisposalHold hold, AsyncCallback<Actionable.ActionImpact> callback) {
+    HistoryUtils.newHistory(EditDisposalHold.RESOLVER, hold.getId());
+    callback.onSuccess(Actionable.ActionImpact.NONE);
   }
 
   public static void lift(DisposalHold hold, AsyncCallback<Actionable.ActionImpact> callback) {

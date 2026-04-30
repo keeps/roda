@@ -15,18 +15,21 @@ import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.wui.client.common.CreateOrUpdateDisposalRuleActionsToolbar;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoActionsToolbar;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
+import org.roda.wui.client.disposal.rule.data.panels.DisposalRuleDataPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.DisposalScheduleRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.Toast;
 
 import java.util.List;
 
@@ -51,8 +54,8 @@ public class CreateDisposalRule extends Composite {
             if (throwable != null) {
               AsyncCallbackUtils.defaultFailureTreatment(throwable);
             } else {
-              CreateDisposalRule createDisposalRule = new CreateDisposalRule(new DisposalRule(),
-                disposalSchedules, disposalRulesCount);
+              CreateDisposalRule createDisposalRule = new CreateDisposalRule(new DisposalRule(), disposalSchedules,
+                disposalRulesCount);
               callback.onSuccess(createDisposalRule);
             }
           }));
@@ -82,14 +85,14 @@ public class CreateDisposalRule extends Composite {
   @UiField
   NavigationToolbar<DisposalRule> navigationToolbar;
   @UiField
-  CreateOrUpdateDisposalRuleActionsToolbar actionsToolbar;
+  NoActionsToolbar actionsToolbar;
   @UiField
   TitlePanel title;
   @UiField
   FlowPanel disposalRuleDataPanel;
 
   public CreateDisposalRule(DisposalRule disposalRule, DisposalSchedules disposalSchedules,
-                            LongResponse disposalRulesCount) {
+    LongResponse disposalRulesCount) {
 
     initWidget(uiBinder.createAndBindUi(this));
     disposalRule.setOrder(disposalRulesCount.getResult().intValue());
@@ -98,30 +101,31 @@ public class CreateDisposalRule extends Composite {
     DisposalRuleDataPanel dataPanel = new DisposalRuleDataPanel(disposalRule, disposalSchedules, false);
     disposalRuleDataPanel.add(dataPanel);
 
+    dataPanel.setSaveHandler(() -> {
+      Services services = new Services("Create disposal rule", "create");
+      services.disposalRuleResource(s -> s.createDisposalRule(dataPanel.getValue())).whenComplete((created, throwable) -> {
+        if (throwable != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(throwable);
+        } else {
+          Toast.showInfo(messages.disposalRulesTitle(), messages.disposalRuleSuccessfullyCreated());
+          HistoryUtils.newHistory(ShowDisposalRule.RESOLVER, created.getId());
+        }
+      });
+    });
+
+    dataPanel.setCancelHandler(() -> HistoryUtils.newHistory(DisposalPolicy.RESOLVER.getHistoryPath()));
+
     navigationToolbar.withoutButtons().build();
     navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getCreateDisposalRuleBreadcrumbs());
 
     actionsToolbar.setLabel(messages.showDisposalRuleTitle());
 
-    // 2. Give the toolbar the panel so it can check validity
-    actionsToolbar.setDataPanel(dataPanel);
-    actionsToolbar.setIsCreate(true);
-
     // 3. Pass the shared object
-    actionsToolbar.setObjectAndBuild(disposalRule, null, new AsyncCallback<Actionable.ActionImpact>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(Actionable.ActionImpact result) {
-        // Redirect user or show success message if result == ActionImpact.UPDATED
-      }
-    });
+    actionsToolbar.build();
 
     title.setText(messages.newDisposalRuleTitle());
     title.setIconClass("DisposalRule");
+    title.addStyleName("mb-20");
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");

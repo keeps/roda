@@ -8,7 +8,10 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
+import org.roda.wui.client.disposal.schedule.EditDisposalSchedule;
 import org.roda.wui.client.services.Services;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 /**
@@ -21,6 +24,16 @@ public class DisposalScheduleActions {
 
   private DisposalScheduleActions() {
     // Private constructor to prevent instantiation
+  }
+
+  public static void newDisposalSchedule(AsyncCallback<Actionable.ActionImpact> callback) {
+    HistoryUtils.newHistory(CreateDisposalSchedule.RESOLVER.getHistoryPath());
+    callback.onSuccess(Actionable.ActionImpact.UPDATED);
+  }
+
+  public static void editDisposalSchedule(DisposalSchedule schedule, AsyncCallback<Actionable.ActionImpact> callback) {
+    HistoryUtils.newHistory(EditDisposalSchedule.RESOLVER, schedule.getId());
+    callback.onSuccess(Actionable.ActionImpact.UPDATED);
   }
 
   public static void removeDisposalSchedule(DisposalSchedule schedule,

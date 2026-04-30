@@ -8,7 +8,7 @@
 		<g:FlowPanel styleName="browse wui-edit-disposal-hold" addStyleNames="wrapper skip_padding">
 			<common:NavigationToolbar ui:field="navigationToolbar"/>
 
-			<common:CreateOrUpdateDisposalHoldActionsToolbar ui:field="actionsToolbar"/>
+			<common:NoActionsToolbar ui:field="actionsToolbar"/>
 
 			<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
 				<g:FlowPanel addStyleNames="col_12 content">
