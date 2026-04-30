@@ -25,6 +25,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.i18n.client.TimeZone;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONException;
 import com.google.gwt.json.client.JSONObject;
@@ -443,6 +444,9 @@ public class FormUtilities {
     final boolean mandatory, final Callable<Void> onChange) {
     // Top label
     final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
+    final TimeZone utcZone = TimeZone.createTimeZone(0);
+    final long HALF_DAY_MS = 43200000L; // 12 hours in milliseconds
+
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
     if (mandatory) {
@@ -459,7 +463,9 @@ public class FormUtilities {
       public String format(DateBox dateBox, Date date) {
         if (date == null)
           return null;
-        return dateTimeFormat.format(date);
+        // Shift time to midday (+12h) to avoid timezone edge-cases when formatting to UTC
+        Date safeDate = new Date(date.getTime() + HALF_DAY_MS);
+        return dateTimeFormat.format(safeDate, utcZone);
       }
     });
 
@@ -477,7 +483,12 @@ public class FormUtilities {
       @Override
       public void onValueChange(ValueChangeEvent<Date> valueChangeEvent) {
         FormUtilities.callOnChange(onChange);
-        String newValue = dateTimeFormat.format(mvDate.getValue());
+        Date date = mvDate.getValue();
+        String newValue = null;
+        if (date != null) {
+          Date safeDate = new Date(date.getTime() + HALF_DAY_MS);
+          newValue = dateTimeFormat.format(safeDate, utcZone);
+        }
         mv.set("value", newValue);
         if (mandatory && (newValue != null && !"".equals(newValue.trim()))) {
           mvDate.removeStyleName("isWrong");
@@ -496,7 +507,8 @@ public class FormUtilities {
         try {
           Date date = dateTimeFormat.parse(value.trim());
           mvDate.setValue(date);
-          mv.set("value", value);
+          Date safeDate = new Date(date.getTime() + HALF_DAY_MS);
+          mv.set("value", dateTimeFormat.format(safeDate, utcZone));
         } catch (IllegalArgumentException iae) {
           if (event.getValue() == null || "".equals(event.getValue().trim())) {
             mv.set("value", null);
