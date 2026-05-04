@@ -1037,8 +1037,8 @@ public class SolrUtils {
     String escapedMask = maskValue.replace("\"", "\\\"");
 
     if (parameter.getParentFilter() != null) {
-      String parentQuery = buildBlockJoinSubQuery(parameter.getParentFilter());
-      ret.append("{!child of=\"").append(escapedMask).append("\"}").append(parentQuery);
+      String parentQuery = buildBlockJoinSubQuery(parameter.getParentFilter()).replace("\"", "\\\"");
+      ret.append("{!child of=\"").append(escapedMask).append("\" v=\"").append(parentQuery).append("\"}");
     } else {
       ret.append("{!child of=\"").append(escapedMask).append("\"}");
     }
@@ -1051,8 +1051,8 @@ public class SolrUtils {
     String escapedMask = maskValue.replace("\"", "\\\"");
 
     if (parameter.getChildrenFilter() != null) {
-      String childQuery = buildBlockJoinSubQuery(parameter.getChildrenFilter());
-      ret.append("{!parent which=\"").append(escapedMask).append("\"}").append(childQuery);
+      String childQuery = buildBlockJoinSubQuery(parameter.getChildrenFilter()).replace("\"", "\\\"");
+      ret.append("{!parent which=\"").append(escapedMask).append("\" v=\"").append(childQuery).append("\"}");
     } else {
       ret.append("{!parent which=\"").append(escapedMask).append("\"}");
     }
@@ -1121,6 +1121,24 @@ public class SolrUtils {
         buildBlockJoinSubQueryClause(sb, values.get(i));
       }
       sb.append(")");
+    } else if (parameter instanceof DateIntervalFilterParameter dateIntervalPar) {
+      if (dateIntervalPar.getFromValue() != null || dateIntervalPar.getToValue() != null) {
+        sb.append("+").append(dateIntervalPar.getFromName()).append(":[")
+          .append(processFromDate(dateIntervalPar.getFromValue())).append(" TO ")
+          .append(processToDate(dateIntervalPar.getToValue(), dateIntervalPar.getGranularity())).append("]");
+      }
+    } else if (parameter instanceof DateRangeFilterParameter dateRangePar) {
+      if (dateRangePar.getFromValue() != null || dateRangePar.getToValue() != null) {
+        sb.append("+").append(dateRangePar.getName()).append(":[")
+          .append(processFromDate(dateRangePar.getFromValue())).append(" TO ")
+          .append(processToDate(dateRangePar.getToValue(), dateRangePar.getGranularity(), false)).append("]");
+      }
+    } else if (parameter instanceof LongRangeFilterParameter longRangePar) {
+      if (longRangePar.getFromValue() != null || longRangePar.getToValue() != null) {
+        sb.append("+").append(longRangePar.getName()).append(":[")
+          .append(longRangePar.getFromValue() != null ? longRangePar.getFromValue() : "*").append(" TO ")
+          .append(longRangePar.getToValue() != null ? longRangePar.getToValue() : "*").append("]");
+      }
     } else {
       parseFilterParameter(sb, parameter, !sb.isEmpty());
     }
