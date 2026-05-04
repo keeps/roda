@@ -1091,6 +1091,14 @@ public class SolrUtils {
       String value = basicPar.getValue();
       if (StringUtils.isBlank(value) || "*".equals(value)) {
         sb.append("+").append(basicPar.getName()).append(":*");
+      } else if (value.contains("*") || value.contains("?")) {
+        // wildcards cannot appear inside quoted phrases — emit each token unquoted
+        for (String token : value.trim().split("\\s+")) {
+          if (sb.length() > 0) {
+            sb.append(" ");
+          }
+          sb.append("+").append(basicPar.getName()).append(":").append(escapeSolrSpecialChars(token));
+        }
       } else {
         String cleanValue = value.matches("^\".+\"$") ? value.substring(1, value.length() - 1) : value;
         sb.append("+").append(basicPar.getName()).append(":\"").append(cleanValue.replace("\"", "\\\"")).append("\"");
