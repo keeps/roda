@@ -112,7 +112,7 @@
         <cas.client.version>4.1.0</cas.client.version>
         <swagger.version>2.2.41</swagger.version>
         <jackson.version>2.20.1</jackson.version>
-        <spring.version>6.2.17</spring.version>
+        <spring.version>6.2.18</spring.version>
         <solr.version>9.10.0</solr.version>
         <pekko.version>1.4.0</pekko.version>
         <httpcomponents.version>5.5</httpcomponents.version>
