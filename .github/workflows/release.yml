@@ -34,7 +34,7 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
       - name: Install clamdscan
-        run: sudo apt-get install clamdscan -y
+        run: sudo apt-get update && sudo apt-get install clamdscan -y
       - name: Get release version
         id: get_version
         run: echo "release_version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
