@@ -36,6 +36,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.index.utils.IterableIndexResult;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.DefaultStoragePath;
@@ -143,7 +144,7 @@ public class NestedDocumentSearchTest extends AbstractTestNGSpringContextTests {
     long childCount = childResp.getResults().getNumFound();
     assertTrue("Child email documents should be indexed in Solr (found " + childCount + ")", childCount > 0);
 
-    // Layer 4: block-join ParentWhichFilterParameter returns the parent AIP
+    // Layer 4: block-join ParentWhichFilterParameter — verify generated query string and Solr result
     Filter nestedFilter = new Filter(
       new ParentWhichFilterParameter(
         new SimpleFilterParameter("content_type", "emailarchive"),
@@ -151,14 +152,19 @@ public class NestedDocumentSearchTest extends AbstractTestNGSpringContextTests {
           new SimpleFilterParameter("sender_s", "joao.silva@empresa.pt"),
           new SimpleFilterParameter("content_type", "email")))));
 
+    String nestedQuery = SolrUtils.parseFilter(nestedFilter);
+    assertEquals("Block-join query must use double-quoted which= and + required operators",
+      "{!parent which=\"content_type:emailarchive\"}(+sender_s:\"joao.silva@empresa.pt\" +content_type:\"email\")",
+      nestedQuery);
+
     IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, nestedFilter, Sorter.NONE,
       new Sublist(0, 10), Collections.emptyList());
 
     assertEquals("ParentWhichFilterParameter should return exactly 1 AIP", 1L, result.getTotalCount());
     assertEquals("Returned AIP id should match", aipId, result.getResults().get(0).getId());
 
-    // Layer 5: same block-join combined with AllFilterParameter (*:* AND {!parent ...})
-    // This reproduces the production scenario where q.op=AND was breaking the query
+    // Layer 5: AllFilterParameter combined with ParentWhichFilterParameter must not emit *:* prefix
+    // (production scenario: default filter adds AllFilterParameter, should not break block-join)
     Filter combinedFilter = new Filter(
       new AllFilterParameter(),
       new ParentWhichFilterParameter(
@@ -166,6 +172,11 @@ public class NestedDocumentSearchTest extends AbstractTestNGSpringContextTests {
         new AndFiltersParameters(Arrays.asList(
           new SimpleFilterParameter("sender_s", "joao.silva@empresa.pt"),
           new SimpleFilterParameter("content_type", "email")))));
+
+    String combinedQuery = SolrUtils.parseFilter(combinedFilter);
+    assertEquals("AllFilterParameter must be dropped when block-join is present",
+      "{!parent which=\"content_type:emailarchive\"}(+sender_s:\"joao.silva@empresa.pt\" +content_type:\"email\")",
+      combinedQuery);
 
     IndexResult<IndexedAIP> combinedResult = index.find(IndexedAIP.class, combinedFilter, Sorter.NONE,
       new Sublist(0, 10), Collections.emptyList());

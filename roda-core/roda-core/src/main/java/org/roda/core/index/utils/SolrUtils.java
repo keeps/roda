@@ -982,7 +982,12 @@ public class SolrUtils {
     if (filter == null || filter.getParameters().isEmpty()) {
       return ret.toString();
     } else {
+      boolean hasBlockJoin = filter.getParameters().stream()
+        .anyMatch(p -> p instanceof ParentWhichFilterParameter || p instanceof ChildOfFilterParameter);
       for (FilterParameter parameter : filter.getParameters()) {
+        if (hasBlockJoin && parameter instanceof AllFilterParameter) {
+          continue;
+        }
         parseFilterParameter(ret, parameter, true);
       }
     }
@@ -1033,34 +1038,88 @@ public class SolrUtils {
   private static void appendBlockJoinChildrenFilterParameter(StringBuilder ret, ChildOfFilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
     appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
-    StringBuilder blockMask = new StringBuilder();
-    parseFilterParameter(blockMask, parameter.getChildrenOfFilter(), false);
-    String replace = blockMask.toString().replace(": ", ":");
+    String maskValue = buildBlockJoinMask(parameter.getChildrenOfFilter());
+    String escapedMask = maskValue.replace("\"", "\\\"");
 
     if (parameter.getParentFilter() != null) {
-      StringBuilder someParents = new StringBuilder();
-      parseFilterParameter(someParents, parameter.getParentFilter(), false);
-
-      ret.append("{!child of=").append(replace).append("}").append(someParents);
+      String parentQuery = buildBlockJoinSubQuery(parameter.getParentFilter());
+      ret.append("{!child of=\"").append(escapedMask).append("\"}").append(parentQuery);
     } else {
-      ret.append("{!child of=").append(replace).append("}");
+      ret.append("{!child of=\"").append(escapedMask).append("\"}");
     }
   }
 
   private static void appendBlockJoinFilterParameter(StringBuilder ret, ParentWhichFilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
     appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
-    StringBuilder blockMask = new StringBuilder();
-    parseFilterParameter(blockMask, parameter.getParentFilter(), false);
-    String replace = blockMask.toString().replace(": ", ":");
+    String maskValue = buildBlockJoinMask(parameter.getParentFilter());
+    String escapedMask = maskValue.replace("\"", "\\\"");
 
     if (parameter.getChildrenFilter() != null) {
-      StringBuilder someChildren = new StringBuilder();
-      parseFilterParameter(someChildren, parameter.getChildrenFilter(), false);
-
-      ret.append("{!parent which=").append(replace).append("}").append(someChildren);
+      String childQuery = buildBlockJoinSubQuery(parameter.getChildrenFilter());
+      ret.append("{!parent which=\"").append(escapedMask).append("\"}").append(childQuery);
     } else {
-      ret.append("{!parent which=").append(replace).append("}");
+      ret.append("{!parent which=\"").append(escapedMask).append("\"}");
+    }
+  }
+
+  private static String buildBlockJoinMask(FilterParameter parameter) throws RequestNotValidException {
+    if (parameter instanceof SimpleFilterParameter simplePar) {
+      String value = simplePar.getValue();
+      if (value.matches("[\\w.-]+")) {
+        return simplePar.getName() + ":" + value;
+      } else {
+        return simplePar.getName() + ":\"" + value.replace("\"", "\\\"") + "\"";
+      }
+    }
+    StringBuilder sb = new StringBuilder();
+    parseFilterParameter(sb, parameter, false);
+    String s = sb.toString().replace(": ", ":");
+    if (s.startsWith("(") && s.endsWith(")")) {
+      s = s.substring(1, s.length() - 1);
+    }
+    return s;
+  }
+
+  private static String buildBlockJoinSubQuery(FilterParameter parameter) throws RequestNotValidException {
+    StringBuilder sb = new StringBuilder();
+    buildBlockJoinSubQueryClause(sb, parameter);
+    return "(" + sb.toString() + ")";
+  }
+
+  private static void buildBlockJoinSubQueryClause(StringBuilder sb, FilterParameter parameter)
+    throws RequestNotValidException {
+    if (parameter instanceof SimpleFilterParameter simplePar) {
+      sb.append("+").append(simplePar.getName()).append(":\"")
+        .append(simplePar.getValue().replace("\"", "\\\"")).append("\"");
+    } else if (parameter instanceof BasicSearchFilterParameter basicPar) {
+      String value = basicPar.getValue();
+      if (StringUtils.isBlank(value) || "*".equals(value)) {
+        sb.append("+").append(basicPar.getName()).append(":*");
+      } else {
+        String cleanValue = value.matches("^\".+\"$") ? value.substring(1, value.length() - 1) : value;
+        sb.append("+").append(basicPar.getName()).append(":\"").append(cleanValue.replace("\"", "\\\"")).append("\"");
+      }
+    } else if (parameter instanceof AndFiltersParameters andPar) {
+      List<FilterParameter> values = andPar.getValues();
+      for (int i = 0; i < values.size(); i++) {
+        if (i > 0) {
+          sb.append(" ");
+        }
+        buildBlockJoinSubQueryClause(sb, values.get(i));
+      }
+    } else if (parameter instanceof OrFiltersParameters orPar) {
+      sb.append("(");
+      List<FilterParameter> values = orPar.getValues();
+      for (int i = 0; i < values.size(); i++) {
+        if (i > 0) {
+          sb.append(" OR ");
+        }
+        buildBlockJoinSubQueryClause(sb, values.get(i));
+      }
+      sb.append(")");
+    } else {
+      parseFilterParameter(sb, parameter, !sb.isEmpty());
     }
   }
 
