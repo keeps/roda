@@ -982,12 +982,7 @@ public class SolrUtils {
     if (filter == null || filter.getParameters().isEmpty()) {
       return ret.toString();
     } else {
-      boolean hasBlockJoin = filter.getParameters().stream()
-        .anyMatch(p -> p instanceof ParentWhichFilterParameter || p instanceof ChildOfFilterParameter);
       for (FilterParameter parameter : filter.getParameters()) {
-        if (hasBlockJoin && parameter instanceof AllFilterParameter) {
-          continue;
-        }
         parseFilterParameter(ret, parameter, true);
       }
     }
