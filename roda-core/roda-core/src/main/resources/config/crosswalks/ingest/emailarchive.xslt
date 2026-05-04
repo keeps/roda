@@ -39,10 +39,10 @@
       <field name="emailAddress_s"><xsl:value-of select="normalize-space(*:emailAddress/text())"/></field>
     </xsl:if>
     <xsl:if test="normalize-space(*:dateStart/text()) != ''">
-      <field name="dateStart_dt"><xsl:value-of select="normalize-space(*:dateStart/text())"/>T00:00:00Z</field>
+      <field name="dateInitial"><xsl:value-of select="normalize-space(*:dateStart/text())"/>T00:00:00Z</field>
     </xsl:if>
     <xsl:if test="normalize-space(*:dateEnd/text()) != ''">
-      <field name="dateEnd_dt"><xsl:value-of select="normalize-space(*:dateEnd/text())"/>T00:00:00Z</field>
+      <field name="dateFinal"><xsl:value-of select="normalize-space(*:dateEnd/text())"/>T00:00:00Z</field>
     </xsl:if>
     <xsl:if test="normalize-space(*:totalMessages/text()) != ''">
       <field name="totalMessages_i"><xsl:value-of select="normalize-space(*:totalMessages/text())"/></field>
