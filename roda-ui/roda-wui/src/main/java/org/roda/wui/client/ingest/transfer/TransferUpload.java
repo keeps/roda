@@ -162,6 +162,8 @@ public class TransferUpload extends Composite {
   private String getUploadUrl() {
     String ret = null;
 
+    uploadTitle.setIcon("ma ma-upload");
+
     if (isIngest) {
       uploadTitle.setText(messages.ingestTransferUploadTitle());
       if (resource == null) {
