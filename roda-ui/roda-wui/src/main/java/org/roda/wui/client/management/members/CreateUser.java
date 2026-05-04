@@ -86,7 +86,7 @@ public class CreateUser extends Composite {
       services.membersResource(s -> s.createUser(request, LocaleInfo.getCurrentLocale().getLocaleName()))
         .whenComplete((created, error) -> {
           if (error == null) {
-            Toast.showInfo(messages.groups(), messages.groupSuccessfullyCreated());
+            Toast.showInfo(messages.groups(), messages.userSuccessfullyCreated());
             HistoryUtils.newHistory(ShowMember.RESOLVER, created.getUUID());
           } else {
             Toast.showError(messages.groups(), error.getMessage());

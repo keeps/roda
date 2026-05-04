@@ -18,7 +18,6 @@ import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoActionsToolbar;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.main.BreadcrumbUtils;
