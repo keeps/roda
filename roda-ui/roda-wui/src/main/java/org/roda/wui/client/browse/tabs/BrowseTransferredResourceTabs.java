@@ -18,6 +18,7 @@ import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.ingest.transfer.tabs.TransferredResourceDetailsPanel;
 
 public class BrowseTransferredResourceTabs extends Tabs {
   public void init(TransferredResource resource) {
@@ -42,7 +43,7 @@ public class BrowseTransferredResourceTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DetailsTab(resource);
+        return new TransferredResourceDetailsPanel(resource);
       }
     });
   }

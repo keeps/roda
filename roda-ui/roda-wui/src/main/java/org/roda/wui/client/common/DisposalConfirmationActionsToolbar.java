@@ -52,7 +52,6 @@ public class DisposalConfirmationActionsToolbar extends BrowseObjectActionsToolb
         style =  Tag.TagStyle.NEUTRAL;
     }
 
-    GWT.log("Disposal Confirmation state: " + object.getState() + " - Tag style: " + style);
     Tag tag = Tag.fromText(messages.disposalConfirmationState(object.getState()), style);
     tags.add(tag);
   }

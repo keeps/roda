@@ -17,6 +17,8 @@ import org.roda.core.common.Messages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
+import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
@@ -75,6 +77,12 @@ public class I18nUtility {
         fields.add(RodaConstants.MEMBERS_FULLNAME);
         RODAMember group = RodaCoreFactory.getIndexService().retrieve(RODAMember.class, facetValue, fields);
         ret = group.getFullName();
+      } else if (resultClass.equals(DisposalSchedule.class)
+        && facetField.equals(RodaConstants.DISPOSAL_SCHEDULE_FULL_RETENTION_PERIOD) && facetValue != null) {
+        String prefixKey = RodaConstants.I18N_UI_FACETS_PREFIX + "." + resultClass.getSimpleName() + "." + facetField
+          + ".";
+        ret = getRetentionPeriodTranslation(facetValue, prefixKey, locale);
+
       } else {
         ret = RodaCoreFactory.getI18NMessages(locale).getTranslation(bundleKey);
       }
@@ -84,6 +92,25 @@ public class I18nUtility {
     }
 
     return ret;
+  }
+
+  private static String getRetentionPeriodTranslation(String value, String prefixKey, Locale locale) {
+    if (RetentionPeriodIntervalCode.NO_RETENTION_PERIOD.toString().equals(value)) {
+      return RodaCoreFactory.getI18NMessages(locale).getTranslation(prefixKey + value);
+    } else {
+      String numberPart = value.replaceAll("\\D+", "");
+      String intervalPart = value.replaceAll("\\d+", "");
+
+      String intervalTranslation;
+      if (Integer.parseInt(numberPart) == 1) {
+        String replaced = intervalPart.replace("S", "");
+        intervalTranslation = RodaCoreFactory.getI18NMessages(locale).getTranslation(prefixKey + replaced);
+      } else {
+        intervalTranslation = RodaCoreFactory.getI18NMessages(locale).getTranslation(prefixKey + intervalPart);
+      }
+
+      return numberPart + " " + intervalTranslation;
+    }
   }
 
   public static String getMessage(String key, String defaultMessage, String localeString) {

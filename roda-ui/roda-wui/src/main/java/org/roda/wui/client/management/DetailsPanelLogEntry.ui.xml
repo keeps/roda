@@ -7,6 +7,5 @@
 
     <g:FlowPanel addStyleNames="descriptiveMetadataHTML">
         <g:FlowPanel ui:field="details" addStyleNames="descriptiveMetadata"/>
-
     </g:FlowPanel>
 </ui:UiBinder>

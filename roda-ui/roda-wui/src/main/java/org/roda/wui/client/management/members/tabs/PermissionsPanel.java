@@ -87,7 +87,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
     // 1. Fetch the absolute latest member data (to get freshly edited roles)
     Services userServices = new Services("Get updated member", "get");
-    userServices.membersResource(s -> s.getUser(member.getId())).whenComplete(this::handleMemberRefresh);
+    userServices.membersResource(s -> s.getMember(member.getUUID())).whenComplete(this::handleMemberRefresh);
   }
 
   private void handleMemberRefresh(RODAMember updatedMember, Throwable error) {
@@ -102,18 +102,23 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     this.member = updatedMember;
 
     // 2. Fetch the groups
-    Services groupServices = new Services("Fetch user's group", "get");
-    groupServices.membersResource(s -> s.getUserGroups(member.getId())).whenComplete((groups, throwable) -> {
-      if (throwable != null) {
-        loading.hide();
-        Toast.showError("Unable to fetch user's groups");
-        ClientLogger clientLogger = new ClientLogger();
-        clientLogger.error("Error fetching user's groups", throwable);
-        HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
-      } else {
-        init(member, groups, viewOnly, expanded);
-      }
-    });
+    if (member.isUser()) {
+      Services groupServices = new Services("Fetch user's group", "get");
+      groupServices.membersResource(s -> s.getUserGroups(member.getId())).whenComplete((groups, throwable) -> {
+        if (throwable != null) {
+          loading.hide();
+          Toast.showError("Unable to fetch user's groups");
+          ClientLogger clientLogger = new ClientLogger();
+          clientLogger.error("Error fetching user's groups", throwable);
+          HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
+        } else {
+          init(member, groups, viewOnly, expanded);
+        }
+      });
+    } else {
+      // If it's a group, we can skip directly to init()
+      init(member, Set.of(), viewOnly, expanded);
+    }
   }
 
   public void init(RODAMember member, Set<Group> groups, boolean viewOnly, boolean expanded) {

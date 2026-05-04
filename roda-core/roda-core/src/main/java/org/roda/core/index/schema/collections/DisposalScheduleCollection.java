@@ -18,8 +18,6 @@ import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,9 +29,6 @@ import java.util.List;
  */
 
 public class DisposalScheduleCollection extends AbstractSolrCollection<DisposalSchedule, DisposalSchedule> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(DisposalScheduleCollection.class);
-
   @Override
   public Class<DisposalSchedule> getIndexClass() {
     return DisposalSchedule.class;
@@ -76,6 +71,7 @@ public class DisposalScheduleCollection extends AbstractSolrCollection<DisposalS
     fields.add(new Field(RodaConstants.DISPOSAL_SCHEDULE_ACTION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_SCHEDULE_RETENTION_PERIOD_INTERVAL_CODE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_SCHEDULE_RETENTION_PERIOD_DURATION, Field.TYPE_INT));
+    fields.add(new Field(RodaConstants.DISPOSAL_SCHEDULE_FULL_RETENTION_PERIOD, Field.TYPE_STRING));
 
     return fields;
   }
@@ -93,12 +89,20 @@ public class DisposalScheduleCollection extends AbstractSolrCollection<DisposalS
     doc.addField(RodaConstants.DISPOSAL_SCHEDULE_SCOPE_NOTES, disposalSchedule.getScopeNotes());
     if (!DisposalActionCode.RETAIN_PERMANENTLY.equals(disposalSchedule.getActionCode())) {
       doc.addField(RodaConstants.DISPOSAL_SCHEDULE_RETENTION_PERIOD_INTERVAL_CODE,
-              disposalSchedule.getRetentionPeriodIntervalCode().toString());
+        disposalSchedule.getRetentionPeriodIntervalCode().toString());
       doc.addField(RodaConstants.DISPOSAL_SCHEDULE_RETENTION_PERIOD_DURATION,
-              disposalSchedule.getRetentionPeriodDuration());
+        disposalSchedule.getRetentionPeriodDuration());
     }
     doc.addField(RodaConstants.DISPOSAL_SCHEDULE_STATE, disposalSchedule.getState().toString());
     doc.addField(RodaConstants.DISPOSAL_SCHEDULE_ACTION, disposalSchedule.getActionCode().toString());
+    if (!DisposalActionCode.RETAIN_PERMANENTLY.equals(disposalSchedule.getActionCode())) {
+      if (disposalSchedule.getRetentionPeriodIntervalCode().equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)) {
+        doc.addField(RodaConstants.DISPOSAL_SCHEDULE_FULL_RETENTION_PERIOD, disposalSchedule.getRetentionPeriodIntervalCode().toString());
+      } else {
+        doc.addField(RodaConstants.DISPOSAL_SCHEDULE_FULL_RETENTION_PERIOD,
+                disposalSchedule.getRetentionPeriodDuration() + disposalSchedule.getRetentionPeriodIntervalCode().toString());
+      }
+    }
 
     return doc;
   }

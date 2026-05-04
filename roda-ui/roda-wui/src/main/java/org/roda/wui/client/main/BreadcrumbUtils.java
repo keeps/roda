@@ -23,6 +23,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.log.LogEntry;
@@ -54,7 +55,9 @@ import org.roda.wui.client.management.members.CreateGroup;
 import org.roda.wui.client.management.members.CreateUser;
 import org.roda.wui.client.management.members.EditGroup;
 import org.roda.wui.client.management.members.EditUser;
+import org.roda.wui.client.planning.agents.PreservationAgents;
 import org.roda.wui.client.planning.RiskRegister;
+import org.roda.wui.client.planning.agents.ShowPreservationAgent;
 import org.roda.wui.client.planning.ShowRisk;
 import org.roda.wui.client.management.members.MemberManagement;
 import org.roda.wui.client.management.members.ShowMember;
@@ -412,7 +415,7 @@ public class BreadcrumbUtils {
     if (notification != null) {
       List<String> path = new ArrayList<>(ShowNotification.RESOLVER.getHistoryPath());
       path.add(notification.getUUID());
-      String label = StringUtils.isNotBlank(notification.getId()) ? notification.getId() : notification.getUUID();
+      String label = notification.getSubject();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
 
@@ -763,12 +766,33 @@ public class BreadcrumbUtils {
     return ret;
   }
 
-  private static final List<String> getViewItemEventsHistoryToken(String id) {
+  public static List<BreadcrumbItem> getPreservationAgentBreadcrumbs() {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.preservationAgentsTitle()),
+            messages.preservationAgentsTitle(), PreservationAgents.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getPreservationAgentBreadcrumbs(IndexedPreservationAgent agent) {
+    List<BreadcrumbItem> ret = getPreservationAgentBreadcrumbs();
+
+    if (agent != null) {
+      List<String> path = new ArrayList<>(ShowPreservationAgent.RESOLVER.getHistoryPath());
+      path.add(agent.getId());
+      String label = agent.getName();
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
+    }
+
+    return ret;
+  }
+
+  private static List<String> getViewItemEventsHistoryToken(String id) {
     return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), PreservationEvents.BROWSE_RESOLVER.getHistoryToken(),
       id);
   }
 
-  private static final List<String> getViewItemHistoryToken(String id) {
+  private static List<String> getViewItemHistoryToken(String id) {
     return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), id);
   }
 }

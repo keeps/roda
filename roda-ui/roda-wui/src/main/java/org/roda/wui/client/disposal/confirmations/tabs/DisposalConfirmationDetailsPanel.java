@@ -8,17 +8,9 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.ui.HTML;
-import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
-import org.roda.wui.client.common.ActionsToolbar;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientMessages;
+import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
+import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
 import org.roda.wui.client.common.actions.DisposalConfirmationToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
@@ -29,36 +21,29 @@ import java.util.List;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-
-public class DisposalConfirmationDetailsPanel extends Composite {
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @UiField
-  ActionsToolbar actionsToolbar;
-
-  @UiField
-  FlowPanel detailsPanel;
+public class DisposalConfirmationDetailsPanel extends GenericMetadataCardPanel<DisposalConfirmation> {
 
   public DisposalConfirmationDetailsPanel(DisposalConfirmation disposalConfirmation) {
-    initWidget(uiBinder.createAndBindUi(this));
-
-    actionsToolbar
-      .setActionableMenu(new ActionableWidgetBuilder<DisposalConfirmation>(DisposalConfirmationToolbarActions.get())
-        .buildGroupedListWithObjects(new ActionableObject<>(disposalConfirmation),
-          List.of(DisposalConfirmationToolbarActions.DisposalConfirmationReportAction.PRINT),
-          List.of(DisposalConfirmationToolbarActions.DisposalConfirmationReportAction.PRINT)),
-        true);
-
-    actionsToolbar.setLabelVisible(false);
-    actionsToolbar.setTagsVisible(false);
-
-    showDisposalConfirmationDetails(disposalConfirmation);
+    setData(disposalConfirmation);
   }
 
-  private void showDisposalConfirmationDetails(DisposalConfirmation disposalConfirmation) {
+  @Override
+  protected FlowPanel createHeaderWidget(DisposalConfirmation disposalConfirmation) {
+    if (disposalConfirmation == null) {
+      return null;
+    }
+
+    return new ActionableWidgetBuilder<DisposalConfirmation>(DisposalConfirmationToolbarActions.get())
+      .buildGroupedListWithObjects(new ActionableObject<>(disposalConfirmation),
+        List.of(DisposalConfirmationToolbarActions.DisposalConfirmationReportAction.PRINT),
+        List.of(DisposalConfirmationToolbarActions.DisposalConfirmationReportAction.PRINT));
+  }
+
+  @Override
+  protected void buildFields(DisposalConfirmation disposalConfirmation) {
     SafeUri uri = RestUtils.createDisposalConfirmationHTMLUri(disposalConfirmation.getId(), false);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
+
     try {
       requestBuilder.sendRequest(null, new RequestCallback() {
 
@@ -66,7 +51,7 @@ public class DisposalConfirmationDetailsPanel extends Composite {
         public void onResponseReceived(Request request, Response response) {
           if (200 == response.getStatusCode()) {
             HTML reportHtml = new HTML(SafeHtmlUtils.fromSafeConstant(response.getText()));
-            detailsPanel.add(reportHtml);
+            metadataContainer.add(reportHtml);
           }
         }
 
@@ -79,9 +64,5 @@ public class DisposalConfirmationDetailsPanel extends Composite {
     } catch (RequestException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  interface MyUiBinder extends UiBinder<Widget, DisposalConfirmationDetailsPanel> {
-    Widget createAndBindUi(DisposalConfirmationDetailsPanel detailsPanel);
   }
 }

@@ -32,7 +32,7 @@ public class RODAMemberPermissionsTab extends Composite {
   PermissionsPanel permissionsTablePanel;
 
   public RODAMemberPermissionsTab(RODAMember member, AsyncCallback<Actionable.ActionImpact> actionCallback) {
-    permissionsTablePanel = new PermissionsPanel(member, true, false);
+    permissionsTablePanel = new PermissionsPanel(member, true, true);
     initWidget(uiBinder.createAndBindUi(this));
 
     // 1. Create a local callback to intercept the UPDATED event

@@ -15,6 +15,7 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
