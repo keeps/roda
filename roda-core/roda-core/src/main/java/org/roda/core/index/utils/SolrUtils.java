@@ -1041,7 +1041,7 @@ public class SolrUtils {
       StringBuilder someParents = new StringBuilder();
       parseFilterParameter(someParents, parameter.getParentFilter(), false);
 
-      ret.append("{!child of=").append(replace).append("} ").append(someParents);
+      ret.append("{!child of=").append(replace).append("}").append(someParents);
     } else {
       ret.append("{!child of=").append(replace).append("}");
     }
@@ -1058,7 +1058,7 @@ public class SolrUtils {
       StringBuilder someChildren = new StringBuilder();
       parseFilterParameter(someChildren, parameter.getChildrenFilter(), false);
 
-      ret.append("{!parent which=").append(replace).append("} ").append(someChildren);
+      ret.append("{!parent which=").append(replace).append("}").append(someChildren);
     } else {
       ret.append("{!parent which=").append(replace).append("}");
     }

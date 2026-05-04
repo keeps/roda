@@ -26,6 +26,7 @@ import org.roda.core.config.TestConfig;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.ParentWhichFilterParameter;
@@ -155,5 +156,22 @@ public class NestedDocumentSearchTest extends AbstractTestNGSpringContextTests {
 
     assertEquals("ParentWhichFilterParameter should return exactly 1 AIP", 1L, result.getTotalCount());
     assertEquals("Returned AIP id should match", aipId, result.getResults().get(0).getId());
+
+    // Layer 5: same block-join combined with AllFilterParameter (*:* AND {!parent ...})
+    // This reproduces the production scenario where q.op=AND was breaking the query
+    Filter combinedFilter = new Filter(
+      new AllFilterParameter(),
+      new ParentWhichFilterParameter(
+        new SimpleFilterParameter("content_type", "emailarchive"),
+        new AndFiltersParameters(Arrays.asList(
+          new SimpleFilterParameter("sender_s", "joao.silva@empresa.pt"),
+          new SimpleFilterParameter("content_type", "email")))));
+
+    IndexResult<IndexedAIP> combinedResult = index.find(IndexedAIP.class, combinedFilter, Sorter.NONE,
+      new Sublist(0, 10), Collections.emptyList());
+
+    assertEquals("AllFilter + ParentWhichFilterParameter should return exactly 1 AIP", 1L,
+      combinedResult.getTotalCount());
+    assertEquals("Returned AIP id should match", aipId, combinedResult.getResults().get(0).getId());
   }
 }
