@@ -303,6 +303,11 @@ public class RODAMemberActions {
           }
         });
       }
+
+        @Override
+        public void onFailure(Throwable caught) {
+            callback.onSuccess(Actionable.ActionImpact.NONE);
+        }
     });
   }
 

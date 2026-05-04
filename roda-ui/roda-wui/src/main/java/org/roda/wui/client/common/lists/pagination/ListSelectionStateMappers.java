@@ -17,6 +17,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
@@ -35,6 +36,7 @@ public class ListSelectionStateMappers {
   private static DisposalHoldMapper disposalHoldMapper = GWT.create(DisposalHoldMapper.class);
   private static DisposalScheduleMapper disposalScheduleMapper = GWT.create(DisposalScheduleMapper.class);
   private static DisposalRuleMapper disposalRuleMapper = GWT.create(DisposalRuleMapper.class);
+  private static NotificationMapper notificationMapper = GWT.create(NotificationMapper.class);
 
   private ListSelectionStateMappers() {
     // do nothing
@@ -61,6 +63,8 @@ public class ListSelectionStateMappers {
       ret = disposalScheduleMapper.write((ListSelectionState<DisposalSchedule>) object);
     } else if (DisposalRule.class.getName().equals(objectClass)) {
       ret = disposalRuleMapper.write((ListSelectionState<DisposalRule>) object);
+    } else if (Notification.class.getName().equals(objectClass)) {
+      ret = notificationMapper.write((ListSelectionState<Notification>) object);
     } else {
       ret = null;
     }
@@ -87,6 +91,8 @@ public class ListSelectionStateMappers {
       state = (ListSelectionState<T>) disposalScheduleMapper.read(json);
     } else if (DisposalRule.class.getName().equals(objectClass)) {
       state = (ListSelectionState<T>) disposalRuleMapper.read(json);
+    } else if (Notification.class.getName().equals(objectClass)) {
+      state = (ListSelectionState<T>) notificationMapper.read(json);
     } else {
       state = null;
     }
@@ -127,6 +133,10 @@ public class ListSelectionStateMappers {
 
   // Disposal rule
   public interface DisposalRuleMapper extends ObjectMapper<ListSelectionState<DisposalRule>> {
+  }
+
+  // Notification
+  public interface NotificationMapper extends ObjectMapper<ListSelectionState<Notification>> {
   }
 
 }

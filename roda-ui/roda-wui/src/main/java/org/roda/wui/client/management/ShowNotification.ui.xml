@@ -10,12 +10,12 @@
 	<g:FocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
 			<common:NavigationToolbar ui:field="navigationToolbar" />
-			<common:ActionsToolbar ui:field="actionsToolbar" />
+			<common:NoActionsToolbar ui:field="actionsToolbar" />
 
 			<g:FlowPanel addStyleNames="row full_width skip_padding">
 				<g:FlowPanel addStyleNames="col_12 content">
 					<common:TitlePanel ui:field="title" text="{messages.notificationTitle}" iconClass="Notification" />
-					<tabs:BrowseNotificationsTabs ui:field="browseTab"/>
+					<tabs:NotificationsTabs ui:field="browseTab"/>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

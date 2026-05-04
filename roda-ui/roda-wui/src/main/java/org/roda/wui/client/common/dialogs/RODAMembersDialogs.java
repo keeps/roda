@@ -213,7 +213,7 @@ public class RODAMembersDialogs {
       @Override
       public void onClick(ClickEvent clickEvent) {
         dialogBox.hide();
-        callback.onSuccess(null);
+        callback.onFailure(null);
       }
     });
 

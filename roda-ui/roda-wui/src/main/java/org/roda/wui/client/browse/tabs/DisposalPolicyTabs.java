@@ -1,7 +1,5 @@
 package org.roda.wui.client.browse.tabs;
 
-import java.util.List;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
@@ -54,8 +52,7 @@ public class DisposalPolicyTabs extends Tabs {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_RULES)) {
       ListBuilder<DisposalRule> ruleListBuilder = new ListBuilder<>(() -> new DisposalRuleList(),
         new AsyncTableCellOptions<>(DisposalRule.class, "DisposalPolicyPage_disposalRules")
-          .withActionable(DisposalRuleSearchWrapperActions.get())
-          .withCsvDownloadButtonVisibility(false).bindOpener());
+          .withActionable(DisposalRuleSearchWrapperActions.get()).withCsvDownloadButtonVisibility(false).bindOpener());
 
       createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalRulesTitle()), new TabContentBuilder() {
         @Override

@@ -31,7 +31,7 @@ public class DisposalScheduleTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DisposalScheduleDetailsPanel(schedule, actionCallback);
+        return new DisposalScheduleDetailsPanel(schedule);
       }
     });
 

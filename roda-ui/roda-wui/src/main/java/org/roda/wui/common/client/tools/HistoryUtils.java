@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.codec.language.bm.Rule;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmation;
@@ -55,7 +54,7 @@ import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.management.ShowLogEntry;
 import org.roda.wui.client.management.ShowNotification;
 import org.roda.wui.client.management.members.ShowMember;
-import org.roda.wui.client.planning.ShowPreservationAgent;
+import org.roda.wui.client.planning.agents.ShowPreservationAgent;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.planning.ShowRisk;
 import org.roda.wui.client.planning.ShowRiskIncidence;
