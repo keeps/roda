@@ -1,5 +1,18 @@
 # Changelog
 
+## v6.2.0 (04/05/2026)
+#### New features
+
+- Add parent location column to AIP selection and search lists #3656
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v6.1.0 (20/04/2026)
 #### New features
 - Added a TIFF viewer
@@ -389,21 +402,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
-
----
-
-## v5.5.1 (08/03/2024)
-#### Bug fixes
-- Remove "opt-in" from roda-core.properties #3113
-- Fix ns2 namespace in premis.xml when creating technical metadata  #3114 
-
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
 
 ---
 
