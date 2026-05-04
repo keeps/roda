@@ -34,7 +34,7 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
-import org.roda.wui.client.planning.ShowPreservationAgent;
+import org.roda.wui.client.planning.agents.ShowPreservationAgent;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;

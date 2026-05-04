@@ -8,17 +8,17 @@
 /**
  *
  */
-package org.roda.wui.client.planning;
+package org.roda.wui.client.planning.agents;
 
 import java.util.List;
 
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.PreservationAgentActions;
 import org.roda.wui.client.common.lists.PreservationAgentList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.planning.Planning;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -31,8 +31,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
@@ -62,18 +60,10 @@ public class PreservationAgents extends Composite {
       return "agents";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, PreservationAgents> {
-  }
-
   private static PreservationAgents instance = null;
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   @UiField(provided = true)
   SearchWrapper searchWrapper;
-
   @UiField
   FlowPanel pageDescription;
 
@@ -112,5 +102,8 @@ public class PreservationAgents extends Composite {
       HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, PreservationAgents> {
   }
 }

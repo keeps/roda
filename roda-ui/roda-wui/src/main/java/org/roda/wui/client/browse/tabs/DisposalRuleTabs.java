@@ -16,7 +16,7 @@ public class DisposalRuleTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DisposalRuleDetailsPanel(rule, actionCallback);
+        return new DisposalRuleDetailsPanel(rule);
       }
     });
   }

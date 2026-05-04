@@ -10,14 +10,13 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.wui.client.browse.tabs.BrowseNotificationsTabs;
+import org.roda.wui.client.browse.tabs.NotificationsTabs;
 import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoActionsToolbar;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.main.BreadcrumbUtils;
@@ -80,37 +79,26 @@ public class ShowNotification extends Composite {
       return "notification";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, ShowNotification> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.NOTIFICATION_ID, RodaConstants.NOTIFICATION_SUBJECT, RodaConstants.NOTIFICATION_BODY,
-    RodaConstants.NOTIFICATION_SENT_ON, RodaConstants.NOTIFICATION_FROM_USER,
-    RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED, RodaConstants.NOTIFICATION_RECIPIENT_USERS,
-    RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS, RodaConstants.NOTIFICATION_STATE);
+  private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   @UiField
   TitlePanel title;
   @UiField
-  ActionsToolbar actionsToolbar;
+  NoActionsToolbar actionsToolbar;
   @UiField
   NavigationToolbar<Notification> navigationToolbar;
   @UiField
   FocusPanel keyboardFocus;
   @UiField
-  BrowseNotificationsTabs browseTab;
+  NotificationsTabs browseTab;
 
   public ShowNotification(Notification notification) {
     initWidget(uiBinder.createAndBindUi(this));
-    navigationToolbar.withoutButtons().build();
+    navigationToolbar.withObject(notification).build();
     navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getNotificationBreadcrumbs(notification));
 
     actionsToolbar.setLabel(messages.notificationTitle());
-    actionsToolbar.setTagsVisible(false);
 
     title.setText(StringUtils.isNotBlank(notification.getSubject()) ? notification.getSubject() : notification.getId());
 
@@ -120,4 +108,6 @@ public class ShowNotification extends Composite {
     keyboardFocus.addStyleName("browse browse-file browse_main_panel");
   }
 
+  interface MyUiBinder extends UiBinder<Widget, ShowNotification> {
+  }
 }

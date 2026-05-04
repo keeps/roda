@@ -437,10 +437,43 @@ public class JavascriptUtils {
   }-*/;
 
   public static native void print(String html) /*-{
-    top.consoleRef=$wnd.open('','_blank', "");
-    top.consoleRef.document.write(html);
-    top.consoleRef.print();
-    top.consoleRef.document.close()
+    // 1. Create the hidden iframe
+    var iframe = $doc.createElement('iframe');
+
+    // Hide it from the user, but it MUST be in the DOM to be printed
+    iframe.style.visibility = 'hidden';
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+
+    // Append it to the main document body
+    $doc.body.appendChild(iframe);
+
+    // 2. Safely get the iframe's document stream
+    var iframeWindow = iframe.contentWindow || iframe.contentDocument;
+    var iframeDoc = iframeWindow.document || iframeWindow;
+
+    // 3. Write the HTML and close the stream
+    iframeDoc.open();
+    iframeDoc.write(html);
+    iframeDoc.close(); // MUST close before printing
+
+    // 4. Print the iframe (Wrapped in a slight timeout)
+    // Browsers (especially Chrome and WebKit) need a few milliseconds to
+    // actually render the DOM inside the iframe before the print dialog opens.
+    // If you don't wait, it will print a blank white page.
+    $wnd.setTimeout(function() {
+        iframeWindow.focus();
+        iframeWindow.print();
+
+        // 5. Cleanup: Remove the iframe from the DOM so we don't leak memory.
+        // We wait a couple of seconds to ensure the print spooler has caught it.
+        $wnd.setTimeout(function() {
+            $doc.body.removeChild(iframe);
+        }, 2000);
+
+    }, 250);
 }-*/;
 
   public static native String encodeBase64(String jsonValue) /*-{

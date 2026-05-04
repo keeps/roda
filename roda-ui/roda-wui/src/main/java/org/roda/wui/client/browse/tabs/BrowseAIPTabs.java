@@ -19,6 +19,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.EditPermissionsTab;
+import org.roda.wui.client.browse.tabs.aip.AipDetailsTab;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -135,7 +136,7 @@ public class BrowseAIPTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DetailsTab(browseAIPResponse);
+        return new AipDetailsTab(browseAIPResponse);
       }
     });
   }
