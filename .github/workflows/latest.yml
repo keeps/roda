@@ -43,7 +43,7 @@ jobs:
           mkdir -p /tmp/roda-jar
           cp roda-ui/roda-wui/target/roda-wui-*.jar /tmp/roda-jar/
       - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: roda-jar
           path: /tmp/roda-jar/
@@ -98,7 +98,7 @@ jobs:
           digest="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests/${digest#sha256:}"
       - name: Upload digest
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: digests-${{ env.platform_tag }}
           path: /tmp/digests/*
