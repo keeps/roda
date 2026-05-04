@@ -174,8 +174,8 @@ public class NestedDocumentSearchTest extends AbstractTestNGSpringContextTests {
           new SimpleFilterParameter("content_type", "email")))));
 
     String combinedQuery = SolrUtils.parseFilter(combinedFilter);
-    assertEquals("AllFilterParameter must be dropped when block-join is present",
-      "{!parent which=\"content_type:emailarchive\"}(+sender_s:\"joao.silva@empresa.pt\" +content_type:\"email\")",
+    assertEquals("AllFilterParameter combined with block-join produces *:* AND prefix (harmless, matches everything)",
+      "*:* AND {!parent which=\"content_type:emailarchive\"}(+sender_s:\"joao.silva@empresa.pt\" +content_type:\"email\")",
       combinedQuery);
 
     IndexResult<IndexedAIP> combinedResult = index.find(IndexedAIP.class, combinedFilter, Sorter.NONE,
