@@ -1032,13 +1032,14 @@ public class SolrUtils {
 
   private static void appendBlockJoinChildrenFilterParameter(StringBuilder ret, ChildOfFilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
+    appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
     StringBuilder blockMask = new StringBuilder();
-    parseFilterParameter(blockMask, parameter.getChildrenOfFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
+    parseFilterParameter(blockMask, parameter.getChildrenOfFilter(), false);
     String replace = blockMask.toString().replace(": ", ":");
 
     if (parameter.getParentFilter() != null) {
       StringBuilder someParents = new StringBuilder();
-      parseFilterParameter(someParents, parameter.getParentFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
+      parseFilterParameter(someParents, parameter.getParentFilter(), false);
 
       ret.append("{!child of=").append(replace).append("} ").append(someParents);
     } else {
@@ -1048,13 +1049,14 @@ public class SolrUtils {
 
   private static void appendBlockJoinFilterParameter(StringBuilder ret, ParentWhichFilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
+    appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
     StringBuilder blockMask = new StringBuilder();
-    parseFilterParameter(blockMask, parameter.getParentFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
+    parseFilterParameter(blockMask, parameter.getParentFilter(), false);
     String replace = blockMask.toString().replace(": ", ":");
 
     if (parameter.getChildrenFilter() != null) {
       StringBuilder someChildren = new StringBuilder();
-      parseFilterParameter(someChildren, parameter.getChildrenFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
+      parseFilterParameter(someChildren, parameter.getChildrenFilter(), false);
 
       ret.append("{!parent which=").append(replace).append("} ").append(someChildren);
     } else {
