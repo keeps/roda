@@ -8945,66 +8945,41 @@ span.code {
     flex-direction: column;
 }
 
-.details-panel-section {
-    display: flex;
-    flex-direction: column;
+.details-panel-sections .roda6Card {
+    margin-bottom: 1rem;
 }
 
-.details-panel-section-header .form-separator {
-    font-size: 14px;
-    font-weight: bold;
-    margin: 3em -15px 0 -15px !important;
-}
-
-.details-panel-rich-content {
-    margin-top: 0.5rem;
-}
-
-.details-card {
-    margin-bottom: 1.5rem;
-    padding: 1.25rem 1.5rem;
-    border: 1px solid #E1E1E1;
-    border-radius: 4px;
-    background: white;
-}
-
-.details-card-header {
+.preservation-event-tab-card-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 1rem;
     margin-bottom: 1rem;
 }
 
-.details-card-title {
+.preservation-event-tab-card-title {
     font-size: 16px;
     font-weight: 600;
     color: COLOR_PRIMARY;
     margin: 0;
 }
 
-.details-card-body.descriptiveMetadata .field:last-child {
-    margin-bottom: 0;
-}
-
-.details-card-action {
+.preservation-event-tab-card-action {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: COLOR_PRIMARY;
     text-decoration: none;
     flex-shrink: 0;
-}
-
-.details-card-action:hover {
-    text-decoration: none;
-    opacity: 0.8;
-}
-
-.details-card-action svg {
     width: 18px;
     height: 18px;
-    fill: currentColor;
+}
+
+.preservation-event-tab-card-action-open::after {
+    @mixin fontawesome();
+    content: "\e89e";
+    font-size: 16px;
+    line-height: 1;
+    color: currentColor;
 }
 
 /******************************

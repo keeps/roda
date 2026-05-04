@@ -95,30 +95,6 @@ public class ListSelectionStateMappers {
     return state;
   }
 
-  // IndexedAIP
-  public interface IndexedAIPMapper extends ObjectMapper<ListSelectionState<IndexedAIP>> {
-  }
-
-  // IndexedRepresentation
-  public interface IndexedRepresentationMapper extends ObjectMapper<ListSelectionState<IndexedRepresentation>> {
-  }
-
-  // IndexedFile
-  public interface IndexedFileMapper extends ObjectMapper<ListSelectionState<IndexedFile>> {
-  }
-
-  // IndexedDIP
-  public interface IndexedDIPMapper extends ObjectMapper<ListSelectionState<IndexedDIP>> {
-  }
-
-  // DIPFile
-  public interface DIPFileMapper extends ObjectMapper<ListSelectionState<DIPFile>> {
-  }
-
-  // Job report
-  public interface IndexedReportMapper extends ObjectMapper<ListSelectionState<IndexedReport>> {
-  }
-
   // IndexedPreservationEvent
   public interface IndexedPreservationEventMapper extends ObjectMapper<ListSelectionState<IndexedPreservationEvent>> {
   }

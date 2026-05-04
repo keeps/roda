@@ -120,7 +120,7 @@ public class BrowsePreservationEventTabs extends Tabs {
     String href = HistoryUtils.createHistoryHashLink(ShowPreservationAgent.RESOLVER, agent.getId());
 
     FlowPanel card = buildCard();
-    card.add(buildCardHeader(title, href));
+    card.add(buildCardHeader(title, href, false));
 
     FlowPanel body = buildCardBody();
     addIfNotBlank(body, messages.preservationEventAgentIdentifier(), agent.getId());
@@ -161,7 +161,7 @@ public class BrowsePreservationEventTabs extends Tabs {
 
   private Widget buildUriPanel(String idValue) {
     FlowPanel card = buildCard();
-    card.add(buildCardHeader(messages.uriLinkingIdentifierTitle(), idValue));
+    card.add(buildCardHeader(messages.uriLinkingIdentifierTitle(), idValue, true));
 
     FlowPanel body = buildCardBody();
     Anchor link = new Anchor(idValue, UriUtils.fromString(idValue).asString());
@@ -177,7 +177,7 @@ public class BrowsePreservationEventTabs extends Tabs {
     String href = aip != null ? HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(aip.getId())) : null;
 
     FlowPanel card = buildCard();
-    card.add(buildCardHeader(messages.intellectualEntity(), href));
+    card.add(buildCardHeader(messages.intellectualEntity(), href, false));
 
     FlowPanel body = buildCardBody();
     if (aip != null) {
@@ -197,7 +197,7 @@ public class BrowsePreservationEventTabs extends Tabs {
       : null;
 
     FlowPanel card = buildCard();
-    card.add(buildCardHeader(messages.showRepresentationExtended(), href));
+    card.add(buildCardHeader(messages.showRepresentationExtended(), href, false));
 
     FlowPanel body = buildCardBody();
 
@@ -222,7 +222,7 @@ public class BrowsePreservationEventTabs extends Tabs {
       : null;
 
     FlowPanel card = buildCard();
-    card.add(buildCardHeader(messages.showFileExtended(), href));
+    card.add(buildCardHeader(messages.showFileExtended(), href, false));
 
     FlowPanel body = buildCardBody();
 
@@ -260,7 +260,7 @@ public class BrowsePreservationEventTabs extends Tabs {
       : null;
 
     FlowPanel card = buildCard();
-    card.add(buildCardHeader(messages.showTransferredResourceExtended(), href));
+    card.add(buildCardHeader(messages.showTransferredResourceExtended(), href, false));
 
     FlowPanel body = buildCardBody();
     if (resource != null) {
@@ -296,34 +296,6 @@ public class BrowsePreservationEventTabs extends Tabs {
   }
 
   // common widget constructors, css to be changed
-  private FlowPanel buildCard() {
-    FlowPanel card = new FlowPanel();
-    card.addStyleName("details-panel-section");
-    card.addStyleName("details-card");
-    return card;
-  }
-
-  private FlowPanel buildCardHeader(String title, String href) {
-    FlowPanel header = new FlowPanel();
-    header.addStyleName("details-card-header");
-
-    Label titleLabel = new Label(title);
-    titleLabel.addStyleName("details-card-title");
-    header.add(titleLabel);
-
-    if (StringUtils.isNotBlank(href)) {
-      header.add(buildActionLink(href, title));
-    }
-
-    return header;
-  }
-
-  private FlowPanel buildCardBody() {
-    FlowPanel body = new FlowPanel();
-    body.addStyleName("details-card-body");body.addStyleName("descriptiveMetadata");
-    return body;
-  }
-
   private FlowPanel buildField(String labelText, Widget valueWidget) {
     FlowPanel field = new FlowPanel();
     field.setStyleName("field");
@@ -352,17 +324,44 @@ public class BrowsePreservationEventTabs extends Tabs {
     }
   }
 
-  private Anchor buildActionLink(String title, String href) {
-    Anchor link = new Anchor();
-    link.setHref(href);
-    link.setTitle(title);
-    link.getElement().setAttribute("target", "_blank");
-    link.addStyleName("details-card-action");
-    link.getElement().setInnerHTML(
-      "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" aria-hidden=\"true\">"
-        + "<path d=\"M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z\"/>"
-        + "</svg>");
-    return link;
+
+  private FlowPanel buildCard() {
+    FlowPanel card = new FlowPanel();
+    card.addStyleName("roda6Card");
+    return card;
+  }
+
+  private FlowPanel buildCardHeader(String title, String href, boolean external) {
+    FlowPanel header = new FlowPanel();
+    header.addStyleName("preservation-event-tab-card-header");
+
+    Label titleLabel = new Label(title);
+    titleLabel.addStyleName("preservation-event-tab-card-title");
+    header.add(titleLabel);
+
+    if (StringUtils.isNotBlank(href)) {
+      Anchor link = new Anchor();
+      link.setHref(href);
+      link.setTitle(title);
+      link.addStyleName("preservation-event-tab-card-action");
+      link.addStyleName("preservation-event-tab-card-action-open");
+
+      if (external) {
+        link.getElement().setAttribute("target", "_blank");
+        link.getElement().setAttribute("rel", "noopener noreferrer");
+      }
+
+      header.add(link);
+    }
+
+    return header;
+  }
+
+  private FlowPanel buildCardBody() {
+    FlowPanel body = new FlowPanel();
+    body.addStyleName("cardBody");
+    body.addStyleName("descriptiveMetadata");
+    return body;
   }
 
   private void addIdentifierNotFound(FlowPanel body, String value) {
