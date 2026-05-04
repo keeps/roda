@@ -88,7 +88,7 @@ public class DisposalHoldToolbarActions extends AbstractActionable<DisposalHold>
     ActionableBundle<DisposalHold> disposalHoldActionableBundle = new ActionableBundle<>();
 
     ActionableGroup<DisposalHold> managementGroup = new ActionableGroup<>(messages.manage(), "btn-edit");
-    managementGroup.addButton(messages.editButton(), DisposalHoldAction.EDIT, ActionImpact.UPDATED, "fas fa-pencil");
+    managementGroup.addButton(messages.editButton(), DisposalHoldAction.EDIT, ActionImpact.UPDATED, "btn-edit");
     managementGroup.addButton(messages.liftButton(), DisposalHoldAction.LIFT, ActionImpact.UPDATED, "btn-lift-hold");
 
     disposalHoldActionableBundle.addGroup(managementGroup);

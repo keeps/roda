@@ -88,7 +88,7 @@ public class DisposalScheduleToolbarActions extends AbstractActionable<DisposalS
 
     ActionableGroup<DisposalSchedule> managementGroup = new ActionableGroup<>(messages.manage(), "btn-edit");
     managementGroup.addButton(messages.editButton(), DisposalScheduleAction.EDIT, ActionImpact.UPDATED,
-      "fas fa-pencil");
+      "btn-edit");
     managementGroup.addButton(messages.removeButton(), DisposalScheduleAction.REMOVE, ActionImpact.UPDATED,
       "fas fa-trash");
 
