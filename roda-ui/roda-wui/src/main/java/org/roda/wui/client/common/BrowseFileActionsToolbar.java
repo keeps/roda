@@ -27,7 +27,7 @@ public class BrowseFileActionsToolbar extends BrowseObjectActionsToolbar<Indexed
   }
 
   protected void buildIcon() {
-    setIcon("cmi cmi-file");
+    setIcon("fa fa-file-o");
   }
 
   protected void buildActions() {
