@@ -15,7 +15,6 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.planning.DetailsPanelRepresentationInformation;

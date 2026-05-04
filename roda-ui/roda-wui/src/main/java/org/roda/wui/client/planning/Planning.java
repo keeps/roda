@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.planning.agents.PreservationAgents;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;

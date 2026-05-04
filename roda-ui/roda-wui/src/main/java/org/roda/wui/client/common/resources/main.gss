@@ -9101,7 +9101,7 @@ wui-disposal-hold-data .form-textbox {
 }
 
 .roda6CardWithHeader .cardBody {
-  padding: 8px 16px;
+  padding: 16px;
 }
 
 .gwt-DialogBox .roda6Card,
@@ -10010,4 +10010,36 @@ wui-disposal-hold-data .form-textbox {
     width: 100%;
     box-sizing: border-box;
     padding: 6px 8px; /* Slightly taller padding for standalone look */
+}
+
+.generic-metadata-panel .label {
+    font-size: 14px;
+    font-weight: 300;
+    color: COLOR_GREY_MEDIUM;
+    width: 250px;
+}
+
+.generic-metadata-panel .field {
+    display: flex;
+    flex-direction: row;
+}
+
+.generic-metadata-panel .field + .generic-metadata-panel .field {
+    margin-bottom: 1rem;
+}
+
+.generic-metadata-panel .field:last-child {
+     margin-bottom: 0 !important;
+}
+
+.generic-metadata-panel .value {
+    font-size: 14px;
+    color: black;
+    flex: 1;
+}
+
+.generic-metadata-panel .form-separator {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 3em -15px 0 -15px !important;
 }
