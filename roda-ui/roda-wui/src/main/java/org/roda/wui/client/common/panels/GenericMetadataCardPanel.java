@@ -2,11 +2,14 @@ package org.roda.wui.client.common.panels;
 
 import java.util.function.Function;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import org.roda.wui.client.common.ActionsToolbar;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -20,12 +23,12 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public abstract class GenericMetadataCardPanel<T> extends Composite {
 
+  private final FlowPanel mainContainer;
+  private final FlowPanel bodyContainer;
   // The container that holds the key-value pairs
   protected FlowPanel metadataContainer;
-  private final FlowPanel mainContainer;
-    private final FlowPanel bodyContainer;
 
-  public GenericMetadataCardPanel() {
+  protected GenericMetadataCardPanel() {
     mainContainer = new FlowPanel();
     mainContainer.setStyleName("roda6Card");
 
@@ -43,16 +46,20 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
     initWidget(mainContainer);
   }
 
-  public GenericMetadataCardPanel(Widget headerWidget) {
+  protected GenericMetadataCardPanel(FlowPanel header) {
     // <div class="roda6CardWithHeader">
     mainContainer = new FlowPanel();
     mainContainer.setStyleName("roda6CardWithHeader");
 
     // <div class="cardHeader">
-    if (headerWidget != null || headerWidger.getWidgetCount() == 0) {
-        FlowPanel headerContainer = new FlowPanel();
+    if (header != null && header.getWidgetCount() != 0) {
+      FlowPanel headerContainer = new FlowPanel();
       headerContainer.setStyleName("cardHeader");
-      headerContainer.add(headerWidget);
+      ActionsToolbar actionsToolbar = new ActionsToolbar();
+      actionsToolbar.setActionableMenu(header);
+      actionsToolbar.setLabelVisible(false);
+      actionsToolbar.setTagsVisible(false);
+      headerContainer.add(actionsToolbar);
       mainContainer.add(headerContainer);
     }
 
@@ -70,17 +77,14 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
     initWidget(mainContainer);
   }
 
-  /**
-   * The generic method to add a field only if the getter returns a
-   * non-null/non-empty value. * @param labelText The text to display in the label
-   * div.
-   * 
-   * @param getter
-   *          The Function method reference to extract the value from the data
-   *          object.
-   * @param data
-   *          The actual data object.
-   */
+  protected void addSeparator(String labelText) {
+    Label separatorLabel = new Label(labelText);
+    separatorLabel.addStyleName("form-separator");
+
+    // Append to the metadata container
+    metadataContainer.add(separatorLabel);
+  }
+
   protected void addFieldIfNotNull(String labelText, Function<T, String> getter, T data) {
     if (data == null)
       return;
@@ -88,33 +92,24 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
     // Execute the getter function
     String value = getter.apply(data);
 
-    // Only build the DOM elements if the value exists
-    if (value != null && !value.trim().isEmpty()) {
+    addFieldIfNotNull(labelText, value);
+  }
 
-      // <div class="field">
-      FlowPanel fieldDiv = new FlowPanel();
-      fieldDiv.setStyleName("field");
+  protected void addFieldIfNotNull(String labelText, Function<T, String> getter, T data, ClickHandler onClick) {
+    if (data == null)
+      return;
 
-      // <div class="label">Identifier</div>
-      FlowPanel labelDiv = new FlowPanel();
-      labelDiv.setStyleName("label");
-      labelDiv.getElement().setInnerText(labelText);
+    // Execute the getter function
+    String value = getter.apply(data);
 
-      // <div class="value"><span class="gwt-InlineHTML">...</span></div>
-      FlowPanel valueDiv = new FlowPanel();
-      valueDiv.setStyleName("value");
-      valueDiv.add(new InlineHTML(value));
-
-      // Assemble
-      fieldDiv.add(labelDiv);
-      fieldDiv.add(valueDiv);
-
-      // Append to the metadata container
-      metadataContainer.add(fieldDiv);
-    }
+    addFieldIfNotNull(labelText, value, onClick);
   }
 
   protected void addFieldIfNotNull(String labelText, String value) {
+    addFieldIfNotNull(labelText, value, null);
+  }
+
+  protected void addFieldIfNotNull(String labelText, String value, ClickHandler onClick) {
     // Only build the DOM elements if the value exists
     if (value != null && !value.trim().isEmpty()) {
 
@@ -130,7 +125,12 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
       // <div class="value"><span class="gwt-InlineHTML">...</span></div>
       FlowPanel valueDiv = new FlowPanel();
       valueDiv.setStyleName("value");
-      valueDiv.add(new InlineHTML(value));
+      InlineHTML inlineHTML = new InlineHTML(value);
+      if (onClick != null) {
+        inlineHTML.addClickHandler(onClick);
+        inlineHTML.addStyleName("btn-link addCursorPointer");
+      }
+      valueDiv.add(inlineHTML);
 
       // Assemble
       fieldDiv.add(labelDiv);
@@ -142,6 +142,10 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
   }
 
   protected void addFieldIfNotNull(String labelText, SafeHtml value) {
+    addFieldIfNotNull(labelText, value, null);
+  }
+
+  protected void addFieldIfNotNull(String labelText, SafeHtml value, ClickHandler onClick) {
     if (value == null)
       return;
 
@@ -160,7 +164,12 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
       // <div class="value"><span class="gwt-InlineHTML">...</span></div>
       FlowPanel valueDiv = new FlowPanel();
       valueDiv.setStyleName("value");
-      valueDiv.add(new InlineHTML(value));
+      InlineHTML inlineHTML = new InlineHTML(value);
+      if (onClick != null) {
+        inlineHTML.addClickHandler(onClick);
+        inlineHTML.addStyleName("btn-link addCursorPointer");
+      }
+      valueDiv.add(inlineHTML);
 
       // Assemble
       fieldDiv.add(labelDiv);
@@ -169,6 +178,35 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
       // Append to the metadata container
       metadataContainer.add(fieldDiv);
     }
+  }
+
+  protected void addPreCodeFieldIfNotNull(String labelText, Widget widget) {
+
+    if (widget == null) {
+      return;
+    }
+
+    // <div class="field">
+    FlowPanel fieldDiv = new FlowPanel();
+    fieldDiv.setStyleName("field");
+
+    // <div class="label">Identifier</div>
+    FlowPanel labelDiv = new FlowPanel();
+    labelDiv.setStyleName("label");
+    labelDiv.getElement().setInnerText(labelText);
+
+    FlowPanel valueDiv = new FlowPanel();
+    valueDiv.setStyleName("value");
+    valueDiv.addStyleName("code-pre");
+    valueDiv.addStyleName("notification-body-content");
+    valueDiv.add(widget);
+
+    // Assemble
+    fieldDiv.add(labelDiv);
+    fieldDiv.add(valueDiv);
+
+    // Append to the metadata container
+    metadataContainer.add(fieldDiv);
   }
 
   /**

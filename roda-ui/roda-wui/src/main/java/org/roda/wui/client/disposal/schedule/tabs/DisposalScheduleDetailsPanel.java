@@ -2,10 +2,10 @@ package org.roda.wui.client.disposal.schedule.tabs;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
-import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.actions.DisposalScheduleAction;
 import org.roda.wui.client.common.actions.DisposalScheduleToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -30,19 +30,14 @@ public class DisposalScheduleDetailsPanel extends GenericMetadataCardPanel<Dispo
     setData(schedule);
   }
 
-  private static ActionsToolbar createConfiguredToolbar(DisposalSchedule schedule) {
+  private static FlowPanel createConfiguredToolbar(DisposalSchedule schedule) {
     if (schedule == null) {
       return null;
     }
 
-    ActionsToolbar toolbar = new ActionsToolbar();
-    toolbar.setLabelVisible(false);
-    toolbar.setTagsVisible(false);
-    toolbar.setActionableMenu(
-      new ActionableWidgetBuilder<DisposalSchedule>(DisposalScheduleToolbarActions.get()).buildGroupedListWithObjects(
-        new ActionableObject<>(schedule), List.of(DisposalScheduleAction.EDIT), List.of(DisposalScheduleAction.EDIT)));
-
-    return toolbar;
+    return new ActionableWidgetBuilder<DisposalSchedule>(DisposalScheduleToolbarActions.get())
+      .buildGroupedListWithObjects(new ActionableObject<>(schedule), List.of(DisposalScheduleAction.EDIT),
+        List.of(DisposalScheduleAction.EDIT));
   }
 
   @Override

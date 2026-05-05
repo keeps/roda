@@ -10041,5 +10041,5 @@ wui-disposal-hold-data .form-textbox {
 .generic-metadata-panel .form-separator {
     font-size: 14px;
     font-weight: bold;
-    margin: 3em -15px 0 -15px !important;
+    margin: 1rem -15px 0 -15px !important;
 }

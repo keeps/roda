@@ -47,9 +47,44 @@ public class Humanize {
   protected static final NumberFormat SMALL_NUMBER_FORMAT = NumberFormat.getFormat("0.#");
   protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getFormat("#");
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  public static final DateTimeFormat DATE_TIME_FORMAT_STRICT_UTC = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss 'UTC'");
 
   private Humanize() {
     // do nothing
+  }
+
+  /**
+   * Formats a raw Date object directly into "yyyy-MM-dd HH:mm:ss UTC"
+   */
+  public static String formatDateTimeToStrictUTC(Date date) {
+    if (date == null) {
+      return "";
+    }
+    // TimeZone.createTimeZone(0) forces the output to UTC, handling the 1-hour offset
+    return DATE_TIME_FORMAT_STRICT_UTC.format(date, TimeZone.createTimeZone(0));
+  }
+
+  /**
+   * Parses a localized string like "May 5, 2026, 2:29:17 PM" and converts it to "yyyy-MM-dd HH:mm:ss UTC"
+   */
+  public static String convertStringToStrictUTC(String localizedDateString) {
+    if (localizedDateString == null || localizedDateString.trim().isEmpty()) {
+      return "";
+    }
+
+    try {
+      // Parse the incoming localized string
+      DateTimeFormat parser = DateTimeFormat.getFormat("MMM d, yyyy, h:mm:ss a");
+      Date parsedDate = parser.parse(localizedDateString);
+
+      // Reformat using the strict UTC method
+      return formatDateTimeToStrictUTC(parsedDate);
+
+    } catch (IllegalArgumentException e) {
+      // Safe fallback: if it's already formatted or parsing fails, return the original string
+      GWT.log("Could not parse date string for UTC conversion: " + localizedDateString, e);
+      return localizedDateString;
+    }
   }
 
   public static Long parseFileSize(String size, String unit) {

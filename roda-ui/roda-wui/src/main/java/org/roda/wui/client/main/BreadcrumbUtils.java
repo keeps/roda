@@ -415,7 +415,7 @@ public class BreadcrumbUtils {
     if (notification != null) {
       List<String> path = new ArrayList<>(ShowNotification.RESOLVER.getHistoryPath());
       path.add(notification.getUUID());
-      String label = StringUtils.isNotBlank(notification.getId()) ? notification.getId() : notification.getUUID();
+      String label = notification.getSubject();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
 

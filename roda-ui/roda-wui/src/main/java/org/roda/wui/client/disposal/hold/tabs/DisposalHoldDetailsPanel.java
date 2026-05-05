@@ -2,8 +2,8 @@ package org.roda.wui.client.disposal.hold.tabs;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
-import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.actions.DisposalHoldAction;
 import org.roda.wui.client.common.actions.DisposalHoldToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -28,20 +28,13 @@ public class DisposalHoldDetailsPanel extends GenericMetadataCardPanel<DisposalH
     setData(disposalHold);
   }
 
-  private static ActionsToolbar createConfiguredToolbar(DisposalHold hold) {
+  private static FlowPanel createConfiguredToolbar(DisposalHold hold) {
     if (hold == null) {
       return null;
     }
 
-    ActionsToolbar actionsToolbar = new ActionsToolbar();
-    actionsToolbar.setActionableMenu(
-      new ActionableWidgetBuilder<DisposalHold>(DisposalHoldToolbarActions.get()).buildGroupedListWithObjects(
-        new ActionableObject<>(hold), List.of(DisposalHoldAction.EDIT), List.of(DisposalHoldAction.EDIT)),
-      true);
-    actionsToolbar.setLabelVisible(false);
-    actionsToolbar.setTagsVisible(false);
-
-    return actionsToolbar;
+    return new ActionableWidgetBuilder<DisposalHold>(DisposalHoldToolbarActions.get()).buildGroupedListWithObjects(
+            new ActionableObject<>(hold), List.of(DisposalHoldAction.EDIT), List.of(DisposalHoldAction.EDIT));
   }
 
   @Override
