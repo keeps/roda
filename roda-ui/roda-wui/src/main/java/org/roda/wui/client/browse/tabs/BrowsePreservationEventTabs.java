@@ -18,10 +18,7 @@ import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.UriUtils;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 
 public class BrowsePreservationEventTabs extends Tabs {
 
@@ -181,7 +178,10 @@ public class BrowsePreservationEventTabs extends Tabs {
 
     FlowPanel body = buildCardBody();
     if (aip != null) {
-      addIfNotBlank(body, messages.genericTitle(), aip.getTitle());
+      if (StringUtils.isNotBlank(aip.getTitle())) {
+        addIfNotBlank(body, messages.genericTitle(), aip.getTitle());
+      } else
+        addEmptyInnerMessage(body, messages.noTitleMessage());
     } else {
       addIdentifierNotFound(body, LinkingObjectUtils.getLinkingObjectPath(idValue));
     }
@@ -295,6 +295,33 @@ public class BrowsePreservationEventTabs extends Tabs {
         || RodaConstants.URI_TYPE.equalsIgnoreCase(object.getType()));
   }
 
+  private void addIfNotBlank(FlowPanel panel, String label, String value) {
+    if (StringUtils.isNotBlank(value)) {
+      panel.add(buildField(label, new Label(value)));
+    }
+  }
+
+  private void addField(FlowPanel panel, String label, Widget valueWidget) {
+    if (valueWidget != null) {
+      panel.add(buildField(label, valueWidget));
+    }
+  }
+
+  private void addIdentifierNotFound(FlowPanel body, String value) {
+    addIfNotBlank(body, messages.identifierNotFound(), value);
+  }
+
+  private void addEmptyInnerMessage(FlowPanel body, String messageHtml) {
+    SimplePanel info = new SimplePanel();
+    info.addStyleName("table-empty-inner");
+
+    HTML label = new HTML(messageHtml);
+    label.addStyleName("table-empty-inner-label");
+    info.setWidget(label);
+
+    body.add(info);
+  }
+
   // common widget constructors, css to be changed
   private FlowPanel buildField(String labelText, Widget valueWidget) {
     FlowPanel field = new FlowPanel();
@@ -311,19 +338,6 @@ public class BrowsePreservationEventTabs extends Tabs {
     field.add(value);
     return field;
   }
-
-  private void addIfNotBlank(FlowPanel panel, String label, String value) {
-    if (StringUtils.isNotBlank(value)) {
-      panel.add(buildField(label, new Label(value)));
-    }
-  }
-
-  private void addField(FlowPanel panel, String label, Widget valueWidget) {
-    if (valueWidget != null) {
-      panel.add(buildField(label, valueWidget));
-    }
-  }
-
 
   private FlowPanel buildCard() {
     FlowPanel card = new FlowPanel();
@@ -362,9 +376,5 @@ public class BrowsePreservationEventTabs extends Tabs {
     body.addStyleName("cardBody");
     body.addStyleName("descriptiveMetadata");
     return body;
-  }
-
-  private void addIdentifierNotFound(FlowPanel body, String value) {
-    addIfNotBlank(body, messages.identifierNotFound(), value);
   }
 }
