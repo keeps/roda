@@ -6165,6 +6165,37 @@ td.datePickerMonth, td.datePickerYear {
     display: none;
 }
 
+.preservation-event-tab-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.preservation-event-tab-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: COLOR_PRIMARY;
+    margin: 0;
+}
+
+.preservation-event-tab-card-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: COLOR_PRIMARY;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.preservation-event-tab-card-action-open::after {
+    @mixin fontawesome();
+    content: "\e89e";
+    font-size: 16px;
+    line-height: 1;
+    color: currentColor;
+}
+
 /**********************************************
 				USER MANAGEMENT
 ************************************************/
@@ -8947,39 +8978,6 @@ span.code {
 
 .details-panel-sections .roda6Card {
     margin-bottom: 1rem;
-}
-
-.preservation-event-tab-card-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.preservation-event-tab-card-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: COLOR_PRIMARY;
-    margin: 0;
-}
-
-.preservation-event-tab-card-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: COLOR_PRIMARY;
-    text-decoration: none;
-    flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-}
-
-.preservation-event-tab-card-action-open::after {
-    @mixin fontawesome();
-    content: "\e89e";
-    font-size: 16px;
-    line-height: 1;
-    color: currentColor;
 }
 
 /******************************
