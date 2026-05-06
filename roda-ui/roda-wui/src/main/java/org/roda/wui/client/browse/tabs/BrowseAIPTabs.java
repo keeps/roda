@@ -20,6 +20,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.EditPermissionsTab;
 import org.roda.wui.client.browse.tabs.aip.AipDetailsTab;
+import org.roda.wui.client.browse.tabs.aip.AipPermissionTabs;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -32,11 +33,11 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
-import org.roda.wui.client.disposal.association.DisposalPolicyAssociationTab;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
+import org.roda.wui.client.disposal.association.DisposalPolicyAssociationTab;
 
 /**
  *
@@ -116,7 +117,7 @@ public class BrowseAIPTabs extends Tabs {
       createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalTab()), new TabContentBuilder() {
         @Override
         public Widget buildTabWidget() {
-          return new DisposalPolicyAssociationTab(browseAIPResponse, actionCallback);
+          return new DisposalPolicyAssociationTab(browseAIPResponse.getIndexedAIP(), actionCallback);
         }
       });
     }
@@ -125,10 +126,7 @@ public class BrowseAIPTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.permissionsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        AipToolbarActions aipToolbarActions = AipToolbarActions.get(aip.getId(), aip.getState(), aip.getPermissions());
-        return new EditPermissionsTab(new ActionableWidgetBuilder<>(aipToolbarActions).buildGroupedListWithObjects(
-          new ActionableObject<>(aip), List.of(AipToolbarActions.AIPAction.UPDATE_PERMISSIONS),
-          List.of(AipToolbarActions.AIPAction.UPDATE_PERMISSIONS)), IndexedAIP.class.getName(), aip);
+        return new AipPermissionTabs(aip);
       }
     });
 

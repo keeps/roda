@@ -9042,6 +9042,7 @@ span.code {
     padding: 8px;
     border: none;
     background-color: transparent;
+    border-radius: 6px;
 }
 
 .permissionsTab .panel.permission .panel-body {

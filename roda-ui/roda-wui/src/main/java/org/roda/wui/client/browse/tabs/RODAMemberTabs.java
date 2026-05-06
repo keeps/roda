@@ -43,8 +43,7 @@ public class RODAMemberTabs extends Tabs {
       }
     });
 
-    if (member.isUser() && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_REVOKE_ACCESS_TOKEN,
-      RodaConstants.PERMISSION_METHOD_REGENERATE_ACCESS_TOKEN, RodaConstants.PERMISSION_METHOD_DELETE_ACCESS_TOKEN)) {
+    if (member.isUser()) {
       createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.showAccessKeyTitle()), new TabContentBuilder() {
         @Override
         public Widget buildTabWidget() {

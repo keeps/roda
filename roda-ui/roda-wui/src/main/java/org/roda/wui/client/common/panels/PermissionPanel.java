@@ -1,5 +1,9 @@
 package org.roda.wui.client.common.panels;
 
+/**
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
+ */
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Composite;
@@ -7,74 +11,99 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import config.i18n.client.ClientMessages;
-import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.ip.Permissions;
+import org.roda.wui.client.common.labels.Tag;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-/**
- * @author Miguel Guimarães <mguimaraes@keep.pt>
- */
 public class PermissionPanel extends Composite {
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private final Set<String> list;
-  private final boolean isUser;
+    private static final ClientMessages messages = GWT.create(ClientMessages.class);
+    
+    private FlowPanel panel;
+    private FlowPanel panelBody;
+    private FlowPanel rightPanel;
+    private HTML type;
+    private Label nameLabel;
+    private FlowPanel permissionTagsPanel;
 
-  // Private constructor forces the use of the Builder
-  private PermissionPanel(Builder builder) {
-    this.list = builder.list;
-    this.isUser = builder.isUser;
+    private String name;
+    private boolean isUser;
 
-    FlowPanel superPanel = new FlowPanel();
-    initWidget(superPanel);
+    public PermissionPanel(String name, boolean isUser, Set<Permissions.PermissionType> permissions) {
+        this.name = name;
+        this.isUser = isUser;
 
-    for (String str : list) {
-      FlowPanel panel = new FlowPanel();
+        panel = new FlowPanel();
+        panelBody = new FlowPanel();
 
-      FlowPanel panelBody = new FlowPanel();
-      HTML type = new HTML(
-        SafeHtmlUtils.fromSafeConstant(isUser ? "<i class='fa fa-users'></i>" : "<i class='fa fa-user'></i>"));
-      panelBody.add(type);
-      type.addStyleName("permission-type");
-      Label label = new Label(str);
-      panelBody.add(label);
-      panel.add(panelBody);
-      panelBody.addStyleName("panel-body");
-      label.addStyleName("permission-name");
+        type = new HTML(
+                SafeHtmlUtils.fromSafeConstant(isUser ? "<i class='fa fa-user'></i>" : "<i class='fa fa-users'></i>"));
+        nameLabel = new Label(name);
 
-      panel.addStyleName("panel permission");
-      panel.addStyleName(isUser ? "permission-group" : "permission-user");
+        rightPanel = new FlowPanel();
+        permissionTagsPanel = new FlowPanel();
 
-      superPanel.add(panel);
+        Map<Permissions.PermissionType, Tag.TagStyle> tagStyles = new HashMap<>();
+        tagStyles.put(Permissions.PermissionType.GRANT, Tag.TagStyle.BORDER_BLACK);
+        tagStyles.put(Permissions.PermissionType.READ, Tag.TagStyle.BORDER_BLACK);
+        tagStyles.put(Permissions.PermissionType.DELETE, Tag.TagStyle.BORDER_DANGER);
+        tagStyles.put(Permissions.PermissionType.CREATE, Tag.TagStyle.BORDER_BLACK);
+        tagStyles.put(Permissions.PermissionType.UPDATE, Tag.TagStyle.BORDER_BLACK);
+        for (Permissions.PermissionType permissionType : permissions) {
+            Tag permissionTag = Tag.fromText(messages.objectPermission(permissionType), tagStyles.get(permissionType));
+            permissionTagsPanel.add(permissionTag);
+            permissionTag.addStyleName("permission-tag");
+        }
+
+        panelBody.add(type);
+        panelBody.add(nameLabel);
+        panelBody.add(rightPanel);
+
+        rightPanel.add(permissionTagsPanel);
+
+        panel.add(panelBody);
+
+        initWidget(panel);
+
+        panel.addStyleName("panel permission");
+        panel.addStyleName(isUser ? "permission-user" : "permission-group");
+        panelBody.addStyleName("panel-body");
+        type.addStyleName("permission-type");
+        nameLabel.addStyleName("permission-name");
+        rightPanel.addStyleName("pull-right");
+        permissionTagsPanel.addStyleName("permission-tags");
     }
-  }
 
-  public Set<String> getList() {
-    return list;
-  }
-
-  public boolean isUser() {
-    return isUser;
-  }
-
-  // --- BUILDER IMPLEMENTATION ---
-
-  public static class Builder {
-    private final Set<String> list;
-    private final boolean isUser;
-
-    public Builder(RODAMember member) {
-      this.isUser = member.isUser();
-      if (this.isUser) {
-        list = ((User) member).getGroups();
-      } else {
-        list = ((Group) member).getUsers();
-      }
+    public Set<Permissions.PermissionType> getPermissions() {
+        HashSet<Permissions.PermissionType> permissions = new HashSet<>();
+        for (int i = 0; i < permissionTagsPanel.getWidgetCount(); i++) {
+            ValueLabel valueCheckBox = (ValueLabel) permissionTagsPanel.getWidget(i);
+            permissions.add(valueCheckBox.getPermissionType());
+        }
+        return permissions;
     }
 
-    public PermissionPanel build() {
-      return new PermissionPanel(this);
+    public String getName() {
+        return name;
     }
-  }
+
+    public boolean isUser() {
+        return isUser;
+    }
+
+    public class ValueLabel extends Label {
+        private Permissions.PermissionType permissionType;
+
+        public ValueLabel(Permissions.PermissionType permissionType) {
+            super(messages.objectPermission(permissionType));
+            this.permissionType = permissionType;
+        }
+
+        public Permissions.PermissionType getPermissionType() {
+            return permissionType;
+        }
+    }
 }

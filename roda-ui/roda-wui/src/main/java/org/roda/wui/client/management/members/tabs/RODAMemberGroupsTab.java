@@ -14,13 +14,8 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.RODAMemberAction;
@@ -30,6 +25,7 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.ActionMenuCell;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
+import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -40,30 +36,38 @@ import java.util.Set;
  *
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class RODAMemberGroupsTab extends Composite {
+public class RODAMemberGroupsTab extends GenericMetadataCardPanel<RODAMember> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private final String id;
-  private final RODAMember member; // Keep a reference to check member.isUser() in refresh()
-  @UiField
-  ActionsToolbar actionsToolbar;
-  @UiField
-  FlowPanel groupsPanel;
 
-  private AsyncCallback<Actionable.ActionImpact> actionCallback;
+  private final String id;
+  private final RODAMember member;
+  private final AsyncCallback<Actionable.ActionImpact> actionCallback;
+  private FlowPanel groupsPanel;
 
   public RODAMemberGroupsTab(RODAMember member, AsyncCallback<Actionable.ActionImpact> actionCallback) {
-    initWidget(uiBinder.createAndBindUi(this));
-
+    super();
     this.member = member;
     this.id = member.getId();
     this.actionCallback = actionCallback;
+
+    // This template method automatically calls createHeaderWidget() and
+    // buildFields()
+    setData(member);
+  }
+
+  @Override
+  protected FlowPanel createHeaderWidget(RODAMember member) {
+    if (member == null) {
+      return null;
+    }
 
     // 1. Create a local callback to intercept the UPDATED event
     AsyncCallback<Actionable.ActionImpact> localCallback = new AsyncCallback<Actionable.ActionImpact>() {
       @Override
       public void onFailure(Throwable caught) {
-        actionCallback.onFailure(caught);
+        if (actionCallback != null) {
+          actionCallback.onFailure(caught);
+        }
       }
 
       @Override
@@ -71,25 +75,35 @@ public class RODAMemberGroupsTab extends Composite {
         if (Actionable.ActionImpact.UPDATED.equals(result)) {
           // Refresh the table locally
           refresh();
-          actionCallback.onSuccess(result);
+          if (actionCallback != null) {
+            actionCallback.onSuccess(result);
+          }
         } else {
           // Pass other events (like DESTROYED) up the chain
-          actionCallback.onSuccess(result);
+          if (actionCallback != null) {
+            actionCallback.onSuccess(result);
+          }
         }
       }
     };
 
-    // 2. Bind the local callback to the toolbar
-    actionsToolbar.setLabelVisible(false);
-    actionsToolbar.setTagsVisible(false);
-    actionsToolbar.setActionableMenu(new ActionableWidgetBuilder<RODAMember>(RODAMemberToolbarActions.get())
-      .withActionCallback(localCallback).buildGroupedListWithObjects(new ActionableObject<>(member),
+    // 2. Bind the local callback to the toolbar builder
+    return new ActionableWidgetBuilder<RODAMember>(RODAMemberToolbarActions.get()).withActionCallback(localCallback)
+      .buildGroupedListWithObjects(new ActionableObject<>(member),
         List.of(RODAMemberAction.ADD_NEW_GROUP, RODAMemberAction.ADD_NEW_MEMBER),
-        List.of(RODAMemberAction.ADD_NEW_GROUP, RODAMemberAction.ADD_NEW_MEMBER)),
-      true);
+        List.of(RODAMemberAction.ADD_NEW_GROUP, RODAMemberAction.ADD_NEW_MEMBER));
+  }
 
-    // 3. Call unified refresh
-    refresh();
+  @Override
+  protected void buildFields(RODAMember member) {
+    if (member != null) {
+      // Initialize the container for the tables
+      groupsPanel = new FlowPanel();
+      metadataContainer.add(groupsPanel);
+
+      // Call unified refresh to fetch and populate data
+      refresh();
+    }
   }
 
   public void refresh() {
@@ -183,7 +197,9 @@ public class RODAMemberGroupsTab extends Composite {
 
                   // Simple call to the unified refresh method
                   refresh();
-                  actionCallback.onSuccess(Actionable.ActionImpact.UPDATED);
+                  if (actionCallback != null) {
+                    actionCallback.onSuccess(Actionable.ActionImpact.UPDATED);
+                  }
 
                 } else {
                   Toast.showError("Failed to remove group from user");
@@ -215,22 +231,24 @@ public class RODAMemberGroupsTab extends Composite {
     removeBtn.addClickHandler(e -> {
       popup.hide();
 
-      Dialogs.showConfirmDialog(messages.removeMemberConfirmationTitle(), messages.removeMemberConfirmationMessage(key.getFullName()),
-        messages.cancelButton(), messages.confirmButton(), new NoAsyncCallback<Boolean>() {
+      Dialogs.showConfirmDialog(messages.removeMemberConfirmationTitle(),
+        messages.removeMemberConfirmationMessage(key.getFullName()), messages.cancelButton(), messages.confirmButton(),
+        new NoAsyncCallback<Boolean>() {
           @Override
           public void onSuccess(Boolean confirm) {
             if (confirm) {
               Services services = new Services("Remove member from group", "update");
-              services.membersResource(s -> s.removeMembersFromGroup(id, key.getId())).whenComplete((response, error) -> {
-                if (response != null) {
-                  Toast.showInfo(messages.groups(), messages.groupSuccessfullyRemoved());
+              services.membersResource(s -> s.removeMembersFromGroup(id, key.getId()))
+                .whenComplete((response, error) -> {
+                  if (response != null) {
+                    Toast.showInfo(messages.groups(), messages.groupSuccessfullyRemoved());
 
-                  // Simple call to the unified refresh method
-                  refresh();
-                } else {
-                  Toast.showError("Failed to remove group from user");
-                }
-              });
+                    // Simple call to the unified refresh method
+                    refresh();
+                  } else {
+                    Toast.showError("Failed to remove group from user");
+                  }
+                });
             }
           }
         });
@@ -322,9 +340,5 @@ public class RODAMemberGroupsTab extends Composite {
         new BasicTablePanel.ColumnInfo<User>(messages.groupName(), 15, getUserNameColumn()),
         new BasicTablePanel.ColumnInfo<>(messages.actions(), 5, getUserActionsColumn()));
     }
-  }
-
-  interface MyUiBinder extends UiBinder<Widget, RODAMemberGroupsTab> {
-    Widget createAndBindUi(RODAMemberGroupsTab tab);
   }
 }

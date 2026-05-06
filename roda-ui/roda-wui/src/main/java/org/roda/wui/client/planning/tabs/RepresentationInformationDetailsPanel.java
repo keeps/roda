@@ -1,97 +1,81 @@
-package org.roda.wui.client.planning;
+package org.roda.wui.client.planning.tabs;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
+import org.roda.wui.client.common.actions.RepresentationInformationActions;
+import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.planning.RepresentationInformationNetwork;
+import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientMessages;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  *
- * @author Eduardo Teixeira <eteixeira@keep.pt>
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class DetailsPanelRepresentationInformation extends Composite {
+public class RepresentationInformationDetailsPanel extends GenericMetadataCardPanel<RepresentationInformation> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  @UiField
-  FlowPanel details;
-
-  public DetailsPanelRepresentationInformation(RepresentationInformation ri) {
-    initWidget(uiBinder.createAndBindUi(this));
-    init(ri);
+  public RepresentationInformationDetailsPanel(RepresentationInformation data) {
+    setData(data);
   }
 
-  private void init(RepresentationInformation ri) {
-    if (ri.getCreatedOn() != null && StringUtils.isNotBlank(ri.getCreatedBy())) {
-      addIfNotBlank(messages.detailsCreatedOn(), Humanize.formatDateTime(ri.getCreatedOn()));
-      addIfNotBlank(messages.detailsCreatedBy(), ri.getCreatedBy());
-    }
-
-    if (ri.getUpdatedOn() != null && StringUtils.isNotBlank(ri.getUpdatedBy())) {
-      addIfNotBlank(messages.detailsUpdatedOn(), Humanize.formatDateTime(ri.getUpdatedOn()));
-      addIfNotBlank(messages.detailsUpdatedBy(), ri.getUpdatedBy());
-    }
-    addIfNotBlank(messages.representationInformationIdentifier(), ri.getId());
-    addIfNotBlank(messages.representationInformationName(), ri.getName());
-    addIfNotBlank(messages.representationInformationDescription(), ri.getDescription());
-    addIfNotBlank(messages.representationInformationFamily(), ri.getFamilyI18n());
-
-    if (ri.getSupport() != null) {
-      addIfNotBlank(messages.representationInformationSupport(),
-        messages.representationInformationSupportValue(ri.getSupport().toString()));
-    }
-
-    addTagsField(ri);
-    addExtrasField(ri);
-    initRelations(ri);
-
+  @Override
+  protected FlowPanel createHeaderWidget(RepresentationInformation data) {
+    return new ActionableWidgetBuilder<RepresentationInformation>(RepresentationInformationActions.get())
+      .buildGroupedListWithObjects(new ActionableObject<>(data),
+        List.of(RepresentationInformationActions.RepresentationInformationAction.EDIT),
+        List.of(RepresentationInformationActions.RepresentationInformationAction.EDIT));
   }
 
-  private void addIfNotBlank(String label, String value) {
-    if (StringUtils.isNotBlank(value)) {
-      details.add(buildField(label, new InlineHTML(SafeHtmlUtils.htmlEscape(value))));
+  @Override
+  protected void buildFields(RepresentationInformation data) {
+    buildField(messages.representationInformationName()).withValue(data.getName()).build();
+    buildField(messages.representationInformationDescription()).withValue(data.getDescription()).build();
+    buildField(messages.representationInformationFamily()).withValue(data.getFamilyI18n()).build();
+
+    if (data.getSupport() != null) {
+      buildField(messages.representationInformationSupport())
+        .withValue(messages.representationInformationSupportValue(data.getSupport().toString())).build();
     }
-  }
+    initRelations(data);
 
-  private Widget buildField(String label, Widget valueWidget) {
-    FlowPanel fieldPanel = new FlowPanel();
-    fieldPanel.setStyleName("field");
+    addTagsField(data);
+    addExtrasField(data);
 
-    Label fieldLabel = new Label(label);
-    fieldLabel.setStyleName("label");
+    addSeparator(messages.representationInformationAdditionalInformation());
+    buildField(messages.representationInformationIdentifier()).withValue(data.getId()).build();
 
-    FlowPanel fieldValuePanel = new FlowPanel();
-    fieldValuePanel.setStyleName("value");
-    fieldValuePanel.add(valueWidget);
+    if (data.getCreatedOn() != null && StringUtils.isNotBlank(data.getCreatedBy())) {
+      buildField(messages.detailsCreatedOn()).withValue(Humanize.formatDateTime(data.getCreatedOn())).build();
+      buildField(messages.detailsCreatedBy()).withValue(data.getCreatedBy()).build();
+    }
 
-    fieldPanel.add(fieldLabel);
-    fieldPanel.add(fieldValuePanel);
-
-    return fieldPanel;
+    if (data.getUpdatedOn() != null && StringUtils.isNotBlank(data.getUpdatedBy())) {
+      buildField(messages.detailsUpdatedOn()).withValue(Humanize.formatDateTime(data.getUpdatedOn())).build();
+      buildField(messages.detailsUpdatedBy()).withValue(data.getUpdatedBy()).build();
+    }
   }
 
   private void addTagsField(RepresentationInformation ri) {
@@ -114,10 +98,15 @@ public class DetailsPanelRepresentationInformation extends Composite {
       tagsPanel.add(tag);
     }
 
-    details.add(buildField(messages.representationInformationTags(), tagsPanel));
+    buildField(messages.representationInformationTags()).withWidget(tagsPanel).build();
   }
 
   private void addExtrasField(RepresentationInformation ri) {
+    // 1. Create a placeholder panel and add it to the container synchronously
+    // to reserve its spot in the exact order defined in buildFields().
+    FlowPanel extrasPlaceholder = new FlowPanel();
+    metadataContainer.add(extrasPlaceholder);
+
     Services services = new Services("Retrieve representation information family metadata", "get");
     services
       .representationInformationResource(
@@ -132,7 +121,9 @@ public class DetailsPanelRepresentationInformation extends Composite {
           HtmlSnippetUtils.createExtraShow(extrasContent, family.getFamilyValues(), false);
 
           if (extrasContent.getWidgetCount() > 0) {
-            details.add(extrasContent);
+            // 2. Add the loaded content to the placeholder instead of the main
+            // metadataContainer.
+            extrasPlaceholder.add(extrasContent);
           }
         }
       });
@@ -148,7 +139,7 @@ public class DetailsPanelRepresentationInformation extends Composite {
       Widget relationValue = createRelationViewer(relation);
       if (relationValue != null) {
         relationValue.addStyleName("ri-links-panel");
-        details.add(buildField(relation.getRelationTypeI18n(), relationValue));
+        buildField(relation.getRelationTypeI18n()).withWidget(relationValue).build();
       }
     }
   }
@@ -181,9 +172,5 @@ public class DetailsPanelRepresentationInformation extends Composite {
     }
 
     return widgetToAdd;
-  }
-
-  interface MyUiBinder extends UiBinder<Widget, DetailsPanelRepresentationInformation> {
-    Widget createAndBindUi(DetailsPanelRepresentationInformation representationInformationPanel);
   }
 }

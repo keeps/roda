@@ -3,6 +3,7 @@ package org.roda.wui.client.browse.tabs;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Widget;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.wui.client.management.tabs.AuditLogDetailsPanel;
 
 /**
  *
@@ -14,7 +15,7 @@ public class BrowseLogEntryTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DetailsTab(logEntry);
+        return new AuditLogDetailsPanel(logEntry);
       }
     });
   }

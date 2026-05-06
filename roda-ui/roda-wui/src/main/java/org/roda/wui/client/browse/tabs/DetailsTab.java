@@ -7,20 +7,7 @@
  */
 package org.roda.wui.client.browse.tabs;
 
-import java.util.List;
-
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.wui.client.common.model.BrowseAIPResponse;
-import org.roda.wui.client.common.model.BrowseRepresentationResponse;
-import org.roda.wui.client.planning.DetailsPanelRepresentationInformation;
-import org.roda.wui.client.management.DetailsPanelLogEntry;
-import org.roda.wui.client.planning.DetailsPanelAIP;
-import org.roda.wui.client.planning.DetailsPanelFile;
-import org.roda.wui.client.planning.DetailsPanelRepresentation;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -41,44 +28,10 @@ public class DetailsTab extends Composite {
   @UiField
   FlowPanel content;
 
-  public DetailsTab(BrowseAIPResponse response) {
-    initWidget(uiBinder.createAndBindUi(this));
-    // Get metadata and populate widget
-    DetailsPanelAIP detailsPanel = new DetailsPanelAIP(response);
-    content.add(detailsPanel);
-  }
-
-  public DetailsTab(BrowseRepresentationResponse response) {
-    initWidget(uiBinder.createAndBindUi(this));
-    // Get metadata and populate widget
-    DetailsPanelRepresentation detailsPanel = new DetailsPanelRepresentation(response);
-    content.add(detailsPanel);
-  }
-
-  public DetailsTab(IndexedFile file, List<String> riRules) {
-    initWidget(uiBinder.createAndBindUi(this));
-    // Get metadata and populate widget
-    DetailsPanelFile detailsPanel = new DetailsPanelFile(file, riRules);
-    content.add(detailsPanel);
-  }
-
-  public DetailsTab(RepresentationInformation ri){
-    initWidget(uiBinder.createAndBindUi(this));
-
-    DetailsPanelRepresentationInformation detailsPanel = new DetailsPanelRepresentationInformation(ri);
-    content.add(detailsPanel);
-  }
-
   public DetailsTab(IndexedRisk risk) {
     initWidget(uiBinder.createAndBindUi(this));
 
     DetailsPanelRisk detailsPanel = new DetailsPanelRisk(risk, "RiskShowPanel_riskIncidences");
-    content.add(detailsPanel);
-  }
-
-  public DetailsTab(LogEntry logEntry) {
-    initWidget(uiBinder.createAndBindUi(this));
-    DetailsPanelLogEntry detailsPanel = new DetailsPanelLogEntry(logEntry);
     content.add(detailsPanel);
   }
 

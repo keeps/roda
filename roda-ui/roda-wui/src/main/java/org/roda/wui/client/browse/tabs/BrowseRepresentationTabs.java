@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.wui.client.browse.tabs.representation.RepresentationDetailsTab;
 import org.roda.wui.client.common.actions.FileSearchWrapperActions;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
@@ -108,7 +109,7 @@ public class BrowseRepresentationTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DetailsTab(browseRepresentationResponse);
+        return new RepresentationDetailsTab(browseRepresentationResponse);
       }
     });
   }

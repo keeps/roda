@@ -25,6 +25,7 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.labels.Header;
 import org.roda.wui.client.common.labels.Tag;
+import org.roda.wui.client.common.panels.PermissionPanel;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -67,21 +68,9 @@ public class EditPermissionsTab extends Composite {
   ActionsToolbar actionsToolbar;
 
   private List<HasPermissions> objects = new ArrayList<>();
-  private String objectId = null;
-  private SelectedItems<?> selectedItems;
-
-  public EditPermissionsTab(SelectedItems<?> items) {
-    this.selectedItems = items;
-    initWidget(uiBinder.createAndBindUi(this));
-    initLabels();
-    actionsToolbar.setVisible(false);
-    editPermissionsDescription.add(new HTMLWidgetWrapper("EditMultiplePermissionsDescription.html"));
-  }
 
   public EditPermissionsTab(FlowPanel toolbarActionableMenu, String objectClass, HasPermissions object) {
     this.objects.add(object);
-    this.objectId = object.getId();
-    this.selectedItems = SelectedItemsList.create(objectClass, objectId);
     initWidget(uiBinder.createAndBindUi(this));
     initLabels();
     actionsToolbar.setActionableMenu(toolbarActionableMenu, true);
@@ -91,97 +80,11 @@ public class EditPermissionsTab extends Composite {
     createPermissionPanel();
   }
 
-  public EditPermissionsTab(String objectClass, SelectedItems<? extends HasPermissions> selectedItems,
-    List<? extends HasPermissions> list) {
-    this.objects.addAll(list);
-    this.selectedItems = selectedItems;
-    initWidget(uiBinder.createAndBindUi(this));
-    editPermissionsDescription.add(new HTMLWidgetWrapper("EditPermissionsDescription.html"));
-    initLabels();
-    actionsToolbar.setVisible(false);
-    createPermissionPanelList();
-  }
-
   private void initLabels() {
     userPermissionsTitle.setHeaderText(messages.permissionAssignedGroups());
     userPermissionsTitle.setLevel(4);
     groupPermissionsTitle.setHeaderText(messages.permissionAssignedUsers());
     groupPermissionsTitle.setLevel(4);
-  }
-
-  private void createPermissionPanelList() {
-    Map<String, Set<PermissionType>> userPermissionsToShow = new HashMap<>();
-    Map<String, Set<PermissionType>> groupPermissionsToShow = new HashMap<>();
-
-    if (!objects.isEmpty()) {
-      Permissions firstAIPPermissions = objects.get(0).getPermissions();
-
-      for (String userName : firstAIPPermissions.getUsernames()) {
-        userPermissionsToShow.put(userName, firstAIPPermissions.getUserPermissions(userName));
-      }
-
-      for (String groupName : firstAIPPermissions.getGroupnames()) {
-        groupPermissionsToShow.put(groupName, firstAIPPermissions.getGroupPermissions(groupName));
-      }
-
-      for (int i = 1; i < objects.size(); i++) {
-        Permissions permissions = objects.get(i).getPermissions();
-
-        for (Iterator<Entry<String, Set<PermissionType>>> userIterator = userPermissionsToShow.entrySet()
-          .iterator(); userIterator.hasNext();) {
-          Entry<String, Set<PermissionType>> entry = userIterator.next();
-          if (permissions.getUsernames().contains(entry.getKey())) {
-            Set<PermissionType> userPermissionType = entry.getValue();
-
-            for (Iterator<PermissionType> permissionTypeIterator = userPermissionType.iterator(); permissionTypeIterator
-              .hasNext();) {
-              PermissionType permissionType = permissionTypeIterator.next();
-
-              if (!permissions.getUserPermissions(entry.getKey()).contains(permissionType)) {
-                permissionTypeIterator.remove();
-              }
-            }
-          } else {
-            userIterator.remove();
-          }
-        }
-
-        for (Iterator<Entry<String, Set<PermissionType>>> groupIterator = groupPermissionsToShow.entrySet()
-          .iterator(); groupIterator.hasNext();) {
-          Entry<String, Set<PermissionType>> entry = groupIterator.next();
-          if (permissions.getGroupnames().contains(entry.getKey())) {
-            Set<PermissionType> groupPermissionType = entry.getValue();
-
-            for (Iterator<PermissionType> permissionTypeIterator = groupPermissionType
-              .iterator(); permissionTypeIterator.hasNext();) {
-              PermissionType permissionType = permissionTypeIterator.next();
-
-              if (!permissions.getGroupPermissions(entry.getKey()).contains(permissionType)) {
-                permissionTypeIterator.remove();
-              }
-            }
-          } else {
-            groupIterator.remove();
-          }
-        }
-
-      }
-    }
-
-    userPermissionsEmpty.setVisible(userPermissionsToShow.isEmpty());
-    groupPermissionsEmpty.setVisible(groupPermissionsToShow.isEmpty());
-
-    for (Entry<String, Set<PermissionType>> entry : userPermissionsToShow.entrySet()) {
-      PermissionPanel permissionPanel = new PermissionPanel(entry.getKey(), true, entry.getValue());
-      userPermissionsPanel.add(permissionPanel);
-      bindUpdateEmptyVisibility(permissionPanel);
-    }
-
-    for (Entry<String, Set<PermissionType>> entry : groupPermissionsToShow.entrySet()) {
-      PermissionPanel permissionPanel = new PermissionPanel(entry.getKey(), false, entry.getValue());
-      groupPermissionsPanel.add(permissionPanel);
-      bindUpdateEmptyVisibility(permissionPanel);
-    }
   }
 
   private void createPermissionPanel() {
@@ -204,17 +107,6 @@ public class EditPermissionsTab extends Composite {
     }
   }
 
-  public void addPermissionPanel(RODAMember member) {
-    PermissionPanel permissionPanel = new PermissionPanel(member);
-    if (member.isUser()) {
-      bindUpdateEmptyVisibility(permissionPanel);
-      userPermissionsPanel.insert(permissionPanel, 0);
-    } else {
-      bindUpdateEmptyVisibility(permissionPanel);
-      groupPermissionsPanel.insert(permissionPanel, 0);
-    }
-  }
-
   private void bindUpdateEmptyVisibility(PermissionPanel permissionPanel) {
     permissionPanel.addAttachHandler(new Handler() {
 
@@ -231,32 +123,6 @@ public class EditPermissionsTab extends Composite {
 
       }
     });
-  }
-
-  public List<String> getAssignedUserNames() {
-    List<String> ret = new ArrayList<>();
-    for (int i = 0; i < userPermissionsPanel.getWidgetCount(); i++) {
-      PermissionPanel permissionPanel = (PermissionPanel) userPermissionsPanel.getWidget(i);
-
-      if (permissionPanel.isUser()) {
-        ret.add(permissionPanel.getName());
-      }
-    }
-
-    return ret;
-  }
-
-  public List<String> getAssignedGroupNames() {
-    List<String> ret = new ArrayList<>();
-    for (int i = 0; i < groupPermissionsPanel.getWidgetCount(); i++) {
-      PermissionPanel permissionPanel = (PermissionPanel) groupPermissionsPanel.getWidget(i);
-
-      if (!permissionPanel.isUser()) {
-        ret.add(permissionPanel.getName());
-      }
-    }
-
-    return ret;
   }
 
   public Permissions getPermissions() {
@@ -288,94 +154,4 @@ public class EditPermissionsTab extends Composite {
   interface MyUiBinder extends UiBinder<Widget, EditPermissionsTab> {
   }
 
-  public class PermissionPanel extends Composite {
-    private FlowPanel panel;
-    private FlowPanel panelBody;
-    private FlowPanel rightPanel;
-    private HTML type;
-    private Label nameLabel;
-    private FlowPanel permissionTagsPanel;
-
-    private String name;
-    private boolean isUser;
-
-    public PermissionPanel(RODAMember member) {
-      this(member.getName(), member.isUser(), new HashSet<>());
-    }
-
-    public PermissionPanel(String name, boolean isUser, Set<PermissionType> permissions) {
-      this.name = name;
-      this.isUser = isUser;
-
-      panel = new FlowPanel();
-      panelBody = new FlowPanel();
-
-      type = new HTML(
-        SafeHtmlUtils.fromSafeConstant(isUser ? "<i class='fa fa-user'></i>" : "<i class='fa fa-users'></i>"));
-      nameLabel = new Label(name);
-
-      rightPanel = new FlowPanel();
-      permissionTagsPanel = new FlowPanel();
-
-      Map<PermissionType, Tag.TagStyle> tagStyles = new HashMap<>();
-      tagStyles.put(PermissionType.GRANT, Tag.TagStyle.BORDER_BLACK);
-      tagStyles.put(PermissionType.READ, Tag.TagStyle.BORDER_BLACK);
-      tagStyles.put(PermissionType.DELETE, Tag.TagStyle.BORDER_DANGER);
-      tagStyles.put(PermissionType.CREATE, Tag.TagStyle.BORDER_BLACK);
-      tagStyles.put(PermissionType.UPDATE, Tag.TagStyle.BORDER_BLACK);
-      for (PermissionType permissionType : permissions) {
-        Tag permissionTag = Tag.fromText(messages.objectPermission(permissionType), tagStyles.get(permissionType));
-        permissionTagsPanel.add(permissionTag);
-        permissionTag.addStyleName("permission-tag");
-      }
-
-      panelBody.add(type);
-      panelBody.add(nameLabel);
-      panelBody.add(rightPanel);
-
-      rightPanel.add(permissionTagsPanel);
-
-      panel.add(panelBody);
-
-      initWidget(panel);
-
-      panel.addStyleName("panel permission");
-      panel.addStyleName(isUser ? "permission-user" : "permission-group");
-      panelBody.addStyleName("panel-body");
-      type.addStyleName("permission-type");
-      nameLabel.addStyleName("permission-name");
-      rightPanel.addStyleName("pull-right");
-      permissionTagsPanel.addStyleName("permission-tags");
-    }
-
-    public Set<PermissionType> getPermissions() {
-      HashSet<PermissionType> permissions = new HashSet<>();
-      for (int i = 0; i < permissionTagsPanel.getWidgetCount(); i++) {
-        ValueLabel valueCheckBox = (ValueLabel) permissionTagsPanel.getWidget(i);
-        permissions.add(valueCheckBox.getPermissionType());
-      }
-      return permissions;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public boolean isUser() {
-      return isUser;
-    }
-
-    public class ValueLabel extends Label {
-      private PermissionType permissionType;
-
-      public ValueLabel(PermissionType permissionType) {
-        super(messages.objectPermission(permissionType));
-        this.permissionType = permissionType;
-      }
-
-      public PermissionType getPermissionType() {
-        return permissionType;
-      }
-    }
-  }
 }
