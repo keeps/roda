@@ -153,8 +153,8 @@ public class NestedDocumentSearchTest extends AbstractTestNGSpringContextTests {
           new SimpleFilterParameter("content_type", "email")))));
 
     String nestedQuery = SolrUtils.parseFilter(nestedFilter);
-    assertEquals("Block-join query must use double-quoted which= and + required operators",
-      "{!parent which=\"content_type:emailarchive\"}(+sender_s:\"joao.silva@empresa.pt\" +content_type:\"email\")",
+    assertEquals("Block-join query must use v= local param to avoid outer-parser whitespace splitting",
+      "{!parent which=\"content_type:emailarchive\" v=\"(+sender_s:\\\"joao.silva@empresa.pt\\\" +content_type:\\\"email\\\")\"}",
       nestedQuery);
 
     IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, nestedFilter, Sorter.NONE,
@@ -175,7 +175,7 @@ public class NestedDocumentSearchTest extends AbstractTestNGSpringContextTests {
 
     String combinedQuery = SolrUtils.parseFilter(combinedFilter);
     assertEquals("AllFilterParameter combined with block-join produces *:* AND prefix (harmless, matches everything)",
-      "*:* AND {!parent which=\"content_type:emailarchive\"}(+sender_s:\"joao.silva@empresa.pt\" +content_type:\"email\")",
+      "*:* AND {!parent which=\"content_type:emailarchive\" v=\"(+sender_s:\\\"joao.silva@empresa.pt\\\" +content_type:\\\"email\\\")\"}",
       combinedQuery);
 
     IndexResult<IndexedAIP> combinedResult = index.find(IndexedAIP.class, combinedFilter, Sorter.NONE,

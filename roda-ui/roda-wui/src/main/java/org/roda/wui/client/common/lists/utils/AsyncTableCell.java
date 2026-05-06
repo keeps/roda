@@ -390,7 +390,16 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     // autoUpdateConsumers.add(st -> GWT.log(st.toString()));
     addAutoUpdateControlListener();
 
-    if (options.isBindOpener()) {
+    if (options.getCustomOpener() != null) {
+      final java.util.function.Consumer<T> opener = options.getCustomOpener();
+      getSelectionModel().addSelectionChangeHandler(event -> {
+        ListSelectionState<T> state = getListSelectionState();
+        if (state != null) {
+          clearSelected();
+          opener.accept(state.getSelected());
+        }
+      });
+    } else if (options.isBindOpener()) {
       display.addCellPreviewHandler(event -> {
         NativeEvent nativeEvent = event.getNativeEvent();
         if ("click".equals(nativeEvent.getType())) {
