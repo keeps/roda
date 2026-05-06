@@ -87,7 +87,7 @@ public class RiskController implements RiskRestService, Exportable {
   }
 
   @Override
-  public LongResponse count(CountRequest countRequest) {
+  public LongResponse count(@RequestBody CountRequest countRequest) {
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     if (UserUtility.hasPermissions(requestContext.getUser(), RodaConstants.PERMISSION_METHOD_FIND_RISK)) {
       return new LongResponse(indexService.count(IndexedRisk.class, countRequest));
