@@ -5,6 +5,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.risks.RiskMitigationTerms;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
@@ -18,11 +19,11 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class BrowseRiskTabs extends Tabs {
 
-  public void init(IndexedRisk risk, AsyncCallback<Actionable.ActionImpact> actionCallback) {
+  public void init(IndexedRisk risk, RiskMitigationTerms terms, AsyncCallback<Actionable.ActionImpact> actionCallback) {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new RiskDetailsPanel(risk, actionCallback);
+        return new RiskDetailsPanel(risk, terms, actionCallback);
       }
     });
 

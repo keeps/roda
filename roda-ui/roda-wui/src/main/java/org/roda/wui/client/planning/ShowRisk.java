@@ -13,9 +13,11 @@ package org.roda.wui.client.planning;
 import java.util.List;
 
 import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.RiskMitigationTerms;
 import org.roda.wui.client.browse.tabs.BrowseRiskTabs;
 import org.roda.wui.client.common.*;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -67,8 +69,16 @@ public class ShowRisk extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private final String riskUuid;
-
-  private final AsyncCallback<Actionable.ActionImpact> actionCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
+  @UiField
+  FocusPanel keyboardFocus;
+  @UiField
+  NavigationToolbar<IndexedRisk> navigationToolbar;
+  @UiField
+  TitlePanel title;
+  @UiField(provided = true)
+  BrowseRiskTabs riskTabs;
+  @UiField
+  BrowseRiskActionsToolbar actionsToolbar;  private final AsyncCallback<Actionable.ActionImpact> actionCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
     @Override
     public void onSuccess(Actionable.ActionImpact result) {
       if (result.equals(Actionable.ActionImpact.DESTROYED)) {
@@ -79,27 +89,13 @@ public class ShowRisk extends Composite {
       }
     }
   };
-
-  @UiField
-  FocusPanel keyboardFocus;
-
-  @UiField
-  NavigationToolbar<IndexedRisk> navigationToolbar;
-
-  @UiField
-  TitlePanel title;
-
-  @UiField(provided = true)
-  BrowseRiskTabs riskTabs;
-
-  @UiField
-  BrowseRiskActionsToolbar actionsToolbar;
-
-  public ShowRisk(IndexedRisk risk) {
+  private RiskMitigationTerms riskMitigationTerms;
+  public ShowRisk(IndexedRisk risk, RiskMitigationTerms terms) {
     riskUuid = risk.getUUID();
+    riskMitigationTerms = terms;
 
     riskTabs = new BrowseRiskTabs();
-    riskTabs.init(risk, actionCallback);
+    riskTabs.init(risk, terms, actionCallback);
     initWidget(uiBinder.createAndBindUi(this));
 
     keyboardFocus.setFocus(true);
@@ -126,15 +122,20 @@ public class ShowRisk extends Composite {
     services
       .rodaEntityRestService(s -> s.findByUuid(riskUUID, LocaleInfo.getCurrentLocale().getLocaleName()),
         IndexedRisk.class)
-      .thenCompose(indexedRisk -> services.riskResource(s -> s.retrieveRiskVersions(riskUUID))
-        .whenComplete((result, throwable) -> {
+      .thenCompose(indexedRisk -> services.riskResource(s -> s.retrieveRiskVersions(riskUUID)).thenCompose(versions -> {
+        indexedRisk.setHasVersions(!versions.getVersions().isEmpty());
+
+        return services.riskResource(s -> s.retrieveRiskMitigationTerms(riskUUID)).whenComplete((terms, throwable) -> {
           if (throwable == null) {
-            indexedRisk.setHasVersions(!result.getVersions().isEmpty());
-            callback.onSuccess(new ShowRisk(indexedRisk));
+            callback.onSuccess(new ShowRisk(indexedRisk, terms));
           } else {
             callback.onFailure(throwable);
           }
-        }));
+        });
+      })).exceptionally(throwable -> {
+        callback.onFailure(throwable);
+        return null;
+      });
   }
 
   private void refreshRisk() {
@@ -142,23 +143,34 @@ public class ShowRisk extends Composite {
     services
       .rodaEntityRestService(s -> s.findByUuid(riskUuid, LocaleInfo.getCurrentLocale().getLocaleName()),
         IndexedRisk.class)
-      .thenCompose(indexedRisk -> services.riskResource(s -> s.retrieveRiskVersions(riskUuid))
-        .whenComplete((result, throwable) -> {
+      .thenCompose(indexedRisk -> services.riskResource(s -> s.retrieveRiskVersions(riskUuid)).thenCompose(versions -> {
+        indexedRisk.setHasVersions(!versions.getVersions().isEmpty());
+
+        return services.riskResource(s -> s.retrieveRiskMitigationTerms(riskUuid)).whenComplete((terms, throwable) -> {
           if (throwable == null) {
-            indexedRisk.setHasVersions(!result.getVersions().isEmpty());
-            updateRiskUI(indexedRisk);
+            updateRiskUI(indexedRisk, terms);
+          } else {
+            AsyncCallbackUtils.defaultFailureTreatment(throwable);
           }
-        }));
+        });
+      })).exceptionally(throwable -> {
+        AsyncCallbackUtils.defaultFailureTreatment(throwable);
+        return null;
+      });
   }
 
-  private void updateRiskUI(IndexedRisk risk) {
+  private void updateRiskUI(IndexedRisk risk, RiskMitigationTerms terms) {
+    riskMitigationTerms = terms;
     navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getRiskBreadCrumbs(risk));
     actionsToolbar.setObjectAndBuild(risk, null, actionCallback);
     title.setText(StringUtils.isNotBlank(risk.getName()) ? risk.getName() : risk.getId());
     riskTabs.clear();
-    riskTabs.init(risk, actionCallback);
+    riskTabs.init(risk, terms, actionCallback);
   }
 
   interface MyUiBinder extends UiBinder<Widget, ShowRisk> {
   }
+
+
+
 }

@@ -19,7 +19,6 @@ import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.planning.DetailsPanelRepresentationInformation;
 import org.roda.wui.client.management.DetailsPanelNotification;
 import org.roda.wui.client.management.DetailsPanelLogEntry;
-import org.roda.wui.client.ingest.transfer.DetailsPanelTransferredResource;
 import org.roda.wui.client.planning.DetailsPanelAIP;
 import org.roda.wui.client.planning.DetailsPanelFile;
 import org.roda.wui.client.planning.DetailsPanelRepresentation;
@@ -67,13 +66,6 @@ public class DetailsTab extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     DetailsPanelRepresentationInformation detailsPanel = new DetailsPanelRepresentationInformation(ri);
-    content.add(detailsPanel);
-  }
-
-  public DetailsTab(TransferredResource resource) {
-    initWidget(uiBinder.createAndBindUi(this));
-
-    DetailsPanelTransferredResource detailsPanel = new DetailsPanelTransferredResource(resource);
     content.add(detailsPanel);
   }
 

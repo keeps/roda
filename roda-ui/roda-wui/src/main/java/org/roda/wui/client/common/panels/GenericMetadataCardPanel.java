@@ -122,6 +122,7 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
     private SafeHtml htmlValue;
     private Widget widgetValue;
     private ClickHandler clickHandler;
+    private String valueStyleName;
     private boolean isPreCode = false;
 
     private FieldBuilder(String labelText) {
@@ -153,6 +154,11 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
       return this;
     }
 
+    public FieldBuilder withValueStyleName(String styleName) {
+      this.valueStyleName = styleName;
+      return this;
+    }
+
     /**
      * Finalizes the field. If a valid value is present, it constructs the DOM
      * elements and appends them to the metadata container.
@@ -173,6 +179,10 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
       // 2. If all values were null or empty, abort building (mimics 'IfNotNull')
       if (finalContentWidget == null) {
         return;
+      }
+
+      if (valueStyleName != null && !valueStyleName.trim().isEmpty()) {
+        finalContentWidget.addStyleName(valueStyleName);
       }
 
       // 3. Apply ClickHandler if requested (only works natively with InlineHTML in
