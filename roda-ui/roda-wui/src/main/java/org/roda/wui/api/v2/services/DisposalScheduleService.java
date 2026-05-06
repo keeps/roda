@@ -28,6 +28,7 @@ import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;

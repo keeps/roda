@@ -1325,6 +1325,7 @@ public final class RodaConstants {
   public static final String DISPOSAL_SCHEDULE_ACTION = "action";
   public static final String DISPOSAL_SCHEDULE_RETENTION_PERIOD_INTERVAL_CODE =  "retentionPeriodIntervalCode";
   public static final String DISPOSAL_SCHEDULE_RETENTION_PERIOD_DURATION = "retentionPeriodDuration";
+  public static final String DISPOSAL_SCHEDULE_FULL_RETENTION_PERIOD = "fullRetentionPeriodPeriod";
 
   public static final String DISPOSAL_HOLD_TITLE = "title";
   public static final String DISPOSAL_HOLD_DESCRIPTION = "description";
@@ -2162,6 +2163,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS = "org.roda.wui.api.v2.controller.AIPController.updatePermissions";
   public static final String PERMISSION_METHOD_UPDATE_DIP_PERMISSIONS = "org.roda.wui.api.v2.controller.DIPController.updatePermissions";
   public static final String PERMISSION_METHOD_CREATE_JOB = "org.roda.wui.api.v2.controller.JobsController.createJob";
+  public static final String PERMISSION_METHOD_LIST_JOB = "org.roda.wui.api.v2.controller.JobsController.getJobFromModel";
   public static final String PERMISSION_METHOD_APPRAISAL = "org.roda.wui.api.v2.controller.AIPController.appraisal";
   public static final String PERMISSION_METHOD_CHANGE_AIP_TYPE = "org.roda.wui.api.v2.controller.AIPController.changeAIPType";
   public static final String PERMISSION_METHOD_CHANGE_REPRESENTATION_TYPE = "org.roda.wui.api.v2.controller.RepresentationController.changeRepresentationType";
@@ -2189,7 +2191,6 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_FILE = "org.roda.wui.api.v2.controller.AIPController.deleteDescriptiveMetadataFile";
   public static final String PERMISSION_METHOD_RETRIEVE_AIP_DESCRIPTIVE_METADATA_VERSIONS = "org.roda.wui.api.v2.controller.AIPController.retrieveDescriptiveMetadataVersions";
   public static final String PERMISSION_METHOD_RETRIEVE_REPRESENTATION_DESCRIPTIVE_METADATA_VERSIONS = "org.roda.wui.api.v2.controller.AIPController.retrieveRepresentationDescriptiveMetadataVersions";
-  public static final String PERMISSION_METHOD_LIST_USERS = "org.roda.wui.api.v2.services.IndexService.find(RODAMember)";
 
   public static final String PERMISSION_METHOD_CREATE_USER = "org.roda.wui.api.v2.controller.MembersController.createUser";
   public static final String PERMISSION_METHOD_CREATE_GROUP = "org.roda.wui.api.v2.controller.MembersController.createGroup";

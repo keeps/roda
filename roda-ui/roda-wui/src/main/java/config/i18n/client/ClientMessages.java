@@ -765,6 +765,8 @@ public interface ClientMessages extends Messages {
 
   String transferredResourceDateCreated();
 
+  String transferredResourceLastScannedAt();
+
   String numberOfFiles(long countFiles, long countFolders);
 
   String representationId();
@@ -2793,4 +2795,8 @@ public interface ClientMessages extends Messages {
   String disposalScheduleSuccessfullyUpdated();
 
   String disposalPolicyOverdueRecordsTitle();
+
+  String failedToRemoveGroupFromUser();
+
+  String failedToRemoveUserFromGroup();
 }

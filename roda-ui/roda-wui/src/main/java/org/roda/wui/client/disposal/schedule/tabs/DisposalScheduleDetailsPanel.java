@@ -26,37 +26,37 @@ public class DisposalScheduleDetailsPanel extends GenericMetadataCardPanel<Dispo
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public DisposalScheduleDetailsPanel(DisposalSchedule schedule) {
-    super(createConfiguredToolbar(schedule));
     setData(schedule);
   }
 
-  private static FlowPanel createConfiguredToolbar(DisposalSchedule schedule) {
-    if (schedule == null) {
+  @Override
+  protected FlowPanel createHeaderWidget(DisposalSchedule data) {
+    if (data == null) {
       return null;
     }
 
     return new ActionableWidgetBuilder<DisposalSchedule>(DisposalScheduleToolbarActions.get())
-      .buildGroupedListWithObjects(new ActionableObject<>(schedule), List.of(DisposalScheduleAction.EDIT),
+      .buildGroupedListWithObjects(new ActionableObject<>(data), List.of(DisposalScheduleAction.EDIT),
         List.of(DisposalScheduleAction.EDIT));
   }
 
   @Override
-  public void setData(DisposalSchedule schedule) {
-    // 1. Clear any existing fields in case setData is called multiple times
-    metadataContainer.clear();
+  protected void buildFields(DisposalSchedule schedule) {
+    buildField(messages.disposalScheduleTitle()).withValue(schedule.getTitle()).build();
 
-    if (schedule == null) {
-      return;
-    }
+    buildField(messages.disposalScheduleDescription()).withValue(schedule.getDescription()).build();
 
-    addFieldIfNotNull(messages.disposalScheduleTitle(), DisposalSchedule::getTitle, schedule);
-    addFieldIfNotNull(messages.disposalScheduleDescription(), DisposalSchedule::getDescription, schedule);
-    addFieldIfNotNull(messages.disposalScheduleMandate(), DisposalSchedule::getMandate, schedule);
-    addFieldIfNotNull(messages.disposalScheduleNotes(), DisposalSchedule::getScopeNotes, schedule);
-    addFieldIfNotNull(messages.disposalScheduleActionCol(),
-      messages.disposalScheduleActionCode(schedule.getActionCode().toString()));
-    addFieldIfNotNull(messages.disposalScheduleRetentionTriggerElementId(),
-      DisposalScheduleUtils.getI18nRetentionTriggerIdentifier(schedule.getRetentionTriggerElementId()));
+    buildField(messages.disposalScheduleMandate()).withValue(schedule.getMandate()).build();
+
+    buildField(messages.disposalScheduleNotes()).withValue(schedule.getScopeNotes()).build();
+
+    buildField(messages.disposalScheduleActionCol())
+      .withValue(messages.disposalScheduleActionCode(schedule.getActionCode().toString())).build();
+
+    buildField(messages.disposalScheduleRetentionTriggerElementId())
+      .withValue(DisposalScheduleUtils.getI18nRetentionTriggerIdentifier(schedule.getRetentionTriggerElementId()))
+      .build();
+
     if (!DisposalActionCode.RETAIN_PERMANENTLY.equals(schedule.getActionCode())) {
       String retentionPeriod;
 
@@ -66,9 +66,10 @@ public class DisposalScheduleDetailsPanel extends GenericMetadataCardPanel<Dispo
         retentionPeriod = messages.retentionPeriod(schedule.getRetentionPeriodDuration(),
           schedule.getRetentionPeriodIntervalCode().toString());
       }
-      addFieldIfNotNull(messages.disposalScheduleRetentionPeriodDuration(), retentionPeriod);
+      buildField(messages.disposalScheduleRetentionPeriodDuration()).withValue(retentionPeriod).build();
     }
 
-    addFieldIfNotNull(messages.showUserStatusLabel(), HtmlSnippetUtils.getDisposalScheduleStateHtml(schedule));
+    buildField(messages.showUserStatusLabel()).withHtml(HtmlSnippetUtils.getDisposalScheduleStateHtml(schedule))
+      .build();
   }
 }

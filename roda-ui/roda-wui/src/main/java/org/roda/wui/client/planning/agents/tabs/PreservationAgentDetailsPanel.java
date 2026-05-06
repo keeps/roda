@@ -1,6 +1,8 @@
 package org.roda.wui.client.planning.agents.tabs;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.ui.FlowPanel;
+
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
@@ -8,29 +10,30 @@ import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-
 public class PreservationAgentDetailsPanel extends GenericMetadataCardPanel<IndexedPreservationAgent> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public PreservationAgentDetailsPanel(IndexedPreservationAgent agent) {
-    super();
     setData(agent);
   }
 
   @Override
-  public void setData(IndexedPreservationAgent agent) {
-    // 1. Clear any existing fields in case setData is called multiple times
-    metadataContainer.clear();
+  protected FlowPanel createHeaderWidget(IndexedPreservationAgent agent) {
+    return null;
+  }
 
-    if (agent == null) {
-      return;
-    }
+  @Override
+  protected void buildFields(IndexedPreservationAgent agent) {
+    buildField(messages.preservationAgentName()).withValue(agent.getName()).build();
 
-    addFieldIfNotNull(messages.preservationAgentName(), IndexedPreservationAgent::getName, agent);
-    addFieldIfNotNull(messages.preservationAgentId(), IndexedPreservationAgent::getId, agent);
-    addFieldIfNotNull(messages.preservationAgentType(), IndexedPreservationAgent::getType, agent);
-    addFieldIfNotNull(messages.preservationAgentVersion(), IndexedPreservationAgent::getVersion, agent);
-    addFieldIfNotNull(messages.preservationAgentNote(), IndexedPreservationAgent::getNote, agent);
-    addFieldIfNotNull(messages.preservationAgentExtension(), IndexedPreservationAgent::getExtension, agent);
+    buildField(messages.preservationAgentId()).withValue(agent.getId()).build();
+
+    buildField(messages.preservationAgentType()).withValue(agent.getType()).build();
+
+    buildField(messages.preservationAgentVersion()).withValue(agent.getVersion()).build();
+
+    buildField(messages.preservationAgentNote()).withValue(agent.getNote()).build();
+
+    buildField(messages.preservationAgentExtension()).withValue(agent.getExtension()).build();
   }
 }

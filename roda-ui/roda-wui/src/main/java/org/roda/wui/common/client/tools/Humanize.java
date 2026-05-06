@@ -44,10 +44,11 @@ public class Humanize {
   public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss z");
   public static final DateTimeFormat DATE_TIME_FORMAT_JSON = DateTimeFormat.getFormat("yyyy-MM-ddTHH:mm:ss.SSSZZZ");
   public static final boolean FORMAT_UTC = false;
+  public static final DateTimeFormat DATE_TIME_FORMAT_STRICT_UTC = DateTimeFormat
+    .getFormat("yyyy-MM-dd HH:mm:ss 'UTC'");
   protected static final NumberFormat SMALL_NUMBER_FORMAT = NumberFormat.getFormat("0.#");
   protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getFormat("#");
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  public static final DateTimeFormat DATE_TIME_FORMAT_STRICT_UTC = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss 'UTC'");
 
   private Humanize() {
     // do nothing
@@ -60,12 +61,14 @@ public class Humanize {
     if (date == null) {
       return "";
     }
-    // TimeZone.createTimeZone(0) forces the output to UTC, handling the 1-hour offset
+    // TimeZone.createTimeZone(0) forces the output to UTC, handling the 1-hour
+    // offset
     return DATE_TIME_FORMAT_STRICT_UTC.format(date, TimeZone.createTimeZone(0));
   }
 
   /**
-   * Parses a localized string like "May 5, 2026, 2:29:17 PM" and converts it to "yyyy-MM-dd HH:mm:ss UTC"
+   * Parses a localized string like "May 5, 2026, 2:29:17 PM" and converts it to
+   * "yyyy-MM-dd HH:mm:ss UTC"
    */
   public static String convertStringToStrictUTC(String localizedDateString) {
     if (localizedDateString == null || localizedDateString.trim().isEmpty()) {
@@ -74,14 +77,19 @@ public class Humanize {
 
     try {
       // Parse the incoming localized string
-      DateTimeFormat parser = DateTimeFormat.getFormat("MMM d, yyyy, h:mm:ss a");
-      Date parsedDate = parser.parse(localizedDateString);
+      DateTimeFormat parser = DateTimeFormat.getFormat("MMMM d, yyyy, K:mm:ss a");
+      // 2. Sanitize the string to replace Narrow No-Break Spaces and standard
+      // No-Break spaces
+      String cleanInput = localizedDateString.replace('\u202F', ' ').replace('\u00A0', ' ');
+
+      Date parsedDate = parser.parse(cleanInput);
 
       // Reformat using the strict UTC method
       return formatDateTimeToStrictUTC(parsedDate);
 
     } catch (IllegalArgumentException e) {
-      // Safe fallback: if it's already formatted or parsing fails, return the original string
+      // Safe fallback: if it's already formatted or parsing fails, return the
+      // original string
       GWT.log("Could not parse date string for UTC conversion: " + localizedDateString, e);
       return localizedDateString;
     }
@@ -272,7 +280,7 @@ public class Humanize {
     Date parsed = DATE_TIME_FORMAT_JSON.parse(date);
 
     return applyDateTimeFormat(parsed, ConfigurationManager.getString(RodaConstants.UI_DATE_TIME_FORMAT_SIMPLE),
-        DATE_TIME_FORMAT);
+      DATE_TIME_FORMAT);
   }
 
   public enum DHMSFormat {

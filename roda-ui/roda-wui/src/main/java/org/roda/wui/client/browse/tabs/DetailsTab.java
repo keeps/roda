@@ -10,17 +10,13 @@ package org.roda.wui.client.browse.tabs;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.model.BrowseRepresentationResponse;
 import org.roda.wui.client.planning.DetailsPanelRepresentationInformation;
-import org.roda.wui.client.management.DetailsPanelNotification;
 import org.roda.wui.client.management.DetailsPanelLogEntry;
-import org.roda.wui.client.ingest.transfer.DetailsPanelTransferredResource;
 import org.roda.wui.client.planning.DetailsPanelAIP;
 import org.roda.wui.client.planning.DetailsPanelFile;
 import org.roda.wui.client.planning.DetailsPanelRepresentation;
@@ -73,23 +69,10 @@ public class DetailsTab extends Composite {
     content.add(detailsPanel);
   }
 
-  public DetailsTab(TransferredResource resource) {
-    initWidget(uiBinder.createAndBindUi(this));
-
-    DetailsPanelTransferredResource detailsPanel = new DetailsPanelTransferredResource(resource);
-    content.add(detailsPanel);
-  }
-
   public DetailsTab(IndexedRisk risk) {
     initWidget(uiBinder.createAndBindUi(this));
 
     DetailsPanelRisk detailsPanel = new DetailsPanelRisk(risk, "RiskShowPanel_riskIncidences");
-    content.add(detailsPanel);
-  }
-
-  public DetailsTab(Notification notification) {
-    initWidget(uiBinder.createAndBindUi(this));
-    DetailsPanelNotification detailsPanel = new DetailsPanelNotification(notification);
     content.add(detailsPanel);
   }
 

@@ -20,16 +20,15 @@ import java.util.List;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-
 public class RODAMemberDetailsPanel extends GenericMetadataCardPanel<RODAMember> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public RODAMemberDetailsPanel(RODAMember member) {
-    super(createConfiguredToolbar(member));
     setData(member);
   }
 
-  private static FlowPanel createConfiguredToolbar(RODAMember member) {
+  @Override
+  protected FlowPanel createHeaderWidget(RODAMember member) {
     if (member == null) {
       return null;
     }
@@ -40,19 +39,13 @@ public class RODAMemberDetailsPanel extends GenericMetadataCardPanel<RODAMember>
   }
 
   @Override
-  public void setData(RODAMember data) {
-    // 1. Clear any existing fields in case setData is called multiple times
-    metadataContainer.clear();
-
-    if (data == null) {
-      return;
-    }
-
+  protected void buildFields(RODAMember data) {
     if (data.isUser()) {
       User user = (User) data;
-      addFieldIfNotNull(messages.username(), RODAMember::getId, data);
-      addFieldIfNotNull(messages.fullname(), RODAMember::getFullName, data);
-      addFieldIfNotNull(messages.email(), user.getEmail());
+
+      buildField(messages.username()).withValue(data.getId()).build();
+      buildField(messages.fullname()).withValue(data.getFullName()).build();
+      buildField(messages.email()).withValue(user.getEmail()).build();
 
       if (!user.getExtra().isEmpty()) {
         String pendingSeparatorLabel = null;
@@ -72,16 +65,17 @@ public class RODAMemberDetailsPanel extends GenericMetadataCardPanel<RODAMember>
                 pendingSeparatorLabel = null; // Clear it so it doesn't render again
               }
 
-              addFieldIfNotNull(HtmlSnippetUtils.getMetadataValueLabel(extra), value);
+              buildField(HtmlSnippetUtils.getMetadataValueLabel(extra)).withValue(value).build();
             }
           }
         }
       }
-      addFieldIfNotNull(messages.showUserStatusLabel(), HtmlSnippetUtils.getUserStateHtml(user));
+
+      buildField(messages.showUserStatusLabel()).withHtml(HtmlSnippetUtils.getUserStateHtml(user)).build();
 
     } else {
-      addFieldIfNotNull(messages.username(), RODAMember::getId, data);
-      addFieldIfNotNull(messages.fullname(), RODAMember::getFullName, data);
+      buildField(messages.username()).withValue(data.getId()).build();
+      buildField(messages.fullname()).withValue(data.getFullName()).build();
     }
   }
 }

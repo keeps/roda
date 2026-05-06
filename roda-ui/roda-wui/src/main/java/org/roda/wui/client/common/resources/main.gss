@@ -1329,6 +1329,14 @@ button:after {
     content: "\e97a";
 }
 
+.ma-group-remove:after {
+    content: "\e7ad";
+}
+
+.ma-person-remove:after {
+    content: "\ef66";
+}
+
 .ma-pageview:after {
     content: "\e87a";
 }
@@ -10036,6 +10044,13 @@ wui-disposal-hold-data .form-textbox {
     font-size: 14px;
     color: black;
     flex: 1;
+}
+
+.generic-metadata-panel .generic-multiline {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .generic-metadata-panel .form-separator {

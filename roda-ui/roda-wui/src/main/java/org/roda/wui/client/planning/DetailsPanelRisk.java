@@ -12,7 +12,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.InlineHTML;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.ingest.transfer.DetailsPanelTransferredResource;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -26,7 +25,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 

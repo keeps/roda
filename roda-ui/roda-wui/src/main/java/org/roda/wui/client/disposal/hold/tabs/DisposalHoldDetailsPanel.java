@@ -23,26 +23,25 @@ public class DisposalHoldDetailsPanel extends GenericMetadataCardPanel<DisposalH
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public DisposalHoldDetailsPanel(DisposalHold disposalHold) {
-    super(createConfiguredToolbar(disposalHold));
-
     setData(disposalHold);
   }
 
-  private static FlowPanel createConfiguredToolbar(DisposalHold hold) {
-    if (hold == null) {
+  @Override
+  protected FlowPanel createHeaderWidget(DisposalHold data) {
+    if (data == null) {
       return null;
     }
 
     return new ActionableWidgetBuilder<DisposalHold>(DisposalHoldToolbarActions.get()).buildGroupedListWithObjects(
-            new ActionableObject<>(hold), List.of(DisposalHoldAction.EDIT), List.of(DisposalHoldAction.EDIT));
+      new ActionableObject<>(data), List.of(DisposalHoldAction.EDIT), List.of(DisposalHoldAction.EDIT));
   }
 
   @Override
-  public void setData(DisposalHold data) {
-    addFieldIfNotNull(messages.disposalHoldTitle(), DisposalHold::getTitle, data);
-    addFieldIfNotNull(messages.disposalHoldDescription(), DisposalHold::getDescription, data);
-    addFieldIfNotNull(messages.disposalHoldMandate(), DisposalHold::getMandate, data);
-    addFieldIfNotNull(messages.disposalHoldNotes(), DisposalHold::getScopeNotes, data);
-    addFieldIfNotNull(messages.showUserStatusLabel(), HtmlSnippetUtils.getDisposalHoldStateHtml(data));
+  protected void buildFields(DisposalHold data) {
+    buildField(messages.disposalHoldTitle()).withValue(data.getTitle()).build();
+    buildField(messages.disposalHoldDescription()).withValue(data.getDescription()).build();
+    buildField(messages.disposalScheduleMandate()).withValue(data.getMandate()).build();
+    buildField(messages.disposalHoldNotes()).withValue(data.getScopeNotes()).build();
+    buildField(messages.showUserStatusLabel()).withHtml(HtmlSnippetUtils.getDisposalHoldStateHtml(data)).build();
   }
 }

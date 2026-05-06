@@ -4,7 +4,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
@@ -26,46 +28,47 @@ public class NotificationDetailsPanel extends GenericMetadataCardPanel<Notificat
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public NotificationDetailsPanel(Notification notification) {
-    super();
     setData(notification);
   }
 
   @Override
-  public void setData(Notification data) {
-    // 1. Clear any existing fields in case setData is called multiple times
-    metadataContainer.clear();
+  protected FlowPanel createHeaderWidget(Notification notification) {
+    return null;
+  }
 
-    if (data == null) {
-      return;
-    }
+  @Override
+  protected void buildFields(Notification data) {
+    buildField(messages.notificationIdentifier()).withValue(data.getId()).build();
 
-    addFieldIfNotNull(messages.notificationIdentifier(), data.getId());
-    addFieldIfNotNull(messages.notificationSubject(), data.getSubject());
-    addPreCodeFieldIfNotNull(messages.notificationBody(), buildNotificationBody(data.getBody()));
-    addFieldIfNotNull(messages.notificationSentOn(),
-            SafeHtmlUtils.htmlEscape(Humanize.formatDateTime(data.getSentOn())));
-    addFieldIfNotNull(messages.notificationFromUser(), data.getFromUser());
-    addFieldIfNotNull(messages.notificationIsAcknowledged(),
-            messages.isAcknowledged(Boolean.toString(data.isAcknowledged()).toLowerCase()));
+    buildField(messages.notificationSubject()).withValue(data.getSubject()).build();
 
-    addFieldIfNotNull(messages.notificationState(), HtmlSnippetUtils.getNotificationStateHTML(data.getState()));
+    // Map the custom widget and apply the pre-code CSS styles natively via the
+    // builder
+    buildField(messages.notificationBody()).withWidget(buildNotificationBody(data.getBody())).asPreCode().build();
+
+    buildField(messages.notificationSentOn())
+      .withValue(SafeHtmlUtils.htmlEscape(Humanize.formatDateTime(data.getSentOn()))).build();
+
+    buildField(messages.notificationFromUser()).withValue(data.getFromUser()).build();
+
+    buildField(messages.notificationIsAcknowledged())
+      .withValue(messages.isAcknowledged(Boolean.toString(data.isAcknowledged()).toLowerCase())).build();
+
+    buildField(messages.notificationState()).withHtml(HtmlSnippetUtils.getNotificationStateHTML(data.getState()))
+      .build();
 
     if (data.getAcknowledgedUsers() != null && !data.getAcknowledgedUsers().isEmpty()) {
       addSeparator(messages.notificationAcknowledgedUsers());
 
-      SafeHtmlBuilder ackUsersHtml = new SafeHtmlBuilder();
-      boolean first = true;
+      FlowPanel list = new FlowPanel();
+      list.addStyleName("generic-multiline");
+
       for (Map.Entry<String, String> e : data.getAcknowledgedUsers().entrySet()) {
-        if (!first) {
-          ackUsersHtml.appendHtmlConstant("<br/>");
-        }
-
         String convertedDate = Humanize.convertStringToStrictUTC(e.getValue());
-
-        ackUsersHtml.appendEscaped(e.getKey() + " @ " + convertedDate);
-        first = false;
+        list.add(new HTMLPanel("span", SafeHtmlUtils.htmlEscape(e.getKey() + " @ " + convertedDate)));
       }
-      addFieldIfNotNull("Users", ackUsersHtml.toSafeHtml());
+
+      buildField("Users").withWidget(list).build();
     }
 
     List<String> remaining = new ArrayList<>();
@@ -79,20 +82,20 @@ public class NotificationDetailsPanel extends GenericMetadataCardPanel<Notificat
 
     if (!remaining.isEmpty()) {
       addSeparator(messages.notificationNotAcknowledgedUsers());
+      FlowPanel list = new FlowPanel();
+      list.addStyleName("generic-multiline");
 
-      SafeHtmlBuilder notAckUsersHtml = new SafeHtmlBuilder();
-      boolean first = true;
       for (String user : remaining) {
-        if (!first) {
-          notAckUsersHtml.appendHtmlConstant("<br/>");
-        }
-        // appendEscaped handles the HTML escaping securely
-        notAckUsersHtml.appendEscaped(user);
-        first = false;
+        list.add(new HTMLPanel("span", SafeHtmlUtils.htmlEscape(user)));
       }
-      addFieldIfNotNull("Users", notAckUsersHtml.toSafeHtml());
+
+      buildField("Users").withWidget(list).build();
     }
   }
+
+  // ==========================================
+  // HELPER METHODS
+  // ==========================================
 
   private Widget buildNotificationBody(String rawBody) {
     String body = rawBody == null ? "" : rawBody.trim();
@@ -124,7 +127,7 @@ public class NotificationDetailsPanel extends GenericMetadataCardPanel<Notificat
   private boolean isHtml(String body) {
     String s = body == null ? "" : body.trim().toLowerCase();
     return s.contains("<html") || s.contains("<body") || s.contains("<div") || s.contains("<p") || s.contains("<h1")
-            || s.contains("<h2") || s.contains("<ul") || s.contains("<table") || s.contains("<a ") || s.contains("<style");
+      || s.contains("<h2") || s.contains("<ul") || s.contains("<table") || s.contains("<a ") || s.contains("<style");
   }
 
   private HTML buildHighlightedCodeBlock(String body, String language) {
