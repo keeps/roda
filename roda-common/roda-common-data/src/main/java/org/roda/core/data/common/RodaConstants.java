@@ -176,6 +176,7 @@ public final class RodaConstants {
 
   public static final String UI_LISTS_PAGE_SIZE_INITIAL = "pageSize.initial";
   public static final String UI_LISTS_PAGE_SIZE_INCREMENT = "pageSize.increment";
+  public static final String UI_LISTS_INCLUDE_NESTED_DOCUMENTS = "includeNestedDocuments";
 
   public static final String UI_ICONS_CLASS = "ui.icons.class";
   public static final String UI_SERVICE_DROPFOLDER_URL = "ui.service.dropfolder.url";
