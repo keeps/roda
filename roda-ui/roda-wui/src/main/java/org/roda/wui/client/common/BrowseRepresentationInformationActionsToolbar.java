@@ -26,8 +26,8 @@ public class BrowseRepresentationInformationActionsToolbar
     RepresentationInformationActions representationInformationActions;
     representationInformationActions = RepresentationInformationActions.get();
     this.actions.add(new ActionableWidgetBuilder<RepresentationInformation>(representationInformationActions)
-      .buildGroupedListWithObjects(new ActionableObject<>(object), List.of(),
+      .buildGroupedListWithObjects(new ActionableObject<>(object), List.of(RepresentationInformationActions.RepresentationInformationAction.START_PROCESS, RepresentationInformationActions.RepresentationInformationAction.REMOVE
+              ,RepresentationInformationActions.RepresentationInformationAction.DOWNLOAD),
         List.of(RepresentationInformationActions.RepresentationInformationAction.START_PROCESS)));
   }
-
 }

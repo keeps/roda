@@ -25,15 +25,10 @@ public class PreservationAgentDetailsPanel extends GenericMetadataCardPanel<Inde
   @Override
   protected void buildFields(IndexedPreservationAgent agent) {
     buildField(messages.preservationAgentName()).withValue(agent.getName()).build();
-
     buildField(messages.preservationAgentId()).withValue(agent.getId()).build();
-
     buildField(messages.preservationAgentType()).withValue(agent.getType()).build();
-
     buildField(messages.preservationAgentVersion()).withValue(agent.getVersion()).build();
-
     buildField(messages.preservationAgentNote()).withValue(agent.getNote()).build();
-
     buildField(messages.preservationAgentExtension()).withValue(agent.getExtension()).build();
   }
 }

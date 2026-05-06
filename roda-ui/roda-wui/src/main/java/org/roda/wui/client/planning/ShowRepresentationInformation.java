@@ -83,19 +83,15 @@ public class ShowRepresentationInformation extends Composite {
   @UiField
   BrowseRepresentationInformationTabs browseRepresentationInformationTabs;
 
-  private RepresentationInformation ri;
-
   public ShowRepresentationInformation() {
-    this.ri = new RepresentationInformation();
   }
 
   public ShowRepresentationInformation(final RepresentationInformation ri) {
     instance = this;
-    this.ri = ri;
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    navigationToolbar.withoutButtons().build();
+    navigationToolbar.withObject(ri).build();
     navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getRepresentationInformationBreadCrumbs(ri));
 
     title.setText(ri.getName());
