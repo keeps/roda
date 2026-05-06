@@ -12,7 +12,7 @@ import org.roda.wui.client.common.ActionsToolbar;
 /**
  * A generic composite card panel specifically for descriptive metadata.
  * * @param <T> The data model type.
- * 
+ *
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public abstract class GenericMetadataCardPanel<T> extends Composite {
@@ -50,7 +50,7 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
 
   /**
    * Starts the fluent builder for adding a new field to the metadata panel.
-   * 
+   *
    * @param labelText
    *          The text for the field label.
    * @return A new FieldBuilder instance.
@@ -102,7 +102,7 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
 
   /**
    * Developers must define the header widget (e.g., ActionableWidgetBuilder).
-   * 
+   *
    * @return The Widget to go inside the header, or null if no header is needed.
    */
   protected abstract FlowPanel createHeaderWidget(T data);

@@ -109,7 +109,7 @@ public class ShowLogEntry extends Composite {
    */
   public ShowLogEntry(LogEntry logEntry) {
     initWidget(uiBinder.createAndBindUi(this));
-    navigationToolbar.withoutButtons().build();
+    navigationToolbar.withObject(logEntry).build();
     navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getLogEntryBreadcrumbs(logEntry));
 
     actionsToolbar.setLabel(messages.showLogEntryTitle());

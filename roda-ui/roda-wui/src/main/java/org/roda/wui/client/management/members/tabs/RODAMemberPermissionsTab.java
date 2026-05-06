@@ -1,19 +1,15 @@
 package org.roda.wui.client.management.members.tabs;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.common.ActionsToolbar;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.RODAMemberAction;
 import org.roda.wui.client.common.actions.RODAMemberToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
 
 import java.util.List;
 
@@ -21,47 +17,63 @@ import java.util.List;
  *
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class RODAMemberPermissionsTab extends Composite {
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+public class RODAMemberPermissionsTab extends GenericMetadataCardPanel<RODAMember> {
 
-  @UiField
-  ActionsToolbar actionsToolbar;
-
-  // Changed from FlowPanel to PermissionsPanel to expose the refresh() method
-  @UiField(provided = true)
-  PermissionsPanel permissionsTablePanel;
+  private final AsyncCallback<Actionable.ActionImpact> parentActionCallback;
+  private PermissionsPanel permissionsTablePanel;
 
   public RODAMemberPermissionsTab(RODAMember member, AsyncCallback<Actionable.ActionImpact> actionCallback) {
-    permissionsTablePanel = new PermissionsPanel(member, true, true);
-    initWidget(uiBinder.createAndBindUi(this));
+    super();
+    this.parentActionCallback = actionCallback;
+
+    // This template method automatically calls createHeaderWidget() and
+    // buildFields()
+    setData(member);
+  }
+
+  @Override
+  protected FlowPanel createHeaderWidget(RODAMember member) {
+    if (member == null) {
+      return null;
+    }
 
     // 1. Create a local callback to intercept the UPDATED event
     AsyncCallback<Actionable.ActionImpact> localCallback = new AsyncCallback<Actionable.ActionImpact>() {
       @Override
       public void onFailure(Throwable caught) {
-        actionCallback.onFailure(caught);
+        if (parentActionCallback != null) {
+          parentActionCallback.onFailure(caught);
+        }
       }
 
       @Override
       public void onSuccess(Actionable.ActionImpact result) {
         if (Actionable.ActionImpact.UPDATED.equals(result)) {
           // Refresh the table locally WITHOUT reloading the whole page!
-          permissionsTablePanel.refresh();
+          if (permissionsTablePanel != null) {
+            permissionsTablePanel.refresh();
+          }
         } else {
-          actionCallback.onSuccess(result);
+          if (parentActionCallback != null) {
+            parentActionCallback.onSuccess(result);
+          }
         }
       }
     };
 
-    actionsToolbar.setLabelVisible(false);
-    actionsToolbar.setTagsVisible(false);
-    actionsToolbar.setActionableMenu(new ActionableWidgetBuilder<RODAMember>(RODAMemberToolbarActions.get())
-      .withActionCallback(localCallback).buildGroupedListWithObjects(new ActionableObject<>(member),
-        List.of(RODAMemberAction.EDIT_PERMISSIONS), List.of(RODAMemberAction.EDIT_PERMISSIONS)),
-      true);
+    return new ActionableWidgetBuilder<RODAMember>(RODAMemberToolbarActions.get()).withActionCallback(localCallback)
+      .buildGroupedListWithObjects(new ActionableObject<>(member), List.of(RODAMemberAction.EDIT_PERMISSIONS),
+        List.of(RODAMemberAction.EDIT_PERMISSIONS));
   }
 
-  interface MyUiBinder extends UiBinder<Widget, RODAMemberPermissionsTab> {
-    Widget createAndBindUi(RODAMemberPermissionsTab tab);
+  @Override
+  protected void buildFields(RODAMember member) {
+    if (member != null) {
+      // Initialize the permissions panel
+      permissionsTablePanel = new PermissionsPanel(member, true, true);
+
+      // Append it directly to the protected metadataContainer
+      metadataContainer.add(permissionsTablePanel);
+    }
   }
 }

@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import org.roda.wui.client.planning.tabs.RepresentationInformationDetailsPanel;
 
 /**
  *
@@ -40,7 +41,7 @@ public class BrowseRepresentationInformationTabs extends Tabs {
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
       @Override
       public Widget buildTabWidget() {
-        return new DetailsTab(ri);
+        return new RepresentationInformationDetailsPanel(ri);
       }
     });
 

@@ -129,6 +129,10 @@ public class AipDetailsTab extends GenericMetadataCardPanel<BrowseAIPResponse> {
     IndexedAIP aip = response.getIndexedAIP();
     FlowPanel panel = new FlowPanel();
 
+    if (aip.getLevel() == null) {
+      return null;
+    }
+
     final String riFilter = RepresentationInformationUtils
       .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.AIP_LEVEL, aip.getLevel());
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
