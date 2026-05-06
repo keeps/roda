@@ -54,6 +54,7 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
   private String searchPlaceholder;
   private boolean forceSelectable;
   private boolean redirectOnSingleResult;
+  private boolean includeNestedDocuments;
 
   private List<ColumnOptions> columnOptions;
   private String defaultSortListColumnName;
@@ -88,6 +89,8 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     searchPlaceholder = null;
     forceSelectable = false;
     redirectOnSingleResult = false;
+    includeNestedDocuments = ConfigurationManager.getBoolean(false, RodaConstants.UI_LISTS_PROPERTY, listId,
+      RodaConstants.UI_LISTS_INCLUDE_NESTED_DOCUMENTS);
 
     columnOptions = ColumnOptionsFactory.getColumnOptions(listId);
     defaultSortListColumnName = ConfigurationManager.getStringWithDefault("", RodaConstants.UI_LISTS_PROPERTY, listId,
@@ -316,6 +319,15 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
 
   public boolean getRedirectOnSingleResult() {
     return redirectOnSingleResult;
+  }
+
+  public boolean isIncludeNestedDocuments() {
+    return includeNestedDocuments;
+  }
+
+  public AsyncTableCellOptions<T> withIncludeNestedDocuments(boolean includeNestedDocuments) {
+    this.includeNestedDocuments = includeNestedDocuments;
+    return this;
   }
 
   /**

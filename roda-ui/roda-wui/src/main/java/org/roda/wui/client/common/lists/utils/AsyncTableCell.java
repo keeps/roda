@@ -615,7 +615,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     Services services = new Services(reason, "get");
     FindRequest findRequest = FindRequest.getBuilder(getFilter(), getJustActive()).withSublist(sublist)
       .withFacets(getFacets()).withExportFacets(false).withSorter(sorter).withFieldsToReturn(fieldsToReturn)
-      .withCollapse(getCollapse()).build();
+      .withCollapse(getCollapse()).withIncludeNestedDocuments(options.isIncludeNestedDocuments()).build();
     return services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       getClassToReturn());
   }

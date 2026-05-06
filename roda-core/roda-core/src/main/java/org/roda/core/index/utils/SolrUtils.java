@@ -312,6 +312,11 @@ public class SolrUtils {
       query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
     }
 
+    if (IndexedAIP.class.isAssignableFrom(classToRetrieve)
+      && !hasNestedDocumentsFilter(filter, classToRetrieve)) {
+      query.addFilterQuery("-_nest_path_:*");
+    }
+
     query.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
     query.setRows(pageSize);
     query.setSorts(Arrays.asList(SortClause.asc(RodaConstants.INDEX_UUID)));
@@ -359,6 +364,12 @@ public class SolrUtils {
     parseAndConfigureFacets(findRequest.getFacets(), query);
     if (hasPermissionFilters(classToRetrieve) && !hasNestedDocumentsFilter(findRequest.getFilter(), classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, findRequest.isOnlyActive(), classToRetrieve));
+    }
+
+    if (IndexedAIP.class.isAssignableFrom(classToRetrieve)
+      && !hasNestedDocumentsFilter(findRequest.getFilter(), classToRetrieve)
+      && !findRequest.isIncludeNestedDocuments()) {
+      query.addFilterQuery("-_nest_path_:*");
     }
 
     if (hasNestedDocumentsFilter(findRequest.getFilter(), classToRetrieve)) {
@@ -1865,6 +1876,9 @@ public class SolrUtils {
     query.setQuery(queryBuilder.toString());
     if (hasPermissionFilters(classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
+    }
+    if (IndexedAIP.class.isAssignableFrom(classToRetrieve)) {
+      query.addFilterQuery("-_nest_path_:*");
     }
     parseAndConfigureFacets(new Facets(new SimpleFacetParameter(field)), query);
     List<String> suggestions = new ArrayList<>();
