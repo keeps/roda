@@ -45,10 +45,14 @@ public class PluginUtils {
     });
   }
 
-  public static List<PluginType> getPluginTypesWithoutIngest() {
+  public static List<PluginType> getPluginTypesWithoutIngestAndInternal() {
     List<PluginType> types = new ArrayList<>(Arrays.asList(PluginType.values()));
     types.remove(PluginType.INGEST);
+    types.remove(PluginType.INTERNAL);
     return types;
   }
 
+  public static List<PluginType> getIngestPluginTypes() {
+    return List.of(PluginType.INGEST);
+  }
 }

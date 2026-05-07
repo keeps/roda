@@ -323,7 +323,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT, RodaConstants.PLUGIN_CATEGORY_MAINTENANCE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MAINTENANCE);
   }
 
   @Override

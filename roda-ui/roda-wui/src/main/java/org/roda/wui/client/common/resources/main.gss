@@ -20,6 +20,12 @@
 @def COLOR_LABEL_WARNING		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.warning")');
 @def COLOR_LABEL_INFO			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.info")');
 
+@def BACKGROUND_COLOR_LABEL_DEFAULT		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.background.label.default")');
+@def BACKGROUND_COLOR_LABEL_SUCCESS		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.background.label.success")');
+@def BACKGROUND_COLOR_LABEL_DANGER		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.background.label.danger")');
+@def BACKGROUND_COLOR_LABEL_WARNING		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.background.label.warning")');
+@def BACKGROUND_COLOR_LABEL_INFO		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.background.label.info")');
+
 @def COLOR_ACTIONS_PRIMARY			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.actions.primary")');
 @def COLOR_ACTIONS_PRIMARY_HOVER	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.actions.primary.hover")');
 @def COLOR_ACTIONS_DANGER			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.actions.danger")');
@@ -158,7 +164,12 @@ h6, .h6 {
 }
 
 .noMargin {
-    margin: 0px;
+    margin: 0 !important;
+}
+
+.rodaTitleHeader {
+    margin-bottom: 16px;
+    margin-top: 0
 }
 
 .rodaTitleHeader i {
@@ -207,7 +218,7 @@ ol {
 }
 
 .field {
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
 }
 
 .field ul {
@@ -225,81 +236,77 @@ ol {
 
 table .label-success, table .label-danger, table .label-warning, table .label-info, table .label-default {
     font-size: 1.2rem;
+    padding: .2em .6em;
 }
 
 .label-success {
-    background-color: COLOR_LABEL_SUCCESS;
+    background-color: BACKGROUND_COLOR_LABEL_SUCCESS;
     display: inline;
-    padding: .2em .6em .3em;
-    /*     font-size: 75%; */
-    /*     font-weight: 700; */
+    padding: 8px 6px;
     line-height: 1;
-    color: #047857;
+    color: COLOR_LABEL_SUCCESS;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
-    border-radius: .25em;
+    border-radius: 4px;
     font-weight: bold;
+    font-size: 1.1rem;
 }
 
 .label-danger {
-    background-color: COLOR_LABEL_DANGER;
+    background-color: BACKGROUND_COLOR_LABEL_DANGER;
     display: inline;
-    padding: .2em .6em .3em;
-    /*     font-size: 75%; */
-    /*     font-weight: 700; */
+    padding: 8px 6px;
     line-height: 1;
-    color: #B91C3B;
+    color: COLOR_LABEL_DANGER;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
-    border-radius: .25em;
+    border-radius: 4px;
     font-weight: bold;
+    font-size: 1.1rem;
 }
 
 .label-warning {
-    background-color: COLOR_LABEL_WARNING;
+    background-color: BACKGROUND_COLOR_LABEL_WARNING;
     display: inline;
-    padding: .2em .6em .3em;
-    /*font-size: 75%;
-    font-weight: 700;*/
+    padding: 8px 6px;
     line-height: 1;
-    color: #9b6100;
+    color: COLOR_LABEL_WARNING;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
-    border-radius: .25em;
+    border-radius: 4px;
     font-weight: bold;
+    font-size: 1.1rem;
 }
 
 .label-info {
-    background-color: COLOR_LABEL_INFO;
+    background-color: BACKGROUND_COLOR_LABEL_INFO;
     display: inline;
-    padding: .2em .6em .3em;
-    /*     font-size: 75%; */
-    /*     font-weight: 700; */
+    padding: 8px 6px;
     line-height: 1;
-    color: #036d97;
+    color: COLOR_LABEL_INFO;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
-    border-radius: .25em;
+    border-radius: 4px;
     font-weight: bold;
+    font-size: 1.1rem;
 }
 
 .label-default {
-    background-color: COLOR_LABEL_DEFAULT;
+    background-color: BACKGROUND_COLOR_LABEL_DEFAULT;
     display: inline;
-    padding: .2em .6em .3em;
-    /*     font-size: 75%; */
-    /*     font-weight: 700; */
+    padding: 8px 6px;
     line-height: 1;
-    color: #666;
+    color: COLOR_LABEL_DEFAULT;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
-    border-radius: .25em;
+    border-radius: 4px;
     font-weight: bold;
+    font-size: 11px;
 }
 
 .label-priority-urgent {
@@ -514,7 +521,7 @@ div.inline {
 }
 
 .browse_aip .row .content .lowerContent {
-    padding: 30px;
+    padding: 32px;
     background-color: COLOR_GREY_BGDARKER;
 }
 
@@ -946,13 +953,13 @@ pre code {
 .itemPanel .itemIcon,
 .itemPanel .itemText {
     display: inline;
-    color: #777;
+    color: black;
     margin-right: 5px;
 }
 
 .itemPanel .itemText {
     font-size: 1.2rem;
-    color: #999;
+    color: black;
 }
 
 .itemButtonsPanel {
@@ -1164,8 +1171,12 @@ button:after {
     content: "\e1c4";
 }
 
+.btn-command:after {
+    content: "\e86f";
+}
+
 .btn-assessment:after {
-    content: "\e85c";
+    content: "\f1bb";
 }
 
 .btn-download:after {
@@ -6068,17 +6079,6 @@ td.datePickerMonth, td.datePickerYear {
     display: inline;
 }
 
-.plugin-options-parameter:first-child {
-    border: none;
-    padding: 0;
-}
-
-.plugin-options-parameter {
-    border-top: 1px solid #eee;
-    padding-top: 10px;
-    padding-bottom: 5px;
-}
-
 /**********************************************
 				INGEST PROCESS VIEW
 ************************************************/
@@ -8518,10 +8518,6 @@ span.code {
     width: 10%;
 }
 
-.alignButtonsPanel{
-    margin-top: 2rem;
-}
-
 .disposalRuleDescription{
     min-height: 25rem;
 }
@@ -9260,26 +9256,80 @@ wui-disposal-hold-data .form-textbox {
 /******************************
   Badges
  ******************************/
+ /* The Main Wrapper */
  .badge-panel {
-    position: relative;
-    background-color: #f5f5f5;
-    display: inline-flex;
-    padding: 0.7rem;
-    line-height: 1;
-    color: #666;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
-    border-radius: .25em;
-    align-items: center;
+     display: inline-flex;
+     align-items: center;
+     gap: 0.4rem;
+     padding: 8px 6px;
+     line-height: 1;
+     color: #666;
+     text-align: center;
+     white-space: nowrap;
+     vertical-align: baseline;
+     border-radius: 0.4rem;
+ }
+
+ /* Global ::before rule for the icon */
+ .badge-panel::before {
+     @mixin fontawesome();
+     font-size: 1.5rem;
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+     flex-shrink: 0;
+     line-height: 1;
+     vertical-align: middle;
+ }
+
+.badge-icon-characterization::before {
+     content: "\e5fa";
+}
+
+.badge-icon-conversion::before {
+    content: "\e2e7";
+}
+
+.badge-icon-reindex::before {
+    content: "\e8ba";
+}
+
+.badge-icon-risk_assessment::before {
+    content: "\f083";
+}
+
+.badge-icon-validation::before {
+    content: "\e92d";
+}
+
+.badge-icon-maintenance::before {
+    content: "\f100";
+}
+
+.badge-icon-digital_signature::before {
+    content: "\e90d";
+}
+
+.badge-icon-eArchiving::before {
+    content: "\e1a1";
+}
+
+.badge-icon-ingest::before {
+    content: "\ef48";
+}
+
+.badge-icon-invalid::before {
+    content: "\e9d4";
+}
+
+.badge-icon-plugin-verified::before {
+    content: "\f013";
 }
 
 .badge-label {
     font-family: FONT_PRIMARY;
     font-size: 1.1rem;
     text-align: left;
-    text-transform: uppercase;
-    text-decoration: none;
     font-weight: bold;
 }
 
@@ -9288,79 +9338,20 @@ wui-disposal-hold-data .form-textbox {
     color: #fff;
 }
 
+.badge-panel-secondary {
+    background-color: #EDEDED;
+    color: #666;
+}
+
 .badge-panel-success {
-    background-color: COLOR_LABEL_SUCCESS;
-    color: #fff;
+    background-color: BACKGROUND_COLOR_LABEL_SUCCESS;
+    color: COLOR_LABEL_SUCCESS;
 }
 
 .badge-panel-danger {
-    background-color: COLOR_LABEL_DANGER;
-    color: #fff;
+    background-color: BACKGROUND_COLOR_LABEL_DANGER;
+    color: COLOR_LABEL_DANGER;
 }
-
-.badge-icon {
-    margin-right: .5em;
-    font-size: 1.1rem;
-    width: 1.5rem;
-}
-
-.badge-icon span.fa-stack {
-    line-height: 1;
-    height: 1rem;
-    vertical-align: baseline;
-    width: inherit;
-}
-
-.badge-for-version {
-    border-radius: 2px;
-    border: none;
-    padding: 1rem;
-    margin-left: 5px;
-    background-color: #c5eafc;
-    align-self: center;
-    cursor: pointer;
-}
-
-.badge-for-version .badge-label {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 60px;
-    font-weight: 600;
-    font-size: 1.0rem;
-    text-align: left;
-    color: #286b93;
-}
-
-.badge-notification {
-    color: #286b93;
-    font-size: 0.8rem;
-    height: 0.8rem;
-    line-height: 0.8rem;
-    padding-left: 2px;
-    width: 1.5rem;
-}
-
-.badge-for-version .badge-notification .fa-stack {
-    font-size: inherit;
-    height: inherit;
-    line-height: inherit;
-}
-
-.badge-for-version .badge-notification i {
-    vertical-align: middle;
-    font-size: inherit;
-}
-
-.badge-for-version .badge-notification i:first-child {
-    font-size: 1.6em;
-}
-
-.badge-for-version .badge-notification i:last-child {
-    font-size: 0.8em;
-}
-
-
 
 .collapsable-card-panel-close {
   background-color:transparent;
@@ -9409,24 +9400,12 @@ wui-disposal-hold-data .form-textbox {
   font-weight: bold;
 }
 
-.conversion-profile {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-}
-
-.conversion-profile select {
-    margin-right: 10px
-}
-
 .value-overflow {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     width: 69vw;
 }
-
-
 
 .wui-dialog-license-layout-footer {
      text-align: right;
@@ -9906,11 +9885,13 @@ wui-disposal-hold-data .form-textbox {
    ============================================================ */
 .generic-data-panel {
     min-height: auto;
+    padding: 1.6rem;
 }
 
 .generic-data-panel-fields {
     display: flex;
     flex-direction: column;
+    gap: 1.6rem;
 }
 
 .generic-form-field {
@@ -9922,7 +9903,7 @@ wui-disposal-hold-data .form-textbox {
 }
 
 .generic-form-field .form-textbox {
-    font-size: 14px;
+    font-size: 1.4rem;
     color: black;
     flex: 1;
 }
@@ -9934,14 +9915,14 @@ wui-disposal-hold-data .form-textbox {
 .generic-form-field-left-panel {
     flex: 1;
     display: flex;
-    gap: 16px;
+    gap: 1.6rem;
     align-items: flex-start; /* Keeps the label at the top for tall inputs */
     width: 100%;
 }
 
 .generic-form-field-input-panel {
     display: flex;
-    gap: 8px;
+    gap: 0.8rem;
     align-items: flex-start; /* Prevents upward overflow for tall inputs */
 }
 
@@ -9957,14 +9938,58 @@ wui-disposal-hold-data .form-textbox {
     flex: 1;
 }
 
+.pt-16 {
+    padding-top: 1.6rem;
+}
+
+.pb-16 {
+    padding-bottom: 1.6rem;
+}
+
+.pl-16 {
+    padding-left: 1.6rem;
+}
+
+.pr-16 {
+    padding-right: 1.6rem;
+}
+
+.p-16 {
+    padding: 1.6rem;
+}
+
+.px-16 {
+    padding-left: 1.6rem;
+    padding-right: 1.6rem;
+}
+
+.py-16 {
+    padding-top: 1.6rem;
+    padding-bottom: 1.6rem;
+}
+
 .mb-20 {
     margin-bottom: 20px;
 }
 
+.mb-16 {
+    margin-bottom: 16px;
+}
+
+.mb-8 {
+    margin-bottom: 8px;
+}
+
+.mb-4 {
+    margin-bottom: 4px;
+}
+
 .generic-data-panel-fields .form-separator {
-  font-size: 14px;
-  font-weight: bold;
-  margin: 0 -15px 0 -15px !important;
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 1.6rem;
+    margin: 0 0 1.6rem   0 !important;
+    padding: unset !important;
 }
 
 .generic-data-panel-fields .form-readonly-value {
@@ -10021,8 +10046,12 @@ wui-disposal-hold-data .form-textbox {
     padding: 6px 8px; /* Slightly taller padding for standalone look */
 }
 
+.generic-metadata-panel {
+    padding: 1.6rem;
+}
+
 .generic-metadata-panel .label {
-    font-size: 14px;
+    font-size: 1.4rem;
     font-weight: 300;
     color: COLOR_GREY_MEDIUM;
     width: 250px;
@@ -10034,7 +10063,7 @@ wui-disposal-hold-data .form-textbox {
 }
 
 .generic-metadata-panel .field + .generic-metadata-panel .field {
-    margin-bottom: 1rem;
+    margin-bottom: 1.6rem;
 }
 
 .generic-metadata-panel .field:last-child {
@@ -10042,9 +10071,16 @@ wui-disposal-hold-data .form-textbox {
 }
 
 .generic-metadata-panel .value {
-    font-size: 14px;
+    font-size: 1.4rem;
     color: black;
     flex: 1;
+}
+
+.generic-metadata-panel .value.with-inline-badge {
+  display: flex;
+  align-items: baseline; /* Keeps text aligned properly */
+  flex-wrap: wrap;       /* Prevents overflow if the value is long */
+  gap: 16px;
 }
 
 .generic-metadata-panel .generic-multiline {
@@ -10057,5 +10093,578 @@ wui-disposal-hold-data .form-textbox {
 .generic-metadata-panel .form-separator {
     font-size: 14px;
     font-weight: bold;
-    margin: 1rem -15px 0 -15px !important;
+    margin-bottom: 16px;
+    margin: 0 0 16px 0 !important;
+    padding: unset !important;
+}
+
+.generic-metadata-panel .tags-inline-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Layout for the flexbox header */
+.collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    border-radius: 4px; /* Adjust to match your theme */
+    padding: 0 16px;
+}
+
+.collapsible-body {
+    margin-top: 16px;
+}
+
+/* Ensure the title text matches your bold/blue style */
+.collapsible-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #127faa;
+}
+
+/* Group badges and chevron on the right side */
+.collapsible-right-side {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* Gap between the badges cluster and the chevron */
+}
+
+/* Add spacing between multiple badges */
+.collapsible-badges {
+    display: flex;
+    gap: 8px; /* Gap between 'Mandatory' and 'Success' */
+}
+
+/* Animate the chevron when expanding/collapsing */
+.collapsible-chevron i {
+    transition: transform 0.3s ease;
+    color: #666;
+}
+
+.collapsible-card.expanded .collapsible-chevron i {
+    transform: rotate(180deg);
+}
+
+/* 1. Reset the counter on the parent container that holds the list */
+.collapsible-card-list {
+    counter-reset: step-counter;
+}
+
+/* 2. Increment the counter for every card inside that list */
+.collapsible-card {
+    counter-increment: step-counter;
+    padding: 16px !important;
+}
+
+/* 3. Inject the number before the title text */
+.collapsible-title::before {
+    content: counter(step-counter) ".";
+    margin-right: 10px;
+    font-weight: 600;
+}
+
+.collapsible-title.no-step-counter::before {
+    content: none;
+    margin-right: 0;
+}
+
+/* Container styling to align items in a row */
+.download-resource-container {
+    display: flex;
+    align-items: center;
+    gap: 24px; /* Adjusts the space between the text and the link */
+    font-family: inherit;
+    font-size: 14px;
+    color: black;
+}
+
+/* Optional: specific styling for the label text */
+.resource-description {
+    line-height: 1.5;
+}
+
+/* Styling for the link to flex the text and icon together */
+.resource-download-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #036d97;
+    text-decoration: none;
+    font-weight: 500 !important;
+    cursor: pointer;
+    font-size: 1.3rem;
+}
+
+/* Hover effect */
+.resource-download-link:hover {
+    text-decoration: none;
+}
+
+
+/* ============================================================
+   Create Job Plugins Tab
+============================================================ */
+.search-filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+ }
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+}
+
+.search-filter-container .label {
+    width: unset !important;
+}
+
+.search-filter-container .form-textbox {
+    font-size: 1.4rem;
+    color: black;
+    flex: 1;
+    background-color: #fafafa;
+    border-bottom: 1px solid #d9d9d9;
+    border-left: none;
+}
+
+.search-filter-container .form-listbox {
+    border: none;
+      font-size: 14px;
+      color: black;
+      flex: 1;
+      width: 256px;
+      margin-bottom: unset;
+}
+
+/* The parent container */
+.split-panel-container {
+    display: flex;
+    gap: 16px; /* Creates the 16px gap between children */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* The child panels */
+.split-panel-column {
+    flex: 1;
+    border-radius: 0.4rem;
+    box-sizing: border-box;
+}
+
+.split-panel-column.right-side {
+    background-color: #f5f5f5;
+    padding: 1.6rem;
+}
+
+/* Base styling */
+.plugin-list-item-new {
+    margin: 0;
+    padding: 0.8rem;
+    font-weight: 300;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease;
+    font-size: 1.4rem;
+
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+/* Add this to style the pseudo-element globally for all items */
+.plugin-list-item-new::before {
+    color: black;
+    @mixin fontawesome();
+    font-size: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.plugin-list-item-new-characterization::before {
+    content: "\e5fa";
+}
+
+.plugin-list-item-new-conversion::before {
+    content: "\e2e7";
+}
+
+.plugin-list-item-new-reindex::before {
+    content: "\e8ba";
+}
+
+.plugin-list-item-new-risk_assessment::before {
+    content: "\f083";
+}
+
+.plugin-list-item-new-validation::before {
+    content: "\e92d";
+}
+
+.plugin-list-item-new-maintenance::before {
+    content: "\f100";
+}
+
+.plugin-list-item-new-digital_signature::before {
+    content: "\e90d";
+}
+
+.plugin-list-item-new-earchiving::before {
+    content: "\e1a1";
+}
+
+.plugin-list-item-new-ingest::before {
+    content: "\ef48";
+}
+
+/* Alternating background colors */
+.plugin-list-item-new:nth-child(odd) {
+    background-color: #FAFAFA;
+}
+
+.plugin-list-item-new:nth-child(even) {
+    background-color: #ffffff;
+}
+
+/* Hover effect */
+.plugin-list-item-new:hover {
+    background-color: #e6f2f7;
+}
+
+/* The active/selected state */
+.selected-plugin {
+    background-color: #D2E7F9 !important;
+    color: #036D97;
+}
+
+/* Main header container pushing the two groups apart */
+.plugin-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Vertically centers the left and right groups */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Both left and right groups share the exact same flex layout and gap */
+.header-left-group,
+.header-right-group {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+}
+
+/* Make the title stand out */
+.plugin-header-title {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: black;
+}
+
+.plugin-header-subtitle {
+  font-size: 1.3rem;
+  color: #666;
+}
+
+/* Optional styling for your secondary labels */
+.plugin-header-label {
+    color: #666666;
+    font-size: 1.4rem;
+}
+
+/* Container to keep things organized */
+.description-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.description-text {
+    margin: 0;
+    color: black;
+    line-height: 1.5em;
+    font-size: 1.4rem;
+    overflow: hidden;
+
+    /* The legacy WebKit way (Required for current browsers) */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+
+    /* The future standard way (Will take over when fully supported) */
+    display: box;
+    box-orient: vertical;
+}
+
+.description-text.clamped {
+    /* The legacy WebKit way */
+    -webkit-line-clamp: 2;
+
+    /* The future standard way */
+    line-clamp: 2;
+}
+
+/* Make the label look like a clickable link */
+.show-more-btn {
+    color: #036D97; /* Your standard link color */
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 400;
+    align-self: flex-start; /* Prevents the button click area from stretching across the whole screen */
+    transition: color 0.2s ease;
+}
+
+.show-more-btn:hover {
+    text-decoration: underline;
+}
+
+.priority-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Forces 3 equal columns */
+    gap: 1.6rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.priority-card {
+    /* Remove `flex: 1;` */
+    display: flex;
+    align-items: flex-start;
+    gap: 1.6rem;
+    background-color: #FAFAFA;
+    padding: 16px;
+    border-radius: 0.6rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.priority-card:hover {
+    background-color: #f1f1f1;
+}
+
+.priority-radio {
+    margin: 0;
+    margin-top: 2px; /* Minor tweak to align perfectly with the badge's text baseline */
+}
+
+.priority-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.priority-badge {
+    padding: 4px 10px;
+    border-radius: 0.4rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    width: fit-content;
+}
+
+.badge-danger {
+    background-color: BACKGROUND_COLOR_LABEL_DANGER;
+    color: COLOR_LABEL_DANGER;
+}
+
+.badge-warning {
+    background-color: BACKGROUND_COLOR_LABEL_WARNING;
+    color: COLOR_LABEL_WARNING;
+}
+
+.badge-success {
+    background-color: BACKGROUND_COLOR_LABEL_SUCCESS;
+    color: COLOR_LABEL_SUCCESS;
+}
+
+.badge-default {
+     background-color: BACKGROUND_COLOR_LABEL_DEFAULT;
+     color: COLOR_LABEL_DEFAULT;
+}
+
+.badge-info {
+     background-color: BACKGROUND_COLOR_LABEL_INFO;
+     color: COLOR_LABEL_INFO;
+}
+
+.priority-description {
+    margin: 0;
+    color: #4b5563;
+    font-size: 1.4rem;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   PLUGIN PARAMETERS LAYOUT
+   ============================================================ */
+
+/* Main wrapper - Add padding or max-width here if needed in the future */
+.plugin-parameters {
+    background-color: white;
+    border-radius: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    padding: 1.6rem;
+}
+
+/* Container for all options - uses flexbox to stack them and apply the 1.6rem gap */
+.plugin-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+}
+
+/* Individual parameter wrapper - stacks the label, input, and helper text with a 0.8rem gap */
+.plugin-option-parameter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.plugin-option-nested-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+}
+
+.plugin-option-parameter .form-label {
+    font-size: 1.4rem;
+    color: #343a3f;
+}
+
+.plugin-option-parameter label {
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: #343a3f;
+}
+
+.plugin-option-parameter .form-textbox {
+    font-size: 1.4rem;
+    color: black;
+    flex: 1;
+    background-color: #fafafa;
+    border-bottom: 1px solid #d9d9d9;
+    border-left: none;
+}
+
+.plugin-option-parameter .form-listbox {
+    border:none;
+    margin-left: -4px;
+    font-size: 14px;
+    color: black;
+    flex: 1;
+}
+
+.plugin-option-parameter .form-help {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: #666666;
+    margin: 0;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.my-custom-checkbox label {
+    display: inline-flex;
+    align-items: center; /* This is the magic property that perfectly centers both! */
+    cursor: pointer;
+}
+
+.my-custom-checkbox input[type="checkbox"] {
+    opacity: 0;
+    position: absolute;
+    cursor: pointer;
+}
+
+.my-custom-checkbox label::before {
+    font-family: 'MaterialIcons';
+    content: "\e835";
+    font-size: 24px;
+
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    flex-shrink: 0;
+
+    color: #757575;
+    margin-right: 8px;
+    transition: color 0.2s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.my-custom-checkbox input[type="checkbox"]:checked + label::before {
+    content: "\e834"; /* Hex for 'check_box' */
+    color: COLOR_PRIMARY;
+}
+
+.my-custom-checkbox input[type="checkbox"]:disabled + label::before {
+    /* Use a gradient to create a background that we can resize */
+    background-image: linear-gradient(#E0E0E0, #E0E0E0);
+    background-size: 18px 18px;  /* Shrinks the background. Tweak to 16px or 20px if needed! */
+    background-position: center; /* Centers the background perfectly behind the icon */
+    background-repeat: no-repeat;
+
+    color: #BDBDBD;
+    border-radius: 2px;
+    cursor: not-allowed;
+}
+
+.my-custom-checkbox input[type="checkbox"]:disabled + label {
+    color: #9E9E9E;      /* Gray text to match */
+    cursor: not-allowed; /* Ensures the cursor shows as disabled over the text too */
+}
+
+/* The main container holding all options */
+.radio-group-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 0.8rem;
+}
+
+/* The wrapper for a single Radio + Description pair */
+.radio-option-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Align the description with the text of the radio button, bypassing the circle */
+.radio-option-help {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: #666666;
+    margin: 0;
+    margin-left: 28px;
+}
+
+/* Optional: If you want to use the same custom Material styling trick for radios */
+.my-custom-radio label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.4rem;
+    color: #343a3f;
+}
+
+/* Add a gap between the radio circle and the label text */
+.my-custom-radio input[type="radio"] {
+    margin-right: 0.8rem; /* Adjust this value to get the exact gap you want */
+    cursor: pointer;
 }

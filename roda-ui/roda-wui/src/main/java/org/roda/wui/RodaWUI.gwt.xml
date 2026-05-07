@@ -48,5 +48,5 @@
 	<!-- <stylesheet src="Main.css" /> Replaced by MyResources -->
 	<stylesheet src="../api/v2/themes?resource-id=theme.css" />
 	<stylesheet src="../api/v2/themes?resource-id=printing.css" />
-	<collapse-all-properties/>
+	<!--collapse-all-properties/-->
 </module>

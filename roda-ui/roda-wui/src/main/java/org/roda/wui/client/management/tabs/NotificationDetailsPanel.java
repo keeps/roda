@@ -60,15 +60,13 @@ public class NotificationDetailsPanel extends GenericMetadataCardPanel<Notificat
     if (data.getAcknowledgedUsers() != null && !data.getAcknowledgedUsers().isEmpty()) {
       addSeparator(messages.notificationAcknowledgedUsers());
 
-      FlowPanel list = new FlowPanel();
-      list.addStyleName("generic-multiline");
-
+      List<String> ackUsers = new ArrayList<>();
       for (Map.Entry<String, String> e : data.getAcknowledgedUsers().entrySet()) {
         String convertedDate = Humanize.convertStringToStrictUTC(e.getValue());
-        list.add(new HTMLPanel("span", SafeHtmlUtils.htmlEscape(e.getKey() + " @ " + convertedDate)));
+        ackUsers.add(e.getKey() + " @ " + convertedDate);
       }
 
-      buildField("Users").withWidget(list).build();
+      buildField("Users").withMultilineStrings(ackUsers).build();
     }
 
     List<String> remaining = new ArrayList<>();
@@ -82,14 +80,8 @@ public class NotificationDetailsPanel extends GenericMetadataCardPanel<Notificat
 
     if (!remaining.isEmpty()) {
       addSeparator(messages.notificationNotAcknowledgedUsers());
-      FlowPanel list = new FlowPanel();
-      list.addStyleName("generic-multiline");
 
-      for (String user : remaining) {
-        list.add(new HTMLPanel("span", SafeHtmlUtils.htmlEscape(user)));
-      }
-
-      buildField("Users").withWidget(list).build();
+      buildField("Users").withMultilineStrings(remaining).build();
     }
   }
 

@@ -60,14 +60,7 @@ public class AipDetailsTab extends GenericMetadataCardPanel<BrowseAIPResponse> {
 
     if (!aip.getIngestSIPIds().isEmpty()) {
       addSeparator(messages.detailsIngest());
-
-      FlowPanel sipIds = new FlowPanel();
-      sipIds.addStyleName("generic-multiline");
-      for (String ingestSIPId : aip.getIngestSIPIds()) {
-        sipIds.add(new HTMLPanel("span", ingestSIPId));
-      }
-
-      buildField(messages.sipId()).withWidget(sipIds).build();
+      buildField(messages.sipId()).withMultilineStrings(aip.getIngestSIPIds()).build();
     }
 
     boolean canAccessJobs = PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_JOB);

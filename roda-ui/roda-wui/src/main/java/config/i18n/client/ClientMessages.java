@@ -279,6 +279,8 @@ public interface ClientMessages extends Messages {
 
   String selected(@PluralCount int selectedCount, String entity);
 
+  String noObjectsSelected();
+
   String inspectTransferredResource();
 
   String identifierNotFound();
@@ -329,9 +331,13 @@ public interface ClientMessages extends Messages {
 
   String createJobTitle();
 
+  String createJobInformationTitle();
+
   String createJobName();
 
   String createJobSelectObject();
+
+  String createJobSelectedObjects();
 
   String createJobSelectedSIP();
 
@@ -348,6 +354,8 @@ public interface ClientMessages extends Messages {
   SafeHtml createJobCategoryWorkflow(List<String> categoryLabels);
 
   String createJobOrchestration();
+
+  String jobPerformanceAndPriority();
 
   String createJobCurlCommand();
 
@@ -412,6 +420,8 @@ public interface ClientMessages extends Messages {
   String dialogRefresh();
 
   /*** Generic Buttons ***/
+
+  String startButton();
 
   String backButton();
 
@@ -1909,7 +1919,7 @@ public interface ClientMessages extends Messages {
 
   SafeHtml pluginTrustedMessage(String publisher, String to);
 
-  SafeHtml pluginUntrustedMessage();
+  String pluginUntrustedMessage();
 
   String pluginVendorLabel();
 
@@ -2799,4 +2809,16 @@ public interface ClientMessages extends Messages {
   String failedToRemoveGroupFromUser();
 
   String failedToRemoveUserFromGroup();
+
+  String openSourceObject();
+
+  String openOutcomeObject();
+
+  String conversionProfileRepresentationParameter();
+
+  String conversionProfileDisseminationParameter();
+
+  String availableActionsTabLabel();
+
+  String noPluginsFoundMatchingYourCriteria();
 }

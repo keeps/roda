@@ -70,12 +70,7 @@ public class FileDetailsTab extends GenericMetadataCardPanel<IndexedFile> {
       .withValue(file.getDateCreatedByApplication()).build();
 
     if (file.getHash() != null && !file.getHash().isEmpty()) {
-      FlowPanel list = new FlowPanel();
-      list.addStyleName("generic-multiline");
-      for (String hash : file.getHash()) {
-        list.add(new HTMLPanel("span", SafeHtmlUtils.htmlEscape(hash)));
-      }
-      buildField(messages.viewRepresentationInfoHash()).withWidget(list).build();
+      buildField(messages.viewRepresentationInfoHash()).withMultilineStrings(file.getHash()).build();
     }
 
     if (file.isReference()) {

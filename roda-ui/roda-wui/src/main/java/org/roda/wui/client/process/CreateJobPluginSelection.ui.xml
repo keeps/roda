@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:tabs="urn:import:org.roda.wui.client.browse.tabs">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+
+    <g:FlowPanel styleName="roda6Card mb-16">
+        <g:FlowPanel addStyleNames="cardBody">
+            <g:FlowPanel addStyleNames="generic-metadata-panel">
+                <g:Label addStyleNames="form-separator">
+                    <ui:text from='{messages.actions}'/>
+                </g:Label>
+
+                <tabs:JobPluginActionsTab ui:field="tabs"/>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>
+
+

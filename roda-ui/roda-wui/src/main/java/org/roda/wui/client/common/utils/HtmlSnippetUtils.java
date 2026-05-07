@@ -403,7 +403,7 @@ public class HtmlSnippetUtils {
         .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.mandatoryPlugin() + CLOSE_SPAN);
     } else {
       pluginMandatoryHTML = SafeHtmlUtils
-        .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.optionalPlugin() + CLOSE_SPAN);
+        .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.optionalPlugin() + CLOSE_SPAN);
     }
 
     return pluginMandatoryHTML;

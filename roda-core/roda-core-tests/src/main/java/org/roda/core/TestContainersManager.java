@@ -9,19 +9,19 @@ package org.roda.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
-import org.testcontainers.utility.MountableFile;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Collections;
 
 /**
  * Singleton manager for test infrastructure containers (ZooKeeper, Solr,
@@ -46,6 +46,7 @@ public class TestContainersManager {
   private final GenericContainer<?> postgres;
   private final GenericContainer<?> mailpit;
   private final GenericContainer<?> siegfried;
+  private final GenericContainer<?> clamav;
 
   @SuppressWarnings("resource")
   private TestContainersManager() {
@@ -58,7 +59,10 @@ public class TestContainersManager {
       .withNetworkAliases("zookeeper").withExposedPorts(2181)
       .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(60)));
     zookeeper.start();
-    LOGGER.info("ZooKeeper started at {}:{}", zookeeper.getHost(), zookeeper.getMappedPort(2181));
+    // This is the IP address of the Docker Host bridge (e.g. 192.168.x.x) which
+    // Maven CAN reach
+    String dockerHostIp = zookeeper.getHost();
+    LOGGER.info("ZooKeeper started at {}:{}", dockerHostIp, zookeeper.getMappedPort(2181));
 
     // Solr — connects to ZooKeeper via the internal Docker network alias.
     // Solr registers itself in ZooKeeper using the result of
@@ -66,11 +70,22 @@ public class TestContainersManager {
     // the container's bridge-network IP. On Linux (CI and most developer
     // machines) this IP is directly reachable from the Docker host, so the
     // CloudSolrClient can connect without any additional port mapping.
+    // Find a free port dynamically to prevent conflicts if multiple CI jobs run
+    // concurrently
+    int externalSolrPort = findFreePort();
+
     solr = new GenericContainer<>(DockerImageName.parse("solr:9")).withNetwork(network)
-      .withEnv("ZK_HOST", "zookeeper:2181").withExposedPorts(8983).waitingFor(Wait.forHttp("/solr/admin/info/system")
-        .forPort(8983).forStatusCode(200).withStartupTimeout(Duration.ofMinutes(3)));
+            .withExposedPorts(externalSolrPort) // <--- Tell Testcontainers to expect the dynamic port
+            .withEnv("ZK_HOST", "zookeeper:2181")
+            .withEnv("SOLR_HOST", dockerHostIp)
+            .withEnv("SOLR_PORT", String.valueOf(externalSolrPort)); // Solr binds to this port internally
+    // Map the Host port directly to the SAME Container port (e.g. 33841:33841)
+    solr.setPortBindings(Collections.singletonList(externalSolrPort + ":" + externalSolrPort));
+    // Wait strategy must also ping the new dynamic port
+    solr.waitingFor(Wait.forHttp("/solr/admin/info/system")
+            .forPort(externalSolrPort).forStatusCode(200).withStartupTimeout(Duration.ofMinutes(3)));
     solr.start();
-    LOGGER.info("Solr started at {}:{}", solr.getHost(), solr.getMappedPort(8983));
+    LOGGER.info("Solr started and registered in ZK at {}:{}", dockerHostIp, externalSolrPort);
 
     // PostgreSQL
     postgres = new GenericContainer<>(DockerImageName.parse("postgres:17")).withEnv("POSTGRES_USER", "admin")
@@ -86,15 +101,15 @@ public class TestContainersManager {
     LOGGER.info("Mailpit started at {}:{}", mailpit.getHost(), mailpit.getMappedPort(1025));
 
     // Clamav
-    GenericContainer<?> clamav = new GenericContainer<>(DockerImageName.parse("clamav/clamav:1.5.2"))
-      .withExposedPorts(3310).withFileSystemBind("/tmp", "/tmp", BindMode.READ_WRITE)
+    clamav = new GenericContainer<>(DockerImageName.parse("clamav/clamav:1.5.2")).withExposedPorts(3310)
+      .withFileSystemBind("/tmp", "/tmp", BindMode.READ_WRITE)
       .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(60)));
     clamav.start();
 
     String configContent = """
-        TCPSocket %d
-        TCPAddr %s
-        """.formatted(clamav.getMappedPort(3310), clamav.getHost());
+      TCPSocket %d
+      TCPAddr %s
+      """.formatted(clamav.getMappedPort(3310), clamav.getHost());
 
     try {
       Path tempConfigFile = Paths.get("/tmp/clamd.conf");
@@ -130,6 +145,16 @@ public class TestContainersManager {
     return INSTANCE;
   }
 
+  // Utility to find a guaranteed free port on the host
+  private int findFreePort() {
+    try (ServerSocket socket = new ServerSocket(0)) {
+      return socket.getLocalPort();
+    } catch (IOException e) {
+      LOGGER.warn("Could not find a free port dynamically, falling back to 18983");
+      return 18983;
+    }
+  }
+
   private void configureSystemProperties() {
     String zkUrl = zookeeper.getHost() + ":" + zookeeper.getMappedPort(2181);
     System.setProperty("RODA_CORE_SOLR_TYPE", "CLOUD");
@@ -157,11 +182,17 @@ public class TestContainersManager {
     if (solr != null && solr.isRunning()) {
       solr.stop();
     }
-    if (zookeeper != null && zookeeper.isRunning()) {
-      zookeeper.stop();
-    }
     if (postgres != null && postgres.isRunning()) {
       postgres.stop();
+    }
+    if (mailpit != null && mailpit.isRunning()) {
+      mailpit.stop();
+    }
+    if (clamav != null && clamav.isRunning()) {
+      clamav.stop();
+    }
+    if (siegfried != null && siegfried.isRunning()) {
+      siegfried.stop();
     }
     if (network != null) {
       network.close();

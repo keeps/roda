@@ -5,7 +5,7 @@
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel>
-		<g:Label addStyleNames="label associative-label" ui:field="itemName">
+		<g:Label addStyleNames="associative-label" ui:field="itemName">
 		</g:Label>
 		<g:Anchor addStyleNames="pull-right toolbarLink toolbarLinkSmall" ui:field="removeDynamicTextBoxButton">
 		</g:Anchor>

@@ -108,7 +108,7 @@ public class EditDisposalHold extends Composite {
 
     title.setText(disposalHold.getTitle());
     title.setIconClass("DisposalHold");
-    title.addStyleName("mb-20");
+    title.addStyleName("mb-16");
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");

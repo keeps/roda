@@ -98,7 +98,7 @@ public class JobActions extends AbstractActionable<IndexedJob> {
         object.getJobStats() != null && object.getJobStats().getOutcomeObjectsWithManualIntervention() > 0,
         CanActResult.Reason.CONTEXT, messages.reasonJobDoesNotNeedAppraisal());
     } else if (JobAction.INGEST_PROCESS.equals(action)) {
-      return new CanActResult(PluginType.INGEST.equals(object.getPluginType()), CanActResult.Reason.CONTEXT,
+      return new CanActResult(PluginType.INGEST.equals(object.getPluginType()) && object.isInFinalState(), CanActResult.Reason.CONTEXT,
         messages.reasonPluginIsNotIngest());
     }
     return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonInvalidContext());
@@ -353,8 +353,8 @@ public class JobActions extends AbstractActionable<IndexedJob> {
     // job.getJobStats().getOutcomeObjectsWithManualIntervention() + ")"
 
     managementGroup.addButton(messages.sidebarAppraisalTitle(), JobAction.INGEST_APPRAISAL, ActionImpact.NONE,
-      "btn-play");
-    managementGroup.addButton(messages.listButton(), JobAction.INGEST_PROCESS, ActionImpact.NONE, "btn-play");
+      "btn-assessment");
+    managementGroup.addButton(messages.listButton(), JobAction.INGEST_PROCESS, ActionImpact.NONE, "btn-search");
 
     jobActionableBundle.addGroup(managementGroup);
 

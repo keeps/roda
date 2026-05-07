@@ -134,7 +134,7 @@ public class CreateDisposalConfirmation extends Composite {
 
     title.setText(messages.createDisposalConfirmationTitle());
     title.setIconClass("DisposalConfirmations");
-    title.addStyleName("mb-20");
+    title.addStyleName("mb-16");
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");

@@ -1501,7 +1501,6 @@ public final class RodaConstants {
 
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
-  public static final String PLUGIN_CATEGORY_RISK_MANAGEMENT = "risk_management";
   public static final String PLUGIN_CATEGORY_DISSEMINATION = "dissemination";
   public static final String PLUGIN_CATEGORY_INGEST = "ingest";
   public static final String PLUGIN_CATEGORY_REPLICATION = "replication";

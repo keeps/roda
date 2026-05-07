@@ -73,8 +73,6 @@ public class PreservationAgentActions extends AbstractActionable<IndexedPreserva
   // ACTIONS
   private void download(IndexedPreservationAgent agent, AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = RestUtils.createPreservationAgentDownloadUri(agent.getId());
-    GWT.log("Download URI: " + downloadUri.asString());
-    GWT.log("HERE!!!");
     callback.onSuccess(ActionImpact.NONE);
     Window.Location.assign(downloadUri.asString());
   }

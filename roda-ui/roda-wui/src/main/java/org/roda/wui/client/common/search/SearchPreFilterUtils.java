@@ -14,6 +14,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 
+import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -132,5 +133,73 @@ public class SearchPreFilterUtils {
     }
 
     return null;
+  }
+
+  /**
+   * Generates a plain text representation of the filter.
+   * Replaces the HTML <ul>/<li> structure with a simple semicolon-separated string.
+   */
+  public static String getFilterText(Filter filter, String classToFilter) {
+    if (filter == null || filter.getParameters().isEmpty()) {
+      return "";
+    }
+
+    // 1. Build the prefix safely using GWT's builder to avoid the `safe: ""` bug
+    SafeHtmlBuilder prefixBuilder = new SafeHtmlBuilder();
+    prefixBuilder.append(SafeHtmlUtils.fromSafeConstant(messages.allOfAObject(classToFilter)))
+            .append(messages.searchPreFilterWhere())
+            .append(SafeHtmlUtils.fromSafeConstant(": "));
+
+    // 2. Convert to a raw string and clean up HTML/entities
+    String prefix = prefixBuilder.toSafeHtml().asString()
+            .replaceAll("<[^>]+>", "")
+            .replace("&nbsp;", " ")
+            .trim() + " ";
+
+    List<FilterParameter> parameterValues = filter.getParameters();
+    StringBuilder plainTextBuilder = new StringBuilder();
+    plainTextBuilder.append(prefix);
+
+    for (int i = 0; i < parameterValues.size(); i++) {
+      String paramText = getFilterParameterText(parameterValues.get(i));
+
+      // Skip empty parameters so we don't end up with weird semicolons
+      if (!paramText.isEmpty()) {
+        if (i > 0 && plainTextBuilder.charAt(plainTextBuilder.length() - 1) != ' ') {
+          plainTextBuilder.append("; ");
+        }
+        plainTextBuilder.append(paramText);
+      }
+    }
+
+    return plainTextBuilder.toString();
+  }
+
+  /**
+   * Reuses the existing HTML generation logic but strips all HTML tags
+   * and unescapes basic HTML entities to return pure plain text.
+   */
+  public static String getFilterParameterText(FilterParameter parameter) {
+    SafeHtml htmlValue = getFilterParameterHTML(parameter);
+
+    if (htmlValue == null || htmlValue.asString().trim().isEmpty()) {
+      return "";
+    }
+
+    // 1. Convert SafeHtml to a raw string
+    // 2. Strip all HTML tags (like <span> and </span>)
+    // 3. Replace common HTML entities back to plain text
+    return htmlValue.asString()
+            .replaceAll("<[^>]+>", "")  // Removes all tags
+            .replace("&nbsp;", " ")     // Standardize spaces
+            .replace("&lt;", "<")       // Unescape brackets if user searched for them
+            .replace("&gt;", ">")
+            .replace("&amp;", "&")
+            .replace("&quot;", "\"")
+            .trim();
+  }
+
+  private SearchPreFilterUtils() {
+    // private constructor
   }
 }

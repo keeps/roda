@@ -205,7 +205,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MAINTENANCE);
   }
 
   @Override
