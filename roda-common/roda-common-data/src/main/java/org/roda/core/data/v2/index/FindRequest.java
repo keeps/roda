@@ -61,6 +61,8 @@ public class FindRequest extends CountRequest {
   private Long childrenLimit;
   @JsonProperty("childrenFilter")
   private Filter childrenFilter;
+  @JsonProperty("includeNestedDocuments")
+  private boolean includeNestedDocuments;
 
   // Private constructor for Jackson deserialization
   private FindRequest(FindRequestBuilder builder) {
@@ -76,6 +78,7 @@ public class FindRequest extends CountRequest {
     this.childrenFieldsToReturn = builder.childrenFieldsToReturn;
     this.childrenLimit = builder.childrenLimit;
     this.childrenFilter = builder.childrenFilter;
+    this.includeNestedDocuments = builder.includeNestedDocuments;
   }
 
   public Sorter getSorter() {
@@ -122,6 +125,10 @@ public class FindRequest extends CountRequest {
     return childrenFilter;
   }
 
+  public boolean isIncludeNestedDocuments() {
+    return includeNestedDocuments;
+  }
+
   public static FindRequestBuilder getBuilder(final Filter filter, boolean onlyActive) {
     return new FindRequestBuilder(filter, onlyActive);
   }
@@ -141,6 +148,7 @@ public class FindRequest extends CountRequest {
     private List<String> childrenFieldsToReturn;
     private Long childrenLimit;
     private Filter childrenFilter;
+    private boolean includeNestedDocuments;
 
     public FindRequestBuilder(@JsonProperty("filter") final Filter filter,
       @JsonProperty("onlyActive") boolean onlyActive) {
@@ -155,6 +163,7 @@ public class FindRequest extends CountRequest {
       this.fieldsToReturn = Collections.emptyList();
       this.collapse = null;
       this.children = false;
+      this.includeNestedDocuments = false;
     }
 
     public FindRequest build() {
@@ -213,6 +222,11 @@ public class FindRequest extends CountRequest {
 
     public FindRequestBuilder withChildrenFilter(Filter childrenFilter) {
       this.childrenFilter = childrenFilter;
+      return this;
+    }
+
+    public FindRequestBuilder withIncludeNestedDocuments(boolean includeNestedDocuments) {
+      this.includeNestedDocuments = includeNestedDocuments;
       return this;
     }
   }

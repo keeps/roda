@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Edge case: mailbox with metadata but no email records yet indexed -->
+<emailArchive xmlns="https://roda-community.org/schemas/emailarchive/v1">
+  <custodian>Empty Mailbox User</custodian>
+  <emailAddress>empty@example.org</emailAddress>
+  <dateStart>2023-01-01</dateStart>
+  <dateEnd>2023-01-01</dateEnd>
+  <totalMessages>0</totalMessages>
+  <originalFormat>MBOX</originalFormat>
+  <archivingMotive>Legal Hold</archivingMotive>
+</emailArchive>

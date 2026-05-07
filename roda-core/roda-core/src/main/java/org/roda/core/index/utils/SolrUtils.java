@@ -312,6 +312,11 @@ public class SolrUtils {
       query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
     }
 
+    if (IndexedAIP.class.isAssignableFrom(classToRetrieve)
+      && !hasNestedDocumentsFilter(filter, classToRetrieve)) {
+      query.addFilterQuery("-_nest_path_:*");
+    }
+
     query.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
     query.setRows(pageSize);
     query.setSorts(Arrays.asList(SortClause.asc(RodaConstants.INDEX_UUID)));
@@ -359,6 +364,12 @@ public class SolrUtils {
     parseAndConfigureFacets(findRequest.getFacets(), query);
     if (hasPermissionFilters(classToRetrieve) && !hasNestedDocumentsFilter(findRequest.getFilter(), classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, findRequest.isOnlyActive(), classToRetrieve));
+    }
+
+    if (IndexedAIP.class.isAssignableFrom(classToRetrieve)
+      && !hasNestedDocumentsFilter(findRequest.getFilter(), classToRetrieve)
+      && !findRequest.isIncludeNestedDocuments()) {
+      query.addFilterQuery("-_nest_path_:*");
     }
 
     if (hasNestedDocumentsFilter(findRequest.getFilter(), classToRetrieve)) {
@@ -1032,33 +1043,115 @@ public class SolrUtils {
 
   private static void appendBlockJoinChildrenFilterParameter(StringBuilder ret, ChildOfFilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
-    StringBuilder blockMask = new StringBuilder();
-    parseFilterParameter(blockMask, parameter.getChildrenOfFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
-    String replace = blockMask.toString().replace(": ", ":");
+    appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
+    String maskValue = buildBlockJoinMask(parameter.getChildrenOfFilter());
+    String escapedMask = maskValue.replace("\"", "\\\"");
 
     if (parameter.getParentFilter() != null) {
-      StringBuilder someParents = new StringBuilder();
-      parseFilterParameter(someParents, parameter.getParentFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
-
-      ret.append("{!child of=").append(replace).append("} ").append(someParents);
+      String parentQuery = buildBlockJoinSubQuery(parameter.getParentFilter()).replace("\"", "\\\"");
+      ret.append("{!child of=\"").append(escapedMask).append("\" v=\"").append(parentQuery).append("\"}");
     } else {
-      ret.append("{!child of=").append(replace).append("}");
+      ret.append("{!child of=\"").append(escapedMask).append("\"}");
     }
   }
 
   private static void appendBlockJoinFilterParameter(StringBuilder ret, ParentWhichFilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
-    StringBuilder blockMask = new StringBuilder();
-    parseFilterParameter(blockMask, parameter.getParentFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
-    String replace = blockMask.toString().replace(": ", ":");
+    appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
+    String maskValue = buildBlockJoinMask(parameter.getParentFilter());
+    String escapedMask = maskValue.replace("\"", "\\\"");
 
     if (parameter.getChildrenFilter() != null) {
-      StringBuilder someChildren = new StringBuilder();
-      parseFilterParameter(someChildren, parameter.getChildrenFilter(), prefixWithANDOperatorIfBuilderNotEmpty);
-
-      ret.append("{!parent which=").append(replace).append("} ").append(someChildren);
+      String childQuery = buildBlockJoinSubQuery(parameter.getChildrenFilter()).replace("\"", "\\\"");
+      ret.append("{!parent which=\"").append(escapedMask).append("\" v=\"").append(childQuery).append("\"}");
     } else {
-      ret.append("{!parent which=").append(replace).append("}");
+      ret.append("{!parent which=\"").append(escapedMask).append("\"}");
+    }
+  }
+
+  private static String buildBlockJoinMask(FilterParameter parameter) throws RequestNotValidException {
+    if (parameter instanceof SimpleFilterParameter simplePar) {
+      String value = simplePar.getValue();
+      if (value.matches("[\\w.-]+")) {
+        return simplePar.getName() + ":" + value;
+      } else {
+        return simplePar.getName() + ":\"" + value.replace("\"", "\\\"") + "\"";
+      }
+    }
+    StringBuilder sb = new StringBuilder();
+    parseFilterParameter(sb, parameter, false);
+    String s = sb.toString().replace(": ", ":");
+    if (s.startsWith("(") && s.endsWith(")")) {
+      s = s.substring(1, s.length() - 1);
+    }
+    return s;
+  }
+
+  private static String buildBlockJoinSubQuery(FilterParameter parameter) throws RequestNotValidException {
+    StringBuilder sb = new StringBuilder();
+    buildBlockJoinSubQueryClause(sb, parameter);
+    return "(" + sb.toString() + ")";
+  }
+
+  private static void buildBlockJoinSubQueryClause(StringBuilder sb, FilterParameter parameter)
+    throws RequestNotValidException {
+    if (parameter instanceof SimpleFilterParameter simplePar) {
+      sb.append("+").append(simplePar.getName()).append(":\"")
+        .append(simplePar.getValue().replace("\"", "\\\"")).append("\"");
+    } else if (parameter instanceof BasicSearchFilterParameter basicPar) {
+      String value = basicPar.getValue();
+      if (StringUtils.isBlank(value) || "*".equals(value)) {
+        sb.append("+").append(basicPar.getName()).append(":*");
+      } else if (value.contains("*") || value.contains("?")) {
+        // wildcards cannot appear inside quoted phrases — emit each token unquoted
+        for (String token : value.trim().split("\\s+")) {
+          if (sb.length() > 0) {
+            sb.append(" ");
+          }
+          sb.append("+").append(basicPar.getName()).append(":").append(escapeSolrSpecialChars(token));
+        }
+      } else {
+        String cleanValue = value.matches("^\".+\"$") ? value.substring(1, value.length() - 1) : value;
+        sb.append("+").append(basicPar.getName()).append(":\"").append(cleanValue.replace("\"", "\\\"")).append("\"");
+      }
+    } else if (parameter instanceof AndFiltersParameters andPar) {
+      List<FilterParameter> values = andPar.getValues();
+      for (int i = 0; i < values.size(); i++) {
+        if (i > 0) {
+          sb.append(" ");
+        }
+        buildBlockJoinSubQueryClause(sb, values.get(i));
+      }
+    } else if (parameter instanceof OrFiltersParameters orPar) {
+      sb.append("(");
+      List<FilterParameter> values = orPar.getValues();
+      for (int i = 0; i < values.size(); i++) {
+        if (i > 0) {
+          sb.append(" OR ");
+        }
+        buildBlockJoinSubQueryClause(sb, values.get(i));
+      }
+      sb.append(")");
+    } else if (parameter instanceof DateIntervalFilterParameter dateIntervalPar) {
+      if (dateIntervalPar.getFromValue() != null || dateIntervalPar.getToValue() != null) {
+        sb.append("+").append(dateIntervalPar.getFromName()).append(":[")
+          .append(processFromDate(dateIntervalPar.getFromValue())).append(" TO ")
+          .append(processToDate(dateIntervalPar.getToValue(), dateIntervalPar.getGranularity())).append("]");
+      }
+    } else if (parameter instanceof DateRangeFilterParameter dateRangePar) {
+      if (dateRangePar.getFromValue() != null || dateRangePar.getToValue() != null) {
+        sb.append("+").append(dateRangePar.getName()).append(":[")
+          .append(processFromDate(dateRangePar.getFromValue())).append(" TO ")
+          .append(processToDate(dateRangePar.getToValue(), dateRangePar.getGranularity(), false)).append("]");
+      }
+    } else if (parameter instanceof LongRangeFilterParameter longRangePar) {
+      if (longRangePar.getFromValue() != null || longRangePar.getToValue() != null) {
+        sb.append("+").append(longRangePar.getName()).append(":[")
+          .append(longRangePar.getFromValue() != null ? longRangePar.getFromValue() : "*").append(" TO ")
+          .append(longRangePar.getToValue() != null ? longRangePar.getToValue() : "*").append("]");
+      }
+    } else {
+      parseFilterParameter(sb, parameter, !sb.isEmpty());
     }
   }
 
@@ -1783,6 +1876,9 @@ public class SolrUtils {
     query.setQuery(queryBuilder.toString());
     if (hasPermissionFilters(classToRetrieve)) {
       query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
+    }
+    if (IndexedAIP.class.isAssignableFrom(classToRetrieve)) {
+      query.addFilterQuery("-_nest_path_:*");
     }
     parseAndConfigureFacets(new Facets(new SimpleFacetParameter(field)), query);
     List<String> suggestions = new ArrayList<>();
