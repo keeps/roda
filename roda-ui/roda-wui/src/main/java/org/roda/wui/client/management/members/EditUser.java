@@ -122,7 +122,7 @@ public class EditUser extends Composite {
 
     title.setText(user.getFullName());
     title.setIconClass("User");
-    title.addStyleName("mb-20");
+    title.addStyleName("mb-16");
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");

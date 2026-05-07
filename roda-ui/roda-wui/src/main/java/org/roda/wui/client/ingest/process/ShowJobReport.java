@@ -1,66 +1,55 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
-/**
- *
- */
 package org.roda.wui.client.ingest.process;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.Widget;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.wui.client.common.JobReportActionsToolbar;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.labels.Header;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.StringUtils;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientMessages;
+import java.util.List;
 
 /**
- * @author Luis Faria
  *
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class ShowJobReport extends Composite {
-
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 3) {
-        String jobId = historyTokens.get(0);
         String jobReportId = historyTokens.get(2);
-        retrieveJobReport(jobReportId, callback);
+        Services services = new Services("Get job report items", "get");
+
+        services.jobReportResource(s -> s.findByUuid(jobReportId, LocaleInfo.getCurrentLocale().getLocaleName()))
+          .thenCompose(indexedReport -> services
+            .jobsResource(s -> s.getJobReport(indexedReport.getJobId(), jobReportId)).whenComplete((reports, error) -> {
+              if (reports != null) {
+                indexedReport.setReports(reports.getReports());
+                ShowJobReport showJob = new ShowJobReport(indexedReport);
+                callback.onSuccess(showJob);
+              } else if (error != null) {
+                callback.onFailure(error);
+              }
+            }));
       } else {
         HistoryUtils.newHistory(IngestProcess.RESOLVER);
         callback.onSuccess(null);
@@ -69,7 +58,6 @@ public class ShowJobReport extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      // TODO check for show job permission
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {IngestProcess.RESOLVER}, false, callback);
     }
 
@@ -84,239 +72,62 @@ public class ShowJobReport extends Composite {
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, ShowJobReport> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  // empty to get all report information
-  private static final List<String> fieldsToReturn = new ArrayList<>();
-
-  private static IndexedReport jobReport = new IndexedReport();
-
-  @UiField
-  Label instanceIdLabel;
-  @UiField
-  Label instanceIdValue;
-
-  @UiField
-  Anchor job;
-  @UiField
-  Label outcomeObjectLabel;
-  @UiField
-  Anchor outcomeObject;
-  @UiField
-  HTML outcomeObjectState;
-
-  @UiField
-  Label sourceObjectLabel;
-  @UiField
-  Anchor sourceObject;
-  @UiField
-  Label dateCreated;
-  @UiField
-  Label dateUpdated;
-  @UiField
-  Label duration;
-  @UiField
-  HTML status;
-  // FIXME 20160606 hsilva: added jobStateDetails
-  @UiField
-  Label progress;
-  @UiField
-  FlowPanel reportAttributes;
-  @UiField
-  FlowPanel reportItems;
-  @UiField
-  FlowPanel ingestTypePanel;
-  @UiField
-  Label ingestType;
-  @UiField
-  Button searchPrevious, searchNext, buttonBack;
   @UiField
   FocusPanel keyboardFocus;
 
-  private static void retrieveJobReport(String jobReportId, AsyncCallback<Widget> callback) {
-    Services services = new Services("Get job report items", "get");
+  @UiField
+  NavigationToolbar<IndexedReport> navigationToolbar;
 
-    services.jobReportResource(s -> s.findByUuid(jobReportId, LocaleInfo.getCurrentLocale().getLocaleName()))
-      .thenCompose(indexedReport -> services.jobsResource(s -> s.getJobReport(indexedReport.getJobId(), jobReportId))
-        .whenComplete((reports, error) -> {
-          if (reports != null) {
-            indexedReport.setReports(reports.getReports());
-            ShowJobReport showJob = new ShowJobReport(indexedReport);
-            callback.onSuccess(showJob);
-          } else if (error != null) {
-            callback.onFailure(error);
-          }
-        }));
-  }
+  @UiField
+  JobReportActionsToolbar actionsToolbar;
 
-  public ShowJobReport(IndexedReport jobReport) {
-    this.jobReport = jobReport;
+  @UiField
+  TitlePanel title;
 
+  @UiField
+  FlowPanel content;
+
+  @UiField
+  Header tasksHeader;
+
+  @UiField
+  FlowPanel lowerContent;
+
+  public ShowJobReport(IndexedReport report) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    if (jobReport.getInstanceId() != null) {
-      instanceIdValue.setText(jobReport.getInstanceId());
-    } else {
-      instanceIdLabel.setVisible(false);
-      instanceIdValue.setVisible(false);
-    }
+    navigationToolbar.withObject(report).build();
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getJobReportBreadcrumbs(report));
 
-    job.setText(jobReport.getJobName());
-    job.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
-    outcomeObjectState.setVisible(false);
+    title.setIconClass("IndexedReport");
+    title.setText(messages.reportTitle());
+    title.addStyleName("mb-16");
 
-    boolean hasSource = !jobReport.getSourceObjectOriginalIds().isEmpty() || !jobReport.getSourceObjectId().isEmpty();
+    actionsToolbar.setObjectAndBuild(report, null, null);
+    actionsToolbar.setLabel("Report");
 
-    if (hasSource) {
-      String idText = !jobReport.getSourceObjectOriginalIds().isEmpty()
-        ? " (" + StringUtils.prettyPrint(jobReport.getSourceObjectOriginalIds()) + ")"
-        : "";
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse");
 
-      if (StringUtils.isNotBlank(jobReport.getSourceObjectOriginalName())) {
-        sourceObject.setText(jobReport.getSourceObjectOriginalName() + idText);
-      } else if (StringUtils.isNotBlank(jobReport.getSourceObjectLabel())) {
-        sourceObject.setText(jobReport.getSourceObjectLabel() + idText);
-      } else if (StringUtils.isNotBlank(jobReport.getSourceObjectId())) {
-        sourceObject.setText(jobReport.getSourceObjectId() + idText);
-      } else {
-        hasSource = false;
-      }
+    content.add(new JobReportDetailsPanel(report));
 
-      // sourceObject.setTitle(jobReport.getSourceObjectOriginalName());
-      sourceObject.setHref(HistoryUtils.createHistoryHashLink(
-        HistoryUtils.getHistoryUuidResolver(jobReport.getSourceObjectClass(), jobReport.getSourceObjectId())));
-      sourceObjectLabel.setText(messages.jobReportSource(jobReport.getSourceObjectClass()));
-    }
+    tasksHeader.setHeaderText(messages.reportRunTasks());
+    tasksHeader.setLevel(5);
 
-    sourceObjectLabel.setVisible(hasSource);
-    sourceObject.setVisible(hasSource);
+    lowerContent.addStyleName("collapsible-card-list");
 
-    boolean hasOutcome = StringUtils.isNotBlank(jobReport.getOutcomeObjectId())
-      && !jobReport.getOutcomeObjectId().equals(jobReport.getSourceObjectId());
-    if (hasOutcome) {
-      if (jobReport.getOutcomeObjectLabel() != null) {
-        outcomeObject.setText(jobReport.getOutcomeObjectLabel());
-      } else if (jobReport.getOutcomeObjectId() != null) {
-        outcomeObject.setText(jobReport.getOutcomeObjectId());
-      } else {
-        hasOutcome = false;
-      }
+    for (Report item : report.getReports()) {
+      JobReportItemPanel itemPanel = new JobReportItemPanel(item);
+      // Optional: add a bottom margin so they don't stick together
+      itemPanel.addStyleName("mb-16");
 
-      // outcomeObject.setTitle(jobReport.getSourceObjectOriginalName());
-      outcomeObject.setHref(HistoryUtils.createHistoryHashLink(
-        HistoryUtils.getHistoryUuidResolver(jobReport.getOutcomeObjectClass(), jobReport.getOutcomeObjectId())));
-      outcomeObjectLabel.setText(messages.jobReportOutcome(jobReport.getOutcomeObjectClass()));
-      outcomeObjectState.setHTML(HtmlSnippetUtils.getAIPStateHTML(jobReport.getOutcomeObjectState()));
-    }
-
-    outcomeObject.setVisible(hasOutcome);
-    outcomeObjectState.setVisible(hasOutcome);
-    outcomeObjectLabel.setVisible(hasOutcome);
-    dateCreated.setText(Humanize.formatDateTime(jobReport.getDateCreated()));
-    dateUpdated.setText(Humanize.formatDateTime(jobReport.getDateUpdated()));
-    duration.setText(Humanize.durationInDHMS(jobReport.getDateCreated(), jobReport.getDateUpdated(), DHMSFormat.LONG));
-    status.setHTML(HtmlSnippetUtils.getPluginStateHTML(jobReport.getPluginState()));
-    progress.setText(messages.showJobReportProgress(jobReport.getCompletionPercentage(), jobReport.getStepsCompleted(),
-      jobReport.getTotalSteps()));
-
-    ListSelectionUtils.bindLayout(jobReport, searchPrevious, searchNext, keyboardFocus, true, false, false);
-
-    // If it is an ingestion, creates a panel to render the type of Ingestion
-    if (jobReport.getIngestType() != null) {
-      ingestType
-        .setText(jobReport.getIngestType().equals("NEW") ? messages.newIngestion() : messages.ingestionUpdate());
-    } else {
-      ingestTypePanel.setVisible(false);
-    }
-
-    for (Report reportItem : jobReport.getReports()) {
-      FlowPanel panel = new FlowPanel();
-      panel.setStyleName("panel");
-      panel.addStyleName("panel-counter");
-      reportItems.add(panel);
-
-      FlowPanel panelHeading = new FlowPanel();
-      panelHeading.setStyleName("panel-heading");
-      Label panelTitle = new Label(reportItem.getTitle());
-
-      HTML pluginMandatoryHTML = new HTML(HtmlSnippetUtils.getPluginMandatoryHTML(reportItem.getPluginIsMandatory()));
-      pluginMandatoryHTML.addStyleName("small");
-
-      panelTitle.setStyleName("panel-title");
-      panelHeading.add(panelTitle);
-      panelHeading.add(pluginMandatoryHTML);
-      panel.add(panelHeading);
-
-      FlowPanel panelBody = new FlowPanel();
-      panelBody.addStyleName("panel-body");
-      panel.add(panelBody);
-
-      Label attributeLabel = new Label(messages.reportAgent());
-      attributeLabel.setStyleName("label");
-      panelBody.add(attributeLabel);
-
-      String text;
-      if (StringUtils.isNotBlank(reportItem.getPluginVersion())) {
-        text = messages.pluginLabelWithVersion(reportItem.getPlugin(), reportItem.getPluginVersion());
-      } else {
-        text = messages.pluginLabel(reportItem.getPlugin());
-      }
-
-      Label attributeValue = new Label(text);
-      attributeValue.setStyleName("value");
-      panelBody.add(attributeValue);
-
-      attributeLabel = new Label(messages.reportStartDatetime());
-      attributeLabel.setStyleName("label");
-      panelBody.add(attributeLabel);
-      attributeValue = new Label(Humanize.formatDateTime(reportItem.getDateCreated()));
-      attributeValue.setStyleName("value");
-      panelBody.add(attributeValue);
-
-      attributeLabel = new Label(messages.reportEndDatetime());
-      attributeLabel.setStyleName("label");
-      panelBody.add(attributeLabel);
-      attributeValue = new Label(Humanize.formatDateTime(reportItem.getDateUpdated()));
-      attributeValue.setStyleName("value");
-      panelBody.add(attributeValue);
-
-      attributeLabel = new Label(messages.reportOutcome());
-      attributeLabel.setStyleName("label");
-      panelBody.add(attributeLabel);
-      HTML outcomeHTML = new HTML(HtmlSnippetUtils.getPluginStateHTML(reportItem.getPluginState()));
-      panelBody.add(outcomeHTML);
-
-      if (reportItem.getPluginDetails() != null && !"".equals(reportItem.getPluginDetails())) {
-        attributeLabel = new Label(messages.reportOutcomeDetails());
-        attributeLabel.setStyleName("label");
-        panelBody.add(attributeLabel);
-        if (reportItem.isHtmlPluginDetails()) {
-          attributeValue = new HTML(SafeHtmlUtils.fromTrustedString(reportItem.getPluginDetails()));
-        } else {
-          attributeValue = new Label(reportItem.getPluginDetails());
-        }
-        attributeValue.addStyleName("code-pre");
-        panelBody.add(attributeValue);
-      }
-    }
-
-    Element firstElement = this.getElement().getFirstChildElement();
-    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
-      firstElement.removeFromParent();
+      lowerContent.add(itemPanel);
     }
   }
 
-  @UiHandler("buttonBack")
-  void buttonCancelHandler(ClickEvent e) {
-    cancel();
+  interface MyUiBinder extends UiBinder<Widget, ShowJobReport> {
   }
-
-  private void cancel() {
-    HistoryUtils.newHistory(ShowJob.RESOLVER, jobReport.getJobId());
-  }
-
 }

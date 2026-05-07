@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Panel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.ip.AIP;
@@ -68,10 +70,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import config.i18n.client.ClientMessages;
 
 public class PluginParameterPanel extends Composite {
-  public static final String FORM_SELECTBOX = "form-selectbox";
-  public static final String FORM_TEXTBOX_SMALL = "form-textbox-small";
-  public static final String FORM_RADIOBUTTON = "form-radiobutton";
-  public static final String FORM_RADIOGROUP = "form-radiogroup";
+  public static final String FORM_SELECTBOX = "form-listbox";
   public static final String FORM_LABEL = "form-label";
   public static final String FORM_TEXTBOX = "form-textbox";
   public static final String OBJECT_BOX = "object box";
@@ -89,34 +88,16 @@ public class PluginParameterPanel extends Composite {
   private String aipTitle;
   private boolean conversionPanel = false;
 
-  public PluginParameterPanel(PluginParameter parameter) {
-    super();
-    this.parameter = parameter;
-
-    this.pluginId = null;
-
-    layout = new FlowPanel();
-
-    initWidget(layout);
-
-    updateLayout();
-
-    layout.addStyleName("plugin-options-parameter");
-  }
-
   public PluginParameterPanel(PluginParameter parameter, String pluginId) {
     super();
     this.parameter = parameter;
-
     this.pluginId = pluginId;
-
     layout = new FlowPanel();
 
     initWidget(layout);
 
     updateLayout();
-
-    layout.addStyleName("plugin-options-parameter");
+    layout.addStyleName("plugin-option-parameter");
   }
 
   private void updateLayout() {
@@ -160,20 +141,24 @@ public class PluginParameterPanel extends Composite {
   private void createConversionLayout() {
     conversionPanel = true;
     Label parameterName = new Label(parameter.getName());
+    parameterName.addStyleName(FORM_LABEL);
     final ListBox dropdown = new ListBox();
     dropdown.addStyleName(FORM_SELECTBOX);
-    dropdown.addStyleName(FORM_TEXTBOX_SMALL);
 
-    dropdown.addItem("Representation", ConversionProfileOutcomeType.REPRESENTATION.toString());
-    dropdown.addItem("Dissemination", ConversionProfileOutcomeType.DISSEMINATION.toString());
+    dropdown.addItem(messages.conversionProfileRepresentationParameter(),
+      ConversionProfileOutcomeType.REPRESENTATION.toString());
+    dropdown.addItem(messages.conversionProfileDisseminationParameter(),
+      ConversionProfileOutcomeType.DISSEMINATION.toString());
 
     value = dropdown.getSelectedValue();
     FlowPanel innerPanel = new FlowPanel();
+    innerPanel.addStyleName("plugin-option-nested-panel");
     dropdown.addChangeHandler(event -> {
       value = dropdown.getSelectedValue();
       innerPanel.clear();
 
       FlowPanel profiles = new FlowPanel();
+      profiles.addStyleName("plugin-option-nested-panel");
       createConversionProfileLayout(profiles, value, pluginId);
       innerPanel.add(profiles);
 
@@ -182,14 +167,14 @@ public class PluginParameterPanel extends Composite {
         ValueChangeHandler<String> typeChanged = typeChangedEvent -> representationParameter
           .setValue(typeChangedEvent.getValue());
 
-        innerPanel.add(createRepresentationType(messages.representationTypeTitle(),
-          messages.representationTypeDescription(), typeChanged));
+        createRepresentationType(innerPanel, messages.representationTypeTitle(),
+          messages.representationTypeDescription(), typeChanged);
         ValueChangeHandler<Boolean> preservationStatusChanged = preservationStatusChangedEvent -> representationParameter
           .setMarkAsPreservation(preservationStatusChangedEvent.getValue());
 
-        innerPanel
-          .add(createBooleanLayout(messages.changeRepresentationStatusToPreservationTitle(), Boolean.toString(true),
-            messages.changeRepresentationStatusToPreservationDescription(), false, preservationStatusChanged));
+        createBooleanLayout(innerPanel, messages.changeRepresentationStatusToPreservationTitle(),
+          Boolean.toString(true), messages.changeRepresentationStatusToPreservationDescription(), false,
+          preservationStatusChanged);
 
         value = RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION;
       } else {
@@ -199,11 +184,12 @@ public class PluginParameterPanel extends Composite {
         ValueChangeHandler<String> descriptionChanged = descriptionChangedEvent -> disseminationParameter
           .setDescription(descriptionChangedEvent.getValue());
 
-        innerPanel.add(createTextBoxLayout(messages.disseminationTitle(), disseminationParameter.getTitle(),
-          messages.disseminationTitleDescription(), false, titleChanged));
-        innerPanel
-          .add(createTextBoxLayout(messages.disseminationDescriptionTitle(), disseminationParameter.getDescription(),
-            messages.disseminationDescriptionDescription(), false, descriptionChanged));
+        createTextBoxLayout(innerPanel, messages.disseminationTitle(), disseminationParameter.getTitle(),
+          messages.disseminationTitleDescription(), false, titleChanged);
+
+        createTextBoxLayout(innerPanel, messages.disseminationDescriptionTitle(),
+          disseminationParameter.getDescription(), messages.disseminationDescriptionDescription(), false,
+          descriptionChanged);
 
         value = RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION;
       }
@@ -226,14 +212,13 @@ public class PluginParameterPanel extends Composite {
     DomEvent.fireNativeEvent(Document.get().createChangeEvent(), listBox);
   }
 
-  private FlowPanel createRepresentationType(String name, String description,
+  private void createRepresentationType(FlowPanel panel, String name, String description,
     ValueChangeHandler<String> changeHandler) {
-    FlowPanel panel = new FlowPanel();
     Label parameterName = new Label(name);
+    parameterName.addStyleName(FORM_LABEL);
 
     final ListBox selectBox = new ListBox();
     selectBox.addStyleName(FORM_SELECTBOX);
-    selectBox.addStyleName(FORM_TEXTBOX_SMALL);
     selectBox.setTitle("representation type box");
 
     Services services = new Services("Retrieve representation type options", "get");
@@ -256,8 +241,8 @@ public class PluginParameterPanel extends Composite {
     final TextBox newTypeBox = new TextBox();
     final Label newTypeLabel = new Label(messages.entityTypeNewLabel() + ": ");
     newTypeBox.getElement().setPropertyString("placeholder", messages.entityTypeNewLabel());
-    newTypeBox.addStyleName("form-textbox wui-dialog-message plugin-representation-type-box");
-    newTypeLabel.addStyleName("plugin-representation-type-label");
+    newTypeBox.addStyleName(FORM_TEXTBOX);
+    newTypeLabel.addStyleName(FORM_LABEL);
     newTypeLabel.setVisible(false);
     newTypeBox.setVisible(false);
     newTypeBox.addValueChangeHandler(changeHandler);
@@ -270,26 +255,23 @@ public class PluginParameterPanel extends Composite {
     });
 
     panel.add(parameterName);
-    addHelp(panel, description);
     panel.add(selectBox);
     panel.add(newTypeLabel);
     panel.add(newTypeBox);
-
-    return panel;
+    addHelp(panel, description);
   }
 
   private void createRepresentationTypeLayout(PluginParameter parameter) {
     ValueChangeHandler<String> handler = event -> value = event.getValue();
 
-    FlowPanel panel = createRepresentationType(parameter.getName(), parameter.getDescription(), handler);
-    layout.add(panel);
+    createRepresentationType(layout, parameter.getName(), parameter.getDescription(), handler);
   }
 
   private void createSelectSeverityLayout() {
     Label parameterName = new Label(parameter.getName());
+    parameterName.addStyleName(FORM_LABEL);
     final ListBox severityBox = new ListBox();
     severityBox.addStyleName(FORM_SELECTBOX);
-    severityBox.addStyleName(FORM_TEXTBOX_SMALL);
 
     for (SeverityLevel severity : SeverityLevel.values()) {
       severityBox.addItem(messages.severityLevel(severity), severity.toString());
@@ -307,6 +289,7 @@ public class PluginParameterPanel extends Composite {
 
   private void createSelectRiskLayout() {
     Label parameterName = new Label(parameter.getName());
+    parameterName.addStyleName(FORM_LABEL);
     IncrementalAssociativeList list = new IncrementalAssociativeList(IndexedRisk.class, RodaConstants.RISK_ID,
       RodaConstants.INDEX_SEARCH, messages.getRisksDialogName());
 
@@ -412,10 +395,11 @@ public class PluginParameterPanel extends Composite {
     layout.add(parameterName);
     layout.add(button);
     layout.add(editPanel);
+    addHelp();
 
     parameterName.addStyleName(FORM_LABEL);
     aipPanel.addStyleName("itemPanel");
-    button.addStyleName("form-button btn btn-play");
+    button.addStyleName("btn btn-play");
     buttonsPanel.addStyleName("itemButtonsPanel");
     editButton.addStyleName("toolbarLink toolbarLinkSmall");
     removeButton.addStyleName("toolbarLink toolbarLinkSmall");
@@ -423,9 +407,10 @@ public class PluginParameterPanel extends Composite {
 
   private void createSelectRodaObjectLayout() {
     Label parameterName = new Label(parameter.getName());
+    parameterName.addStyleName(FORM_LABEL);
+
     final ListBox objectBox = new ListBox();
     objectBox.addStyleName(FORM_SELECTBOX);
-    objectBox.addStyleName(FORM_TEXTBOX_SMALL);
 
     Services services = new Services("Retrieve indexed plugin object classes", "get");
     services.configurationsResource(ConfigurationRestService::retrieveReindexPluginObjectClasses)
@@ -451,9 +436,9 @@ public class PluginParameterPanel extends Composite {
 
   private void createDropdownLayout() {
     Label parameterName = new Label(parameter.getName());
+    parameterName.addStyleName(FORM_LABEL);
     final ListBox dropdown = new ListBox();
     dropdown.addStyleName(FORM_SELECTBOX);
-    dropdown.addStyleName(FORM_TEXTBOX_SMALL);
 
     Services services = new Services("Retrieve dropdown plugin parameter items", "get");
     services
@@ -485,13 +470,10 @@ public class PluginParameterPanel extends Composite {
   private void createConversionProfileLayout(FlowPanel result, String repOrDip, String pluginId) {
     Set<ConversionProfile> treeSet = new HashSet<>();
     Label parameterName = new Label(messages.conversionProfileTitle());
-    final Label description = new Label();
+    parameterName.addStyleName(FORM_LABEL);
+    final Label descriptionHelper = new Label();
     final ListBox dropdown = new ListBox();
     dropdown.addStyleName(FORM_SELECTBOX);
-    dropdown.addStyleName(FORM_TEXTBOX_SMALL);
-
-    FlowPanel panel = new FlowPanel();
-    FlowPanel descriptionPanel = new FlowPanel();
 
     Services services = new Services("Retrieve conversion profiles", "get");
     services
@@ -503,14 +485,14 @@ public class PluginParameterPanel extends Composite {
 
           for (ConversionProfile item : treeSet) {
             dropdown.addItem(item.getTitle(), item.getProfile());
-            description.setText(item.getDescription());
-            description.addStyleName(FORM_HELP);
+            descriptionHelper.setText(item.getDescription());
+            descriptionHelper.addStyleName(FORM_HELP);
           }
 
           profile = dropdown.getSelectedValue();
           for (ConversionProfile conversionProfile : treeSet) {
             if (conversionProfile.getProfile().equals(profile)) {
-              description.setText(conversionProfile.getDescription());
+              descriptionHelper.setText(conversionProfile.getDescription());
               break;
             }
           }
@@ -519,21 +501,16 @@ public class PluginParameterPanel extends Composite {
             profile = dropdown.getSelectedValue();
             for (ConversionProfile conversionProfile : treeSet) {
               if (conversionProfile.getProfile().equals(profile)) {
-                description.setText(conversionProfile.getDescription());
+                descriptionHelper.setText(conversionProfile.getDescription());
                 break;
               }
             }
           });
 
-          panel.add(dropdown);
-          descriptionPanel.add(description);
-          panel.addStyleName("conversion-profile");
-
           dropdown.setTitle(OBJECT_BOX);
           result.add(parameterName);
-          addHelp(result, messages.conversionProfileDescription());
-          result.add(panel);
-          result.add(descriptionPanel);
+          result.add(dropdown);
+          result.add(descriptionHelper);
         }
       });
   }
@@ -546,10 +523,15 @@ public class PluginParameterPanel extends Composite {
       .whenComplete((objectClassFields, throwable) -> {
         if (throwable == null) {
           final List<String> selectedFields = new ArrayList<>();
+
+          // 1. Create the wrapper for your checkboxes
           FlowPanel group = new FlowPanel();
+          // Apply the custom flexbox container class to get the 0.4rem gap
+          group.addStyleName("checkbox-group");
+
           Label parameterName = new Label(parameter.getName());
+          parameterName.addStyleName(FORM_LABEL);
           layout.add(parameterName);
-          addHelp();
 
           for (String field : objectClassFields.getObjectClassFields().get(className)) {
             final String classField = className
@@ -562,7 +544,8 @@ public class PluginParameterPanel extends Composite {
             }
 
             group.add(box);
-            box.addStyleName(FORM_RADIOBUTTON);
+            // 2. Apply your custom material icon checkbox style
+            box.addStyleName("my-custom-checkbox");
 
             box.addValueChangeHandler(event -> {
               if (Boolean.TRUE.equals(event.getValue())) {
@@ -577,7 +560,8 @@ public class PluginParameterPanel extends Composite {
           if (File.class.getSimpleName().equals(className)) {
             CheckBox box = new CheckBox(messages.atLeastOneOfAbove());
             group.add(box);
-            box.addStyleName(FORM_RADIOBUTTON);
+            // 2. Apply your custom material icon checkbox style here as well
+            box.addStyleName("my-custom-checkbox");
 
             if (defaultValues.contains(RodaConstants.ONE_OF_FORMAT_FIELDS)) {
               box.setValue(true);
@@ -596,26 +580,29 @@ public class PluginParameterPanel extends Composite {
 
           value = StringUtils.join(selectedFields, ",");
           layout.add(group);
-          group.addStyleName(FORM_RADIOGROUP);
-          parameterName.addStyleName(FORM_LABEL);
+          addHelp();
         }
       });
   }
 
   private void createPermissionTypesLayout() {
     final List<String> selectedTypes = new ArrayList<>();
-    FlowPanel group = new FlowPanel();
     Label parameterName = new Label(parameter.getName());
+    parameterName.addStyleName(FORM_LABEL);
     layout.add(parameterName);
-    addHelp();
+
+    // Create a wrapper for the checkboxes
+    FlowPanel checkboxContainer = new FlowPanel();
+    checkboxContainer.addStyleName("checkbox-group");
 
     for (PermissionType permissionType : PermissionType.values()) {
       CheckBox box = new CheckBox(permissionType.toString());
       box.setValue(true);
       selectedTypes.add(permissionType.toString());
 
-      group.add(box);
-      box.addStyleName(FORM_RADIOBUTTON);
+      // Add the checkbox to the inner container instead of the main layout
+      checkboxContainer.add(box);
+      box.addStyleName("my-custom-checkbox");
 
       box.addValueChangeHandler(event -> {
         if (Boolean.TRUE.equals(event.getValue())) {
@@ -627,61 +614,73 @@ public class PluginParameterPanel extends Composite {
       });
     }
 
+    // Add the grouped container to the main layout
+    layout.add(checkboxContainer);
+
     value = StringUtils.join(selectedTypes, ",");
-    layout.add(group);
-    group.addStyleName(FORM_RADIOGROUP);
-    parameterName.addStyleName(FORM_LABEL);
+    addHelp();
   }
 
   private void createPluginSipToAipLayout() {
-    List<PluginType> plugins = Arrays.asList(PluginType.SIP_TO_AIP);
+    List<PluginType> plugins = List.of(PluginType.SIP_TO_AIP);
     Services services = new Services("Retrieve plugin information", "get");
-    services.configurationsResource(s -> s.retrievePluginsInfo(plugins, false)).whenComplete((pluginInfoList, throwable) -> {
-      if (throwable == null) {
-        Label parameterName = new Label(parameter.getName());
-        layout.add(parameterName);
-        addHelp();
+    services
+      .configurationsResource(s -> s.retrievePluginsInfo(plugins, false, LocaleInfo.getCurrentLocale().getLocaleName()))
+      .whenComplete((pluginInfoList, throwable) -> {
+        if (throwable == null) {
+          Label parameterName = new Label(parameter.getName());
+          parameterName.addStyleName(FORM_LABEL);
+          layout.add(parameterName);
 
-        FlowPanel radioGroup = new FlowPanel();
-        PluginUtils.sortByName(pluginInfoList.getPluginInfoList());
+          FlowPanel radioGroup = new FlowPanel();
+          // Use a custom class for the outer group
+          radioGroup.addStyleName("radio-group-container");
+          PluginUtils.sortByName(pluginInfoList.getPluginInfoList());
 
-        for (final PluginInfo pluginInfo : pluginInfoList.getPluginInfoList()) {
-          if (pluginInfo != null) {
-            RadioButton pRadio = new RadioButton(parameter.getName(),
-              messages.pluginLabelWithVersion(pluginInfo.getName(), pluginInfo.getVersion()));
+          for (final PluginInfo pluginInfo : pluginInfoList.getPluginInfoList()) {
+            if (pluginInfo != null) {
+              // Create a wrapper for this specific option
+              FlowPanel optionWrapper = new FlowPanel();
+              optionWrapper.addStyleName("radio-option-wrapper");
 
-            if (pluginInfo.getId().equals(parameter.getDefaultValue())) {
-              pRadio.setValue(true);
-              value = pluginInfo.getId();
-            }
+              RadioButton pRadio = new RadioButton(parameter.getName(),
+                messages.pluginLabelWithVersion(pluginInfo.getName(), pluginInfo.getVersion()));
 
-            Label pHelp = new Label(pluginInfo.getDescription());
-            pRadio.setTitle("radio button");
-
-            radioGroup.add(pRadio);
-            radioGroup.add(pHelp);
-
-            pRadio.addStyleName(FORM_RADIOBUTTON);
-            pHelp.addStyleName(FORM_HELP);
-
-            pRadio.addValueChangeHandler(event -> {
-              if (Boolean.TRUE.equals(event.getValue())) {
+              if (pluginInfo.getId().equals(parameter.getDefaultValue())) {
+                pRadio.setValue(true);
                 value = pluginInfo.getId();
               }
-            });
+
+              Label pHelp = new Label(pluginInfo.getDescription());
+              pRadio.setTitle("radio button");
+
+              pRadio.addStyleName("my-custom-radio"); // Consistent with your checkboxes
+              pHelp.addStyleName("radio-option-help");
+
+              // Add elements to the wrapper, NOT directly to the group
+              optionWrapper.add(pRadio);
+              optionWrapper.add(pHelp);
+
+              // Add the wrapper to the main group
+              radioGroup.add(optionWrapper);
+
+              pRadio.addValueChangeHandler(event -> {
+                if (Boolean.TRUE.equals(event.getValue())) {
+                  value = pluginInfo.getId();
+                }
+              });
+            }
           }
+
+          layout.add(radioGroup);
+          addHelp();
         }
-
-        layout.add(radioGroup);
-
-        radioGroup.addStyleName(FORM_RADIOGROUP);
-        parameterName.addStyleName(FORM_LABEL);
-      }
-    });
+      });
   }
 
   private void createIntegerLayout() {
     Label parameterName = new Label(parameter.getName());
+    parameterName.addStyleName(FORM_LABEL);
     IntegerBox parameterBox = new IntegerBox();
     if (parameter.getDefaultValue() != null) {
       parameterBox.setText(parameter.getDefaultValue());
@@ -689,98 +688,76 @@ public class PluginParameterPanel extends Composite {
     }
 
     parameterBox.setTitle("parameter box");
+    parameterBox.addStyleName(FORM_TEXTBOX);
+    parameterBox.addChangeHandler(event -> value = ((IntegerBox) event.getSource()).getValue().toString());
+
     layout.add(parameterName);
     layout.add(parameterBox);
     addHelp();
-
-    parameterName.addStyleName(FORM_LABEL);
-    parameterBox.addStyleName(FORM_TEXTBOX);
-
-    // binding change
-    parameterBox.addChangeHandler(event -> value = ((IntegerBox) event.getSource()).getValue().toString());
   }
 
   private void createStringLayout(PluginParameter parameter) {
     ValueChangeHandler<String> changeHandler = event -> value = event.getValue();
 
-    FlowPanel textBoxLayout = createTextBoxLayout(parameter.getName(), parameter.getDefaultValue(),
-      parameter.getDescription(), parameter.isReadonly(), changeHandler);
-    layout.add(textBoxLayout);
+    createTextBoxLayout(layout, parameter.getName(), parameter.getDefaultValue(), parameter.getDescription(),
+      parameter.isReadonly(), changeHandler);
   }
 
-  private FlowPanel createTextBoxLayout(String name, String defaultValue, String description, boolean isReadOnly,
-    ValueChangeHandler<String> valueChangeEvent) {
-
-    FlowPanel panel = new FlowPanel();
-
-    Label parameterName = new Label(name);
-    TextBox parameterBox = new TextBox();
+  private void createTextBoxLayout(FlowPanel targetPanel, String name, String defaultValue, String description,
+    boolean isReadOnly, ValueChangeHandler<String> valueChangeEvent) {
 
     if (defaultValue != null) {
-      parameterBox.setText(defaultValue);
       value = defaultValue;
     }
 
+    Label parameterName = new Label(name);
     parameterName.addStyleName(FORM_LABEL);
-    parameterBox.addStyleName(FORM_TEXTBOX);
+    targetPanel.add(parameterName);
 
-    parameterBox.setEnabled(!isReadOnly);
-    parameterBox.setTitle("parameter box");
+    if (isReadOnly) {
+      InlineHTML html = new InlineHTML();
+      html.setText(value);
+      targetPanel.add(html);
+    } else {
+      TextBox parameterBox = new TextBox();
+      parameterBox.addStyleName(FORM_TEXTBOX);
+      parameterBox.setText(value);
+      parameterBox.setTitle("parameter box");
+      parameterBox.addValueChangeHandler(valueChangeEvent);
+      targetPanel.add(parameterBox);
+    }
 
-    panel.add(parameterName);
-    addHelp(panel, description);
-    panel.add(parameterBox);
-
-    parameterBox.addValueChangeHandler(valueChangeEvent);
-
-    return panel;
+    addHelp(targetPanel, description);
   }
 
   private void createBooleanLayout(PluginParameter parameter) {
-    ValueChangeHandler<Boolean> changeHandler = event -> value = Boolean.TRUE.equals(event.getValue()) ? "true"
-      : "false";
-    layout.add(createBooleanLayout(parameter.getName(), parameter.getDefaultValue(), parameter.getDescription(),
-      parameter.isReadonly(), changeHandler));
+    ValueChangeHandler<Boolean> changeHandler = event -> value = Boolean
+      .toString(Boolean.TRUE.equals(event.getValue()));
+    createBooleanLayout(layout, parameter.getName(), parameter.getDefaultValue(), parameter.getDescription(),
+      parameter.isReadonly(), changeHandler);
   }
 
-  private FlowPanel createBooleanLayout(String name, String defaultValue, String description, boolean isReadOnly,
-    ValueChangeHandler<Boolean> valueChangeHandler) {
-    FlowPanel panel = new FlowPanel();
+  private void createBooleanLayout(FlowPanel panel, String name, String defaultValue, String description,
+    boolean isReadOnly, ValueChangeHandler<Boolean> valueChangeHandler) {
 
     CheckBox checkBox = new CheckBox(name);
     checkBox.setValue("true".equals(defaultValue));
-    value = "true".equals(defaultValue) ? "true" : "false";
+    value = Boolean.toString("true".equals(defaultValue));
     checkBox.setEnabled(!isReadOnly);
     checkBox.getElement().setTitle("checkbox");
 
-    checkBox.addStyleName("form-checkbox");
+    checkBox.addStyleName("my-custom-checkbox");
     checkBox.addValueChangeHandler(valueChangeHandler);
 
     panel.add(checkBox);
     addHelp(panel, description);
-
-    return panel;
-  }
-
-  private void createBooleanLayout() {
-    CheckBox checkBox = new CheckBox(parameter.getName());
-    checkBox.setValue("true".equals(parameter.getDefaultValue()));
-    value = "true".equals(parameter.getDefaultValue()) ? "true" : "false";
-    checkBox.setEnabled(!parameter.isReadonly());
-    checkBox.getElement().setTitle("checkbox");
-
-    layout.add(checkBox);
-    addHelp();
-
-    checkBox.addStyleName("form-checkbox");
-    checkBox.addValueChangeHandler(event -> value = Boolean.TRUE.equals(event.getValue()) ? "true" : "false");
   }
 
   private void addHelp() {
     addHelp(layout, parameter.getDescription());
   }
 
-  private void addHelp(FlowPanel panel, String description) {
+  private void addHelp(Panel panel, String description) {
     if (StringUtils.isNotBlank(description)) {
       Label pHelp = new Label(description);
       panel.add(pHelp);

@@ -13,6 +13,10 @@ import java.util.Map;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.HasSelectionHandlers;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -30,7 +34,7 @@ import config.i18n.client.ClientMessages;
  *
  * @author Alexandre Flores <aflores@keep.pt>
  */
-public class Tabs extends Composite {
+public class Tabs extends Composite implements HasSelectionHandlers<Integer> {
   protected static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static Tabs.MyUiBinder uiBinder = GWT.create(Tabs.MyUiBinder.class);
   private final Map<Widget, TabContentBuilder> tabs;
@@ -53,24 +57,6 @@ public class Tabs extends Composite {
       }
     };
     selectTab(null);
-  }
-
-  public void setStorageKey(String storageKey) {
-    this.storageKey = storageKey;
-
-    // Immediately attempt to restore the saved tab index
-    Storage sessionStorage = Storage.getSessionStorageIfSupported();
-    if (sessionStorage != null) {
-      String savedIndexStr = sessionStorage.getItem(storageKey);
-      if (savedIndexStr != null) {
-        try {
-          int activeIndex = Integer.parseInt(savedIndexStr);
-          selectTabByIndex(activeIndex);
-        } catch (NumberFormatException e) {
-          // If parsing fails, it safely ignores and keeps the default tab
-        }
-      }
-    }
   }
 
   public void setDefaultContent(TabContentBuilder tabContentBuilder) {
@@ -105,13 +91,6 @@ public class Tabs extends Composite {
     }
   }
 
-  public void addStaticElement(Widget widget) {
-    SimplePanel tabButtonContainer = new SimplePanel();
-    tabButtonContainer.addStyleName("tabButtonContainer");
-    tabButtonContainer.setWidget(widget);
-    tabButtons.add(tabButtonContainer);
-  }
-
   private ClickHandler createTabClickHandler(Widget tabButtonContainer) {
     return new ClickHandler() {
       @Override
@@ -135,7 +114,7 @@ public class Tabs extends Composite {
               sessionStorage.setItem(storageKey, String.valueOf(getSelectedTabIndex()));
             }
           }
-
+          SelectionEvent.fire(this, getSelectedTabIndex());
         } else {
           tab.getKey().removeStyleName("tabSelected");
         }
@@ -197,8 +176,13 @@ public class Tabs extends Composite {
     }
   }
 
+  @Override
+  public HandlerRegistration addSelectionHandler(SelectionHandler<Integer> handler) {
+    return addHandler(handler, SelectionEvent.getType());
+  }
+
   public interface TabContentBuilder {
-    public Widget buildTabWidget();
+    Widget buildTabWidget();
   }
 
   interface MyUiBinder extends UiBinder<Widget, Tabs> {

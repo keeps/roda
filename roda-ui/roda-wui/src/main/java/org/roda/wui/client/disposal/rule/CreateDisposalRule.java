@@ -125,7 +125,7 @@ public class CreateDisposalRule extends Composite {
 
     title.setText(messages.newDisposalRuleTitle());
     title.setIconClass("DisposalRule");
-    title.addStyleName("mb-20");
+    title.addStyleName("mb-16");
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");

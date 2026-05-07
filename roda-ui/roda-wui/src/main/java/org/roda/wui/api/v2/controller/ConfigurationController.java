@@ -18,7 +18,9 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.StringResponse;
+import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginInfoList;
+import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.properties.ConversionProfileOutcomeType;
@@ -34,6 +36,7 @@ import org.roda.wui.api.v2.services.ConfigurationsService;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.services.ConfigurationRestService;
 import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.model.RequestContext;
 import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.common.utils.RequestUtils;
@@ -130,14 +133,21 @@ public class ConfigurationController implements ConfigurationRestService {
   }
 
   @Override
-  public PluginInfoList retrievePluginsInfo(List<PluginType> types, boolean removeNotListable) {
+  public PluginInfoList retrievePluginsInfo(List<PluginType> types, boolean removeNotListable, String localeString) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       controllerAssistant.checkRoles(requestContext.getUser());
 
-      return RodaCoreFactory.getPluginManager().getPluginsInfo(types, removeNotListable);
+      PluginInfoList list = RodaCoreFactory.getPluginManager().getPluginsInfo(types, removeNotListable);
+      for (PluginInfo plugin : list.getPluginInfoList()) {
+        for (PluginParameter param : plugin.getParameters()) {
+          param.setName(I18nUtility.getMessage(param.getName(), param.getName(), localeString));
+        }
+      }
+
+      return list;
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);

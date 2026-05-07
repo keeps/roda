@@ -181,7 +181,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT, RodaConstants.PLUGIN_CATEGORY_MAINTENANCE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MAINTENANCE);
   }
 
   @Override

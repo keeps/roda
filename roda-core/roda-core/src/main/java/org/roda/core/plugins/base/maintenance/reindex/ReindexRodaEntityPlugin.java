@@ -255,7 +255,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_REINDEX, RodaConstants.PLUGIN_CATEGORY_MAINTENANCE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_REINDEX);
   }
 
   @Override

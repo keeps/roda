@@ -76,7 +76,8 @@ public interface ConfigurationRestService extends DirectRestService {
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
     @ApiResponse(responseCode = "403", description = "Access forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   PluginInfoList retrievePluginsInfo(@RequestParam(name = "type") List<PluginType> types,
-    @RequestParam(name = "removeNotListable", defaultValue = "true", required = false) boolean removeNotListable);
+    @RequestParam(name = "removeNotListable", defaultValue = "true", required = false) boolean removeNotListable,
+    @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
   @RequestMapping(method = RequestMethod.GET, path = "/plugins/reindex", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Retrieves a list of resources that are used by reindex plugins", responses = {

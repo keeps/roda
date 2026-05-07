@@ -2,6 +2,8 @@ package org.roda.wui.client.common.panels;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -18,9 +20,9 @@ import org.roda.wui.client.common.ActionsToolbar;
 public abstract class GenericMetadataCardPanel<T> extends Composite {
 
   protected final FlowPanel metadataContainer;
-  private final FlowPanel mainContainer;
-  private final FlowPanel headerContainer;
-  private final FlowPanel bodyContainer;
+  protected final FlowPanel mainContainer;
+  protected final FlowPanel headerContainer;
+  protected final FlowPanel bodyContainer;
 
   protected GenericMetadataCardPanel() {
     mainContainer = new FlowPanel();
@@ -63,7 +65,7 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
    * Core template method. It handles clearing, building the header, and building
    * the fields dynamically based on the provided data.
    */
-  public final void setData(T data) {
+  public void setData(T data) {
     if (data == null) {
       metadataContainer.clear();
       return;
@@ -123,6 +125,7 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
     private Widget widgetValue;
     private ClickHandler clickHandler;
     private boolean isPreCode = false;
+    private SafeHtml badgeHtml;
 
     private FieldBuilder(String labelText) {
       this.labelText = labelText;
@@ -150,6 +153,128 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
 
     public FieldBuilder onClick(ClickHandler handler) {
       this.clickHandler = handler;
+      return this;
+    }
+
+    /**
+     * Appends an inline badge generated from a SafeHtml helper right next to the
+     * value.
+     *
+     * @param badgeHtml
+     *          The fully constructed SafeHtml snippet
+     */
+    public FieldBuilder withInlineBadge(SafeHtml badgeHtml) {
+      this.badgeHtml = badgeHtml;
+      return this;
+    }
+
+    /**
+     * Builds a field where the value is styled as a badge.
+     *
+     * @param value         The text value to display inside the badge.
+     * @param badgeCssClass The CSS class for the badge style (e.g., "badge-success" or BADGE_TYPE.SUCCESS.getCssClass()).
+     */
+    public FieldBuilder withBadge(String value, String badgeCssClass) {
+      if (value == null || value.trim().isEmpty()) {
+        return this;
+      }
+
+      SafeHtmlBuilder sb = new SafeHtmlBuilder();
+
+      // Use fromTrustedString for the opening tag so we can dynamically inject the CSS class
+      sb.append(SafeHtmlUtils.fromTrustedString("<span class=\"" + badgeCssClass + "\">"));
+
+      // Automatically HTML-escape the user-provided value
+      sb.appendEscaped(value);
+
+      // Close the span
+      sb.appendHtmlConstant("</span>");
+
+      this.htmlValue = sb.toSafeHtml();
+      return this;
+    }
+
+    public FieldBuilder withMultilineStrings(Iterable<String> values) {
+      if (values == null) {
+        return this;
+      }
+
+      SafeHtmlBuilder sb = new SafeHtmlBuilder();
+      boolean hasElements = false;
+
+      sb.appendHtmlConstant("<div class=\"generic-multiline\">");
+      for (String val : values) {
+        if (val != null && !val.trim().isEmpty()) {
+          sb.appendHtmlConstant("<span>");
+          sb.appendEscaped(val); // Automatically escapes the string
+          sb.appendHtmlConstant("</span>");
+          hasElements = true;
+        }
+      }
+      sb.appendHtmlConstant("</div>");
+
+      if (hasElements) {
+        this.htmlValue = sb.toSafeHtml();
+      }
+
+      return this;
+    }
+
+    /**
+     * Builds a generic multiline container from a list of SafeHtml,
+     * wrapping each value in a span element.
+     */
+    public FieldBuilder withMultilineHtml(Iterable<SafeHtml> values) {
+      if (values == null) {
+        return this;
+      }
+
+      SafeHtmlBuilder sb = new SafeHtmlBuilder();
+      boolean hasElements = false;
+
+      sb.appendHtmlConstant("<div class=\"generic-multiline\">");
+      for (SafeHtml html : values) {
+        if (html != null && html.asString() != null && !html.asString().trim().isEmpty()) {
+          sb.appendHtmlConstant("<span>");
+          sb.append(html);
+          sb.appendHtmlConstant("</span>");
+          hasElements = true;
+        }
+      }
+      sb.appendHtmlConstant("</div>");
+
+      if (hasElements) {
+        this.htmlValue = sb.toSafeHtml();
+      }
+
+      return this;
+    }
+
+    public FieldBuilder withMultipleHtmlBadges(Iterable<SafeHtml> values) {
+      if (values == null) {
+        return this;
+      }
+
+      SafeHtmlBuilder sb = new SafeHtmlBuilder();
+      boolean hasElements = false;
+
+      // Start the wrapper div
+      sb.appendHtmlConstant("<div class=\"tags-inline-container\">");
+
+      for (SafeHtml html : values) {
+        if (html != null && html.asString() != null && !html.asString().trim().isEmpty()) {
+          sb.append(html);
+          hasElements = true;
+        }
+      }
+
+      // Close the wrapper div
+      sb.appendHtmlConstant("</div>");
+
+      if (hasElements) {
+        this.htmlValue = sb.toSafeHtml();
+      }
+
       return this;
     }
 
@@ -193,6 +318,12 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
       FlowPanel valueDiv = new FlowPanel();
       valueDiv.setStyleName("value");
       valueDiv.add(finalContentWidget);
+
+      // --- Append the inline SafeHtml badge if provided ---
+      if (badgeHtml != null) {
+        valueDiv.addStyleName("with-inline-badge"); // Add a helper class
+        valueDiv.add(new InlineHTML(badgeHtml));
+      }
 
       if (isPreCode) {
         valueDiv.addStyleName("code-pre");

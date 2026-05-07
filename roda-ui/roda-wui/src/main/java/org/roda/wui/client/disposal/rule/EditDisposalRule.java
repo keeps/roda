@@ -122,7 +122,7 @@ public class EditDisposalRule extends Composite {
 
     title.setText(disposalRule.getTitle());
     title.setIconClass("DisposalRule");
-    title.addStyleName("mb-20");
+    title.addStyleName("mb-16");
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");

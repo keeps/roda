@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+
+    <g:FlowPanel styleName="roda6Card mb-16">
+        <g:FlowPanel addStyleNames="cardBody">
+            <g:FlowPanel addStyleNames="generic-data-panel">
+                <g:FlowPanel addStyleNames="generic-data-panel-fields">
+                    <g:Label addStyleNames="form-separator">
+                        <ui:text from='{messages.createJobInformationTitle}'/>
+                    </g:Label>
+                    <g:FlowPanel addStyleNames="generic-form-field">
+                        <g:FlowPanel addStyleNames="generic-form-field-left-panel">
+                            <g:Label addStyleNames="form-label">
+                                <ui:text from='{messages.createJobName}'/>
+                            </g:Label>
+                        </g:FlowPanel>
+                        <g:FlowPanel addStyleNames="generic-form-field-input-panel full_width">
+                            <g:TextBox addStyleNames="form-textbox" ui:field="jobNameTextBox"/>
+                        </g:FlowPanel>
+                    </g:FlowPanel>
+
+                    <g:FlowPanel addStyleNames="generic-form-field">
+                        <g:FlowPanel addStyleNames="generic-form-field-left-panel">
+                            <g:Label addStyleNames="form-label">
+                                <ui:text from='{messages.createJobSelectObject}'/>
+                            </g:Label>
+                        </g:FlowPanel>
+                        <g:FlowPanel addStyleNames="generic-form-field-input-panel full_width">
+                            <g:ListBox addStyleNames="form-listbox" ui:field="runOnListBox"/>
+                        </g:FlowPanel>
+                    </g:FlowPanel>
+                </g:FlowPanel>
+            </g:FlowPanel>
+
+            <g:FlowPanel ui:field="targetListPanel"/>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>
+
+

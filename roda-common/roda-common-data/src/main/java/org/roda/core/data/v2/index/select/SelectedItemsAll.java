@@ -7,7 +7,6 @@
  */
 package org.roda.core.data.v2.index.select;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.roda.core.data.v2.IsRODAObject;
 
 import java.io.Serial;

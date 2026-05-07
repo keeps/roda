@@ -120,11 +120,6 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return createActionsMenu(actionableBundle, objects);
   }
 
-  public FlowPanel buildListWithObjectsAndDefaults(ActionableObject<T> objects) {
-    ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
-    return createActionsMenuWithDefaults(actionableBundle, objects);
-  }
-
   public FlowPanel buildListWithObjectsAndDefaults(ActionableObject<T> objects,
     List<Actionable.Action<T>> actionWhitelist, List<Actionable.Action<T>> actionBlacklist) {
     ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
@@ -168,15 +163,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return createGroupedActionsMenu(actionableBundle, objects, ungroupedActions);
   }
 
-  public FlowPanel buildUngroupedActions(ActionableObject<T> objects,
-                                         List<Actionable.Action<T>> ungroupedActions) {
-    ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
-
-    return createGroupedActionsMenu(actionableBundle, objects, ungroupedActions, true);
-  }
-
   // Internal (GUI elements creation)
-
   private FlowPanel createActionsMenu(ActionableBundle<T> actionableBundle, ActionableObject<T> objects) {
     FlowPanel panel = new FlowPanel();
     panel.addStyleName("actionable-menu");
@@ -347,7 +334,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
       Button groupButton = null;
       for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
         if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
-          && actionable.canAct(actionButton.getAction(), objects).canAct()
+          && actionable.contextCanAct(actionButton.getAction(), objects).canAct()
           && !ungroupedActions.contains(actionButton.getAction())) {
           ActionableTitle actionableTitle = actionGroup.getTitle();
 
@@ -402,7 +389,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
       for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
         if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
-          && actionable.canAct(actionButton.getAction(), objects).canAct()) {
+          && actionable.contextCanAct(actionButton.getAction(), objects).canAct()) {
 
           ActionButton<T> button = new ActionButton<>(actionButton);
 

@@ -8,74 +8,48 @@
 package org.roda.wui.client.common;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.StringUtils;
 
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class BadgePanel extends FlowPanel {
-  private HTML iconHTML;
 
-  private HTML notificationHTML;
-
-  private Label textLabel;
+  private final Label textLabel;
+  private String currentIconCss = "";
 
   public BadgePanel() {
     super();
     this.addStyleName("badge-panel");
 
-    iconHTML = new HTML();
-    iconHTML.addStyleName("badge-icon");
-    add(iconHTML);
-    iconHTML.setVisible(false);
-
     textLabel = new Label();
     textLabel.addStyleName("badge-label");
     add(textLabel);
-
-    notificationHTML = new HTML(HtmlSnippetUtils.getStackIcon("fas fa-sync-alt", "fas fa-question"));
-    notificationHTML.addStyleName("badge-notification");
-    notificationHTML.setVisible(false);
-    add(notificationHTML);
   }
 
   public void setIconClass(String classSimpleName) {
-    setIcon(ConfigurationManager.getString(RodaConstants.UI_ICONS_CLASS, classSimpleName));
-  }
 
-  public void setIcon(String iconCss) {
-    // set default if empty
-    if (StringUtils.isBlank(iconCss)) {
-      iconCss = "fa fa-question-circle";
+    // 1. Clean up previous icon classes if they exist
+    if (currentIconCss != null && !currentIconCss.isEmpty()) {
+      for (String cssClass : currentIconCss.split("\\s+")) {
+        this.removeStyleName(cssClass);
+      }
     }
 
-    setIcon(SafeHtmlUtils.fromSafeConstant("<i class=\"" + iconCss + "\"></i>"));
-  }
+    // 2. Apply the new icon classes directly to this panel
+    for (String cssClass : classSimpleName.split("\\s+")) {
+      this.addStyleName(cssClass);
+    }
 
-  public void setIcon(SafeHtml iconSafeHtml) {
-    iconHTML.setHTML(iconSafeHtml);
-    iconHTML.setVisible(true);
+    currentIconCss = classSimpleName;
   }
 
   public void setText(String text) {
-    textLabel.setTitle(text);
     textLabel.setText(text);
-  }
-
-  @Override
-  public void addStyleName(String style) {
-    super.addStyleName(style);
-  }
-
-  public void enableNotification(boolean value){
-    notificationHTML.setVisible(value);
   }
 }

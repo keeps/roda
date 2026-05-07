@@ -114,7 +114,7 @@ public class EditGroup extends Composite {
 
     title.setText(group.getFullName());
     title.setIconClass("Group");
-    title.addStyleName("mb-20");
+    title.addStyleName("mb-16");
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");

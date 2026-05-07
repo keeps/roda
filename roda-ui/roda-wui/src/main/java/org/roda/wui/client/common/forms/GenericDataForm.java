@@ -111,10 +111,10 @@ public class GenericDataForm<T> extends Composite implements GenericDataPanel<T>
     leftPanel.addStyleName("generic-form-field-left-panel");
 
     Label label = new Label(labelText);
-    if (mandatory) {
-      label.setText(labelText + " *");
-    }
     label.addStyleName("form-label");
+    if (mandatory) {
+      label.addStyleName("form-label-mandatory");
+    }
 
     FlowPanel inputPanel = new FlowPanel();
     inputPanel.addStyleName("generic-form-field-input-panel full_width");
@@ -176,10 +176,10 @@ public class GenericDataForm<T> extends Composite implements GenericDataPanel<T>
     leftPanel.addStyleName("generic-form-field-left-panel");
 
     Label label = new Label(labelText);
-    if (mandatory) {
-      label.setText(labelText + " *");
-    }
     label.addStyleName("form-label");
+    if (mandatory) {
+      label.addStyleName("form-label-mandatory");
+    }
 
     FlowPanel inputPanel = new FlowPanel();
     inputPanel.addStyleName("generic-form-field-input-panel full_width");
@@ -213,10 +213,10 @@ public class GenericDataForm<T> extends Composite implements GenericDataPanel<T>
     leftPanel.addStyleName("generic-form-field-left-panel");
 
     Label label = new Label(labelText);
-    if (mandatory) {
-      label.setText(labelText + " *");
-    }
     label.addStyleName("form-label");
+    if (mandatory) {
+      label.addStyleName("form-label-mandatory");
+    }
 
     FlowPanel inputPanel = new FlowPanel();
     inputPanel.addStyleName("generic-form-field-input-panel full_width");

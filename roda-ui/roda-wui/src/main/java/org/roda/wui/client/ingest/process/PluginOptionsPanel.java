@@ -21,12 +21,9 @@ import com.google.gwt.user.client.ui.FlowPanel;
 
 public class PluginOptionsPanel extends Composite {
 
+  private final List<PluginParameterPanel> panels;
+  private final FlowPanel layout;
   private PluginInfo pluginInfo = null;
-  private List<PluginInfo> plugins = new ArrayList<>();
-
-  private List<PluginParameterPanel> panels;
-
-  private FlowPanel layout;
 
   public PluginOptionsPanel() {
     super();
@@ -47,10 +44,6 @@ public class PluginOptionsPanel extends Composite {
         layout.add(panel);
       }
     }
-  }
-
-  public PluginInfo getPluginInfo() {
-    return pluginInfo;
   }
 
   public void setPluginInfo(PluginInfo pluginInfo) {
@@ -96,13 +89,4 @@ public class PluginOptionsPanel extends Composite {
 
     return missing;
   }
-
-  public List<PluginInfo> getPlugins() {
-    return plugins;
-  }
-
-  public void setPlugins(List<PluginInfo> plugins) {
-    this.plugins = plugins;
-  }
-
 }

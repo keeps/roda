@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -23,7 +22,6 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -62,7 +60,7 @@ public class SearchWrapper extends Composite {
     rootPanel = new FlowPanel();
     rootPanel.setStyleName("searchWrapper");
     mainPanel = new FlowPanel();
-    mainPanel.setStyleName("searchWrapperMainPanel roda6Card");
+    mainPanel.setStyleName("searchWrapperMainPanel");
     sidePanel = new FlowPanel();
     sidePanel.setStyleName("searchWrapperSidePanel");
     rootPanel.add(mainPanel);
@@ -84,7 +82,13 @@ public class SearchWrapper extends Composite {
   }
 
   public <T extends IsIndexed> SearchWrapper createListAndSearchPanel(ListBuilder<T> listBuilder,
-    boolean showSaveButton, boolean hideListAfterClear) {
+                                                                      boolean showSaveButton, boolean hideListAfterClear) {
+    return createListAndSearchPanel(listBuilder, showSaveButton, hideListAfterClear, "roda6Card");
+  }
+
+  public <T extends IsIndexed> SearchWrapper createListAndSearchPanel(ListBuilder<T> listBuilder,
+    boolean showSaveButton, boolean hideListAfterClear, String listClassForMainPanel) {
+    mainPanel.addStyleName(listClassForMainPanel);
     AsyncTableCell<T> list = listBuilder.build();
 
     SearchPanel<T> searchPanel;
@@ -135,10 +139,6 @@ public class SearchWrapper extends Composite {
     return this;
   }
 
-  private <T extends IsIndexed> void addShortcutButtons(SearchPanel<T> searchPanel) {
-
-  }
-
   public SelectedItems<? extends IsIndexed> getSelectedItemsInCurrentList() {
     String lookupClassSimpleName = searchPanelSelectionDropdown != null
       ? searchPanelSelectionDropdown.getSelectedValue()
@@ -180,13 +180,6 @@ public class SearchWrapper extends Composite {
     }
   }
 
-  private <T extends IsIndexed> void refreshList(Class<T> objectClass) {
-    AsyncTableCell<T> list = components.getList(objectClass);
-    if (list != null) {
-      list.refresh();
-    }
-  }
-
   public <T extends IsIndexed> void setFilter(String objectClassSimpleName, Filter filter) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClassSimpleName);
     if (searchPanel != null) {
@@ -201,49 +194,10 @@ public class SearchWrapper extends Composite {
     }
   }
 
-  public <T extends IsIndexed> void resetToDefaultFilter(String objectClassSimpleName) {
-    SearchPanel<T> searchPanel = components.getSearchPanel(objectClassSimpleName);
-    if (searchPanel != null) {
-      searchPanel.setDefaultFilter(SearchFilters.allFilter(), false);
-    }
-  }
-
   public <T extends IsIndexed> void resetToDefaultFilter(Class<T> objectClass) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClass);
     if (searchPanel != null) {
       searchPanel.setDefaultFilter(SearchFilters.allFilter(), false);
-    }
-  }
-
-  public <T extends IsIndexed> void addSearchFieldTextValueChangeHandler(String objectClassSimpleName,
-    ValueChangeHandler<String> handler) {
-    SearchPanel<T> searchPanel = components.getSearchPanel(objectClassSimpleName);
-    if (searchPanel != null) {
-      searchPanel.addValueChangeHandler(handler);
-    }
-  }
-
-  public <T extends IsIndexed> void addSearchFieldTextValueChangeHandler(Class<T> objectClass,
-    ValueChangeHandler<String> handler) {
-    SearchPanel<T> searchPanel = components.getSearchPanel(objectClass);
-    if (searchPanel != null) {
-      searchPanel.addValueChangeHandler(handler);
-    }
-  }
-
-  public <T extends IsIndexed> void addListDataChangeHandler(String objectClassSimpleName,
-    ValueChangeHandler<IndexResult<T>> handler) {
-    AsyncTableCell<T> list = components.getList(objectClassSimpleName);
-    if (list != null) {
-      list.addValueChangeHandler(handler);
-    }
-  }
-
-  public <T extends IsIndexed> void addListDataChangeHandler(Class<T> objectClass,
-    ValueChangeHandler<IndexResult<T>> handler) {
-    AsyncTableCell<T> list = components.getList(objectClass);
-    if (list != null) {
-      list.addValueChangeHandler(handler);
     }
   }
 
@@ -281,7 +235,7 @@ public class SearchWrapper extends Composite {
    * BasicAsyncTableCell, at least for now) that is used to enforce type coherence
    */
   @SuppressWarnings("unchecked")
-  private class Components {
+  private static class Components {
     private final Map<Class<? extends IsIndexed>, SearchPanel<? extends IsIndexed>> searchPanels = new LinkedHashMap<>();
     private final Map<Class<? extends IsIndexed>, AsyncTableCell<? extends IsIndexed>> lists = new LinkedHashMap<>();
 
