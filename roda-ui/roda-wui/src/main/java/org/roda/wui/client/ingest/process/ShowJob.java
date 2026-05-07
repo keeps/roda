@@ -115,8 +115,8 @@ public class ShowJob extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() > 1 && historyTokens.get(1).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
-        ShowJobReport.RESOLVER.resolve(historyTokens, callback);
+      if (historyTokens.size() > 1 && historyTokens.get(1).equals(ShowJobReportV2.RESOLVER.getHistoryToken())) {
+        ShowJobReportV2.RESOLVER.resolve(historyTokens, callback);
       } else if (!historyTokens.isEmpty()) {
         String jobId = historyTokens.get(0);
         Services services = new Services("Get job plugin info", "get");

@@ -24,6 +24,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.log.LogEntry;
@@ -41,6 +42,8 @@ import org.roda.wui.client.disposal.rule.EditDisposalRule;
 import org.roda.wui.client.disposal.rule.ShowDisposalRule;
 import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
 import org.roda.wui.client.disposal.schedule.EditDisposalSchedule;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.ingest.process.ShowJobReportV2;
 import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.ShowLogEntry;
 import org.roda.wui.client.management.ShowNotification;
@@ -63,6 +66,8 @@ import org.roda.wui.client.management.members.MemberManagement;
 import org.roda.wui.client.management.members.ShowMember;
 import org.roda.wui.client.planning.RepresentationInformationNetwork;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
+import org.roda.wui.client.process.ActionProcess;
+import org.roda.wui.client.process.Process;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -769,7 +774,7 @@ public class BreadcrumbUtils {
   public static List<BreadcrumbItem> getPreservationAgentBreadcrumbs() {
     List<BreadcrumbItem> ret = new ArrayList<>();
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.preservationAgentsTitle()),
-            messages.preservationAgentsTitle(), PreservationAgents.RESOLVER.getHistoryPath()));
+      messages.preservationAgentsTitle(), PreservationAgents.RESOLVER.getHistoryPath()));
 
     return ret;
   }
@@ -794,5 +799,33 @@ public class BreadcrumbUtils {
 
   private static List<String> getViewItemHistoryToken(String id) {
     return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), id);
+  }
+
+  public static List<BreadcrumbItem> getReportBreadcrumbs() {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.processTitle()), messages.processTitle(),
+            ActionProcess.RESOLVER.getHistoryPath()));
+
+    return ret;
+
+  }
+
+  public static List<BreadcrumbItem> getJobReportBreadcrumbs(IndexedReport report) {
+    List<BreadcrumbItem> ret = getReportBreadcrumbs();
+
+    if (report != null) {
+      List<String> path = new ArrayList<>(ShowJob.RESOLVER.getHistoryPath());
+      path.add(report.getJobId());
+      String label = report.getJobName();
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
+
+      List<String> jobReportPath = new ArrayList<>(ShowJobReportV2.RESOLVER.getHistoryPath());
+      jobReportPath.add(report.getJobId());
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(report.getSourceObjectLabel()), report.getSourceObjectLabel(),
+              ShowJobReportV2.RESOLVER.getHistoryPath()));
+    }
+
+    return ret;
   }
 }
