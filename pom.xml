@@ -200,6 +200,14 @@
                 <module>roda-core/roda-core-tests</module>
             </modules>
         </profile>
+        <profile>
+            <!-- Black-box E2E API tests. Run with: mvn test -Pe2e
+                 Requires Docker with Compose V2 and docker.io/keeps/roda:development. -->
+            <id>e2e</id>
+            <modules>
+                <module>roda-api-tests</module>
+            </modules>
+        </profile>
     </profiles>
     <build>
         <plugins>

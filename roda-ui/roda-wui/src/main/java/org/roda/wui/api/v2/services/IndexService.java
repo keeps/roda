@@ -152,7 +152,7 @@ public class IndexService {
       public Long process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException {
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_CLASS_PARAM, returnClass.getSimpleName(),
-          RodaConstants.CONTROLLER_FILTER_PARAM, request.getFilter().toString());
+          RodaConstants.CONTROLLER_FILTER_PARAM, String.valueOf(request.getFilter()));
         return requestContext.getIndexService().count(returnClass, request.getFilter(), requestContext.getUser(),
           request.isOnlyActive());
       }
