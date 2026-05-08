@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!--
+  TestNG suite descriptor for the RODA API E2E test module.
+  Activated by the Maven Surefire plugin when running: mvn test -Pe2e
+-->
+<suite name="RODA API E2E Tests" verbose="1" thread-count="1">
+
+  <test name="AIP API Tests">
+    <packages>
+      <package name="org.roda.tests.api.aips"/>
+    </packages>
+  </test>
+
+</suite>

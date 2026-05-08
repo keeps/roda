@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.roda-community</groupId>
+    <artifactId>roda</artifactId>
+    <version>6.3.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>roda-api-tests</artifactId>
+  <name>RODA - API End-to-End Tests</name>
+  <packaging>jar</packaging>
+
+  <description>
+    Black-box, out-of-process E2E API tests for RODA.
+    Uses Testcontainers (ComposeContainer) to spin up the full stack
+    from deploys/standalone/docker-compose-e2e.yaml, then exercises the REST API
+    via REST Assured against generated OpenAPI model POJOs.
+
+    Requires:
+      - Docker with Compose V2 plugin (docker compose) on PATH
+      - docker.io/keeps/roda:development image available locally or pullable
+      - No port conflicts on the host for ports mapped by docker-compose-e2e.yaml
+
+    Run with:
+      mvn test -Pe2e
+  </description>
+
+  <properties>
+    <testcontainers.version>2.0.2</testcontainers.version>
+    <restassured.version>5.5.2</restassured.version>
+    <openapi.generator.version>7.10.0</openapi.generator.version>
+  </properties>
+
+  <dependencies>
+
+    <!-- TestNG — consistent with other RODA test modules -->
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Testcontainers core — ComposeContainer and DockerComposeContainer are in the core jar -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- REST Assured for fluent API testing -->
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <version>${restassured.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!--
+      jackson-databind and jakarta.annotation-api must be compile-scoped (not test),
+      because the OpenAPI-generated model POJOs in target/generated-sources are compiled
+      as part of the main source set, which does not see test-scoped dependencies.
+    -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <!-- Required by generated JSON.java for Java 8 date/time serialization -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+    </dependency>
+
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <!--
+        OpenAPI Generator: generates model POJOs from the root openapi.json.
+        API client classes are suppressed (apis=false) — we use REST Assured instead.
+        Supporting files (AbstractOpenApiSchema, etc.) are kept so model classes compile.
+      -->
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>${openapi.generator.version}</version>
+        <executions>
+          <execution>
+            <id>generate-api-models</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>${project.basedir}/../openapi.json</inputSpec>
+              <generatorName>java</generatorName>
+              <output>${project.build.directory}/generated-sources/openapi</output>
+              <modelPackage>org.roda.tests.api.model</modelPackage>
+              <apiPackage>org.roda.tests.api.client</apiPackage>
+              <invokerPackage>org.roda.tests.api.invoker</invokerPackage>
+              <globalProperties>
+                <!-- Generate all model POJOs -->
+                <models></models>
+                <!-- Suppress generated API client classes -->
+                <apis>false</apis>
+                <!-- Suppress API/model doc and test stubs -->
+                <apiDocs>false</apiDocs>
+                <modelDocs>false</modelDocs>
+                <apiTests>false</apiTests>
+                <modelTests>false</modelTests>
+                <!--
+                  Supporting files (AbstractOpenApiSchema, ApiClient, etc.) are kept
+                  because model classes for oneOf/anyOf schemas extend AbstractOpenApiSchema.
+                  They are unused at runtime but required for compilation.
+                -->
+              </globalProperties>
+              <configOptions>
+                <library>native</library>
+                <dateLibrary>java8</dateLibrary>
+                <serializationLibrary>jackson</serializationLibrary>
+                <!-- Disable OpenAPI nullable wrapper (simpler POJOs) -->
+                <openApiNullable>false</openApiNullable>
+                <!-- No bean validation annotations needed in test POJOs -->
+                <useBeanValidation>false</useBeanValidation>
+                <performBeanValidation>false</performBeanValidation>
+                <!-- Use Jakarta EE (Spring Boot 3 / Java 21 baseline) -->
+                <useJakartaEe>true</useJakartaEe>
+                <!-- Keep POJOs simple: no fluent builders -->
+                <generateBuilders>false</generateBuilders>
+              </configOptions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+        Maven Surefire: run tests via TestNG suite descriptor.
+        Tests are intentionally excluded from the default surefire scan
+        until the Docker environment is explicitly started via -Pe2e.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <suiteXmlFiles>
+            <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+          </suiteXmlFiles>
+          <!-- 10 min actuator/health wait + test execution -->
+          <forkedProcessTimeoutInSeconds>720</forkedProcessTimeoutInSeconds>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>
