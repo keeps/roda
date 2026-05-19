@@ -51,12 +51,12 @@ public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NEW_TYPE,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_NEW_TYPE, "New type", PluginParameterType.STRING)
-        .isMandatory(false).withDescription("New type").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_NEW_TYPE, "plugin.changeTypePlugin.parameter.newType.name", PluginParameterType.STRING)
+        .isMandatory(false).withDescription("plugin.changeTypePlugin.parameter.newType.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details", PluginParameterType.STRING)
-        .isMandatory(false).withDescription("Details that will be used when creating event").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "plugin.generic.parameter.eventDetails.name", PluginParameterType.STRING)
+        .isMandatory(false).withDescription("plugin.generic.parameter.eventDetails.description").build());
   }
 
   @Override
@@ -71,12 +71,12 @@ public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> 
 
   @Override
   public String getName() {
-    return "RODA entity type change";
+    return "plugin.changeTypePlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Changes AIP or representation type value";
+    return "plugin.changeTypePlugin.description";
   }
 
   @Override

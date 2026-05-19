@@ -13,19 +13,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
-import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -56,21 +53,21 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "plugin.disassociateDisposalHoldFromAip.parameter.holdId.name",
           PluginParameter.PluginParameterType.STRING)
-        .isMandatory(true).isReadOnly(false).withDescription("Disposal hold identifier").build());
+        .isMandatory(true).isReadOnly(false).withDescription("plugin.disassociateDisposalHoldFromAip.parameter.holdId.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL, "Disassociate all holds",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL, "plugin.disassociateDisposalHoldFromAip.parameter.disassociateAll.name",
           PluginParameter.PluginParameterType.BOOLEAN)
         .withDefaultValue("false").isMandatory(true).isReadOnly(false)
-        .withDescription("Disassociate all disposal holds associated to AIP").build());
+        .withDescription("plugin.disassociateDisposalHoldFromAip.parameter.disassociateAll.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Details", PluginParameter.PluginParameterType.STRING)
-        .isMandatory(false).withDescription("Details that will be used when creating event").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "plugin.disassociateDisposalHoldFromAip.parameter.eventDetails.name", PluginParameter.PluginParameterType.STRING)
+        .isMandatory(false).withDescription("plugin.disassociateDisposalHoldFromAip.parameter.eventDetails.description").build());
   }
 
   private String disposalHoldId;
@@ -78,7 +75,7 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   private String details;
 
   public static String getStaticName() {
-    return "Disassociate disposal hold from AIP";
+    return "plugin.disassociateDisposalHoldFromAip.name";
   }
 
   public static String getStaticDescription() {

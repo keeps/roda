@@ -44,7 +44,7 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
   private static final Logger LOGGER = LoggerFactory.getLogger(DisassociateDisposalScheduleToAIPPlugin.class);
 
   public static String getStaticName() {
-    return "Disassociate disposal schedule";
+    return "plugin.disassociateDisposalScheduleToAipPlugin.name";
   }
 
   public static String getStaticDescription() {

@@ -37,7 +37,6 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.DefaultModelService;
-import org.roda.core.model.DefaultTransactionalModelService;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -50,7 +49,6 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
-import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +62,7 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   private boolean processedWithErrors = false;
 
   public static String getStaticName() {
-    return "Restore records under disposal confirmation report";
+    return "plugin.restoreRecordsPlugin.name";
   }
 
   public static String getStaticDescription() {

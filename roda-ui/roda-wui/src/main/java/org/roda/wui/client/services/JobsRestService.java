@@ -109,5 +109,6 @@ public interface JobsRestService extends RODAEntityRestService<IndexedJob> {
   @Operation(summary = "Get job plugin info", description = "Gets the information about the plugins executed on the job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = PluginInfoRequest.class))), responses = {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PluginInfo.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
-  List<PluginInfo> getJobPluginInfo(PluginInfoRequest pluginInfoRequest);
+  List<PluginInfo> getJobPluginInfo(PluginInfoRequest pluginInfoRequest,
+    @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 }

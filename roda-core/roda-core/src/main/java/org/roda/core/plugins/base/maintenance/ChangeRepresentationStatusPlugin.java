@@ -47,12 +47,12 @@ public class ChangeRepresentationStatusPlugin extends AbstractPlugin<Representat
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NEW_STATUS,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_NEW_STATUS, "New status", PluginParameterType.STRING)
-        .isMandatory(false).withDescription("New type").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_NEW_STATUS, "plugin.changeRepresentationStatusPlugin.parameter.newStatus.name", PluginParameterType.STRING)
+        .isMandatory(false).withDescription("plugin.changeRepresentationStatusPlugin.parameter.newStatus.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details", PluginParameterType.STRING)
-        .isMandatory(false).withDescription("Details that will be used when creating event").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "plugin.generic.parameter.eventDetails.name", PluginParameterType.STRING)
+        .isMandatory(false).withDescription("plugin.generic.parameter.eventDetails.description").build());
   }
 
   private List<String> newStatus = new ArrayList<>();
@@ -70,12 +70,12 @@ public class ChangeRepresentationStatusPlugin extends AbstractPlugin<Representat
 
   @Override
   public String getName() {
-    return "Change representation status";
+    return "plugin.changeRepresentationStatusPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Changes Representation status value";
+    return "plugin.changeRepresentationStatusPlugin.description";
   }
 
   @Override

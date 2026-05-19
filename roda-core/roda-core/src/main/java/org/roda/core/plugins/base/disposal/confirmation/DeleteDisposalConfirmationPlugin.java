@@ -57,15 +57,15 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details", PluginParameter.PluginParameterType.STRING)
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "plugin.deleteDisposalConfirmationPlugin.parameter.eventDetails.name", PluginParameter.PluginParameterType.STRING)
         .withDefaultValue("").isMandatory(false).isReadOnly(false)
-        .withDescription("Details that will be used when creating event").build());
+        .withDescription("plugin.deleteDisposalConfirmationPlugin.parameter.eventDetails.description").build());
   }
 
   private String details;
 
   public static String getStaticName() {
-    return "Delete disposal confirmation report";
+    return "plugin.deleteDisposalConfirmationPlugin.name";
   }
 
   public static String getStaticDescription() {

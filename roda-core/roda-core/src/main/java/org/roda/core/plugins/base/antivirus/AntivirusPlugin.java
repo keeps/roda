@@ -78,7 +78,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Malware detector";
+    return "plugin.antivirusPlugin.name";
   }
 
   @Override
@@ -87,9 +87,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "This plugin provides robust security features by leveraging the ClamAV antivirus engine to scan files for potential threats, including trojans, "
-      + "viruses, malware, and other malicious content.\nClamAV is a trusted, open-source (GPL) antivirus engine that is widely used in the industry for its "
-      + "exceptional accuracy and effectiveness in detecting threats";
+    return "plugin.antivirusPlugin.description";
   }
 
   @Override

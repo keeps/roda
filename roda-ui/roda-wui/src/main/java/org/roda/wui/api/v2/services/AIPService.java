@@ -678,14 +678,12 @@ public class AIPService {
 
   public Job updateAIPPermissions(User user, UpdatePermissionsRequest request)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    final String eventDescription = "The process of updating an object of the repository.";
 
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON,
       JsonUtils.getJsonFromObject(request.getPermissions()));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, Boolean.toString(request.isRecursive()));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, request.getDetails());
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, eventDescription);
 
     return CommonServicesUtils.createAndExecuteInternalJob("Update AIP permissions",
       CommonServicesUtils.convertSelectedItems(request.getItemsToUpdate(), IndexedAIP.class),

@@ -20,7 +20,7 @@ public class ReindexDIPFilePlugin extends ReindexRodaEntityPlugin<DIPFile> {
 
   @Override
   public String getName() {
-    return "Rebuild DIP file index";
+    return "plugin.reindexDipFilePlugin.name";
   }
 
   @Override

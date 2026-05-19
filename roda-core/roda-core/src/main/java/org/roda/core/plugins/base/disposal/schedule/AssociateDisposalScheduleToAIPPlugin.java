@@ -57,18 +57,18 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, "Disposal schedule id",
-        PluginParameter.PluginParameterType.STRING).withDescription("Disposal schedule identifier").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, "plugin.associateDisposalScheduleToAipPlugin.parameter.scheduleId.name",
+        PluginParameter.PluginParameterType.STRING).withDescription("plugin.associateDisposalScheduleToAipPlugin.parameter.scheduleId.description").build());
   }
 
   private String disposalScheduleId;
 
   public static String getStaticName() {
-    return "Associate disposal schedule";
+    return "plugin.associateDisposalScheduleToAipPlugin.name";
   }
 
   public static String getStaticDescription() {
-    return "Associates a disposal schedule to a AIP";
+    return "plugin.associateDisposalScheduleToAipPlugin.description";
   }
 
   @Override

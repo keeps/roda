@@ -20,7 +20,7 @@ public class ReindexIncidencePlugin extends ReindexRodaEntityPlugin<RiskIncidenc
 
   @Override
   public String getName() {
-    return "Rebuild incidence index";
+    return "plugin.reindexIncidencePlugin.name";
   }
 
   @Override

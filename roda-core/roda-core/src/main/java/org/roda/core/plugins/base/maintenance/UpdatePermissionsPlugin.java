@@ -48,30 +48,32 @@ import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
 public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
-  private Permissions permissions;
-  private String details = null;
-  private String eventDescription = null;
-  private boolean recursive = true;
-
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON, "Permission object in JSON", PluginParameterType.STRING)
-      .isMandatory(false).withDescription("Permission object in JSON.").build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON,
+          "plugin.updatePermissionsPlugin.parameter.permissions.name", PluginParameterType.STRING)
+        .isMandatory(false).withDescription("plugin.updatePermissionsPlugin.parameter.permissions.description")
+        .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details", PluginParameterType.STRING)
-        .isMandatory(false).withDescription("Details that will be used when creating event").build());
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, "Event description", PluginParameterType.STRING)
-        .isMandatory(false).withDescription("Description that will be used when creating event").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "plugin.generic.parameter.eventDetails.name",
+          PluginParameterType.STRING)
+        .isMandatory(false).withDefaultValue("plugin.generic.parameter.eventDetails.description").build());
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RECURSIVE, "Recursive mode", PluginParameterType.BOOLEAN)
-        .withDefaultValue("true").withDescription("Execute in recursive mode.").build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, PluginParameter
+      .getBuilder(RodaConstants.PLUGIN_PARAMS_RECURSIVE, "plugin.updatePermissionsPlugin.parameter.recursiveMode.name",
+        PluginParameterType.BOOLEAN)
+      .withDefaultValue("true").withDescription("plugin.updatePermissionsPlugin.parameter.recursiveMode.description")
+      .build());
   }
+
+  private Permissions permissions;
+  private String details = null;
+  private boolean recursive = true;
 
   @Override
   public void init() throws PluginException {
@@ -85,12 +87,12 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
 
   @Override
   public String getName() {
-    return "Update AIP permissions recursively";
+    return "plugin.updatePermissionsPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Update AIP permissions recursively copying from parent or using serializable permission object";
+    return "plugin.updatePermissionsPlugin.description";
   }
 
   @Override
@@ -102,7 +104,6 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RECURSIVE));
     return parameters;
@@ -120,10 +121,6 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DETAILS)) {
       details = parameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS);
-    }
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION)) {
-      eventDescription = parameters.get(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION);
     }
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RECURSIVE)) {
@@ -182,8 +179,8 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
 
       List<LinkingIdentifier> sources = Arrays
         .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
-      model.createEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, sources, null,
-        state, outcome, details, job.getUsername(), true, null);
+      model.createEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, getPreservationEventDescription(),
+        sources, null, state, outcome, details, job.getUsername(), true, null);
     }
   }
 

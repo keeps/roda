@@ -56,36 +56,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExportAIPPlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ExportAIPPlugin.class);
-
   public static final String PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER = "outputFolder";
   public static final String PLUGIN_PARAM_EXPORT_TYPE = "exportType";
   public static final String PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS = "removeIfAlreadyExists";
-
-  private String outputFolder;
-  private ExportType exportType;
-  private boolean removeIfAlreadyExists;
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(ExportAIPPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
     pluginParameters.put(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER,
-      PluginParameter.getBuilder(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "Destination folder", PluginParameterType.STRING)
-        .withDefaultValue("/tmp/export").withDescription("Folder where the exported AIPs will be stored.").build());
+      PluginParameter
+        .getBuilder(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "plugin.exportAipPlugin.parameter.destinationFolder.name",
+          PluginParameterType.STRING)
+        .withDefaultValue("/tmp/export")
+        .withDescription("plugin.exportAipPlugin.parameter.destinationFolder.description").build());
 
     pluginParameters.put(PLUGIN_PARAM_EXPORT_TYPE,
-      PluginParameter.getBuilder(PLUGIN_PARAM_EXPORT_TYPE, "Type of export", PluginParameterType.STRING)
-        .withDefaultValue("FOLDER")
-        .withDescription("Type of export: ZIP – exports each AIP as a ZIP file; FOLDER – exports each AIP as a folder.")
-        .build());
+      PluginParameter
+        .getBuilder(PLUGIN_PARAM_EXPORT_TYPE, "plugin.exportAipPlugin.parameter.exportType.name",
+          PluginParameterType.DROPDOWN)
+        .withDefaultValue("FOLDER").withDescription("plugin.exportAipPlugin.parameter.exportType.description").build());
 
     pluginParameters.put(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS,
       PluginParameter
-        .getBuilder(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS, "Overwrite files/folders",
-          PluginParameterType.BOOLEAN)
-        .withDefaultValue("true")
-        .withDescription("Overwrites files and folders if they already exist on the destination folder.").build());
+        .getBuilder(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS,
+          "plugin.exportAipPlugin.parameter.removeIfAlreadyExists.name", PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").withDescription("plugin.exportAipPlugin.parameter.removeIfAlreadyExists.decription")
+        .build());
   }
+
+  private String outputFolder;
+  private ExportType exportType;
+  private boolean removeIfAlreadyExists;
 
   @Override
   public void init() throws PluginException {
@@ -99,15 +100,12 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "AIP Batch Exporter";
+    return "plugin.exportAipPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "The AIP Batch Exporter is a powerful plugin that allows you to select a group of AIPs and export them as a single ZIP file or folder. "
-      + "The outcome is saved on the server file system, which can be accessed by users with the necessary permissions.\nThis plugin is particularly "
-      + "useful when you need to export a large number of AIPs based on specific search criteria. With just a few clicks, you can create a batch"
-      + "export of AIPs and download them in a compressed format.\nThis saves time and effort and ensures that your AIPs are stored and transferred efficiently.";
+    return "plugin.exportAipPlugin.description";
   }
 
   @Override
@@ -147,8 +145,8 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<AIP>() {
 
       @Override
@@ -183,8 +181,8 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   }
 
-  private Report exportFolders(List<AIP> aips, ModelService model, IndexService index,
-    Report report, JobPluginInfo jobPluginInfo, Job job) {
+  private Report exportFolders(List<AIP> aips, ModelService model, IndexService index, Report report,
+    JobPluginInfo jobPluginInfo, Job job) {
     try {
       FileStorageService localStorage = new FileStorageService(Paths.get(FilenameUtils.normalize(outputFolder)), false,
         null, false);
@@ -276,8 +274,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 

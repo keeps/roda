@@ -50,28 +50,28 @@ public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS,
       PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS,
-        "Risk incidence status", PluginParameterType.STRING).withDefaultValue("UNMITIGATED").isMandatory(false)
-        .isReadOnly(false).withDescription("Risk incidence status.").build());
+        "plugin.updateIncidencesPlugin.parameter.riskIncidenceStatus.name", PluginParameterType.STRING).withDefaultValue("UNMITIGATED").isMandatory(false)
+        .isReadOnly(false).withDescription("plugin.updateIncidencesPlugin.parameter.riskIncidenceStatus.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY,
       PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY,
-        "Risk incidence severity", PluginParameterType.STRING).withDefaultValue("MODERATE").isMandatory(false)
-        .isReadOnly(false).withDescription("Risk incidence severity.").build());
+        "plugin.updateIncidencesPlugin.parameter.riskIncidenceSeverity.name", PluginParameterType.STRING).withDefaultValue("MODERATE").isMandatory(false)
+        .isReadOnly(false).withDescription("plugin.updateIncidencesPlugin.parameter.riskIncidenceSeverity.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_ON,
       PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_ON,
-        "Risk incidence mitigated on", PluginParameterType.STRING).withDefaultValue("").isMandatory(false)
-        .isReadOnly(false).withDescription("Risk incidence mitigated on.").build());
+        "plugin.updateIncidencesPlugin.parameter.riskIncidenceMitigatedOn.name", PluginParameterType.STRING).withDefaultValue("").isMandatory(false)
+        .isReadOnly(false).withDescription("plugin.updateIncidencesPlugin.parameter.riskIncidenceMitigatedOn.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_BY,
       PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_BY,
-        "Risk incidence mitigated by", PluginParameterType.STRING).withDefaultValue("MODERATE").isMandatory(false)
-        .isReadOnly(false).withDescription("Risk incidence mitigated by.").build());
+        "plugin.updateIncidencesPlugin.parameter.riskIncidenceMitigatedBy.name", PluginParameterType.STRING).withDefaultValue("MODERATE").isMandatory(false)
+        .isReadOnly(false).withDescription("plugin.updateIncidencesPlugin.parameter.riskIncidenceMitigatedBy.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_DESCRIPTION,
       PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_DESCRIPTION,
-        "Risk incidence mitigated description", PluginParameterType.STRING).withDefaultValue("MODERATE")
-        .isMandatory(false).isReadOnly(false).withDescription("Risk incidence mitigated description.").build());
+        "plugin.updateIncidencesPlugin.parameter.riskIncidenceMitigatedDescription.name", PluginParameterType.STRING).withDefaultValue("MODERATE")
+        .isMandatory(false).isReadOnly(false).withDescription("plugin.updateIncidencesPlugin.parameter.riskIncidenceMitigatedDescription.description").build());
   }
 
   @Override
@@ -86,12 +86,12 @@ public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
 
   @Override
   public String getName() {
-    return "Update AIP permissions recursively";
+    return "plugin.updateIncidencesPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Update AIP permissions recursively copying from parent or using serializable permission object";
+    return "plugin.updateIncidencesPlugin.descrption";
   }
 
   @Override

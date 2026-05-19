@@ -44,8 +44,8 @@ public class AddRepresentationInformationFilterPlugin extends AbstractPlugin<Rep
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER, "New filter",
-        PluginParameterType.STRING).withDescription("Representation information new filter").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER, "plugin.addRepresentationInformationFilterPlugin.parameter.newFilter.name",
+        PluginParameterType.STRING).withDescription("plugin.addRepresentationInformationFilterPlugin.parameter.newFilter.description").build());
   }
 
   @Override
@@ -60,12 +60,12 @@ public class AddRepresentationInformationFilterPlugin extends AbstractPlugin<Rep
 
   @Override
   public String getName() {
-    return "Add representation information filter";
+    return "plugin.addRepresentationInformationFilterPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Add filter to a representation information list";
+    return "plugin.addRepresentationInformationFilterPlugin.description";
   }
 
   @Override

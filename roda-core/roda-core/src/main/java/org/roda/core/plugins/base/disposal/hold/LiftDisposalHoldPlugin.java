@@ -59,21 +59,21 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<Void> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "plugin.liftDisposalHoldPlugin.parameter.holdId.name",
           PluginParameter.PluginParameterType.STRING)
-        .isMandatory(true).isReadOnly(false).withDescription("Disposal hold identifier").build());
+        .isMandatory(true).isReadOnly(false).withDescription("plugin.liftDisposalHoldPlugin.parameter.holdId.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Details", PluginParameter.PluginParameterType.STRING)
-        .isMandatory(false).withDescription("Details that will be used when creating event").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "plugin.liftDisposalHoldPlugin.parameter.eventDetails.name", PluginParameter.PluginParameterType.STRING)
+        .isMandatory(false).withDescription("plugin.liftDisposalHoldPlugin.parameter.eventDetails.description").build());
   }
 
   private String disposalHoldId;
   private String details;
 
   public static String getStaticName() {
-    return "Lift disposal hold";
+    return "plugin.liftDisposalHoldPlugin.name";
   }
 
   public static String getStaticDescription() {

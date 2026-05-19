@@ -28,16 +28,16 @@ import org.slf4j.LoggerFactory;
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
  */
-public class MutipleStepUtils {
+public class MultipleStepUtils {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MutipleStepUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MultipleStepUtils.class);
 
-  private MutipleStepUtils() {
+  private MultipleStepUtils() {
     // do nothing
   }
 
   public static void executePlugin(final MultipleStepBundle bundle, final Step step) {
-    final Report pluginReport = MutipleStepUtils.executeStep(bundle, step);
+    final Report pluginReport = MultipleStepUtils.executeStep(bundle, step);
     mergeReports(bundle.getJobPluginInfo(), pluginReport);
   }
 

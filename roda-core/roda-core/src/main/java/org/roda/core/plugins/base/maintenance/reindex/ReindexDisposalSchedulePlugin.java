@@ -20,7 +20,7 @@ public class ReindexDisposalSchedulePlugin extends ReindexRodaEntityPlugin<Dispo
 
   @Override
   public String getName() {
-    return "Rebuild disposal schedule index";
+    return "plugin.reindexDisposalSchedulePlugin.name";
   }
 
   @Override

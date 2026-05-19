@@ -20,7 +20,7 @@ public class ReindexDisposalHoldPlugin extends ReindexRodaEntityPlugin<DisposalH
 
   @Override
   public String getName() {
-    return "Rebuild disposal hold index";
+    return "plugin.reindexDisposalHoldPlugin.name";
   }
 
   @Override

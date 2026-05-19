@@ -46,37 +46,33 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA, "Validate descriptive metadata",
-        PluginParameterType.BOOLEAN)
-      .withDefaultValue("true")
-      .withDescription(
-        "If true, the action will check if the descriptive metadata is valid according to the schemas installed in the repository.")
-      .build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_VALIDATE_DESCRIPTIVE_METADATA,
+          "plugin.descriptiveMetadataValidationPlugin.parameter.validate.name", PluginParameterType.BOOLEAN)
+        .withDefaultValue("true")
+        .withDescription("plugin.descriptiveMetadataValidationPlugin.parameter.validate.description").build());
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE, "Descriptive metadata format",
-        PluginParameterType.STRING)
-      .isMandatory(false)
-      .withDescription(
-        "Descriptive metadata format to be used as fallback if the information package does not specify the metadata format or if the action is set to FORCE.")
-      .build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_TYPE,
+          "plugin.descriptiveMetadataValidationPlugin.parameter.metadataType.name", PluginParameterType.STRING)
+        .isMandatory(false)
+        .withDescription("plugin.descriptiveMetadataValidationPlugin.parameter.metadataType.description").build());
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION, "Descriptive metadata version",
-        PluginParameterType.STRING)
-      .isMandatory(false)
-      .withDescription(
-        "Descriptive metadata version to be used as fallback if the information package does not specify the metadata version or if the action is set to FORCE.")
-      .build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_VERSION,
+          "plugin.descriptiveMetadataValidationPlugin.parameter.metadataVersion.name", PluginParameterType.STRING)
+        .isMandatory(false)
+        .withDescription("plugin.descriptiveMetadataValidationPlugin.parameter.metadataVersion.description").build());
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE, PluginParameter
-      .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE, "Force metadata format and version",
-        PluginParameterType.BOOLEAN)
-      .withDefaultValue("false")
-      .withDescription(
-        "If true, bypass the metadata format and version set in the information package and use the metadata format and version passed as parameters (see above).")
-      .build());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE,
+      PluginParameter
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DESCRIPTIVE_METADATA_FORCE_TYPE,
+          "plugin.descriptiveMetadataValidationPlugin.parameter.force.name", PluginParameterType.BOOLEAN)
+        .withDefaultValue("false")
+        .withDescription("plugin.descriptiveMetadataValidationPlugin.parameter.force.description").build());
   }
 
   private boolean validateDescriptiveMetadata;
@@ -87,12 +83,11 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   private List<Pair<String, String>> schemasInfo;
 
   public static String getStaticName() {
-    return "Metadata validation";
+    return "plugin.descriptiveMetadataValidationPlugin.name";
   }
 
   public static String getStaticDescription() {
-    return "Checks if the descriptive metadata included in the Information Package is present, and if it is valid according to the "
-      + "XML Schemas installed in the repository. A validation report is generated indicating which Information Packages have valid and invalid metadata.";
+    return "plugin.descriptiveMetadataValidationPlugin.description";
   }
 
   @Override
@@ -154,8 +149,8 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, Report report, Job cachedJob,
@@ -276,8 +271,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     return null;
   }

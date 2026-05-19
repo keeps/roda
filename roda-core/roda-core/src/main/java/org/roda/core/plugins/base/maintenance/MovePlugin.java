@@ -69,12 +69,12 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ID,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_ID, "Destination object identifier", PluginParameterType.STRING)
-        .isMandatory(false).withDescription("Destination object identifier").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_ID, "plugin.movePlugin.parameter.destObjectId.name", PluginParameterType.STRING)
+        .isMandatory(false).withDescription("plugin.movePlugin.parameter.destObjectId.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details", PluginParameterType.STRING)
-        .isMandatory(false).withDefaultValue("Details that will be used when creating event").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "plugin.generic.parameter.eventDetails.name", PluginParameterType.STRING)
+        .isMandatory(false).withDefaultValue("plugin.generic.parameter.eventDetails.description").build());
   }
 
   @Override
@@ -89,12 +89,12 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public String getName() {
-    return "Move action over RODA entity";
+    return "plugin.movePlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Executes move actions over RODA entity faster";
+    return "plugin.movePlugin.description";
   }
 
   @Override

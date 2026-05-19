@@ -45,8 +45,8 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
       PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
-        "Delete older than X days", PluginParameterType.INTEGER).withDefaultValue("90").isMandatory(false)
-        .isReadOnly(false).withDescription("The plugin will delete all logs older than the specified number of days.")
+        "plugin.auditLogTruncatorPlugin.parameter.deleteOlderLogs.name", PluginParameterType.INTEGER).withDefaultValue("90").isMandatory(false)
+        .isReadOnly(false).withDescription("plugin.auditLogTruncatorPlugin.parameter.deleteOlderLogs.description")
         .build());
   }
 
@@ -64,7 +64,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Audit Log Truncator";
+    return "plugin.auditLogTruncatorPlugin.name";
   }
 
   @Override
@@ -74,10 +74,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "The Audit Log Truncator removes all entries in the audit log that are older than the specified number of"
-      + " days. The log is preserved as external physical files, however older entries will not be displayed in the graphical user interface. "
-      + "To access older log entries, one needs access to the storage layer of the repository server.\nAudit log truncation "
-      + "automatically frees index space and improves performance of the repository as a whole.";
+    return "plugin.auditLogTruncatorPlugin.description";
   }
 
   @Override
