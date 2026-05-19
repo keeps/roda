@@ -11,9 +11,14 @@ import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.rule.DisposalRule;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.common.client.ClientLogger;
 
@@ -35,6 +40,7 @@ public class ListSelectionStateMappers {
   private static DisposalRuleMapper disposalRuleMapper = GWT.create(DisposalRuleMapper.class);
   private static NotificationMapper notificationMapper = GWT.create(NotificationMapper.class);
   private static RiskMapper riskMapper = GWT.create(RiskMapper.class);
+  private static RepresentationInformationMapper representationInformationMapper = GWT.create(RepresentationInformationMapper.class);
 
   private ListSelectionStateMappers() {
     // do nothing
@@ -65,6 +71,8 @@ public class ListSelectionStateMappers {
       ret = notificationMapper.write((ListSelectionState<Notification>) object);
     } else if (IndexedRisk.class.getName().equals(objectClass)) {
       ret = riskMapper.write((ListSelectionState<IndexedRisk>) object);
+    } else if (RepresentationInformation.class.getName().equals(objectClass)) {
+      ret = representationInformationMapper.write((ListSelectionState<RepresentationInformation>) object);
     } else {
       ret = null;
     }
@@ -95,6 +103,8 @@ public class ListSelectionStateMappers {
       state = (ListSelectionState<T>) notificationMapper.read(json);
     } else if (IndexedRisk.class.getName().equals(objectClass)) {
       state = (ListSelectionState<T>) riskMapper.read(json);
+    } else if (RepresentationInformation.class.getName().equals(objectClass)) {
+      state = (ListSelectionState<T>) representationInformationMapper.read(json);
     } else {
       state = null;
     }
@@ -143,6 +153,10 @@ public class ListSelectionStateMappers {
 
   // IndexedRisk
   public interface RiskMapper extends ObjectMapper<ListSelectionState<IndexedRisk>> {
+  }
+
+  // Representation Information
+  public interface RepresentationInformationMapper extends ObjectMapper<ListSelectionState<RepresentationInformation>> {
   }
 
 }

@@ -7298,6 +7298,17 @@ td.datePickerMonth, td.datePickerYear {
     margin-bottom: 20px;
 }
 
+.ri-dialog .dialog-right-side .form-textbox,
+.ri-dialog .dialog-right-side .form-listbox {
+    background-color: #FAFAFA;
+    border-color: #D9D9D9;
+    color: black;
+}
+
+.ri-dialog .dialog-right-side .form-label {
+    color: #666666;
+}
+
 @media (max-width: 800px) {
     .ri-dialog .ri-dialog-list-scroll {
         width: 100%;
@@ -7884,6 +7895,17 @@ span.code {
 .incremental-list .removable-textbox:last-of-type .ri-toolbarLink {
     background-color: COLOR_PRIMARY;
     color: white;
+}
+
+.generic-form-field-input-panel.incremental-relation-list-values {
+    display: block;
+    width: 100%;
+}
+
+.incremental-relation-list-values .removable-relation {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
 }
 
 /** Display Rich Text Values **/
