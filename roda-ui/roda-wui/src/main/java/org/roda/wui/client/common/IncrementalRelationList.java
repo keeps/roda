@@ -24,17 +24,17 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -71,6 +71,7 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
   }
 
   public void setRelationList(final List<RepresentationInformationRelation> list) {
+    clear();
     for (RepresentationInformationRelation element : list) {
       addRelation(element, false);
     }
@@ -118,13 +119,28 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
 
     for (Entry<String, List<RemovableRelation>> entry : relations.entrySet()) {
       if (!entry.getValue().isEmpty()) {
+        FlowPanel field = new FlowPanel();
+        field.addStyleName("generic-form-field");
+
+        FlowPanel leftPanel = new FlowPanel();
+        leftPanel.addStyleName("generic-form-field-left-panel");
+
         Label typeLabel = new Label(entry.getKey());
-        typeLabel.addStyleName("label");
-        contentPanel.add(typeLabel);
+        typeLabel.addStyleName("form-label");
+
+        FlowPanel inputPanel = new FlowPanel();
+        inputPanel.addStyleName("generic-form-field-input-panel");
+        inputPanel.addStyleName("incremental-relation-list-values");
 
         for (RemovableRelation relation : entry.getValue()) {
-          contentPanel.add(relation);
+          inputPanel.add(relation);
         }
+
+        leftPanel.add(typeLabel);
+        leftPanel.add(inputPanel);
+
+        field.add(leftPanel);
+        contentPanel.add(field);
       }
     }
   }
