@@ -59,14 +59,12 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Remove AIP(s) whose ingest failed";
+    return "plugin.cleanupFailedIngestAipPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Permanently removes AIP(s) from the repository whose ingest failed (state="
-      + AIPState.INGEST_PROCESSING.toString()
-      + "). Data, metadata and event history will be deleted permanently. WARNING: This operation cannot be undone. Use with extreme caution.";
+    return "plugin.cleanupFailedIngestAipPlugin.description";
   }
 
   @Override

@@ -49,8 +49,8 @@ public class ChangeRodaMemberStatusPlugin<T extends RODAMember> extends Abstract
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RODA_MEMBER_ACTIVATE,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_RODA_MEMBER_ACTIVATE, "Activate", PluginParameterType.BOOLEAN)
-        .isMandatory(true).withDescription("Activate RODA members").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_RODA_MEMBER_ACTIVATE, "plugin.changeRodaMemberStatusPlugin.parameter.activate.name", PluginParameterType.BOOLEAN)
+        .isMandatory(true).withDescription("plugin.changeRodaMemberStatusPlugin.parameter.activate.description").build());
   }
 
   private boolean activate;
@@ -67,12 +67,12 @@ public class ChangeRodaMemberStatusPlugin<T extends RODAMember> extends Abstract
 
   @Override
   public String getName() {
-    return "Changes RODA user status";
+    return "plugin.changeRodaMemberStatusPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Activates or deactivates RODA users";
+    return "plugin.changeRodaMemberStatusPlugin.description";
   }
 
   @Override
@@ -98,13 +98,13 @@ public class ChangeRodaMemberStatusPlugin<T extends RODAMember> extends Abstract
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
 
     return PluginHelper.processObjects(this,
-            (RODAObjectsProcessingLogic<T>) (index1, model1, report, cachedJob, jobPluginInfo, plugin, objects) -> {
+      (RODAObjectsProcessingLogic<T>) (index1, model1, report, cachedJob, jobPluginInfo, plugin, objects) -> {
         processRodaMember(model1, report, jobPluginInfo, cachedJob, objects);
-            }, index, model, liteList);
+      }, index, model, liteList);
   }
 
   private void processRodaMember(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
@@ -138,8 +138,7 @@ public class ChangeRodaMemberStatusPlugin<T extends RODAMember> extends Abstract
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     return new Report();
   }
 

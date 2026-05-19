@@ -81,12 +81,12 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public String getName() {
-    return "E-ARK SIP";
+    return "plugin.eARKSipToAipPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "E-ARK SIP as a zip file.";
+    return "plugin.eARKSipToAipPlugin.description";
   }
 
   @Override

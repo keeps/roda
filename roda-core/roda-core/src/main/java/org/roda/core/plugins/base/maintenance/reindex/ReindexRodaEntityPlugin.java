@@ -60,14 +60,14 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("false").isMandatory(false).withDescription("Clear all indexes before reindexing them.")
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "plugin.reindexRodaEntityPlugin.parameter.clearIndexes.name", PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").isMandatory(false).withDescription("plugin.reindexRodaEntityPlugin.parameter.clearIndexes.description")
         .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("true").isMandatory(false).withDescription("Optimize indexes after reindexing them.")
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "plugin.reindexRodaEntityPlugin.parameter.optimizeIndexes.name", PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isMandatory(false).withDescription("plugin.reindexRodaEntityPlugin.parameter.optimizeIndexes.description")
         .build());
   }
 
@@ -86,8 +86,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
   @Override
   public String getDescription() {
-    return "Rebuild indexed information from data kept in storage. All indexes can be rebuilt or refreshed from information persisted in storage. This may also be "
-      + "necessary when updating the indexing system. Additional options include clearing index before re-index (full re-index) and to optimize indexes.";
+    return "plugin.reindexRodaEntityPlugin.description";
   }
 
   @Override

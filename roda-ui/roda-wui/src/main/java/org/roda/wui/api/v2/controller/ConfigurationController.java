@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v2.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -137,17 +138,47 @@ public class ConfigurationController implements ConfigurationRestService {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
+
     try {
       controllerAssistant.checkRoles(requestContext.getUser());
 
-      PluginInfoList list = RodaCoreFactory.getPluginManager().getPluginsInfo(types, removeNotListable);
-      for (PluginInfo plugin : list.getPluginInfoList()) {
-        for (PluginParameter param : plugin.getParameters()) {
-          param.setName(I18nUtility.getMessage(param.getName(), param.getName(), localeString));
+      PluginInfoList originalList = RodaCoreFactory.getPluginManager().getPluginsInfo(types, removeNotListable);
+      List<PluginInfo> translatedPlugins = new ArrayList<>();
+
+      for (PluginInfo originalPlugin : originalList.getPluginInfoList()) {
+
+        // 1. Use the built-in copy constructor! (Yay, less code)
+        PluginInfo clonedPlugin = new PluginInfo(originalPlugin);
+
+        // 2. Translate the plugin info
+        clonedPlugin.setName(I18nUtility.getMessage(originalPlugin.getName(), originalPlugin.getName(), localeString));
+        clonedPlugin.setDescription(I18nUtility.getMessage(originalPlugin.getDescription(), originalPlugin.getDescription(), localeString));
+
+        // 3. We still MUST deep-copy the parameters!
+        List<PluginParameter> translatedParameters = new ArrayList<>();
+        for (PluginParameter originalParam : originalPlugin.getParameters()) {
+
+          // You still need a helper or copy constructor for PluginParameter
+          PluginParameter clonedParam = new PluginParameter(originalParam); // Assuming you add a copy constructor here too!
+
+          clonedParam.setName(I18nUtility.getMessage(originalParam.getName(), originalParam.getName(), localeString));
+          clonedParam.setDescription(I18nUtility.getMessage(originalParam.getDescription(), originalParam.getDescription(), localeString));
+
+          translatedParameters.add(clonedParam);
         }
+
+        // 4. Overwrite the shallow-copied list with our deep-copied list
+        clonedPlugin.setParameters(translatedParameters);
+
+        translatedPlugins.add(clonedPlugin);
       }
 
-      return list;
+      PluginInfoList translatedPluginInfoList = new PluginInfoList();
+      translatedPluginInfoList.setPluginInfoList(translatedPlugins);
+      // Don't forget to copy over any other fields from originalList to translatedPluginInfoList here if they exist
+
+      return translatedPluginInfoList;
+
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);

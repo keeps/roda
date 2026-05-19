@@ -54,8 +54,8 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "Ingest job identifier", PluginParameterType.STRING)
-        .withDescription("The identifier of the job responsible to ingest the information package to fix.").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "plugin.fixAncestorsPlugin.parameter.ingestJobId.name", PluginParameterType.STRING)
+        .withDescription("plugin.fixAncestorsPlugin.parameter.ingestJobId.description").build());
   }
 
   @Override
@@ -69,7 +69,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticName() {
-    return "AIP ancestor hierarchy fix";
+    return "plugin.fixAncestorsPlugin.name";
   }
 
   @Override
@@ -78,9 +78,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticDescription() {
-    return "Attempts to fix the ancestor hierarchy of the AIPs in the catalogue by removing ghosts (i.e. AIPs with nonexistent ancestors in the catalogue) "
-      + "and merging AIPs with the same Ingest SIP identifier.\nThis task aims to fix problems that may occur when SIPs are ingested but not all the "
-      + "necessary items to construct the catalogue hierarchy have been received or properly ingested.";
+    return "plugin.fixAncestorsPlugin.description";
   }
 
   @Override

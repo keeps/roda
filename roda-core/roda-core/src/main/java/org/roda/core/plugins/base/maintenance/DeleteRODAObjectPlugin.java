@@ -55,14 +55,14 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "Event details", PluginParameterType.STRING)
-        .isMandatory(false).withDescription("Details that will be used when creating event").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "plugin.generic.parameter.eventDetails.name", PluginParameterType.STRING)
+        .isMandatory(false).withDescription("plugin.generic.parameter.eventDetails.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DONT_CHECK_RELATIVES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DONT_CHECK_RELATIVES, "Don't check relatives",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DONT_CHECK_RELATIVES, "plugin.deleteRodaObjectPlugin.parameter.checkRelatives.name",
           PluginParameterType.BOOLEAN)
-        .withDefaultValue("false").isMandatory(false).withDescription("If relatives shouldn't be checked for deletion")
+        .withDefaultValue("false").isMandatory(false).withDescription("plugin.deleteRodaObjectPlugin.parameter.checkRelatives.description")
         .build());
   }
 
@@ -78,12 +78,12 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
   @Override
   public String getName() {
-    return "Delete RODA entities";
+    return "plugin.deleteRodaObjectPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Delete any removable type of RODA entities";
+    return "plugin.deleteRodaObjectPlugin.description";
   }
 
   @Override

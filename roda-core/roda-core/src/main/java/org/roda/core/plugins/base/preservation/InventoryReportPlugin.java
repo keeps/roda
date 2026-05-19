@@ -56,8 +56,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InventoryReportPlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(InventoryReportPlugin.class);
-
   public static final String EXPORT_CSV_TEMP_FOLDER = "CSV";
   public static final String CSV_FILE_FIELDS = "parameter.csv.file.fields";
   public static final String CSV_FILE_OUTPUT = "parameter.csv.file.output";
@@ -65,7 +63,6 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   public static final String CSV_FILE_OUTPUT_DATA = "parameter.csv.file.output.data";
   public static final String CSV_FILE_OUTPUT_DESCRIPTIVE = "parameter.csv.file.output.descriptive";
   public static final String CSV_FILE_OTHER_METADATA_TYPES = "parameter.csv.file.output.other";
-
   public static final String CSV_FIELD_SIP_ID = "sipId";
   public static final String CSV_FIELD_AIP_ID = "aipId";
   public static final String CSV_FIELD_REPRESENTATION_ID = "representationId";
@@ -73,26 +70,60 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   public static final String CSV_FIELD_FILE_ID = "fileId";
   public static final String CSV_FIELD_ISDIRECTORY = "isDirectory";
   public static final String CSV_FIELD_PARENT_ID = "parentId";
-
   public static final String CSV_FIELD_CHECKSUM_SHA1 = "SHA-1";
   public static final String CSV_FIELD_CHECKSUM_SHA256 = "SHA-256";
   public static final String CSV_FIELD_CHECKSUM_MD5 = "MD5";
-
   public static final String CSV_FILE_TYPE = "type";
-
-  public enum CSV_LINE_TYPE {
-    DATA, METADATA_DESCRIPTIVE, METADATA_OTHER
-  }
-
-  protected static final List<String> CHECKSUM_ALGORITHMS = Arrays.asList(CSV_FIELD_CHECKSUM_MD5,
-    CSV_FIELD_CHECKSUM_SHA1, CSV_FIELD_CHECKSUM_SHA256);
-
   public static final String CSV_DEFAULT_FIELDS = StringUtils.join(Arrays.asList(CSV_FIELD_SIP_ID, CSV_FIELD_AIP_ID,
     CSV_FIELD_REPRESENTATION_ID, CSV_FIELD_FILE_PATH, CSV_FIELD_FILE_ID, CSV_FIELD_PARENT_ID, CSV_FIELD_ISDIRECTORY,
     CSV_FILE_TYPE, CSV_FIELD_CHECKSUM_SHA256, CSV_FIELD_CHECKSUM_MD5, CSV_FIELD_CHECKSUM_SHA1), ",");
   public static final String CSV_DEFAULT_OUTPUT = "/tmp/output.csv";
   public static final String CSV_DEFAULT_HEADERS = "true";
   public static final String CSV_DEFAULT_OTHER_METADATA = "ApacheTika,Siegfried";
+  protected static final List<String> CHECKSUM_ALGORITHMS = Arrays.asList(CSV_FIELD_CHECKSUM_MD5,
+    CSV_FIELD_CHECKSUM_SHA1, CSV_FIELD_CHECKSUM_SHA256);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InventoryReportPlugin.class);
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
+  static {
+    pluginParameters.put(CSV_FILE_FIELDS,
+      PluginParameter
+        .getBuilder(CSV_FILE_FIELDS, "plugin.inventoryReportPlugin.parameter.fields.name", PluginParameterType.STRING)
+        .withDefaultValue(CSV_DEFAULT_FIELDS)
+        .withDescription("plugin.inventoryReportPlugin.parameter.fields.description").build());
+
+    pluginParameters.put(CSV_FILE_OUTPUT,
+      PluginParameter
+        .getBuilder(CSV_FILE_OUTPUT, "plugin.inventoryReportPlugin.parameter.output.name", PluginParameterType.STRING)
+        .withDefaultValue(CSV_DEFAULT_OUTPUT)
+        .withDescription("plugin.inventoryReportPlugin.parameter.output.description").build());
+
+    pluginParameters.put(CSV_FILE_HEADERS, PluginParameter
+      .getBuilder(CSV_FILE_HEADERS, "plugin.inventoryReportPlugin.parameter.headers.name", PluginParameterType.BOOLEAN)
+      .withDefaultValue(CSV_DEFAULT_HEADERS)
+      .withDescription("plugin.inventoryReportPlugin.parameter.headers.description").build());
+
+    pluginParameters.put(CSV_FILE_OUTPUT_DATA,
+      PluginParameter
+        .getBuilder(CSV_FILE_OUTPUT_DATA, "plugin.inventoryReportPlugin.parameter.outputData.name",
+          PluginParameterType.BOOLEAN)
+        .withDefaultValue(CSV_DEFAULT_HEADERS)
+        .withDescription("plugin.inventoryReportPlugin.parameter.outputData.description").build());
+
+    pluginParameters.put(CSV_FILE_OUTPUT_DESCRIPTIVE,
+      PluginParameter
+        .getBuilder(CSV_FILE_OUTPUT_DESCRIPTIVE, "plugin.inventoryReportPlugin.parameter.outputDescriptive.name",
+          PluginParameterType.BOOLEAN)
+        .withDefaultValue(CSV_DEFAULT_HEADERS)
+        .withDescription("plugin.inventoryReportPlugin.parameter.outputDescriptive.description").build());
+
+    pluginParameters.put(CSV_FILE_OTHER_METADATA_TYPES,
+      PluginParameter
+        .getBuilder(CSV_FILE_OTHER_METADATA_TYPES, "plugin.inventoryReportPlugin.parameter.otherMetadataTypes.name",
+          PluginParameterType.STRING)
+        .withDefaultValue(CSV_DEFAULT_OTHER_METADATA)
+        .withDescription("plugin.inventoryReportPlugin.parameter.otherMetadataTypes.description").build());
+  }
 
   private List<String> fields = null;
   private Path output;
@@ -100,43 +131,6 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   private boolean outputDataInformation;
   private boolean outputDescriptiveMetadataInformation;
   private List<String> otherMetadataTypes;
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
-
-  static {
-    pluginParameters.put(CSV_FILE_FIELDS, PluginParameter
-      .getBuilder(CSV_FILE_FIELDS, "Attributes to include in the report", PluginParameterType.STRING)
-      .withDefaultValue(CSV_DEFAULT_FIELDS)
-      .withDescription(
-        "List of file attributes to include in the inventory export. The example includes all the possible options. Remove attributes as necessary.")
-      .build());
-    pluginParameters.put(CSV_FILE_OUTPUT,
-      PluginParameter.getBuilder(CSV_FILE_OUTPUT, "Report file path", PluginParameterType.STRING)
-        .withDefaultValue(CSV_DEFAULT_OUTPUT)
-        .withDescription("The full path and file name on the server where the inventory report file should be created.")
-        .build());
-    pluginParameters.put(CSV_FILE_HEADERS,
-      PluginParameter.getBuilder(CSV_FILE_HEADERS, "Include header line", PluginParameterType.BOOLEAN)
-        .withDefaultValue(CSV_DEFAULT_HEADERS).withDescription("Include a header line in the CSV inventory report.")
-        .build());
-    pluginParameters.put(CSV_FILE_OUTPUT_DATA,
-      PluginParameter.getBuilder(CSV_FILE_OUTPUT_DATA, "Include data files", PluginParameterType.BOOLEAN)
-        .withDefaultValue(CSV_DEFAULT_HEADERS)
-        .withDescription("Include in the inventory report information about data files that exist inside AIPs.")
-        .build());
-    pluginParameters.put(CSV_FILE_OUTPUT_DESCRIPTIVE,
-      PluginParameter
-        .getBuilder(CSV_FILE_OUTPUT_DESCRIPTIVE, "Include descriptive metadata files", PluginParameterType.BOOLEAN)
-        .withDefaultValue(CSV_DEFAULT_HEADERS)
-        .withDescription(
-          "Include in the inventory report information about descriptive metadata files that exist inside AIPs.")
-        .build());
-    pluginParameters.put(CSV_FILE_OTHER_METADATA_TYPES,
-      PluginParameter
-        .getBuilder(CSV_FILE_OTHER_METADATA_TYPES, "Include other metadata files", PluginParameterType.STRING)
-        .withDefaultValue(CSV_DEFAULT_OTHER_METADATA).withDescription(
-          "Include in the inventory report information about other metadata files that exist inside AIPs.")
-        .build());
-  }
 
   @Override
   public void init() throws PluginException {
@@ -150,17 +144,12 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Inventory Report Creator";
+    return "plugin.inventoryReportPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "The Inventory Report Creator plugin automates the generation of a detailed inventory report in CSV format for all AIPs and their corresponding "
-      + "files (both data and metadata) within a repository. The report includes technical information such as SIP ID, AIP ID, representation ID, "
-      + "file path, and cryptographic hash values such as SHA-256, MD5, and SHA-1. This information can be used to validate the completeness and correctness "
-      + "of the repository content by comparing it to previous inventory reports generated during pre-ingest.\nThe Inventory Report Comparator App is "
-      + "an optional tool that can be used to compare inventory reports from different time periods. This allows for easy identification of any changes "
-      + "or discrepancies in the repository's content over time. To learn more about the Inventory Report Comparator App or to request a demo, please contact sales@keep.pt.";
+    return "plugin.inventoryReportPlugin.description";
   }
 
   @Override
@@ -222,8 +211,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
 
     Path jobCSVTempFolder = getJobCSVTempFolder();
     Path csvTempFile = jobCSVTempFolder.resolve(IdUtils.createUUID() + ".csv");
@@ -234,8 +223,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
         @Override
 
-        public void process(IndexService index, ModelService model, Report report,
-          Job cachedJob, JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        public void process(IndexService index, ModelService model, Report report, Job cachedJob,
+          JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
           processAIP(model, jobPluginInfo, csvFilePrinter, object);
         }
       }, index, model, liteList);
@@ -244,8 +233,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     }
   }
 
-  private void processAIP(ModelService model, JobPluginInfo jobPluginInfo,
-    CSVPrinter csvFilePrinter, AIP aip) {
+  private void processAIP(ModelService model, JobPluginInfo jobPluginInfo, CSVPrinter csvFilePrinter, AIP aip) {
     if (csvFilePrinter == null) {
       LOGGER.warn("CSVPrinter is NULL! Skipping...");
       return;
@@ -276,8 +264,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     try {
       Path jobCSVTempFolder = getJobCSVTempFolder();
       Files.createDirectories(jobCSVTempFolder);
@@ -378,5 +365,9 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   @Override
   public List<Class<AIP>> getObjectClasses() {
     return Arrays.asList(AIP.class);
+  }
+
+  public enum CSV_LINE_TYPE {
+    DATA, METADATA_DESCRIPTIVE, METADATA_OTHER
   }
 }

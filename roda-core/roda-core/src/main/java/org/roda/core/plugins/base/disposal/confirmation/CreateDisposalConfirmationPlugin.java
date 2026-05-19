@@ -12,7 +12,6 @@ import static org.roda.core.data.common.RodaConstants.PLUGIN_PARAMS_DISPOSAL_CON
 import static org.roda.core.data.common.RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE;
 import static org.roda.core.data.common.RodaConstants.PreservationEventType;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,7 +57,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,11 +71,11 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE,
-      PluginParameter.getBuilder(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE, "Disposal confirmation title",
-        PluginParameter.PluginParameterType.STRING).withDescription("Disposal confirmation report title").build());
+      PluginParameter.getBuilder(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE, "plugin.createDisposalConfirmationPlugin.parameter.title.name",
+        PluginParameter.PluginParameterType.STRING).withDescription("plugin.createDisposalConfirmationPlugin.parameter.title.description").build());
     pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO,
-      PluginParameter.getBuilder(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO, "Disposal confirmation information",
-        PluginParameter.PluginParameterType.STRING).withDefaultValue("Disposal confirmation information").build());
+      PluginParameter.getBuilder(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO, "plugin.createDisposalConfirmationPlugin.parameter.info.name",
+        PluginParameter.PluginParameterType.STRING).withDefaultValue("plugin.createDisposalConfirmationPlugin.parameter.info.description").build());
   }
 
   private final Set<String> disposalSchedules = new HashSet<>();
@@ -89,7 +87,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
   private Map<String, String> extraInformation;
 
   public static String getStaticName() {
-    return "Create disposal confirmation report";
+    return "plugin.createDisposalConfirmationPlugin.name";
   }
 
   public static String getStaticDescription() {
@@ -260,8 +258,8 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
             "was successfully assign to disposal confirmation", confirmationId, aip.getId());
 
           aipCounter++;
-        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException |
-                 AlreadyExistsException e) {
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+          | AlreadyExistsException e) {
           LOGGER.error("Failed to assign AIP '{}' to disposal confirmation '{}': {}", aip.getId(), confirmationId,
             e.getMessage(), e);
           state = PluginState.FAILURE;
@@ -410,8 +408,8 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           "was skipped from being assign to disposal confirmation due to incompatible disposal schedule",
           confirmationId, aip.getId());
       }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException |
-             AlreadyExistsException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
+      | AlreadyExistsException e) {
       LOGGER.error("Failed to assign AIP '{}' to disposal confirmation '{}': {}", child.getId(), confirmationId,
         e.getMessage(), e);
       state = PluginState.FAILURE;

@@ -43,6 +43,10 @@ import org.roda.core.model.ModelService;
  */
 public class DisposalHoldPluginUtils {
 
+  private DisposalHoldPluginUtils() {
+    /* This utility class should not be instantiated */
+  }
+
   public static void addDisposalHoldAIPMetadata(AIP aip, String disposalHoldId, String associatedBy) {
     DisposalAIPMetadata disposal;
     if (aip.getDisposal() != null) {

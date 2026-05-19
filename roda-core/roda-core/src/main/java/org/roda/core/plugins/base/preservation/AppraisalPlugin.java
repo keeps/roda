@@ -61,13 +61,13 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ACCEPT,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_ACCEPT, "Appraisal accept or reject", PluginParameterType.BOOLEAN)
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_ACCEPT, "plugin.appraisalPlugin.parameter.acceptOrReject.name", PluginParameterType.BOOLEAN)
         .withDefaultValue("true").isMandatory(false)
-        .withDescription("Allows to accept or reject intellectual entities.").build());
+        .withDescription("plugin.appraisalPlugin.parameter.acceptOrReject.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REJECT_REASON,
-      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_REJECT_REASON, "Reject reason", PluginParameterType.STRING)
-        .isMandatory(false).withDescription("Appraisal reject reason").build());
+      PluginParameter.getBuilder(RodaConstants.PLUGIN_PARAMS_REJECT_REASON, "plugin.appraisalPlugin.parameter.rejectReason.name", PluginParameterType.STRING)
+        .isMandatory(false).withDescription("plugin.appraisalPlugin.parameter.rejectReason.description").build());
   }
 
   @Override
@@ -82,12 +82,12 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Update AIP permissions recursively";
+    return "plugin.appraisalPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Update AIP permissions recursively copying from parent or using serializable permission object";
+    return "";
   }
 
   @Override

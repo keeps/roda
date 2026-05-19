@@ -25,7 +25,7 @@ public class ReindexRepresentationPlugin extends ReindexRodaEntityPlugin<Represe
 
   @Override
   public String getName() {
-    return "Rebuild representation index";
+    return "plugin.reindexRepresentationPlugin.name";
   }
 
   @Override

@@ -54,14 +54,14 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("false").isMandatory(false).withDescription("Clear all indexes before reindexing them.")
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "plugin.reindexRodaEntityPlugin.parameter.clearIndexes.name", PluginParameterType.BOOLEAN)
+        .withDefaultValue("false").isMandatory(false).withDescription("plugin.reindexRodaEntityPlugin.parameter.clearIndexes.description")
         .build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN)
-        .withDefaultValue("true").isMandatory(false).withDescription("Optimize indexes after reindexing them.")
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "plugin.reindexRodaEntityPlugin.parameter.optimizeIndexes.name", PluginParameterType.BOOLEAN)
+        .withDefaultValue("true").isMandatory(false).withDescription("plugin.reindexRodaEntityPlugin.parameter.optimizeIndexes.description")
         .build());
   }
 
@@ -77,14 +77,12 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Rebuild transferred resource index";
+    return "plugin.reindexTransferredResourcePlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies between what is "
-      + "shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for "
-      + "various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
+    return "plugin.reindexRodaEntityPlugin.description";
   }
 
   @Override

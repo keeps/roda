@@ -71,12 +71,12 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public String getName() {
-    return "Uploaded file/folder";
+    return "plugin.transferredResourceToAipPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "Treats a file/folder as a SIP.";
+    return "plugin.transferredResourceToAipPlugin.description";
   }
 
   @Override

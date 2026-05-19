@@ -54,19 +54,19 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL, "Override disposal schedule",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL, "plugin.applyDisposalRulesPlugin.parameter.overrideManual.name",
           PluginParameter.PluginParameterType.BOOLEAN)
-        .withDefaultValue("false").withDescription("Overrides manually associated disposal schedules.").build());
+        .withDefaultValue("false").withDescription("plugin.applyDisposalRulesPlugin.parameter.overrideManual.description").build());
   }
 
   private boolean overrideManualAssociations = false;
 
   public static String getStaticName() {
-    return "Disposal schedule association via disposal rule";
+    return "plugin.applyDisposalRulesPlugin.name";
   }
 
   public static String getStaticDescription() {
-    return "Associates a disposal schedule to an AIP via rules previously defined for the repository.";
+    return "plugin.applyDisposalRulesPlugin.description";
   }
 
   @Override

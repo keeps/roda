@@ -59,12 +59,12 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public String getName() {
-    return "BagIt";
+    return "plugin.bagitToAipPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return "BagIt as a zip file";
+    return "plugin.bagitToAipPlugin.description";
   }
 
   @Override

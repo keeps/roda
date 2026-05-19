@@ -12,9 +12,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +46,6 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.DefaultModelService;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -59,10 +55,8 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceUtils;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FileStorageService;
-import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,14 +70,11 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   private boolean processedWithErrors = false;
 
   public static String getStaticName() {
-    return "Destroy records under disposal confirmation report";
+    return "plugin.destroyRecordsPlugin.name";
   }
 
   public static String getStaticDescription() {
-    return "Destroys records under a disposal confirmation report moving "
-      + "them to a disposal bin structure so they can be later on restored or "
-      + "permanently deleted from the storage. This process marks the AIP as "
-      + "destroyed and a PREMIS event is recorded after finishing the task.";
+    return "plugin.destroyRecordsPlugin.description";
   }
 
   @Override

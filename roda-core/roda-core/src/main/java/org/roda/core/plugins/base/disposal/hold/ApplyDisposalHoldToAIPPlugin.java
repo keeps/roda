@@ -59,16 +59,18 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
-          PluginParameter.PluginParameterType.STRING)
-        .isMandatory(true).isReadOnly(false).withDescription("Disposal hold identifier").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
+          "plugin.applyDisposalHoldToAipPlugin.parameter.holdId.name", PluginParameter.PluginParameterType.STRING)
+        .isMandatory(true).isReadOnly(false)
+        .withDescription("plugin.applyDisposalHoldToAipPlugin.parameter.holdId.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE, "Override disposal holds",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE,
+          "plugin.applyDisposalHoldToAipPlugin.parameter.override.name",
           PluginParameter.PluginParameterType.BOOLEAN)
         .withDefaultValue("false").isMandatory(true).isReadOnly(false)
-        .withDescription("Lift all disposal holds associated and apply the selected disposal hold").build());
+        .withDescription("plugin.applyDisposalHoldToAipPlugin.parameter.override.description").build());
 
   }
 
@@ -76,7 +78,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
   private boolean override;
 
   public static String getStaticName() {
-    return "Apply disposal hold";
+    return "plugin.applyDisposalHoldToAipPlugin.name";
   }
 
   public static String getStaticDescription() {

@@ -56,7 +56,7 @@ services:
       - "8025:8025" # web ui
 
   openldap:
-    image: docker.io/bitnami/openldap:2.6
+    image: docker.io/bitnamilegacy/openldap:2.6
     restart: unless-stopped
     user: 1001:root
     ports:
@@ -73,10 +73,11 @@ services:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
 
   roda:
-    image: docker.io/keeps/roda:development
+    image: docker.io/keeps/roda:latest
     restart: unless-stopped
     ports:
       - "8080:8080"
+      - "5005:5005"
     depends_on:
       - solr
       - clamd
@@ -86,6 +87,8 @@ services:
       - roda_data:/roda/data/
       - ./roda/config/roda-core.properties:/roda/config/roda-core.properties:ro
     environment:
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+
       # Spring configuration
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/roda_core_db
 

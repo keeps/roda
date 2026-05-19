@@ -20,7 +20,7 @@ public class ReindexJobPlugin extends ReindexRodaEntityPlugin<Job> {
 
   @Override
   public String getName() {
-    return "Rebuild job index";
+    return "plugin.reindexJobPlugin.name";
   }
 
   @Override

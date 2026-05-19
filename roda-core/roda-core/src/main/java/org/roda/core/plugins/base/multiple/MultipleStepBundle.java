@@ -26,21 +26,21 @@ public class MultipleStepBundle {
   private Plugin<?> plugin;
   private IndexService index;
   private ModelService model;
-  private MultipleJobPluginInfo mutipleJobPluginInfo;
+  private MultipleJobPluginInfo multipleJobPluginInfo;
   private PluginParameter pluginParameter;
   private Map<String, String> parameterValues;
   private List<? extends IsRODAObject> objects;
   private Job cachedJob;
 
   public MultipleStepBundle(final Plugin<?> plugin, final IndexService index, final ModelService model,
-    final MultipleJobPluginInfo mutipleJobPluginInfo,
+    final MultipleJobPluginInfo multipleJobPluginInfo,
     final PluginParameter pluginParameter, final Map<String, String> parameterValues,
     final List<? extends IsRODAObject> objects, final Job cachedJob) {
 
     this.plugin = plugin;
     this.index = index;
     this.model = model;
-    this.mutipleJobPluginInfo = mutipleJobPluginInfo;
+    this.multipleJobPluginInfo = multipleJobPluginInfo;
     this.pluginParameter = pluginParameter;
     this.parameterValues = parameterValues;
     this.objects = objects;
@@ -72,11 +72,11 @@ public class MultipleStepBundle {
   }
 
   public MultipleJobPluginInfo getJobPluginInfo() {
-    return mutipleJobPluginInfo;
+    return multipleJobPluginInfo;
   }
 
   public void setJobPluginInfo(MultipleJobPluginInfo multipleJobPluginInfo) {
-    this.mutipleJobPluginInfo = multipleJobPluginInfo;
+    this.multipleJobPluginInfo = multipleJobPluginInfo;
   }
 
   public PluginParameter getPluginParameter() {

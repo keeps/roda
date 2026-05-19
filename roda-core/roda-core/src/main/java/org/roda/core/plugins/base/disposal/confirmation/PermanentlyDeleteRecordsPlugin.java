@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.base.disposal.confirmation;
 
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,7 +24,6 @@ import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
-import org.roda.core.model.DefaultModelService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
@@ -48,12 +46,11 @@ public class PermanentlyDeleteRecordsPlugin extends AbstractPlugin<DisposalConfi
   private static final Logger LOGGER = LoggerFactory.getLogger(PermanentlyDeleteRecordsPlugin.class);
 
   public static String getStaticName() {
-    return "Permanently delete records from disposal confirmation report";
+    return "plugin.permanentlyDeleteRecordsPlugin.name";
   }
 
   public static String getStaticDescription() {
-    return "Permanently deletes from the disposal bin the original records destroyed releasing storage space from the repository."
-      + "A PREMIS event is recorded after finishing the task.";
+    return "plugin.permanentlyDeleteRecordsPlugin.description";
   }
 
   @Override

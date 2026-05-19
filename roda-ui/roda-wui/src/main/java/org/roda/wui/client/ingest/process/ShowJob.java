@@ -63,7 +63,7 @@ public class ShowJob extends Composite {
         String jobId = historyTokens.get(0);
         Services services = new Services("Get job plugin info", "get");
         services.jobsResource(s -> s.findByUuid(jobId, LocaleInfo.getCurrentLocale().getLocaleName())).thenCompose(
-          retrievedJob -> services.jobsResource(s -> s.getJobPluginInfo(new PluginInfoRequest(retrievedJob)))
+          retrievedJob -> services.jobsResource(s -> s.getJobPluginInfo(new PluginInfoRequest(retrievedJob), LocaleInfo.getCurrentLocale().getLocaleName()))
             .whenComplete((pluginInfoList, error) -> {
               if (error != null) {
                 if (error.getCause() instanceof NotFoundException) {
@@ -142,7 +142,7 @@ public class ShowJob extends Composite {
 
   // State Variables
   private IndexedJob job;
-  private Map<String, PluginInfo> pluginsInfo;
+  private final Map<String, PluginInfo> pluginsInfo;
   private Timer autoUpdateTimer = null;
   private int autoUpdateTimerPeriod = 0;
 
@@ -200,8 +200,12 @@ public class ShowJob extends Composite {
     PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
     if (pluginInfo != null && !pluginInfo.getParameters().isEmpty()) {
       pluginParametersPanel.add(
-        new JobParametersPanel(job, pluginsInfo, pluginInfo.getParameters(), messages.pluginLabelWithVersion(pluginInfo.getName(), pluginInfo.getVersion())));
+        new JobParametersPanel(job, pluginsInfo, pluginInfo.getParameters(), pluginNameAndVersion(pluginInfo.getName(), pluginInfo.getVersion())));
     }
+  }
+
+  private String pluginNameAndVersion(String pluginName, String version) {
+    return pluginName+ " (" + version + ")";
   }
 
   private void updateUi(final boolean isIngest) {

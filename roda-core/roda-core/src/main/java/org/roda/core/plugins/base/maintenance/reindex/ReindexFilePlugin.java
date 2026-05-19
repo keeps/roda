@@ -20,7 +20,7 @@ public class ReindexFilePlugin extends ReindexRodaEntityPlugin<File> {
 
   @Override
   public String getName() {
-    return "Rebuild file index";
+    return "plugin.reindexFilePlugin.name";
   }
 
   @Override

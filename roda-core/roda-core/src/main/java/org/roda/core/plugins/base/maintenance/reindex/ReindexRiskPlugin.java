@@ -20,7 +20,7 @@ public class ReindexRiskPlugin extends ReindexRodaEntityPlugin<Risk> {
 
   @Override
   public String getName() {
-    return "Rebuild risk index";
+    return "plugin.reindexRiskPlugin.name";
   }
 
   @Override

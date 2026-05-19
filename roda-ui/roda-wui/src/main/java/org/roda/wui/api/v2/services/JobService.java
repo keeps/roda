@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginInfoList;
 import org.roda.core.data.v2.jobs.PluginInfoRequest;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -60,6 +62,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v2.utils.ApiUtils;
+import org.roda.wui.common.I18nUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -335,37 +338,85 @@ public class JobService {
     }
   }
 
-  public List<PluginInfo> getJobPluginInfo(PluginInfoRequest pluginInfoRequest, List<PluginInfo> pluginsInfo) {
-    PluginInfo basePlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginInfoRequest.getPlugin());
+  public List<PluginInfo> getJobPluginInfo(PluginInfoRequest pluginInfoRequest, String localeString) {
+    List<PluginInfo> pluginsInfo = new ArrayList<>();
+    PluginInfo originalPlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginInfoRequest.getPlugin());
 
-    if (basePlugin != null) {
+    if (originalPlugin != null) {
+      // It's safest to assume the original object shouldn't be mutated.
+      // If getPluginInfo doesn't return a deep copy, we must clone it and its parameters.
+      PluginInfo basePlugin = clonePluginInfo(originalPlugin);
       pluginsInfo.add(basePlugin);
 
-      for (PluginParameter parameter : basePlugin.getParameters()) {
-        if (PluginParameter.PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
-          String pluginId = pluginInfoRequest.getPluginParameters().get(parameter.getId());
+      basePlugin.setName(I18nUtility.getMessage(originalPlugin.getName(), originalPlugin.getName(), localeString));
+      basePlugin.setDescription(I18nUtility.getMessage(originalPlugin.getDescription(), originalPlugin.getDescription(), localeString));
+
+      List<PluginParameter> translatedParameters = new ArrayList<>();
+
+      for (PluginParameter originalParam : originalPlugin.getParameters()) {
+        // Create a copy of the parameter so we don't mutate the cached singleton
+        PluginParameter translatedParam = cloneParameter(originalParam);
+
+        // Always use the original parameter's name/desc as the translation key
+        translatedParam.setName(I18nUtility.getMessage(originalParam.getName(), originalParam.getName(), localeString));
+        translatedParam.setDescription(I18nUtility.getMessage(originalParam.getDescription(), originalParam.getDescription(), localeString));
+
+        if (PluginParameter.PluginParameterType.PLUGIN_SIP_TO_AIP.equals(originalParam.getType())) {
+          String pluginId = pluginInfoRequest.getPluginParameters().get(originalParam.getId());
           if (pluginId == null) {
-            pluginId = parameter.getDefaultValue();
+            pluginId = originalParam.getDefaultValue();
           }
           if (pluginId != null) {
             PluginInfo refPlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginId);
             if (refPlugin != null) {
-              pluginsInfo.add(refPlugin);
+              // Clone the reference plugin as well before mutating
+              PluginInfo clonedRef = clonePluginInfo(refPlugin);
+              clonedRef.setName(I18nUtility.getMessage(refPlugin.getName(), refPlugin.getName(), localeString));
+              clonedRef.setDescription(I18nUtility.getMessage(refPlugin.getDescription(), refPlugin.getDescription(), localeString));
+              pluginsInfo.add(clonedRef);
             } else {
               LOGGER.warn("Could not find plugin: {}", pluginId);
             }
           }
         }
+        translatedParameters.add(translatedParam);
       }
+
+      // Override the old parameters list with your newly cloned and translated list
+      basePlugin.setParameters(translatedParameters);
     }
 
-    // FIXME nvieira 20170208 it could possibly, in the future, be necessary to
-    // add more plugin types adding all AIP to AIP plugins for job report list
-    List<PluginInfo> aipToAipPlugins = RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.AIP_TO_AIP);
-    if (aipToAipPlugins != null) {
-      pluginsInfo.addAll(aipToAipPlugins);
-    }
     return pluginsInfo;
+  }
+
+// --- Helper Methods ---
+
+  private PluginParameter cloneParameter(PluginParameter original) {
+    // If PluginParameter has a copy constructor (e.g., new PluginParameter(original)), use that!
+    // Otherwise, manually copy the fields based on your payload structure:
+    PluginParameter copy = new PluginParameter();
+    copy.setId(original.getId());
+    copy.setType(original.getType());
+    copy.setDefaultValue(original.getDefaultValue());
+    copy.setPossibleValues(original.getPossibleValues());
+    copy.setMandatory(original.isMandatory());
+    copy.setReadonly(original.isReadonly());
+    copy.setRenderingHints(original.getRenderingHints());
+    // Name and Description will be overwritten by the i18n utility later
+    return copy;
+  }
+
+  private PluginInfo clonePluginInfo(PluginInfo original) {
+    // Similarly, use a copy constructor if available, or manually copy standard fields.
+    // If RodaCoreFactory.getPluginManager().getPluginInfo() already returns a clone,
+    // you might not need this helper, but you MUST still use the cloneParameter helper above.
+    PluginInfo copy = new PluginInfo();
+    copy.setId(original.getId());
+    copy.setVersion(original.getVersion());
+    copy.setType(original.getType());
+    copy.setCategories(original.getCategories());
+    copy.setParameters(original.getParameters()); // Will be overwritten by translatedParameters
+    return copy;
   }
 
   private JobParallelism getJobParallelismFromConfiguration() {

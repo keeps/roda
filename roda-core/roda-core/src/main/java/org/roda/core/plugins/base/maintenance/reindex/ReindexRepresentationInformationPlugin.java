@@ -20,7 +20,7 @@ public class ReindexRepresentationInformationPlugin extends ReindexRodaEntityPlu
 
   @Override
   public String getName() {
-    return "Rebuild representation information index";
+    return "plugin.reindexRepresentationInformationPlugin.name";
   }
 
   @Override

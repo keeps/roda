@@ -183,7 +183,6 @@ public class JobParametersPanel extends GenericCollapsibleCardPanel<IndexedJob> 
       }
     }
 
-
     buildField(parameter.getName()).withBadge(value, cssClass).build();
   }
 }

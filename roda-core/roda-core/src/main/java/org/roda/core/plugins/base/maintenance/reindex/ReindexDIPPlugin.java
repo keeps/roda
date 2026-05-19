@@ -25,7 +25,7 @@ public class ReindexDIPPlugin extends ReindexRodaEntityPlugin<DIP> {
 
   @Override
   public String getName() {
-    return "Rebuild DIP index";
+    return "plugin.reindexDipPlugin.name";
   }
 
   @Override

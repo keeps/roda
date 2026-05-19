@@ -348,10 +348,8 @@ public class JobsController implements JobsRestService, Exportable {
   }
 
   @Override
-  public List<PluginInfo> getJobPluginInfo(@RequestBody PluginInfoRequest pluginInfoRequest) {
-    List<PluginInfo> pluginsInfo = new ArrayList<>();
-
-    return jobService.getJobPluginInfo(pluginInfoRequest, pluginsInfo);
+  public List<PluginInfo> getJobPluginInfo(@RequestBody PluginInfoRequest pluginInfoRequest, String localeString) {
+    return jobService.getJobPluginInfo(pluginInfoRequest, localeString);
   }
 
   @Override

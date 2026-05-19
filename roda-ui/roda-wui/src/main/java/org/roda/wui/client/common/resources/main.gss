@@ -10392,7 +10392,7 @@ wui-disposal-hold-data .form-textbox {
 
 .description-text {
     margin: 0;
-    color: black;
+    color: #343A3F;
     line-height: 1.5em;
     font-size: 1.4rem;
     overflow: hidden;

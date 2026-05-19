@@ -56,28 +56,29 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_MIMETYPE,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_MIMETYPE, "Mimetype", PluginParameter.PluginParameterType.STRING)
-        .withDescription("The MIME type to set for all selected files.").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_MIMETYPE, "plugin.editFileFormatPlugin.parameter.mimetype.name",
+          PluginParameter.PluginParameterType.STRING)
+        .withDescription("plugin.editFileFormatPlugin.parameter.mimetype.description").build());
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_FORMAT,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_FORMAT, "Format", PluginParameter.PluginParameterType.STRING)
-        .withDescription("The full format descriptor to set for all selected files.").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_FORMAT, "plugin.editFileFormatPlugin.parameter.format.name",
+          PluginParameter.PluginParameterType.STRING)
+        .withDescription("plugin.editFileFormatPlugin.parameter.format.description").build());
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_FORMAT_VERSION,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_FORMAT_VERSION, "Format version",
-          PluginParameter.PluginParameterType.STRING)
-        .withDescription("The version for the format descriptor to set for all selected files.").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_FORMAT_VERSION,
+          "plugin.editFileFormatPlugin.parameter.formatVersion.name", PluginParameter.PluginParameterType.STRING)
+        .withDescription("plugin.editFileFormatPlugin.parameter.formatVersion.description").build());
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PRONOM,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_PRONOM, "PRONOM", PluginParameter.PluginParameterType.STRING)
-        .withDescription("The PRONOM identifier to set for all selected files.").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_PRONOM, "plugin.editFileFormatPlugin.parameter.pronom.name",
+          PluginParameter.PluginParameterType.STRING)
+        .withDescription("plugin.editFileFormatPlugin.parameter.pronom.description").build());
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INCIDENCES,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INCIDENCES, "Clear Siegfried risk incidences",
-          PluginParameter.PluginParameterType.BOOLEAN)
-        .withDescription(
-          "Have this plugin clear risk incidences caused by Siegfried file format identification warnings.")
-        .build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_CLEAR_INCIDENCES,
+          "plugin.editFileFormatPlugin.parameter.clearIncidences.name", PluginParameter.PluginParameterType.BOOLEAN)
+        .withDescription("plugin.editFileFormatPlugin.parameter.clearIncidences.description").build());
   }
 
   private String mimetype;
@@ -85,14 +86,6 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
   private String formatVersion;
   private String pronom;
   private boolean clearIncidences;
-
-  public static String getStaticName() {
-    return "Edit File Format";
-  }
-
-  public static String getStaticDescription() {
-    return "Overwrites the selected files' extension, MIME type, format and PRONOM identifier with provided values.";
-  }
 
   @Override
   public void init() {
@@ -106,12 +99,12 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
 
   @Override
   public String getName() {
-    return getStaticName();
+    return "plugin.editFileFormatPlugin.name";
   }
 
   @Override
   public String getDescription() {
-    return getStaticDescription();
+    return "plugin.editFileFormatPlugin.description";
   }
 
   @Override
@@ -230,8 +223,7 @@ public class EditFileFormatPlugin extends AbstractPlugin<File> {
       true);
 
     LinkingIdentifier source = PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(),
-      file.getPath(), file.getId(),
-      RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
+      file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
     model.notifyFileUpdated(file);
     return source;
   }

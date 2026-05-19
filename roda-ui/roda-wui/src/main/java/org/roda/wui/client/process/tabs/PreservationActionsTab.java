@@ -120,7 +120,7 @@ public class PreservationActionsTab extends Composite {
     ListBox comboBox = new ListBox();
     comboBox.addStyleName("form-listbox");
 
-    comboBox.addItem("All", "all");
+    comboBox.addItem(messages.showPluginCategories("All"), "all");
     for (String category : categories) {
       comboBox.addItem(messages.showPluginCategories(category), category);
     }

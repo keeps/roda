@@ -20,7 +20,7 @@ public class ReindexDisposalConfirmationPlugin extends ReindexRodaEntityPlugin<D
 
   @Override
   public String getName() {
-    return "Rebuild disposal confirmation index";
+    return "plugin.reindexDisposalConfirmationPlugin.name";
   }
 
   @Override

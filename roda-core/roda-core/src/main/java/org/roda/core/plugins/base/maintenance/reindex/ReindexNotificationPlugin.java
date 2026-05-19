@@ -20,7 +20,7 @@ public class ReindexNotificationPlugin extends ReindexRodaEntityPlugin<Notificat
 
   @Override
   public String getName() {
-    return "Rebuild notification index";
+    return "plugin.reindexNotificationPlugin.name";
   }
 
   @Override
