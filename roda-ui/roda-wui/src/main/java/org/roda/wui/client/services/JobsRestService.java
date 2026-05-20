@@ -103,7 +103,8 @@ public interface JobsRestService extends RODAEntityRestService<IndexedJob> {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Report.class))),
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
   Report getJobReport(@PathVariable(name = "id") String id,
-    @PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_REPORT_ID) String reportId);
+    @PathVariable(name = RodaConstants.API_PATH_PARAM_JOB_REPORT_ID) String reportId,
+                      @Parameter(description = "The language to be used for internationalization", content = @Content(schema = @Schema(defaultValue = "en", implementation = String.class))) @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
   @RequestMapping(method = RequestMethod.POST, path = "/plugin-info", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Get job plugin info", description = "Gets the information about the plugins executed on the job", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = PluginInfoRequest.class))), responses = {

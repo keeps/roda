@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -858,8 +860,7 @@ public class PluginManager {
           }
         }
 
-        Function<Locale, ResourceBundle> provider = locale -> ResourceBundle.getBundle(buildPluginMessagesBaseName(),
-          locale, classloader, new PluginMessagesControl());
+        Function<Locale, ResourceBundle> provider = getLocaleResourceBundleFunction(p, classloader);
         RodaCoreFactory.addPluginMessagesProvider(p.pluginId, provider);
 
         // load certificates
@@ -933,6 +934,47 @@ public class PluginManager {
     } catch (IOException e1) {
       LOGGER.error("Plugin failed to initialize: {}", p.jarPath, e1);
     }
+  }
+
+  private Function<Locale, ResourceBundle> getLocaleResourceBundleFunction(PluginLoadInfo p, ClassLoader classloader) {
+    String pluginMessagesName = buildPluginMessagesBaseName();
+    String libraryMessagesName = RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_I18N_FOLDER + "/AbstractMessages";
+
+      return locale -> {
+        ResourceBundle pluginBundle = null;
+        ResourceBundle libraryBundle = null;
+        PluginMessagesControl control = new PluginMessagesControl();
+
+        // Try loading the Plugin's own Messages
+        try {
+          pluginBundle = ResourceBundle.getBundle(pluginMessagesName, locale, classloader, control);
+        } catch (MissingResourceException e) {
+          LOGGER.debug("No specific Messages found for plugin {}", p.pluginId);
+        }
+
+        // Try loading the Library's Messages
+        try {
+          libraryBundle = ResourceBundle.getBundle(libraryMessagesName, locale, classloader, control);
+        } catch (MissingResourceException e) {
+          LOGGER.debug("No abstract library Messages found for plugin {}", p.pluginId);
+        }
+        // Combine them, or return whichever one exists
+        if (pluginBundle != null && libraryBundle != null) {
+          return new CompositeResourceBundle(pluginBundle, libraryBundle);
+        } else if (pluginBundle != null) {
+          return pluginBundle;
+        } else if (libraryBundle != null) {
+          return libraryBundle;
+        } else {
+          // Return an empty bundle if neither exists to avoid null pointers down the line
+          return new ResourceBundle() {
+            @Override
+            protected Object handleGetObject(String key) { return null; }
+            @Override
+            public Enumeration<String> getKeys() { return Collections.emptyEnumeration(); }
+          };
+        }
+      };
   }
 
   private void loadPluginResources(Path jarPath, PluginInfo pluginInfo) throws IOException {

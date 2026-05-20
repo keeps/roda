@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.ui.TextBox;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.jobs.Certificate;
 import org.roda.core.data.v2.jobs.CertificateInfo;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -31,6 +32,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -253,7 +255,7 @@ public class PreservationActionsTab extends Composite {
 
     Button button = new Button();
     button.addStyleName("btn btn-primary btn-play");
-    if (info.getCertificateInfo().getCertificateStatus().equals(CertificateInfo.CertificateStatus.NOT_VERIFIED)) {
+    if (!shouldEnableCreateButton(info)) {
       button.setEnabled(false);
       button.setTitle(messages.pluginUntrustedMessage());
     }
@@ -276,6 +278,12 @@ public class PreservationActionsTab extends Composite {
       }
     });
     buttonsContainer.add(buttonCancel);
+  }
+
+  private boolean shouldEnableCreateButton(PluginInfo info) {
+    // Enable it for development or for verified plugins
+    boolean optIn = ConfigurationManager.getBoolean(false, RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY);
+    return (optIn && info.isInstalled()) || info.isVerified() && info.isInstalled();
   }
 
   private FlowPanel buildPluginParametersPanel(PluginInfo info) {

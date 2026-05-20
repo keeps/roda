@@ -55,6 +55,7 @@ import org.roda.core.data.v2.jobs.PluginInfoRequest;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
@@ -65,12 +66,15 @@ import org.roda.wui.api.v2.utils.ApiUtils;
 import org.roda.wui.common.I18nUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JobService {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(JobService.class);
+
+  @Autowired
+  TranslationService translationService;
 
   public Job getJobFromModel(String jobId)
     throws NotFoundException, AuthorizationDeniedException, RequestNotValidException, GenericException {
@@ -246,7 +250,8 @@ public class JobService {
     return jobUserDetails;
   }
 
-  public StreamResponse retrieveJobAttachment(String jobId, String attachmentId) throws NotFoundException, GenericException {
+  public StreamResponse retrieveJobAttachment(String jobId, String attachmentId)
+    throws NotFoundException, GenericException {
     Path filePath = RodaCoreFactory.getJobAttachmentsDirectoryPath().resolve(jobId).resolve(attachmentId);
 
     if (!filePath.startsWith(RodaCoreFactory.getJobAttachmentsDirectoryPath())) {
@@ -344,13 +349,16 @@ public class JobService {
 
     if (originalPlugin != null) {
       // It's safest to assume the original object shouldn't be mutated.
-      // If getPluginInfo doesn't return a deep copy, we must clone it and its parameters.
+      // If getPluginInfo doesn't return a deep copy, we must clone it and its
+      // parameters.
       PluginInfo basePlugin = clonePluginInfo(originalPlugin);
       pluginsInfo.add(basePlugin);
 
       basePlugin.setName(I18nUtility.getMessage(originalPlugin.getName(), originalPlugin.getName(), localeString));
-      basePlugin.setDescription(I18nUtility.getMessage(originalPlugin.getDescription(), originalPlugin.getDescription(), localeString));
-
+      if (StringUtils.isNotBlank(originalPlugin.getDescription())) {
+        basePlugin.setDescription(
+          I18nUtility.getMessage(originalPlugin.getDescription(), originalPlugin.getDescription(), localeString));
+      }
       List<PluginParameter> translatedParameters = new ArrayList<>();
 
       for (PluginParameter originalParam : originalPlugin.getParameters()) {
@@ -359,7 +367,10 @@ public class JobService {
 
         // Always use the original parameter's name/desc as the translation key
         translatedParam.setName(I18nUtility.getMessage(originalParam.getName(), originalParam.getName(), localeString));
-        translatedParam.setDescription(I18nUtility.getMessage(originalParam.getDescription(), originalParam.getDescription(), localeString));
+        if (StringUtils.isNotBlank(originalParam.getDescription())) {
+          translatedParam.setDescription(
+            I18nUtility.getMessage(originalParam.getDescription(), originalParam.getDescription(), localeString));
+        }
 
         if (PluginParameter.PluginParameterType.PLUGIN_SIP_TO_AIP.equals(originalParam.getType())) {
           String pluginId = pluginInfoRequest.getPluginParameters().get(originalParam.getId());
@@ -372,7 +383,8 @@ public class JobService {
               // Clone the reference plugin as well before mutating
               PluginInfo clonedRef = clonePluginInfo(refPlugin);
               clonedRef.setName(I18nUtility.getMessage(refPlugin.getName(), refPlugin.getName(), localeString));
-              clonedRef.setDescription(I18nUtility.getMessage(refPlugin.getDescription(), refPlugin.getDescription(), localeString));
+              clonedRef.setDescription(
+                I18nUtility.getMessage(refPlugin.getDescription(), refPlugin.getDescription(), localeString));
               pluginsInfo.add(clonedRef);
             } else {
               LOGGER.warn("Could not find plugin: {}", pluginId);
@@ -389,10 +401,11 @@ public class JobService {
     return pluginsInfo;
   }
 
-// --- Helper Methods ---
+  // --- Helper Methods ---
 
   private PluginParameter cloneParameter(PluginParameter original) {
-    // If PluginParameter has a copy constructor (e.g., new PluginParameter(original)), use that!
+    // If PluginParameter has a copy constructor (e.g., new
+    // PluginParameter(original)), use that!
     // Otherwise, manually copy the fields based on your payload structure:
     PluginParameter copy = new PluginParameter();
     copy.setId(original.getId());
@@ -407,9 +420,12 @@ public class JobService {
   }
 
   private PluginInfo clonePluginInfo(PluginInfo original) {
-    // Similarly, use a copy constructor if available, or manually copy standard fields.
-    // If RodaCoreFactory.getPluginManager().getPluginInfo() already returns a clone,
-    // you might not need this helper, but you MUST still use the cloneParameter helper above.
+    // Similarly, use a copy constructor if available, or manually copy standard
+    // fields.
+    // If RodaCoreFactory.getPluginManager().getPluginInfo() already returns a
+    // clone,
+    // you might not need this helper, but you MUST still use the cloneParameter
+    // helper above.
     PluginInfo copy = new PluginInfo();
     copy.setId(original.getId());
     copy.setVersion(original.getVersion());
@@ -449,5 +465,26 @@ public class JobService {
     } catch (IllegalArgumentException e) {
       return JobPriority.MEDIUM;
     }
+  }
+
+  public Report translateReports(Report report, String localeString) {
+    List<PluginType> types = new ArrayList<>(Arrays.asList(PluginType.values()));
+    PluginInfoList pluginInfoList = RodaCoreFactory.getPluginManager().getPluginsInfo(types, false);
+
+    List<Report> translatedReports = new ArrayList<>();
+
+    for (Report innerReport : report.getReports()) {
+      pluginInfoList.getPluginInfoList().stream().filter(p -> p.getId().equals(innerReport.getPlugin())).findFirst()
+        .ifPresentOrElse(pluginInfo -> {
+          PluginInfo infoTranslated = translationService.translatePlugin(pluginInfo, localeString);
+          Report clonedReport = new Report(innerReport);
+          clonedReport.setTitle(infoTranslated.getName());
+          clonedReport.setPluginName(infoTranslated.getName());
+          translatedReports.add(clonedReport);
+        }, () -> translatedReports.add(innerReport));
+    }
+
+    report.setReports(translatedReports);
+    return report;
   }
 }

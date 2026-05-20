@@ -21,6 +21,7 @@ import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.jobs.CreateJobRequest;
 import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.JobParallelism;
