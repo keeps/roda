@@ -379,10 +379,12 @@ public class DeleteRodaObjectPluginUtils {
           reportItem.addPluginDetails("Could not delete sublevel Files: " + e.getMessage());
         }
 
-
-        jobPluginInfo.incrementObjectsProcessed(reportItem.getPluginState());
+        if (!PluginState.RUNNING.equals(reportItem.getPluginState())) {
+          jobPluginInfo.incrementObjectsProcessed(reportItem.getPluginState());
+        }
 
         deleteFile(file, index, model, report, jobPluginInfo, reportItem, plugin, details, job);
+        jobPluginInfo.incrementObjectsProcessed(reportItem.getPluginState());
 
         if (doReport) {
           report.addReport(reportItem);

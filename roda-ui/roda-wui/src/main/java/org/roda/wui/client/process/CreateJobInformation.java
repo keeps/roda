@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
@@ -20,6 +21,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.File;
@@ -148,6 +150,10 @@ public class CreateJobInformation extends Composite {
   }
 
   public SelectedItems<? extends IsRODAObject> getSelectedItems() {
+    if (runOnListBox.getSelectedValue().equals(org.roda.core.data.v2.Void.class.getName())) {
+      return new SelectedItemsNone<>();
+    }
+
     if (selectedItems instanceof SelectedItemsAll<?>) {
       return SelectedItemsAll.create(runOnListBox.getSelectedValue());
     } else {

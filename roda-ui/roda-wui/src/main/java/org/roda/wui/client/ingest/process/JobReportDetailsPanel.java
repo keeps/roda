@@ -6,7 +6,6 @@ import config.i18n.client.ClientMessages;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 

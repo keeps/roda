@@ -41,7 +41,7 @@ public class ShowJobReport extends Composite {
 
         services.jobReportResource(s -> s.findByUuid(jobReportId, LocaleInfo.getCurrentLocale().getLocaleName()))
           .thenCompose(indexedReport -> services
-            .jobsResource(s -> s.getJobReport(indexedReport.getJobId(), jobReportId)).whenComplete((reports, error) -> {
+            .jobsResource(s -> s.getJobReport(indexedReport.getJobId(), jobReportId, LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((reports, error) -> {
               if (reports != null) {
                 indexedReport.setReports(reports.getReports());
                 ShowJobReport showJob = new ShowJobReport(indexedReport);

@@ -826,8 +826,13 @@ public class BreadcrumbUtils {
 
       List<String> jobPath = HistoryUtils.getHistory(ShowJob.RESOLVER.getHistoryPath(), report.getJobId());
 
-      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(report.getSourceObjectLabel()), report.getSourceObjectLabel(),
-        HistoryUtils.getHistory(jobPath, ShowJobReport.RESOLVER.getHistoryToken(), report.getUUID())));
+      if (StringUtils.isBlank(report.getSourceObjectLabel())) {
+        ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(report.getSourceObjectId()), report.getSourceObjectId(),
+                HistoryUtils.getHistory(jobPath, ShowJobReport.RESOLVER.getHistoryToken(), report.getUUID())));
+      } else {
+        ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(report.getSourceObjectLabel()), report.getSourceObjectLabel(),
+                HistoryUtils.getHistory(jobPath, ShowJobReport.RESOLVER.getHistoryToken(), report.getUUID())));
+      }
     }
 
     return ret;

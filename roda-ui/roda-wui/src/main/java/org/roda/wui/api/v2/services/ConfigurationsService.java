@@ -22,6 +22,9 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.jobs.CertificateInfo;
+import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.properties.ConversionProfile;
 import org.roda.core.data.v2.properties.ConversionProfileOutcomeType;
 import org.roda.core.data.v2.properties.ConversionProfiles;
@@ -29,7 +32,9 @@ import org.roda.core.data.v2.properties.DropdownPluginParameterItem;
 import org.roda.core.data.v2.properties.DropdownPluginParameterItems;
 import org.roda.core.data.v2.properties.ObjectClassFields;
 import org.roda.wui.client.browse.Viewers;
+import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.server.ServerTools;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -37,6 +42,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ConfigurationsService {
+
+  @Autowired
+  TranslationService translationService;
 
   private static final String UI_VIEWERS_PREFIX = "ui.viewers.";
 
@@ -189,5 +197,13 @@ public class ConfigurationsService {
     objectClassFields.setObjectClassFields(fieldsResult);
     objectClassFields.setTranslations(translationsResult);
     return objectClassFields;
+  }
+
+  public PluginInfo translatePlugin(PluginInfo originalPlugin, String localeString) {
+    return translationService.translatePlugin(originalPlugin, localeString);
+  }
+
+  public List<PluginParameter> translatePluginParameters(PluginInfo originalPlugin, String localeString) {
+    return translationService.translatePluginParameters(originalPlugin, localeString);
   }
 }

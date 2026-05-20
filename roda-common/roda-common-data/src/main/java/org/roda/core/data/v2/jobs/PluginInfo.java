@@ -59,6 +59,15 @@ public class PluginInfo implements Serializable {
   public PluginInfo(PluginInfo pluginInfo) {
     this(pluginInfo.getId(), pluginInfo.getName(), pluginInfo.getVersion(), pluginInfo.getDescription(),
       pluginInfo.getType(), pluginInfo.getCategories(), pluginInfo.getParameters());
+    this.objectClasses = pluginInfo.getObjectClasses();
+    this.isVerified = pluginInfo.isVerified();
+    this.certificateInfo = pluginInfo.getCertificateInfo();
+    this.isInstalled = pluginInfo.isInstalled();
+    this.hasLicenseFile = pluginInfo.hasLicenseFile();
+    this.licenseFilePath = pluginInfo.getLicenseFilePath();
+    this.hasDocumentationFile = pluginInfo.hasDocumentationFile();
+    this.documentationFilePath = pluginInfo.getDocumentationFilePath();
+    this.marketInfo = pluginInfo.getMarketInfo();
   }
 
   /**

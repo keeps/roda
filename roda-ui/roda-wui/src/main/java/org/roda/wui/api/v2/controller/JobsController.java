@@ -292,7 +292,7 @@ public class JobsController implements JobsRestService, Exportable {
   }
 
   @Override
-  public Report getJobReport(String jobId, String jobReportId) {
+  public Report getJobReport(String jobId, String jobReportId, String localeString) {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
     LogEntryState state = LogEntryState.SUCCESS;
@@ -301,7 +301,8 @@ public class JobsController implements JobsRestService, Exportable {
       // check permissions
       controllerAssistant.checkRoles(requestContext.getUser());
       ModelService model = RodaCoreFactory.getModelService();
-      return model.retrieveJobReport(jobId, jobReportId);
+
+      return jobService.translateReports(model.retrieveJobReport(jobId, jobReportId), localeString);
     } catch (AuthorizationDeniedException e) {
       state = LogEntryState.UNAUTHORIZED;
       throw new RESTException(e);
