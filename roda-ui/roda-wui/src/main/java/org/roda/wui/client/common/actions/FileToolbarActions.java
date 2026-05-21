@@ -33,6 +33,7 @@ import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
+import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -122,12 +123,6 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
-  public CanActResult userCanAct(Action<IndexedFile> action) {
-    return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
-      messages.reasonUserLacksPermission());
-  }
-
-  @Override
   public CanActResult contextCanAct(Action<IndexedFile> action) {
     return new CanActResult(
       aipId != null && representationId != null && POSSIBLE_ACTIONS_WITH_REPRESENTATION.contains(action),
@@ -135,7 +130,7 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
-  public CanActResult userCanAct(Action<IndexedFile> action, IndexedFile file) {
+  public CanActResult userCanAct(Action<IndexedFile> action, ActionableObject<IndexedFile> object) {
     return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
       messages.reasonUserLacksPermission());
   }
@@ -143,8 +138,8 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   @Override
   public CanActResult contextCanAct(Action<IndexedFile> action, IndexedFile file) {
     if (AIPState.UNDER_APPRAISAL.equals(state)) {
-      return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL.contains(action),
-              CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+      return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonAIPUnderAppraisal());
     }
 
     if (file.isDirectory()) {
@@ -165,8 +160,8 @@ public class FileToolbarActions extends AbstractActionable<IndexedFile> {
   @Override
   public CanActResult contextCanAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
     if (AIPState.UNDER_APPRAISAL.equals(state)) {
-      return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL.contains(action),
-              CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+      return new CanActResult(POSSIBLE_ACTIONS_ON_FILE_UNDER_APPRAISAL.contains(action), CanActResult.Reason.CONTEXT,
+        messages.reasonAIPUnderAppraisal());
     }
 
     if (aipId != null && representationId != null) {
