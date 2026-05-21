@@ -46,6 +46,7 @@ import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
+import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
@@ -214,6 +215,59 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     } else {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonCantActOnSingleObject());
+    }
+  }
+
+  @Override
+  public CanActResult userCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
+    IndexedAIP aip = object.getObject();
+    if (aip == NO_AIP_OBJECT) {
+      return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
+              messages.reasonUserLacksPermission());
+    } else if ((AIPAction.REMOVE.equals(action) || AIPAction.NEW_CHILD_AIP_BELOW.equals(action)
+            || AIPAction.MOVE_IN_HIERARCHY.equals(action) || AIPAction.CHANGE_TYPE.equals(action)
+            || AIPAction.NEW_REPRESENTATION.equals(action) || AIPAction.CREATE_DESCRIPTIVE_METADATA.equals(action))
+            && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalConfirmationId()))) {
+      return new CanActResult(false, CanActResult.Reason.USER, messages.reasonAIPProtectedByDisposalPolicy());
+    } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState()) && (AIPAction.CREATE_DESCRIPTIVE_METADATA.equals(action)
+            || AIPAction.NEW_CHILD_AIP_BELOW.equals(action) || SEARCH_WITHIN_ACTIONS.contains(action)
+            || DOWNLOAD_ACTIONS.contains(action) || AIPAction.NEW_PROCESS.equals(action)
+            || AIPAction.CHANGE_TYPE.equals(action) || AIPAction.MOVE_IN_HIERARCHY.equals(action)
+            || AIPAction.REMOVE.equals(action) || AIPAction.UPDATE_PERMISSIONS.equals(action)
+            || AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action) || AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action))) {
+      return new CanActResult(false, CanActResult.Reason.USER, messages.reasonAIPUnderAppraisal());
+    } else {
+      return new CanActResult(hasPermissions(action, aip.getPermissions()), CanActResult.Reason.USER,
+              messages.reasonUserLacksPermission());
+    }
+  }
+
+  @Override
+  public CanActResult contextCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
+    IndexedAIP aip = object.getObject();
+    if (aip == NO_AIP_OBJECT) {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action), CanActResult.Reason.CONTEXT,
+              messages.reasonNoObjectSelected());
+    } else if (AIPState.DESTROYED.equals(parentAipState)) {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, "");
+    } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState()) && AIPState.UNDER_APPRAISAL.equals(parentAipState)
+            && Objects.equals(parentAipId, NO_AIP_PARENT)) {
+      return new CanActResult(APPRAISAL_ACTIONS.contains(action), CanActResult.Reason.CONTEXT,
+              messages.reasonAffectedAIPUnderAppraisal());
+    } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
+      return new CanActResult(APPRAISAL_ACTIONS.contains(action) || POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action),
+              CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+    } else if (action.equals(AIPAction.REMOVE)
+            && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
+    } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId()) && (action.equals(AIPAction.MOVE_IN_HIERARCHY)
+            || action.equals(AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE) || action.equals(AIPAction.ASSOCIATE_DISPOSAL_HOLD))) {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
+    } else if (action.equals(AIPAction.MOVE_IN_HIERARCHY) && aip.isOnHold()) {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
+    } else {
+      return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action), CanActResult.Reason.CONTEXT,
+              messages.reasonCantActOnSingleObject());
     }
   }
 

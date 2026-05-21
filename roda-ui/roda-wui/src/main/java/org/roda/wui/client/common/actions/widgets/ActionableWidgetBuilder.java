@@ -334,7 +334,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
       Button groupButton = null;
       for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
         if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
-          && actionable.contextCanAct(actionButton.getAction(), objects).canAct()
+          && actionable.canAct(actionButton.getAction(), objects).canAct()
           && !ungroupedActions.contains(actionButton.getAction())) {
           ActionableTitle actionableTitle = actionGroup.getTitle();
 
@@ -384,12 +384,11 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
           popupPanel.add(buttonsPanel);
           break;
         }
-
       }
 
       for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
         if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
-          && actionable.contextCanAct(actionButton.getAction(), objects).canAct()) {
+          && actionable.canAct(actionButton.getAction(), objects).canAct()) {
 
           ActionButton<T> button = new ActionButton<>(actionButton);
 
