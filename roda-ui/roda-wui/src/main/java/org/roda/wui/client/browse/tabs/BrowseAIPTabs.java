@@ -18,13 +18,10 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.EditPermissionsTab;
 import org.roda.wui.client.browse.tabs.aip.AipDetailsTab;
 import org.roda.wui.client.browse.tabs.aip.AipPermissionTabs;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipToolbarActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
@@ -123,12 +120,14 @@ public class BrowseAIPTabs extends Tabs {
     }
 
     // Permissions
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.permissionsTab()), new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        return new AipPermissionTabs(aip);
-      }
-    });
+    if (PermissionClientUtils.hasPermissions("org.roda.wui.api.controllers.Browser.verifyPermissions")) {
+      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.permissionsTab()), new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          return new AipPermissionTabs(aip);
+        }
+      });
+    }
 
     // Details
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
