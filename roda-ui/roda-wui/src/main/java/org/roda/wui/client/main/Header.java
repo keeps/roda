@@ -307,6 +307,8 @@ public class Header extends Composite {
     updateResolverSubItemVisibility(UserLog.RESOLVER, administrationLog);
     updateResolverSubItemVisibility(NotificationRegister.RESOLVER, administrationNotifications);
     updateResolverSubItemVisibility(Statistics.RESOLVER, administrationStatistics);
+    updateSubItemVisibility(List.of("job.manage"), administrationMarketplace);
+    updateSubItemVisibility(List.of("job.manage"), administrationMonitoring);
     MenuItem adminItem = new MenuItem(messages.title("administration"), administrationMenu);
     adminItem.addStyleName("administration_menu_item");
     updateResolverTopItemVisibility(Management.RESOLVER, adminItem, 4);
@@ -325,7 +327,7 @@ public class Header extends Composite {
     updateResolverSubItemVisibility(RepresentationInformationNetwork.RESOLVER, planningRepresentationInformation);
     updateResolverSubItemVisibility(PreservationEvents.PLANNING_RESOLVER, planningEvent);
     updateResolverSubItemVisibility(PreservationAgents.RESOLVER, planningAgent);
-    MenuItem planningItem = new MenuItem(messages.title("planning"), planningMenu);
+    MenuItem planningItem = new MenuItem(messages.title("preservation"), planningMenu);
     planningItem.addStyleName("planning_menu_item");
     updateResolverTopItemVisibility(Planning.RESOLVER, planningItem, 6);
 
@@ -376,6 +378,21 @@ public class Header extends Composite {
 
   private void updateResolverSubItemVisibility(final HistoryResolver resolver, final MenuItem item) {
     resolver.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        logger.error("Error getting role", caught);
+      }
+
+      @Override
+      public void onSuccess(Boolean asRole) {
+        item.setVisible(asRole);
+      }
+    });
+  }
+
+  private void updateSubItemVisibility(List<String> roles, final MenuItem item) {
+    UserLogin.getInstance().checkRole(roles, new AsyncCallback<Boolean>() {
 
       @Override
       public void onFailure(Throwable caught) {
