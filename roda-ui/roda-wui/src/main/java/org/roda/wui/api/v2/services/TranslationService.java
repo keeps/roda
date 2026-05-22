@@ -45,31 +45,10 @@ public class TranslationService {
 
   public PluginInfo translatePlugin(PluginInfo originalPlugin, String localeString) {
     PluginInfo clonedPlugin = new PluginInfo(originalPlugin);
-    if (originalPlugin.getCertificateInfo().getCertificateStatus().equals(CertificateInfo.CertificateStatus.INTERNAL)) {
-      clonedPlugin.setName(I18nUtility.getMessage(originalPlugin.getName(), originalPlugin.getName(), localeString));
-      clonedPlugin.setDescription(
-              I18nUtility.getMessage(originalPlugin.getDescription(), originalPlugin.getDescription(), localeString));
-    } else {
-      Locale locale = ServerTools.parseLocale(localeString);
-      ResourceBundle resourceBundle = RodaCoreFactory.getPluginMessages(originalPlugin.getId(), locale);
 
-      String name;
-      String description;
-      try {
-        name = resourceBundle.getString(originalPlugin.getName());
-      } catch (MissingResourceException e) {
-        name = originalPlugin.getName();
-      }
-
-      try {
-        description = resourceBundle.getString(originalPlugin.getDescription());
-      } catch (MissingResourceException e) {
-        description = originalPlugin.getDescription();
-      }
-
-      clonedPlugin.setName(name);
-      clonedPlugin.setDescription(description);
-    }
+    clonedPlugin.setName(I18nUtility.getMessage(originalPlugin.getName(), originalPlugin.getName(), localeString));
+    clonedPlugin.setDescription(
+      I18nUtility.getMessage(originalPlugin.getDescription(), originalPlugin.getDescription(), localeString));
 
     return clonedPlugin;
   }
@@ -79,36 +58,11 @@ public class TranslationService {
     for (PluginParameter originalParam : originalPlugin.getParameters()) {
       PluginParameter clonedParam = new PluginParameter(originalParam);
 
-      if (originalPlugin.getCertificateInfo().getCertificateStatus()
-              .equals(CertificateInfo.CertificateStatus.INTERNAL)) {
+      clonedParam.setName(I18nUtility.getMessage(originalParam.getName(), originalParam.getName(), localeString));
+      clonedParam.setDescription(
+        I18nUtility.getMessage(originalParam.getDescription(), originalParam.getDescription(), localeString));
 
-        clonedParam.setName(I18nUtility.getMessage(originalParam.getName(), originalParam.getName(), localeString));
-        clonedParam.setDescription(
-                I18nUtility.getMessage(originalParam.getDescription(), originalParam.getDescription(), localeString));
-
-        translatedParameters.add(clonedParam);
-      } else {
-        Locale locale = ServerTools.parseLocale(localeString);
-        ResourceBundle resourceBundle = RodaCoreFactory.getPluginMessages(originalPlugin.getId(), locale);
-
-        String name;
-        String description;
-        try {
-          name = resourceBundle.getString(originalParam.getName());
-        } catch (MissingResourceException e) {
-          name = originalParam.getName();
-        }
-
-        try {
-          description = resourceBundle.getString(originalParam.getDescription());
-        } catch (MissingResourceException e) {
-          description = originalParam.getDescription();
-        }
-
-        clonedParam.setName(name);
-        clonedParam.setDescription(description);
-        translatedParameters.add(clonedParam);
-      }
+      translatedParameters.add(clonedParam);
     }
 
     return translatedParameters;
