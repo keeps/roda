@@ -34,6 +34,9 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.browse.BrowseTop;
+import org.roda.wui.client.browse.CreateDescriptiveMetadata;
+import org.roda.wui.client.browse.DescriptiveMetadataHistory;
+import org.roda.wui.client.browse.EditDescriptiveMetadata;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.ShowPreservationEvent;
 import org.roda.wui.client.disposal.DisposalConfirmations;
@@ -62,11 +65,16 @@ import org.roda.wui.client.management.members.CreateGroup;
 import org.roda.wui.client.management.members.CreateUser;
 import org.roda.wui.client.management.members.EditGroup;
 import org.roda.wui.client.management.members.EditUser;
-import org.roda.wui.client.planning.*;
-import org.roda.wui.client.planning.agents.PreservationAgents;
-import org.roda.wui.client.planning.agents.ShowPreservationAgent;
 import org.roda.wui.client.management.members.MemberManagement;
 import org.roda.wui.client.management.members.ShowMember;
+import org.roda.wui.client.planning.CreateRisk;
+import org.roda.wui.client.planning.EditRisk;
+import org.roda.wui.client.planning.RepresentationInformationNetwork;
+import org.roda.wui.client.planning.RiskRegister;
+import org.roda.wui.client.planning.ShowRepresentationInformation;
+import org.roda.wui.client.planning.ShowRisk;
+import org.roda.wui.client.planning.agents.PreservationAgents;
+import org.roda.wui.client.planning.agents.ShowPreservationAgent;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.CreateDefaultJob;
 import org.roda.wui.client.process.CreateSelectedJob;
@@ -483,7 +491,8 @@ public class BreadcrumbUtils {
 
     if (preservationEvent != null) {
       List<String> path = new ArrayList<>(ShowPreservationEvent.RESOLVER.getHistoryPath());
-      String label = StringUtils.isNotBlank(preservationEvent.getId()) ? preservationEvent.getId() : preservationEvent.getUUID();
+      String label = StringUtils.isNotBlank(preservationEvent.getId()) ? preservationEvent.getId()
+        : preservationEvent.getUUID();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
 
@@ -869,10 +878,11 @@ public class BreadcrumbUtils {
 
       if (StringUtils.isBlank(report.getSourceObjectLabel())) {
         ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(report.getSourceObjectId()), report.getSourceObjectId(),
-                HistoryUtils.getHistory(jobPath, ShowJobReport.RESOLVER.getHistoryToken(), report.getUUID())));
+          HistoryUtils.getHistory(jobPath, ShowJobReport.RESOLVER.getHistoryToken(), report.getUUID())));
       } else {
-        ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(report.getSourceObjectLabel()), report.getSourceObjectLabel(),
-                HistoryUtils.getHistory(jobPath, ShowJobReport.RESOLVER.getHistoryToken(), report.getUUID())));
+        ret.add(
+          new BreadcrumbItem(SafeHtmlUtils.fromString(report.getSourceObjectLabel()), report.getSourceObjectLabel(),
+            HistoryUtils.getHistory(jobPath, ShowJobReport.RESOLVER.getHistoryToken(), report.getUUID())));
       }
     }
 
@@ -932,6 +942,97 @@ public class BreadcrumbUtils {
       ActionProcess.RESOLVER.getHistoryPath()));
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.createJobTitle()), messages.createJobTitle(),
       CreateDefaultJob.RESOLVER.getHistoryPath()));
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getEditDescriptiveMetadataBreadcrumbs(IndexedAIP aip, String filename) {
+    List<BreadcrumbItem> ret = new ArrayList<>(getAipBreadcrumbs(aip));
+
+    List<String> path = new ArrayList<>(EditDescriptiveMetadata.RESOLVER.getHistoryPath());
+    path.add(aip.getId());
+    path.add(filename);
+
+    ret.add(new BreadcrumbItem(messages.editDescriptiveMetadataTitle(), path));
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getEditRepresentationDescriptiveMetadataBreadcrumbs(IndexedAIP aip,
+    IndexedRepresentation representation, String filename) {
+
+    List<BreadcrumbItem> ret = new ArrayList<>(getRepresentationBreadcrumbs(aip, representation));
+
+    List<String> path = new ArrayList<>(EditDescriptiveMetadata.RESOLVER.getHistoryPath());
+    path.add(aip.getId());
+    path.add(representation.getId());
+    path.add(filename);
+
+    ret.add(new BreadcrumbItem(messages.editDescriptiveMetadataTitle(), path));
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getCreateDescriptiveMetadataBreadcrumbs(IndexedAIP aip, boolean isNew) {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+
+    if (isNew) {
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.allCollectionsTitle()),
+        messages.allCollectionsTitle(), BrowseTop.RESOLVER.getHistoryPath()));
+    } else {
+      ret.addAll(getAipBreadcrumbs(aip));
+    }
+
+    List<String> path = new ArrayList<>(CreateDescriptiveMetadata.RESOLVER.getHistoryPath());
+    path.add(RodaConstants.RODA_OBJECT_AIP);
+    path.add(aip.getId());
+
+    if (isNew) {
+      path.add(CreateDescriptiveMetadata.NEW);
+    }
+
+    String label = isNew ? messages.newArchivalPackage() : messages.newDescriptiveMetadataTitle();
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(label), label, path));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getCreateRepresentationDescriptiveMetadataBreadcrumbs(IndexedAIP aip,
+    IndexedRepresentation representation) {
+    List<BreadcrumbItem> ret = new ArrayList<>(getRepresentationBreadcrumbs(aip, representation));
+
+    List<String> path = new ArrayList<>(CreateDescriptiveMetadata.RESOLVER.getHistoryPath());
+    path.add(RodaConstants.RODA_OBJECT_REPRESENTATION);
+    path.add(aip.getId());
+    path.add(representation.getId());
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.newDescriptiveMetadataTitle()),
+      messages.newDescriptiveMetadataTitle(), path));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getDescriptiveMetadataHistoryBreadcrumbs(IndexedAIP aip,
+    String descriptiveMetadataId) {
+    List<BreadcrumbItem> ret = new ArrayList<>(getAipBreadcrumbs(aip));
+
+    List<String> path = new ArrayList<>(DescriptiveMetadataHistory.RESOLVER.getHistoryPath());
+    path.add(aip.getId());
+    path.add(descriptiveMetadataId);
+
+    ret.add(new BreadcrumbItem(messages.historyDescriptiveMetadataTitle(), path));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getRepresentationDescriptiveMetadataHistoryBreadcrumbs(IndexedAIP aip,
+    IndexedRepresentation representation, String descriptiveMetadataId) {
+    List<BreadcrumbItem> ret = new ArrayList<>(getRepresentationBreadcrumbs(aip, representation));
+
+    List<String> path = new ArrayList<>(DescriptiveMetadataHistory.RESOLVER.getHistoryPath());
+    path.add(aip.getId());
+    path.add(representation.getId());
+    path.add(descriptiveMetadataId);
+
+    ret.add(new BreadcrumbItem(messages.historyDescriptiveMetadataTitle(), path));
+
     return ret;
   }
 }

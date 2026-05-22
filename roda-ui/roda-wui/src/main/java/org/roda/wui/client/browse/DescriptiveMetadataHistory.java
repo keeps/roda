@@ -5,9 +5,6 @@
  *
  * https://github.com/keeps/roda
  */
-/**
- *
- */
 package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
@@ -15,8 +12,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IndexedRepresentationRequest;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataVersions;
 import org.roda.core.data.v2.ip.metadata.ResourceVersion;
+import org.roda.wui.client.browse.tabs.DescriptiveMetadataTabs;
+import org.roda.wui.client.common.ActionsToolbar;
+import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -24,6 +27,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -34,12 +38,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -52,14 +50,14 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -70,6 +68,7 @@ import config.i18n.client.ClientMessages;
  */
 public class DescriptiveMetadataHistory extends Composite {
 
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -81,33 +80,50 @@ public class DescriptiveMetadataHistory extends Composite {
 
         Services service = new Services("History resolver", "get");
 
-        service.aipResource(s -> s.requestAIPLock(aipId)).whenComplete((value, error) -> {
-          if (value) {
-            if (representationId == null) {
-              service.aipResource(s -> s.retrieveAIPDescriptiveMetadataVersions(aipId, descriptiveMetadataId,
-                LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, throwable) -> {
-                  if (throwable != null) {
-                    AsyncCallbackUtils.defaultFailureTreatment(throwable);
-                  } else {
-                    DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, null,
-                      descriptiveMetadataId, result);
-                    callback.onSuccess(widget);
-                  }
-                });
-            } else {
-              service
-                .aipResource(s -> s.retrieveRepresentationDescriptiveMetadataVersions(aipId, representationId,
-                  descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName()))
-                .whenComplete((result, throwable) -> {
-                  if (throwable != null) {
-                    AsyncCallbackUtils.defaultFailureTreatment(throwable);
-                  } else {
-                    DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, representationId,
-                      descriptiveMetadataId, result);
-                    callback.onSuccess(widget);
-                  }
-                });
-            }
+        service.aipResource(s -> s.requestAIPLock(aipId)).whenComplete((locked, lockError) -> {
+          if (lockError != null) {
+            callback.onFailure(lockError);
+          } else if (!Boolean.TRUE.equals(locked)) {
+            GWT.log("DescriptiveMetadataHistory lock result: " + locked);
+            HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
+            Toast.showInfo(messages.editDescMetadataLockedTitle(), messages.editDescMetadataLockedText());
+            callback.onSuccess(null);
+          } else {
+            service.rodaEntityRestService(s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()),
+              IndexedAIP.class).whenComplete((aip, aipError) -> {
+                if (aipError != null) {
+                  callback.onFailure(aipError);
+                } else if (representationId == null) {
+                  service.aipResource(s -> s.retrieveAIPDescriptiveMetadataVersions(aip.getId(), descriptiveMetadataId,
+                    LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((versions, versionsError) -> {
+                      if (versionsError != null) {
+                        callback.onFailure(versionsError);
+                      } else {
+                        callback.onSuccess(new DescriptiveMetadataHistory(aip, null, descriptiveMetadataId, versions));
+                      }
+                    });
+                } else {
+                  service
+                    .representationResource(s -> s.retrieveIndexedRepresentationViaRequest(
+                      new IndexedRepresentationRequest(aipId, representationId)))
+                    .whenComplete((representation, representationError) -> {
+                      if (representationError != null) {
+                        callback.onFailure(representationError);
+                      } else {
+                        service.aipResource(s -> s.retrieveRepresentationDescriptiveMetadataVersions(aip.getId(),
+                          representation.getId(), descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName()))
+                          .whenComplete((versions, versionsError) -> {
+                            if (versionsError != null) {
+                              callback.onFailure(versionsError);
+                            } else {
+                              callback.onSuccess(
+                                new DescriptiveMetadataHistory(aip, representation, descriptiveMetadataId, versions));
+                            }
+                          });
+                      }
+                    });
+                }
+              });
           }
         });
       } else {
@@ -132,54 +148,36 @@ public class DescriptiveMetadataHistory extends Composite {
       return "history";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, DescriptiveMetadataHistory> {
-  }
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   private final String aipId;
   private final String representationId;
   private final String descriptiveMetadataId;
-  private DescriptiveMetadataVersions descriptiveMetadataVersions;
-
-  private boolean inHTML = true;
-  private String selectedVersion = null;
-  private boolean aipLocked;
 
   @UiField
-  ListBox list;
-
+  ActionsToolbar actionsToolbar;
   @UiField
-  Label descriptiveMetadataType;
-
+  NavigationToolbar<IndexedAIP> navigationToolbar;
   @UiField
-  HTML preview;
-
-  @UiField
-  FocusPanel showXml;
-
-  @UiField
-  Button buttonRevert;
-
-  @UiField
-  Button buttonRemove;
-
-  @UiField
-  Button buttonCancel;
-
+  FlowPanel radioContainer;
   @UiField
   TitlePanel title;
+  @UiField
+  SimplePanel tabsContainer;
+  @UiField
+  FocusPanel keyboardFocus;
+  @UiField
+  FlowPanel versionActionsPanel;
+  private DescriptiveMetadataVersions descriptiveMetadataVersions;
+  private String selectedVersion = null;
+  private boolean aipLocked;
 
   /**
    * Create a new panel to select descriptive metadata history
    *
-   * @param aipId
-   *          the AIP identifier.
-   * @param representationId
-   *          the representation identifier.
+   * @param aip
+   *          the AIP.
+   * @param representation
+   *          the representation.
    * @param descriptiveMetadataId
    *          the descriptive metadata identifier.
    * @param versions
@@ -187,54 +185,84 @@ public class DescriptiveMetadataHistory extends Composite {
    *          bundle @{DescriptiveMetadataVersionsBundle}
    *
    */
-  public DescriptiveMetadataHistory(final String aipId, final String representationId,
+  public DescriptiveMetadataHistory(final IndexedAIP aip, final IndexedRepresentation representation,
     final String descriptiveMetadataId, final DescriptiveMetadataVersions versions) {
-    this.aipId = aipId;
-    this.representationId = representationId;
+    this.aipId = aip.getId();
+    this.representationId = representation != null ? representation.getId() : null;
     this.descriptiveMetadataId = descriptiveMetadataId;
     this.descriptiveMetadataVersions = versions;
     aipLocked = true;
 
     initWidget(uiBinder.createAndBindUi(this));
-    CreateDescriptiveMetadata.initTitle(aipId, title);
-    init();
+    CreateDescriptiveMetadata.initTitle(aip, title, false);
+    title.addStyleName("mb-16");
 
-    list.addChangeHandler(new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        String versionKey = list.getSelectedValue();
-        selectedVersion = versionKey;
-        updatePreview();
-      }
-    });
-
-    PermissionClientUtils.bindPermission(buttonRevert, descriptiveMetadataVersions.getPermissions(),
-      RodaConstants.PERMISSION_METHOD_REVERT_DESCRIPTIVE_METADATA_VERSION);
-    PermissionClientUtils.bindPermission(buttonRemove, descriptiveMetadataVersions.getPermissions(),
-      RodaConstants.PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_VERSION);
-
-    Element firstElement = showXml.getElement().getFirstChildElement();
-    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
-      firstElement.setAttribute("title", "browse input");
+    navigationToolbar.withoutButtons().build();
+    if (representation == null) {
+      navigationToolbar
+        .updateBreadcrumbPath(BreadcrumbUtils.getDescriptiveMetadataHistoryBreadcrumbs(aip, descriptiveMetadataId));
+    } else {
+      navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getRepresentationDescriptiveMetadataHistoryBreadcrumbs(aip,
+        representation, descriptiveMetadataId));
     }
 
-    // Set the selected index
-    list.setSelectedIndex(0);
-    // Manually trigger a ValueChangeEvent
-    DomEvent.fireNativeEvent(Document.get().createChangeEvent(), list);
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse");
 
+    init();
+
+    actionsToolbar.setLabel(messages.historyDescriptiveMetadataTitle());
+    actionsToolbar.setTagsVisible(false);
+
+    if (PermissionClientUtils.hasPermissions(descriptiveMetadataVersions.getPermissions(),
+      RodaConstants.PERMISSION_METHOD_REVERT_DESCRIPTIVE_METADATA_VERSION)) {
+
+      Button revertBtn = new Button(messages.revertButton());
+      revertBtn.addStyleName("btn btn-play mr-10");
+      revertBtn.addStyleName("btn-separator-right");
+      revertBtn.addClickHandler(event -> revertSelectedVersion());
+
+      versionActionsPanel.add(revertBtn);
+    }
+
+    if (PermissionClientUtils.hasPermissions(descriptiveMetadataVersions.getPermissions(),
+      RodaConstants.PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_VERSION)) {
+
+      Button removeBtn = new Button(messages.removeButton());
+      removeBtn.addStyleName("btn btn-ban btn-danger");
+      removeBtn.addStyleName("btn-separator-right");
+      removeBtn.addClickHandler(event -> removeSelectedVersion());
+
+      versionActionsPanel.add(removeBtn);
+    }
+
+    Button cancelBtn = new Button(messages.cancelButton());
+    cancelBtn.addStyleName("btn");
+    cancelBtn.addStyleName("btn-link");
+
+    cancelBtn.addClickHandler(event -> cancel());
+    versionActionsPanel.add(cancelBtn);
   }
 
   private void init() {
-    // sort
+    radioContainer.clear();
+
+    if (descriptiveMetadataVersions.getVersions() == null) {
+      selectedVersion = null;
+      tabsContainer.clear();
+      return;
+    }
+
     List<ResourceVersion> versionList = new ArrayList<>(descriptiveMetadataVersions.getVersions());
     versionList.sort((v1, v2) -> (int) (v2.getCreatedDate().getTime() - v1.getCreatedDate().getTime()));
 
-    // create list layout
+    String radioGroupName = "versionsGroup_" + descriptiveMetadataId;
+    boolean isFirst = true;
+
     for (ResourceVersion version : versionList) {
       String versionKey = version.getId();
       String message = "";
+
       if (version.getProperties() != null) {
         message = messages.versionAction(version.getProperties().get(RodaConstants.VERSION_ACTION));
 
@@ -242,41 +270,40 @@ public class DescriptiveMetadataHistory extends Composite {
           message = messages.versionActionBy(message, version.getProperties().get(RodaConstants.VERSION_USER));
         }
       }
-      Date createdDate = version.getCreatedDate();
 
-      list.addItem(messages.descriptiveMetadataHistoryLabel(message, createdDate), versionKey);
+      Date createdDate = version.getCreatedDate();
+      String labelText = messages.descriptiveMetadataHistoryLabel(message, createdDate);
+      RadioButton rb = new RadioButton(radioGroupName, labelText);
+
+      rb.addStyleName("mb-5 display-block");
+      rb.addValueChangeHandler(event -> {
+        if (event.getValue()) {
+          selectedVersion = versionKey;
+          updateTabs();
+        }
+      });
+
+      if (isFirst) {
+        rb.setValue(true);
+        selectedVersion = versionKey;
+        isFirst = false;
+      }
+
+      radioContainer.add(rb);
     }
 
     if (!versionList.isEmpty()) {
-      list.setSelectedIndex(0);
-      selectedVersion = versionList.get(0).getId();
+      updateTabs();
     }
-
-    // Manually trigger a ValueChangeEvent
-    DomEvent.fireNativeEvent(Document.get().createChangeEvent(), list);
 
   }
 
-  protected void updatePreview() {
-    getDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, selectedVersion, inHTML,
-      new AsyncCallback<SafeHtml>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(SafeHtml html) {
-          preview.setHTML(html);
-          if (inHTML) {
-            preview.removeStyleName("code-pre");
-          } else {
-            preview.addStyleName("code-pre");
-            JavascriptUtils.runHighlighterOn(preview.getElement());
-          }
-        }
-      });
+  private void cancel() {
+    if (representationId == null) {
+      HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
+    } else {
+      HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+    }
   }
 
   private void getDescriptiveMetadata(final String aipId, final String representationId, final String descId,
@@ -353,27 +380,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
   }
 
-  public boolean isInHTML() {
-    return inHTML;
-  }
-
-  public void setInHTML(boolean inHTML) {
-    this.inHTML = inHTML;
-    if (inHTML) {
-      showXml.removeStyleName("toolbarLink-selected");
-    } else {
-      showXml.addStyleName("toolbarLink-selected");
-    }
-  }
-
-  @UiHandler("showXml")
-  void buttonShowXmlHandler(ClickEvent e) {
-    setInHTML(!isInHTML());
-    updatePreview();
-  }
-
-  @UiHandler("buttonRevert")
-  void buttonRevertHandler(ClickEvent e) {
+  void revertSelectedVersion() {
     Dialogs.showConfirmDialog(messages.descriptiveHistoryRevertConfirmDialogTitle(),
       messages.descriptiveHistoryRevertConfirmDialogMessage(), messages.dialogNo(), messages.dialogYes(),
       new NoAsyncCallback<Boolean>() {
@@ -412,8 +419,7 @@ public class DescriptiveMetadataHistory extends Composite {
       });
   }
 
-  @UiHandler("buttonRemove")
-  void buttonRemoveHandler(ClickEvent e) {
+  void removeSelectedVersion() {
 
     Dialogs.showConfirmDialog(messages.descriptiveHistoryRemoveConfirmDialogTitle(),
       messages.descriptiveHistoryRemoveConfirmDialogMessage(), messages.dialogNo(), messages.removeButton(),
@@ -468,49 +474,10 @@ public class DescriptiveMetadataHistory extends Composite {
       });
   }
 
-  protected void refresh() {
-
-    Services service = new Services("Get descriptive metadata versions", "get");
-
-    if (representationId == null) {
-      service.aipResource(s -> s.retrieveAIPDescriptiveMetadataVersions(aipId, descriptiveMetadataId,
-        LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((value, error) -> {
-          if (error != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(error);
-          } else {
-            DescriptiveMetadataHistory.this.descriptiveMetadataVersions = value;
-            clean();
-            init();
-          }
-        });
-    } else {
-      service.aipResource(s -> s.retrieveRepresentationDescriptiveMetadataVersions(aipId, representationId,
-        descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName())).whenComplete((result, throwable) -> {
-          if (throwable != null) {
-            AsyncCallbackUtils.defaultFailureTreatment(throwable);
-          } else {
-            DescriptiveMetadataHistory.this.descriptiveMetadataVersions = result;
-            clean();
-            init();
-          }
-        });
-    }
-  }
-
   protected void clean() {
-    list.clear();
-    descriptiveMetadataType.setText("");
+    radioContainer.clear();
     selectedVersion = null;
-    preview.setHTML("");
-  }
-
-  @UiHandler("buttonCancel")
-  void buttonCancelHandler(ClickEvent e) {
-    cancel();
-  }
-
-  private void cancel() {
-    HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
+    tabsContainer.clear();
   }
 
   @Override
@@ -520,5 +487,46 @@ public class DescriptiveMetadataHistory extends Composite {
       services.aipResource(s -> s.releaseAIPLock(this.aipId)).whenComplete((s, throwable) -> aipLocked = false);
     }
     super.onDetach();
+  }
+
+  protected void updateTabs() {
+    tabsContainer.clear();
+
+    if (selectedVersion == null) {
+      return;
+    }
+
+    DescriptiveMetadataTabs versionTabs = new DescriptiveMetadataTabs();
+    versionTabs.init(() -> new DescriptiveMetadataViewPanel(selectedVersion, true),
+      () -> new DescriptiveMetadataViewPanel(selectedVersion, false));
+
+    tabsContainer.setWidget(versionTabs);
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, DescriptiveMetadataHistory> {
+  }
+
+  private class DescriptiveMetadataViewPanel extends SimplePanel {
+    public DescriptiveMetadataViewPanel(String versionKey, boolean isHtml) {
+      final HTML content = new HTML();
+      setWidget(content);
+
+      getDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, versionKey, isHtml,
+        new AsyncCallback<SafeHtml>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(SafeHtml html) {
+            content.setHTML(html);
+            if (!isHtml) {
+              content.addStyleName("code-pre");
+              JavascriptUtils.runHighlighterOn(content.getElement());
+            }
+          }
+        });
+    }
   }
 }

@@ -46,7 +46,7 @@ public class BrowsePreservationEventTabs extends Tabs {
     this.outcomeDetails = outcomeDetails;
 
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {
-      ;
+
       @Override
       public Widget buildTabWidget() {
         return new DetailsPanelPreservationEvent(event, outcomeDetails);

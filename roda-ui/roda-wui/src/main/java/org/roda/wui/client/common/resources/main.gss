@@ -10719,6 +10719,24 @@ wui-disposal-hold-data .form-textbox {
     margin-top: 0.8rem;
 }
 
+.versions-timeline > span {
+    position: relative;
+    display: block;
+    margin-bottom: 12px;
+    min-height: 24px;
+}
+
+.versions-timeline > span:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 22px;
+    left: 10px;
+    bottom: -16px;
+    width: 2px;
+    background-color: #e0e0e0;
+    z-index: 1;
+}
+
 /* The wrapper for a single Radio + Description pair */
 .radio-option-wrapper {
     display: flex;
