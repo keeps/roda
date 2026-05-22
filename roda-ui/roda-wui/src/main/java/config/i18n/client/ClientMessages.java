@@ -82,6 +82,8 @@ public interface ClientMessages extends Messages {
 
   String newDescriptiveMetadataTitle();
 
+  String editDescriptiveMetadataTitle();
+
   String historyDescriptiveMetadataTitle();
 
   String catalogueTransferredResourceTitle();
@@ -835,6 +837,8 @@ public interface ClientMessages extends Messages {
 
   String descriptiveMetadataHistoryLabel(String versionKey, Date createdDate);
 
+  String descriptiveMetadataHistoryVersionsTitle();
+
   /************* Preservation Agent List ****************/
 
   String preservationAgentsTitle();
@@ -1425,7 +1429,7 @@ public interface ClientMessages extends Messages {
 
   String permissionAssignedUsersEmpty();
 
-    String listOfAIPs();
+  String listOfAIPs();
 
   String listOfRepresentations();
 
@@ -1442,6 +1446,10 @@ public interface ClientMessages extends Messages {
   String searchAIP();
 
   String aipPermissionDetails();
+
+  String descriptiveMetadataPreviewView();
+
+  String descriptiveMetadataPreviewCode();
 
   /***** Representation ****/
 
