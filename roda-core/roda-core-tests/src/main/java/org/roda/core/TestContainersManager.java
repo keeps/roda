@@ -182,6 +182,9 @@ public class TestContainersManager {
     if (solr != null && solr.isRunning()) {
       solr.stop();
     }
+    if (zookeeper != null  && zookeeper.isRunning()) {
+      zookeeper.stop();
+    }
     if (postgres != null && postgres.isRunning()) {
       postgres.stop();
     }
