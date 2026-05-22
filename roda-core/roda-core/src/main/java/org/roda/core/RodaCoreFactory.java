@@ -673,6 +673,10 @@ public class RodaCoreFactory {
     configurationManager.setConfigSymbolicLinksAllowed(configSymbolicLinksAllowed);
   }
 
+  public static Collection<Function<Locale, ResourceBundle>> getAllPluginMessageProviders() {
+    return pluginMessageRegistry.values();
+  }
+
   private static void instantiateEssentialDirectories() {
     directoryInitializer = DirectoryInitializer.getInstance(configurationManager);
     if (INSTANTIATE_EXAMPLE_RESOURCES) {

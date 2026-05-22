@@ -348,6 +348,10 @@ public class JobService {
     PluginInfo originalPlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginInfoRequest.getPlugin());
 
     if (originalPlugin != null) {
+
+      translationService.translatePlugin(originalPlugin, localeString);
+      translationService.translatePluginParameters(originalPlugin, localeString);
+
       // It's safest to assume the original object shouldn't be mutated.
       // If getPluginInfo doesn't return a deep copy, we must clone it and its
       // parameters.
@@ -433,38 +437,6 @@ public class JobService {
     copy.setCategories(original.getCategories());
     copy.setParameters(original.getParameters()); // Will be overwritten by translatedParameters
     return copy;
-  }
-
-  private JobParallelism getJobParallelismFromConfiguration() {
-    // Fetch priority
-    String parallelism = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_ORCHESTRATOR_PREFIX,
-      RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PARALLELISM);
-
-    if (parallelism == null) {
-      return JobParallelism.NORMAL;
-    }
-
-    try {
-      return JobParallelism.valueOf(parallelism);
-    } catch (IllegalArgumentException e) {
-      return JobParallelism.NORMAL;
-    }
-  }
-
-  private JobPriority getJobPriorityFromConfiguration() {
-    // Fetch priority
-    String priority = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_ORCHESTRATOR_PREFIX,
-      RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PRIORITY);
-
-    if (priority == null) {
-      return JobPriority.MEDIUM;
-    }
-
-    try {
-      return JobPriority.valueOf(priority);
-    } catch (IllegalArgumentException e) {
-      return JobPriority.MEDIUM;
-    }
   }
 
   public Report translateReports(Report report, String localeString) {

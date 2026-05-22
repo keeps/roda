@@ -199,8 +199,8 @@ public class PluginParameterPanel extends Composite {
 
     dropdown.setTitle(OBJECT_BOX);
     layout.add(parameterName);
-    addHelp();
     layout.add(dropdown);
+    addHelp();
     layout.add(innerPanel);
   }
 

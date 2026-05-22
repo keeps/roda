@@ -23,7 +23,6 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.base.notifications.JobNotification;
-import org.roda.core.storage.StorageService;
 
 /**
  * This interface should be implemented by any class that want to be a RODA

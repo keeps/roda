@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.apache.commons.configuration2.CombinedConfiguration;
@@ -28,6 +29,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.tree.MergeCombiner;
 import org.apache.commons.configuration2.tree.NodeCombiner;
 import org.apache.commons.io.IOUtils;
+import org.roda.core.RodaCoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,10 +37,12 @@ public class Messages {
   private static final Logger LOGGER = LoggerFactory.getLogger(Messages.class);
 
   private static final String MESSAGES_BUNDLE = "ServerMessages";
-  private ResourceBundle resourceBundle;
-  private Map<String, Map<String, ?>> translationsCache;
+  private final Locale locale;
+  private final ResourceBundle resourceBundle;
+  private final Map<String, Map<String, ?>> translationsCache;
 
   public Messages(Locale locale, Path folder) {
+    this.locale = locale;
     this.resourceBundle = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale, new FolderBasedUTF8Control(folder));
     this.translationsCache = new HashMap<>();
   }
@@ -50,7 +54,20 @@ public class Messages {
    * @return
    */
   public String getTranslation(String key) {
-    return resourceBundle.getString(key);
+    try {
+      // 1. Try core ServerMessages first
+      return resourceBundle.getString(key);
+    } catch (MissingResourceException e) {
+      // 2. Fallback to loaded plugin Messages
+      for (Function<Locale, ResourceBundle> provider : RodaCoreFactory.getAllPluginMessageProviders()) {
+        ResourceBundle pluginBundle = provider.apply(this.locale);
+        if (pluginBundle != null && pluginBundle.containsKey(key)) {
+          return pluginBundle.getString(key);
+        }
+      }
+      // 3. Throw original exception if missing everywhere
+      throw e;
+    }
   }
 
   public String getTranslationWithArgs(String key, Object... args) {
@@ -68,7 +85,16 @@ public class Messages {
   }
 
   public boolean containsTranslation(String key) {
-    return resourceBundle.containsKey(key);
+    if (resourceBundle.containsKey(key)) {
+      return true;
+    }
+    for (Function<Locale, ResourceBundle> provider : RodaCoreFactory.getAllPluginMessageProviders()) {
+      ResourceBundle pluginBundle = provider.apply(this.locale);
+      if (pluginBundle != null && pluginBundle.containsKey(key)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -84,19 +110,42 @@ public class Messages {
     }
 
     Map<String, T> map = new HashMap<>();
-    Enumeration<String> keys = resourceBundle.getKeys();
     String fullPrefix = prefix + ".";
-    while (keys.hasMoreElements()) {
-      String key = keys.nextElement();
-      if (key.startsWith(fullPrefix)) {
-        map.put(replacePrefixFromKey ? key.replaceFirst(Pattern.quote(fullPrefix), "i18n.") : key,
-          valueClass.cast(resourceBundle.getString(key)));
-      }
+
+    // 1. Load keys from main Core bundle
+    populateTranslationsMap(map, this.resourceBundle, fullPrefix, replacePrefixFromKey, valueClass);
+
+    // 2. Merge keys from all Plugin bundles (Core keys take precedence if conflicts
+    // occur)
+    for (Function<Locale, ResourceBundle> provider : RodaCoreFactory.getAllPluginMessageProviders()) {
+      ResourceBundle pluginBundle = provider.apply(this.locale);
+      populateTranslationsMap(map, pluginBundle, fullPrefix, replacePrefixFromKey, valueClass);
     }
 
     // cache it
     translationsCache.put(prefix, map);
     return map;
+  }
+
+  /**
+   * Helper method to populate translation map from a specific ResourceBundle
+   */
+  private <T extends Object> void populateTranslationsMap(Map<String, T> map, ResourceBundle bundle, String fullPrefix,
+    boolean replacePrefixFromKey, Class<T> valueClass) {
+
+    if (bundle == null)
+      return;
+
+    Enumeration<String> keys = bundle.getKeys();
+    while (keys.hasMoreElements()) {
+      String key = keys.nextElement();
+      if (key.startsWith(fullPrefix)) {
+        String finalKey = replacePrefixFromKey ? key.replaceFirst(Pattern.quote(fullPrefix), "i18n.") : key;
+        // Use putIfAbsent to ensure Core translations don't get overwritten by plugin
+        // translations
+        map.putIfAbsent(finalKey, valueClass.cast(bundle.getString(key)));
+      }
+    }
   }
 
   private class FolderBasedUTF8Control extends Control {
