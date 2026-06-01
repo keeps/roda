@@ -461,6 +461,10 @@ public interface ClientMessages extends Messages {
 
   String applyAllButton();
 
+  String applyPermissionsToHierarchyConfirmationMessage();
+
+  String applyPermissionsToDisseminationsButton();
+
   String stopButton();
 
   String approveButton();
@@ -922,6 +926,10 @@ public interface ClientMessages extends Messages {
   String objectPermission(@Select PermissionType permissionType);
 
   String objectPermissionDescription(@Select PermissionType permissionType);
+
+  String crudActionsPermissionSection();
+
+  String administrativeActionsPermissionSection();
 
   /************* Ingest appraisal ****************/
   String aipState(@Select AIPState state);
@@ -1392,8 +1400,6 @@ public interface ClientMessages extends Messages {
   String sublevels();
 
   String moveArchivalPackage();
-
-  String archivalPackagePermissions();
 
   String editArchivalPackagePermissions();
 
@@ -2764,6 +2770,14 @@ public interface ClientMessages extends Messages {
   String permissionsUpdateWithSuccess();
 
   String editPermissionsModalTitle();
+
+  String editMemberPermissionsDialogTitle(String memberName);
+
+  String removePermissionConfirmDialogTitle();
+
+  String removeUserPermissionConfirmationMessage(String username);
+
+  String removeGroupPermissionConfirmationMessage(String groupname);
 
   // ── Email viewer ──────────────────────────────────────────────────────────
 

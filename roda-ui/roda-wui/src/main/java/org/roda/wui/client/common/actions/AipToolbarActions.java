@@ -23,15 +23,18 @@ import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.core.data.v2.generics.DeleteRequest;
+import org.roda.core.data.v2.generics.UpdatePermissionsRequest;
 import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -49,6 +52,7 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
+import org.roda.wui.client.common.dialogs.MemberPermissionsSelectDialog;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
@@ -93,12 +97,13 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     List.of(AIPAction.NEW_CHILD_AIP_TOP));
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
     List.of(AIPAction.NEW_CHILD_AIP_BELOW));
-  private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
-    Arrays.asList(AIPAction.DOWNLOAD, AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.REMOVE,
-      AIPAction.NEW_PROCESS, AIPAction.DOWNLOAD_EVENTS, AIPAction.DOWNLOAD_DOCUMENTATION,
-      AIPAction.DOWNLOAD_SUBMISSIONS, AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
-      AIPAction.ASSOCIATE_DISPOSAL_HOLD, AIPAction.SEARCH_DESCENDANTS, AIPAction.SEARCH_PACKAGE,
-      AIPAction.NEW_CHILD_AIP_BELOW, AIPAction.NEW_REPRESENTATION, AIPAction.CREATE_DESCRIPTIVE_METADATA));
+  private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(Arrays.asList(AIPAction.DOWNLOAD,
+    AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.ADD_USER_PERMISSION,
+    AIPAction.ADD_GROUP_PERMISSION, AIPAction.APPLY_PERMISSIONS_TO_HIERARCHY, AIPAction.APPLY_PERMISSIONS_TO_DIPS,
+    AIPAction.REMOVE, AIPAction.NEW_PROCESS, AIPAction.DOWNLOAD_EVENTS, AIPAction.DOWNLOAD_DOCUMENTATION,
+    AIPAction.DOWNLOAD_SUBMISSIONS, AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
+    AIPAction.ASSOCIATE_DISPOSAL_HOLD, AIPAction.SEARCH_DESCENDANTS, AIPAction.SEARCH_PACKAGE,
+    AIPAction.NEW_CHILD_AIP_BELOW, AIPAction.NEW_REPRESENTATION, AIPAction.CREATE_DESCRIPTIVE_METADATA));
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.REMOVE, AIPAction.NEW_PROCESS,
       AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE, AIPAction.ASSOCIATE_DISPOSAL_HOLD));
@@ -182,6 +187,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       || DOWNLOAD_ACTIONS.contains(action) || AIPAction.NEW_PROCESS.equals(action)
       || AIPAction.CHANGE_TYPE.equals(action) || AIPAction.MOVE_IN_HIERARCHY.equals(action)
       || AIPAction.REMOVE.equals(action) || AIPAction.UPDATE_PERMISSIONS.equals(action)
+      || AIPAction.ADD_USER_PERMISSION.equals(action) || AIPAction.ADD_GROUP_PERMISSION.equals(action)
+      || AIPAction.APPLY_PERMISSIONS_TO_HIERARCHY.equals(action) || AIPAction.APPLY_PERMISSIONS_TO_DIPS.equals(action)
       || AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action) || AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action))) {
       return new CanActResult(false, CanActResult.Reason.USER, messages.reasonAIPUnderAppraisal());
     } else {
@@ -223,22 +230,24 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     IndexedAIP aip = object.getObject();
     if (aip == NO_AIP_OBJECT) {
       return new CanActResult(hasPermissions(action, permissions), CanActResult.Reason.USER,
-              messages.reasonUserLacksPermission());
+        messages.reasonUserLacksPermission());
     } else if ((AIPAction.REMOVE.equals(action) || AIPAction.NEW_CHILD_AIP_BELOW.equals(action)
-            || AIPAction.MOVE_IN_HIERARCHY.equals(action) || AIPAction.CHANGE_TYPE.equals(action)
-            || AIPAction.NEW_REPRESENTATION.equals(action) || AIPAction.CREATE_DESCRIPTIVE_METADATA.equals(action))
-            && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalConfirmationId()))) {
+      || AIPAction.MOVE_IN_HIERARCHY.equals(action) || AIPAction.CHANGE_TYPE.equals(action)
+      || AIPAction.NEW_REPRESENTATION.equals(action) || AIPAction.CREATE_DESCRIPTIVE_METADATA.equals(action))
+      && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalConfirmationId()))) {
       return new CanActResult(false, CanActResult.Reason.USER, messages.reasonAIPProtectedByDisposalPolicy());
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState()) && (AIPAction.CREATE_DESCRIPTIVE_METADATA.equals(action)
-            || AIPAction.NEW_CHILD_AIP_BELOW.equals(action) || SEARCH_WITHIN_ACTIONS.contains(action)
-            || DOWNLOAD_ACTIONS.contains(action) || AIPAction.NEW_PROCESS.equals(action)
-            || AIPAction.CHANGE_TYPE.equals(action) || AIPAction.MOVE_IN_HIERARCHY.equals(action)
-            || AIPAction.REMOVE.equals(action) || AIPAction.UPDATE_PERMISSIONS.equals(action)
-            || AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action) || AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action))) {
+      || AIPAction.NEW_CHILD_AIP_BELOW.equals(action) || SEARCH_WITHIN_ACTIONS.contains(action)
+      || DOWNLOAD_ACTIONS.contains(action) || AIPAction.NEW_PROCESS.equals(action)
+      || AIPAction.CHANGE_TYPE.equals(action) || AIPAction.MOVE_IN_HIERARCHY.equals(action)
+      || AIPAction.REMOVE.equals(action) || AIPAction.UPDATE_PERMISSIONS.equals(action)
+      || AIPAction.ADD_USER_PERMISSION.equals(action) || AIPAction.ADD_GROUP_PERMISSION.equals(action)
+      || AIPAction.APPLY_PERMISSIONS_TO_HIERARCHY.equals(action) || AIPAction.APPLY_PERMISSIONS_TO_DIPS.equals(action)
+      || AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action) || AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action))) {
       return new CanActResult(false, CanActResult.Reason.USER, messages.reasonAIPUnderAppraisal());
     } else {
       return new CanActResult(hasPermissions(action, aip.getPermissions()), CanActResult.Reason.USER,
-              messages.reasonUserLacksPermission());
+        messages.reasonUserLacksPermission());
     }
   }
 
@@ -247,27 +256,27 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     IndexedAIP aip = object.getObject();
     if (aip == NO_AIP_OBJECT) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action), CanActResult.Reason.CONTEXT,
-              messages.reasonNoObjectSelected());
+        messages.reasonNoObjectSelected());
     } else if (AIPState.DESTROYED.equals(parentAipState)) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, "");
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState()) && AIPState.UNDER_APPRAISAL.equals(parentAipState)
-            && Objects.equals(parentAipId, NO_AIP_PARENT)) {
+      && Objects.equals(parentAipId, NO_AIP_PARENT)) {
       return new CanActResult(APPRAISAL_ACTIONS.contains(action), CanActResult.Reason.CONTEXT,
-              messages.reasonAffectedAIPUnderAppraisal());
+        messages.reasonAffectedAIPUnderAppraisal());
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
       return new CanActResult(APPRAISAL_ACTIONS.contains(action) || POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action),
-              CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
+        CanActResult.Reason.CONTEXT, messages.reasonAIPUnderAppraisal());
     } else if (action.equals(AIPAction.REMOVE)
-            && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
+      && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
     } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId()) && (action.equals(AIPAction.MOVE_IN_HIERARCHY)
-            || action.equals(AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE) || action.equals(AIPAction.ASSOCIATE_DISPOSAL_HOLD))) {
+      || action.equals(AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE) || action.equals(AIPAction.ASSOCIATE_DISPOSAL_HOLD))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
     } else if (action.equals(AIPAction.MOVE_IN_HIERARCHY) && aip.isOnHold()) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
     } else {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action), CanActResult.Reason.CONTEXT,
-              messages.reasonCantActOnSingleObject());
+        messages.reasonCantActOnSingleObject());
     }
   }
 
@@ -311,6 +320,14 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       move(aip, callback);
     } else if (AIPAction.UPDATE_PERMISSIONS.equals(action)) {
       updatePermissions(aip, callback);
+    } else if (AIPAction.ADD_USER_PERMISSION.equals(action)) {
+      addUserPermissions(aip, callback);
+    } else if (AIPAction.ADD_GROUP_PERMISSION.equals(action)) {
+      addGroupPermissions(aip, callback);
+    } else if (AIPAction.APPLY_PERMISSIONS_TO_DIPS.equals(action)) {
+      applyPermissionsToDIPs(aip, callback);
+    } else if (AIPAction.APPLY_PERMISSIONS_TO_HIERARCHY.equals(action)) {
+      applyPermissionsToHierarchy(aip, callback);
     } else if (AIPAction.REMOVE.equals(action)) {
       remove(aip, callback);
     } else if (AIPAction.NEW_PROCESS.equals(action)) {
@@ -955,6 +972,190 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     });
   }
 
+  private void editPermissions(IndexedAIP aip, EditPermissions.Mode mode, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
+    EditPermissions.showModal(IndexedAIP.class.getName(), aip, mode);
+  }
+
+  private void applyPermissionsToHierarchy(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
+    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
+      new ActionNoAsyncCallback<String>(callback) {
+
+        @Override
+        public void onSuccess(String details) {
+          Services services = new Services("Update AIP permissions", "update");
+
+          UpdatePermissionsRequest request = new UpdatePermissionsRequest();
+          request.setPermissions(aip.getPermissions());
+          request.setDetails(details);
+          request.setRecursive(true);
+          request.setSelectedItems(SelectedItemsList.create(IndexedAIP.class.getName(), aip.getId()));
+
+          services.aipResource(s -> s.updatePermissions(request)).whenComplete((job, throwable) -> {
+            if (throwable != null) {
+              callback.onFailure(throwable);
+            } else {
+              Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+              callback.onSuccess(ActionImpact.NONE);
+
+              if (job != null) {
+                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    // stay on current page
+                  }
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                  }
+                });
+              }
+            }
+          });
+        }
+      });
+  }
+
+  private void addUserPermissions(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+    MemberPermissionsSelectDialog dialog = new MemberPermissionsSelectDialog(messages.addUserButton(),
+      getMembersFilter(aip, true), new AsyncCallback<MemberPermissionsSelectDialog.Result>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onSuccess(ActionImpact.NONE);
+        }
+
+        @Override
+        public void onSuccess(MemberPermissionsSelectDialog.Result result) {
+          Permissions permissions = new Permissions(aip.getPermissions());
+
+          for (String username : result.getMemberNames()) {
+            permissions.setUserPermissions(username, result.getPermissions());
+          }
+
+          saveNewPermissions(aip, permissions, callback);
+        }
+      });
+
+    dialog.showAndCenter();
+  }
+
+  private void addGroupPermissions(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+    MemberPermissionsSelectDialog dialog = new MemberPermissionsSelectDialog(messages.addGroupButton(),
+      getMembersFilter(aip, false), new AsyncCallback<MemberPermissionsSelectDialog.Result>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onSuccess(ActionImpact.NONE);
+        }
+
+        @Override
+        public void onSuccess(MemberPermissionsSelectDialog.Result result) {
+          Permissions permissions = new Permissions(aip.getPermissions());
+
+          for (String groupname : result.getMemberNames()) {
+            permissions.setGroupPermissions(groupname, result.getPermissions());
+          }
+
+          saveNewPermissions(aip, permissions, callback);
+        }
+      });
+
+    dialog.showAndCenter();
+  }
+
+  // creates filter to remove any user or group already in aip's permissions
+  private Filter getMembersFilter(IndexedAIP aip, boolean isUser) {
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
+
+    Permissions permissions = aip.getPermissions();
+    if (permissions != null) {
+      if (isUser && permissions.getUsernames() != null) {
+        for (String username : permissions.getUsernames()) {
+          filter.add(new NotSimpleFilterParameter(RodaConstants.MEMBERS_ID, username));
+        }
+      } else if (!isUser && permissions.getGroupnames() != null) {
+        for (String groupname : permissions.getGroupnames()) {
+          filter.add(new NotSimpleFilterParameter(RodaConstants.MEMBERS_ID, groupname));
+        }
+      }
+    }
+
+    return filter;
+  }
+
+  private void saveNewPermissions(IndexedAIP aip, Permissions newPermissions, AsyncCallback<ActionImpact> callback) {
+    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
+      new ActionNoAsyncCallback<String>(callback) {
+
+        @Override
+        public void onSuccess(String details) {
+          Services services = new Services("Update AIP permissions", "update");
+
+          UpdatePermissionsRequest request = new UpdatePermissionsRequest();
+          request.setPermissions(newPermissions);
+          request.setDetails(details);
+          request.setRecursive(false);
+          request.setSelectedItems(SelectedItemsList.create(IndexedAIP.class.getName(), aip.getId()));
+
+          services.aipResource(s -> s.updatePermissions(request)).whenComplete((job, throwable) -> {
+            if (throwable != null) {
+              callback.onFailure(throwable);
+            } else {
+              Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+              aip.setPermissions(newPermissions);
+              callback.onSuccess(ActionImpact.UPDATED);
+            }
+          });
+        }
+      });
+  }
+
+  private void applyPermissionsToDIPs(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
+    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
+      new ActionNoAsyncCallback<String>(callback) {
+
+        @Override
+        public void onSuccess(String details) {
+          Services services = new Services("Update DIP permissions", "update");
+
+          UpdatePermissionsRequest request = new UpdatePermissionsRequest();
+          request.setPermissions(aip.getPermissions());
+          request.setDetails(details);
+          request.setRecursive(false);
+
+          Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, aip.getId()));
+          request.setSelectedItems(new SelectedItemsFilter<>(filter, IndexedDIP.class.getName(), false));
+
+          services.dipResource(s -> s.updatePermissions(request)).whenComplete((job, throwable) -> {
+            if (throwable != null) {
+              callback.onFailure(throwable);
+            } else {
+              Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+              callback.onSuccess(ActionImpact.NONE);
+
+              if (job != null) {
+                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    // stay on current page
+                  }
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                  }
+                });
+              }
+            }
+          });
+        }
+      });
+  }
+
   private void disassociateDisposalSchedule(SelectedItems<IndexedAIP> aips, Long size,
     AsyncCallback<ActionImpact> callback) {
 
@@ -1233,8 +1434,12 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     managementGroup.addButton(messages.changeTypeButton(), AIPAction.CHANGE_TYPE, ActionImpact.UPDATED, BTN_EDIT);
     managementGroup.addButton(messages.moveArchivalPackage(), AIPAction.MOVE_IN_HIERARCHY, ActionImpact.UPDATED,
       BTN_EDIT);
-    managementGroup.addButton(messages.editArchivalPackagePermissions(), AIPAction.UPDATE_PERMISSIONS,
-      ActionImpact.UPDATED, BTN_EDIT);
+    managementGroup.addButton("Add user", AIPAction.ADD_USER_PERMISSION, ActionImpact.UPDATED, "btn-plus-circle");
+    managementGroup.addButton("Add group", AIPAction.ADD_GROUP_PERMISSION, ActionImpact.UPDATED, "btn-plus-circle");
+    managementGroup.addButton(messages.applyAllButton(), AIPAction.APPLY_PERMISSIONS_TO_HIERARCHY, ActionImpact.UPDATED,
+      "btn-play");
+    managementGroup.addButton(messages.applyPermissionsToDisseminationsButton(), AIPAction.APPLY_PERMISSIONS_TO_DIPS,
+      ActionImpact.UPDATED, "btn-play");
     managementGroup.addButton(messages.removeArchivalPackage(), AIPAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
     // PRESERVATION
@@ -1264,6 +1469,10 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     NEW_CHILD_AIP_TOP(RodaConstants.PERMISSION_METHOD_CREATE_AIP_TOP), DOWNLOAD(),
     MOVE_IN_HIERARCHY(RodaConstants.PERMISSION_METHOD_MOVE_AIP_IN_HIERARCHY),
     UPDATE_PERMISSIONS(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS),
+    ADD_USER_PERMISSION(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS),
+    ADD_GROUP_PERMISSION(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS),
+    APPLY_PERMISSIONS_TO_HIERARCHY(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS),
+    APPLY_PERMISSIONS_TO_DIPS(RodaConstants.PERMISSION_METHOD_UPDATE_DIP_PERMISSIONS),
     REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_AIP), NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
     DOWNLOAD_EVENTS(RodaConstants.PERMISSION_METHOD_FIND_PRESERVATION_EVENT), DOWNLOAD_SUBMISSIONS(),
     APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),

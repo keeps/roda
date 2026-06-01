@@ -30,11 +30,11 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.model.BrowseAIPResponse;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
+import org.roda.wui.client.disposal.association.DisposalPolicyAssociationTab;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
-import org.roda.wui.client.disposal.association.DisposalPolicyAssociationTab;
 
 /**
  *
@@ -124,7 +124,8 @@ public class BrowseAIPTabs extends Tabs {
       createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.permissionsTab()), new TabContentBuilder() {
         @Override
         public Widget buildTabWidget() {
-          return new AipPermissionTabs(aip);
+          boolean hasDips = browseAIPResponse.getDipCount() != null && browseAIPResponse.getDipCount().getResult() > 0;
+          return new AipPermissionTabs(aip, hasDips, actionCallback);
         }
       });
     }
