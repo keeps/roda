@@ -9950,6 +9950,11 @@ wui-disposal-hold-data .form-textbox {
   margin-top: 15px;
 }
 
+.edit-member-permissions-dialog .wui-dialog-layout {
+  width: 450px;
+  max-width: 90vw;
+}
+
 /* ============================================================
    GENERIC FORM FIELD STRUCTURE
    ============================================================ */

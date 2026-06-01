@@ -70,6 +70,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
@@ -78,7 +79,6 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 
 public class EditPermissions extends Composite {
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private final String objectClass;
@@ -99,6 +99,8 @@ public class EditPermissions extends Composite {
   private List<HasPermissions> objects = new ArrayList<>();
   private String objectId = null;
   private SelectedItems<?> selectedItems;
+  private Mode mode = Mode.ALL;
+  private DialogBox modal;
 
   public EditPermissions(String objectClass, SelectedItems<?> items) {
     this.objectClass = objectClass;
@@ -127,6 +129,40 @@ public class EditPermissions extends Composite {
     buttonApplyToAll.setVisible(IndexedAIP.class.getName().equals(objectClass));
     editPermissionsDescription.add(new HTMLWidgetWrapper("EditPermissionsDescription.html"));
     createPermissionPanelList();
+  }
+
+  public EditPermissions(String objectClass, HasPermissions object, Mode mode) {
+    this(objectClass, object);
+    this.mode = mode;
+    configureMode();
+  }
+
+  public static DialogBox showModal(String objectClass, HasPermissions object, Mode mode) {
+    EditPermissions editPermissions = new EditPermissions(objectClass, object, mode);
+
+    DialogBox dialogBox = new DialogBox(false, true);
+    editPermissions.modal = dialogBox;
+
+    dialogBox.setWidget(editPermissions);
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+    dialogBox.addStyleName("wui-dialog-information");
+    dialogBox.center();
+    dialogBox.show();
+
+    return dialogBox;
+  }
+
+  private void configureMode() {
+    buttonApplyToAll.setVisible(false);
+
+    if (Mode.USERS.equals(mode)) {
+      groupPermissionsPanel.setVisible(false);
+      groupPermissionsEmpty.setVisible(false);
+    } else if (Mode.GROUPS.equals(mode)) {
+      userPermissionsPanel.setVisible(false);
+      userPermissionsEmpty.setVisible(false);
+    }
   }
 
   private void createPermissionPanelList() {
@@ -357,6 +393,9 @@ public class EditPermissions extends Composite {
             request.setRecursive(recursive);
             request.setSelectedItems(selectedItems);
             services.aipResource(s -> s.updatePermissions(request)).whenComplete((job, throwable) -> {
+              if (modal != null) {
+                modal.hide();
+              }
               Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
               Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
@@ -407,7 +446,30 @@ public class EditPermissions extends Composite {
     apply(true);
   }
 
-  public static final HistoryResolver AIP_RESOLVER = new HistoryResolver() {
+  @UiHandler("buttonClose")
+  void buttonCancelHandler(ClickEvent e) {
+    if (modal != null) {
+      modal.hide();
+      return;
+    }
+
+    if (objectId != null) {
+      if (IndexedAIP.class.getName().equals(objectClass)) {
+        HistoryUtils.openBrowse(objectId);
+      } else {
+        HistoryUtils.openBrowse((IndexedDIP) objects.get(0));
+      }
+    } else {
+      HistoryUtils.newHistory(BrowseTop.RESOLVER);
+    }
+  }
+
+  public enum Mode {
+    ALL, USERS, GROUPS
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, EditPermissions> {
+  }  public static final HistoryResolver AIP_RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
@@ -477,22 +539,6 @@ public class EditPermissions extends Composite {
       return "edit_permissions";
     }
   };
-
-  @UiHandler("buttonClose")
-  void buttonCancelHandler(ClickEvent e) {
-    if (objectId != null) {
-      if (IndexedAIP.class.getName().equals(objectClass)) {
-        HistoryUtils.openBrowse(objectId);
-      } else {
-        HistoryUtils.openBrowse((IndexedDIP) objects.get(0));
-      }
-    } else {
-      HistoryUtils.newHistory(BrowseTop.RESOLVER);
-    }
-  }
-
-  interface MyUiBinder extends UiBinder<Widget, EditPermissions> {
-  }
 
   public class PermissionPanel extends Composite {
     private FlowPanel panel;
@@ -629,6 +675,8 @@ public class EditPermissions extends Composite {
       }
     }
   }
+
+
 
   public static final HistoryResolver DIP_RESOLVER = new HistoryResolver() {
 

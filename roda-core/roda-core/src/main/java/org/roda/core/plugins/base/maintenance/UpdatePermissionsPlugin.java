@@ -62,7 +62,7 @@ public class UpdatePermissionsPlugin<T extends IsRODAObject> extends AbstractPlu
       PluginParameter
         .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "plugin.generic.parameter.eventDetails.name",
           PluginParameterType.STRING)
-        .isMandatory(false).withDefaultValue("plugin.generic.parameter.eventDetails.description").build());
+        .isMandatory(false).withDescription("plugin.generic.parameter.eventDetails.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, PluginParameter
       .getBuilder(RodaConstants.PLUGIN_PARAMS_RECURSIVE, "plugin.updatePermissionsPlugin.parameter.recursiveMode.name",

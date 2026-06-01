@@ -1000,7 +1000,7 @@ public class AipSearchWrapperActions extends AbstractActionable<IndexedAIP> {
       BTN_EDIT);
     managementGroup.addButton(messages.moveArchivalPackage(), AipSearchWrapperAction.MOVE_IN_HIERARCHY,
       ActionImpact.UPDATED, BTN_EDIT);
-    managementGroup.addButton(messages.archivalPackagePermissions(), AipSearchWrapperAction.UPDATE_PERMISSIONS,
+    managementGroup.addButton(messages.editArchivalPackagePermissions(), AipSearchWrapperAction.UPDATE_PERMISSIONS,
       ActionImpact.UPDATED, BTN_EDIT);
     managementGroup.addButton(messages.removeArchivalPackage(), AipSearchWrapperAction.REMOVE, ActionImpact.DESTROYED,
       "btn-ban");
