@@ -275,7 +275,7 @@ public class DescriptiveMetadataHistory extends Composite {
       String labelText = messages.descriptiveMetadataHistoryLabel(message, createdDate);
       RadioButton rb = new RadioButton(radioGroupName, labelText);
 
-      rb.addStyleName("mb-5 display-block");
+      rb.addStyleName("mb-5 display-block my-custom-radio");
       rb.addValueChangeHandler(event -> {
         if (event.getValue()) {
           selectedVersion = versionKey;

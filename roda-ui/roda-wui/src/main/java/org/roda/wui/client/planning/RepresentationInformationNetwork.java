@@ -90,7 +90,6 @@ public class RepresentationInformationNetwork extends Composite {
       () -> new RepresentationInformationList(),
       new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationNetwork_RI")
         .withSummary(messages.representationInformationTitle()).bindOpener()
-        .withSearchPlaceholder(messages.representationInformationRegisterSearchPlaceHolder())
         .withActionable(RepresentationInformationActions.get()).withActionBlacklist(
           List.of(RepresentationInformationActions.RepresentationInformationAction.ASSOCIATE_WITH_EXISTING,
             RepresentationInformationActions.RepresentationInformationAction.ASSOCIATE_WITH_NEW)));
