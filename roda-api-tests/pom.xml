@@ -32,9 +32,36 @@
 
   <properties>
     <testcontainers.version>2.0.2</testcontainers.version>
-    <restassured.version>5.5.2</restassured.version>
+    <restassured.version>5.5.7</restassured.version>
     <openapi.generator.version>7.10.0</openapi.generator.version>
   </properties>
+
+  <!--
+    Override the Groovy version inherited from Spring Boot 4.x BOM (which pins 5.0.5).
+    REST Assured 5.5.x was reverted to Groovy 4.0.22 starting from 5.5.3.
+    Groovy 5.0.x has a bug in ClosureMetaClass.invokeOnDelegationObject (GROOVY-11128
+    follow-up): getEnclosingClass() returns null for compiled REST Assured closures,
+    causing Class.isAssignableFrom(null) -> NullPointerException on any GET request.
+  -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.groovy</groupId>
+        <artifactId>groovy</artifactId>
+        <version>4.0.22</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.groovy</groupId>
+        <artifactId>groovy-xml</artifactId>
+        <version>4.0.22</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.groovy</groupId>
+        <artifactId>groovy-json</artifactId>
+        <version>4.0.22</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
 
@@ -165,8 +192,12 @@
           <suiteXmlFiles>
             <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
           </suiteXmlFiles>
-          <!-- 10 min actuator/health wait + test execution -->
-          <forkedProcessTimeoutInSeconds>720</forkedProcessTimeoutInSeconds>
+          <!-- 10 min actuator/health wait + 3 min LDAP poll + test execution -->
+          <forkedProcessTimeoutInSeconds>1200</forkedProcessTimeoutInSeconds>
+          <!-- groovy.use.classvalue=true: use ClassValue (thread-safe) instead of
+               WeakHashMap for Groovy's metaclass cache. Improves thread safety
+               when REST Assured closures are invoked from TestNG worker threads. -->
+          <argLine>-Dgroovy.use.classvalue=true</argLine>
         </configuration>
       </plugin>
 

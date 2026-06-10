@@ -13,7 +13,11 @@ import static io.restassured.RestAssured.preemptive;
 import java.io.File;
 import java.time.Duration;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.ObjectMapperConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.ComposeContainer;
@@ -101,6 +105,16 @@ public abstract class AbstractApiTest {
     RestAssured.basePath = "/api/v2";
     RestAssured.defaultParser = io.restassured.parsing.Parser.JSON;
 
+    // Configure Jackson to ignore unknown fields — the server may return extra
+    // properties (e.g. "UUID" alongside "uuid") not present in the generated model.
+    RestAssured.config = RestAssured.config().objectMapperConfig(
+      ObjectMapperConfig.objectMapperConfig().jackson2ObjectMapperFactory(
+        (cls, charset) -> new ObjectMapper()
+          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+          .registerModule(new JavaTimeModule())
+      )
+    );
+
     // requestSpecification is the most reliable way to set default auth globally
     // across all given() calls in REST Assured 5.x.
     RestAssured.requestSpecification = new RequestSpecBuilder()
@@ -118,7 +132,7 @@ public abstract class AbstractApiTest {
   }
 
   private void pollUntil(String label, java.util.function.BooleanSupplier condition) {
-    long deadline = System.currentTimeMillis() + Duration.ofMinutes(5).toMillis();
+    long deadline = System.currentTimeMillis() + Duration.ofMinutes(3).toMillis();
     int attempt = 0;
     while (System.currentTimeMillis() < deadline) {
       attempt++;
