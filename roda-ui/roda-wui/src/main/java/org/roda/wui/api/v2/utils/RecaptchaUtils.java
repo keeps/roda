@@ -17,7 +17,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 public class RecaptchaUtils {
   private RecaptchaUtils() {

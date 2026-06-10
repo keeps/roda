@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
@@ -63,6 +64,7 @@ public class IndexedRepresentation extends Representation
   }
 
   @Override
+  @JsonProperty("uuid")
   public String getUUID() {
     return uuid;
   }

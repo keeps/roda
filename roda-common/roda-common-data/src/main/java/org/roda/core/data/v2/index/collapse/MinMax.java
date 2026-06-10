@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.v2.index.collapse;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -14,6 +16,7 @@ import java.util.Objects;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MinMax implements Serializable {
 
   @Serial

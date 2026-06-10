@@ -35,33 +35,32 @@ import org.roda.core.storage.Binary;
 import org.roda.wui.common.model.RequestContext;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @Service
 public class ClassificationPlanService {
 
   public ConsumesOutputStream retrieveClassificationPlan(RequestContext context, String filename)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+          throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
+      JsonMapper mapper = JsonMapper.builder().build();
       ObjectNode root = mapper.createObjectNode();
 
       ArrayNode array = mapper.createArrayNode();
       List<String> descriptionsLevels = RodaUtils
-        .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.LEVELS_CLASSIFICATION_PLAN));
+              .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.LEVELS_CLASSIFICATION_PLAN));
 
       Filter allButRepresentationsFilter = new Filter(
-        new OneOfManyFilterParameter(RodaConstants.AIP_LEVEL, descriptionsLevels));
+              new OneOfManyFilterParameter(RodaConstants.AIP_LEVEL, descriptionsLevels));
 
       IndexService index = context.getIndexService();
       boolean justActive = true;
       try (IterableIndexResult<IndexedAIP> res = index.findAll(IndexedAIP.class, allButRepresentationsFilter,
-        context.getUser(), justActive, new ArrayList<>())) {
+              context.getUser(), justActive, new ArrayList<>())) {
         for (IndexedAIP re : res) {
           array.add(aipToJSON(context.getModelService(), re));
         }
@@ -72,7 +71,7 @@ public class ClassificationPlanService {
       return new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_APPLICATION_JSON, out -> {
         try {
           mapper.writeValue(out, root);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
           // do nothing
         }
       });
@@ -82,9 +81,8 @@ public class ClassificationPlanService {
   }
 
   private static ObjectNode aipToJSON(ModelService model, IndexedAIP indexedAIP)
-    throws IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    JsonFactory factory = new JsonFactory();
-    ObjectMapper mapper = new ObjectMapper(factory);
+          throws IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    JsonMapper mapper = JsonMapper.builder().build();
 
     ObjectNode node = mapper.createObjectNode();
     if (indexedAIP.getTitle() != null) {

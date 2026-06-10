@@ -10,17 +10,14 @@ package org.roda.core.data.v2.jpa;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * JPA converter for Map&lt;String, Object&gt; objects.
@@ -44,7 +41,7 @@ public class ObjectMapConverter implements AttributeConverter<Map<String, Object
       return new HashMap<>();
     }
     try {
-      ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+      JsonMapper mapper = JsonMapper.builder().build();
       return mapper.readValue(dbData, new TypeReference<Map<String, Object>>() {});
     } catch (Exception e) {
       LOGGER.error("Error converting JSON to Map<String, Object>: {}", e.getMessage(), e);

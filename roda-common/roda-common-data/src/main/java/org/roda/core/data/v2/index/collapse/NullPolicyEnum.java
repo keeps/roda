@@ -7,6 +7,9 @@
  */
 package org.roda.core.data.v2.index.collapse;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
@@ -19,8 +22,22 @@ public enum NullPolicyEnum {
     this.value = value;
   }
 
+  @JsonValue
   @Override
   public String toString() {
     return value;
+  }
+
+  @JsonCreator
+  public static NullPolicyEnum fromString(String key) {
+    if (key == null) {
+      return null;
+    }
+    for (NullPolicyEnum e : NullPolicyEnum.values()) {
+      if (e.name().equalsIgnoreCase(key)) {
+        return e;
+      }
+    }
+    throw new IllegalArgumentException("Unknown NullPolicyEnum value: " + key);
   }
 }

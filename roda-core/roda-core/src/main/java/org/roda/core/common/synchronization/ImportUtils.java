@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
-import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -32,21 +30,11 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.LiteRODAObject;
-import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
-import org.roda.core.data.v2.jobs.IndexedJob;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
@@ -62,23 +50,21 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.base.maintenance.DeleteRodaObjectPluginUtils;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
-import org.roda.core.storage.Container;
-import org.roda.core.storage.Resource;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonEncoding;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
@@ -91,9 +77,9 @@ public class ImportUtils {
     // do nothing
   }
 
-  public static int importStorage(final ModelService model, final IndexService index,
-    final Path workingDir, final boolean importJobs) throws GenericException, NotFoundException,
-    AuthorizationDeniedException, AlreadyExistsException, RequestNotValidException {
+  public static int importStorage(final ModelService model, final IndexService index, final Path workingDir,
+    final boolean importJobs) throws GenericException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException, RequestNotValidException {
     FileStorageService tmpStorage = new FileStorageService(workingDir.resolve(RodaConstants.CORE_STORAGE_FOLDER), false,
       null, false);
     return model.importAll(index, tmpStorage, importJobs);
@@ -209,7 +195,7 @@ public class ImportUtils {
           if (!exist) {
             listToRemove.add(indexed.getId());
           }
-        } catch (final IOException e) {
+        } catch (final IOException | JacksonException e) {
           LOGGER.error("Can't read the json file {}", e.getMessage());
         }
       });
@@ -298,7 +284,7 @@ public class ImportUtils {
       errors++;
       distributedInstance.incrementEntityCounters(RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE,
         ModelUtils.giveRespectiveModelClass(indexedClass).getName());
-    } catch (final IOException e) {
+    } catch (final IOException | JacksonException e) {
       LOGGER.error("Can't read the json file {}", e.getMessage());
     }
 
@@ -333,23 +319,24 @@ public class ImportUtils {
   }
 
   public static void createLastSyncFile(final Path bundleWorkingDir, final RODAInstance rodaInstance,
-    final String jobID, final String bundleId) throws IOException {
-    final StringBuilder fileNameBuilder = new StringBuilder();
-    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REPORT_FILE).append("_").append(rodaInstance.getId())
-      .append(".json");
-    final Path temporaryReportPath = bundleWorkingDir.resolve(fileNameBuilder.toString());
+                                        final String jobID, final String bundleId) throws IOException {
+    final String fileNameBuilder = RodaConstants.SYNCHRONIZATION_REPORT_FILE + "_" + rodaInstance.getId() +
+            ".json";
+    final Path temporaryReportPath = bundleWorkingDir.resolve(fileNameBuilder);
     createReport(temporaryReportPath);
     OutputStream outputStream = null;
     JsonGenerator jsonGenerator = null;
     try {
       if (temporaryReportPath != null) {
         outputStream = new BufferedOutputStream(new FileOutputStream(temporaryReportPath.toFile()));
-        final JsonFactory jsonFactory = new JsonFactory();
-        jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
+        JsonMapper mapper = JsonMapper.builder().build();
+        // Jackson 3: Pretty printing is now configured via the ObjectWriter
+        jsonGenerator = mapper.writerWithDefaultPrettyPrinter()
+                .createGenerator(outputStream, JsonEncoding.UTF8);
       }
 
       writeLastSyncFile(jsonGenerator, rodaInstance, jobID, bundleId);
-    } catch (final IOException e) {
+    } catch (final IOException | JacksonException e) {
       LOGGER.error("Can't create report with the summary of synchronization {}", e.getMessage());
     } finally {
       if (jsonGenerator != null) {
@@ -367,40 +354,41 @@ public class ImportUtils {
 
     try {
       jsonGenerator.writeStartObject();
-      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_UUID, bundleId);
-      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_INSTANCE_ID, rodaInstance.getId());
-      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_FROM_DATE,
+      jsonGenerator.writeStringProperty(RodaConstants.SYNCHRONIZATION_REPORT_KEY_UUID, bundleId);
+      jsonGenerator.writeStringProperty(RodaConstants.SYNCHRONIZATION_REPORT_KEY_INSTANCE_ID, rodaInstance.getId());
+      jsonGenerator.writeStringProperty(RodaConstants.SYNCHRONIZATION_REPORT_KEY_FROM_DATE,
         rodaInstance.getLastSynchronizationDate().toString());
       if (rodaInstance.getSyncErrors() > 0) {
-        jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_STATUS,
+        jsonGenerator.writeStringProperty(RodaConstants.SYNCHRONIZATION_REPORT_KEY_STATUS,
           RodaConstants.SYNCHRONIZATION_REPORT_VALUE_STATUS_ERROR);
       } else {
-        jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_STATUS,
+        jsonGenerator.writeStringProperty(RodaConstants.SYNCHRONIZATION_REPORT_KEY_STATUS,
           RodaConstants.SYNCHRONIZATION_REPORT_VALUE_STATUS_SUCCESS);
       }
-      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_JOB, jobID);
+      jsonGenerator.writeStringProperty(RodaConstants.SYNCHRONIZATION_REPORT_KEY_JOB, jobID);
 
-      jsonGenerator.writeFieldName(RodaConstants.SYNCHRONIZATION_REPORT_KEY_SUMMARY);
+      jsonGenerator.writeName(RodaConstants.SYNCHRONIZATION_REPORT_KEY_SUMMARY);
       writeSummaryLists(jsonGenerator, rodaInstance.getEntitySummaryList());
 
       jsonGenerator.writeEndObject();
-    } catch (final IOException e) {
+    } catch (final IOException | JacksonException e) {
       LOGGER.error("Can't write report with the summary of synchronization {}", e.getMessage());
     }
-
   }
 
   private static void writeSummaryLists(final JsonGenerator jsonGenerator, final List<EntitySummary> entitySummaries)
-    throws IOException {
+    throws IOException, JacksonException {
     jsonGenerator.writeStartArray();
     for (EntitySummary entitySummary : entitySummaries) {
       jsonGenerator.writeStartObject();
-      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_ENTITY_CLASS,
+      jsonGenerator.writeStringProperty(RodaConstants.SYNCHRONIZATION_REPORT_KEY_ENTITY_CLASS,
         entitySummary.getEntityClass());
-      jsonGenerator.writeNumberField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_UPDATED_AND_ADDED,
+      jsonGenerator.writeNumberProperty(RodaConstants.SYNCHRONIZATION_REPORT_KEY_UPDATED_AND_ADDED,
         entitySummary.getCountAddedUpdated());
-      jsonGenerator.writeNumberField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_REMOVED, entitySummary.getCountRemoved());
-      jsonGenerator.writeNumberField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_ISSUES, entitySummary.getCountIssues());
+      jsonGenerator.writeNumberProperty(RodaConstants.SYNCHRONIZATION_REPORT_KEY_REMOVED,
+        entitySummary.getCountRemoved());
+      jsonGenerator.writeNumberProperty(RodaConstants.SYNCHRONIZATION_REPORT_KEY_ISSUES,
+        entitySummary.getCountIssues());
       jsonGenerator.writeEndObject();
     }
     jsonGenerator.writeEndArray();

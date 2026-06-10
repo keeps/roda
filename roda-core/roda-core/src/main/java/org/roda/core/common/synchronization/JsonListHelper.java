@@ -8,15 +8,15 @@
 package org.roda.core.common.synchronization;
 
 import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonEncoding;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
@@ -39,17 +39,19 @@ public class JsonListHelper {
    * array.
    *
    * @throws IOException
-   *           if some i/o error occur
+   * if some i/o error occur
+   * @throws JacksonException
+   * if a Jackson processing error occurs
    */
-  public void init() throws IOException {
+  public void init() throws IOException, JacksonException {
     if (!Files.exists(path)) {
       Files.createFile(path);
     }
 
     if (path != null) {
       outputStream = new BufferedOutputStream(Files.newOutputStream(path.toFile().toPath()));
-      final JsonFactory jsonFactory = new JsonFactory();
-      jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
+      JsonMapper mapper = JsonMapper.builder().build();
+      jsonGenerator = mapper.writerWithDefaultPrettyPrinter().createGenerator(outputStream, JsonEncoding.UTF8);
     }
 
     if (!isInitialized) {
@@ -62,11 +64,11 @@ public class JsonListHelper {
    * Write a json string.
    *
    * @param value
-   *          the value.
-   * @throws IOException
-   *           if some i/o error occur
+   * the value.
+   * @throws JacksonException
+   * if a Jackson processing error occurs
    */
-  public void writeString(final String value) throws IOException {
+  public void writeString(final String value) throws JacksonException {
     jsonGenerator.writeString(value);
   }
 
@@ -74,9 +76,11 @@ public class JsonListHelper {
    * Close the {@link JsonGenerator} and the {@link OutputStream}.
    *
    * @throws IOException
-   *           if some i/o error occur
+   * if some i/o error occur
+   * @throws JacksonException
+   * if a Jackson processing error occurs
    */
-  public void close() throws IOException {
+  public void close() throws IOException, JacksonException {
     if (jsonGenerator != null) {
       jsonGenerator.writeEndArray();
       jsonGenerator.close();
