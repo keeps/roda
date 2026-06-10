@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -150,6 +151,7 @@ public class TransferredResource implements IsModelObject, IsIndexed, HasId, Set
   }
 
   @Override
+  @JsonProperty("uuid")
   public String getUUID() {
     return uuid;
   }

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -30,8 +31,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   @Serial
+  @JsonIgnore
   private static final long serialVersionUID = -178083792639806983L;
 
+  @JsonProperty("uuid")
   private String uuid;
   private String id;
   private String address;
@@ -43,7 +46,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private long duration;
 
   // REST API requests
-  private AuditLogRequestHeaders auditLogRequestHeaders = new AuditLogRequestHeaders();
+  private AuditLogRequestHeaders auditLogRequestHeaders;
 
   private String instanceId = "";
   private long lineNumber = -1;
@@ -59,6 +62,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
    */
   public LogEntry() {
     this.state = LogEntryState.UNKNOWN;
+    this.auditLogRequestHeaders = new AuditLogRequestHeaders();
   }
 
   /**
@@ -385,6 +389,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   }
 
   @Override
+  @JsonProperty("uuid")
   public String getUUID() {
     return uuid;
   }

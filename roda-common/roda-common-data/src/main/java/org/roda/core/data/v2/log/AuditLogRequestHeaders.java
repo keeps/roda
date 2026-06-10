@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.log;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serial;
@@ -19,6 +20,7 @@ import java.io.Serializable;
 public class AuditLogRequestHeaders implements Serializable {
 
   @Serial
+  @JsonIgnore
   private static final long serialVersionUID = -166139273669982053L;
 
   private String uuid;

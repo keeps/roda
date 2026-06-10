@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
@@ -108,6 +109,7 @@ public class IndexedFile
   }
 
   @Override
+  @JsonProperty("uuid")
   public String getUUID() {
     return uuid;
   }

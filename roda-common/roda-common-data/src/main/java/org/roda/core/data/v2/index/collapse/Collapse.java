@@ -10,6 +10,7 @@ package org.roda.core.data.v2.index.collapse;
 import java.io.Serial;
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.roda.core.data.v2.index.sort.Sorter;
 
 /**
@@ -17,6 +18,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
  */
 
 // https://solr.apache.org/guide/solr/latest/query-guide/collapse-and-expand-results.html
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Collapse implements Serializable {
 
   @Serial

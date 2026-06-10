@@ -16,26 +16,20 @@ import java.util.Base64;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class Pbkdf2PasswordEncoderImpl extends Pbkdf2PasswordEncoder {
+public class Pbkdf2PasswordEncoderImpl implements PasswordEncoder {
 
   static final int hashBitSize = 512;
   static final int saltByteSize = 16;
   static final int pbkdf2Iterations = 10000;
-  static final SecretKeyFactoryAlgorithm algorithm = SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA512;
+  static final String algorithm = "PBKDF2WithHmacSHA512";
   final String prefix = "{PBKDF2-SHA512}";
 
   public Pbkdf2PasswordEncoderImpl() {
-    this("", saltByteSize, pbkdf2Iterations, algorithm);
-  }
-
-  public Pbkdf2PasswordEncoderImpl(CharSequence secret, int saltLength, int iterations,
-    SecretKeyFactoryAlgorithm secretKeyFactoryAlgorithm) {
-    super(secret, saltLength, iterations, secretKeyFactoryAlgorithm);
   }
 
   @Override
@@ -46,7 +40,7 @@ public class Pbkdf2PasswordEncoderImpl extends Pbkdf2PasswordEncoder {
 
     try {
       PBEKeySpec spec = new PBEKeySpec(rawPassword.toString().toCharArray(), salt, pbkdf2Iterations, hashBitSize);
-      SecretKeyFactory skf = SecretKeyFactory.getInstance(algorithm.toString());
+      SecretKeyFactory skf = SecretKeyFactory.getInstance(algorithm);
       byte[] hash = skf.generateSecret(spec).getEncoded();
 
       String salt64 = Base64.getEncoder().encodeToString(salt).replace("+", ".").replace("=", "");
@@ -71,7 +65,7 @@ public class Pbkdf2PasswordEncoderImpl extends Pbkdf2PasswordEncoder {
 
     try {
       PBEKeySpec spec = new PBEKeySpec(rawPassword.toString().toCharArray(), salt, iterations, hashBitSize);
-      SecretKeyFactory skf = SecretKeyFactory.getInstance(algorithm.toString());
+      SecretKeyFactory skf = SecretKeyFactory.getInstance(algorithm);
       byte[] computedHash = skf.generateSecret(spec).getEncoded();
 
       return MessageDigest.isEqual(storedHash, computedHash);

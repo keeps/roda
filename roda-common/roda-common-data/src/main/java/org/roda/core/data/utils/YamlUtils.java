@@ -19,9 +19,9 @@ import org.roda.core.data.exceptions.GenericException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import tools.jackson.core.JacksonException;
+import tools.jackson.dataformat.yaml.YAMLMapper;
+import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -60,21 +60,16 @@ public class YamlUtils {
   private static String getYamlFromObject(Object object, Class<?> mixin) {
     String ret = null;
     try {
-      ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-      mapper = addMixinsToMapper(mapper, object, mixin);
+      YAMLMapper.Builder builder = YAMLMapper.builder();
+      if (mixin != null) {
+        builder.addMixIn(object.getClass(), mixin);
+      }
+      YAMLMapper mapper = builder.build();
       ret = mapper.writeValueAsString(object);
-    } catch (IOException e) {
+    } catch (JacksonException e) {
       LOGGER.error("Error transforming object '{}' to yaml string", object, e);
     }
     return ret;
-  }
-
-  private static ObjectMapper addMixinsToMapper(ObjectMapper mapper, Object object, Class<?> mixin) {
-    if (mixin != null) {
-      mapper.addMixIn(object.getClass(), mixin);
-    }
-
-    return mapper;
   }
 
   public static <T> T getObjectFromYaml(InputStream yaml, Class<T> objectClass) throws GenericException {
@@ -92,9 +87,11 @@ public class YamlUtils {
 
   public static <T> T getObjectFromYaml(String yaml, Class<T> objectClass) throws GenericException {
     try {
-      ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+      YAMLMapper mapper = YAMLMapper.builder()
+              .disable(YAMLWriteFeature.WRITE_DOC_START_MARKER)
+              .build();
       return mapper.readValue(yaml, objectClass);
-    } catch (IOException e) {
+    } catch (JacksonException e) {
       throw new GenericException(YAML_ERROR_MESSAGE, e);
     }
   }

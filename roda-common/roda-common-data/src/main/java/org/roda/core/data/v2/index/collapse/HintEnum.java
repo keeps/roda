@@ -7,6 +7,9 @@
  */
 package org.roda.core.data.v2.index.collapse;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
@@ -20,8 +23,22 @@ public enum HintEnum {
     this.value = value;
   }
 
+  @JsonValue
   @Override
   public String toString() {
     return value;
+  }
+
+  @JsonCreator
+  public static HintEnum fromString(String key) {
+    if (key == null) {
+      return null;
+    }
+    for (HintEnum e : HintEnum.values()) {
+      if (e.name().equalsIgnoreCase(key)) {
+        return e;
+      }
+    }
+    throw new IllegalArgumentException("Unknown HintEnum value: " + key);
   }
 }
