@@ -8,7 +8,6 @@
 package org.roda.tests.api;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.preemptive;
 
 import java.io.File;
 import java.time.Duration;
@@ -78,6 +77,10 @@ public abstract class AbstractApiTest {
    */
   @BeforeSuite(alwaysRun = true)
   public void startEnvironment() {
+    if (COMPOSE != null) {
+      LOGGER.info("RODA Docker Compose stack already running; skipping re-initialization");
+      return;
+    }
     LOGGER.info("Starting RODA Docker Compose stack from {}", COMPOSE_FILE.getAbsolutePath());
 
     COMPOSE = new ComposeContainer(COMPOSE_FILE)
@@ -101,19 +104,34 @@ public abstract class AbstractApiTest {
     RestAssured.basePath = "/api/v2";
     RestAssured.defaultParser = io.restassured.parsing.Parser.JSON;
 
-    // requestSpecification is the most reliable way to set default auth globally
-    // across all given() calls in REST Assured 5.x.
-    RestAssured.requestSpecification = new RequestSpecBuilder()
-      .setAuth(preemptive().basic(ADMIN_USER, ADMIN_PASSWORD))
-      .build();
-
     // Phase 2: /actuator/health reports UP before LDAP is fully operational.
-    // Poll until the admin user is returned, confirming LDAP auth works.
+    // Poll until the admin user is returned using basic auth, confirming LDAP auth works.
     LOGGER.info("Waiting for LDAP authentication to be ready...");
     pollUntil("LDAP auth", () -> {
-      String name = given().when().get("/members/users/authenticated").then().extract().path("name");
+      String name = given().auth().preemptive().basic(ADMIN_USER, ADMIN_PASSWORD)
+        .when().get("/members/users/authenticated").then().extract().path("name");
       return ADMIN_USER.equals(name);
     });
+
+    // Create an access key via basic auth, then use the returned key as bearer token
+    // for all subsequent requests in the test suite.
+    LOGGER.info("Creating access token for test suite...");
+    long expirationTimeMs = System.currentTimeMillis() + (365 * 24 * 60 * 60 * 1000L); // 1 year from now
+    String accessKey = given().auth().preemptive().basic(ADMIN_USER, ADMIN_PASSWORD)
+      .contentType("application/json")
+      .accept("application/json")
+      .body("{\"name\":\"e2e-test\",\"expirationDate\":" + expirationTimeMs + "}")
+      .when()
+      .post("/members/users/" + ADMIN_USER + "/access-keys")
+      .then()
+      .statusCode(201)
+      .extract()
+      .path("key");
+
+    LOGGER.info("Access token created; switching to bearer authentication for all tests");
+    RestAssured.requestSpecification = new RequestSpecBuilder()
+      .addHeader("Authorization", "Bearer " + accessKey)
+      .build();
 
   }
 

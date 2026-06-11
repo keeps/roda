@@ -9,8 +9,9 @@ then
 fi
 
 if [[ $# -eq 0 ]] ; then
-    echo "Starting RODA (user: $(whoami))"
-    exec java -jar /KEEPS/bin/roda-wui-*.jar
+    RODA_JAR=$(ls -t /KEEPS/bin/roda-wui-*.jar | head -1)
+    echo "Starting RODA with JAR: $RODA_JAR (user: $(whoami))"
+    exec java -jar "$RODA_JAR"
 fi
 
 exec "$@"
