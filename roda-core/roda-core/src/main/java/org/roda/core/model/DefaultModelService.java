@@ -3903,7 +3903,7 @@ public class DefaultModelService implements ModelService {
     } else {
       metsOutPut = ModelUtils.getMetsStoragePath(aipId, null);
     }
-    storage.createBinary(metsOutPut, metsPayload, false);
+    storage.updateBinaryContent(metsOutPut, metsPayload, false, true, false, new HashMap<>());
 
   }
 
