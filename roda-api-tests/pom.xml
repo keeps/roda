@@ -32,10 +32,30 @@
 
   <properties>
     <testcontainers.version>2.0.2</testcontainers.version>
-    <restassured.version>5.5.2</restassured.version>
+    <restassured.version>5.5.7</restassured.version>
     <openapi.generator.version>7.10.0</openapi.generator.version>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.groovy</groupId>
+        <artifactId>groovy</artifactId>
+        <version>4.0.22</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.groovy</groupId>
+        <artifactId>groovy-xml</artifactId>
+        <version>4.0.22</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.groovy</groupId>
+        <artifactId>groovy-json</artifactId>
+        <version>4.0.22</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
   <dependencies>
 
     <!-- TestNG — consistent with other RODA test modules -->
@@ -165,8 +185,12 @@
           <suiteXmlFiles>
             <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
           </suiteXmlFiles>
-          <!-- 10 min actuator/health wait + test execution -->
-          <forkedProcessTimeoutInSeconds>720</forkedProcessTimeoutInSeconds>
+          <!-- 10 min actuator/health wait + 3 min LDAP poll + test execution -->
+          <forkedProcessTimeoutInSeconds>1200</forkedProcessTimeoutInSeconds>
+          <!-- groovy.use.classvalue=true: use ClassValue (thread-safe) instead of
+               WeakHashMap for Groovy's metaclass cache. Improves thread safety
+               when REST Assured closures are invoked from TestNG worker threads. -->
+          <argLine>-Dgroovy.use.classvalue=true</argLine>
         </configuration>
       </plugin>
 

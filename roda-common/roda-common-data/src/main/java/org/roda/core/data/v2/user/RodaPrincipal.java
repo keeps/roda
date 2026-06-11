@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -172,6 +173,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
   }
 
   @Override
+  @JsonProperty("uuid")
   public String getUUID() {
     return getUUID(isUser(), getId());
   }

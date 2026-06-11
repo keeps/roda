@@ -21,56 +21,46 @@ import io.restassured.http.ContentType;
 /**
  * E2E tests for the {@code /api/v2/aips} resource.
  *
- * <p>All tests run against a live RODA instance managed by Testcontainers.
- * The Docker Compose stack is started once per suite in {@link AbstractApiTest}.
+ * <p>
+ * All tests run against a live RODA instance managed by Testcontainers. The
+ * Docker Compose stack is started once per suite in {@link AbstractApiTest}.
  *
- * <p>A freshly started RODA instance has no AIPs, so count/find assertions
- * verify structure (non-null, non-negative) rather than exact counts.
+ * <p>
+ * A freshly started RODA instance has no AIPs, so count/find assertions verify
+ * structure (non-null, non-negative) rather than exact counts.
  *
- * <p>Filter JSON is built as raw strings because the generated OpenAPI model
- * uses {@code "@type"} as the Jackson discriminator while RODA expects {@code "type"}.
+ * <p>
+ * Filter JSON is built as raw strings because the generated OpenAPI model uses
+ * {@code "@type"} as the Jackson discriminator while RODA expects
+ * {@code "type"}.
  */
 @Test(groups = {"e2e", "aips"})
 public class AipApiTest extends AbstractApiTest {
 
-  private static final String ALL_FILTER_BODY =
-    "{\"filter\":{\"parameters\":[{\"type\":\"AllFilterParameter\"}]}}";
+  private static final String ALL_FILTER_BODY = "{\"filter\":{\"parameters\":[{\"type\":\"AllFilterParameter\"}]}}";
 
   /**
    * Sanity check: the authenticated admin user is returned correctly.
    */
   @Test
   public void getAuthenticatedUser_returnsAdminUser() {
-    User user = given()
-      .when()
-      .get("/members/users/authenticated")
-      .then()
-      .statusCode(200)
-      .extract().as(User.class);
+    User user = given().when().get("/members/users/authenticated").then().statusCode(200).extract().as(User.class);
 
     Assert.assertNotNull(user, "Authenticated user must not be null");
-    Assert.assertEquals(user.getName(), ADMIN_USER,
-      "Expected the admin user to be authenticated");
+    Assert.assertEquals(user.getName(), ADMIN_USER, "Expected the admin user to be authenticated");
   }
 
   /**
-   * {@code POST /aips/count} with an AllFilterParameter must return HTTP 200
-   * and a non-negative count.
+   * {@code POST /aips/count} with an AllFilterParameter must return HTTP 200 and
+   * a non-negative count.
    */
   @Test
   public void countAips_withAllFilter_returns200AndNonNegativeCount() {
-    LongResponse response = given()
-      .contentType(ContentType.JSON)
-      .body(ALL_FILTER_BODY)
-      .when()
-      .post("/aips/count")
-      .then()
-      .statusCode(200)
-      .extract().as(LongResponse.class);
+    LongResponse response = given().contentType(ContentType.JSON).body(ALL_FILTER_BODY).when().post("/aips/count")
+      .then().statusCode(200).extract().as(LongResponse.class);
 
     Assert.assertNotNull(response, "Count response must not be null");
-    Assert.assertTrue(response.getResult() >= 0,
-      "AIP count must be non-negative, got: " + response.getResult());
+    Assert.assertTrue(response.getResult() >= 0, "AIP count must be non-negative, got: " + response.getResult());
   }
 
   /**
@@ -79,22 +69,14 @@ public class AipApiTest extends AbstractApiTest {
    */
   @Test
   public void findAips_withAllFilter_returns200AndValidIndexResult() {
-    String body =
-      "{\"filter\":{\"parameters\":[{\"type\":\"AllFilterParameter\"}]}," +
-      "\"sublist\":{\"firstElementIndex\":0,\"maximumElementCount\":10}}";
+    String body = "{\"filter\":{\"parameters\":[{\"type\":\"AllFilterParameter\"}]},"
+      + "\"sublist\":{\"firstElementIndex\":0,\"maximumElementCount\":10}" + ",\"onlyActive\":true}";
 
-    IndexResult result = given()
-      .contentType(ContentType.JSON)
-      .body(body)
-      .when()
-      .post("/aips/find")
-      .then()
-      .statusCode(200)
-      .extract().as(IndexResult.class);
+    IndexResult result = given().contentType(ContentType.JSON).body(body).when().post("/aips/find").then()
+      .statusCode(200).extract().as(IndexResult.class);
 
     Assert.assertNotNull(result, "IndexResult must not be null");
-    Assert.assertTrue(result.getTotalCount() >= 0,
-      "Total count must be non-negative, got: " + result.getTotalCount());
+    Assert.assertTrue(result.getTotalCount() >= 0, "Total count must be non-negative, got: " + result.getTotalCount());
     // RODA returns results:null (not []) when totalCount == 0
     if (result.getTotalCount() > 0) {
       Assert.assertNotNull(result.getResults(), "IndexResult.results must not be null when totalCount > 0");
@@ -106,10 +88,6 @@ public class AipApiTest extends AbstractApiTest {
    */
   @Test
   public void getAipConfigurationTypes_returns200() {
-    given()
-      .when()
-      .get("/aips/configuration/types")
-      .then()
-      .statusCode(200);
+    given().when().get("/aips/configuration/types").then().statusCode(200);
   }
 }

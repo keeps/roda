@@ -16,7 +16,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication
+@SpringBootApplication(excludeName = {
+        "org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration",
+        "org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration",
+        "org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientAutoConfiguration"})
 @ComponentScan(basePackages = {"org.roda.*"})
 @EnableJpaRepositories(basePackages = "org.roda.core.repository")
 @EntityScan(basePackages = {"org.roda.core.entity", "org.roda.core.data.v2.jobs"})
