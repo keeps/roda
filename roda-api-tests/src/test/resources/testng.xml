@@ -12,4 +12,10 @@
     </packages>
   </test>
 
+  <test name="Ingest Lifecycle Tests">
+    <packages>
+      <package name="org.roda.tests.api.lifecycle"/>
+    </packages>
+  </test>
+
 </suite>
