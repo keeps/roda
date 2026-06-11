@@ -11,6 +11,7 @@ import java.io.Serial;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import org.roda.core.data.v2.index.collapse.Collapse;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -62,6 +63,14 @@ public class FindRequest extends CountRequest {
   @JsonProperty("childrenFilter")
   private Filter childrenFilter;
 
+  public FindRequest() {
+    super();
+    this.sorter = Sorter.NONE;
+    this.sublist = new Sublist(0, 10);
+    this.facets = Facets.NONE;
+    this.fieldsToReturn = Collections.emptyList();
+  }
+
   // Private constructor for Jackson deserialization
   private FindRequest(FindRequestBuilder builder) {
     super(builder.filter, builder.onlyActive);
@@ -78,52 +87,97 @@ public class FindRequest extends CountRequest {
     this.childrenFilter = builder.childrenFilter;
   }
 
+  @JsonCreator
+  public static FindRequestBuilder getBuilder(final Filter filter, boolean onlyActive) {
+    return new FindRequestBuilder(filter, onlyActive);
+  }
+
   public Sorter getSorter() {
     return sorter;
+  }
+
+  public void setSorter(Sorter sorter) {
+    this.sorter = sorter;
   }
 
   public Sublist getSublist() {
     return sublist;
   }
 
+  public void setSublist(Sublist sublist) {
+    this.sublist = sublist;
+  }
+
   public Facets getFacets() {
     return facets;
+  }
+
+  public void setFacets(Facets facets) {
+    this.facets = facets;
   }
 
   public boolean isExportFacets() {
     return exportFacets;
   }
 
+  public void setExportFacets(boolean exportFacets) {
+    this.exportFacets = exportFacets;
+  }
+
   public String getFilename() {
     return filename;
+  }
+
+  public void setFilename(String filename) {
+    this.filename = filename;
   }
 
   public List<String> getFieldsToReturn() {
     return fieldsToReturn;
   }
 
+  public void setFieldsToReturn(List<String> fieldsToReturn) {
+    this.fieldsToReturn = fieldsToReturn;
+  }
+
   public Collapse getCollapse() {
     return collapse;
+  }
+
+  public void setCollapse(Collapse collapse) {
+    this.collapse = collapse;
   }
 
   public boolean getChildren() {
     return children;
   }
 
+  public void setChildren(boolean children) {
+    this.children = children;
+  }
+
   public List<String> getChildrenFieldsToReturn() {
     return childrenFieldsToReturn;
+  }
+
+  public void setChildrenFieldsToReturn(List<String> childrenFieldsToReturn) {
+    this.childrenFieldsToReturn = childrenFieldsToReturn;
   }
 
   public Long getChildrenLimit() {
     return childrenLimit;
   }
 
+  public void setChildrenLimit(Long childrenLimit) {
+    this.childrenLimit = childrenLimit;
+  }
+
   public Filter getChildrenFilter() {
     return childrenFilter;
   }
 
-  public static FindRequestBuilder getBuilder(final Filter filter, boolean onlyActive) {
-    return new FindRequestBuilder(filter, onlyActive);
+  public void setChildrenFilter(Filter childrenFilter) {
+    this.childrenFilter = childrenFilter;
   }
 
   @JsonPOJOBuilder
