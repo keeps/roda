@@ -176,6 +176,15 @@ public final class RodaConstants {
 
   public static final String UI_LISTS_PAGE_SIZE_INITIAL = "pageSize.initial";
   public static final String UI_LISTS_PAGE_SIZE_INCREMENT = "pageSize.increment";
+  public static final String UI_LISTS_INCLUDE_NESTED_DOCUMENTS = "includeNestedDocuments";
+
+  public static final String UI_CATALOGUE_VIRTUAL_PROPERTY = "ui.catalogue.virtual";
+  public static final String UI_LISTS_CATALOGUE_LABEL_I18N_PROPERTY = "catalogue.label.i18n";
+  public static final String UI_LISTS_CATALOGUE_ICON_PROPERTY = "catalogue.icon";
+  public static final String UI_LISTS_CATALOGUE_FILTER = "catalogue.filter";
+  public static final String UI_LISTS_CATALOGUE_CHILDOF_FILTER = "catalogue.childOf.filter";
+  public static final String UI_LISTS_CATALOGUE_CLICK_ACTION = "catalogue.click_action";
+  public static final String UI_LISTS_CATALOGUE_CLICK_ACTION_BROWSE_PARENT = "browse_parent";
 
   public static final String UI_ICONS_CLASS = "ui.icons.class";
   public static final String UI_SERVICE_DROPFOLDER_URL = "ui.service.dropfolder.url";
@@ -1980,6 +1989,8 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_SUGGEST_FIELD = "suggestField";
   public static final String SEARCH_FIELD_TYPE_SUGGEST_PARTIAL = "suggestPartial";
   public static final String SEARCH_FIELD_TYPE_CONTROLLED = "controlled";
+  public static final String SEARCH_FIELD_NESTED_TYPE = "nestedType";
+  public static final String SEARCH_FIELD_NESTED_PARENT_TYPE = "nestedParentType";
   public static final String SEARCH_WITH_PREFILTER_HANDLER = "$prefilter";
   public static final String SEARCH_WITH_SAVED_HANDLER = "$savedSearch";
 

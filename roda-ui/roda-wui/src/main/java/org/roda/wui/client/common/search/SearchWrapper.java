@@ -276,6 +276,42 @@ public class SearchWrapper extends Composite {
     searchPanel.attachSearchPanelSelectionDropdown(searchPanelSelectionDropdown);
   }
 
+  public <T extends IsIndexed> SearchWrapper createVirtualListAndSearchPanel(ListBuilder<T> listBuilder,
+    boolean showSaveButton, boolean hideListAfterClear) {
+    AsyncTableCell<T> list = listBuilder.build();
+    String listId = list.getListId();
+
+    String labelI18nKey = ConfigurationManager.resolveTranslation(RodaConstants.UI_LISTS_PROPERTY, listId,
+      RodaConstants.UI_LISTS_CATALOGUE_LABEL_I18N_PROPERTY);
+    if (labelI18nKey == null) {
+      labelI18nKey = listId;
+    }
+
+    String icon = ConfigurationManager.getString(RodaConstants.UI_LISTS_PROPERTY, listId,
+      RodaConstants.UI_LISTS_CATALOGUE_ICON_PROPERTY);
+
+    Filter filter = list.getFilter();
+    String allFilter = SearchFilters.searchField();
+    boolean incremental = SearchFilters.shouldBeIncremental(filter);
+
+    SearchPanel<T> searchPanel = new SearchPanel<>(list, filter, allFilter, incremental,
+      listBuilder.getOptions().getSearchPlaceholder(), hasMultipleSearchPanels, showSaveButton, hideListAfterClear);
+
+    initSearchPanelSelectionDropdown();
+    searchPanelSelectionDropdown.addItem(labelI18nKey, listId, icon);
+    searchPanel.setVisible(true);
+
+    components.putVirtual(listId, searchPanel, list);
+
+    if (mainPanel.getWidgetCount() == 0) {
+      if (preselectedDropdownValue == null || preselectedDropdownValue.equals(listId)) {
+        attachComponents(listId);
+      }
+    }
+
+    return this;
+  }
+
   /**
    * Auxiliary manager for inner components (groups of one searchWrapper and one
    * BasicAsyncTableCell, at least for now) that is used to enforce type coherence
@@ -284,6 +320,8 @@ public class SearchWrapper extends Composite {
   private class Components {
     private final Map<Class<? extends IsIndexed>, SearchPanel<? extends IsIndexed>> searchPanels = new LinkedHashMap<>();
     private final Map<Class<? extends IsIndexed>, AsyncTableCell<? extends IsIndexed>> lists = new LinkedHashMap<>();
+    private final Map<String, SearchPanel<? extends IsIndexed>> virtualSearchPanels = new LinkedHashMap<>();
+    private final Map<String, AsyncTableCell<? extends IsIndexed>> virtualLists = new LinkedHashMap<>();
 
     /**
      * Add a new set of components associated with a class.
@@ -302,6 +340,11 @@ public class SearchWrapper extends Composite {
       lists.put(objectClass, list);
     }
 
+    <T extends IsIndexed> void putVirtual(String listId, SearchPanel<T> searchPanel, AsyncTableCell<T> list) {
+      virtualSearchPanels.put(listId, searchPanel);
+      virtualLists.put(listId, list);
+    }
+
     <T extends IsIndexed> SearchPanel<T> getSearchPanel(Class<T> objectClass) {
       return (SearchPanel<T>) searchPanels.get(objectClass);
     }
@@ -310,18 +353,26 @@ public class SearchWrapper extends Composite {
       return (AsyncTableCell<T>) lists.get(objectClass);
     }
 
-    <T extends IsIndexed> SearchPanel<T> getSearchPanel(String className) {
-      return (SearchPanel<T>) searchPanels.get(classForName(className));
+    <T extends IsIndexed> SearchPanel<T> getSearchPanel(String key) {
+      if (virtualSearchPanels.containsKey(key)) {
+        return (SearchPanel<T>) virtualSearchPanels.get(key);
+      }
+      return (SearchPanel<T>) searchPanels.get(classForName(key));
     }
 
-    <T extends IsIndexed> AsyncTableCell<T> getList(String className) {
-      return (AsyncTableCell<T>) lists.get(classForName(className));
+    <T extends IsIndexed> AsyncTableCell<T> getList(String key) {
+      if (virtualLists.containsKey(key)) {
+        return (AsyncTableCell<T>) virtualLists.get(key);
+      }
+      return (AsyncTableCell<T>) lists.get(classForName(key));
     }
 
     <T extends IsIndexed> void forEachList(Consumer<AsyncTableCell<T>> action) {
       for (AsyncTableCell<? extends IsIndexed> value : lists.values()) {
-        AsyncTableCell<T> list = (AsyncTableCell<T>) value;
-        action.accept(list);
+        action.accept((AsyncTableCell<T>) value);
+      }
+      for (AsyncTableCell<? extends IsIndexed> value : virtualLists.values()) {
+        action.accept((AsyncTableCell<T>) value);
       }
     }
 

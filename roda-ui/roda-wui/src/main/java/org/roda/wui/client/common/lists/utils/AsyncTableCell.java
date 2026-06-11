@@ -389,7 +389,16 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     // autoUpdateConsumers.add(st -> GWT.log(st.toString()));
     addAutoUpdateControlListener();
 
-    if (options.isBindOpener()) {
+    if (options.getCustomOpener() != null) {
+      final java.util.function.Consumer<T> opener = options.getCustomOpener();
+      getSelectionModel().addSelectionChangeHandler(event -> {
+        ListSelectionState<T> state = getListSelectionState();
+        if (state != null) {
+          clearSelected();
+          opener.accept(state.getSelected());
+        }
+      });
+    } else if (options.isBindOpener()) {
       ListSelectionUtils.bindBrowseOpener(this);
     }
 
@@ -615,7 +624,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     Services services = new Services(reason, "get");
     FindRequest findRequest = FindRequest.getBuilder(getFilter(), getJustActive()).withSublist(sublist)
       .withFacets(getFacets()).withExportFacets(false).withSorter(sorter).withFieldsToReturn(fieldsToReturn)
-      .withCollapse(getCollapse()).build();
+      .withCollapse(getCollapse()).withIncludeNestedDocuments(options.isIncludeNestedDocuments()).build();
     return services.rodaEntityRestService(s -> s.find(findRequest, LocaleInfo.getCurrentLocale().getLocaleName()),
       getClassToReturn());
   }

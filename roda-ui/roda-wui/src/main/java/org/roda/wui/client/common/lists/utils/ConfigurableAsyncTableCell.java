@@ -375,7 +375,7 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
               case DATE_FORMAT_SIMPLE:
                 return Humanize.formatDate((String) value, false);
               case LIST:
-                List<String> renderedList = ((List<?>) value).stream().map(v -> renderValue(v, hint)).collect(Collectors.toList());
+                List<String> renderedList = ((List<?>) value).stream().map(v -> renderValue(v, null)).collect(Collectors.toList());
                 return StringUtils.prettyPrint(renderedList);
               default:
                 return value.toString();
