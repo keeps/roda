@@ -12,8 +12,6 @@ services:
   solr:
     image: docker.io/solr:9.8.1
     restart: unless-stopped
-    ports:
-      - "8983:8983"
     environment:
       SOLR_HEAP: 2g
       ZK_HOST: zoo:2181
@@ -41,17 +39,11 @@ services:
   mailpit:
     image: axllent/mailpit:v1.24
     restart: unless-stopped
-    ports:
-      - "1025:1025"
-      - "8025:8025"
 
   openldap:
     image: docker.io/bitnamilegacy/openldap:2.6
     restart: unless-stopped
     user: 1001:root
-    ports:
-      - "1389:1389"
-      - "1636:1636"
     environment:
       - BITNAMI_DEBUG=true
       - LDAP_ROOT=dc=roda,dc=org
@@ -66,7 +58,7 @@ services:
     image: docker.io/keeps/roda:development
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "8080"
     depends_on:
       - solr
       - clamd
@@ -94,8 +86,6 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: roda
       POSTGRES_DB: roda_core_db
-    ports:
-      - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
 

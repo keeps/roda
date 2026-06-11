@@ -20,7 +20,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
-import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;
+import org.springframework.boot.web.server.servlet.CookieSameSiteSupplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -216,6 +216,7 @@ public class RodaConfig {
       registry.addViewController("/").setViewName("forward:/Main.html");
       registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
+
   }
 
   // TODO: add welcome page

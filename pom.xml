@@ -108,11 +108,11 @@
         <maven.compiler.release>21</maven.compiler.release>
         <roda.temporary.repository>${user.dir}</roda.temporary.repository>
         <java_version>21</java_version>
-        <gwt.version>2.12.2</gwt.version>
+        <gwt.version>2.13.0</gwt.version>
         <cas.client.version>4.1.0</cas.client.version>
         <swagger.version>2.2.41</swagger.version>
-        <jackson.version>2.20.1</jackson.version>
-        <spring.version>6.2.18</spring.version>
+        <jackson.version>2.21.2</jackson.version>
+        <spring.version>7.0.7</spring.version>
         <solr.version>9.10.0</solr.version>
         <pekko.version>1.4.0</pekko.version>
         <httpcomponents.version>5.5</httpcomponents.version>
@@ -120,10 +120,10 @@
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
-        <springboot.version>3.5.14</springboot.version>
+        <springboot.version>4.0.6</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
-        <logback.version>1.5.25</logback.version>
-        <mockito.version>5.18.0</mockito.version>
+        <logback.version>1.5.32</logback.version>
+        <mockito.version>5.20.0</mockito.version>
     </properties>
     <profiles>
         <profile>
@@ -435,30 +435,14 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
-                <artifactId>jackson-bom</artifactId>
-                <version>2.20.0</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <!-- Import dependency management from Spring Boot -->
+                <!-- Import dependency management from Spring Boot (manages both Jackson 2 and 3 BOMs) -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${springboot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>6.1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.persistence</groupId>
-                <artifactId>jakarta.persistence-api</artifactId>
-                <version>3.1.0</version>
-            </dependency>
+            <!-- jakarta.servlet-api and jakarta.persistence-api are managed by Spring Boot BOM -->
             <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-util -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
@@ -566,17 +550,6 @@
                 <groupId>org.eclipse.angus</groupId>
                 <artifactId>angus-mail</artifactId>
                 <version>2.0.3</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.transaction</groupId>
-                <artifactId>jta</artifactId>
-                <version>1.1</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml</groupId>
-                <artifactId>jsr173</artifactId>
-                <version>1.0</version>
-                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>jpl.mipl</groupId>

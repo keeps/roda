@@ -62,7 +62,17 @@ public class FindRequest extends CountRequest {
   @JsonProperty("childrenFilter")
   private Filter childrenFilter;
 
-  // Private constructor for Jackson deserialization
+  // No-arg constructor for Jackson 3 deserialization (Jackson 3 ignores Jackson 2's
+  // @JsonDeserialize(builder=...) and needs a public constructor + setters instead).
+  // Jackson 2 still uses the FindRequestBuilder via @JsonDeserialize.
+  public FindRequest() {
+    super();
+    this.sorter = Sorter.NONE;
+    this.sublist = new Sublist(0, 10);
+    this.facets = Facets.NONE;
+    this.fieldsToReturn = Collections.emptyList();
+  }
+
   private FindRequest(FindRequestBuilder builder) {
     super(builder.filter, builder.onlyActive);
     this.sorter = builder.sorter;
@@ -82,44 +92,88 @@ public class FindRequest extends CountRequest {
     return sorter;
   }
 
+  public void setSorter(Sorter sorter) {
+    this.sorter = sorter;
+  }
+
   public Sublist getSublist() {
     return sublist;
+  }
+
+  public void setSublist(Sublist sublist) {
+    this.sublist = sublist;
   }
 
   public Facets getFacets() {
     return facets;
   }
 
+  public void setFacets(Facets facets) {
+    this.facets = facets;
+  }
+
   public boolean isExportFacets() {
     return exportFacets;
+  }
+
+  public void setExportFacets(boolean exportFacets) {
+    this.exportFacets = exportFacets;
   }
 
   public String getFilename() {
     return filename;
   }
 
+  public void setFilename(String filename) {
+    this.filename = filename;
+  }
+
   public List<String> getFieldsToReturn() {
     return fieldsToReturn;
+  }
+
+  public void setFieldsToReturn(List<String> fieldsToReturn) {
+    this.fieldsToReturn = fieldsToReturn;
   }
 
   public Collapse getCollapse() {
     return collapse;
   }
 
+  public void setCollapse(Collapse collapse) {
+    this.collapse = collapse;
+  }
+
   public boolean getChildren() {
     return children;
+  }
+
+  public void setChildren(boolean children) {
+    this.children = children;
   }
 
   public List<String> getChildrenFieldsToReturn() {
     return childrenFieldsToReturn;
   }
 
+  public void setChildrenFieldsToReturn(List<String> childrenFieldsToReturn) {
+    this.childrenFieldsToReturn = childrenFieldsToReturn;
+  }
+
   public Long getChildrenLimit() {
     return childrenLimit;
   }
 
+  public void setChildrenLimit(Long childrenLimit) {
+    this.childrenLimit = childrenLimit;
+  }
+
   public Filter getChildrenFilter() {
     return childrenFilter;
+  }
+
+  public void setChildrenFilter(Filter childrenFilter) {
+    this.childrenFilter = childrenFilter;
   }
 
   public static FindRequestBuilder getBuilder(final Filter filter, boolean onlyActive) {

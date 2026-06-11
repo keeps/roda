@@ -10,17 +10,16 @@ package org.roda.wui;
 import org.roda.core.RodaBootstrap;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
-import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.boot.web.server.servlet.context.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication(exclude = {OAuth2ClientAutoConfiguration.class, SecurityAutoConfiguration.class,
-  UserDetailsServiceAutoConfiguration.class})
+@SpringBootApplication(excludeName = {
+  "org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration",
+  "org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration",
+  "org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientAutoConfiguration"})
 @ComponentScan(basePackages = {"org.roda.*"})
 @EnableJpaRepositories(basePackages = "org.roda.core.repository")
 @EntityScan(basePackages = {"org.roda.core.entity", "org.roda.core.data.v2.jobs"})

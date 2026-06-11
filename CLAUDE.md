@@ -14,12 +14,12 @@ RODA (Repository of Authentic Digital Records) is an enterprise-grade **digital 
 |-----------|-----------|---------|
 | Language | Java | 21 (Oracle JDK) |
 | Build | Apache Maven | 3.8.6+ |
-| Backend | Spring Boot | 3.5.x |
-| Web UI | GWT | 2.12.2 |
+| Backend | Spring Boot | 4.0.x |
+| Web UI | GWT | 2.13.0 |
 | Search/Index | Apache Solr | 9.10.0 |
 | Database | PostgreSQL | 17 |
 | Actors | Pekko (Akka replacement) | 1.4.0 |
-| Serialization | Jackson | 2.20.1 |
+| Serialization | Jackson | 2.21.2 |
 
 ---
 
