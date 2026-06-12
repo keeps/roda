@@ -21,6 +21,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.services.Services;
@@ -75,7 +76,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
 
     Services services = new Services("Find RODA members", "get");
     FindRequest request = FindRequest.getBuilder(filter, justActive).withSorter(sorter)
-      .build();
+      .withSublist(new Sublist(0, Integer.MAX_VALUE)).build();
     services.membersResource(s -> s.find(request, LocaleInfo.getCurrentLocale().getLocaleName()))
       .whenComplete((indexedResult, throwable) -> {
         if (throwable != null) {
