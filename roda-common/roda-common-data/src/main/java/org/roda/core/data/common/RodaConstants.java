@@ -394,7 +394,7 @@ public final class RodaConstants {
   public static final String API_REST_V2_TRANSFERRED_RESOURCE_CREATE_RESOURCE = "create/resource";
 
   // Report
-  public static final String API_REST_V2_JOB_REPORT = "api/v2/job-report/";
+  public static final String API_REST_V2_JOB_REPORT = "api/v2/job-reports/";
 
   // jobs
   public static final String API_REST_V2_JOBS = "api/v2/jobs/";
