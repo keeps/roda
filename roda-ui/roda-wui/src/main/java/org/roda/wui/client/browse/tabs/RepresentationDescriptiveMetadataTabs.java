@@ -7,7 +7,9 @@
  */
 package org.roda.wui.client.browse.tabs;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
@@ -15,9 +17,13 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.wui.client.browse.DescriptiveMetadataHistory;
 import org.roda.wui.client.browse.EditDescriptiveMetadata;
 import org.roda.wui.client.common.ActionsToolbar;
+import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.labels.Header;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
+import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -47,7 +53,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class RepresentationDescriptiveMetadataTabs extends Tabs {
   public void init(IndexedAIP aip, IndexedRepresentation representation,
-    DescriptiveMetadataInfos descriptiveMetadataInfos) {
+    DescriptiveMetadataInfos descriptiveMetadataInfos, AsyncCallback<Actionable.ActionImpact> actionCallback) {
     for (DescriptiveMetadataInfo metadataInfo : descriptiveMetadataInfos.getDescriptiveMetadataInfoList()) {
       // Tab button
       SafeHtml buttonTitle = SafeHtmlUtils.fromString(metadataInfo.getLabel());
@@ -85,6 +91,38 @@ public class RepresentationDescriptiveMetadataTabs extends Tabs {
                     metadataID);
                 }
               }, messages.editButton(), "btn-edit");
+            }
+
+            // Remove button logic
+            if (!AIPState.DESTROYED.equals(aip.getState()) && !aip.isOnHold() && aip.getDisposalConfirmationId() == null
+              && PermissionClientUtils.hasPermissions(aip.getPermissions(),
+                RodaConstants.PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_FILE)) {
+              descriptiveMetadataToolbar.addAction(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                  Dialogs.showConfirmDialog(messages.removeMetadataFileTitle(), messages.removeMetadataFileLabel(),
+                    messages.cancelButton(), messages.confirmButton(), new NoAsyncCallback<Boolean>() {
+
+                      public void onSuccess(Boolean confirm) {
+                        if (confirm) {
+                          Services service = new Services("Delete descriptive metadata file", "delete");
+
+                          service.aipResource(s -> s.deleteRepresentationDescriptiveMetadataFile(aip.getId(),
+                            representation.getId(), metadataID)).whenComplete((value, error) -> {
+                              if (error == null) {
+                                Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
+                                if (actionCallback != null) {
+                                  actionCallback.onSuccess(Actionable.ActionImpact.UPDATED);
+                                }
+                              } else {
+                                AsyncCallbackUtils.defaultFailureTreatment(error);
+                              }
+                            });
+                        }
+                      }
+                    });
+                }
+              }, messages.removeButton(), "btn-ban");
             }
 
             // History button

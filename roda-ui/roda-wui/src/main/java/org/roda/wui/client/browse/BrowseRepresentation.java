@@ -212,7 +212,7 @@ public class BrowseRepresentation extends Composite {
     objectToolbar.setObjectAndBuild(representation, aip.getState(), aip.getPermissions(), handler);
 
     // TABS
-    browseTab.init(response);
+    browseTab.init(response, handler);
   }
 
   private void initHandlers() {

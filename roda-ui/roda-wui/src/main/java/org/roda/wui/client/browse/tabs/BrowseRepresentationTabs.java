@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.browse.tabs;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -19,6 +20,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.tabs.representation.RepresentationDetailsTab;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.FileSearchWrapperActions;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
@@ -39,7 +41,7 @@ import java.util.Arrays;
  * @author Alexandre Flores <aflores@keep.pt>
  */
 public class BrowseRepresentationTabs extends Tabs {
-  public void init(BrowseRepresentationResponse browseRepresentationResponse) {
+  public void init(BrowseRepresentationResponse browseRepresentationResponse, AsyncCallback<Actionable.ActionImpact> actionCallback) {
     IndexedAIP aip = browseRepresentationResponse.getIndexedAIP();
     IndexedRepresentation representation = browseRepresentationResponse.getIndexedRepresentation();
 
@@ -74,7 +76,7 @@ public class BrowseRepresentationTabs extends Tabs {
         @Override
         public Widget buildTabWidget() {
           RepresentationDescriptiveMetadataTabs descriptiveMetadataTabs = new RepresentationDescriptiveMetadataTabs();
-          descriptiveMetadataTabs.init(aip, representation, browseRepresentationResponse.getDescriptiveMetadataInfos());
+          descriptiveMetadataTabs.init(aip, representation, browseRepresentationResponse.getDescriptiveMetadataInfos(), actionCallback);
           descriptiveMetadataTabs.setStyleName("descriptiveMetadataTabs");
           return descriptiveMetadataTabs;
         }
