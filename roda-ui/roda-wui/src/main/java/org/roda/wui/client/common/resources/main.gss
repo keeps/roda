@@ -8961,7 +8961,7 @@ span.code {
 }
 
 .descriptiveMetadataTabs .descriptiveMetadata {
-    padding: 24px 0px;
+    padding: 1.6rem;
 }
 
 .descriptiveMetadataTabs .tabButtonContainer:last-child {

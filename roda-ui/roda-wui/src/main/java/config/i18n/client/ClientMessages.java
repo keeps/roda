@@ -80,6 +80,8 @@ public interface ClientMessages extends Messages {
 
   String riskIncidencesTitle();
 
+  String descriptiveMetadataTitle();
+
   String newDescriptiveMetadataTitle();
 
   String editDescriptiveMetadataTitle();

@@ -119,7 +119,7 @@ public class EditDisposalSchedule extends Composite {
     navigationToolbar.withoutButtons().build();
     navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getEditDisposalScheduleBreadcrumbs(disposalSchedule));
 
-    actionsToolbar.setLabel(messages.showDisposalRuleTitle());
+    actionsToolbar.setLabel(messages.showDisposalScheduleTitle());
 
     // 3. Pass the shared object
     actionsToolbar.build();

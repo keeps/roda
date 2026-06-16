@@ -52,7 +52,7 @@ public class BrowseAIPTabs extends Tabs {
         @Override
         public Widget buildTabWidget() {
           AIPDescriptiveMetadataTabs aipDescriptiveMetadataTabs = new AIPDescriptiveMetadataTabs();
-          aipDescriptiveMetadataTabs.init(aip, browseAIPResponse.getDescriptiveMetadataInfos());
+          aipDescriptiveMetadataTabs.init(aip, browseAIPResponse.getDescriptiveMetadataInfos(), actionCallback);
           aipDescriptiveMetadataTabs.setStyleName("descriptiveMetadataTabs");
           return aipDescriptiveMetadataTabs;
         }

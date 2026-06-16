@@ -150,7 +150,7 @@ public class CreateDescriptiveMetadata extends Composite {
         BreadcrumbUtils.getCreateRepresentationDescriptiveMetadataBreadcrumbs(aip, representation));
     }
 
-    actionsToolbar.setLabel(isNew ? messages.newArchivalPackage() : messages.newDescriptiveMetadataTitle());
+    actionsToolbar.setLabel(isNew ? messages.intellectualEntity() : messages.descriptiveMetadataTitle());
     actionsToolbar.build();
 
     initTitle(aip, title, isNew);
@@ -179,6 +179,8 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   protected static void initTitle(IndexedAIP aip, TitlePanel title, boolean isNew) {
+    title.addStyleName("mb-16");
+
     if (isNew) {
       title.setIcon(DescriptionLevelUtils.getTopIconSafeHtml());
       title.setText(messages.newArchivalPackage());

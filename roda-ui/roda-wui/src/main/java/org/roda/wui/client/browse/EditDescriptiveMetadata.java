@@ -168,7 +168,7 @@ public class EditDescriptiveMetadata extends Composite {
         BreadcrumbUtils.getEditRepresentationDescriptiveMetadataBreadcrumbs(aip, representation, filename));
     }
 
-    actionsToolbar.setLabel(messages.editDescriptiveMetadataTitle());
+    actionsToolbar.setLabel(messages.descriptiveMetadataTitle());
     actionsToolbar.build();
 
     DescriptiveMetadataPanel dataPanel = new DescriptiveMetadataPanel(aip.getId(),
@@ -184,6 +184,7 @@ public class EditDescriptiveMetadata extends Composite {
 
       @Override
       public void onSuccess(CreateDescriptiveMetadataRequest request) {
+        request.setFilename(filename);
         updateMetadataOnServer(dataPanel, request);
       }
     }));

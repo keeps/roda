@@ -53,7 +53,7 @@ public class DescriptiveMetadataPanel extends Composite {
 
   private final GenericDataForm<DescriptiveMetadata> form;
 
-  private TextBox filenameValue;
+  private Label filenameValue;
   private ListBox type;
   private HTML idError;
   private Label formSimilarDanger;
@@ -90,12 +90,8 @@ public class DescriptiveMetadataPanel extends Composite {
   }
 
   private void buildFields() {
-    filenameValue = new TextBox();
-    filenameValue.addStyleName("form-textbox");
-    filenameValue.setEnabled(!editMode);
-    if (editMode) {
-      filenameValue.addStyleName("wui-cursor-not-allowed");
-    }
+    filenameValue = new Label();
+    filenameValue.addStyleName("form-readonly-value");
     form.addCustomWidget(createFilenameField());
 
     type = new ListBox();
