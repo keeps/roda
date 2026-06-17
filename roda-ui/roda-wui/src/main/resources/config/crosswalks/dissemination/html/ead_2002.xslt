@@ -668,32 +668,37 @@
 	<!-- This template handles description levels and their translation -->
 	<xsl:template name="descriptionLevel">
 		<xsl:if test="//ead:archdesc/@level">
-
-
-			<xsl:variable name="descriptionLevel">
+			
+			<xsl:variable name="levelCode">
 				<xsl:choose>
 					<xsl:when test="/ead:ead/ead:archdesc/@level='otherlevel'">
-						<xsl:variable name="levelCode">
-							<xsl:value-of select="/*:ead/*:archdesc/@otherlevel"/>
-						</xsl:variable>
-						<xsl:value-of select="$descriptionLevelTranslationMap/entry[@key=$levelCode]/text()"/>
+						<xsl:value-of select="/*:ead/*:archdesc/@otherlevel"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:variable name="levelCode">
-							<xsl:value-of select="/*:ead/*:archdesc/@level"/>
-						</xsl:variable>
-
-						<xsl:value-of select="$descriptionLevelTranslationMap/entry[@key=$levelCode]/text()"/>
+						<xsl:value-of select="/*:ead/*:archdesc/@level"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
-
+			
+			<xsl:variable name="translation" select="$descriptionLevelTranslationMap/entry[@key=$levelCode]/text()"/>
+			
+			<xsl:variable name="descriptionLevel">
+				<xsl:choose>
+					<xsl:when test="string-length($translation) &gt; 0">
+						<xsl:value-of select="$translation"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$levelCode"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			
 			<xsl:call-template name="simpleField">
 				<xsl:with-param name="label" select="$i18n.level"></xsl:with-param>
 				<xsl:with-param name="value"><xsl:value-of select="$descriptionLevel"></xsl:value-of> </xsl:with-param>
 			</xsl:call-template>
+			
 		</xsl:if>
-
 	</xsl:template>
 
 	<!-- This template handles rage dates -->
