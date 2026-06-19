@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -115,6 +116,7 @@ public class DIPFile implements IsModelObject, IsIndexed, HasId, SetsUUID, HasPe
   }
 
   @Override
+  @JsonProperty("uuid")
   public String getUUID() {
     return uuid;
   }

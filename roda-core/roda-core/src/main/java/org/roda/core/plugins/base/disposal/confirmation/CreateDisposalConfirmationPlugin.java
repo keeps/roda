@@ -75,7 +75,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         PluginParameter.PluginParameterType.STRING).withDescription("plugin.createDisposalConfirmationPlugin.parameter.title.description").build());
     pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO,
       PluginParameter.getBuilder(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO, "plugin.createDisposalConfirmationPlugin.parameter.info.name",
-        PluginParameter.PluginParameterType.STRING).withDefaultValue("plugin.createDisposalConfirmationPlugin.parameter.info.description").build());
+        PluginParameter.PluginParameterType.STRING).withDescription("plugin.createDisposalConfirmationPlugin.parameter.info.description").build());
   }
 
   private final Set<String> disposalSchedules = new HashSet<>();
