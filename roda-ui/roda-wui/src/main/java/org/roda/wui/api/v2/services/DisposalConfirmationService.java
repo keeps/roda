@@ -214,9 +214,15 @@ public class DisposalConfirmationService {
       String reportTemplate = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
 
       Handlebars handlebars = new Handlebars();
-      handlebars.registerHelper(HBS_DATEFORMAT_HELPER_NAME, (Helper<Long>) (value, options) -> {
-        ZonedDateTime date = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
-        return DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(date);
+      handlebars.registerHelper(HBS_DATEFORMAT_HELPER_NAME, (Helper<Object>) (value, options) -> {
+        if (value instanceof Long valueInLong) {
+          ZonedDateTime date = Instant.ofEpochMilli(valueInLong).atZone(ZoneOffset.UTC);
+          return DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(date);
+        } else if  (value instanceof String valueInString) {
+          ZonedDateTime date = Instant.parse(valueInString).atZone(ZoneOffset.UTC);
+          return DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(date);
+        }
+        return value;
       });
       Template template = handlebars.compileInline(reportTemplate);
       String apply = template.apply(confirmationValues);
