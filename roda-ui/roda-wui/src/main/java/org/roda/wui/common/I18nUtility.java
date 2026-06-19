@@ -22,6 +22,7 @@ import org.roda.core.data.v2.disposal.schedule.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -82,7 +83,8 @@ public class I18nUtility {
         String prefixKey = RodaConstants.I18N_UI_FACETS_PREFIX + "." + resultClass.getSimpleName() + "." + facetField
           + ".";
         ret = getRetentionPeriodTranslation(facetValue, prefixKey, locale);
-
+      } else if (resultClass.equals(IndexedReport.class) &&  (facetField.equals("unsuccessfulPlugins") || facetField.equals("successfulPlugins"))) {
+        ret = RodaCoreFactory.getI18NMessages(locale).getTranslation(facetValue);
       } else {
         ret = RodaCoreFactory.getI18NMessages(locale).getTranslation(bundleKey);
       }

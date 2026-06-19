@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -44,6 +45,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.characterization.model.TechnicalMetadata;
 import org.roda.core.common.characterization.model.TechnicalMetadataElement;
 import org.roda.core.common.characterization.model.TechnicalMetadataField;
+import org.roda.core.config.ConfigurationManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -857,8 +859,10 @@ public final class PremisV3Utils {
     ValidationException, AlreadyExistsException {
     String id = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
       RODAInstanceUtils.getLocalInstanceIdentifier());
-    ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(), "",
-      plugin.getDescription(), plugin.getVersion());
+
+    Messages messages = RodaCoreFactory.getI18NMessages(Locale.ENGLISH);
+    ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, messages.getTranslation(plugin.getName(), plugin.getName()), plugin.getAgentType(), "",
+            messages.getTranslation(plugin.getDescription(), plugin.getDescription()), plugin.getVersion());
     return model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
   }
 

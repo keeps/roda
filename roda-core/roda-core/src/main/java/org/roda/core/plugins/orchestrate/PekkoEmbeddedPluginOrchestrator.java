@@ -158,7 +158,7 @@ public class PekkoEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Job job,
     Class<T1> classToActOn, Filter filter, Boolean justActive, Plugin<T> plugin) {
     try {
-      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
+      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getClass().getSimpleName());
       boolean noObjectsOrchestrated = true;
       ActorRef jobActor = (ActorRef) context;
       ActorRef jobStateInfoActor = getJobContextInformation(plugin);
@@ -212,7 +212,7 @@ public class PekkoEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public <T extends IsRODAObject> void runPluginOnObjects(Object context, Job job, Plugin<T> plugin,
     Class<T> objectClass, List<String> uuids) {
     try {
-      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
+      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getClass().getSimpleName());
       boolean noObjectsOrchestrated = true;
       ActorRef jobActor = (ActorRef) context;
       ActorRef jobStateInfoActor = getJobContextInformation(plugin);
