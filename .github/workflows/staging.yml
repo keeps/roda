@@ -11,7 +11,7 @@ jobs:
     env:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Set up JDK 21
@@ -58,7 +58,7 @@ jobs:
           - platform: linux/arm64
             runner: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Prepare platform tag
         run: echo "platform_tag=$(echo "${{ matrix.platform }}" | tr '/' '-')" >> $GITHUB_ENV
       - name: Download JAR artifact
