@@ -100,6 +100,14 @@
             <organizationUrl>https://www.keep.pt</organizationUrl>
             <timezone>0</timezone>
         </developer>
+        <developer>
+            <id>eteixeira</id>
+            <name>Eduardo Teixeira</name>
+            <email>eteixeira@keep.pt</email>
+            <organization>KEEP SOLUTIONS</organization>
+            <organizationUrl>https://www.keep.pt</organizationUrl>
+            <timezone>0</timezone>
+        </developer>
     </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -108,7 +116,7 @@
         <maven.compiler.release>21</maven.compiler.release>
         <roda.temporary.repository>${user.dir}</roda.temporary.repository>
         <java_version>21</java_version>
-        <gwt.version>2.12.2</gwt.version>
+        <gwt.version>2.13.1</gwt.version>
         <cas.client.version>4.1.0</cas.client.version>
         <swagger.version>2.2.41</swagger.version>
         <spring.version>7.0.7</spring.version>
@@ -121,8 +129,8 @@
         <testng.groups>all</testng.groups>
         <springboot.version>4.0.6</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
-        <logback.version>1.5.25</logback.version>
-        <mockito.version>5.18.0</mockito.version>
+        <logback.version>1.5.34</logback.version>
+        <mockito.version>5.23.0</mockito.version>
     </properties>
     <profiles>
         <profile>
