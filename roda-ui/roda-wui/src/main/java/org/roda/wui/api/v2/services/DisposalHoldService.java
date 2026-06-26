@@ -8,7 +8,9 @@
 package org.roda.wui.api.v2.services;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
@@ -76,12 +78,21 @@ public class DisposalHoldService {
 
   public Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId, boolean override)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return applyDisposalHolds(user, items, Collections.singletonList(disposalHoldId), override);
+  }
+
+  public Job applyDisposalHolds(User user, SelectedItems<IndexedAIP> items, List<String> disposalHoldIds,
+    boolean override) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    if (disposalHoldIds == null || disposalHoldIds.isEmpty()) {
+      throw new RequestNotValidException("At least one disposal hold id is required");
+    }
+
     Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_IDS, String.join(",", disposalHoldIds));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE, Boolean.toString(override));
 
-    return CommonServicesUtils.createAndExecuteInternalJob("Apply disposal hold", items,
-      ApplyDisposalHoldToAIPPlugin.class, user, pluginParameters, "Could not execute apply disposal hold action");
+    return CommonServicesUtils.createAndExecuteInternalJob("Apply disposal holds", items,
+      ApplyDisposalHoldToAIPPlugin.class, user, pluginParameters, "Could not execute apply disposal holds action");
   }
 
   public Job liftDisposalHold(User user, String disposalHoldId, String details)

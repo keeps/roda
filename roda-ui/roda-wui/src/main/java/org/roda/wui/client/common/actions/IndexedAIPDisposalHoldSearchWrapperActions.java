@@ -15,6 +15,7 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
@@ -75,6 +76,10 @@ public class IndexedAIPDisposalHoldSearchWrapperActions extends AbstractActionab
 
   @Override
   public CanActResult contextCanAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
+    if (isDisposalHoldLifted()) {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonHoldAlreadyLifted());
+    }
+
     if (object.getObject() != null || object.getObjects() != null) {
       return new CanActResult(POSSIBLE_ACTIONS_ON_DISPOSAL_HOLD.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonInvalidContext());
@@ -85,7 +90,7 @@ public class IndexedAIPDisposalHoldSearchWrapperActions extends AbstractActionab
 
   @Override
   public void act(Action<IndexedAIP> action, IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    if (DisposalHoldAction.DISASSOCIATE.equals(action)) {
+    if (DisposalHoldAction.DISASSOCIATE.equals(action) && !isDisposalHoldLifted()) {
       disassociate(objectToSelectedItems(aip, IndexedAIP.class), callback);
     } else {
       unsupportedAction(action, callback);
@@ -94,7 +99,7 @@ public class IndexedAIPDisposalHoldSearchWrapperActions extends AbstractActionab
 
   @Override
   public void act(Action<IndexedAIP> action, SelectedItems<IndexedAIP> aips, AsyncCallback<ActionImpact> callback) {
-    if (DisposalHoldAction.DISASSOCIATE.equals(action)) {
+    if (DisposalHoldAction.DISASSOCIATE.equals(action) && !isDisposalHoldLifted()) {
       disassociate(aips, callback);
     } else {
       unsupportedAction(action, callback);
@@ -173,11 +178,19 @@ public class IndexedAIPDisposalHoldSearchWrapperActions extends AbstractActionab
     ActionableBundle<IndexedAIP> disposalHoldActionableBundle = new ActionableBundle<>();
 
     ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
-    managementGroup.addButton(messages.disassociateDisposalHoldButton(), DisposalHoldAction.DISASSOCIATE,
-      ActionImpact.UPDATED, "btn-lift-hold");
+    if (!isDisposalHoldLifted()) {
+      managementGroup.addButton(messages.disassociateDisposalHoldButton(), DisposalHoldAction.DISASSOCIATE,
+        ActionImpact.UPDATED, "btn-lift-hold");
+    }
 
-    disposalHoldActionableBundle.addGroup(managementGroup);
+    if (!managementGroup.getButtons().isEmpty()) {
+      disposalHoldActionableBundle.addGroup(managementGroup);
+    }
     return disposalHoldActionableBundle;
+  }
+
+  private boolean isDisposalHoldLifted() {
+    return disposalHold != null && DisposalHoldState.LIFTED.equals(disposalHold.getState());
   }
 
   public enum DisposalHoldAction implements Action<IndexedAIP> {

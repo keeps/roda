@@ -106,11 +106,15 @@ public class BrowseAIPTabs extends Tabs {
     }
 
     // Disposal
-    List<String> disposalMethods = new ArrayList<>();
-    disposalMethods.addAll(AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_HOLD.getMethods());
-    disposalMethods.addAll(AipToolbarActions.AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.getMethods());
-    if (PermissionClientUtils.hasPermissions(disposalMethods, aip.getPermissions())
-      && !aip.getState().equals(AIPState.INGEST_PROCESSING)) {
+    boolean canReadDisposalSchedules = PermissionClientUtils
+      .hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES);
+    boolean canReadDisposalHolds = PermissionClientUtils
+      .hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS);
+    boolean canReadDisposalConfirmations = PermissionClientUtils
+      .hasPermissions(RodaConstants.PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION);
+
+    boolean canSeeDisposalTab = canReadDisposalSchedules || canReadDisposalHolds || canReadDisposalConfirmations;
+    if (canSeeDisposalTab && !aip.getState().equals(AIPState.INGEST_PROCESSING)) {
       createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalTab()), new TabContentBuilder() {
         @Override
         public Widget buildTabWidget() {

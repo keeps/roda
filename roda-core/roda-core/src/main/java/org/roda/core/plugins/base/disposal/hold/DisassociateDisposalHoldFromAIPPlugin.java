@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -23,6 +24,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -53,25 +55,30 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "plugin.disassociateDisposalHoldFromAip.parameter.holdId.name",
-          PluginParameter.PluginParameterType.STRING)
-        .isMandatory(true).isReadOnly(false).withDescription("plugin.disassociateDisposalHoldFromAip.parameter.holdId.description").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
+          "plugin.disassociateDisposalHoldFromAip.parameter.holdId.name", PluginParameter.PluginParameterType.STRING)
+        .isMandatory(true).isReadOnly(false)
+        .withDescription("plugin.disassociateDisposalHoldFromAip.parameter.holdId.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL, "plugin.disassociateDisposalHoldFromAip.parameter.disassociateAll.name",
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL,
+          "plugin.disassociateDisposalHoldFromAip.parameter.disassociateAll.name",
           PluginParameter.PluginParameterType.BOOLEAN)
         .withDefaultValue("false").isMandatory(true).isReadOnly(false)
         .withDescription("plugin.disassociateDisposalHoldFromAip.parameter.disassociateAll.description").build());
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS,
       PluginParameter
-        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS, "plugin.disassociateDisposalHoldFromAip.parameter.eventDetails.name", PluginParameter.PluginParameterType.STRING)
-        .isMandatory(false).withDescription("plugin.disassociateDisposalHoldFromAip.parameter.eventDetails.description").build());
+        .getBuilder(RodaConstants.PLUGIN_PARAMS_DETAILS,
+          "plugin.disassociateDisposalHoldFromAip.parameter.eventDetails.name",
+          PluginParameter.PluginParameterType.STRING)
+        .isMandatory(false).withDescription("plugin.disassociateDisposalHoldFromAip.parameter.eventDetails.description")
+        .build());
   }
 
   private String disposalHoldId;
-  private boolean clearAll;
+  private boolean disassociateAllActiveDirectHolds;
   private String details;
 
   public static String getStaticName() {
@@ -100,7 +107,8 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
     }
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL)) {
-      clearAll = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL));
+      disassociateAllActiveDirectHolds = Boolean
+        .parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL));
     }
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DETAILS)) {
@@ -194,6 +202,11 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
     JobPluginInfo jobPluginInfo, List<AIP> aips) {
     report.addPluginDetails(details);
 
+    if (!disassociateAllActiveDirectHolds && isDisposalHoldLifted()) {
+      skipLiftedDisposalHold(index, model, report, cachedJob, jobPluginInfo, aips);
+      return;
+    }
+
     for (AIP aip : aips) {
       String outcomeText;
       PluginState state = PluginState.SUCCESS;
@@ -201,9 +214,9 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       LOGGER.debug("Processing AIP {}", aip.getId());
 
-      if (clearAll) {
+      if (disassociateAllActiveDirectHolds) {
         try {
-          // lift disposal holds
+          // disassociate active direct disposal holds
           if (aip.getHolds() != null && !aip.getHolds().isEmpty()) {
             outcomeText = "Cannot found any active direct disposal hold for disassociate from AIP : " + aip.getId();
             boolean hasAtLeastOneDirectHold = false;
@@ -234,38 +247,72 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
           }
 
         } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-          outcomeText = "Error lifting all disposal holds from AIP " + aip.getId();
-          LOGGER.error("Error lifting all disposal holds from '{}': {}", aip.getId(), e.getMessage(), e);
+          outcomeText = "Error disassociating all active direct disposal holds from AIP " + aip.getId();
+          LOGGER.error("Error disassociating all active direct disposal holds from '{}': {}", aip.getId(),
+            e.getMessage(), e);
           state = PluginState.FAILURE;
           jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(state)
-            .setPluginDetails("Error lifting all disposal holds from AIP '" + aip.getId() + "': " + e.getMessage());
+          reportItem.setPluginState(state).setPluginDetails(
+            "Error disassociating all active direct disposal holds from AIP '" + aip.getId() + "': " + e.getMessage());
         }
       } else {
         try {
           Pair<Boolean, String> outcome = DisposalHoldPluginUtils.disassociateDisposalHoldFromAIP(disposalHoldId, aip,
             reportItem);
-          boolean lifted = outcome.getFirst();
+          boolean disassociated = outcome.getFirst();
           outcomeText = outcome.getSecond();
-          processTransitiveAIP(model, index, cachedJob, aip, disposalHoldId, jobPluginInfo, report);
-          model.updateAIP(aip, cachedJob.getUsername());
-          if (lifted) {
+
+          if (disassociated) {
+            processTransitiveAIP(model, index, cachedJob, aip, disposalHoldId, jobPluginInfo, report);
+            model.updateAIP(aip, cachedJob.getUsername());
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
+            reportItem.setPluginState(PluginState.SUCCESS);
           } else {
+            state = PluginState.SKIPPED;
+            LOGGER.info("{} aip : {}", outcomeText, aip.getId());
             jobPluginInfo.incrementObjectsProcessedWithSkipped();
+            reportItem.setPluginState(state).setPluginDetails(outcomeText);
           }
-          reportItem.setPluginState(state);
         } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-          outcomeText = "Error lifting disposal hold" + disposalHoldId + " from AIP " + aip.getId();
-          LOGGER.error("Error lifting disposal hold '{}' from '{}': {}", disposalHoldId, aip.getId(), e.getMessage(),
-            e);
+          outcomeText = "Error disassociating disposal hold " + disposalHoldId + " from AIP " + aip.getId();
+          LOGGER.error("Error disassociating disposal hold '{}' from '{}': {}", disposalHoldId, aip.getId(),
+            e.getMessage(), e);
           state = PluginState.FAILURE;
           jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(state).setPluginDetails(
-            "Error lifting disposal hold '" + disposalHoldId + "' from AIP '" + aip.getId() + "': " + e.getMessage());
+          reportItem.setPluginState(state).setPluginDetails("Error disassociating disposal hold '" + disposalHoldId
+            + "' from AIP '" + aip.getId() + "': " + e.getMessage());
         }
       }
 
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+
+      try {
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, reportItem.getPluginState(),
+          outcomeText, true, cachedJob);
+      } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+        | AuthorizationDeniedException | AlreadyExistsException e) {
+        LOGGER.error("Error creating event: {}", e.getMessage(), e);
+      }
+    }
+  }
+
+  private boolean isDisposalHoldLifted() {
+    RodaCoreFactory.invalidateDisposalHold(disposalHoldId);
+    DisposalHold disposalHold = RodaCoreFactory.getDisposalHold(disposalHoldId);
+    return disposalHold != null && DisposalHoldState.LIFTED.equals(disposalHold.getState());
+  }
+
+  private void skipLiftedDisposalHold(IndexService index, ModelService model, Report report, Job cachedJob,
+    JobPluginInfo jobPluginInfo, List<AIP> aips) {
+    for (AIP aip : aips) {
+      String outcomeText = "Disposal hold '" + disposalHoldId + "' is lifted and cannot be disassociated from aip '"
+        + aip.getId() + "'";
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+      LOGGER.info("{} aip : {}", outcomeText, aip.getId());
+      jobPluginInfo.incrementObjectsProcessedWithSkipped();
+      reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails(outcomeText);
       report.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 

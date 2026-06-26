@@ -12,6 +12,7 @@ import org.roda.core.data.v2.disposal.hold.DisposalHolds;
 import org.roda.core.data.v2.disposal.metadata.DisposalHoldsAIPMetadata;
 import org.roda.core.data.v2.disposal.metadata.DisposalTransitiveHoldsAIPMetadata;
 import org.roda.core.data.v2.generics.select.SelectedItemsRequest;
+import org.roda.core.data.v2.ip.disposalhold.ApplyDisposalHoldRequest;
 import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
 import org.roda.core.data.v2.ip.disposalhold.UpdateDisposalHoldRequest;
 import org.roda.core.data.v2.jobs.Job;
@@ -79,6 +80,11 @@ public interface DisposalHoldRestService extends RODAEntityRestService<DisposalH
     @Parameter(description = "Selected AIPs", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) SelectedItemsRequest selectedItems,
     @Parameter(description = "Disposal hold id", required = true) @PathVariable(name = "id") String disposalHoldId,
     @Parameter(name = "override", description = "Lift all disposal holds associated and apply the selected disposal hold") @RequestParam(name = "override", required = false, defaultValue = "false") boolean override);
+
+  @RequestMapping(method = RequestMethod.POST, path = "/associate", produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Apply disposal holds to selected AIPs", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApplyDisposalHoldRequest.class))), responses = {
+    @ApiResponse(responseCode = "200", description = "Job created", content = @Content(schema = @Schema(implementation = Job.class)))})
+  Job applyDisposalHolds(ApplyDisposalHoldRequest request);
 
   @RequestMapping(method = RequestMethod.POST, path = "/{id}/lift", produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Lift specific disposal hold", responses = {

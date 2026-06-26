@@ -20,7 +20,6 @@ import org.roda.core.data.utils.SelectedItemsUtils;
 import org.roda.core.data.v2.aip.AssessmentRequest;
 import org.roda.core.data.v2.aip.MoveRequest;
 import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
 import org.roda.core.data.v2.generics.DeleteRequest;
 import org.roda.core.data.v2.generics.UpdatePermissionsRequest;
@@ -38,7 +37,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
+import org.roda.core.data.v2.ip.disposalhold.ApplyDisposalHoldRequest;
 import org.roda.core.data.v2.representation.ChangeTypeRequest;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
@@ -59,14 +58,11 @@ import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
 import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogResult;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.search.Search;
-import org.roda.wui.client.services.DisposalHoldRestService;
-import org.roda.wui.client.services.DisposalScheduleRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -97,13 +93,14 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     List.of(AIPAction.NEW_CHILD_AIP_TOP));
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
     List.of(AIPAction.NEW_CHILD_AIP_BELOW));
-  private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(Arrays.asList(AIPAction.DOWNLOAD,
-    AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.ADD_USER_PERMISSION,
-    AIPAction.ADD_GROUP_PERMISSION, AIPAction.APPLY_PERMISSIONS_TO_HIERARCHY, AIPAction.APPLY_PERMISSIONS_TO_DIPS,
-    AIPAction.REMOVE, AIPAction.NEW_PROCESS, AIPAction.DOWNLOAD_EVENTS, AIPAction.DOWNLOAD_DOCUMENTATION,
-    AIPAction.DOWNLOAD_SUBMISSIONS, AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
-    AIPAction.ASSOCIATE_DISPOSAL_HOLD, AIPAction.SEARCH_DESCENDANTS, AIPAction.SEARCH_PACKAGE,
-    AIPAction.NEW_CHILD_AIP_BELOW, AIPAction.NEW_REPRESENTATION, AIPAction.CREATE_DESCRIPTIVE_METADATA));
+  private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
+    Arrays.asList(AIPAction.DOWNLOAD, AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS,
+      AIPAction.ADD_USER_PERMISSION, AIPAction.ADD_GROUP_PERMISSION, AIPAction.APPLY_PERMISSIONS_TO_HIERARCHY,
+      AIPAction.APPLY_PERMISSIONS_TO_DIPS, AIPAction.REMOVE, AIPAction.NEW_PROCESS, AIPAction.DOWNLOAD_EVENTS,
+      AIPAction.DOWNLOAD_DOCUMENTATION, AIPAction.DOWNLOAD_SUBMISSIONS, AIPAction.CHANGE_TYPE,
+      AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE, AIPAction.DISASSOCIATE_DISPOSAL_SCHEDULE,
+      AIPAction.ASSOCIATE_DISPOSAL_HOLD, AIPAction.SEARCH_DESCENDANTS, AIPAction.SEARCH_PACKAGE,
+      AIPAction.NEW_CHILD_AIP_BELOW, AIPAction.NEW_REPRESENTATION, AIPAction.CREATE_DESCRIPTIVE_METADATA));
   private static final Set<AIPAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AIPAction.MOVE_IN_HIERARCHY, AIPAction.UPDATE_PERMISSIONS, AIPAction.REMOVE, AIPAction.NEW_PROCESS,
       AIPAction.CHANGE_TYPE, AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE, AIPAction.ASSOCIATE_DISPOSAL_HOLD));
@@ -189,7 +186,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       || AIPAction.REMOVE.equals(action) || AIPAction.UPDATE_PERMISSIONS.equals(action)
       || AIPAction.ADD_USER_PERMISSION.equals(action) || AIPAction.ADD_GROUP_PERMISSION.equals(action)
       || AIPAction.APPLY_PERMISSIONS_TO_HIERARCHY.equals(action) || AIPAction.APPLY_PERMISSIONS_TO_DIPS.equals(action)
-      || AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action) || AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action))) {
+      || AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action) || AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)
+      || AIPAction.DISASSOCIATE_DISPOSAL_SCHEDULE.equals(action))) {
       return new CanActResult(false, CanActResult.Reason.USER, messages.reasonAIPUnderAppraisal());
     } else {
       return new CanActResult(hasPermissions(action, aip.getPermissions()), CanActResult.Reason.USER,
@@ -215,10 +213,17 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
     } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId()) && (action.equals(AIPAction.MOVE_IN_HIERARCHY)
-      || action.equals(AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE) || action.equals(AIPAction.ASSOCIATE_DISPOSAL_HOLD))) {
+      || action.equals(AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE) || action.equals(AIPAction.DISASSOCIATE_DISPOSAL_SCHEDULE)
+      || action.equals(AIPAction.ASSOCIATE_DISPOSAL_HOLD))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
     } else if (action.equals(AIPAction.MOVE_IN_HIERARCHY) && aip.isOnHold()) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
+    } else if (AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)
+      && StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, "");
+    } else if (AIPAction.DISASSOCIATE_DISPOSAL_SCHEDULE.equals(action)
+      && !StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, "");
     } else {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonCantActOnSingleObject());
@@ -243,7 +248,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       || AIPAction.REMOVE.equals(action) || AIPAction.UPDATE_PERMISSIONS.equals(action)
       || AIPAction.ADD_USER_PERMISSION.equals(action) || AIPAction.ADD_GROUP_PERMISSION.equals(action)
       || AIPAction.APPLY_PERMISSIONS_TO_HIERARCHY.equals(action) || AIPAction.APPLY_PERMISSIONS_TO_DIPS.equals(action)
-      || AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action) || AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action))) {
+      || AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action) || AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)
+      || AIPAction.DISASSOCIATE_DISPOSAL_SCHEDULE.equals(action))) {
       return new CanActResult(false, CanActResult.Reason.USER, messages.reasonAIPUnderAppraisal());
     } else {
       return new CanActResult(hasPermissions(action, aip.getPermissions()), CanActResult.Reason.USER,
@@ -270,10 +276,17 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
     } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId()) && (action.equals(AIPAction.MOVE_IN_HIERARCHY)
-      || action.equals(AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE) || action.equals(AIPAction.ASSOCIATE_DISPOSAL_HOLD))) {
+      || action.equals(AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE) || action.equals(AIPAction.DISASSOCIATE_DISPOSAL_SCHEDULE)
+      || action.equals(AIPAction.ASSOCIATE_DISPOSAL_HOLD))) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
     } else if (action.equals(AIPAction.MOVE_IN_HIERARCHY) && aip.isOnHold()) {
       return new CanActResult(false, CanActResult.Reason.CONTEXT, messages.reasonAIPProtectedByDisposalPolicy());
+    } else if (AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)
+      && StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, "");
+    } else if (AIPAction.DISASSOCIATE_DISPOSAL_SCHEDULE.equals(action)
+      && !StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
+      return new CanActResult(false, CanActResult.Reason.CONTEXT, "");
     } else {
       return new CanActResult(POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action), CanActResult.Reason.CONTEXT,
         messages.reasonCantActOnSingleObject());
@@ -346,6 +359,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       changeType(aip, callback);
     } else if (AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aip, callback);
+    } else if (AIPAction.DISASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
+      disassociateDisposalSchedule(aip, callback);
     } else if (AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
       manageDisposalHold(aip, callback);
     } else if (AIPAction.NEW_CHILD_AIP_TOP.equals(action) || AIPAction.NEW_CHILD_AIP_BELOW.equals(action)) {
@@ -377,6 +392,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       changeType(aips, callback);
     } else if (AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aips, callback);
+    } else if (AIPAction.DISASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
+      disassociateDisposalSchedule(aips, callback);
     } else if (AIPAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
       manageDisposalHold(aips, callback);
     } else {
@@ -931,52 +948,6 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       });
   }
 
-  private void associateDisposalSchedule(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
-    associateDisposalSchedule(objectToSelectedItems(aip, IndexedAIP.class), callback);
-  }
-
-  private void associateDisposalSchedule(final SelectedItems<IndexedAIP> aips,
-    final AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
-      @Override
-      public void onSuccess(final Long size) {
-        Services services = new Services("List disposal schedules", "get");
-        services.disposalScheduleResource(DisposalScheduleRestService::listDisposalSchedules)
-          .whenComplete((disposalSchedules, caught) -> {
-            if (caught != null) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-              callback.onFailure(caught);
-            } else {
-              // Show the active disposal schedules only
-              disposalSchedules.getObjects()
-                .removeIf(schedule -> DisposalScheduleState.INACTIVE.equals(schedule.getState()));
-              DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(),
-                disposalSchedules, new ActionNoAsyncCallback<DisposalScheduleDialogResult>(callback) {
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    doActionCallbackNone();
-                  }
-
-                  @Override
-                  public void onSuccess(DisposalScheduleDialogResult result) {
-                    if (DisposalScheduleDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
-                      associateDisposalSchedule(aips, size, result, callback);
-                    } else if (DisposalScheduleDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
-                      disassociateDisposalSchedule(aips, size, callback);
-                    }
-                  }
-                });
-            }
-          });
-      }
-    });
-  }
-
-  private void editPermissions(IndexedAIP aip, EditPermissions.Mode mode, AsyncCallback<ActionImpact> callback) {
-    callback.onSuccess(ActionImpact.NONE);
-    EditPermissions.showModal(IndexedAIP.class.getName(), aip, mode);
-  }
-
   private void applyPermissionsToHierarchy(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
       RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
@@ -1064,7 +1035,6 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     dialog.showAndCenter();
   }
 
-  // creates filter to remove any user or group already in aip's permissions
   private Filter getMembersFilter(IndexedAIP aip, boolean isUser) {
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
@@ -1156,6 +1126,63 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       });
   }
 
+  private void associateDisposalSchedule(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+    Filter activeFilter = new Filter(
+      new NotSimpleFilterParameter(RodaConstants.DISPOSAL_SCHEDULE_STATE, DisposalScheduleState.INACTIVE.name()));
+
+    DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(), activeFilter,
+      new ActionNoAsyncCallback<DisposalScheduleDialogResult>(callback) {
+        @Override
+        public void onFailure(Throwable caught) {
+          doActionCallbackNone();
+        }
+
+        @Override
+        public void onSuccess(DisposalScheduleDialogResult result) {
+          associateDisposalSchedule(objectToSelectedItems(aip, IndexedAIP.class), 1L, result.getDisposalScheduleId(),
+            callback);
+        }
+      });
+  }
+
+  private void associateDisposalSchedule(final SelectedItems<IndexedAIP> aips,
+    final AsyncCallback<ActionImpact> callback) {
+    ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
+      @Override
+      public void onSuccess(final Long size) {
+        Filter activeFilter = new Filter(
+          new NotSimpleFilterParameter(RodaConstants.DISPOSAL_SCHEDULE_STATE, DisposalScheduleState.INACTIVE.name()));
+
+        DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(), activeFilter,
+          new ActionNoAsyncCallback<DisposalScheduleDialogResult>(callback) {
+            @Override
+            public void onFailure(Throwable caught) {
+              doActionCallbackNone();
+            }
+
+            @Override
+            public void onSuccess(DisposalScheduleDialogResult result) {
+              associateDisposalSchedule(aips, size, result.getDisposalScheduleId(), callback);
+            }
+          });
+      }
+    });
+  }
+
+  private void disassociateDisposalSchedule(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+    disassociateDisposalSchedule(objectToSelectedItems(aip, IndexedAIP.class), 1L, callback);
+  }
+
+  private void disassociateDisposalSchedule(final SelectedItems<IndexedAIP> aips,
+    final AsyncCallback<ActionImpact> callback) {
+    ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
+      @Override
+      public void onSuccess(final Long size) {
+        disassociateDisposalSchedule(aips, size, callback);
+      }
+    });
+  }
+
   private void disassociateDisposalSchedule(SelectedItems<IndexedAIP> aips, Long size,
     AsyncCallback<ActionImpact> callback) {
 
@@ -1205,9 +1232,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
       });
   }
 
-  private void associateDisposalSchedule(SelectedItems<IndexedAIP> aips, Long size,
-    DisposalScheduleDialogResult dialogResult, AsyncCallback<ActionImpact> callback) {
-    DisposalSchedule disposalSchedule = dialogResult.getDisposalSchedule();
+  private void associateDisposalSchedule(SelectedItems<IndexedAIP> aips, Long size, String disposalScheduleId,
+    AsyncCallback<ActionImpact> callback) {
 
     Dialogs.showConfirmDialog(messages.associateDisposalScheduleDialogTitle(),
       messages.associateDisposalScheduleDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
@@ -1216,8 +1242,9 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean result) {
           if (result) {
             Services services = new Services("Associate disposal schedule", "job");
-            services.disposalScheduleResource(s -> s
-              .associatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips), disposalSchedule.getId()))
+            services
+              .disposalScheduleResource(
+                s -> s.associatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips), disposalScheduleId))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);
@@ -1262,138 +1289,66 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
       @Override
       public void onSuccess(final Long size) {
-        Services services = new Services("Get disposal holds", "get");
-        services.disposalHoldResource(DisposalHoldRestService::listDisposalHolds)
-          .whenComplete((disposalHolds, throwable) -> {
-            if (throwable != null) {
-              AsyncCallbackUtils.defaultFailureTreatment(throwable);
-              callback.onFailure(throwable);
-            } else {
-              disposalHolds.getObjects().removeIf(p -> DisposalHoldState.LIFTED.equals(p.getState()));
-              DisposalDialogs.showDisposalHoldSelection(messages.disposalHoldSelectionDialogTitle(), disposalHolds,
-                new ActionNoAsyncCallback<DisposalHoldDialogResult>(callback) {
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    doActionCallbackNone();
-                  }
+        Filter activeFilter = new Filter(
+          new NotSimpleFilterParameter(RodaConstants.DISPOSAL_HOLD_STATE, DisposalHoldState.LIFTED.name()));
 
-                  @Override
-                  public void onSuccess(DisposalHoldDialogResult result) {
-                    if (DisposalHoldDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
-                      clearDisposalHolds(aips, size, callback);
-                    } else if (DisposalHoldDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
-                      applyDisposalHold(aips, size, result, false, callback);
-                    } else if (DisposalHoldDialogResult.ActionType.OVERRIDE.equals(result.getActionType())) {
-                      applyDisposalHold(aips, size, result, true, callback);
-                    }
-                  }
-                });
+        DisposalDialogs.showDisposalHoldSelection(messages.disposalHoldSelectionDialogTitle(), activeFilter,
+          new ActionNoAsyncCallback<DisposalHoldDialogResult>(callback) {
+            @Override
+            public void onFailure(Throwable caught) {
+              doActionCallbackNone();
+            }
+
+            @Override
+            public void onSuccess(DisposalHoldDialogResult result) {
+              applyDisposalHolds(aips, size, result.getHoldIds(), callback);
             }
           });
       }
     });
   }
 
-  private void applyDisposalHold(final SelectedItems<IndexedAIP> aips, final Long size,
-    DisposalHoldDialogResult holdDialogResult, boolean override, final AsyncCallback<ActionImpact> callback) {
+  private void applyDisposalHolds(final SelectedItems<IndexedAIP> aips, final Long size, List<String> holdIds,
+    final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.applyDisposalHoldDialogTitle(),
       messages.applyDisposalHoldDialogMessage(size.intValue()), messages.dialogNo(), messages.dialogYes(),
       new ActionNoAsyncCallback<Boolean>(callback) {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
+            ApplyDisposalHoldRequest request = new ApplyDisposalHoldRequest();
+            request.setSelectedItems(SelectedItemsUtils.convertToRESTRequest(aips));
+            request.setHoldIds(holdIds);
+            request.setOverride(false);
+
             Services services = new Services("Apply disposal hold", "job");
-            services.disposalHoldResource(s -> s.applyDisposalHold(SelectedItemsUtils.convertToRESTRequest(aips),
-              holdDialogResult.getDisposalHold().getId(), override)).whenComplete((job, throwable) -> {
-                if (throwable != null) {
-                  callback.onFailure(null);
-                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                } else {
-                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+            services.disposalHoldResource(s -> s.applyDisposalHolds(request)).whenComplete((job, throwable) -> {
+              if (throwable != null) {
+                callback.onFailure(null);
+                HistoryUtils.newHistory(InternalProcess.RESOLVER);
+              } else {
+                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
-                      Timer timer = new Timer() {
-                        @Override
-                        public void run() {
-                          doActionCallbackUpdated();
-                        }
-                      };
-                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                    }
-
-                    @Override
-                    public void onSuccess(final Void nothing) {
-                      doActionCallbackNone();
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                    }
-                  });
-                }
-              });
-          } else {
-            doActionCallbackNone();
-          }
-        }
-      });
-  }
-
-  private void clearDisposalHolds(final SelectedItems<IndexedAIP> aips, final Long size,
-    final AsyncCallback<ActionImpact> callback) {
-    Dialogs.showConfirmDialog(messages.clearDisposalHoldDialogTitle(),
-      messages.clearDisposalHoldDialogMessage(size.intValue()), messages.dialogNo(), messages.dialogYes(),
-      new ActionNoAsyncCallback<Boolean>(callback) {
-        @Override
-        public void onSuccess(Boolean result) {
-          if (result) {
-            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
-              new ActionNoAsyncCallback<String>(callback) {
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
-
-                @Override
-                public void onSuccess(String details) {
-                  DisassociateDisposalHoldRequest request = new DisassociateDisposalHoldRequest();
-                  request.setSelectedItems(SelectedItemsUtils.convertToRESTRequest(aips));
-                  request.setClear(true);
-                  request.setDetails(details);
-                  Services services = new Services("Disassociate disposal holds", "job");
-                  services.disposalHoldResource(s -> s.disassociateDisposalHold(request, null))
-                    .whenComplete((job, throwable) -> {
-                      if (throwable != null) {
-                        callback.onFailure(throwable);
-                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                      } else {
-                        Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-
-                          @Override
-                          public void onFailure(Throwable caught) {
-                            Toast.showInfo(messages.runningInBackgroundTitle(),
-                              messages.runningInBackgroundDescription());
-
-                            Timer timer = new Timer() {
-                              @Override
-                              public void run() {
-                                doActionCallbackUpdated();
-                              }
-                            };
-
-                            timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                          }
-
-                          @Override
-                          public void onSuccess(final Void nothing) {
-                            doActionCallbackNone();
-                            HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                          }
-                        });
+                    Timer timer = new Timer() {
+                      @Override
+                      public void run() {
+                        doActionCallbackUpdated();
                       }
-                    });
-                }
-              });
+                    };
+                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                  }
+
+                  @Override
+                  public void onSuccess(final Void nothing) {
+                    doActionCallbackNone();
+                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                  }
+                });
+              }
+            });
           } else {
             doActionCallbackNone();
           }
@@ -1434,8 +1389,10 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     managementGroup.addButton(messages.changeTypeButton(), AIPAction.CHANGE_TYPE, ActionImpact.UPDATED, BTN_EDIT);
     managementGroup.addButton(messages.moveArchivalPackage(), AIPAction.MOVE_IN_HIERARCHY, ActionImpact.UPDATED,
       BTN_EDIT);
-    managementGroup.addButton("Add user", AIPAction.ADD_USER_PERMISSION, ActionImpact.UPDATED, "btn-plus-circle");
-    managementGroup.addButton("Add group", AIPAction.ADD_GROUP_PERMISSION, ActionImpact.UPDATED, "btn-plus-circle");
+    managementGroup.addButton(messages.addUserButton(), AIPAction.ADD_USER_PERMISSION, ActionImpact.UPDATED,
+      "btn-plus-circle");
+    managementGroup.addButton(messages.addGroupButton(), AIPAction.ADD_GROUP_PERMISSION, ActionImpact.UPDATED,
+      "btn-plus-circle");
     managementGroup.addButton(messages.applyAllButton(), AIPAction.APPLY_PERMISSIONS_TO_HIERARCHY, ActionImpact.UPDATED,
       "btn-play");
     managementGroup.addButton(messages.applyPermissionsToDisseminationsButton(), AIPAction.APPLY_PERMISSIONS_TO_DIPS,
@@ -1456,6 +1413,8 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     ActionableGroup<IndexedAIP> disposalGroup = new ActionableGroup<>(messages.disposalTitle(), "btn-calendar");
     disposalGroup.addButton(messages.associateDisposalScheduleButton(), AIPAction.ASSOCIATE_DISPOSAL_SCHEDULE,
       ActionImpact.NONE, "btn-calendar");
+    disposalGroup.addButton(messages.disassociateDisposalScheduleButton(), AIPAction.DISASSOCIATE_DISPOSAL_SCHEDULE,
+      ActionImpact.UPDATED, "btn-calendar");
     disposalGroup.addButton(messages.associateDisposalHoldButton(), AIPAction.ASSOCIATE_DISPOSAL_HOLD,
       ActionImpact.NONE, "btn-lock");
 
@@ -1479,6 +1438,7 @@ public class AipToolbarActions extends AbstractActionable<IndexedAIP> {
     APPRAISAL_REJECT(RodaConstants.PERMISSION_METHOD_APPRAISAL), DOWNLOAD_DOCUMENTATION(),
     CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_AIP_TYPE),
     ASSOCIATE_DISPOSAL_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE),
+    DISASSOCIATE_DISPOSAL_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE),
     ASSOCIATE_DISPOSAL_HOLD(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD), SEARCH_DESCENDANTS(),
     SEARCH_PACKAGE(), NEW_REPRESENTATION(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION),
     CREATE_DESCRIPTIVE_METADATA(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_DESCRIPTIVE_METADATA_FILE);

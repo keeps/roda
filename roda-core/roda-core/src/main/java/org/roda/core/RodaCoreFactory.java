@@ -1762,6 +1762,10 @@ public class RodaCoreFactory {
     }
   }
 
+  public static void invalidateDisposalHold(String disposalHoldId) {
+    DISPOSAL_HOLD_CACHE.invalidate(disposalHoldId);
+  }
+
   public static Protocol getProtocol(URI uri) throws GenericException {
     if (protocolManager != null) {
       try {

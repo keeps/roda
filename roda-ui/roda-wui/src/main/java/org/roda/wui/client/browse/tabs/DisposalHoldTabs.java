@@ -2,6 +2,7 @@ package org.roda.wui.client.browse.tabs;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
@@ -37,12 +38,17 @@ public class DisposalHoldTabs extends Tabs {
 
     // Check if user has permissions to see the AIP
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
+      AsyncTableCellOptions<IndexedAIP> options = new AsyncTableCellOptions<>(IndexedAIP.class,
+        "ShowDisposalSchedule_aips")
+        .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, hold.getId()),
+          new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())))
+        .withSummary(messages.listOfAIPs()).bindOpener();
 
-      ListBuilder<IndexedAIP> aipsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-        new AsyncTableCellOptions<>(IndexedAIP.class, "ShowDisposalSchedule_aips")
-          .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, hold.getId()),
-            new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())))
-          .withActionable(new IndexedAIPDisposalHoldSearchWrapperActions(hold)).withSummary(messages.listOfAIPs()).bindOpener());
+      if (!DisposalHoldState.LIFTED.equals(hold.getState())) {
+        options.withActionable(new IndexedAIPDisposalHoldSearchWrapperActions(hold));
+      }
+
+      ListBuilder<IndexedAIP> aipsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(), options);
 
       createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalScheduleListAips()), new TabContentBuilder() {
         @Override

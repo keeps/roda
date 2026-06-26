@@ -23,7 +23,7 @@ public class DisposalPolicyTabs extends Tabs {
   public void init() {
 
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)) {
-      ListBuilder<DisposalSchedule> scheduleListBuilder = new ListBuilder<>(() -> new DisposalScheduleList(),
+      ListBuilder<DisposalSchedule> scheduleListBuilder = new ListBuilder<>(() -> new DisposalScheduleList(false),
         new AsyncTableCellOptions<>(DisposalSchedule.class, "DisposalPolicyPage_disposalSchedules")
           .withActionable(DisposalScheduleSearchWrapperActions.get()).withCsvDownloadButtonVisibility(false)
           .bindOpener());

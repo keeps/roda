@@ -7,53 +7,37 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.IntegerBox;
-import com.google.gwt.user.client.ui.RadioButton;
+import java.util.List;
+
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
-import org.roda.core.data.v2.disposal.hold.DisposalHolds;
 import org.roda.core.data.v2.disposal.rule.ChangeOrderRequest;
 import org.roda.core.data.v2.disposal.rule.OrderPositions;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedules;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.index.select.SelectedItemsNone;
-import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult.ActionType;
 import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogResult;
 import org.roda.wui.client.common.lists.DisposalHoldList;
-import org.roda.wui.client.common.lists.RodaMemberList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.DisposalScheduleList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
-import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
 import org.roda.wui.client.common.search.SearchWrapper;
-import org.roda.wui.client.disposal.hold.CreateDisposalHold;
-import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.widgets.MyCellTableResources;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
+import com.google.gwt.user.client.ui.RadioButton;
 
 import config.i18n.client.ClientMessages;
 
@@ -82,7 +66,6 @@ public class DisposalDialogs {
 
     final FlowPanel content = new FlowPanel();
     content.addStyleName("wui-dialog-content");
-
 
     HTML messageLabel = new HTML(message);
     messageLabel.addStyleName("wui-dialog-message");
@@ -154,69 +137,27 @@ public class DisposalDialogs {
     dialogBox.show();
   }
 
-  public static void showDisposalHoldSelection(String title, DisposalHolds holds,
+  public static void showDisposalHoldSelection(String title, Filter filter,
     final AsyncCallback<DisposalHoldDialogResult> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
 
     FlowPanel layout = new FlowPanel();
-    Button clearHoldsButton = new Button(messages.clearDisposalHoldButton());
-    Button overrideDisposalHoldButton = new Button(messages.overrideDisposalHoldButton());
-    Button cancelButton = new Button(messages.cancelButton());
-    Button selectHoldButton = new Button(messages.applyDisposalHoldButton());
-    Button newHoldButton = new Button(messages.createDisposalHoldButton());
     FlowPanel footer = new FlowPanel();
-    FlowPanel options = new FlowPanel();
+    Button cancelButton = new Button(messages.cancelButton());
+    Button associateButton = new Button(messages.associateDisposalHoldButton());
+    associateButton.setEnabled(false);
 
-    overrideDisposalHoldButton.setEnabled(false);
-    selectHoldButton.setEnabled(false);
-    selectHoldButton.getElement().getStyle().setMarginRight(10, Style.Unit.PX);
-    clearHoldsButton.getElement().getStyle().setMarginRight(10, Style.Unit.PX);
-    overrideDisposalHoldButton.getElement().getStyle().setMarginRight(10, Style.Unit.PX);
-    newHoldButton.getElement().getStyle().setFloat(Style.Float.LEFT);
-    dialogBox.setWidget(layout);
+    ListBuilder<DisposalHold> listBuilder = new ListBuilder<>(() -> new DisposalHoldList(false),
+      new AsyncTableCellOptions<>(DisposalHold.class, "DisposalHoldSelection_holds").withFilter(filter)
+        .withCsvDownloadButtonVisibility(false).withSummary(title).withRecenteringOfParentDialog(dialogBox)
+        .withForceSelectable(true).addCheckboxSelectionListener(selected -> associateButton.setEnabled(
+          selected instanceof SelectedItemsList<?> && !((SelectedItemsList<?>) selected).getIds().isEmpty())));
 
-    CellTable<DisposalHold> table = new CellTable<>(Integer.MAX_VALUE,
-      (MyCellTableResources) GWT.create(MyCellTableResources.class));
+    SearchWrapper searchWrapper = new SearchWrapper(false).withListsInsideScrollPanel("selectAipResultsPanel")
+      .createListAndSearchPanel(listBuilder);
 
-    table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
-
-    final ScrollPanel displayScroll = new ScrollPanel(table);
-    displayScroll.setSize("100%", "80vh");
-    final SimplePanel displayScrollWrapper = new SimplePanel(displayScroll);
-    displayScrollWrapper.addStyleName("disposal-schedules-modal-table");
-
-    final SingleSelectionModel<DisposalHold> singleSelectionModel = new SingleSelectionModel<>();
-    singleSelectionModel.addSelectionChangeHandler(event -> {
-      singleSelectionModel.setSelected(singleSelectionModel.getSelectedObject(), true);
-      selectHoldButton.setEnabled(true);
-      overrideDisposalHoldButton.setEnabled(true);
-    });
-
-    table.setSelectionModel(singleSelectionModel);
-
-    table.addColumn(new TooltipTextColumn<DisposalHold>() {
-      @Override
-      public String getValue(DisposalHold disposalHold) {
-        return disposalHold != null && disposalHold.getTitle() != null ? disposalHold.getTitle() : "";
-      }
-    }, messages.disposalScheduleTitle());
-
-    table.addColumn(new TooltipTextColumn<DisposalHold>() {
-      @Override
-      public String getValue(DisposalHold disposalHold) {
-        return disposalHold != null && disposalHold.getMandate() != null ? disposalHold.getMandate() : "";
-      }
-    }, messages.disposalScheduleMandate());
-
-    // Create a list data provider.
-    final ListDataProvider<DisposalHold> dataProvider = new ListDataProvider<>(holds.getObjects());
-
-    // Add the table to the dataProvider.
-    dataProvider.addDataDisplay(table);
-
-    layout.add(displayScrollWrapper);
-    layout.add(options);
+    layout.add(searchWrapper);
     layout.add(footer);
 
     dialogBox.setGlassEnabled(true);
@@ -227,133 +168,58 @@ public class DisposalDialogs {
       callback.onFailure(null);
     });
 
-    selectHoldButton.addClickHandler(clickEvent -> {
-      dialogBox.hide();
-      DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.ASSOCIATE,
-        singleSelectionModel.getSelectedObject());
-      callback.onSuccess(result);
-    });
-
-    newHoldButton.addClickHandler(clickEvent -> {
-      dialogBox.hide();
-      callback.onFailure(null);
-      HistoryUtils.newHistory(CreateDisposalHold.RESOLVER);
-    });
-
-    overrideDisposalHoldButton.addClickHandler(clickEvent -> {
-      dialogBox.hide();
-      DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.OVERRIDE,
-        singleSelectionModel.getSelectedObject());
-      callback.onSuccess(result);
-    });
-
-    clearHoldsButton.addClickHandler(clickEvent -> {
-      dialogBox.hide();
-      DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.CLEAR);
-      callback.onSuccess(result);
+    associateButton.addClickHandler(event -> {
+      SelectedItems<DisposalHold> selectedItems = searchWrapper.getSelectedItems(DisposalHold.class);
+      if (selectedItems instanceof SelectedItemsList<?>) {
+        List<String> ids = ((SelectedItemsList<DisposalHold>) selectedItems).getIds();
+        if (!ids.isEmpty()) {
+          dialogBox.hide();
+          DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.ASSOCIATE, ids);
+          callback.onSuccess(result);
+        }
+      }
     });
 
     cancelButton.addStyleName("btn btn-link");
-    selectHoldButton.addStyleName("btn btn-play");
-    clearHoldsButton.addStyleName("btn btn-danger btn-ban");
-    overrideDisposalHoldButton.addStyleName("btn btn-play");
-    newHoldButton.addStyleName("btn btn-plus");
-    table.addStyleName("my-asyncdatagrid-display");
+    associateButton.addStyleName("btn btn-play");
 
     layout.addStyleName("wui-dialog-layout");
     footer.addStyleName("wui-dialog-layout-footer");
-
-    footer.add(newHoldButton);
     footer.add(cancelButton);
-    footer.add(clearHoldsButton);
-    footer.add(overrideDisposalHoldButton);
-    footer.add(selectHoldButton);
+    footer.add(associateButton);
 
+    dialogBox.addStyleName("wui-dialog-prompt");
     dialogBox.setWidget(layout);
     dialogBox.center();
     dialogBox.show();
   }
 
-  public static void showDisposalScheduleSelection(String title, DisposalSchedules schedules,
+  public static void showDisposalScheduleSelection(String title, Filter filter,
     final AsyncCallback<DisposalScheduleDialogResult> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
 
     FlowPanel layout = new FlowPanel();
-    Button cancelButton = new Button(messages.cancelButton());
-    Button changeScheduleButton = new Button(messages.associateDisposalScheduleButton());
-    Button noScheduleButton = new Button(messages.disassociateDisposalScheduleButton());
-    Button newScheduleButton = new Button(messages.createDisposalScheduleButton());
     FlowPanel footer = new FlowPanel();
+    Button cancelButton = new Button(messages.cancelButton());
+    Button associateButton = new Button(messages.associateDisposalScheduleButton());
+    associateButton.setEnabled(false);
+    final DisposalScheduleList scheduleList = new DisposalScheduleList(true);
+    final String[] selectedScheduleId = new String[1];
 
-    changeScheduleButton.setEnabled(false);
-    noScheduleButton.getElement().getStyle().setMarginRight(10, Style.Unit.PX);
-    newScheduleButton.getElement().getStyle().setFloat(Style.Float.LEFT);
-    dialogBox.setWidget(layout);
+    ListBuilder<DisposalSchedule> listBuilder = new ListBuilder<>(() -> scheduleList,
+      new AsyncTableCellOptions<>(DisposalSchedule.class, "DisposalScheduleSelection_schedules").withFilter(filter)
+        .withCsvDownloadButtonVisibility(false).withSummary(title).withRecenteringOfParentDialog(dialogBox)
+        .addSelectionChangeHandler(event -> {
+          DisposalSchedule selected = scheduleList.getSelectionModel().getSelectedObject();
+          selectedScheduleId[0] = selected != null ? selected.getUUID() : null;
+          associateButton.setEnabled(selectedScheduleId[0] != null);
+        }));
 
-    CellTable<DisposalSchedule> table = new CellTable<>(Integer.MAX_VALUE,
-      (MyCellTableResources) GWT.create(MyCellTableResources.class));
+    SearchWrapper searchWrapper = new SearchWrapper(false).withListsInsideScrollPanel("selectAipResultsPanel")
+      .createListAndSearchPanel(listBuilder);
 
-    table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
-
-    final ScrollPanel displayScroll = new ScrollPanel(table);
-    displayScroll.setSize("100%", "70vh");
-    final SimplePanel displayScrollWrapper = new SimplePanel(displayScroll);
-    displayScrollWrapper.addStyleName("disposal-schedules-modal-table");
-
-    final SingleSelectionModel<DisposalSchedule> singleSelectionModel = new SingleSelectionModel<>();
-    singleSelectionModel.addSelectionChangeHandler(event -> {
-      singleSelectionModel.setSelected(singleSelectionModel.getSelectedObject(), true);
-      changeScheduleButton.setEnabled(true);
-    });
-
-    table.setSelectionModel(singleSelectionModel);
-
-    table.addColumn(new TooltipTextColumn<DisposalSchedule>() {
-      @Override
-      public String getValue(DisposalSchedule disposalSchedule) {
-        return disposalSchedule != null && disposalSchedule.getTitle() != null ? disposalSchedule.getTitle() : "";
-      }
-    }, messages.disposalScheduleTitle());
-
-    table.addColumn(new TooltipTextColumn<DisposalSchedule>() {
-      @Override
-      public String getValue(DisposalSchedule disposalSchedule) {
-        return disposalSchedule != null && disposalSchedule.getMandate() != null ? disposalSchedule.getMandate() : "";
-      }
-    }, messages.disposalScheduleMandate());
-
-    table.addColumn(new TextColumn<DisposalSchedule>() {
-      @Override
-      public String getValue(DisposalSchedule disposalSchedule) {
-        if (disposalSchedule.getRetentionPeriodIntervalCode() != null
-          && disposalSchedule.getRetentionPeriodDuration() == null) {
-          return messages.retentionPeriod(0, disposalSchedule.getRetentionPeriodIntervalCode().name());
-        } else if (disposalSchedule.getRetentionPeriodIntervalCode() != null) {
-          return messages.retentionPeriod(disposalSchedule.getRetentionPeriodDuration(),
-            disposalSchedule.getRetentionPeriodIntervalCode().name());
-        } else {
-          return "";
-        }
-      }
-    }, messages.disposalSchedulePeriod());
-
-    table.addColumn(new TextColumn<DisposalSchedule>() {
-      @Override
-      public String getValue(DisposalSchedule disposalSchedule) {
-        return disposalSchedule != null && disposalSchedule.getActionCode() != null
-          ? messages.disposalScheduleAction(disposalSchedule.getActionCode().name())
-          : "";
-      }
-    }, messages.disposalScheduleActionCol());
-
-    // Create a list data provider.
-    final ListDataProvider<DisposalSchedule> dataProvider = new ListDataProvider<>(schedules.getObjects());
-
-    // Add the table to the dataProvider.
-    dataProvider.addDataDisplay(table);
-
-    layout.add(displayScrollWrapper);
+    layout.add(searchWrapper);
     layout.add(footer);
 
     dialogBox.setGlassEnabled(true);
@@ -364,39 +230,24 @@ public class DisposalDialogs {
       callback.onFailure(null);
     });
 
-    noScheduleButton.addClickHandler(clickEvent -> {
-      dialogBox.hide();
-      DisposalScheduleDialogResult result = new DisposalScheduleDialogResult(
-        DisposalScheduleDialogResult.ActionType.CLEAR, singleSelectionModel.getSelectedObject());
-      callback.onSuccess(result);
-    });
-
-    changeScheduleButton.addClickHandler(clickEvent -> {
-      dialogBox.hide();
-      DisposalScheduleDialogResult result = new DisposalScheduleDialogResult(
-        DisposalScheduleDialogResult.ActionType.ASSOCIATE, singleSelectionModel.getSelectedObject());
-      callback.onSuccess(result);
-    });
-
-    newScheduleButton.addClickHandler(clickEvent -> {
-      dialogBox.hide();
-      callback.onFailure(null);
-      HistoryUtils.newHistory(CreateDisposalSchedule.RESOLVER);
+    associateButton.addClickHandler(event -> {
+      if (selectedScheduleId[0] != null) {
+        dialogBox.hide();
+        DisposalScheduleDialogResult result = new DisposalScheduleDialogResult(
+          DisposalScheduleDialogResult.ActionType.ASSOCIATE, selectedScheduleId[0]);
+        callback.onSuccess(result);
+      }
     });
 
     cancelButton.addStyleName("btn btn-link");
-    noScheduleButton.addStyleName("btn btn-danger btn-ban");
-    changeScheduleButton.addStyleName("btn btn-play");
-    newScheduleButton.addStyleName("btn btn-plus");
-    table.addStyleName("my-asyncdatagrid-display");
+    associateButton.addStyleName("btn btn-play");
 
     layout.addStyleName("wui-dialog-layout");
     footer.addStyleName("wui-dialog-layout-footer");
-    footer.add(newScheduleButton);
     footer.add(cancelButton);
-    footer.add(noScheduleButton);
-    footer.add(changeScheduleButton);
+    footer.add(associateButton);
 
+    dialogBox.addStyleName("wui-dialog-prompt");
     dialogBox.setWidget(layout);
     dialogBox.center();
     dialogBox.show();

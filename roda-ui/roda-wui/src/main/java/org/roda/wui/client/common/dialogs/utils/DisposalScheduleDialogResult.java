@@ -9,8 +9,6 @@ package org.roda.wui.client.common.dialogs.utils;
 
 import java.io.Serializable;
 
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
-
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
@@ -21,23 +19,23 @@ public class DisposalScheduleDialogResult implements Serializable {
     CLEAR, ASSOCIATE
   }
 
+  private ActionType actionType;
+  private String disposalScheduleId;
+
   public DisposalScheduleDialogResult() {
   }
 
-  private ActionType actionType;
-  private DisposalSchedule disposalSchedule;
-
-  public DisposalScheduleDialogResult(ActionType actionType, DisposalSchedule disposalSchedule) {
+  public DisposalScheduleDialogResult(ActionType actionType, String disposalScheduleId) {
     this.actionType = actionType;
-    this.disposalSchedule = disposalSchedule;
+    this.disposalScheduleId = disposalScheduleId;
   }
 
-  public DisposalSchedule getDisposalSchedule() {
-    return disposalSchedule;
+  public String getDisposalScheduleId() {
+    return disposalScheduleId;
   }
 
-  public void setDisposalSchedule(DisposalSchedule disposalSchedule) {
-    this.disposalSchedule = disposalSchedule;
+  public void setDisposalScheduleId(String disposalScheduleId) {
+    this.disposalScheduleId = disposalScheduleId;
   }
 
   public ActionType getActionType() {

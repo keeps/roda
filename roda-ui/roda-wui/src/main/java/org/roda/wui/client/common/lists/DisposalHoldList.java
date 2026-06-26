@@ -30,13 +30,21 @@ import config.i18n.client.ClientMessages;
 public class DisposalHoldList extends AsyncTableCell<DisposalHold> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.DISPOSAL_HOLD_TITLE, RodaConstants.DISPOSAL_HOLD_MANDATE,
-    RodaConstants.DISPOSAL_HOLD_SCOPE_NOTES, RodaConstants.DISPOSAL_HOLD_STATE);
-
+    RodaConstants.DISPOSAL_HOLD_TITLE, RodaConstants.DISPOSAL_HOLD_MANDATE, RodaConstants.DISPOSAL_HOLD_SCOPE_NOTES,
+    RodaConstants.DISPOSAL_HOLD_STATE);
+  private final boolean showStateColumn;
   private TextColumn<DisposalHold> titleColumn;
   private TextColumn<DisposalHold> mandateColumn;
   private TextColumn<DisposalHold> scopeNotesColumn;
   private Column<DisposalHold, SafeHtml> stateColumn;
+
+  public DisposalHoldList() {
+    this(true);
+  }
+
+  public DisposalHoldList(boolean showStateColumn) {
+    this.showStateColumn = showStateColumn;
+  }
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<DisposalHold> options) {
@@ -66,27 +74,27 @@ public class DisposalHoldList extends AsyncTableCell<DisposalHold> {
       }
     };
 
-    stateColumn = new Column<DisposalHold, SafeHtml>(new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(DisposalHold hold) {
-        SafeHtml ret = null;
-        if (hold != null) {
-          ret = HtmlSnippetUtils.getDisposalHoldStateHtml(hold);
+    if (showStateColumn) {
+      stateColumn = new Column<DisposalHold, SafeHtml>(new SafeHtmlCell()) {
+        @Override
+        public SafeHtml getValue(DisposalHold hold) {
+          return hold != null ? HtmlSnippetUtils.getDisposalHoldStateHtml(hold) : null;
         }
-
-        return ret;
-      }
-    };
+      };
+      stateColumn.setSortable(true);
+    }
 
     titleColumn.setSortable(true);
     mandateColumn.setSortable(true);
     scopeNotesColumn.setSortable(true);
-    stateColumn.setSortable(true);
 
     addColumn(titleColumn, messages.disposalHoldTitle(), false, false);
     addColumn(mandateColumn, messages.disposalHoldMandate(), false, false, 20);
     addColumn(scopeNotesColumn, messages.disposalHoldNotes(), false, false, 10);
-    addColumn(stateColumn, messages.disposalHoldStateCol(), false, false, 9);
+
+    if (showStateColumn) {
+      addColumn(stateColumn, messages.disposalHoldStateCol(), false, false, 9);
+    }
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortList.ColumnSortInfo(titleColumn, false));
@@ -99,7 +107,9 @@ public class DisposalHoldList extends AsyncTableCell<DisposalHold> {
     columnSortingKeyMap.put(titleColumn, Collections.singletonList(RodaConstants.DISPOSAL_HOLD_TITLE));
     columnSortingKeyMap.put(mandateColumn, Collections.singletonList(RodaConstants.DISPOSAL_HOLD_MANDATE));
     columnSortingKeyMap.put(scopeNotesColumn, Collections.singletonList(RodaConstants.DISPOSAL_HOLD_SCOPE_NOTES));
-    columnSortingKeyMap.put(stateColumn, Collections.singletonList(RodaConstants.DISPOSAL_HOLD_STATE));
+    if (showStateColumn) {
+      columnSortingKeyMap.put(stateColumn, Collections.singletonList(RodaConstants.DISPOSAL_HOLD_STATE));
+    }
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 }

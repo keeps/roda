@@ -7,10 +7,11 @@
  */
 package org.roda.wui.client.common.dialogs.utils;
 
-import org.roda.core.data.v2.disposal.hold.DisposalHold;
-
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
+
+import org.roda.core.data.v2.disposal.hold.DisposalHold;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -19,19 +20,15 @@ public class DisposalHoldDialogResult implements Serializable {
 
   @Serial
   private static final long serialVersionUID = 2998935986470083956L;
-
-  public enum ActionType {
-    OVERRIDE, CLEAR, ASSOCIATE
-  }
-
   private ActionType actionType;
+  private List<String> holdIds;
   private DisposalHold disposalHold;
-
   public DisposalHoldDialogResult() {
   }
 
-  public DisposalHoldDialogResult(ActionType actionType) {
+  public DisposalHoldDialogResult(ActionType actionType, List<String> holdIds) {
     this.actionType = actionType;
+    this.holdIds = holdIds;
   }
 
   public DisposalHoldDialogResult(ActionType actionType, DisposalHold disposalHold) {
@@ -39,19 +36,23 @@ public class DisposalHoldDialogResult implements Serializable {
     this.disposalHold = disposalHold;
   }
 
-  public void setActionType(ActionType actionType) {
-    this.actionType = actionType;
-  }
-
-  public void setDisposalHold(DisposalHold disposalHold) {
-    this.disposalHold = disposalHold;
-  }
-
   public ActionType getActionType() {
     return actionType;
   }
 
-  public DisposalHold getDisposalHold() {
-    return disposalHold;
+  public void setActionType(ActionType actionType) {
+    this.actionType = actionType;
+  }
+
+  public List<String> getHoldIds() {
+    return holdIds;
+  }
+
+  public void setHoldIds(List<String> holdIds) {
+    this.holdIds = holdIds;
+  }
+
+  public enum ActionType {
+    OVERRIDE, CLEAR, ASSOCIATE
   }
 }

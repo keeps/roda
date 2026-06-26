@@ -727,6 +727,7 @@ public final class RodaConstants {
 
   public static final String CONTROLLER_DISPOSAL_HOLD_PARAM = RODA_OBJECT_DISPOSAL_HOLD;
   public static final String CONTROLLER_DISPOSAL_HOLD_ID_PARAM = "disposalHoldId";
+  public static final String CONTROLLER_DISPOSAL_HOLD_IDS_PARAM = "disposalHoldIds";
   public static final String CONTROLLER_DISPOSAL_HOLD_OVERRIDE_PARAM = "overrideDisposalHolds";
   public static final String CONTROLLER_DISPOSAL_HOLD_LIFT_ALL = "liftDisposalHold";
   public static final String CONTROLLER_DISPOSAL_HOLD_DISASSOCIATE_ALL = "disassociateAllDisposalHold";
@@ -1450,6 +1451,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL = "parameter.disposal_schedule_overwrite_manual";
 
   public static final String PLUGIN_PARAMS_DISPOSAL_HOLD_ID = "parameter.disposal_hold_id";
+  public static final String PLUGIN_PARAMS_DISPOSAL_HOLD_IDS = "parameter.disposal_hold_ids";
   public static final String PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL = "parameter.clear_all";
   public static final String PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL = "parameter.clear_all";
   public static final String PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE = "parameter.override";
@@ -2144,6 +2146,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_FIND_LOG_ENTRY = "org.roda.wui.api.v2.services.IndexService.find(LogEntry)";
   public static final String PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION = "org.roda.wui.api.v2.services.IndexService.find(RepresentationInformation)";
   public static final String PERMISSION_METHOD_FIND_RISK = "org.roda.wui.api.v2.services.IndexService.find(IndexedRisk)";
+  public static final String PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.v2.services.IndexService.retrieve(DisposalConfirmation)";
   public static final String PERMISSION_METHOD_FIND_DISPOSAL_CONFIRMATION = "org.roda.wui.api.v2.services.IndexService.find(DisposalConfirmation)";
 
   public static final String PERMISSION_METHOD_DELETE_AIP = "org.roda.wui.api.v2.controller.AIPController.deleteAIPs";

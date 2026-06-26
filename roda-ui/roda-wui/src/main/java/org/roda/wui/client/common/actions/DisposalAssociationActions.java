@@ -12,8 +12,9 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.SelectedItemsUtils;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.disposal.schedule.DisposalScheduleState;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
@@ -24,10 +25,8 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogResult;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
-import org.roda.wui.client.services.DisposalScheduleRestService;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -83,32 +82,20 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
     ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
       @Override
       public void onSuccess(final Long size) {
-        Services services = new Services("List disposal schedules", "get");
-        services.disposalScheduleResource(DisposalScheduleRestService::listDisposalSchedules)
-          .whenComplete((disposalSchedules, throwable) -> {
-            if (throwable != null) {
-              AsyncCallbackUtils.defaultFailureTreatment(throwable);
-              callback.onFailure(throwable);
-            } else {
-              // Show the active disposal schedules only
-              disposalSchedules.getObjects()
-                .removeIf(schedule -> DisposalScheduleState.INACTIVE.equals(schedule.getState()));
-              DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(),
-                disposalSchedules, new ActionNoAsyncCallback<DisposalScheduleDialogResult>(callback) {
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    doActionCallbackNone();
-                  }
+        Filter activeFilter = new Filter(
+          new NotSimpleFilterParameter(RodaConstants.DISPOSAL_SCHEDULE_STATE,
+            DisposalScheduleState.INACTIVE.name()));
 
-                  @Override
-                  public void onSuccess(DisposalScheduleDialogResult result) {
-                    if (DisposalScheduleDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
-                      associateDisposalSchedule(aips, size, result, callback);
-                    } else if (DisposalScheduleDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
-                      disassociateDisposalSchedule(aips, size, result, callback);
-                    }
-                  }
-                });
+        DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(),
+          activeFilter, new ActionNoAsyncCallback<DisposalScheduleDialogResult>(callback) {
+            @Override
+            public void onFailure(Throwable caught) {
+              doActionCallbackNone();
+            }
+
+            @Override
+            public void onSuccess(DisposalScheduleDialogResult result) {
+              associateDisposalSchedule(aips, size, result.getDisposalScheduleId(), callback);
             }
           });
       }
@@ -165,8 +152,7 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void associateDisposalSchedule(SelectedItems<IndexedAIP> aips, Long size,
-    DisposalScheduleDialogResult dialogResult, AsyncCallback<ActionImpact> callback) {
-    DisposalSchedule disposalSchedule = dialogResult.getDisposalSchedule();
+    String disposalScheduleId, AsyncCallback<ActionImpact> callback) {
 
     Dialogs.showConfirmDialog(messages.associateDisposalScheduleDialogTitle(),
       messages.associateDisposalScheduleDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
@@ -176,7 +162,7 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
           if (result) {
             Services services = new Services("Associated disposal schedule", "job");
             services.disposalScheduleResource(s -> s
-              .associatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips), disposalSchedule.getId()))
+              .associatedDisposalSchedule(SelectedItemsUtils.convertToRESTRequest(aips), disposalScheduleId))
               .whenComplete((job, throwable) -> {
                 if (throwable != null) {
                   callback.onFailure(throwable);

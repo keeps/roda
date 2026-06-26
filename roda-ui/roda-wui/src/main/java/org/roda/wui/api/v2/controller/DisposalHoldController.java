@@ -26,6 +26,7 @@ import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SuggestRequest;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposalhold.ApplyDisposalHoldRequest;
 import org.roda.core.data.v2.ip.disposalhold.DisassociateDisposalHoldRequest;
 import org.roda.core.data.v2.ip.disposalhold.UpdateDisposalHoldRequest;
 import org.roda.core.data.v2.jobs.Job;
@@ -144,6 +145,24 @@ public class DisposalHoldController implements DisposalHoldRestService {
         // delegate
         return disposalHoldService.applyDisposalHold(requestContext.getUser(),
           CommonServicesUtils.convertSelectedItems(items, IndexedAIP.class), disposalHoldId, override);
+      }
+    });
+  }
+
+  @Override
+  public Job applyDisposalHolds(@RequestBody ApplyDisposalHoldRequest applyDisposalHoldRequest) {
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<Job>() {
+      @Override
+      public Job process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
+        throws RODAException, RESTException, IOException {
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_SELECTED_PARAM,
+          applyDisposalHoldRequest.getSelectedItems(), RodaConstants.CONTROLLER_DISPOSAL_HOLD_IDS_PARAM,
+          applyDisposalHoldRequest.getHoldIds(), RodaConstants.CONTROLLER_DISPOSAL_HOLD_OVERRIDE_PARAM,
+          applyDisposalHoldRequest.isOverride());
+
+        return disposalHoldService.applyDisposalHolds(requestContext.getUser(),
+          CommonServicesUtils.convertSelectedItems(applyDisposalHoldRequest.getSelectedItems(), IndexedAIP.class),
+          applyDisposalHoldRequest.getHoldIds(), applyDisposalHoldRequest.isOverride());
       }
     });
   }

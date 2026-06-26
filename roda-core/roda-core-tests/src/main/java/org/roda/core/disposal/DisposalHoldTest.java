@@ -17,6 +17,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -30,16 +33,26 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
+import org.roda.core.data.v2.disposal.hold.DisposalHoldState;
 import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.base.disposal.hold.ApplyDisposalHoldToAIPPlugin;
+import org.roda.core.plugins.base.disposal.hold.DisassociateDisposalHoldFromAIPPlugin;
+import org.roda.core.plugins.base.disposal.hold.LiftDisposalHoldPlugin;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -192,12 +205,60 @@ public class DisposalHoldTest {
     model.createDisposalHoldAssociation(aip.getId(), disposalHold.getId(), new Date(), RodaConstants.ADMIN);
     AIP updatedAIP = model.retrieveAIP(aip.getId());
 
+    assertEquals(1, updatedAIP.getDisposal().getHolds().size());
+    assertEquals(disposalHold.getId(), updatedAIP.getDisposal().getHolds().get(0).getId());
+
     index.commitAIPs();
 
     // Retrieve AIP
     final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
 
     assertEquals(disposalHold.getId(), indexedAip.getDisposalHoldsId().get(0));
+  }
+
+  @Test
+  public void testDisassociateDisposalHoldFromAIPWhenHoldIsLifted() throws RequestNotValidException,
+    AuthorizationDeniedException, ValidationException, AlreadyExistsException, NotFoundException, GenericException {
+    // generate AIP ID
+    final String aipId = IdUtils.createUUID();
+
+    // Create AIP
+    final AIP aip = model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
+
+    // generate disposal hold
+    DisposalHold disposalHold = model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
+
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_IDS, disposalHold.getId());
+
+    Job applyHoldJob = TestsHelper.executeJob(ApplyDisposalHoldToAIPPlugin.class, pluginParameters, PluginType.INTERNAL,
+      SelectedItemsList.create(AIP.class, aipId));
+
+    TestsHelper.getJobReports(index, applyHoldJob, true);
+
+    pluginParameters.clear();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHold.getId());
+    Job liftDisposalHoldJob = TestsHelper.executeJob(LiftDisposalHoldPlugin.class, pluginParameters,
+      PluginType.INTERNAL, SelectedItemsNone.create());
+
+    TestsHelper.getJobReports(index, liftDisposalHoldJob, true);
+
+    assertEquals(model.retrieveDisposalHold(disposalHold.getId()).getState(), DisposalHoldState.LIFTED);
+
+    assertEquals(model.retrieveAIP(aipId).getDisposal().getHolds().size(), 1);
+
+    pluginParameters.clear();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHold.getId());
+    Job disassociateDisposalHoldJob = TestsHelper.executeJob(DisassociateDisposalHoldFromAIPPlugin.class,
+      pluginParameters, PluginType.INTERNAL, SelectedItemsList.create(AIP.class, aipId));
+
+    List<Report> jobReports = TestsHelper.getJobReports(index, disassociateDisposalHoldJob, false);
+
+    assertEquals(jobReports.getFirst().getReports().getFirst().getPluginState(), PluginState.SKIPPED);
+
+    assertEquals(model.retrieveAIP(aipId).getDisposal().getHolds().size(), 1);
   }
 
   private DisposalHold createDisposalHold() {

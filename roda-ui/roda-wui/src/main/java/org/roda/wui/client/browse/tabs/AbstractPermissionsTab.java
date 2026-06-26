@@ -98,8 +98,8 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
     }
 
     BasicTablePanel<String> table = new BasicTablePanel<>(groupNames.iterator(),
-      new BasicTablePanel.ColumnInfo<>("", 0.8, getGroupTypeColumn()),
-      new BasicTablePanel.ColumnInfo<>(messages.groupName(), 15, getGroupNameColumn(response)),
+      new BasicTablePanel.ColumnInfo<>("", 1, getGroupTypeColumn()),
+      new BasicTablePanel.ColumnInfo<>(messages.groupName(), 14, getGroupNameColumn()),
       new BasicTablePanel.ColumnInfo<>(messages.userPermissions(), 20, getGroupPermissionsColumn()),
       new BasicTablePanel.ColumnInfo<>(messages.actions(), 5, getGroupActionsColumn()));
 
@@ -124,8 +124,8 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
     }
 
     BasicTablePanel<String> table = new BasicTablePanel<>(usernames.iterator(),
-      new BasicTablePanel.ColumnInfo<>("", 0.8, getUserTypeColumn()),
-      new BasicTablePanel.ColumnInfo<>(messages.username(), 15, getUserNameColumn(response)),
+      new BasicTablePanel.ColumnInfo<>("", 1, getUserTypeColumn()),
+      new BasicTablePanel.ColumnInfo<>(messages.username(), 14, getUserNameColumn()),
       new BasicTablePanel.ColumnInfo<>(messages.userPermissions(), 20, getUserPermissionsColumn()),
       new BasicTablePanel.ColumnInfo<>(messages.actions(), 5, getUserActionsColumn()));
 
@@ -142,8 +142,8 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
     }
 
     BasicTablePanel<String> table = new BasicTablePanel<>(usernames.iterator(),
-      new BasicTablePanel.ColumnInfo<>("", 0.8, getUserTypeColumn()),
-      new BasicTablePanel.ColumnInfo<>(messages.username(), 15, getUserNameColumn(response)),
+      new BasicTablePanel.ColumnInfo<>("", 1, getUserTypeColumn()),
+      new BasicTablePanel.ColumnInfo<>(messages.username(), 14, getUserNameColumn()),
       new BasicTablePanel.ColumnInfo<>(messages.userPermissions(), 20, getUserPermissionsColumn()));
 
     table.removeSelectionModel();

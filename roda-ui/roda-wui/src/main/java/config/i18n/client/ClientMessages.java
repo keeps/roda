@@ -2297,6 +2297,8 @@ public interface ClientMessages extends Messages {
 
   String applyDisposalHoldButton();
 
+  String viewDisposalHoldButton();
+
   String createDisposalHoldButton();
 
   String associateDisposalHoldButton();

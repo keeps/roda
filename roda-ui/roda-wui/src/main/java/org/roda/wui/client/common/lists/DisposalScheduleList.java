@@ -1,13 +1,11 @@
 package org.roda.wui.client.common.lists;
 
-import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortList;
-import com.google.gwt.user.cellview.client.TextColumn;
-import config.i18n.client.ClientMessages;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -15,11 +13,15 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortList;
+import com.google.gwt.user.cellview.client.TextColumn;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -32,12 +34,20 @@ public class DisposalScheduleList extends AsyncTableCell<DisposalSchedule> {
     RodaConstants.DISPOSAL_SCHEDULE_SCOPE_NOTES, RodaConstants.DISPOSAL_SCHEDULE_STATE,
     RodaConstants.DISPOSAL_SCHEDULE_ACTION, RodaConstants.DISPOSAL_SCHEDULE_RETENTION_PERIOD_DURATION,
     RodaConstants.DISPOSAL_SCHEDULE_RETENTION_PERIOD_INTERVAL_CODE);
-
+  private final boolean compact;
   private TextColumn<DisposalSchedule> titleColumn;
   private TextColumn<DisposalSchedule> mandateColumn;
   private TextColumn<DisposalSchedule> periodColumn;
   private TextColumn<DisposalSchedule> actionColumn;
   private Column<DisposalSchedule, SafeHtml> stateColumn;
+
+  public DisposalScheduleList() {
+    this(false);
+  }
+
+  public DisposalScheduleList(boolean compact) {
+    this.compact = compact;
+  }
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<DisposalSchedule> options) {
@@ -100,10 +110,14 @@ public class DisposalScheduleList extends AsyncTableCell<DisposalSchedule> {
     stateColumn.setSortable(true);
 
     addColumn(titleColumn, messages.disposalScheduleTitle(), false, false);
-    addColumn(mandateColumn, messages.disposalScheduleMandate(), false, false, 20);
+    if (!compact) {
+      addColumn(mandateColumn, messages.disposalScheduleMandate(), false, false, 20);
+    }
     addColumn(periodColumn, messages.disposalSchedulePeriod(), false, false, 15);
     addColumn(actionColumn, messages.disposalScheduleActionCol(), false, false, 15);
-    addColumn(stateColumn, messages.disposalScheduleStateCol(), false, false, 9);
+    if (!compact) {
+      addColumn(stateColumn, messages.disposalScheduleStateCol(), false, false, 9);
+    }
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortList.ColumnSortInfo(titleColumn, false));
