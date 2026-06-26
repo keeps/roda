@@ -85,8 +85,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     DATA, METADATA_DESCRIPTIVE, METADATA_OTHER
   }
 
-  protected static final List<String> CHECKSUM_ALGORITHMS = Arrays.asList(CSV_FIELD_CHECKSUM_MD5,
-    CSV_FIELD_CHECKSUM_SHA1, CSV_FIELD_CHECKSUM_SHA256);
+  protected static List<String> CHECKSUM_ALGORITHMS;
 
   public static final String CSV_DEFAULT_FIELDS = StringUtils.join(Arrays.asList(CSV_FIELD_SIP_ID, CSV_FIELD_AIP_ID,
     CSV_FIELD_REPRESENTATION_ID, CSV_FIELD_FILE_PATH, CSV_FIELD_FILE_ID, CSV_FIELD_PARENT_ID, CSV_FIELD_ISDIRECTORY,
@@ -129,7 +128,14 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public void init() throws PluginException {
-    // do nothing
+    List<String> configuredAlgorithms = RodaCoreFactory
+      .getRodaConfigurationAsList("core.inventory.report.checksum.algorithms[]");
+
+    if (configuredAlgorithms != null && !configuredAlgorithms.isEmpty()) {
+      CHECKSUM_ALGORITHMS = configuredAlgorithms;
+    } else {
+      CHECKSUM_ALGORITHMS = Arrays.asList(CSV_FIELD_CHECKSUM_MD5, CSV_FIELD_CHECKSUM_SHA1, CSV_FIELD_CHECKSUM_SHA256);
+    }
   }
 
   @Override
@@ -160,7 +166,9 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
-    parameters.add(pluginParameters.get(CSV_FILE_FIELDS));
+    PluginParameter fieldsParam = pluginParameters.get(CSV_FILE_FIELDS);
+    fieldsParam.setDefaultValue(getCsvFieldsList());
+    parameters.add(fieldsParam);
     PluginParameter outputPluginParameter = pluginParameters.get(CSV_FILE_OUTPUT);
     SimpleDateFormat df = new SimpleDateFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
     String reportName = "inventory_report_" + df.format(new Date()) + ".csv";
@@ -288,6 +296,16 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     Path wd = RodaCoreFactory.getWorkingDirectory();
     Path csvExportTempFolder = wd.resolve(InventoryReportPlugin.EXPORT_CSV_TEMP_FOLDER);
     return csvExportTempFolder.resolve(PluginHelper.getJobId(this));
+  }
+
+  private String getCsvFieldsList() {
+    List<String> defaultFieldsList = new ArrayList<>(
+      Arrays.asList(CSV_FIELD_SIP_ID, CSV_FIELD_AIP_ID, CSV_FIELD_REPRESENTATION_ID, CSV_FIELD_FILE_PATH,
+        CSV_FIELD_FILE_ID, CSV_FIELD_PARENT_ID, CSV_FIELD_ISDIRECTORY, CSV_FILE_TYPE));
+    if (CHECKSUM_ALGORITHMS != null) {
+      defaultFieldsList.addAll(CHECKSUM_ALGORITHMS);
+    }
+    return StringUtils.join(defaultFieldsList, ",");
   }
 
   @Override
