@@ -56,6 +56,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InventoryReportPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(InventoryReportPlugin.class);
+
   public static final String EXPORT_CSV_TEMP_FOLDER = "CSV";
   public static final String CSV_FILE_FIELDS = "parameter.csv.file.fields";
   public static final String CSV_FILE_OUTPUT = "parameter.csv.file.output";
@@ -63,6 +65,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   public static final String CSV_FILE_OUTPUT_DATA = "parameter.csv.file.output.data";
   public static final String CSV_FILE_OUTPUT_DESCRIPTIVE = "parameter.csv.file.output.descriptive";
   public static final String CSV_FILE_OTHER_METADATA_TYPES = "parameter.csv.file.output.other";
+
   public static final String CSV_FIELD_SIP_ID = "sipId";
   public static final String CSV_FIELD_AIP_ID = "aipId";
   public static final String CSV_FIELD_REPRESENTATION_ID = "representationId";
@@ -70,19 +73,32 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   public static final String CSV_FIELD_FILE_ID = "fileId";
   public static final String CSV_FIELD_ISDIRECTORY = "isDirectory";
   public static final String CSV_FIELD_PARENT_ID = "parentId";
+
   public static final String CSV_FIELD_CHECKSUM_SHA1 = "SHA-1";
   public static final String CSV_FIELD_CHECKSUM_SHA256 = "SHA-256";
   public static final String CSV_FIELD_CHECKSUM_MD5 = "MD5";
+
   public static final String CSV_FILE_TYPE = "type";
+
+  public enum CSV_LINE_TYPE {
+    DATA, METADATA_DESCRIPTIVE, METADATA_OTHER
+  }
+
+  protected static List<String> CHECKSUM_ALGORITHMS;
+
   public static final String CSV_DEFAULT_FIELDS = StringUtils.join(Arrays.asList(CSV_FIELD_SIP_ID, CSV_FIELD_AIP_ID,
     CSV_FIELD_REPRESENTATION_ID, CSV_FIELD_FILE_PATH, CSV_FIELD_FILE_ID, CSV_FIELD_PARENT_ID, CSV_FIELD_ISDIRECTORY,
     CSV_FILE_TYPE, CSV_FIELD_CHECKSUM_SHA256, CSV_FIELD_CHECKSUM_MD5, CSV_FIELD_CHECKSUM_SHA1), ",");
   public static final String CSV_DEFAULT_OUTPUT = "/tmp/output.csv";
   public static final String CSV_DEFAULT_HEADERS = "true";
   public static final String CSV_DEFAULT_OTHER_METADATA = "ApacheTika,Siegfried";
-  protected static final List<String> CHECKSUM_ALGORITHMS = Arrays.asList(CSV_FIELD_CHECKSUM_MD5,
-    CSV_FIELD_CHECKSUM_SHA1, CSV_FIELD_CHECKSUM_SHA256);
-  private static final Logger LOGGER = LoggerFactory.getLogger(InventoryReportPlugin.class);
+
+  private List<String> fields = null;
+  private Path output;
+  private boolean enableHeaders;
+  private boolean outputDataInformation;
+  private boolean outputDescriptiveMetadataInformation;
+  private List<String> otherMetadataTypes;
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
@@ -125,16 +141,16 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
         .withDescription("plugin.inventoryReportPlugin.parameter.otherMetadataTypes.description").build());
   }
 
-  private List<String> fields = null;
-  private Path output;
-  private boolean enableHeaders;
-  private boolean outputDataInformation;
-  private boolean outputDescriptiveMetadataInformation;
-  private List<String> otherMetadataTypes;
-
   @Override
   public void init() throws PluginException {
-    // do nothing
+    List<String> configuredAlgorithms = RodaCoreFactory
+      .getRodaConfigurationAsList("core.inventory.report.checksum.algorithms[]");
+
+    if (configuredAlgorithms != null && !configuredAlgorithms.isEmpty()) {
+      CHECKSUM_ALGORITHMS = configuredAlgorithms;
+    } else {
+      CHECKSUM_ALGORITHMS = Arrays.asList(CSV_FIELD_CHECKSUM_MD5, CSV_FIELD_CHECKSUM_SHA1, CSV_FIELD_CHECKSUM_SHA256);
+    }
   }
 
   @Override
@@ -160,7 +176,9 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
-    parameters.add(pluginParameters.get(CSV_FILE_FIELDS));
+    PluginParameter fieldsParam = pluginParameters.get(CSV_FILE_FIELDS);
+    fieldsParam.setDefaultValue(getCsvFieldsList());
+    parameters.add(fieldsParam);
     PluginParameter outputPluginParameter = pluginParameters.get(CSV_FILE_OUTPUT);
     SimpleDateFormat df = new SimpleDateFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
     String reportName = "inventory_report_" + df.format(new Date()) + ".csv";
@@ -211,8 +229,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
-    throws PluginException {
+  public Report execute(IndexService index, ModelService model,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
 
     Path jobCSVTempFolder = getJobCSVTempFolder();
     Path csvTempFile = jobCSVTempFolder.resolve(IdUtils.createUUID() + ".csv");
@@ -223,8 +241,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
         @Override
 
-        public void process(IndexService index, ModelService model, Report report, Job cachedJob,
-          JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        public void process(IndexService index, ModelService model, Report report,
+          Job cachedJob, JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
           processAIP(model, jobPluginInfo, csvFilePrinter, object);
         }
       }, index, model, liteList);
@@ -233,7 +251,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     }
   }
 
-  private void processAIP(ModelService model, JobPluginInfo jobPluginInfo, CSVPrinter csvFilePrinter, AIP aip) {
+  private void processAIP(ModelService model, JobPluginInfo jobPluginInfo,
+    CSVPrinter csvFilePrinter, AIP aip) {
     if (csvFilePrinter == null) {
       LOGGER.warn("CSVPrinter is NULL! Skipping...");
       return;
@@ -264,7 +283,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model)
+    throws PluginException {
     try {
       Path jobCSVTempFolder = getJobCSVTempFolder();
       Files.createDirectories(jobCSVTempFolder);
@@ -286,6 +306,16 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     Path wd = RodaCoreFactory.getWorkingDirectory();
     Path csvExportTempFolder = wd.resolve(InventoryReportPlugin.EXPORT_CSV_TEMP_FOLDER);
     return csvExportTempFolder.resolve(PluginHelper.getJobId(this));
+  }
+
+  private String getCsvFieldsList() {
+    List<String> defaultFieldsList = new ArrayList<>(
+      Arrays.asList(CSV_FIELD_SIP_ID, CSV_FIELD_AIP_ID, CSV_FIELD_REPRESENTATION_ID, CSV_FIELD_FILE_PATH,
+        CSV_FIELD_FILE_ID, CSV_FIELD_PARENT_ID, CSV_FIELD_ISDIRECTORY, CSV_FILE_TYPE));
+    if (CHECKSUM_ALGORITHMS != null) {
+      defaultFieldsList.addAll(CHECKSUM_ALGORITHMS);
+    }
+    return StringUtils.join(defaultFieldsList, ",");
   }
 
   @Override
@@ -365,9 +395,5 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   @Override
   public List<Class<AIP>> getObjectClasses() {
     return Arrays.asList(AIP.class);
-  }
-
-  public enum CSV_LINE_TYPE {
-    DATA, METADATA_DESCRIPTIVE, METADATA_OTHER
   }
 }
