@@ -1,5 +1,69 @@
 # Changelog
 
+## v5.8.0 (29/06/2026)
+#### New features 
+- Added configuration for inventory report checksum algorithms (https://github.com/keeps/roda/commit/a51dddd2bd5b70731f3e06726d8570981692ad9a)
+
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.16 (27/05/2026)
+#### Security
+- Bumped tomcat version
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v6.2.0 (04/05/2026)
+#### New features
+
+- Add parent location column to AIP selection and search lists #3656
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v6.1.0 (20/04/2026)
+#### New features
+- Added a TIFF viewer
+- Added a email viewer (for EML and MSG formats)
+- Use database to temporarily store information about job and job reports #3640
+- Make list page size configurable via roda-wui.properties #3649
+
+#### Enhancements
+- Improve PDF viewer
+- The representation information viewer could respect breaklines of the original text #1521
+- Bad default config for default ingest plugin -- Virus check optional #3510
+
+#### Bug fixes
+- Update disposal workflows to support the transactional model #3620
+- Wrong behaviour when a dissemination is associated with a representation #3606
+- Fix streaming of files and generalizing for other storage providers. #3616
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.7.15 (08/04/2026)
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.7.14 (09/03/2026)
 #### New features 
 
@@ -330,86 +394,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 #### Enhancements 
 
 - Update representation information links
-
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.5.3 (13/03/2024)
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.5.2 (11/03/2024)
-#### Bug fixes
-- Fixed other metadata download #3117
-
-
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
-
----
-
-## v5.5.1 (08/03/2024)
-#### Bug fixes
-- Remove "opt-in" from roda-core.properties #3113
-- Fix ns2 namespace in premis.xml when creating technical metadata  #3114 
-
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
-
----
-
-## v5.5.0 (04/03/2024)
-#### New features
--  Support for generic technical metadata creation and visualization #3097
-
-#### Bug fixes
-- Fixed unexpected behaviour when trying to create a new AIP #3110
-- Fixed AIP permissions calculation using ModelService #3105 
-
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.4.0 (08/02/2024)
-#### New features
--  Technological platforms major upgrade, which largely improves overall security, maintanability and performance #3055
--  Adding support for the latest version of the [E-ARK SIP specification](https://dilcis.eu/specifications/sip) (version 2.1.0) #3046
--  Support [trusting the your own plugins](https://github.com/keeps/roda/blob/master/documentation/Plugin_signing.md) #3059
-
-#### Enhancements
--  Added help text to Agents register page that was missing #2831 
--  Added close button to license popup #2975
--  Improved documentation about default permissions #3045
-- Other small improvements #3063
-
-#### Bug fixes
--  Fixed "Clear" button in search component that did not behave as expected #3062
--  Fixed the Event Register menu entry that did not match the title of page #2832
--  Fixed Date and time of last transfer resource refresh in RODA interface only updated when reloading the page #3038 
--  Fixed default permissions issue when reading admin user permissions from configuration #3066 
 
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities
