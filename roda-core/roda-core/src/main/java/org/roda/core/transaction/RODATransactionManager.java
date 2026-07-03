@@ -106,33 +106,36 @@ public class RODATransactionManager {
     Date initDate = new Date();
     List<Report> reports;
     try {
-      plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
-      reports = RODATransactionManagerUtils.getReportsForTransaction(plugin, transactionId, mainModelService);
-    } catch (Exception e) {
-      LOGGER.error("[transactionId:{}] Error during plugin execution, rolling back transaction", transactionId, e);
-      rollbackTransaction(transactionId);
-      throw new PluginException("Error during plugin execution, transaction was rolled back", e);
+      try {
+        plugin.execute(context.indexService(), context.transactionalModelService(), objectsToBeProcessed);
+        reports = RODATransactionManagerUtils.getReportsForTransaction(plugin, transactionId, mainModelService);
+      } catch (Exception e) {
+        LOGGER.error("[transactionId:{}] Error during plugin execution, rolling back transaction", transactionId, e);
+        rollbackTransaction(transactionId);
+        throw new PluginException("Error during plugin execution, transaction was rolled back", e);
+      }
+
+      // Check if any of the reports indicate that the transaction should be rolled
+      // back
+      if (RODATransactionManagerUtils.shouldRollback(plugin, RODATransactionManagerUtils.getFailedReports(reports))) {
+        rollbackTransaction(transactionId);
+        processPluginExecutionResult(transactionId, initDate, reports, false);
+      } else {
+        // If everything is fine, commit the transaction
+        try {
+          endTransaction(transactionId);
+          processPluginExecutionResult(transactionId, initDate, reports, true);
+        } catch (RODATransactionException e) {
+          // If commit fails, we should attempt to rollback and log the error
+          rollbackTransaction(transactionId);
+          processPluginExecutionResult(transactionId, initDate, reports, false);
+          throw new PluginException("Failed to commit transaction for plugin execution, transaction was rolled back",
+            e);
+        }
+      }
     } finally {
       // remove locks if any
       PluginHelper.releaseObjectLock(plugin);
-    }
-
-    // Check if any of the reports indicate that the transaction should be rolled
-    // back
-    if (RODATransactionManagerUtils.shouldRollback(plugin, RODATransactionManagerUtils.getFailedReports(reports))) {
-      rollbackTransaction(transactionId);
-      processPluginExecutionResult(transactionId, initDate, reports, false);
-    } else {
-      // If everything is fine, commit the transaction
-      try {
-        endTransaction(transactionId);
-        processPluginExecutionResult(transactionId, initDate, reports, true);
-      } catch (RODATransactionException e) {
-        // If commit fails, we should attempt to rollback and log the error
-        rollbackTransaction(transactionId);
-        processPluginExecutionResult(transactionId, initDate, reports, false);
-        throw new PluginException("Failed to commit transaction for plugin execution, transaction was rolled back", e);
-      }
     }
   }
 

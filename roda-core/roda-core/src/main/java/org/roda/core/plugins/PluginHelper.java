@@ -96,6 +96,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.TransactionalModelService;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexActionLogPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexDIPPlugin;
@@ -181,12 +182,20 @@ public final class PluginHelper {
       | NotFoundException e) {
       throw new PluginException("A job exception has occurred", e);
     } finally {
-      if (autoLocking) {
-        releaseObjectLocks(plugin, liteList);
-      }
+      checkModelInstanceAndReleaseLock(plugin, model, liteList, autoLocking);
     }
 
     return report;
+  }
+
+  private static <T extends IsRODAObject> void checkModelInstanceAndReleaseLock(Plugin<T> plugin, ModelService model,
+    List<LiteOptionalWithCause> liteList, boolean autoLocking) {
+    if (model instanceof TransactionalModelService) {
+      LOGGER.info("Delegating object lock release to RODATransactionManager");
+    } else if (autoLocking) {
+      // remove locks if any
+      releaseObjectLocks(plugin, liteList);
+    }
   }
 
   private static <T extends IsRODAObject> void releaseObjectLocks(Plugin<T> plugin,
@@ -266,9 +275,7 @@ public final class PluginHelper {
       | NotFoundException e) {
       throw new PluginException("A job exception has occurred", e);
     } finally {
-      if (autoLocking) {
-        releaseObjectLocks(plugin, liteList);
-      }
+      checkModelInstanceAndReleaseLock(plugin, model, liteList, autoLocking);
     }
 
     return report;

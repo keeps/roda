@@ -21,6 +21,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.TransactionalModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -59,16 +60,15 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     LOGGER.debug("Doing nothing in beforeAllExecute");
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> liteList)
+    throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<T>() {
       @Override
       public void process(IndexService index, ModelService model, Report report, Job cachedJob,
@@ -78,8 +78,8 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
     }, index, model, liteList);
   }
 
-  protected void processObjects(IndexService index, ModelService model, Report report,
-    JobPluginInfo outerJobPluginInfo, Job cachedJob, List<T> resources) {
+  protected void processObjects(IndexService index, ModelService model, Report report, JobPluginInfo outerJobPluginInfo,
+    Job cachedJob, List<T> resources) {
     try {
       boolean updateMetaPluginInformation = true;
       final MultipleJobPluginInfo jobPluginInfo = (MultipleJobPluginInfo) outerJobPluginInfo;
@@ -108,8 +108,12 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
     } catch (JobException e) {
       // do nothing
     } finally {
-      // remove locks if any
-      PluginHelper.releaseObjectLock(this);
+      if (model instanceof TransactionalModelService) {
+        LOGGER.info("Delegating object lock release to RODATransactionManager");
+      } else {
+        // remove locks if any
+        PluginHelper.releaseObjectLock(this);
+      }
     }
   }
 
