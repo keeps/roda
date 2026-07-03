@@ -44,11 +44,9 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -314,7 +312,7 @@ public class SolrUtils {
 
     query.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
     query.setRows(pageSize);
-    query.setSorts(Arrays.asList(SortClause.asc(RodaConstants.INDEX_UUID)));
+    query.setSorts(Arrays.asList(SolrQuery.SortClause.asc(RodaConstants.INDEX_UUID)));
 
     if (!fieldsToReturn.isEmpty()) {
       query.setFields(fieldsToReturn.toArray(new String[fieldsToReturn.size()]));
@@ -472,7 +470,7 @@ public class SolrUtils {
     if (sorter != null && sorter.getParameters().length != 0) {
       sb.append("sort='");
       for (SortParameter sortParameter : sorter.getParameters()) {
-        sb.append(sortParameter.getName()).append(" ").append(sortParameter.isDescending() ? ORDER.desc : ORDER.asc);
+        sb.append(sortParameter.getName()).append(" ").append(sortParameter.isDescending() ? SolrQuery.ORDER.desc : SolrQuery.ORDER.asc);
       }
       sb.append("'");
     }
@@ -1271,11 +1269,11 @@ public class SolrUtils {
    * Roda Sorter > Apache Solr Sort clauses
    * ____________________________________________________________________________________________________________________
    */
-  public static List<SortClause> parseSorter(Sorter sorter) {
-    List<SortClause> ret = new ArrayList<>();
+  public static List<SolrQuery.SortClause> parseSorter(Sorter sorter) {
+    List<SolrQuery.SortClause> ret = new ArrayList<>();
     if (sorter != null) {
       for (SortParameter sortParameter : sorter.getParameters()) {
-        ret.add(new SortClause(sortParameter.getName(), sortParameter.isDescending() ? ORDER.desc : ORDER.asc));
+        ret.add(new SolrQuery.SortClause(sortParameter.getName(), sortParameter.isDescending() ? SolrQuery.ORDER.desc : SolrQuery.ORDER.asc));
       }
     }
     return ret;

@@ -10,12 +10,12 @@ package org.roda.core.common;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -70,9 +70,9 @@ public class TokenManager {
 
     try {
       httpPost.setEntity(new StringEntity(localInstance.getAccessKey()));
-      HttpResponse response = httpClient.execute(httpPost);
+      ClassicHttpResponse response = httpClient.execute(httpPost);
       HttpEntity responseEntity = response.getEntity();
-      int responseStatusCode = response.getStatusLine().getStatusCode();
+      int responseStatusCode = response.getCode();
 
       if (responseStatusCode == 200) {
         return JsonUtils.getObjectFromJson(responseEntity.getContent(), AccessToken.class);

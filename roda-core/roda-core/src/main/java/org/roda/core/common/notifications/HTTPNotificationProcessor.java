@@ -12,16 +12,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.util.Timeout;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.JsonUtils;
@@ -99,10 +104,16 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
 
   private boolean post(String endpoint, String content, int timeout) {
     boolean success = true;
-    RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout)
-      .setConnectionRequestTimeout(timeout).build();
+    Timeout timeoutConfig = Timeout.of(timeout, TimeUnit.MILLISECONDS);
+    ConnectionConfig connectionConfig = ConnectionConfig.custom().setConnectTimeout(timeoutConfig)
+      .setSocketTimeout(timeoutConfig).build();
+    RequestConfig requestConfig = RequestConfig.custom().setResponseTimeout(timeoutConfig)
+      .setConnectionRequestTimeout(timeoutConfig).build();
 
-    try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpclient = HttpClients.custom()
+      .setConnectionManager(
+        PoolingHttpClientConnectionManagerBuilder.create().setDefaultConnectionConfig(connectionConfig).build())
+      .setDefaultRequestConfig(requestConfig).build()) {
       HttpPost httppost = new HttpPost(endpoint);
       httppost.setConfig(requestConfig);
       httppost
@@ -114,8 +125,8 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
         httppost.setHeader(key, value);
       }
 
-      HttpResponse response = httpclient.execute(httppost);
-      if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+      ClassicHttpResponse response = httpclient.execute(httppost);
+      if (response.getCode() != HttpStatus.SC_OK) {
         success = false;
       } else {
         HttpEntity entity = response.getEntity();

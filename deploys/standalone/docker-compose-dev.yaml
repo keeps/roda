@@ -1,6 +1,6 @@
 services:
   zoo:
-    image: docker.io/zookeeper:3.9-jre-17
+    image: docker.io/zookeeper:3.9.5-jre-17
     container_name: zookeeper
     restart: unless-stopped
     ports:
@@ -12,7 +12,7 @@ services:
       - zookeeper_datalog:/datalog
 
   solr:
-    image: docker.io/solr:9
+    image: docker.io/solr:10.0.0
     container_name: solr
     restart: unless-stopped
     ports:
@@ -23,13 +23,11 @@ services:
       SOLR_OPTS: "-Dsolr.environment=dev,label=DEV+ENV"
     depends_on:
       - zoo
-    command:
-      - -c
     volumes:
       - solr_data:/var/solr
 
   clamd:
-    image: docker.io/clamav/clamav:1.4
+    image: docker.io/clamav/clamav:1.5.3-debian
     container_name: clamd
     restart: unless-stopped
     ports:
@@ -43,7 +41,7 @@ services:
       - /tmp:/tmp
 
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.11.0
+    image: ghcr.io/keeps/siegfried:v1.11.4
     container_name: siegfried
     restart: unless-stopped
     ports:
@@ -71,7 +69,7 @@ services:
       - VALIDATOR_URL=none
 
   mailpit:
-    image: axllent/mailpit:v1.24
+    image: axllent/mailpit:v1.30.3
     container_name: mailpit
     restart: unless-stopped
     ports:
@@ -109,10 +107,10 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   dbgate:
-    image: dbgate/dbgate
+    image: dbgate/dbgate:7.2.1-alpine
     restart: always
     ports:
-      - 8082:3000
+      - "8082:3000"
     volumes:
       - dbgate-data:/root/.dbgate
     environment:

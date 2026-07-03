@@ -18,15 +18,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -41,7 +41,7 @@ import org.roda.core.data.v2.synchronization.local.LocalInstance;
 public class MarketUtils {
   private static String retrieveRodaVersion() throws MarketException {
     try (InputStream inputStream = MarketUtils.class.getClassLoader().getResourceAsStream("static/version.json");
-         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+      BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
       StringBuilder builder = new StringBuilder();
       for (String line = null; (line = bufferedReader.readLine()) != null;) {
         builder.append(line).append("\n");
@@ -71,13 +71,13 @@ public class MarketUtils {
 
   public static void retrievePluginsListFromAPI(LocalInstance instance) throws MarketException {
     try {
-      boolean collectVersion = Boolean.parseBoolean(RodaCoreFactory.getProperty(RodaConstants.ENVIRONMENT_COLLECT_VERSION,
-              RodaConstants.DEFAULT_ENVIRONMENT_COLLECT_VERSION));
+      boolean collectVersion = Boolean.parseBoolean(RodaCoreFactory
+        .getProperty(RodaConstants.ENVIRONMENT_COLLECT_VERSION, RodaConstants.DEFAULT_ENVIRONMENT_COLLECT_VERSION));
 
       String rodaVersion = collectVersion ? retrieveRodaVersion() : "development";
 
       String pluginUrl = RodaCoreFactory.getProperty(RodaConstants.MARKET_INFO_URL_PROPERTY,
-              RodaConstants.DEFAULT_MARKET_INFO_URL);
+        RodaConstants.DEFAULT_MARKET_INFO_URL);
 
       Path pluginInfoPath = RodaCoreFactory.getMarketDirectoryPath().resolve(RodaConstants.CORE_MARKET_FILE);
 
@@ -85,12 +85,12 @@ public class MarketUtils {
       HttpGet httpGet = new HttpGet(pluginUrl);
       httpGet.addHeader("Accept", "application/json");
       // TODO: RODA-LOCAL must have an instanceId at startup
-      if(instance != null){
+      if (instance != null) {
         httpGet.addHeader("X-RODA-INSTANCE-ID", instance.getId());
       }
       httpGet.addHeader("X-RODA-VERSION", rodaVersion);
-      HttpResponse response = httpClient.execute(httpGet);
-      int responseStatusCode = response.getStatusLine().getStatusCode();
+      ClassicHttpResponse response = httpClient.execute(httpGet);
+      int responseStatusCode = response.getCode();
 
       if (responseStatusCode == 200) {
         HttpEntity entity = response.getEntity();
@@ -98,7 +98,7 @@ public class MarketUtils {
           String pluginInfo = null;
           // validate
           try (InputStream content = entity.getContent()) {
-            String jsonString = getResultNodeFromJson(IOUtils.toString(content, RodaConstants.DEFAULT_ENCODING));
+            String jsonString = getResultNodeFromJson(IOUtils.toString(content, StandardCharsets.UTF_8));
             List<MarketInfo> listFromJsonLines = JsonUtils.getListFromJson(jsonString, MarketInfo.class);
             pluginInfo = JsonUtils.getJsonLinesFromObjectList(listFromJsonLines);
           }

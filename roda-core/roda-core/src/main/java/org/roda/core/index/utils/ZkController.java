@@ -55,10 +55,10 @@ public class ZkController {
 
     try (SolrZkClient tmpClient = new SolrZkClient.Builder().withUrl(zkHost.substring(0, zkHost.indexOf("/")))
       .withTimeout(60, TimeUnit.SECONDS).withConnTimeOut(30, TimeUnit.SECONDS).build()) {
-      boolean exists = tmpClient.exists(chrootPath, true);
+      boolean exists = tmpClient.exists(chrootPath);
       if (!exists && create) {
         LOGGER.info("creating chroot {}", chrootPath);
-        tmpClient.makePath(chrootPath, false, true);
+        tmpClient.makePath(chrootPath, false);
         exists = true;
       }
       return exists;

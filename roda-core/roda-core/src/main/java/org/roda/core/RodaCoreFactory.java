@@ -64,6 +64,7 @@ import org.apache.solr.common.cloud.DocCollection;
 import org.apache.solr.common.cloud.Replica;
 import org.apache.solr.common.cloud.Slice;
 import org.apache.solr.common.cloud.SolrZkClient;
+import org.apache.solr.common.cloud.ZkStateReader;
 import org.apache.zookeeper.KeeperException;
 import org.roda.core.common.MarketUtils;
 import org.roda.core.common.Messages;
@@ -1096,63 +1097,57 @@ public class RodaCoreFactory {
       throw new GenericException("Could not connect to Solr Cloud", e);
     }
 
-    ClusterState clusterState = cloudSolrClient.getClusterState();
+    ZkStateReader zkStateReader = ZkClientClusterStateProvider.from(cloudSolrClient).getZkStateReader();
+    ClusterState clusterState = zkStateReader.getClusterState();
     LOGGER.info("Live nodes: {}", clusterState.getLiveNodes());
 
     if (clusterState.getLiveNodes().isEmpty()) {
       return false;
     }
 
-    Map<String, DocCollection> collectionStates = clusterState.getCollectionsMap();
     Set<String> allCollections = new HashSet<>();
     Set<String> healthyCollections = new HashSet<>();
 
     boolean healthy;
 
-    for (Entry<String, DocCollection> entry : collectionStates.entrySet()) {
-      String col = entry.getKey();
-      DocCollection docs = entry.getValue();
+    clusterState.collectionStream().forEach(docs -> {
+      String col = docs.getName();
+      allCollections.add(col);
 
-      if (docs != null) {
-        allCollections.add(col);
+      Collection<Slice> slices = docs.getActiveSlices();
+      boolean collectionHealthy = true;
+      // collection healthy if all slices are healthy
+      for (Slice slice : slices) {
+        boolean sliceHealthy = false;
 
-        Collection<Slice> slices = docs.getActiveSlices();
-
-        boolean collectionHealthy = true;
-        // collection healthy if all slices are healthy
-
-        for (Slice slice : slices) {
-          boolean sliceHealthy = false;
-
-          // if at least one replica is active then the slice is healthy
-          for (Replica replica : slice.getReplicas()) {
-            if (Replica.State.ACTIVE.equals(replica.getState())) {
-              sliceHealthy = true;
-              break;
-            } else {
-              LOGGER.info("Replica {} on node {} is {}", replica.getName(), replica.getNodeName(), replica.getState());
-            }
+        // if at least one replica is active then the slice is healthy
+        for (Replica replica : slice.getReplicas()) {
+          if (Replica.State.ACTIVE.equals(replica.getState())) {
+            sliceHealthy = true;
+            break;
+          } else {
+            LOGGER.info("Replica {} on node {} is {}", replica.getName(), replica.getNodeName(), replica.getState());
           }
-
-          collectionHealthy &= sliceHealthy;
         }
 
-        try {
-          SolrPingResponse ping = cloudSolrClient.ping(col);
-          if (ping.getStatus() != 0) {
-            collectionHealthy = false;
-            LOGGER.info("Ping collection {} return code: {}", col, ping);
-          }
-        } catch (SolrServerException | IOException | SolrException e) {
-          LOGGER.info("Ping test failed: [{}] {}", e.getClass().getSimpleName(), e.getMessage());
-          collectionHealthy = false;
-        }
-
-        if (collectionHealthy) {
-          healthyCollections.add(col);
-        }
+        collectionHealthy &= sliceHealthy;
       }
-    }
+      try {
+        SolrPingResponse ping = cloudSolrClient.ping(col);
+        if (ping.getStatus() != 0) {
+          collectionHealthy = false;
+          LOGGER.info("Ping collection {} return code: {}", col, ping);
+        }
+      } catch (SolrServerException | IOException | SolrException e) {
+        LOGGER.info("Ping test failed: [{}] {}", e.getClass().getSimpleName(), e.getMessage());
+        collectionHealthy = false;
+      }
+
+      if (collectionHealthy) {
+        healthyCollections.add(col);
+      }
+
+    });
 
     if (healthyCollections.containsAll(allCollections)) {
       healthy = true;
@@ -1163,8 +1158,8 @@ public class RodaCoreFactory {
       Set<String> unhealthyCollections = new HashSet<>(allCollections);
       unhealthyCollections.removeAll(healthyCollections);
 
-      LOGGER.info("Solr Cloud healthy collections:   " + healthyCollections);
-      LOGGER.info("Solr Cloud unhealthy collections: " + unhealthyCollections);
+      LOGGER.info("Solr Cloud healthy collections: {}", healthyCollections);
+      LOGGER.info("Solr Cloud unhealthy collections: {}", unhealthyCollections);
     }
 
     return healthy;

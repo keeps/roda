@@ -24,12 +24,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.Header;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -455,23 +454,23 @@ public class SeleniumUtils {
   }
 
   private static void sendPostRequest(String source) {
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+      MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+      builder.addTextBody("input", source);
 
-    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-    builder.addTextBody("input", source);
+      HttpPost httpPost = new HttpPost("http://www.acessibilidade.gov.pt/accessmonitor/");
+      httpPost.setEntity(builder.build());
 
-    HttpPost httpPost = new HttpPost("http://www.acessibilidade.gov.pt/accessmonitor/");
-    httpPost.setEntity(builder.build());
+      httpClient.execute(httpPost, response -> {
+        System.err.println(response);
 
-    try {
-      CloseableHttpResponse response = httpClient.execute(httpPost);
-      System.err.println(response);
-
-      for (Header h : response.getAllHeaders()) {
-        if ("location".equalsIgnoreCase(h.getName())) {
-          locations.put(h.getValue(), driver.getCurrentUrl());
+        for (Header h : response.getHeaders()) {
+          if ("location".equalsIgnoreCase(h.getName())) {
+            locations.put(h.getValue(), driver.getCurrentUrl());
+          }
         }
-      }
+        return null;
+      });
     } catch (IOException e) {
       System.err.println("Error sending POST request!");
     }
