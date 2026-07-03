@@ -22,6 +22,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.TransactionalModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -60,20 +61,19 @@ public abstract class NoObjectsMultipleStepPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
     LOGGER.debug("Doing nothing in beforeAllExecute");
     return null;
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model,
-                        List<LiteOptionalWithCause> list) throws PluginException {
+  public Report execute(IndexService index, ModelService model, List<LiteOptionalWithCause> list)
+    throws PluginException {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, Report report, Job cachedJob,
-                          JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         processInternally(index, model, report, jobPluginInfo, cachedJob);
       }
     }, index, model);
@@ -109,8 +109,12 @@ public abstract class NoObjectsMultipleStepPlugin extends AbstractPlugin<Void> {
     } catch (JobException e) {
       // do nothing
     } finally {
-      // remove locks if any
-      PluginHelper.releaseObjectLock(this);
+      if (model instanceof TransactionalModelService) {
+        LOGGER.info("Delegating object lock release to RODATransactionManager");
+      } else {
+        // remove locks if any
+        PluginHelper.releaseObjectLock(this);
+      }
     }
   }
 
