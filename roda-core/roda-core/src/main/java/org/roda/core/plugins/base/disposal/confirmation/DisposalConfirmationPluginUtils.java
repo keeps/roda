@@ -9,6 +9,7 @@ package org.roda.core.plugins.base.disposal.confirmation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,26 @@ public class DisposalConfirmationPluginUtils {
   private DisposalConfirmationPluginUtils() {
   }
 
+  public static DisposalConfirmationAIPEntry convertToDisposalConfirmationAIPEntry(org.roda.core.entity.disposal.confirmation.DisposalConfirmationAIPEntry entry) {
+    DisposalConfirmationAIPEntry result = new DisposalConfirmationAIPEntry();
+
+    result.setAipId(entry.getAipId());
+    result.setAipLevel(entry.getAipLevel());
+    result.setAipTitle(entry.getAipTitle());
+    result.setParentId(entry.getParentId());
+    result.setDestroyedTransitiveSource(entry.getDestroyedTransitiveSource());
+    result.setDestroyedSelection(entry.getDestroyedSelection());
+    result.setAipCreationDate(entry.getAipCreationDate());
+    result.setAipOverdueDate(entry.getAipOverdueDate());
+    result.setAipDisposalScheduleId(entry.getAipDisposalScheduleId());
+    result.setAipDisposalHoldIds(new ArrayList<>(entry.getAipDisposalHoldIds()));
+    result.setAipDisposalHoldTransitiveIds(new ArrayList<>(entry.getAipDisposalHoldTransitiveIds()));
+    result.setAipSize(entry.getAipSize());
+    result.setAipNumberOfFiles(entry.getAipNumberOfFiles());
+
+    return result;
+  }
+
   public static DisposalConfirmation getDisposalConfirmation(String confirmationId, String title, long storageSize,
     Set<String> disposalHolds, Set<String> disposalSchedules, long numberOfAIPs, Map<String, String> extraFields) {
 
@@ -54,9 +75,9 @@ public class DisposalConfirmationPluginUtils {
     return confirmationMetadata;
   }
 
-  public static DisposalConfirmationAIPEntry getAIPEntryFromAIP(IndexService indexService, AIP aip,
-    String topAncestorId, DestroyedSelectionState destroyedSelectionState, Set<String> disposalSchedules,
-    Set<String> disposalHolds, Set<String> disposalHoldTransitives)
+  public static org.roda.core.entity.disposal.confirmation.DisposalConfirmationAIPEntry getAIPEntryFromAIP(
+    IndexService indexService, AIP aip, String topAncestorId, DestroyedSelectionState destroyedSelectionState,
+    Set<String> disposalSchedules, Set<String> disposalHolds, Set<String> disposalHoldTransitives)
     throws GenericException, RequestNotValidException, NotFoundException {
 
     IndexedAIP indexedAIP = indexService.retrieve(IndexedAIP.class, aip.getId(),
@@ -66,19 +87,20 @@ public class DisposalConfirmationPluginUtils {
       disposalSchedules, disposalHolds, disposalHoldTransitives);
   }
 
-  public static DisposalConfirmationAIPEntry getAIPEntryFromAIP(IndexService indexService, AIP aip,
-    DestroyedSelectionState destroyedSelectionState, Set<String> disposalSchedules, Set<String> disposalHolds,
-    Set<String> disposalHoldTransitives) throws GenericException, RequestNotValidException, NotFoundException {
+  public static org.roda.core.entity.disposal.confirmation.DisposalConfirmationAIPEntry getAIPEntryFromAIP(
+    IndexService indexService, AIP aip, DestroyedSelectionState destroyedSelectionState, Set<String> disposalSchedules,
+    Set<String> disposalHolds, Set<String> disposalHoldTransitives)
+    throws GenericException, RequestNotValidException, NotFoundException {
 
     return getAIPEntryFromAIP(indexService, aip, null, destroyedSelectionState, disposalSchedules, disposalHolds,
       disposalHoldTransitives);
   }
 
-  private static DisposalConfirmationAIPEntry createDisposalConfirmationAIPEntry(IndexService indexService,
-    final IndexedAIP indexedAIP, final AIP aip, String topAncestorId, DestroyedSelectionState destroyedSelectionState,
-    Set<String> disposalSchedules, Set<String> disposalHolds, Set<String> disposalHoldTransitives)
-    throws GenericException, RequestNotValidException {
-    DisposalConfirmationAIPEntry entry = new DisposalConfirmationAIPEntry();
+  private static org.roda.core.entity.disposal.confirmation.DisposalConfirmationAIPEntry createDisposalConfirmationAIPEntry(
+    IndexService indexService, final IndexedAIP indexedAIP, final AIP aip, String topAncestorId,
+    DestroyedSelectionState destroyedSelectionState, Set<String> disposalSchedules, Set<String> disposalHolds,
+    Set<String> disposalHoldTransitives) throws GenericException, RequestNotValidException {
+    org.roda.core.entity.disposal.confirmation.DisposalConfirmationAIPEntry entry = new org.roda.core.entity.disposal.confirmation.DisposalConfirmationAIPEntry();
 
     entry.setAipId(aip.getId());
     entry.setAipLevel(indexedAIP.getLevel());
@@ -95,8 +117,8 @@ public class DisposalConfirmationPluginUtils {
     entry.setAipDisposalHoldIds(getDisposalHoldIds(aip.getHolds()));
     disposalHolds.addAll(entry.getAipDisposalHoldIds());
 
-    List<String> collect = aip.getTransitiveHolds().stream().map(DisposalTransitiveHoldAIPMetadata::getId)
-      .collect(Collectors.toList());
+    Set<String> collect = aip.getTransitiveHolds().stream().map(DisposalTransitiveHoldAIPMetadata::getId)
+      .collect(Collectors.toSet());
     entry.setAipDisposalHoldTransitiveIds(collect);
     disposalHoldTransitives.addAll(collect);
 
@@ -105,8 +127,8 @@ public class DisposalConfirmationPluginUtils {
     return entry;
   }
 
-  private static List<String> getDisposalHoldIds(List<DisposalHoldAIPMetadata> disposalHoldAssociation) {
-    List<String> holdIds = new ArrayList<>();
+  private static Set<String> getDisposalHoldIds(List<DisposalHoldAIPMetadata> disposalHoldAssociation) {
+    Set<String> holdIds = new HashSet<>();
 
     if (disposalHoldAssociation != null) {
       for (DisposalHoldAIPMetadata holdAssociation : disposalHoldAssociation) {
@@ -118,7 +140,8 @@ public class DisposalConfirmationPluginUtils {
   }
 
   private static void getStorageSizeInBytesForAIP(IndexService indexService, String aipId,
-    DisposalConfirmationAIPEntry entry) throws GenericException, RequestNotValidException {
+    org.roda.core.entity.disposal.confirmation.DisposalConfirmationAIPEntry entry)
+    throws GenericException, RequestNotValidException {
 
     long totalSize = 0L;
     long totalOfDataFiles = 0L;

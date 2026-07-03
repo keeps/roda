@@ -90,6 +90,7 @@ public class CreateDisposalConfirmation extends Composite {
   TitlePanel title;
   @UiField
   FlowPanel dataPanel;
+
   public CreateDisposalConfirmation(final SelectedItems<IndexedAIP> selectedItems) {
     initWidget(uiBinder.createAndBindUi(this));
 

@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.config.SpringContext;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -34,7 +35,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.disposal.confirmation.DestroyedSelectionState;
-import org.roda.core.data.v2.disposal.confirmation.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.disposal.hold.DisposalHold;
 import org.roda.core.data.v2.disposal.metadata.DisposalConfirmationAIPMetadata;
 import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
@@ -48,6 +48,8 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.entity.disposal.confirmation.DisposalConfirmationAIPEntry;
+import org.roda.core.entity.disposal.confirmation.DisposalConfirmations;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -57,6 +59,8 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.repository.disposal.DisposalConfirmationAIPEntryRepository;
+import org.roda.core.repository.disposal.DisposalConfirmationRepository;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,20 +75,25 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
   static {
     pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE,
-      PluginParameter.getBuilder(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE, "plugin.createDisposalConfirmationPlugin.parameter.title.name",
-        PluginParameter.PluginParameterType.STRING).withDescription("plugin.createDisposalConfirmationPlugin.parameter.title.description").build());
+      PluginParameter
+        .getBuilder(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE,
+          "plugin.createDisposalConfirmationPlugin.parameter.title.name", PluginParameter.PluginParameterType.STRING)
+        .withDescription("plugin.createDisposalConfirmationPlugin.parameter.title.description").build());
     pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO,
-      PluginParameter.getBuilder(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO, "plugin.createDisposalConfirmationPlugin.parameter.info.name",
-        PluginParameter.PluginParameterType.STRING).withDescription("plugin.createDisposalConfirmationPlugin.parameter.info.description").build());
+      PluginParameter
+        .getBuilder(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO,
+          "plugin.createDisposalConfirmationPlugin.parameter.info.name", PluginParameter.PluginParameterType.STRING)
+        .withDescription("plugin.createDisposalConfirmationPlugin.parameter.info.description").build());
   }
 
   private final Set<String> disposalSchedules = new HashSet<>();
   private final Set<String> disposalHolds = new HashSet<>();
   private final Set<String> disposalHoldTransitives = new HashSet<>();
-  private long storageSize = 0L;
-  private int aipCounter = 0;
   private String title;
   private Map<String, String> extraInformation;
+
+  private DisposalConfirmationAIPEntryRepository disposalConfirmationAIPEntryRepository;
+  private DisposalConfirmationRepository disposalConfirmationRepository;
 
   public static String getStaticName() {
     return "plugin.createDisposalConfirmationPlugin.name";
@@ -158,6 +167,14 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
+
+    // create a disposal confirmation uuid and store in the database
+    getDisposalConfirmationRepository();
+    DisposalConfirmations object = new DisposalConfirmations();
+    object.setJobId(PluginHelper.getJobId(this));
+    object.setDisposalConfirmationId(IdUtils.createUUID());
+    disposalConfirmationRepository.save(object);
+
     return null;
   }
 
@@ -173,8 +190,12 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
   private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo,
     Job cachedJob, List<AIP> aips) {
 
-    String confirmationId = IdUtils.createUUID();
     IndexedAIP indexedAIP = null;
+    getDisposalConfirmationRepository();
+    getAIPEntryRepository();
+
+    String disposalConfirmationId = disposalConfirmationRepository.findByJobId(PluginHelper.getJobId(this))
+      .getDisposalConfirmationId();
 
     for (AIP aip : aips) {
       try {
@@ -196,7 +217,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
       if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())) {
         LOGGER.error(
           "Error creating disposal confirmation {}: AIP '{}' marked as already assigned to a disposal confirmation '{}'",
-          confirmationId, aip.getId(), aip.getDisposalConfirmationId());
+          disposalConfirmationId, aip.getId(), aip.getDisposalConfirmationId());
         state = PluginState.FAILURE;
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(state)
@@ -210,7 +231,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
       } else if (indexedAIP != null && indexedAIP.isOnHold()) {
         LOGGER.error(
           "Failed to assign AIP '{}' to disposal confirmation {} because AIP is currently with one or more holds applied",
-          confirmationId, aip.getId());
+          disposalConfirmationId, aip.getId());
         state = PluginState.FAILURE;
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(state)
@@ -222,7 +243,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         processChildren = false;
       } else if (indexedAIP == null) {
         LOGGER.error("Failed to assign AIP '{}' to disposal confirmation {} because retrieving the IndexedAIP failed",
-          confirmationId, aip.getId());
+          disposalConfirmationId, aip.getId());
         state = PluginState.FAILURE;
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(state)
@@ -235,19 +256,19 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
       } else {
         try {
           // Fetch the AIP information to crystallize in the confirmation report
-          DisposalConfirmationAIPEntry entry = DisposalConfirmationPluginUtils.getAIPEntryFromAIP(index, aip,
-            DestroyedSelectionState.DIRECT, disposalSchedules, disposalHolds, disposalHoldTransitives);
-          model.addAIPEntry(confirmationId, entry);
+          org.roda.core.entity.disposal.confirmation.DisposalConfirmationAIPEntry entry = DisposalConfirmationPluginUtils
+            .getAIPEntryFromAIP(index, aip, DestroyedSelectionState.DIRECT, disposalSchedules, disposalHolds,
+              disposalHoldTransitives);
+          entry.setJobId(PluginHelper.getJobId(this));
+          disposalConfirmationAIPEntryRepository.save(entry);
+          // model.addAIPEntry(confirmationId, entry);
 
           // Mark the AIP as "on confirmation" so they cannot be added to another
           // disposal confirmation
           DisposalConfirmationAIPMetadata disposalConfirmationAIPMetadata = new DisposalConfirmationAIPMetadata();
           aip.getDisposal().setConfirmation(disposalConfirmationAIPMetadata);
-          disposalConfirmationAIPMetadata.setId(confirmationId);
+          disposalConfirmationAIPMetadata.setId(disposalConfirmationId);
           model.updateAIP(aip, cachedJob.getUsername());
-
-          // increment the storage size
-          storageSize += entry.getAipSize();
 
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           reportItem.setPluginState(state)
@@ -255,17 +276,14 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
               + "' (" + disposalConfirmationAIPMetadata.getId() + ")");
 
           outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
-            "was successfully assign to disposal confirmation", confirmationId, aip.getId());
-
-          aipCounter++;
-        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
-          | AlreadyExistsException e) {
-          LOGGER.error("Failed to assign AIP '{}' to disposal confirmation '{}': {}", aip.getId(), confirmationId,
-            e.getMessage(), e);
+            "was successfully assign to disposal confirmation", disposalConfirmationId, aip.getId());
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+          LOGGER.error("Failed to assign AIP '{}' to disposal confirmation '{}': {}", aip.getId(),
+            disposalConfirmationId, e.getMessage(), e);
           state = PluginState.FAILURE;
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(state).setPluginDetails("Failed to assign AIP '" + aip.getId()
-            + "' to disposal confirmation '" + title + "' (" + confirmationId + "): " + e.getMessage());
+            + "' to disposal confirmation '" + title + "' (" + disposalConfirmationId + "): " + e.getMessage());
           outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
             "failed to be assigned to disposal confirmation", title, aip.getId());
           report.addReport(reportItem);
@@ -280,65 +298,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         EVENT_DESCRIPTION, state, outcomeText, "", cachedJob.getUsername(), true, null);
 
       if (processChildren) {
-        processAIPChildren(aip, confirmationId, index, model, cachedJob);
-      }
-    }
-
-    if (aipCounter != 0) {
-
-      // Make disposal schedules as a jsonl
-      try {
-        for (String disposalScheduleId : disposalSchedules) {
-          if (disposalScheduleId != null) {
-            DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
-            model.addDisposalScheduleEntry(confirmationId, disposalSchedule);
-          }
-        }
-      } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
-        | AlreadyExistsException e) {
-        LOGGER.error("Failed to create disposal schedules jsonl file", e);
-        report.addPluginDetails("Failed to create jsonl with disposal schedules");
-      }
-
-      // Make disposal holds as a jsonl
-      try {
-        for (String disposalHoldId : disposalHolds) {
-          DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
-          model.addDisposalHoldEntry(confirmationId, disposalHold);
-        }
-      } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException
-        | AlreadyExistsException e) {
-        LOGGER.error("Failed to create disposal holds jsonl file", e);
-        report.addPluginDetails("Failed to create jsonl with disposal holds");
-      }
-
-      // Make disposal holds transitive as a jsonl
-      try {
-        for (String disposalHoldId : disposalHoldTransitives) {
-          DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
-          model.addDisposalHoldTransitiveEntry(confirmationId, disposalHold);
-        }
-      } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException
-        | AlreadyExistsException e) {
-        LOGGER.error("Failed to create transitive disposal holds jsonl file", e);
-        report.addPluginDetails("Failed to create jsonl with transitive disposal holds");
-      }
-
-      // create disposal confirmation report metadata
-      try {
-        model.createDisposalConfirmation(DisposalConfirmationPluginUtils.getDisposalConfirmation(confirmationId, title,
-          storageSize, disposalHolds, disposalSchedules, aipCounter, extraInformation), cachedJob.getUsername());
-
-        model.createRepositoryEvent(getPreservationEventType(), getPreservationEventDescription(), PluginState.SUCCESS,
-          getPreservationEventSuccessMessage(), confirmationId, cachedJob.getUsername(), true, null);
-      } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
-        | AuthorizationDeniedException e) {
-        LOGGER.error("Failed to create disposal confirmation metadata file", e);
-        report.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Failed to create disposal confirmation metadata file: " + e.getMessage());
-
-        model.createRepositoryEvent(getPreservationEventType(), getPreservationEventDescription(), PluginState.FAILURE,
-          getPreservationEventFailureMessage(), confirmationId, cachedJob.getUsername(), true, null);
+        processAIPChildren(aip, disposalConfirmationId, index, model, cachedJob);
       }
     }
   }
@@ -385,9 +345,11 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
       if (processChild) {
         // Fetch the AIP information to crystallize in the confirmation report
-        DisposalConfirmationAIPEntry entry = DisposalConfirmationPluginUtils.getAIPEntryFromAIP(index, aip,
-          topAncestorId, DestroyedSelectionState.TRANSITIVE, disposalSchedules, disposalHolds, disposalHoldTransitives);
-        model.addAIPEntry(confirmationId, entry);
+        org.roda.core.entity.disposal.confirmation.DisposalConfirmationAIPEntry entry = DisposalConfirmationPluginUtils
+          .getAIPEntryFromAIP(index, aip, topAncestorId, DestroyedSelectionState.TRANSITIVE, disposalSchedules,
+            disposalHolds, disposalHoldTransitives);
+        entry.setJobId(PluginHelper.getJobId(this));
+        disposalConfirmationAIPEntryRepository.save(entry);
 
         // Mark the AIP as "on confirmation" so they cannot be added to another
         // disposal confirmation
@@ -396,20 +358,15 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         disposalConfirmationAIPMetadata.setId(confirmationId);
         model.updateAIP(aip, cachedJob.getUsername());
 
-        // increment the storage size
-        storageSize += entry.getAipSize();
-
         outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
           "was successfully assign to disposal confirmation", confirmationId, aip.getId());
-        aipCounter++;
       } else {
         state = PluginState.SKIPPED;
         outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
           "was skipped from being assign to disposal confirmation due to incompatible disposal schedule",
           confirmationId, aip.getId());
       }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
-      | AlreadyExistsException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Failed to assign AIP '{}' to disposal confirmation '{}': {}", child.getId(), confirmationId,
         e.getMessage(), e);
       state = PluginState.FAILURE;
@@ -421,9 +378,68 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
       EVENT_DESCRIPTION, state, outcomeText, "", cachedJob.getUsername(), true, null);
   }
 
+  private DisposalConfirmationAIPEntryRepository getAIPEntryRepository() {
+    if (disposalConfirmationAIPEntryRepository == null && SpringContext.isContextInitialized()) {
+      disposalConfirmationAIPEntryRepository = SpringContext.getBean(DisposalConfirmationAIPEntryRepository.class);
+    }
+    return disposalConfirmationAIPEntryRepository;
+  }
+
+  private DisposalConfirmationRepository getDisposalConfirmationRepository() {
+    if (disposalConfirmationRepository == null && SpringContext.isContextInitialized()) {
+      disposalConfirmationRepository = SpringContext.getBean(DisposalConfirmationRepository.class);
+    }
+    return disposalConfirmationRepository;
+  }
+
   @Override
   public Report afterAllExecute(IndexService index, ModelService model) throws PluginException {
     // do nothing
+    getAIPEntryRepository();
+    getDisposalConfirmationRepository();
+
+    String disposalConfirmationId = disposalConfirmationRepository.findByJobId(PluginHelper.getJobId(this))
+      .getDisposalConfirmationId();
+
+    try {
+      for (String disposalScheduleId : disposalConfirmationAIPEntryRepository
+        .findUniqueScheduleIdsByJobId(PluginHelper.getJobId(this))) {
+        DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
+        model.addDisposalScheduleEntry(disposalConfirmationId, disposalSchedule);
+      }
+
+      for (String disposalHoldId : disposalConfirmationAIPEntryRepository
+        .findDistinctDisposalHoldIdsByJobId(PluginHelper.getJobId(this))) {
+        DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
+        model.addDisposalHoldEntry(disposalConfirmationId, disposalHold);
+      }
+
+      for (String disposalHoldId : disposalConfirmationAIPEntryRepository
+        .findDistinctDisposalHoldTransitiveIdsByJobId(PluginHelper.getJobId(this))) {
+        DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
+        model.addDisposalHoldTransitiveEntry(disposalConfirmationId, disposalHold);
+      }
+
+      for (DisposalConfirmationAIPEntry entry : disposalConfirmationAIPEntryRepository
+        .findByJobId(PluginHelper.getJobId(this))) {
+        model.addAIPEntry(disposalConfirmationId,
+          DisposalConfirmationPluginUtils.convertToDisposalConfirmationAIPEntry(entry));
+      }
+
+      model.createDisposalConfirmation(DisposalConfirmationPluginUtils.getDisposalConfirmation(disposalConfirmationId,
+        title, disposalConfirmationAIPEntryRepository.sumAipSizeByJobId(PluginHelper.getJobId(this)),
+        new HashSet<>(
+          disposalConfirmationAIPEntryRepository.findDistinctDisposalHoldIdsByJobId(PluginHelper.getJobId(this))),
+        new HashSet<>(disposalConfirmationAIPEntryRepository.findUniqueScheduleIdsByJobId(PluginHelper.getJobId(this))),
+        disposalConfirmationAIPEntryRepository.countByJobId(PluginHelper.getJobId(this)), extraInformation),
+        PluginHelper.getJobUsername(this, model));
+
+    } catch (AuthorizationDeniedException | RequestNotValidException | AlreadyExistsException | NotFoundException
+      | GenericException e) {
+      LOGGER.error("Failed to create disposal confirmation files", e);
+      throw new PluginException("Failed to create disposal confirmation files", e);
+    }
+
     return null;
   }
 
