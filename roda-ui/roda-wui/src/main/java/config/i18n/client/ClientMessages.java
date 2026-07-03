@@ -1336,6 +1336,8 @@ public interface ClientMessages extends Messages {
 
   String representationInformationRelationType();
 
+  String representationInformationRelationTypeValue(@Select String value);
+
   String representationInformationRelationObjectType(@Select String type);
 
   String representationInformationRelationLink();
@@ -1357,6 +1359,8 @@ public interface ClientMessages extends Messages {
   String representationInformationFiles(@PluralCount int size, String link);
 
   String representationInformationFilesAssociations();
+
+  String representationInformationRelations();
 
   /****** Descriptive Metadata ****/
 

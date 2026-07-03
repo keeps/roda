@@ -28,22 +28,15 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class RemovableRelation extends Composite implements HasHandlers {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  interface MyUiBinder extends UiBinder<Widget, RemovableRelation> {
-  }
-
   @UiField
   FlowPanel link;
-
   @UiField(provided = true)
   Anchor removeDynamicTextBoxButton;
-
   RepresentationInformationRelation relation = null;
 
   public RemovableRelation() {
@@ -55,10 +48,6 @@ public class RemovableRelation extends Composite implements HasHandlers {
     removeDynamicTextBoxButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
     initWidget(uiBinder.createAndBindUi(this));
 
-    InlineHTML bullet = new InlineHTML("&#8226;");
-    bullet.addStyleName("bullet");
-    link.add(bullet);
-
     String title = riRelation.getTitle();
     if (StringUtils.isBlank(title)) {
       title = riRelation.getLink();
@@ -69,8 +58,7 @@ public class RemovableRelation extends Composite implements HasHandlers {
         HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(riRelation.getLink())), "_blank");
       link.add(a);
     } else if (riRelation.getObjectType().equals(RelationObjectType.REPRESENTATION_INFORMATION)) {
-      List<String> history = new ArrayList<>();
-      history.addAll(ShowRepresentationInformation.RESOLVER.getHistoryPath());
+      List<String> history = new ArrayList<>(ShowRepresentationInformation.RESOLVER.getHistoryPath());
       history.add(riRelation.getLink());
 
       Anchor a = new Anchor(title, HistoryUtils.createHistoryHashLink(history), "_blank");
@@ -92,5 +80,8 @@ public class RemovableRelation extends Composite implements HasHandlers {
 
   public HandlerRegistration addChangeHandler(ChangeHandler handler) {
     return addDomHandler(handler, ChangeEvent.getType());
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, RemovableRelation> {
   }
 }

@@ -130,6 +130,12 @@ public class GenericDataForm<T> extends Composite implements GenericDataPanel<T>
     return searchField;
   }
 
+  public void addSeparator(String labelText) {
+    Label separatorLabel = new Label(labelText);
+    separatorLabel.addStyleName("form-separator");
+    fieldsContainer.add(separatorLabel);
+  }
+
   // --- TEXT FIELDS & TEXT AREAS ---
 
   public FlowPanel addTextField(String labelText, Function<T, String> getter, BiConsumer<T, String> setter,
@@ -287,6 +293,23 @@ public class GenericDataForm<T> extends Composite implements GenericDataPanel<T>
     return searchField;
   }
 
+  public FlowPanel addTagField(String labelText, TagInputWidget widget, Function<T, List<String>> getter,
+    BiConsumer<T, List<String>> setter, boolean mandatory) {
+
+    // Re-use your existing container logic
+    FlowPanel searchField = createFieldContainer(labelText, mandatory);
+    FlowPanel inputPanel = (FlowPanel) ((FlowPanel) searchField.getWidget(0)).getWidget(1);
+
+    inputPanel.add(widget);
+    fieldsContainer.add(searchField);
+
+    // Listen for changes (Tagify fires standard change events on the base input)
+    widget.addChangeHandler(event -> onChange());
+
+    bindings.add(new TagInputBinding(labelText, searchField, widget, getter, setter, mandatory));
+    return searchField;
+  }
+
   private FlowPanel createFieldContainer(String labelText, boolean mandatory) {
     FlowPanel searchField = new FlowPanel();
     searchField.addStyleName("generic-form-field");
@@ -344,6 +367,65 @@ public class GenericDataForm<T> extends Composite implements GenericDataPanel<T>
     boolean validate();
 
     String getRegexErrorMessage();
+  }
+
+  private class TagInputBinding implements FormBinding<T> {
+    private final String labelText;
+    private final FlowPanel container;
+    private final TagInputWidget widget;
+    private final Function<T, List<String>> getter;
+    private final BiConsumer<T, List<String>> setter;
+    private final boolean mandatory;
+
+    TagInputBinding(String labelText, FlowPanel container, TagInputWidget widget,
+                    Function<T, List<String>> getter, BiConsumer<T, List<String>> setter, boolean mandatory) {
+      this.labelText = labelText;
+      this.container = container;
+      this.widget = widget;
+      this.getter = getter;
+      this.setter = setter;
+      this.mandatory = mandatory;
+    }
+
+    @Override
+    public String getLabelText() {
+      return labelText;
+    }
+
+    @Override
+    public String getRegexErrorMessage() {
+      return null;
+    }
+
+    @Override
+    public void refreshFromModel(T model) {
+      List<String> value = getter.apply(model);
+      widget.setTags(value);
+    }
+
+    @Override
+    public void flushToModel(T model) {
+      if (!container.isVisible()) {
+        return;
+      }
+      setter.accept(model, widget.getTags());
+    }
+
+    @Override
+    public boolean validate() {
+      if (!container.isVisible()) {
+        return true;
+      }
+
+      List<String> value = widget.getTags();
+      if (mandatory && (value == null || value.isEmpty())) {
+        widget.addStyleName("isWrong");
+        return false;
+      }
+
+      widget.removeStyleName("isWrong");
+      return true;
+    }
   }
 
   private class TextBoxBaseBinding implements FormBinding<T> {

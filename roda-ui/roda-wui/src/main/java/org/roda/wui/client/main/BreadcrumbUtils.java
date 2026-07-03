@@ -67,7 +67,9 @@ import org.roda.wui.client.management.members.EditGroup;
 import org.roda.wui.client.management.members.EditUser;
 import org.roda.wui.client.management.members.MemberManagement;
 import org.roda.wui.client.management.members.ShowMember;
+import org.roda.wui.client.planning.CreateRepresentationInformation;
 import org.roda.wui.client.planning.CreateRisk;
+import org.roda.wui.client.planning.EditRepresentationInformation;
 import org.roda.wui.client.planning.EditRisk;
 import org.roda.wui.client.planning.RepresentationInformationNetwork;
 import org.roda.wui.client.planning.RiskRegister;
@@ -440,9 +442,7 @@ public class BreadcrumbUtils {
   }
 
   public static List<BreadcrumbItem> getRepresentationInformationBreadCrumbs(RepresentationInformation ri) {
-    List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.representationInformationTitle()),
-      messages.representationInformationTitle(), RepresentationInformationNetwork.RESOLVER.getHistoryPath()));
+    List<BreadcrumbItem> ret = getTopRepresentationInformationBreadcrumbs();
 
     if (ri != null) {
       List<String> path = new ArrayList<>(ShowRepresentationInformation.RESOLVER.getHistoryPath());
@@ -450,6 +450,35 @@ public class BreadcrumbUtils {
       String label = ri.getName() != null ? ri.getName() : ri.getId();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getTopRepresentationInformationBreadcrumbs() {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.representationInformationTitle()),
+      messages.representationInformationTitle(), RepresentationInformationNetwork.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getCreateRepresentationInformationBreadcrumbs() {
+    List<BreadcrumbItem> ret = getTopRepresentationInformationBreadcrumbs();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.createRepresentationInformationTitle()),
+      messages.createRepresentationInformationTitle(), CreateRepresentationInformation.RESOLVER.getHistoryPath()));
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getEditRepresentationInformationBreadcrumbs(RepresentationInformation ri) {
+    List<BreadcrumbItem> ret = getRepresentationInformationBreadCrumbs(ri);
+
+    List<String> path = new ArrayList<>(EditRepresentationInformation.RESOLVER.getHistoryPath());
+    path.add(ri.getId());
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.editRepresentationInformationTitle()),
+            messages.editRepresentationInformationTitle(), path));
 
     return ret;
   }
@@ -491,6 +520,7 @@ public class BreadcrumbUtils {
 
     if (preservationEvent != null) {
       List<String> path = new ArrayList<>(ShowPreservationEvent.RESOLVER.getHistoryPath());
+      path.add(preservationEvent.getUUID());
       String label = StringUtils.isNotBlank(preservationEvent.getId()) ? preservationEvent.getId()
         : preservationEvent.getUUID();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));

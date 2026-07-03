@@ -172,8 +172,8 @@ public class DisposalRuleDataPanel extends Composite
     FlowPanel leftPanel = new FlowPanel();
     leftPanel.addStyleName("generic-form-field-left-panel");
 
-    Label childOfLabel = new Label(messages.selectParentTitle() + "*");
-    childOfLabel.addStyleName("form-label");
+    Label childOfLabel = new Label(messages.selectParentTitle());
+    childOfLabel.addStyleName("form-label form-label-mandatory");
 
     FlowPanel inputPanel = new FlowPanel();
     inputPanel.addStyleName("generic-form-field-input-panel full_width");

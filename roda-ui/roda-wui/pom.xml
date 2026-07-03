@@ -575,6 +575,12 @@
             <version>5.5.207</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>yaireo__tagify</artifactId>
+            <version>4.37.1</version>
+        </dependency>
+
         <!-- File upload -->
         <dependency>
             <groupId>org.webjars.bower</groupId>
