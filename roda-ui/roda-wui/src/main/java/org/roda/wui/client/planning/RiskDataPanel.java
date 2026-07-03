@@ -147,7 +147,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   private void addPreMitigationSection(RiskMitigationProperties properties) {
-    addSectionTitle(messages.riskPreMitigation());
+    form.addSeparator(messages.riskPreMitigation());
 
     preMitigationProbability = createMitigationListBox(properties.getProbabilities(), true);
     form.addListBox(messages.riskPreMitigationProbability(), preMitigationProbability,
@@ -169,7 +169,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   private void addPostMitigationSection(RiskMitigationProperties properties) {
-    addSectionTitle(messages.riskPostMitigation());
+    form.addSeparator(messages.riskPostMitigation());
 
     postMitigationProbability = createMitigationListBox(properties.getProbabilities(), true);
     form.addListBox(messages.riskPostMitigationProbability(), postMitigationProbability,
@@ -192,7 +192,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   private void addMitigationSection() {
-    addSectionTitle(messages.riskMitigation());
+    form.addSeparator(messages.riskMitigation());
 
     form.addTextArea(messages.riskMitigationStrategy(), Risk::getMitigationStrategy, Risk::setMitigationStrategy,
       false);
@@ -227,7 +227,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   /**
-   *  user data panel has been changed
+   * user data panel has been changed
    *
    * @return changed
    */
@@ -296,12 +296,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     }
 
     return risk;
-  }
-
-  private void addSectionTitle(String text) {
-    Label label = new Label(text);
-    label.addStyleName("h4");
-    form.addCustomWidget(label);
   }
 
   private ListBox createMitigationListBox(List<String> values, boolean probability) {

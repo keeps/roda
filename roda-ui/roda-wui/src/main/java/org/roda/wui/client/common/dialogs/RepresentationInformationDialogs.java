@@ -15,6 +15,8 @@ import java.util.Map.Entry;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
+import org.roda.core.data.v2.index.filter.AllFilterParameter;
+import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
@@ -544,6 +546,9 @@ public class RepresentationInformationDialogs {
                 @Override
                 public void onClick(ClickEvent event) {
                   Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, ri.getId()));
+                  if (ri.getId() == null) {
+                    filter = new Filter(new AllFilterParameter());
+                  }
                   SelectRepresentationInformationDialog selectDialog = new SelectRepresentationInformationDialog(
                     messages.chooseEntityTitle(), filter, false);
                   selectDialog.setSingleSelectionMode();
@@ -777,6 +782,9 @@ public class RepresentationInformationDialogs {
         }
 
         Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, aipsAlreadyLinked));
+        if (aipsAlreadyLinked.isEmpty()) {
+          filter = new Filter(new AllFilterParameter());
+        }
         SelectAipDialog selectAipDialog = new SelectAipDialog(messages.chooseEntityTitle(), filter, false, false);
         selectAipDialog.setSingleSelectionMode();
         selectAipDialog.showAndCenter();

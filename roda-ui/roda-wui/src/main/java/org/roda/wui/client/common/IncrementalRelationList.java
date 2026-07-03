@@ -86,7 +86,7 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
   private void addRelation(final RepresentationInformationRelation element, final boolean redesign) {
 
     final RemovableRelation relation = new RemovableRelation(element);
-    String relationType = element.getRelationTypeI18n();
+    String relationType = element.getRelationType();
 
     if (relations.containsKey(relationType)) {
       relations.get(relationType).add(relation);
@@ -125,7 +125,7 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
         FlowPanel leftPanel = new FlowPanel();
         leftPanel.addStyleName("generic-form-field-left-panel");
 
-        Label typeLabel = new Label(entry.getKey());
+        Label typeLabel = new Label(messages.representationInformationRelationTypeValue(entry.getKey()));
         typeLabel.addStyleName("form-label");
 
         FlowPanel inputPanel = new FlowPanel();

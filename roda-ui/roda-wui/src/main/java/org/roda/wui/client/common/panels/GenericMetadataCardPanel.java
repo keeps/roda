@@ -177,8 +177,11 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
     /**
      * Builds a field where the value is styled as a badge.
      *
-     * @param value         The text value to display inside the badge.
-     * @param badgeCssClass The CSS class for the badge style (e.g., "badge-success" or BADGE_TYPE.SUCCESS.getCssClass()).
+     * @param value
+     *          The text value to display inside the badge.
+     * @param badgeCssClass
+     *          The CSS class for the badge style (e.g., "badge-success" or
+     *          BADGE_TYPE.SUCCESS.getCssClass()).
      */
     public FieldBuilder withBadge(String value, String badgeCssClass) {
       if (value == null || value.trim().isEmpty()) {
@@ -187,7 +190,8 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
 
       SafeHtmlBuilder sb = new SafeHtmlBuilder();
 
-      // Use fromTrustedString for the opening tag so we can dynamically inject the CSS class
+      // Use fromTrustedString for the opening tag so we can dynamically inject the
+      // CSS class
       sb.append(SafeHtmlUtils.fromTrustedString("<span class=\"" + badgeCssClass + "\">"));
 
       // Automatically HTML-escape the user-provided value
@@ -227,8 +231,8 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
     }
 
     /**
-     * Builds a generic multiline container from a list of SafeHtml,
-     * wrapping each value in a span element.
+     * Builds a generic multiline container from a list of SafeHtml, wrapping each
+     * value in a span element.
      */
     public FieldBuilder withMultilineHtml(Iterable<SafeHtml> values) {
       if (values == null) {
@@ -251,6 +255,33 @@ public abstract class GenericMetadataCardPanel<T> extends Composite {
 
       if (hasElements) {
         this.htmlValue = sb.toSafeHtml();
+      }
+
+      return this;
+    }
+
+    public FieldBuilder withMultilineWidgets(Iterable<Widget> widgets) {
+      if (widgets == null) {
+        return this;
+      }
+
+      // FlowPanel renders as a standard <div>
+      FlowPanel container = new FlowPanel();
+      container.addStyleName("generic-multiline");
+
+      boolean hasElements = false;
+
+      for (Widget widget : widgets) {
+        if (widget != null) {
+          // In GWT, adding to a FlowPanel automatically appends it to the DOM tree
+          container.add(widget);
+          hasElements = true;
+        }
+      }
+
+      if (hasElements) {
+        // Use the withWidget method that was referenced in your commented-out code
+        this.withWidget(container);
       }
 
       return this;

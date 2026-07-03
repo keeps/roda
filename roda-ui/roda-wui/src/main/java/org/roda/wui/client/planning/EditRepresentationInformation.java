@@ -7,34 +7,27 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.Collections;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.generics.select.SelectedItemsListRequest;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationCreateRequest;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoActionsToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -79,102 +72,71 @@ public class EditRepresentationInformation extends Composite {
       return "edit_representation_information";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, EditRepresentationInformation> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private RepresentationInformation ri;
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private final RepresentationInformation ri;
+  // Modern layout components to match CreateRepresentationInformation
   @UiField
-  Button buttonApply;
-
+  FocusPanel keyboardFocus;
   @UiField
-  Button buttonRemove;
-
+  NavigationToolbar<RepresentationInformation> navigationToolbar;
   @UiField
-  Button buttonCancel;
-
-  @UiField(provided = true)
-  RepresentationInformationDataPanel representationInformationDataPanel;
+  NoActionsToolbar actionsToolbar;
+  @UiField
+  TitlePanel title;
+  @UiField
+  FlowPanel representationInformationDataPanel;
 
   public EditRepresentationInformation(RepresentationInformation ri) {
     this.ri = ri;
-    this.representationInformationDataPanel = new RepresentationInformationDataPanel(true, true, ri);
     initWidget(uiBinder.createAndBindUi(this));
-  }
 
-  @UiHandler("buttonApply")
-  void buttonApplyHandler(ClickEvent e) {
-    if (representationInformationDataPanel.isChanged() && representationInformationDataPanel.isValid()) {
-      String formatId = ri.getId();
-      ri = representationInformationDataPanel.getRepresentationInformation();
-      ri.setId(formatId);
-      Services services = new Services("Update representation information", "update");
-      RepresentationInformationCreateRequest updateRequest = new RepresentationInformationCreateRequest();
-      updateRequest.setRepresentationInformation(ri);
-      updateRequest.setForm(representationInformationDataPanel.getCustomForm());
-      services.representationInformationResource(s -> s.updateRepresentationInformation(updateRequest))
-        .whenComplete((representationInformation, throwable) -> {
-          if (throwable == null) {
-            HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, representationInformation.getId());
-          }
-        });
-    } else {
-      HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, ri.getId());
-    }
-  }
+    RepresentationInformationDataPanel dataPanel = new RepresentationInformationDataPanel(true, ri);
+    representationInformationDataPanel.add(dataPanel);
 
-  @UiHandler("buttonRemove")
-  void buttonRemoveHandler(ClickEvent e) {
-    Services services = new Services("Delete representation information", "delete");
-    services
-      .representationInformationResource(s -> s
-        .deleteMultipleRepresentationInformation(new SelectedItemsListRequest(Collections.singletonList(ri.getUUID()))))
-      .whenComplete((job, throwable) -> {
-        if (throwable == null) {
-          Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+    dataPanel.setSaveHandler(() -> {
+      if (dataPanel.isChanged()) {
+        String formatId = ri.getId();
+        RepresentationInformation updatedRi = dataPanel.getRepresentationInformation();
+        updatedRi.setId(formatId);
 
-            @Override
-            public void onFailure(Throwable caught) {
-              Timer timer = new Timer() {
-                @Override
-                public void run() {
-                  HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER);
-                }
-              };
+        Services services = new Services("Update representation information", "update");
+        RepresentationInformationCreateRequest updateRequest = new RepresentationInformationCreateRequest();
+        updateRequest.setRepresentationInformation(updatedRi);
+        updateRequest.setForm(dataPanel.getCustomForm());
 
-              timer.schedule(RodaConstants.ACTION_TIMEOUT);
-            }
-
-            @Override
-            public void onSuccess(final Void nothing) {
-              HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+        services.representationInformationResource(s -> s.updateRepresentationInformation(updateRequest))
+          .whenComplete((representationInformation, throwable) -> {
+            if (throwable == null) {
+              HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, representationInformation.getId());
             }
           });
-        } else {
-          HistoryUtils.newHistory(InternalProcess.RESOLVER);
-        }
-      });
-  }
+      } else {
+        cancel();
+      }
+    });
 
-  @UiHandler("buttonCancel")
-  void buttonCancelHandler(ClickEvent e) {
-    cancel();
+    dataPanel.setCancelHandler(this::cancel);
+
+    navigationToolbar.withoutButtons().build();
+
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getEditRepresentationInformationBreadcrumbs(ri));
+
+    actionsToolbar.setLabel(messages.editRepresentationInformationTitle()); // Or equivalent edit message
+    actionsToolbar.build();
+
+    title.setText(messages.editRepresentationInformationTitle());
+    title.setIconClass("RepresentationInformation");
+    title.addStyleName("mb-16");
+
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse");
   }
 
   private void cancel() {
     HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, ri.getId());
   }
 
-  private void errorMessage(Throwable caught) {
-    if (caught instanceof NotFoundException) {
-      Toast.showError(messages.editRepresentationInformationNotFound(ri.getName()));
-      cancel();
-    } else {
-      AsyncCallbackUtils.defaultFailureTreatment(caught);
-    }
+  interface MyUiBinder extends UiBinder<Widget, EditRepresentationInformation> {
   }
 }

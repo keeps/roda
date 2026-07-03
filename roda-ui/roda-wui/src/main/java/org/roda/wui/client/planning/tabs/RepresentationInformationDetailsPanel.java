@@ -29,6 +29,9 @@ import org.roda.wui.common.client.tools.StringUtils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -135,13 +138,18 @@ public class RepresentationInformationDetailsPanel extends GenericMetadataCardPa
     }
 
     ri.getRelations().sort(Comparator.comparingInt(o -> o.getObjectType().getWeight()));
-    for (RepresentationInformationRelation relation : ri.getRelations()) {
-      Widget relationValue = createRelationViewer(relation);
-      if (relationValue != null) {
-        relationValue.addStyleName("ri-links-panel");
-        buildField(relation.getRelationTypeI18n()).withWidget(relationValue).build();
-      }
-    }
+
+    Map<String, List<RepresentationInformationRelation>> relationGrouped = ri.getRelations().stream()
+      .collect(Collectors.groupingBy(RepresentationInformationRelation::getRelationTypeI18n));
+
+    relationGrouped.forEach((key, value) -> {
+      // Map each relation to its corresponding Widget (Anchor or Label)
+      List<Widget> widgets = value.stream().map(this::createRelationViewer).filter(Objects::nonNull)
+        .collect(Collectors.toList());
+
+      // Pass the list of widgets to your new builder method
+      buildField(key).withMultilineWidgets(widgets).build();
+    });
   }
 
   private Widget createRelationViewer(RepresentationInformationRelation relation) {
@@ -154,15 +162,15 @@ public class RepresentationInformationDetailsPanel extends GenericMetadataCardPa
       Anchor anchor = null;
 
       if (relation.getObjectType().equals(RelationObjectType.AIP)) {
-        anchor = new Anchor(title,
+        anchor = new Anchor(title + " (" + messages.intellectualEntity() + ")",
           HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(relation.getLink())));
       } else if (relation.getObjectType().equals(RelationObjectType.REPRESENTATION_INFORMATION)) {
-        List<String> history = new ArrayList<>();
-        history.addAll(ShowRepresentationInformation.RESOLVER.getHistoryPath());
+        List<String> history = new ArrayList<>(ShowRepresentationInformation.RESOLVER.getHistoryPath());
         history.add(relation.getLink());
-        anchor = new Anchor(title, HistoryUtils.createHistoryHashLink(history));
+        anchor = new Anchor(title + " (" + messages.representationInformationTitle() + ")",
+          HistoryUtils.createHistoryHashLink(history));
       } else if (relation.getObjectType().equals(RelationObjectType.WEB)) {
-        anchor = new Anchor(title, relation.getLink());
+        anchor = new Anchor(title + " (External link)", relation.getLink());
         anchor.getElement().setAttribute("target", "_blank");
       }
 

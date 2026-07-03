@@ -347,7 +347,7 @@ public class FormUtilities {
     // Field
     final ListBox mvList = new ListBox();
     mvList.setTitle(mvLabel.getText());
-    mvList.addStyleName("form-textbox");
+    mvList.addStyleName("form-listbox");
 
     String options = mv.get("options");
     JSONArray optionsArray = null;
