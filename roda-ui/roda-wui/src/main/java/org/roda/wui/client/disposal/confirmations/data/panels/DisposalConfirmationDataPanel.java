@@ -41,6 +41,7 @@ public class DisposalConfirmationDataPanel extends Composite
     form.addTextField(messages.disposalHoldTitle(), DisposalConfirmation::getTitle, DisposalConfirmation::setTitle,
       true);
 
+    extraFieldsPanel.getElement().getStyle().setProperty("display", "contents");
     form.addCustomWidget(extraFieldsPanel);
 
     // 1. Initialize Buttons
