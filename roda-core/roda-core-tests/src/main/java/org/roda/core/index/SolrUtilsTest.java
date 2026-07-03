@@ -26,8 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrQuery.SortClause;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.hamcrest.Matchers;
@@ -267,7 +266,7 @@ public class SolrUtilsTest {
   @Test
   public void testParseSorter() {
     Sorter sorter = null;
-    List<SortClause> sortList;
+    List<SolrQuery.SortClause> sortList;
     String field1 = "field1";
     String field2 = "field2";
     boolean descending = true;
@@ -291,7 +290,7 @@ public class SolrUtilsTest {
     assertNotNull(sortList);
     assertThat(sortList, Matchers.hasSize(1));
     assertThat(sortList.get(0).getItem(), Matchers.equalTo(field1));
-    assertThat(sortList.get(0).getOrder(), Matchers.equalTo(ORDER.desc));
+    assertThat(sortList.get(0).getOrder(), Matchers.equalTo(SolrQuery.ORDER.desc));
 
     // 4) sorter with 2 sorter parameters
     sorter = new Sorter();
@@ -301,9 +300,9 @@ public class SolrUtilsTest {
     assertNotNull(sortList);
     assertThat(sortList, Matchers.hasSize(2));
     assertThat(sortList.get(0).getItem(), Matchers.equalTo(field1));
-    assertThat(sortList.get(0).getOrder(), Matchers.equalTo(ORDER.desc));
+    assertThat(sortList.get(0).getOrder(), Matchers.equalTo(SolrQuery.ORDER.desc));
     assertThat(sortList.get(1).getItem(), Matchers.equalTo(field2));
-    assertThat(sortList.get(1).getOrder(), Matchers.equalTo(ORDER.asc));
+    assertThat(sortList.get(1).getOrder(), Matchers.equalTo(SolrQuery.ORDER.asc));
   }
 
   @Test

@@ -55,7 +55,7 @@ public class TestContainersManager {
     network = Network.newNetwork();
 
     // ZooKeeper — exposed so that the RODA CloudSolrClient can connect
-    zookeeper = new GenericContainer<>(DockerImageName.parse("zookeeper:3.9.1-jre-17")).withNetwork(network)
+    zookeeper = new GenericContainer<>(DockerImageName.parse("zookeeper:3.9.5-jre-17")).withNetwork(network)
       .withNetworkAliases("zookeeper").withExposedPorts(2181)
       .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(60)));
     zookeeper.start();
@@ -74,11 +74,11 @@ public class TestContainersManager {
     // concurrently
     int externalSolrPort = findFreePort();
 
-    solr = new GenericContainer<>(DockerImageName.parse("solr:9")).withNetwork(network)
+    solr = new GenericContainer<>(DockerImageName.parse("solr:10.0.0")).withNetwork(network)
             .withExposedPorts(externalSolrPort) // <--- Tell Testcontainers to expect the dynamic port
             .withEnv("ZK_HOST", "zookeeper:2181")
             .withEnv("SOLR_HOST", dockerHostIp)
-            .withEnv("SOLR_PORT", String.valueOf(externalSolrPort)); // Solr binds to this port internally
+            .withEnv("SOLR_PORT_LISTEN", String.valueOf(externalSolrPort)); // Solr binds to this port internally
     // Map the Host port directly to the SAME Container port (e.g. 33841:33841)
     solr.setPortBindings(Collections.singletonList(externalSolrPort + ":" + externalSolrPort));
     // Wait strategy must also ping the new dynamic port

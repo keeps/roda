@@ -120,7 +120,7 @@
         <cas.client.version>4.1.0</cas.client.version>
         <swagger.version>2.2.41</swagger.version>
         <spring.version>7.0.7</spring.version>
-        <solr.version>9.10.0</solr.version>
+        <solr.version>10.0.0</solr.version>
         <pekko.version>1.4.0</pekko.version>
         <httpcomponents.version>5.5</httpcomponents.version>
         <commons_ip2.version>2.11.2</commons_ip2.version>
@@ -458,22 +458,22 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-client</artifactId>
-                <version>10.0.19</version>
+                <version>12.1.10</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-http</artifactId>
-                <version>10.0.19</version>
+                <version>12.1.10</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
-                <version>10.0.19</version>
+                <version>12.1.10</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-io</artifactId>
-                <version>10.0.19</version>
+                <version>12.1.10</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
