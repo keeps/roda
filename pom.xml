@@ -122,7 +122,7 @@
         <testng.groups>all</testng.groups>
         <springboot.version>3.5.14</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
-        <logback.version>1.5.25</logback.version>
+        <logback.version>1.5.33</logback.version>
         <mockito.version>5.18.0</mockito.version>
     </properties>
     <profiles>
