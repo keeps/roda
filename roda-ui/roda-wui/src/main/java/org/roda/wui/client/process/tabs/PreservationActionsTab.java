@@ -8,6 +8,7 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.ui.TextBox;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.jobs.Certificate;
@@ -135,25 +136,27 @@ public class PreservationActionsTab extends Composite {
     rightGroup.addStyleName("input-group");
     Label rightLabel = new Label(messages.search());
     rightLabel.addStyleName("label");
-    TextBox textBox = new TextBox();
-    textBox.addStyleName("form-textbox");
+    TextBox searchTextBox = new TextBox();
+    searchTextBox.addStyleName("form-textbox");
     rightGroup.add(rightLabel);
-    rightGroup.add(textBox);
+    rightGroup.add(searchTextBox);
 
     // Attach handlers for BOTH inputs so they work together
-    comboBox.addChangeHandler(event -> buildPluginDetailsArea(comboBox.getSelectedValue(), textBox.getText(), pluginInfos));
+    comboBox.addChangeHandler(event -> buildPluginDetailsArea(comboBox.getSelectedValue(), searchTextBox.getText(), pluginInfos));
 
     // Use KeyUpHandler for real-time filtering as the user types
-    textBox.addKeyUpHandler(event -> buildPluginDetailsArea(comboBox.getSelectedValue(), textBox.getText(), pluginInfos));
+    searchTextBox.addKeyUpHandler(event -> buildPluginDetailsArea(comboBox.getSelectedValue(), searchTextBox.getText(), pluginInfos));
 
     // Fire for the first element
     if (comboBox.getItemCount() > 0) {
       comboBox.setSelectedIndex(0);
-      buildPluginDetailsArea(comboBox.getSelectedValue(), textBox.getText(), pluginInfos);
+      buildPluginDetailsArea(comboBox.getSelectedValue(), searchTextBox.getText(), pluginInfos);
     }
 
     mainContainer.add(leftGroup);
     mainContainer.add(rightGroup);
+
+    Scheduler.get().scheduleDeferred(() -> searchTextBox.setFocus(true));
 
     return mainContainer;
   }
