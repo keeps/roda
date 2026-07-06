@@ -340,7 +340,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
   @Override
   public String getPreservationEventDescription() {
-    return getDescription();
+    return "Associates risk to an object";
   }
 
   @Override

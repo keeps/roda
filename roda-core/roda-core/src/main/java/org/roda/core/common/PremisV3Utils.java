@@ -860,7 +860,10 @@ public final class PremisV3Utils {
     String id = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
       RODAInstanceUtils.getLocalInstanceIdentifier());
 
-    Messages messages = RodaCoreFactory.getI18NMessages(Locale.ENGLISH);
+    String serverLanguage = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.language.default", "en");
+    Locale locale = Locale.forLanguageTag(serverLanguage);
+
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
     ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, messages.getTranslation(plugin.getName(), plugin.getName()), plugin.getAgentType(), "",
             messages.getTranslation(plugin.getDescription(), plugin.getDescription()), plugin.getVersion());
     return model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
