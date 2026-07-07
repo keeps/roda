@@ -750,7 +750,7 @@ pre code {
 }
 
 .success:before {
-    content: '\f00c';
+    content: '\e5ca';
     @mixin fontawesome();
 
     padding-left: 5px;
@@ -5924,8 +5924,15 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 16px;
     font-weight: bold;
     color: #7f858a;
-    border: 5px dashed #e6e7e9;
-    border-radius: 10px;
+    background-color: #fcfcfd; /* Optional: adds a subtle background */
+    border: 3px dashed #c2c6ca; /* Slightly thinner, more refined dashes */
+    border-radius: 24px; /* Much more rounded corners */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+#drop:hover {
+    border-color: #7f858a;
+    background-color: #f3f4f6;
 }
 
 #drop h4 {
@@ -5944,7 +5951,7 @@ td.datePickerMonth, td.datePickerYear {
     padding: 10px 20px;
     color: #fff;
     font-size: 1.2rem;
-    border-radius: 2px;
+    border-radius: 4px;
     cursor: pointer;
     display: block;
     margin: 10px auto 0;

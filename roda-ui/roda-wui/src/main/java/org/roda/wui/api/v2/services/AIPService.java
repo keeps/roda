@@ -240,6 +240,16 @@ public class AIPService {
     return new DescriptiveMetadataInfos();
   }
 
+  public DescriptiveMetadataInfos retrieveRepresentationDescriptiveMetadataList(RequestContext context, String aipId, String representationId,
+                                                                  final Locale locale)
+          throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    if (UserUtility.hasPermissions(context.getUser(), RodaConstants.PERMISSION_METHOD_LIST_AIP_DESCRIPTIVE_METADATA)) {
+      return retrieveDescriptiveMetadataInfos(context.getModelService(), aipId, representationId, locale);
+
+    }
+    return new DescriptiveMetadataInfos();
+  }
+
   private DescriptiveMetadataInfos retrieveDescriptiveMetadataInfos(ModelService model, String aipId,
     String representationId, final Locale locale)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
@@ -297,6 +307,8 @@ public class AIPService {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     DescriptiveMetadataInfo metadataInfo = new DescriptiveMetadataInfo();
     metadataInfo.setId(descriptiveMetadata.getId());
+    metadataInfo.setType(descriptiveMetadata.getType());
+    metadataInfo.setVersion(descriptiveMetadata.getVersion());
 
     if (descriptiveMetadata.getType() != null) {
       try {
@@ -518,14 +530,14 @@ public class AIPService {
       }
       String label = messages.getTranslation(key, type);
 
-      supportedMetadata.addObject(new ConfiguredDescriptiveMetadata(label, id));
+      supportedMetadata.addObject(new ConfiguredDescriptiveMetadata(label, id, type, version));
     }
 
     return supportedMetadata;
   }
 
   public SupportedMetadataValue retrieveSupportedMetadata(RequestContext context, IndexedAIP aip,
-    IndexedRepresentation representation, String descriptiveMetadataId, Locale locale)
+    IndexedRepresentation representation, String descriptiveMetadataFile, String descriptiveMetadataId, Locale locale)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
 
@@ -540,11 +552,11 @@ public class AIPService {
       }
 
       if (checkIfDescriptiveMetadataExists(context.getModelService(), aip, representation,
-        descriptiveMetadataId + XML_EXT)) {
+              descriptiveMetadataFile)) {
         template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         String representationId = representation != null ? representation.getId() : null;
         Binary binary = context.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), representationId,
-          descriptiveMetadataId + XML_EXT);
+                descriptiveMetadataFile);
         String xml = IOUtils.toString(binary.getContent().createInputStream(), StandardCharsets.UTF_8);
 
         Set<MetadataValue> result = getMetadataValuesFromDescriptiveMetadataFile(template, xml);

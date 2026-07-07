@@ -3,12 +3,16 @@ package org.roda.wui.client.browse;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import com.google.gwt.user.client.ui.TextBox;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadataList;
 import org.roda.core.data.v2.ip.metadata.CreateDescriptiveMetadataRequest;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreviewRequest;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataRequestForm;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataRequestXML;
@@ -51,8 +55,9 @@ public class DescriptiveMetadataPanel extends Composite {
   private final boolean editMode;
 
   private final GenericDataForm<DescriptiveMetadata> form;
-
-  private Label filenameValue;
+  private final DescriptiveMetadataInfos descriptiveMetadataInfos;
+  private TextBox filenameTextBox;
+  private Label filenameLabel;
   private ListBox type;
   private HTML idError;
   private Label formSimilarDanger;
@@ -60,24 +65,25 @@ public class DescriptiveMetadataPanel extends Composite {
   private FlowPanel actionsPanel;
   private Button saveButton;
   private Button cancelButton;
-
   private SimplePanel tabsContainer;
-
   private Set<MetadataValue> values;
   private String metadataId;
   private boolean inXML = false;
   private boolean isSimilar = true;
   private TextArea metadataXML;
   private String metadataTextFromForm;
+  private ConfiguredDescriptiveMetadataList supportedDescriptiveMetadataList;
 
   public DescriptiveMetadataPanel(String aipId, String representationId, String filename,
-    SupportedMetadataValue initialValues, Permissions permissions, boolean editMode) {
+    SupportedMetadataValue initialValues, Permissions permissions, boolean editMode,
+    DescriptiveMetadataInfos descriptiveMetadataInfos) {
     this.aipId = aipId;
     this.representationId = representationId;
     this.filename = filename;
     this.permissions = permissions;
     this.editMode = editMode;
     this.form = new GenericDataForm<>();
+    this.descriptiveMetadataInfos = descriptiveMetadataInfos;
 
     this.metadataId = editMode && filename != null ? filename.replace(".xml", "") : null;
     this.values = initialValues != null ? initialValues.getValue() : null;
@@ -89,8 +95,6 @@ public class DescriptiveMetadataPanel extends Composite {
   }
 
   private void buildFields() {
-    filenameValue = new Label();
-    filenameValue.addStyleName("form-readonly-value");
     form.addCustomWidget(createFilenameField());
 
     type = new ListBox();
@@ -148,7 +152,16 @@ public class DescriptiveMetadataPanel extends Composite {
 
     FlowPanel inputPanel = new FlowPanel();
     inputPanel.addStyleName("generic-form-field-input-panel full_width");
-    inputPanel.add(filenameValue);
+
+    if (editMode) {
+      filenameLabel = new Label();
+      filenameLabel.addStyleName("form-readonly-value");
+      inputPanel.add(filenameLabel);
+    } else {
+      filenameTextBox = new TextBox();
+      filenameTextBox.addStyleName("form-textbox");
+      inputPanel.add(filenameTextBox);
+    }
 
     leftPanel.add(label);
     leftPanel.add(inputPanel);
@@ -193,8 +206,13 @@ public class DescriptiveMetadataPanel extends Composite {
   }
 
   public boolean isValid() {
-    return form.isValid() && StringUtils.isNotBlank(getSelectedTypeValue())
-      && StringUtils.isNotBlank(filenameValue.getText()) && filenameValue.getText().endsWith(".xml");
+    if (editMode) {
+      return form.isValid() && StringUtils.isNotBlank(getSelectedTypeValue())
+        && StringUtils.isNotBlank(filenameLabel.getText()) && filenameLabel.getText().endsWith(".xml");
+    } else {
+      return form.isValid() && StringUtils.isNotBlank(getSelectedTypeValue())
+        && StringUtils.isNotBlank(filenameTextBox.getText()) && filenameTextBox.getText().endsWith(".xml");
+    }
   }
 
   private String getSelectedTypeValue() {
@@ -250,23 +268,30 @@ public class DescriptiveMetadataPanel extends Composite {
         if (error != null) {
           AsyncCallbackUtils.defaultFailureTreatment(error);
         } else {
+          supportedDescriptiveMetadataList = value;
           for (ConfiguredDescriptiveMetadata sm : value.getList()) {
             type.addItem(sm.getLabel(), sm.getId());
           }
           type.addItem(messages.otherItem(), "Other");
 
           if (editMode) {
-            IntStream.range(0, type.getItemCount()).filter(i -> type.getValue(i).equals(metadataId)).findFirst()
-              .ifPresent(i -> type.setSelectedIndex(i));
+            DescriptiveMetadataInfo metadataInfo = descriptiveMetadataInfos.getDescriptiveMetadataInfoList().stream()
+              .filter(info -> info.getId().equals(filename)).findFirst().orElse(null);
+            String id = metadataInfo.getVersion() != null ? metadataInfo.getType().toLowerCase() + "_" + metadataInfo.getVersion()
+              : metadataInfo.getType();
 
-            filenameValue.setText(filename);
+            int targetIndex = IntStream.range(0, type.getItemCount()).filter(i -> type.getValue(i).equals(id))
+              .findFirst().orElse(type.getItemCount() - 1);
+
+            filenameLabel.setText(filename);
             form.setModel(createModel());
+            type.setSelectedIndex(targetIndex);
             updateFormOrXML();
           } else {
             type.setSelectedIndex(0);
 
             String selectedType = type.getSelectedValue();
-            filenameValue
+            filenameTextBox
               .setText(StringUtils.isNotBlank(selectedType) ? selectedType + RodaConstants.PREMIS_SUFFIX : "");
 
             form.setModel(createModel());
@@ -310,7 +335,7 @@ public class DescriptiveMetadataPanel extends Composite {
     }
 
     if (!editMode) {
-      filenameValue.setText(StringUtils.isNotBlank(selectedType) ? selectedType + RodaConstants.PREMIS_SUFFIX : "");
+      filenameTextBox.setText(StringUtils.isNotBlank(selectedType) ? selectedType + RodaConstants.PREMIS_SUFFIX : "");
     }
   }
 
@@ -339,14 +364,14 @@ public class DescriptiveMetadataPanel extends Composite {
     formSimilarDanger.setVisible(editMode && !isSimilar);
     tabsContainer.clear();
 
+    DescriptiveMetadataTabs tabs = new DescriptiveMetadataTabs();
     if (values != null && !values.isEmpty()) {
-      DescriptiveMetadataTabs tabs = new DescriptiveMetadataTabs();
-      tabs.init(() -> createFormWidget(), () -> createXmlWidget());
+      tabs.init(this::createFormWidget, this::createXmlWidget);
 
-      tabsContainer.setWidget(tabs);
     } else {
-      tabsContainer.setWidget(createXmlWidget());
+      tabs.init(this::createXmlWidget);
     }
+    tabsContainer.setWidget(tabs);
   }
 
   private Widget createFormWidget() {
@@ -387,29 +412,47 @@ public class DescriptiveMetadataPanel extends Composite {
 
   private void retrievePreview(AsyncCallback<String> callback) {
     Services service = new Services("Preview descriptive metadata", "get");
-    DescriptiveMetadataPreviewRequest previewRequest = new DescriptiveMetadataPreviewRequest(type.getSelectedValue(),
+
+    String descriptiveMetadataId = supportedDescriptiveMetadataList.getList().stream()
+      .filter(p -> p.getId().equals(type.getSelectedValue())).findFirst().map(ConfiguredDescriptiveMetadata::getId)
+      .orElse(metadataId);
+
+    DescriptiveMetadataPreviewRequest previewRequest = new DescriptiveMetadataPreviewRequest(descriptiveMetadataId,
       values);
 
-    service.aipResource(s -> s.retrieveDescriptiveMetadataPreview(aipId, previewRequest))
-      .whenComplete((value, error) -> {
-        if (error != null) {
-          callback.onFailure(error);
-        } else {
-          callback.onSuccess(value.getPreview());
-        }
-      });
+    if (representationId != null) {
+      service
+        .aipResource(s -> s.retrieveRepresentationDescriptiveMetadataPreview(aipId, representationId, previewRequest))
+        .whenComplete((value, error) -> {
+          if (error != null) {
+            callback.onFailure(error);
+          } else {
+            callback.onSuccess(value.getPreview());
+          }
+        });
+    } else {
+
+      service.aipResource(s -> s.retrieveDescriptiveMetadataPreview(aipId, previewRequest))
+        .whenComplete((value, error) -> {
+          if (error != null) {
+            callback.onFailure(error);
+          } else {
+            callback.onSuccess(value.getPreview());
+          }
+        });
+    }
   }
 
   private void getCreateValue(AsyncCallback<CreateDescriptiveMetadataRequest> callback) {
     String idText = type.getSelectedValue();
-    String requestFilename = filenameValue.getText();
+    String requestFilename = filenameTextBox.getText();
     String typeText = getTypeText(idText);
     String typeVersion = getTypeVersion(idText);
     String xmlText = metadataXML.getText();
-    boolean hasOverridenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
+    boolean hasOverriddenTheForm = inXML && !xmlText.equals(metadataTextFromForm);
 
     CreateDescriptiveMetadataRequest request;
-    if (!hasOverridenTheForm && values != null && !values.isEmpty()) {
+    if (!hasOverriddenTheForm && values != null && !values.isEmpty()) {
       request = new DescriptiveMetadataRequestForm(idText, requestFilename, typeText, typeVersion, true, null, values);
     } else {
       request = new DescriptiveMetadataRequestXML(idText, requestFilename, typeText, typeVersion, true, null, xmlText);

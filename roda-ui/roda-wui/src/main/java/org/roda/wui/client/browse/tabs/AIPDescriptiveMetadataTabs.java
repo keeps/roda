@@ -50,7 +50,8 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class AIPDescriptiveMetadataTabs extends Tabs {
 
-  public void init(IndexedAIP aip, DescriptiveMetadataInfos descriptiveMetadataInfos, AsyncCallback<Actionable.ActionImpact> actionCallback) {
+  public void init(IndexedAIP aip, DescriptiveMetadataInfos descriptiveMetadataInfos,
+    AsyncCallback<Actionable.ActionImpact> actionCallback) {
     if (aip.getState().equals(AIPState.INGEST_PROCESSING)) {
       // Content container
       FlowPanel content = new FlowPanel();

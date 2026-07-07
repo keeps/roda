@@ -1457,6 +1457,10 @@ public interface ClientMessages extends Messages {
 
   String descriptiveMetadataPreviewCode();
 
+  String newDescriptiveMetadataInRepresentation(String title);
+
+  String editDescriptiveMetadataInRepresentation(String title);
+
   /***** Representation ****/
 
   String representation();

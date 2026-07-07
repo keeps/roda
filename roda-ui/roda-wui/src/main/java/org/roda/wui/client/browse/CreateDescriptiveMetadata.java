@@ -74,8 +74,8 @@ public class CreateDescriptiveMetadata extends Composite {
             if (throwable != null) {
               callback.onFailure(throwable);
             } else if (isAIP) {
-              boolean isNew = historyTokens.size() == 3 && historyTokens.get(2).equals(NEW);
-              callback.onSuccess(new CreateDescriptiveMetadata(aip, isNew));
+              boolean isTopPath = historyTokens.size() == 3 && historyTokens.get(2).equals(NEW);
+              callback.onSuccess(new CreateDescriptiveMetadata(aip, isTopPath));
             } else {
               final String representationId = historyTokens.get(2);
               boolean isNew = historyTokens.size() == 4 && historyTokens.get(3).equals(NEW);
@@ -100,7 +100,6 @@ public class CreateDescriptiveMetadata extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      // TODO check for edit metadata permission
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseTop.RESOLVER}, false, callback);
     }
 
@@ -118,7 +117,7 @@ public class CreateDescriptiveMetadata extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private final IndexedAIP aip;
   private final IndexedRepresentation representation;
-  private final boolean isNew;
+  private final boolean isTop;
 
   @UiField
   FocusPanel keyboardFocus;
@@ -135,28 +134,28 @@ public class CreateDescriptiveMetadata extends Composite {
     this(aip, null, isNew);
   }
 
-  public CreateDescriptiveMetadata(IndexedAIP aip, IndexedRepresentation representation, boolean isNew) {
+  public CreateDescriptiveMetadata(IndexedAIP aip, IndexedRepresentation representation, boolean isTop) {
     this.aip = aip;
     this.representation = representation;
-    this.isNew = isNew;
+    this.isTop = isTop;
 
     initWidget(uiBinder.createAndBindUi(this));
     navigationToolbar.withoutButtons().build();
 
     if (representation == null) {
-      navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getCreateDescriptiveMetadataBreadcrumbs(aip, isNew));
+      navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getCreateDescriptiveMetadataBreadcrumbs(aip, isTop));
     } else {
       navigationToolbar.updateBreadcrumbPath(
         BreadcrumbUtils.getCreateRepresentationDescriptiveMetadataBreadcrumbs(aip, representation));
     }
 
-    actionsToolbar.setLabel(isNew ? messages.intellectualEntity() : messages.descriptiveMetadataTitle());
+    actionsToolbar.setLabel(isTop ? messages.intellectualEntity() : messages.descriptiveMetadataTitle());
     actionsToolbar.build();
 
-    initTitle(aip, title, isNew);
+    initTitle(aip, representation, title, isTop);
 
     DescriptiveMetadataPanel dataPanel = new DescriptiveMetadataPanel(aip.getId(),
-      representation != null ? representation.getId() : null, null, null, null, false);
+      representation != null ? representation.getId() : null, null, null, null, false, null);
     descriptiveMetadataPanel.add(dataPanel);
 
     dataPanel.setSaveHandler(() -> dataPanel.getValue(new AsyncCallback<CreateDescriptiveMetadataRequest>() {
@@ -178,10 +177,28 @@ public class CreateDescriptiveMetadata extends Composite {
     keyboardFocus.addStyleName("browse");
   }
 
-  protected static void initTitle(IndexedAIP aip, TitlePanel title, boolean isNew) {
+  private void initTitle(IndexedAIP aip, IndexedRepresentation representation, TitlePanel title, boolean isTop) {
     title.addStyleName("mb-16");
 
-    if (isNew) {
+    if (representation == null) {
+      initTitleForAIP(aip, title, isTop);
+    } else {
+      initTitleForRepresentation(representation, title);
+    }
+  }
+
+  private void initTitleForRepresentation(IndexedRepresentation representation, TitlePanel title) {
+    title.setIcon(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
+
+    String representationTitle = representation.getTitle() != null ? representation.getTitle()
+      : representation.getType();
+    representationTitle = representationTitle == null ? representation.getId() : representationTitle;
+
+    title.setText(messages.newDescriptiveMetadataInRepresentation(representationTitle));
+  }
+
+  private void initTitleForAIP(IndexedAIP aip, TitlePanel title, boolean isTop) {
+    if (isTop) {
       title.setIcon(DescriptionLevelUtils.getTopIconSafeHtml());
       title.setText(messages.newArchivalPackage());
       return;
@@ -198,20 +215,6 @@ public class CreateDescriptiveMetadata extends Composite {
     } else {
       title.setText(aip.getId());
     }
-  }
-
-  protected static void initTitle(String aipId, TitlePanel title) {
-    Services service = new Services("Get AIP", "get");
-    service
-      .rodaEntityRestService(s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()), IndexedAIP.class)
-      .whenComplete((aip, error) -> {
-        if (error != null) {
-          AsyncCallbackUtils.defaultFailureTreatment(error);
-        } else {
-          initTitle(aip, title, false);
-          title.addStyleName("mb-16");
-        }
-      });
   }
 
   private void createMetadata(DescriptiveMetadataPanel dataPanel, CreateDescriptiveMetadataRequest request) {
@@ -249,7 +252,7 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   private void cancel() {
-    if (isNew) {
+    if (isTop) {
       if (isAipMetadata()) {
         Services service = new Services("Delete AIP", "deletion");
 

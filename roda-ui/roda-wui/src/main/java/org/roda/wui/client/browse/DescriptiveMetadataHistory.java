@@ -30,6 +30,7 @@ import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
@@ -194,7 +195,7 @@ public class DescriptiveMetadataHistory extends Composite {
     aipLocked = true;
 
     initWidget(uiBinder.createAndBindUi(this));
-    CreateDescriptiveMetadata.initTitle(aip, title, false);
+    initTitle(aip, title);
     title.addStyleName("mb-16");
 
     navigationToolbar.withoutButtons().build();
@@ -306,6 +307,19 @@ public class DescriptiveMetadataHistory extends Composite {
     }
   }
 
+  private void initTitle(IndexedAIP aip, TitlePanel title) {
+    if (aip.getLevel() != null) {
+      title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
+    } else {
+      title.setIcon(DescriptionLevelUtils.getTopIconSafeHtml());
+    }
+
+    if (aip.getTitle() != null) {
+      title.setText(aip.getTitle());
+    } else {
+      title.setText(aip.getId());
+    }
+  }
   private void getDescriptiveMetadata(final String aipId, final String representationId, final String descId,
     final String versionKey, final boolean inHTML, final AsyncCallback<SafeHtml> callback) {
 

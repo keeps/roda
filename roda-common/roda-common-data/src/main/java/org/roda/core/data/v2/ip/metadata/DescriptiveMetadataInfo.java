@@ -22,15 +22,19 @@ public class DescriptiveMetadataInfo implements Serializable {
 
   private String id;
   private String label;
+  private String type;
+  private String version;
   private boolean hasHistory;
 
   public DescriptiveMetadataInfo() {
     // empty constructor
   }
 
-  public DescriptiveMetadataInfo(String id, String label, boolean hasHistory) {
+  public DescriptiveMetadataInfo(String id, String label, String type, String version, boolean hasHistory) {
     this.id = id;
     this.label = label;
+    this.type = type;
+    this.version = version;
     this.hasHistory = hasHistory;
   }
 
@@ -48,6 +52,22 @@ public class DescriptiveMetadataInfo implements Serializable {
 
   public void setLabel(String label) {
     this.label = label;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
   }
 
   public boolean isHasHistory() {

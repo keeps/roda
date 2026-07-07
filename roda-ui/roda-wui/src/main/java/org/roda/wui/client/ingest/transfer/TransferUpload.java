@@ -135,11 +135,6 @@ public class TransferUpload extends Composite {
 
   private boolean isIngest = true;
 
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.TRANSFERRED_RESOURCE_ID, RodaConstants.TRANSFERRED_RESOURCE_ISFILE);
-
-  private HandlerRegistration handlerRegistration;
-
   private static TransferUpload instance = null;
   protected boolean verified = false;
 
