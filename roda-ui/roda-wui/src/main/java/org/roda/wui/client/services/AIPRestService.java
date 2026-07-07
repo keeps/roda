@@ -85,6 +85,17 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
     @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
 
+  @RequestMapping(path = "/{id}/representation/{representation-id}/metadata/descriptive/information", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Get descriptive metadata", description = "Get descriptive metadata related to the representation", responses = {
+          @ApiResponse(responseCode = "200", description = "Information related to Representation descriptive metadata", content = @Content(schema = @Schema(implementation = DescriptiveMetadataInfos.class))),
+          @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+          @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+          @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  DescriptiveMetadataInfos getRepresentationDescriptiveMetadata(
+          @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
+          @Parameter(description = "The representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
+          @Parameter(description = "The language to be used for internationalization") @RequestParam(name = "lang", defaultValue = "en", required = false) String localeString);
+
   @RequestMapping(path = "/{id}/metadata/descriptive", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @Operation(summary = "Creates a descriptive metadata under the AIP", description = "Create AIP descriptive metadata", requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = CreateDescriptiveMetadataRequest.class))), responses = {
@@ -323,6 +334,18 @@ public interface AIPRestService extends RODAEntityRestService<IndexedAIP> {
     @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String aipId,
     @Parameter(description = "The representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
     CreateDescriptiveMetadataRequest content);
+
+  @RequestMapping(path = "{id}/representation/{representation-id}/metadata/descriptive/preview", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Gets a preview of descriptive metadata", description = "Get representation descriptive metadata preview", responses = {
+          @ApiResponse(responseCode = "200", description = "Descriptive metadata preview", content = @Content(schema = @Schema(implementation = DescriptiveMetadataPreview.class))),
+          @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+          @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class))),
+          @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorResponseMessage.class)))})
+  DescriptiveMetadataPreview retrieveRepresentationDescriptiveMetadataPreview(
+          @Parameter(description = "The AIP identifier", required = true) @PathVariable(name = "id") String id,
+          @Parameter(description = "The representation identifier", required = true) @PathVariable(name = "representation-id") String representationId,
+          @Parameter(name = "previewRequest", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) DescriptiveMetadataPreviewRequest previewRequest);
+
 
   @RequestMapping(path = "/permissions/update", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Creates an internal actions to update the permissions of AIP(s)", requestBody = @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UpdatePermissionsRequest.class))), responses = {

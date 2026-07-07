@@ -21,14 +21,18 @@ public class ConfiguredDescriptiveMetadata implements Serializable {
 
   private String label;
   private String id;
+  private String type;
+  private String version;
 
   public ConfiguredDescriptiveMetadata() {
     // do nothing
   }
 
-  public ConfiguredDescriptiveMetadata(String label, String id) {
+  public ConfiguredDescriptiveMetadata(String label, String id, String type, String version) {
     this.label = label;
     this.id = id;
+    this.type = type;
+    this.version = version;
   }
 
   public String getLabel() {
@@ -47,8 +51,25 @@ public class ConfiguredDescriptiveMetadata implements Serializable {
     this.id = id;
   }
 
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
   @Override
   public String toString() {
-    return "SupportedMetadata{" + "label='" + label + '\'' + ", id='" + id + '\'' + '}';
+    return "ConfiguredDescriptiveMetadata{" + "label='" + label + '\'' + ", id='" + id + '\'' + ", type='" + type + '\''
+      + ", version='" + version + '\'' + '}';
   }
 }

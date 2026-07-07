@@ -68,6 +68,8 @@ public class RepresentationService {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     DescriptiveMetadataInfo info = new DescriptiveMetadataInfo();
     info.setId(descriptiveMetadata.getId());
+    info.setType(descriptiveMetadata.getType());
+    info.setVersion(descriptiveMetadata.getVersion());
 
     if (descriptiveMetadata.getType() != null) {
       try {

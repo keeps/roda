@@ -44,6 +44,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.ConfiguredDescriptiveMetadataList;
 import org.roda.core.data.v2.ip.metadata.CreateDescriptiveMetadataRequest;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfo;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreview;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataPreviewRequest;
@@ -662,6 +663,26 @@ public class AIPController implements AIPRestService, Exportable {
   }
 
   @Override
+  public DescriptiveMetadataInfos getRepresentationDescriptiveMetadata(String aipId, String representationId, String localeString) {
+
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<DescriptiveMetadataInfos>() {
+      @Override
+      public DescriptiveMetadataInfos process(RequestContext requestContext,
+                                              RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
+        Locale locale = ServerTools.parseLocale(localeString);
+        controllerAssistant.setRelatedObjectId(aipId);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
+
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+                SelectedItemsList.create(IndexedAIP.class, aipId));
+
+        // delegate
+        return aipService.retrieveRepresentationDescriptiveMetadataList(requestContext, aipId, representationId, locale);
+      }
+    });
+  }
+
+  @Override
   public DescriptiveMetadata createAIPDescriptiveMetadata(String aipId,
     @RequestBody CreateDescriptiveMetadataRequest descriptiveMetadataRequest) {
     return requestHandler.processRequestWithTransaction(new RequestHandler.RequestProcessor<DescriptiveMetadata>() {
@@ -740,8 +761,21 @@ public class AIPController implements AIPRestService, Exportable {
         // check object permissions
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
+        DescriptiveMetadataInfos descriptiveMetadataInfos = aipService.retrieveDescriptiveMetadataList(requestContext,
+          aipId, locale);
+        for (DescriptiveMetadataInfo metadataInfo : descriptiveMetadataInfos.getDescriptiveMetadataInfoList()) {
+          if (metadataInfo.getId().equals(metadataType)) {
+            String metadataId = metadataInfo.getType();
+            if (metadataInfo.getVersion() != null) {
+              metadataId = metadataInfo.getType().toLowerCase() + "_" + metadataInfo.getVersion();
+            }
+
+            return aipService.retrieveSupportedMetadata(requestContext, aip, null, metadataType, metadataId, locale);
+          }
+        }
+
         // delegate
-        return aipService.retrieveSupportedMetadata(requestContext, aip, null, metadataType, locale);
+        return aipService.retrieveSupportedMetadata(requestContext, aip, null, metadataType, metadataType, locale);
       }
     });
   }
@@ -769,8 +803,22 @@ public class AIPController implements AIPRestService, Exportable {
         // check object permissions
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
 
+        DescriptiveMetadataInfos descriptiveMetadataInfos = aipService
+          .retrieveRepresentationDescriptiveMetadataList(requestContext, aipId, representationId, locale);
+        for (DescriptiveMetadataInfo metadataInfo : descriptiveMetadataInfos.getDescriptiveMetadataInfoList()) {
+          if (metadataInfo.getId().equals(metadataType)) {
+            String metadataId = metadataInfo.getType();
+            if (metadataInfo.getVersion() != null) {
+              metadataId = metadataInfo.getType().toLowerCase() + "_" + metadataInfo.getVersion();
+            }
+
+            return aipService.retrieveSupportedMetadata(requestContext, aip, representation, metadataType, metadataId,
+              locale);
+          }
+        }
+
         // delegate
-        return aipService.retrieveSupportedMetadata(requestContext, aip, representation, metadataType,
+        return aipService.retrieveSupportedMetadata(requestContext, aip, representation, metadataType, metadataType,
           locale);
       }
     });
@@ -1001,6 +1049,28 @@ public class AIPController implements AIPRestService, Exportable {
         // delegate
         return new DescriptiveMetadataPreview(aipService.retrieveDescriptiveMetadataPreview(
           requestContext.getModelService(), aipId, null, previewRequest.getId(), previewRequest.getValue()));
+      }
+    });
+  }
+
+  @Override
+  public DescriptiveMetadataPreview retrieveRepresentationDescriptiveMetadataPreview(String aipId,
+    String representationId, @RequestBody DescriptiveMetadataPreviewRequest previewRequest) {
+
+    return requestHandler.processRequest(new RequestHandler.RequestProcessor<DescriptiveMetadataPreview>() {
+      @Override
+      public DescriptiveMetadataPreview process(RequestContext requestContext,
+        RequestControllerAssistant controllerAssistant) throws RODAException, RESTException, IOException {
+        controllerAssistant.setRelatedObjectId(aipId);
+        controllerAssistant.setParameters(RodaConstants.CONTROLLER_TEMPLATE_PARAM, previewRequest.getValue());
+
+        controllerAssistant.checkObjectPermissions(requestContext.getUser(),
+          SelectedItemsList.create(IndexedAIP.class, aipId));
+
+        // delegate
+        return new DescriptiveMetadataPreview(
+          aipService.retrieveDescriptiveMetadataPreview(requestContext.getModelService(), aipId, representationId,
+            previewRequest.getId(), previewRequest.getValue()));
       }
     });
   }
@@ -1396,7 +1466,7 @@ public class AIPController implements AIPRestService, Exportable {
         IndexedAIP aip = requestContext.getIndexService().retrieve(IndexedAIP.class, aipId,
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(requestContext.getUser(), aip);
-        
+
         // delegate
         return requestContext.getModelService().retrieveAIP(aipId);
       }

@@ -16,6 +16,7 @@ import org.roda.core.data.v2.index.IndexedRepresentationRequest;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.CreateDescriptiveMetadataRequest;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataInfos;
 import org.roda.core.data.v2.ip.metadata.SupportedMetadataValue;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.common.NavigationToolbar;
@@ -66,35 +67,42 @@ public class EditDescriptiveMetadata extends Composite {
           if (error == null) {
             if (value) {
               if (representationId == null) {
-                service
-                  .rodaEntityRestService(s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()),
-                    IndexedAIP.class)
-                  .thenCompose(aip -> service.aipResource(s -> s.retrieveAIPSupportedMetadata(aip.getId(),
-                    filename.replace(".xml", ""), LocaleInfo.getCurrentLocale().getLocaleName()))
-                    .whenComplete((result, throwable) -> {
-                      if (throwable != null) {
-                        callback.onFailure(throwable);
-                      } else {
-                        callback.onSuccess(new EditDescriptiveMetadata(aip, null, filename, result));
-                      }
-                    }));
+                service.rodaEntityRestService(s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()),
+                  IndexedAIP.class).thenCompose(aip -> service
+                    .aipResource(
+                      s -> s.getDescriptiveMetadata(aip.getId(), LocaleInfo.getCurrentLocale().getLocaleName()))
+                    .thenCompose(descMetadata -> service
+                      .aipResource(s -> s.retrieveAIPSupportedMetadata(aip.getId(), filename,
+                        LocaleInfo.getCurrentLocale().getLocaleName()))
+                      .whenComplete((supportedMetadata, throwable) -> {
+                        if (throwable != null) {
+                          callback.onFailure(throwable);
+                        } else {
+                          callback.onSuccess(
+                            new EditDescriptiveMetadata(aip, null, filename, supportedMetadata, descMetadata));
+                        }
+                      })));
               } else {
                 service
                   .rodaEntityRestService(s -> s.findByUuid(aipId, LocaleInfo.getCurrentLocale().getLocaleName()),
                     IndexedAIP.class)
                   .thenCompose(aip -> service
-                    .representationResource(s -> s.retrieveIndexedRepresentationViaRequest(
-                      new IndexedRepresentationRequest(aipId, representationId)))
-                    .thenCompose(representation -> service
-                      .aipResource(s -> s.retrieveRepresentationSupportedMetadata(aip.getId(), representation.getId(),
-                        filename.replace(".xml", ""), LocaleInfo.getCurrentLocale().getLocaleName()))
-                      .whenComplete((result, throwable) -> {
-                        if (throwable != null) {
-                          callback.onFailure(throwable);
-                        } else {
-                          callback.onSuccess(new EditDescriptiveMetadata(aip, representation, filename, result));
-                        }
-                      })));
+                    .aipResource(
+                      s -> s.getRepresentationDescriptiveMetadata(aip.getId(), representationId, LocaleInfo.getCurrentLocale().getLocaleName()))
+                    .thenCompose(descMetadata -> service
+                      .representationResource(s -> s.retrieveIndexedRepresentationViaRequest(
+                        new IndexedRepresentationRequest(aipId, representationId)))
+                      .thenCompose(representation -> service
+                        .aipResource(s -> s.retrieveRepresentationSupportedMetadata(aip.getId(), representation.getId(),
+                          filename, LocaleInfo.getCurrentLocale().getLocaleName()))
+                        .whenComplete((supportedMetadata, throwable) -> {
+                          if (throwable != null) {
+                            callback.onFailure(throwable);
+                          } else {
+                            callback.onSuccess(new EditDescriptiveMetadata(aip, representation, filename,
+                              supportedMetadata, descMetadata));
+                          }
+                        }))));
               }
             } else {
               HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
@@ -149,7 +157,7 @@ public class EditDescriptiveMetadata extends Composite {
    * @param filename
    */
   public EditDescriptiveMetadata(IndexedAIP aip, IndexedRepresentation representation, String filename,
-    final SupportedMetadataValue responseParams) {
+    final SupportedMetadataValue responseParams, final DescriptiveMetadataInfos descriptiveMetadataInfos) {
     this.aip = aip;
     this.representation = representation;
     aipLocked = true;
@@ -157,7 +165,7 @@ public class EditDescriptiveMetadata extends Composite {
 
     navigationToolbar.withoutButtons().build();
 
-    initTitle(aip, title);
+    initTitle(aip, representation, title);
     keyboardFocus.setFocus(true);
     keyboardFocus.addStyleName("browse");
 
@@ -172,7 +180,7 @@ public class EditDescriptiveMetadata extends Composite {
     actionsToolbar.build();
 
     DescriptiveMetadataPanel dataPanel = new DescriptiveMetadataPanel(aip.getId(),
-      representation != null ? representation.getId() : null, filename, responseParams, aip.getPermissions(), true);
+      representation != null ? representation.getId() : null, filename, responseParams, aip.getPermissions(), true, descriptiveMetadataInfos);
     descriptiveMetadataPanel.add(dataPanel);
 
     dataPanel.setSaveHandler(() -> dataPanel.getValue(new AsyncCallback<CreateDescriptiveMetadataRequest>() {
@@ -192,7 +200,25 @@ public class EditDescriptiveMetadata extends Composite {
     dataPanel.setCancelHandler(this::back);
   }
 
-  protected static void initTitle(IndexedAIP aip, TitlePanel title) {
+  private void initTitle(IndexedAIP aip, IndexedRepresentation representation, TitlePanel title) {
+    if (representation == null) {
+      initTitleForAip(aip, title);
+    } else {
+      initTitleForRepresentation(representation, title);
+    }
+    title.addStyleName("mb-16");
+  }
+
+  private void initTitleForRepresentation(IndexedRepresentation representation, TitlePanel title) {
+    title.setIcon(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
+
+    String representationTitle = representation.getTitle() != null ? representation.getTitle() : representation.getType();
+    representationTitle = representationTitle == null ? representation.getId() : representationTitle;
+
+    title.setText(messages.editDescriptiveMetadataInRepresentation(representationTitle));
+  }
+
+  private void initTitleForAip(IndexedAIP aip, TitlePanel title) {
     if (aip.getLevel() != null) {
       title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
     } else {
@@ -204,7 +230,6 @@ public class EditDescriptiveMetadata extends Composite {
     } else {
       title.setText(aip.getId());
     }
-    title.addStyleName("mb-16");
   }
 
   @Override
