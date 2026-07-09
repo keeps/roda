@@ -23,18 +23,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.configuration.CombinedConfiguration;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.tree.MergeCombiner;
-import org.apache.commons.configuration.tree.NodeCombiner;
+import org.apache.commons.configuration2.CombinedConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.ReloadingFileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.convert.DisabledListDelimiterHandler;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.io.FileHandler;
+import org.apache.commons.configuration2.reloading.PeriodicReloadingTrigger;
+import org.apache.commons.configuration2.reloading.ReloadingEvent;
+import org.apache.commons.configuration2.tree.MergeCombiner;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.RodaPropertiesReloadStrategy;
 import org.roda.core.common.Messages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -56,12 +60,14 @@ import ch.qos.logback.core.joran.spi.JoranException;
  */
 @Component
 public class ConfigurationManager {
-  private final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManager.class);
   private static ConfigurationManager instance;
+  private final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManager.class);
   private boolean instantiated = false;
   // Configuration related objects
   private CompositeConfiguration rodaConfiguration = null;
   private RodaConstants.NodeType nodeType;
+  private Map<String, ReloadingFileBasedConfigurationBuilder<PropertiesConfiguration>> externalBuilders = new HashMap<>();
+
   private RodaConstants.DistributedModeType distributedModeType;
   private List<String> configurationFiles = null;
   private boolean configSymbolicLinksAllowed;
@@ -85,7 +91,13 @@ public class ConfigurationManager {
    * @see #getRodaSharedConfigurationProperties
    */
   private Map<String, List<String>> rodaSharedConfigurationPropertiesCache = null;
-
+  private final LoadingCache<Locale, Messages> I18N_CACHE = CacheBuilder.newBuilder()
+    .build(new CacheLoader<Locale, Messages>() {
+      @Override
+      public Messages load(Locale locale) throws Exception {
+        return new Messages(locale, getConfigPath().resolve(RodaConstants.CORE_I18N_FOLDER));
+      }
+    });
   /**
    * Shared configuration and message properties (cache). Includes properties from
    * {@code rodaConfiguration} and translations from ServerMessages, filtered by
@@ -94,7 +106,7 @@ public class ConfigurationManager {
    * This cache provides the complete set of properties to be shared with the
    * client browser.
    */
-  private LoadingCache<Locale, Map<String, List<String>>> SHARED_PROPERTIES_CACHE = CacheBuilder.newBuilder()
+  private final LoadingCache<Locale, Map<String, List<String>>> SHARED_PROPERTIES_CACHE = CacheBuilder.newBuilder()
     .build(new CacheLoader<Locale, Map<String, List<String>>>() {
       @Override
       public Map<String, List<String>> load(Locale locale) {
@@ -123,14 +135,12 @@ public class ConfigurationManager {
         return sharedProperties;
       }
     });
+  private final List<String> CONFIGURATIONS = new ArrayList<>(Arrays.asList("roda-core.properties", "roda-roles.properties",
+    "roda-permissions.properties", "roda-instance.properties"));
 
-  private LoadingCache<Locale, Messages> I18N_CACHE = CacheBuilder.newBuilder()
-    .build(new CacheLoader<Locale, Messages>() {
-      @Override
-      public Messages load(Locale locale) throws Exception {
-        return new Messages(locale, getConfigPath().resolve(RodaConstants.CORE_I18N_FOLDER));
-      }
-    });
+  private ConfigurationManager() {
+    // do nothing
+  }
 
   public static ConfigurationManager getInstance() {
     if (instance == null) {
@@ -143,10 +153,6 @@ public class ConfigurationManager {
   // for test only
   public static void resetInstanceAfterTest() {
     instance = null;
-  }
-
-  private ConfigurationManager() {
-    // do nothing
   }
 
   public boolean isInstantiated() {
@@ -281,9 +287,6 @@ public class ConfigurationManager {
     return legacyStorageImplementationEnabled;
   }
 
-  private List<String> CONFIGURATIONS = new ArrayList<>(Arrays.asList("roda-core.properties", "roda-roles.properties",
-    "roda-permissions.properties", "roda-instance.properties"));
-
   public void addDefaultConfiguration(String configuration) {
     CONFIGURATIONS.add(configuration);
     LOGGER.info("Added configuration: '{}'", configuration);
@@ -305,65 +308,137 @@ public class ConfigurationManager {
     rodaPropertiesCache = new HashMap<>();
     rodaConfiguration = new CompositeConfiguration();
     configurationFiles = new ArrayList<>();
+    externalBuilders = new HashMap<>();
 
     for (String configuration : CONFIGURATIONS) {
-      try {
-        addConfiguration(configuration);
-        LOGGER.debug("Loaded {}", configuration);
-      } catch (ConfigurationException e) {
-        throw new RuntimeException("Unable to load configuration for RODA " + configuration + ". Aborting...", e);
-      }
+      addConfiguration(configuration);
+      LOGGER.debug("Loaded {}", configuration);
     }
 
-    legacyStorageImplementationEnabled = getProperty(RodaConstants.CORE_STORAGE_LEGACY_IMPLEMENTATION_ENABLED,
-      false);
+    // 2. Assemble the actual Configuration object from the registered builders
+    assembleGlobalConfiguration();
+
+    legacyStorageImplementationEnabled = getProperty(RodaConstants.CORE_STORAGE_LEGACY_IMPLEMENTATION_ENABLED, false);
     instantiated = true;
   }
 
-  public void addConfiguration(String configurationFile) throws ConfigurationException {
-    Configuration configuration = getConfiguration(configurationFile);
-    rodaConfiguration.addConfiguration(configuration);
-    configurationFiles.add(configurationFile);
+  public void addConfiguration(String configurationFile) {
+    Path configPath = getConfigPath().resolve(configurationFile);
+
+    // Prevent duplicate entries if called multiple times
+    if (!configurationFiles.contains(configurationFile)) {
+      configurationFiles.add(configurationFile);
+    }
+
+    if (FSUtils.exists(configPath)) {
+      registerExternalBuilder(configurationFile, configPath);
+    }
+
+    // CRITICAL FIX: Rebuild the configuration immediately!
+    // This loops through 'configurationFiles' and correctly calls
+    // getInternalConfiguration() to load bundled classpath properties (like roda-wui.properties)
+    assembleGlobalConfiguration();
+
+    // Invalidate the cache since we just injected new properties into the system
+    clearRodaCachableObjectsAfterConfigurationChange();
   }
 
   public void addExternalConfiguration(Path configurationPath) throws ConfigurationException {
-    Configuration configuration = getExternalConfiguration(configurationPath);
-    rodaConfiguration.addConfiguration(configuration);
-  }
+    // Extract the filename to use as our registry key
+    String configurationFile = configurationPath.getFileName().toString();
 
-  private PropertiesConfiguration initConfiguration() {
-    PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
-    propertiesConfiguration.setDelimiterParsingDisabled(true);
-    propertiesConfiguration.setEncoding(RodaConstants.DEFAULT_ENCODING);
-    return propertiesConfiguration;
-  }
-
-  private Configuration getConfiguration(String configurationFile) throws ConfigurationException {
-    Path config = getConfigPath().resolve(configurationFile);
-
-    NodeCombiner combiner = new MergeCombiner();
-    CombinedConfiguration cc = new CombinedConfiguration(combiner);
-
-    if (FSUtils.exists(config)) {
-      cc.addConfiguration(getExternalConfiguration(config));
+    // 1. Add to our tracking list so the assembly method knows about it
+    if (!configurationFiles.contains(configurationFile)) {
+      configurationFiles.add(configurationFile);
     }
 
-    cc.addConfiguration(getInternalConfiguration(configurationFile));
+    // 2. Setup the file watcher / builder for this new file
+    if (FSUtils.exists(configurationPath)) {
+      registerExternalBuilder(configurationFile, configurationPath);
+      LOGGER.info("Successfully registered dynamic external configuration: {}", configurationPath);
+    } else {
+      LOGGER.warn("Attempted to add external configuration that does not exist: {}", configurationPath);
+    }
 
-    // do variable interpolation
-    Configuration configuration = cc.interpolatedConfiguration();
+    // 3. Immediately rebuild the live CompositeConfiguration so the new properties
+    // are available
+    assembleGlobalConfiguration();
 
-    return configuration;
+    // 4. Invalidate the cache since we just injected new properties into the system
+    clearRodaCachableObjectsAfterConfigurationChange();
+  }
+
+  private void registerExternalBuilder(String configurationFile, Path configPath) {
+    LOGGER.trace("Registering configuration builder for file {}", configPath);
+
+    Parameters params = new Parameters();
+    ReloadingFileBasedConfigurationBuilder<PropertiesConfiguration> builder = new ReloadingFileBasedConfigurationBuilder<>(
+      PropertiesConfiguration.class)
+      .configure(params.fileBased().setFile(configPath.toFile()).setEncoding(RodaConstants.DEFAULT_ENCODING)
+        .setListDelimiterHandler(new DisabledListDelimiterHandler()));
+
+    // Setup the background check
+    PeriodicReloadingTrigger trigger = new PeriodicReloadingTrigger(builder.getReloadingController(), null, 5000,
+      TimeUnit.MILLISECONDS);
+    trigger.start();
+
+    // NATIVE 2.x WAY: Attach an event listener for when the file changes
+    builder.getReloadingController().addEventListener(ReloadingEvent.ANY, event -> {
+      LOGGER.info("Configuration change detected in {}!", configurationFile);
+
+      // 1. Rebuild the in-memory CompositeConfiguration with the new snapshots
+      assembleGlobalConfiguration();
+
+      // 2. Call your existing cache clearing method!
+      clearRodaCachableObjectsAfterConfigurationChange();
+    });
+
+    externalBuilders.put(configurationFile, builder);
+  }
+
+  private synchronized void assembleGlobalConfiguration() {
+    LOGGER.debug("Assembling global composite configuration...");
+    CompositeConfiguration newRodaConfig = new CompositeConfiguration();
+
+    for (String configurationFile : configurationFiles) {
+      CombinedConfiguration cc = new CombinedConfiguration(new MergeCombiner());
+
+      // 1. Add External (Overrides) - Ask the builder for the latest snapshot
+      if (externalBuilders.containsKey(configurationFile)) {
+        try {
+          cc.addConfiguration(externalBuilders.get(configurationFile).getConfiguration());
+        } catch (ConfigurationException e) {
+          LOGGER.error("Failed to get latest configuration snapshot for {}", configurationFile, e);
+        }
+      }
+
+      // 2. Add Internal (Defaults) - Read from classpath
+      try {
+        cc.addConfiguration(getInternalConfiguration(configurationFile));
+      } catch (ConfigurationException e) {
+        LOGGER.error("Failed to load internal configuration for {}", configurationFile, e);
+      }
+
+      newRodaConfig.addConfiguration(cc);
+    }
+
+    // Safely swap the old snapshot with the newly built one
+    this.rodaConfiguration = newRodaConfig;
   }
 
   private PropertiesConfiguration getInternalConfiguration(String configurationFile) throws ConfigurationException {
-    PropertiesConfiguration propertiesConfiguration = initConfiguration();
+    PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
+    propertiesConfiguration.setListDelimiterHandler(new DisabledListDelimiterHandler());
+
     InputStream inputStream = ConfigurationManager.class
       .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
+
     if (inputStream != null) {
       LOGGER.trace("Loading configuration from classpath {}", configurationFile);
-      propertiesConfiguration.load(inputStream);
-
+      // In 2.x, we use FileHandler to load from streams
+      FileHandler handler = new FileHandler(propertiesConfiguration);
+      handler.setEncoding(RodaConstants.DEFAULT_ENCODING);
+      handler.load(inputStream);
     } else {
       LOGGER.trace("Configuration {} doesn't exist", configurationFile);
     }
@@ -371,21 +446,10 @@ public class ConfigurationManager {
     return propertiesConfiguration;
   }
 
-  private PropertiesConfiguration getExternalConfiguration(Path config) throws ConfigurationException {
-    PropertiesConfiguration propertiesConfiguration = initConfiguration();
-    LOGGER.trace("Loading configuration from file {}", config);
-    propertiesConfiguration.load(config.toFile());
-    RodaPropertiesReloadStrategy rodaPropertiesReloadStrategy = new RodaPropertiesReloadStrategy();
-    rodaPropertiesReloadStrategy.setRefreshDelay(5000);
-    propertiesConfiguration.setReloadingStrategy(rodaPropertiesReloadStrategy);
-
-    return propertiesConfiguration;
-  }
-
   public String getConfigurationKey(String... keyParts) {
     StringBuilder sb = new StringBuilder();
     for (String part : keyParts) {
-      if (sb.length() != 0) {
+      if (!sb.isEmpty()) {
         sb.append('.');
       }
       sb.append(part);
@@ -403,7 +467,7 @@ public class ConfigurationManager {
 
   public List<String> getRodaConfigurationAsList(String... keyParts) {
     String[] array = rodaConfiguration.getStringArray(getConfigurationKey(keyParts));
-    return Arrays.stream(array).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+    return Arrays.stream(array).filter(StringUtils::isNotBlank).toList();
   }
 
   public String getConfigurationString(String key, String defaultValue) {
@@ -494,7 +558,7 @@ public class ConfigurationManager {
     if (inputStream == null) {
       Path relativizedPath = getConfigPath().getParent().relativize(baseConfigPath);
       inputStream = ConfigurationManager.class
-        .getResourceAsStream("/" + relativizedPath.toString() + "/" + configurationFile);
+        .getResourceAsStream("/" + relativizedPath + "/" + configurationFile);
       LOGGER.trace("Loading configuration from classpath {}", configurationFile);
     }
 
@@ -688,7 +752,7 @@ public class ConfigurationManager {
       Configuration configuration = getRodaConfiguration();
       Iterator<String> keys = configuration.getKeys();
       while (keys.hasNext()) {
-        String key = String.class.cast(keys.next());
+        String key = (String) keys.next();
         String value = configuration.getString(key, "");
         for (String prefixToCache : prefixesToCache) {
           if (key.startsWith(prefixToCache)) {

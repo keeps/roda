@@ -9,8 +9,7 @@ package org.roda.wui.servlets;
 
 import java.io.Serial;
 
-import jakarta.servlet.annotation.WebServlet;
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.model.utils.LdapUtility;
 import org.roda.wui.security.SecurityObserverImpl;
@@ -43,7 +42,7 @@ public class RodaWuiServlet extends HttpServlet {
     } else {
       LOGGER.info("RODA Core started with success!");
     }
-    try {
+
       LOGGER.info("Injecting RODA WUI configurations...");
       RodaCoreFactory.addConfiguration("roda-wui.properties");
       final boolean debug = Boolean
@@ -52,9 +51,7 @@ public class RodaWuiServlet extends HttpServlet {
         LOGGER.warn("Has the debug settings enabled.");
       }
       LOGGER.info("RODA WUI configurations injected with success!");
-    } catch (ConfigurationException e) {
-      LOGGER.error("RODA WUI configurations could not be injected!", e);
-    }
+
 
     RodaCoreFactory.getPluginManager().registerSecurityObserver(new SecurityObserverImpl());
     RodaCoreFactory.addLogger("logback_wui.xml");

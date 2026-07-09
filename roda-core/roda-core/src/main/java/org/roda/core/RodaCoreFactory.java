@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -43,8 +42,8 @@ import java.util.function.Function;
 
 import javax.xml.validation.Schema;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -60,7 +59,6 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.cloud.ClusterState;
-import org.apache.solr.common.cloud.DocCollection;
 import org.apache.solr.common.cloud.Replica;
 import org.apache.solr.common.cloud.Slice;
 import org.apache.solr.common.cloud.SolrZkClient;
@@ -602,10 +600,6 @@ public class RodaCoreFactory {
 
   public static void setLdapUtility(LdapUtility ldapUtility) {
     RodaCoreFactory.ldapUtility = ldapUtility;
-  }
-
-  public static void setConfigurationManager(ConfigurationManager configurationManager) {
-    RodaCoreFactory.configurationManager = configurationManager;
   }
 
   public static String getProperty(String property, String defaultValue) {
@@ -1502,6 +1496,10 @@ public class RodaCoreFactory {
     return configurationManager;
   }
 
+  public static void setConfigurationManager(ConfigurationManager configurationManager) {
+    RodaCoreFactory.configurationManager = configurationManager;
+  }
+
   public static NodeType getNodeType() {
     return nodeType;
   }
@@ -1609,7 +1607,7 @@ public class RodaCoreFactory {
    * Configuration related functionalities
    */
   @Deprecated
-  public static void addConfiguration(String configurationFile) throws ConfigurationException {
+  public static void addConfiguration(String configurationFile) {
     configurationManager.addConfiguration(configurationFile);
   }
 
@@ -1681,16 +1679,6 @@ public class RodaCoreFactory {
     return inputStream;
   }
 
-  public static void clearRodaCachableObjectsAfterConfigurationChange() {
-    configurationManager.clearRodaCachableObjectsAfterConfigurationChange();
-    RODA_SCHEMAS_CACHE.invalidateAll();
-    DISPOSAL_SCHEDULE_CACHE.invalidateAll();
-    DISPOSAL_HOLD_CACHE.invalidateAll();
-    processPreservationEventTypeProperties();
-
-    LOGGER.info("Reloaded roda configurations after file change!");
-  }
-
   private static void processPreservationEventTypeProperties() {
     String prefix = "core.preservation_event_type";
 
@@ -1756,10 +1744,6 @@ public class RodaCoreFactory {
     return algorithms;
   }
 
-  public Map<String, String> getPropertiesFromCache(String cacheName, List<String> prefixesToCache) {
-    return configurationManager.getPropertiesFromCache(cacheName, prefixesToCache);
-  }
-
   public static DisposalSchedule getDisposalSchedule(String disposalScheduleId) {
     try {
       return DISPOSAL_SCHEDULE_CACHE.get(disposalScheduleId);
@@ -1820,10 +1804,6 @@ public class RodaCoreFactory {
     return configurationManager.getI18NMessages(locale);
   }
 
-  /*
-   * Command-line accessible functionalities
-   */
-
   public static void runReindex(List<String> args) {
     String entity = args.get(2);
     if (StringUtils.isNotBlank(entity)) {
@@ -1836,6 +1816,10 @@ public class RodaCoreFactory {
       }
     }
   }
+
+  /*
+   * Command-line accessible functionalities
+   */
 
   private static void runSolrQuery(List<String> args) {
     String collection = args.get(2);
@@ -2129,5 +2113,9 @@ public class RodaCoreFactory {
     }
 
     System.exit(0);
+  }
+
+  public Map<String, String> getPropertiesFromCache(String cacheName, List<String> prefixesToCache) {
+    return configurationManager.getPropertiesFromCache(cacheName, prefixesToCache);
   }
 }
