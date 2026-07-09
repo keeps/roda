@@ -118,7 +118,7 @@
         <java_version>21</java_version>
         <gwt.version>2.13.1</gwt.version>
         <cas.client.version>4.1.0</cas.client.version>
-        <swagger.version>2.2.41</swagger.version>
+        <swagger.version>2.2.52</swagger.version>
         <spring.version>7.0.7</spring.version>
         <solr.version>10.0.0</solr.version>
         <pekko.version>1.4.0</pekko.version>
