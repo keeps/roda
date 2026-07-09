@@ -109,7 +109,7 @@ public class AipPermissionTabs extends GenericMetadataCardPanel<IndexedAIP> {
     if (groupNames == null || groupNames.isEmpty()) {
       SimplePanel panel = new SimplePanel();
       HTML html = new HTML(messages.permissionAssignedGroupsEmpty());
-      html.setStyleName("basicTableEmpty");
+      html.setStyleName("no-permission-assigned");
       panel.setWidget(html);
       return new ScrollPanel(panel);
     }
@@ -132,7 +132,7 @@ public class AipPermissionTabs extends GenericMetadataCardPanel<IndexedAIP> {
     if (usernames == null || usernames.isEmpty()) {
       SimplePanel panel = new SimplePanel();
       HTML html = new HTML(messages.permissionAssignedUsersEmpty());
-      html.setStyleName("basicTableEmpty");
+      html.setStyleName("no-permission-assigned");
       panel.setWidget(html);
       return new ScrollPanel(panel);
     }
