@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.StringResponse;
 import org.roda.core.data.v2.index.CountRequest;
@@ -109,6 +111,15 @@ public class AuditLogController implements AuditLogRestService, Exportable {
       public StringResponse process(RequestContext requestContext, RequestControllerAssistant controllerAssistant)
         throws RODAException, RESTException, IOException {
         String filename = resource.getOriginalFilename();
+
+        // Sanitize filename to prevent path traversal attacks
+        if (filename != null) {
+          filename = FilenameUtils.getName(filename);
+        }
+        if (filename == null || filename.isEmpty()) {
+          throw new RequestNotValidException("Invalid or missing filename");
+        }
+
         controllerAssistant.setParameters(RodaConstants.CONTROLLER_FILENAME_PARAM, filename);
         // delegate
         auditLogService.importLogEntries(requestContext.getModelService(), resource.getInputStream(), filename);
