@@ -24,12 +24,12 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP> {
 
   public SelectAipDialog(String title) {
     super(title,
-      new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(), new AsyncTableCellOptions<>(IndexedAIP.class, listId)
+      new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(), new AsyncTableCellOptions<>(IndexedAIP.class, listId).withCsvDownloadButtonVisibility(false)
         .withSummary(messages.selectAipSearchResults()).withJustActive(true)));
   }
 
   public SelectAipDialog(String title, Filter filter, boolean justActive) {
-    this(title, filter, justActive, true);
+    this(title, filter, justActive, false);
   }
 
   public SelectAipDialog(String title, Filter filter, boolean justActive, boolean exportCsvVisible) {
