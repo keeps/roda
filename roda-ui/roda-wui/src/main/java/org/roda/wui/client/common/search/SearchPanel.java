@@ -29,6 +29,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
@@ -312,30 +313,32 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
       boolean effectivelyVisible = false;
       List<FilterParameter> parameters = new ArrayList<>(defaultFilter.getParameters());
       parameters.removeIf(f -> f instanceof AllFilterParameter);
+
+      // Add the icon if the parameters is not empty
+      if (!parameters.isEmpty()) {
+        HTML header = new HTML(SafeHtmlUtils.fromSafeConstant(FILTER_ICON));
+        header.addStyleName("inline gray");
+        searchPreFilters.add(header);
+      }
+
+      StringBuilder searchPreFiltersTitleBuilder = new StringBuilder();
+
       for (int i = 0; i < parameters.size(); i++) {
-        SafeHtml filterHTML = SearchPreFilterUtils.getFilterParameterHTML(parameters.get(i));
+        String filterParameterText = SearchPreFilterUtils.getFilterParameterText(parameters.get(i));
+        searchPreFiltersTitleBuilder.append(filterParameterText);
 
-        if (filterHTML != null) {
+        if (StringUtils.isNotBlank(filterParameterText)) {
           effectivelyVisible = true;
-          if (i == 0) {
-            HTML header = new HTML(SafeHtmlUtils.fromSafeConstant(FILTER_ICON));
-            header.addStyleName("inline gray");
-            searchPreFilters.add(header);
-          } else {
-            InlineHTML andSeparator = new InlineHTML(messages.searchPreFilterAnd());
-            andSeparator.addStyleName("gray");
-            searchPreFilters.add(andSeparator);
+          if (i != 0) {
+            searchPreFiltersTitleBuilder.append(messages.searchPreFilterAnd());
           }
-
-          HTML html = new HTML(filterHTML);
-          html.addStyleName("gray inline nowrap");
-          searchPreFilters.add(html);
         }
       }
 
       if (effectivelyVisible) {
         searchPreFilters.setVisible(true);
         addStyleName(WITH_FILTERS_CSS);
+        searchPreFilters.setTitle(searchPreFiltersTitleBuilder.toString());
       } else {
         removeStyleName(WITH_FILTERS_CSS);
         searchPreFilters.setVisible(false);

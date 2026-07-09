@@ -10,6 +10,7 @@
     <g:FlowPanel styleName="searchPanelContainer">
         <g:FlowPanel styleName="searchPanel" ui:field="searchPanel">
             <g:SimplePanel ui:field="searchPanelSelectionDropdownWrapper"/>
+            <g:FlowPanel ui:field="searchPreFilters"/>
             <commonsearch:SelectedPanel ui:field="searchSelectedPanel"/>
             <g:FlowPanel styleName="searchPanelLeftInput">
                 <g:TextBox title="{messages.searchButton}" ui:field="searchInputBox" addStyleNames="searchBox"/>
@@ -49,6 +50,5 @@
                 </g:Button>
             </g:FlowPanel>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="searchPreFilters" ui:field="searchPreFilters"/>
     </g:FlowPanel>
 </ui:UiBinder>
