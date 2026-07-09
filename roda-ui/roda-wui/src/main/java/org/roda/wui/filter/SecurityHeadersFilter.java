@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 import org.slf4j.Logger;
