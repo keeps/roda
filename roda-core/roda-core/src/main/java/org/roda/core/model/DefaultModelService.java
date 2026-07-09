@@ -2393,7 +2393,13 @@ public class DefaultModelService implements ModelService {
     GenericException, AlreadyExistsException, RequestNotValidException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    StoragePath logPath = ModelUtils.getLogStoragePath(filename);
+    // Sanitize filename to prevent path traversal
+    String sanitizedFilename = Paths.get(filename).getFileName().toString();
+    if (sanitizedFilename.isEmpty() || sanitizedFilename.contains("..")) {
+      throw new RequestNotValidException("Invalid filename: " + filename);
+    }
+
+    StoragePath logPath = ModelUtils.getLogStoragePath(sanitizedFilename);
     if (storage.exists(logPath)) {
       throw new AlreadyExistsException("Binary already exists: " + logPath);
     }
@@ -2402,7 +2408,7 @@ public class DefaultModelService implements ModelService {
     try {
       List<LogEntry> importedLogs = new ArrayList<>();
       tempDir = Files.createTempDirectory(new Date().getTime() + "");
-      Path path = tempDir.resolve(filename);
+      Path path = tempDir.resolve(sanitizedFilename);
       IOUtils.copyLarge(inputStream, Files.newOutputStream(path));
 
       for (OptionalWithCause<LogEntry> optionalLogEntry : new LogEntryFileSystemIterable(tempDir)) {
