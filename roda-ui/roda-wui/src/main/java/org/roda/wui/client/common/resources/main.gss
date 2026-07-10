@@ -2613,9 +2613,12 @@ td.datePickerMonth, td.datePickerYear {
     vertical-align: bottom;
     color: #a7a9ac;
     cursor: pointer;
-    cursor: hand;
     font-size: 12px;
+}
 
+/* If the first breadcrumb is the 11th from the end (or more), style it AND all its siblings */
+.main .wui-breadcrumbPanel .breadcrumb:first-child:nth-last-child(n+11),
+.main .wui-breadcrumbPanel .breadcrumb:first-child:nth-last-child(n+11) ~ .breadcrumb {
     max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
@@ -5957,6 +5960,7 @@ td.datePickerMonth, td.datePickerYear {
     margin: 10px auto 0;
     max-width: 100px;
     line-height: 1;
+    text-decoration: none;
 }
 
 #drop a:hover {
