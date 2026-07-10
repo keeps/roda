@@ -1502,8 +1502,13 @@ public class DefaultModelService implements ModelService {
     String dirName, String createdBy, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    StoragePath filePath;
+    if (fileId == null) {
+       filePath = ModelUtils.getDirectoryStoragePath(aipId, representationId, directoryPath);
+    } else {
+      filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
+    }
 
-    StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
     final Directory createdDirectory = storage.createDirectory(DefaultStoragePath.parse(filePath, dirName));
     File file = ResourceParseUtils.convertResourceToFile(createdDirectory);
     file.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
