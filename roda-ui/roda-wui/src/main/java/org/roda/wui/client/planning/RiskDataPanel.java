@@ -12,12 +12,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskMitigationProperties;
 import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.client.common.forms.GenericDataForm;
 import org.roda.wui.client.common.forms.GenericDataPanel;
+import org.roda.wui.client.common.forms.TagInputWidget;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.services.RiskRestService;
@@ -62,15 +64,12 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   private Date createdOn;
   private String createdBy;
 
-  /**
-   * Create a new user data panel
-   *
-   * @param risk
-   *          the risk to use
-   *
-   */
-  public RiskDataPanel(IndexedRisk risk, boolean editmode) {
-    this.editmode = editmode;
+  public RiskDataPanel() {
+    this(null, false);
+  }
+
+  public RiskDataPanel(IndexedRisk risk, boolean editMode) {
+    this.editmode = editMode;
     this.form = new GenericDataForm<>();
 
     saveButton = new Button(messages.saveButton());
@@ -90,7 +89,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     Services services = new Services("Retrieve risk mitigation properties", "get");
     services.riskResource(RiskRestService::retrieveRiskMitigationProperties).whenComplete((properties, throwable) -> {
       if (throwable == null) {
-        if (editmode) {
+        if (editMode) {
           initEditMode(risk, properties);
         } else {
           initCreateMode(properties);
@@ -104,7 +103,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     Risk risk = new Risk();
 
     initMitigationLimits(properties);
-    form.addTextField(messages.riskIdentifier(), Risk::getId, Risk::setId, false);
+    form.addTextField(messages.riskIdentifier(), Risk::getId, Risk::setId, true);
     addCommonEditableFields(properties);
     form.addCustomWidget(actionsPanel);
     form.setModel(risk);
@@ -221,9 +220,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   private void addCategoriesField() {
-    categories = new IncrementalList(true);
+    TagInputWidget tags = new TagInputWidget();
 
-    form.addIncrementalListField(messages.riskCategories(), categories, Risk::getCategories, Risk::setCategories, true);
+    form.addTagField(messages.riskCategories(), tags, Risk::getCategories, Risk::setCategories, false);
   }
 
   /**

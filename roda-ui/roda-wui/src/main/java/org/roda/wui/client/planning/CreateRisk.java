@@ -80,7 +80,7 @@ public class CreateRisk extends Composite {
   public CreateRisk() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    RiskDataPanel dataPanel = new RiskDataPanel(null, false);
+    RiskDataPanel dataPanel = new RiskDataPanel();
     riskDataPanel.add(dataPanel);
 
     dataPanel.setSaveHandler(() -> {
