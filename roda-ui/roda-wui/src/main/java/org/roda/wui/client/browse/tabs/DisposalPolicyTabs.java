@@ -36,19 +36,6 @@ public class DisposalPolicyTabs extends Tabs {
       });
     }
 
-    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
-      ListBuilder<DisposalHold> holdListBuilder = new ListBuilder<>(() -> new DisposalHoldList(),
-        new AsyncTableCellOptions<>(DisposalHold.class, "DisposalPolicyPage_disposalHolds")
-          .withActionable(DisposalHoldSearchWrapperActions.get()).withCsvDownloadButtonVisibility(false).bindOpener());
-
-      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalHoldsTitle()), new TabContentBuilder() {
-        @Override
-        public Widget buildTabWidget() {
-          return new SearchWrapper(false).createListAndSearchPanel(holdListBuilder);
-        }
-      });
-    }
-
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_RULES)) {
       ListBuilder<DisposalRule> ruleListBuilder = new ListBuilder<>(() -> new DisposalRuleList(),
         new AsyncTableCellOptions<>(DisposalRule.class, "DisposalPolicyPage_disposalRules")
@@ -58,6 +45,19 @@ public class DisposalPolicyTabs extends Tabs {
         @Override
         public Widget buildTabWidget() {
           return new SearchWrapper(false).createListAndSearchPanel(ruleListBuilder);
+        }
+      });
+    }
+
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
+      ListBuilder<DisposalHold> holdListBuilder = new ListBuilder<>(() -> new DisposalHoldList(),
+        new AsyncTableCellOptions<>(DisposalHold.class, "DisposalPolicyPage_disposalHolds")
+          .withActionable(DisposalHoldSearchWrapperActions.get()).withCsvDownloadButtonVisibility(false).bindOpener());
+
+      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.disposalHoldsTitle()), new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          return new SearchWrapper(false).createListAndSearchPanel(holdListBuilder);
         }
       });
     }
