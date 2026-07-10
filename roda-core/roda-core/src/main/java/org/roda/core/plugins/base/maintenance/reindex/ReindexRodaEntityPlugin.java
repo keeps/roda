@@ -67,7 +67,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
       PluginParameter
         .getBuilder(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "plugin.reindexRodaEntityPlugin.parameter.optimizeIndexes.name", PluginParameterType.BOOLEAN)
-        .withDefaultValue("true").isMandatory(false).withDescription("plugin.reindexRodaEntityPlugin.parameter.optimizeIndexes.description")
+        .withDefaultValue("false").isMandatory(false).withDescription("plugin.reindexRodaEntityPlugin.parameter.optimizeIndexes.description")
         .build());
   }
 
