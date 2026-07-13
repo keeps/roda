@@ -14,6 +14,7 @@ import java.util.MissingResourceException;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.jobs.CertificateInfo;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -59,8 +60,10 @@ public class TranslationService {
       PluginParameter clonedParam = new PluginParameter(originalParam);
 
       clonedParam.setName(I18nUtility.getMessage(originalParam.getName(), originalParam.getName(), localeString));
-      clonedParam.setDescription(
-        I18nUtility.getMessage(originalParam.getDescription(), originalParam.getDescription(), localeString));
+      if (StringUtils.isNotBlank(originalParam.getDescription())) {
+        clonedParam.setDescription(
+          I18nUtility.getMessage(originalParam.getDescription(), originalParam.getDescription(), localeString));
+      }
 
       translatedParameters.add(clonedParam);
     }
