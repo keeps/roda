@@ -12,6 +12,7 @@ import java.util.Date;
 import org.roda.core.data.common.RodaConstants;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsDate;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.TimeZone;
@@ -44,6 +45,7 @@ public class Humanize {
   public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss z");
   public static final DateTimeFormat DATE_TIME_FORMAT_JSON = DateTimeFormat.getFormat("yyyy-MM-ddTHH:mm:ss.SSSZZZ");
   public static final boolean FORMAT_UTC = false;
+  private static final long CIVIL_DATE_UI_SAFE_TIME_SHIFT_MILLIS = 12 * 60 * 60 * 1000;
   public static final DateTimeFormat DATE_TIME_FORMAT_STRICT_UTC = DateTimeFormat
     .getFormat("yyyy-MM-dd HH:mm:ss 'UTC'");
   protected static final NumberFormat SMALL_NUMBER_FORMAT = NumberFormat.getFormat("0.#");
@@ -131,16 +133,16 @@ public class Humanize {
     if (dateInitial == null && dateFinal == null) {
       return extendedDate ? messages.titleDatesEmpty() : messages.simpleDatesEmpty();
     } else if (dateInitial != null && dateFinal == null) {
-      String dateInitialString = formatDate(dateInitial, extendedDate);
+      String dateInitialString = formatCivilDate(dateInitial, extendedDate);
       return extendedDate ? messages.titleDatesNoFinal(dateInitialString)
         : messages.simpleDatesNoFinal(dateInitialString);
     } else if (dateInitial == null) {
-      String dateFinalString = formatDate(dateFinal, extendedDate);
+      String dateFinalString = formatCivilDate(dateFinal, extendedDate);
       return extendedDate ? messages.titleDatesNoInitial(dateFinalString)
         : messages.simpleDatesNoInitial(dateFinalString);
     } else {
-      String dateInitialString = formatDate(dateInitial, extendedDate);
-      String dateFinalString = formatDate(dateFinal, extendedDate);
+      String dateInitialString = formatCivilDate(dateInitial, extendedDate);
+      String dateFinalString = formatCivilDate(dateFinal, extendedDate);
       return extendedDate ? messages.titleDates(dateInitialString, dateFinalString)
         : messages.simpleDates(dateInitialString, dateFinalString);
     }
@@ -242,7 +244,35 @@ public class Humanize {
       DATE_TIME_FORMAT);
   }
 
+  public static Date parseCivilDate(String civilDate) {
+    if (civilDate == null || civilDate.trim().isEmpty()) {
+      return null;
+    }
+
+    String[] parts = civilDate.trim().split("-");
+    if (parts.length != 3) {
+      return null;
+    }
+
+    int year = Integer.parseInt(parts[0]);
+    int month = Integer.parseInt(parts[1]);
+    int day = Integer.parseInt(parts[2]);
+
+    return new Date((long) JsDate.UTC(year, month - 1, day, 0, 0, 0, 0));
+  }
+
+  public static String formatCivilDate(Date date, boolean extended) {
+    String formatPropertyName = extended ? RodaConstants.UI_DATE_FORMAT_TITLE : RodaConstants.UI_DATE_FORMAT_SIMPLE;
+    Date displayDate = new Date(date.getTime() + CIVIL_DATE_UI_SAFE_TIME_SHIFT_MILLIS);
+    return applyDateTimeFormat(displayDate, ConfigurationManager.getString(formatPropertyName), DATE_FORMAT, true);
+  }
+
   private static String applyDateTimeFormat(Date date, String stringFormat, DateTimeFormat defaultValue) {
+    return applyDateTimeFormat(date, stringFormat, defaultValue, false);
+  }
+
+  private static String applyDateTimeFormat(Date date, String stringFormat, DateTimeFormat defaultValue,
+    boolean forceUtc) {
     DateTimeFormat format;
 
     if (stringFormat != null) {
@@ -262,7 +292,7 @@ public class Humanize {
       format = defaultValue;
     }
 
-    if (ConfigurationManager.getBoolean(FORMAT_UTC, RodaConstants.UI_DATE_TIME_FORMAT_UTC)) {
+    if (forceUtc || ConfigurationManager.getBoolean(FORMAT_UTC, RodaConstants.UI_DATE_TIME_FORMAT_UTC)) {
       return format.format(date, TimeZone.createTimeZone(0));
     }
 
