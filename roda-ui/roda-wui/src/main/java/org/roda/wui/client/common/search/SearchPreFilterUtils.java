@@ -115,16 +115,16 @@ public class SearchPreFilterUtils {
     } else if (parameter instanceof DateIntervalFilterParameter) {
       DateIntervalFilterParameter p = (DateIntervalFilterParameter) parameter;
       if (p.getFromValue() != null && p.getToValue() != null) {
-        String fromDateHumanized = Humanize.formatDate(p.getFromValue());
-        String toDateHumanized = Humanize.formatDate(p.getToValue());
+        String fromDateHumanized = Humanize.formatCivilDate(p.getFromValue(), false);
+        String toDateHumanized = Humanize.formatCivilDate(p.getToValue(), false);
         return messages.searchPreFilterDateIntervalFilterParameter(messages.searchPreFilterName(p.getFromName()),
           fromDateHumanized, toDateHumanized);
       } else if (p.getToValue() == null) {
-        String fromDateHumanized = Humanize.formatDate(p.getFromValue());
+        String fromDateHumanized = Humanize.formatCivilDate(p.getFromValue(), false);
         return messages.searchPreFilterDateIntervalFilterParameterFrom(messages.searchPreFilterName(p.getFromName()),
           fromDateHumanized);
       } else {
-        String toDateHumanized = Humanize.formatDate(p.getToValue());
+        String toDateHumanized = Humanize.formatCivilDate(p.getToValue(), false);
         return messages.searchPreFilterDateIntervalFilterParameterTo(messages.searchPreFilterName(p.getFromName()),
           toDateHumanized);
       }
