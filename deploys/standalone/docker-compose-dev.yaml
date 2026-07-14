@@ -41,7 +41,7 @@ services:
       - /tmp:/tmp
 
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.11.4
+    image: ghcr.io/keeps/siegfried:v1.11.6
     container_name: siegfried
     restart: unless-stopped
     ports:
