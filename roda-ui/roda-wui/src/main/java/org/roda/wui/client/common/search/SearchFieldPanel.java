@@ -34,7 +34,6 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
@@ -42,8 +41,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.ClientMessages;
 
@@ -72,10 +69,10 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
   // Text
   private TextBox inputText;
   // Date
-  private DateBox inputDateBox;
+  private TextBox inputDateBox;
   // Date interval
-  private DateBox inputDateBoxFrom;
-  private DateBox inputDateBoxTo;
+  private TextBox inputDateBoxFrom;
+  private TextBox inputDateBoxTo;
   // Numeric
   private TextBox inputNumeric;
   // Numeric interval
@@ -102,8 +99,6 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     searchAdvancedFields = new ListBox();
     duplicateWarning = new Label();
 
-    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-
     KeyDownHandler keyDownHandler = new KeyDownHandler() {
       @Override
       public void onKeyDown(KeyDownEvent event) {
@@ -114,30 +109,9 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputText = new TextBox();
     inputText.addKeyDownHandler(keyDownHandler);
 
-    inputDateBox = new DateBox();
-    inputDateBox.setFormat(dateFormat);
-    inputDateBox.getDatePicker().setYearAndMonthDropdownVisible(true);
-    inputDateBox.getDatePicker().setYearArrowsVisible(true);
-    inputDateBox.setFireNullValues(true);
-    inputDateBox.getElement().setPropertyString("placeholder", messages.searchFieldDatePlaceHolder());
-    inputDateBox.getTextBox().addKeyDownHandler(keyDownHandler);
-
-    inputDateBoxFrom = new DateBox();
-    inputDateBoxFrom.setFormat(dateFormat);
-    inputDateBoxFrom.getDatePicker().setYearAndMonthDropdownVisible(true);
-    inputDateBoxFrom.getDatePicker().setYearArrowsVisible(true);
-    inputDateBoxFrom.setFireNullValues(true);
-    inputDateBoxFrom.getElement().setPropertyString("placeholder", messages.searchFieldDateFromPlaceHolder());
-    inputDateBoxFrom.getTextBox().addKeyDownHandler(keyDownHandler);
-
-    inputDateBoxTo = new DateBox();
-    inputDateBoxTo.setFormat(dateFormat);
-    inputDateBoxTo.getDatePicker().setYearAndMonthDropdownVisible(true);
-    inputDateBoxTo.getDatePicker().setYearArrowsVisible(true);
-    inputDateBoxTo.setFireNullValues(true);
-    inputDateBoxTo.getElement().setPropertyString("placeholder", messages.searchFieldDateToPlaceHolder());
-    inputDateBoxTo.getTextBox().addKeyDownHandler(keyDownHandler);
-
+    inputDateBox = createDateTextBox(messages.searchFieldDatePlaceHolder(), keyDownHandler);
+    inputDateBoxFrom = createDateTextBox(messages.searchFieldDateFromPlaceHolder(), keyDownHandler);
+    inputDateBoxTo = createDateTextBox(messages.searchFieldDateToPlaceHolder(), keyDownHandler);
     inputNumeric = new TextBox();
     inputNumeric.getElement().setPropertyString("placeholder", messages.searchFieldNumericPlaceHolder());
     inputNumeric.getElement().setAttribute("type", "number");
@@ -197,9 +171,9 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     duplicateWarning.setVisible(false);
 
     inputText.addStyleName("form-textbox");
-    inputDateBox.addStyleName("form-textbox form-textbox-small");
-    inputDateBoxFrom.addStyleName("form-textbox form-textbox-small");
-    inputDateBoxTo.addStyleName("form-textbox form-textbox-small");
+    inputDateBox.addStyleName("form-textbox form-textbox-small form-textbox-date");
+    inputDateBoxFrom.addStyleName("form-textbox form-textbox-small form-textbox-date");
+    inputDateBoxTo.addStyleName("form-textbox form-textbox-small form-textbox-date");
     inputNumeric.addStyleName("form-textbox form-textbox-small");
     inputNumericFrom.addStyleName("form-textbox form-textbox-small");
     inputNumericTo.addStyleName("form-textbox form-textbox-small");
@@ -274,16 +248,20 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
       String field = searchFields.get(0);
 
       if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE) && dateValid(inputDateBox)) {
-        filterParameter = new SimpleFilterParameter(field, inputDateBox.getValue().toString());
+        filterParameter = new DateIntervalFilterParameter(field, field,
+          Humanize.parseCivilDate(inputDateBox.getValue()), Humanize.parseCivilDate(inputDateBox.getValue()),
+          RodaConstants.DateGranularity.DAY, 0);
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)
         && dateIntervalValid(inputDateBoxFrom, inputDateBoxTo) && searchFields.size() >= 2) {
         String fieldTo = searchField.getSearchFields().get(1);
-        filterParameter = new DateIntervalFilterParameter(field, fieldTo, inputDateBoxFrom.getValue(),
-          inputDateBoxTo.getValue());
+        filterParameter = new DateIntervalFilterParameter(field, fieldTo,
+          Humanize.parseCivilDate(inputDateBoxFrom.getValue()), Humanize.parseCivilDate(inputDateBoxTo.getValue()),
+          RodaConstants.DateGranularity.DAY, 0);
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)
         && dateIntervalValid(inputDateBoxFrom, inputDateBoxTo)) {
-        filterParameter = new DateIntervalFilterParameter(field, field, inputDateBoxFrom.getValue(),
-          inputDateBoxTo.getValue());
+        filterParameter = new DateIntervalFilterParameter(field, field,
+          Humanize.parseCivilDate(inputDateBoxFrom.getValue()), Humanize.parseCivilDate(inputDateBoxTo.getValue()),
+          RodaConstants.DateGranularity.DAY, 0);
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC) && valid(inputNumeric)) {
         filterParameter = new BasicSearchFilterParameter(field, inputNumeric.getValue());
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)
@@ -385,24 +363,20 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputPanel.addStyleName("full_width");
   }
 
-  private boolean dateIntervalValid(DateBox inputFrom, DateBox inputTo) {
-    if (inputFrom.getValue() != null && inputTo.getValue() != null) {
-      return true;
-    }
-
-    if (inputFrom.getValue() != null && inputTo.getTextBox().getText().isEmpty()) {
-      return true;
-    }
-
-    if (inputFrom.getTextBox().getText().isEmpty() && inputTo.getValue() != null) {
-      return true;
-    }
-
-    return false;
+  private TextBox createDateTextBox(String placeholder, KeyDownHandler keyDownHandler) {
+    TextBox textBox = new TextBox();
+    textBox.getElement().setAttribute("type", "date");
+    textBox.getElement().setPropertyString("placeholder", placeholder);
+    textBox.addKeyDownHandler(keyDownHandler);
+    return textBox;
   }
 
-  private boolean dateValid(DateBox input) {
-    return input.getValue() != null;
+  private boolean dateIntervalValid(TextBox inputFrom, TextBox inputTo) {
+    return dateValid(inputFrom) || dateValid(inputTo);
+  }
+
+  private boolean dateValid(TextBox input) {
+    return input.getValue() != null && !input.getValue().trim().isEmpty();
   }
 
   private boolean valid(TextBox input) {

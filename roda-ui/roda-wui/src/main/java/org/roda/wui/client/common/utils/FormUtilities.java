@@ -8,7 +8,6 @@
 package org.roda.wui.client.common.utils;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -23,7 +22,6 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONException;
@@ -38,7 +36,6 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.datepicker.client.DateBox;
 
 import config.i18n.client.ClientMessages;
 
@@ -442,66 +439,38 @@ public class FormUtilities {
   private static void addDatePicker(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
     final boolean mandatory, final Callable<Void> onChange) {
     // Top label
-    final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
     if (mandatory) {
       mvLabel.addStyleName("form-label-mandatory");
     }
-    // Field
-    final DateBox mvDate = new DateBox();
+
+    final TextBox mvDate = new TextBox();
+    mvDate.getElement().setAttribute("type", "date");
     mvDate.setTitle(mvLabel.getText());
-    mvDate.getDatePicker().setYearAndMonthDropdownVisible(true);
-    mvDate.getDatePicker().setYearArrowsVisible(true);
     mvDate.addStyleName("form-textbox");
-    mvDate.setFormat(new DateBox.DefaultFormat() {
-      @Override
-      public String format(DateBox dateBox, Date date) {
-        if (date == null)
-          return null;
-        return dateTimeFormat.format(date);
-      }
-    });
 
     String value = mv.get("value");
-    if (value != null && value.length() > 0) {
-      try {
-        Date date = dateTimeFormat.parse(value.trim());
-        mvDate.setValue(date);
-      } catch (IllegalArgumentException iae) {
-        mvDate.getTextBox().setValue(value);
-      }
+    if (value != null && !value.trim().isEmpty()) {
+      mvDate.setValue(value.trim());
     }
 
-    mvDate.addValueChangeHandler(new ValueChangeHandler<Date>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<Date> valueChangeEvent) {
-        FormUtilities.callOnChange(onChange);
-        String newValue = dateTimeFormat.format(mvDate.getValue());
-        mv.set("value", newValue);
-        if (mandatory && (newValue != null && !"".equals(newValue.trim()))) {
-          mvDate.removeStyleName("isWrong");
-        } else if (mandatory && (newValue == null || "".equals(newValue.trim()))) {
-          mvDate.addStyleName("isWrong");
-        }
-      }
-    });
-
-    mvDate.getTextBox().addValueChangeHandler(new ValueChangeHandler<String>() {
-
+    mvDate.addValueChangeHandler(new ValueChangeHandler<String>() {
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
         FormUtilities.callOnChange(onChange);
-        String value = event.getValue();
-        try {
-          Date date = dateTimeFormat.parse(value.trim());
-          mvDate.setValue(date);
-          mv.set("value", value);
-        } catch (IllegalArgumentException iae) {
-          if (event.getValue() == null || "".equals(event.getValue().trim())) {
-            mv.set("value", null);
-          }
-          mvDate.getTextBox().setValue(value);
+
+        String newValue = event.getValue();
+        if (newValue != null) {
+          newValue = newValue.trim();
+        }
+
+        mv.set("value", newValue == null || newValue.isEmpty() ? null : newValue);
+
+        if (mandatory && (newValue == null || newValue.isEmpty())) {
+          mvDate.addStyleName("isWrong");
+        } else {
+          mvDate.removeStyleName("isWrong");
         }
       }
     });
