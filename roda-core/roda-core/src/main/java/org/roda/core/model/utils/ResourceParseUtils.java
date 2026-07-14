@@ -23,6 +23,7 @@ import java.util.function.Function;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
@@ -200,11 +201,16 @@ public class ResourceParseUtils {
         LOGGER.error("Error encoding urn separator when converting file event preservation metadata");
       }
     } else if (URNUtils.verifyPremisPrefix(PreservationMetadataType.FILE, filename)) {
-      type = PreservationMetadataType.FILE;
-      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
-      fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
-      String fileIdFromURN = URNUtils.getFileIdFromURN(filename);
-      fileId = fileIdFromURN.substring(0, fileIdFromURN.length() - RodaConstants.PREMIS_SUFFIX.length());
+      try {
+        type = PreservationMetadataType.FILE;
+        id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
+        fileId = PremisV3Utils.binaryToFile(((DefaultBinary) resource).getContent().createInputStream())
+          .getOriginalName().getValue();
+        fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
+      } catch (IOException | GenericException e) {
+        LOGGER.error("Error while trying to convert file event preservation metadata");
+        throw new RequestNotValidException("Error while trying to convert file event preservation metadata");
+      }
     } else if (filename.endsWith(RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX)) {
       type = PreservationMetadataType.OTHER;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
@@ -249,7 +255,7 @@ public class ResourceParseUtils {
       ? ModelUtils.extractFilePathFromRepresentationOtherMetadata(resourcePath)
       : ModelUtils.extractFilePathFromAipOtherMetadata(resourcePath);
     String fileId = filename.substring(0, filename.lastIndexOf('.'));
-    String suffix = filename.substring(filename.lastIndexOf('.'), filename.length());
+    String suffix = filename.substring(filename.lastIndexOf('.'));
 
     OtherMetadata om = new OtherMetadata();
     om.setId(IdUtils.getOtherMetadataId(aipId, representationId, fileDirectoryPath, fileId));
@@ -391,13 +397,13 @@ public class ResourceParseUtils {
       ids.add(fileName.replace(RodaConstants.PREMIS_SUFFIX, ""));
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
     } else if (classToReturn.equals(DisposalSchedule.class)) {
-      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getDisposalScheduleId(storagePath)));
+      ret = OptionalWithCause
+        .of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getDisposalScheduleId(storagePath)));
     } else if (classToReturn.equals(DisposalHold.class)) {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getDisposalHoldId(storagePath)));
     } else if (classToReturn.equals(DisposalRule.class)) {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getDisposalRuleId(storagePath)));
-    }
-    else {
+    } else {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, fileName));
     }
 

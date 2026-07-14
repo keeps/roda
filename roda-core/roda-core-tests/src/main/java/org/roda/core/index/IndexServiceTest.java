@@ -711,7 +711,7 @@ public class IndexServiceTest {
       new Sublist(0, 10), Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 
-    RepresentationInformation ri3 = index.retrieve(RepresentationInformation.class, ri.getId(), new ArrayList<>());
+    RepresentationInformation ri3 = model.retrieveRepresentationInformation(ri.getId());
     assertNotNull(ri3);
     assertEquals(ri.getId(), ri3.getId());
     assertEquals(ri.getName(), ri3.getName());
@@ -722,7 +722,7 @@ public class IndexServiceTest {
     RepresentationInformation ri4 = index.retrieve(RepresentationInformation.class, ri.getId(), new ArrayList<>());
     assertNotNull(ri4);
     assertEquals(ri.getId(), ri4.getId());
-    assertEquals(ri4.getName(), "RepresentationInformation New Name");
+    assertEquals("RepresentationInformation New Name", ri4.getName());
 
     model.deleteRepresentationInformation(ri.getId(), false);
   }

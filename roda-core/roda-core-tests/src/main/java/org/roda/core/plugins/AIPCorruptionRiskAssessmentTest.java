@@ -15,7 +15,6 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
