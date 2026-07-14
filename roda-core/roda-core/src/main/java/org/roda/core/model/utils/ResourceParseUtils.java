@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.function.Function;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
@@ -67,6 +69,7 @@ import org.roda.core.storage.InputStreamContentPayload;
 import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -180,13 +183,14 @@ public class ResourceParseUtils {
     String fileId = null;
 
     PreservationMetadataType type;
+    String substring = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
     if (URNUtils.verifyPremisPrefix(PreservationMetadataType.AGENT, filename)) {
-      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
+      id = substring;
       type = PreservationMetadataType.AGENT;
       aipId = null;
       representationId = null;
     } else if (URNUtils.verifyPremisPrefix(PreservationMetadataType.EVENT, filename)) {
-      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
+      id = substring;
       type = PreservationMetadataType.EVENT;
       try {
         String separator = URLEncoder.encode(RodaConstants.URN_SEPARATOR, RodaConstants.DEFAULT_ENCODING);
@@ -198,11 +202,15 @@ public class ResourceParseUtils {
         LOGGER.error("Error encoding urn separator when converting file event preservation metadata");
       }
     } else if (URNUtils.verifyPremisPrefix(PreservationMetadataType.FILE, filename)) {
-      type = PreservationMetadataType.FILE;
-      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
-      fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
-      String fileIdFromURN = URNUtils.getFileIdFromURN(filename);
-      fileId = fileIdFromURN.substring(0, fileIdFromURN.length() - RodaConstants.PREMIS_SUFFIX.length());
+      try {
+        type = PreservationMetadataType.FILE;
+        id = substring;
+        fileId = PremisV3Utils.binaryToFile(((DefaultBinary) resource).getContent().createInputStream()).getOriginalName().getValue();
+        fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
+      } catch (IOException | GenericException e) {
+        LOGGER.error("Error while trying to convert file event preservation metadata");
+        throw new RequestNotValidException("Error while trying to convert file event preservation metadata");
+      }
     } else if (filename.endsWith(RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX)) {
       type = PreservationMetadataType.OTHER;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
@@ -211,10 +219,10 @@ public class ResourceParseUtils {
     } else if (URNUtils.verifyPremisPrefix(PreservationMetadataType.OTHER, filename)) {
       type = PreservationMetadataType.OTHER;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
-      fileId = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
+      fileId = substring;
       id = fileId;
     } else if (URNUtils.verifyPremisPrefix(PreservationMetadataType.REPRESENTATION, filename)) {
-      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
+      id = substring;
       type = PreservationMetadataType.REPRESENTATION;
     } else {
       throw new RequestNotValidException("Unsupported PREMIS extension type in file: " + filename);
