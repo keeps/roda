@@ -4912,6 +4912,7 @@ td.datePickerMonth, td.datePickerYear {
     display: flex;
     gap: 8px;
     align-items: flex-start;
+    flex: 1;
 }
 
 .search-field-left-panel .search-field-input-panel .gwt-Label {
@@ -4933,7 +4934,6 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 1.2rem;
     width: 20px;
     margin-right: -20px;
-    margin-top: 7px;
     border: none;
     background: transparent;
     cursor: pointer;

@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  *
@@ -62,31 +63,51 @@ public class ShowJob extends Composite {
       } else if (!historyTokens.isEmpty()) {
         String jobId = historyTokens.get(0);
         Services services = new Services("Get job plugin info", "get");
-        services.jobsResource(s -> s.findByUuid(jobId, LocaleInfo.getCurrentLocale().getLocaleName())).thenCompose(
-          retrievedJob -> services.jobsResource(s -> s.getJobPluginInfo(new PluginInfoRequest(retrievedJob), LocaleInfo.getCurrentLocale().getLocaleName()))
-            .whenComplete((pluginInfoList, error) -> {
-              if (error != null) {
-                if (error.getCause() instanceof NotFoundException) {
-                  Toast.showError(messages.notFoundError(), messages.jobNotFound());
-                  HistoryUtils.newHistory(Process.RESOLVER);
-                } else {
-                  AsyncCallbackUtils.defaultFailureTreatment(error.getCause());
-                }
+
+        services.jobsResource(s -> s.findByUuid(jobId, LocaleInfo.getCurrentLocale().getLocaleName()))
+          .thenCompose(retrievedJob -> services.jobsResource(
+            s -> s.getJobPluginInfo(new PluginInfoRequest(retrievedJob), LocaleInfo.getCurrentLocale().getLocaleName()))
+            .thenCompose(pluginInfoList -> {
+              // Fetch user data via memberResource based on job username
+              String username = retrievedJob.getUsername();
+              if (username != null && !username.isEmpty()) {
+                return services.membersResource(s -> s.getUser(username)).exceptionally(ex -> null) // Fallback to null
+                                                                                                    // if user not
+                                                                                                    // found/error
+                  .thenApply(user -> {
+                    String displayName = username;
+                    if (user != null && user.getFullName() != null && !user.getFullName().isEmpty()) {
+                      displayName = user.getFullName() + " (" + username + ")";
+                    }
+                    return new JobLoadContext(retrievedJob, pluginInfoList, displayName);
+                  });
               } else {
-                Map<String, PluginInfo> pluginsInfoMap = new HashMap<>();
-                for (PluginInfo pluginInfo : pluginInfoList) {
-                  pluginsInfoMap.put(pluginInfo.getId(), pluginInfo);
-                }
-                List<FilterParameter> reportFilterParameters = new ArrayList<>();
-                for (int i = 1; i < historyTokens.size() - 1; i += 2) {
-                  String key = historyTokens.get(i);
-                  String value = historyTokens.get(i + 1);
-                  reportFilterParameters.add(new SimpleFilterParameter(key, value));
-                }
-                ShowJob showJob = new ShowJob(retrievedJob, pluginsInfoMap, reportFilterParameters);
-                callback.onSuccess(showJob);
+                return CompletableFuture.completedFuture(new JobLoadContext(retrievedJob, pluginInfoList, null));
               }
-            }));
+            }))
+          .whenComplete((context, error) -> {
+            if (error != null) {
+              if (error.getCause() instanceof NotFoundException) {
+                Toast.showError(messages.notFoundError(), messages.jobNotFound());
+                HistoryUtils.newHistory(Process.RESOLVER);
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(error.getCause());
+              }
+            } else if (context != null) {
+              Map<String, PluginInfo> pluginsInfoMap = new HashMap<>();
+              for (PluginInfo pluginInfo : context.pluginInfoList) {
+                pluginsInfoMap.put(pluginInfo.getId(), pluginInfo);
+              }
+              List<FilterParameter> reportFilterParameters = new ArrayList<>();
+              for (int i = 1; i < historyTokens.size() - 1; i += 2) {
+                String key = historyTokens.get(i);
+                String value = historyTokens.get(i + 1);
+                reportFilterParameters.add(new SimpleFilterParameter(key, value));
+              }
+              ShowJob showJob = new ShowJob(context.job, pluginsInfoMap, reportFilterParameters, context.username);
+              callback.onSuccess(showJob);
+            }
+          });
       } else {
         HistoryUtils.newHistory(Process.RESOLVER);
         callback.onSuccess(null);
@@ -112,47 +133,37 @@ public class ShowJob extends Composite {
   private static final int PERIOD_MILLIS = 10000;
   private static final int PERIOD_MILLIS_FAST = 2000;
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
+  private final Map<String, PluginInfo> pluginsInfo;
+  private final String username;
   @UiField
   FocusPanel keyboardFocus;
-
   @UiField
   NavigationToolbar<IndexedJob> navigationToolbar;
-
   @UiField
   JobActionsToolbar actionsToolbar;
-
   @UiField
   TitlePanel title;
-
   @UiField
   FlowPanel content;
-
   @UiField
   FlowPanel informationPanel;
-
   @UiField
   FlowPanel pluginParametersPanel;
-
   @UiField
   Header header;
-
   @UiField
   FlowPanel lowerContent;
-
   // State Variables
   private IndexedJob job;
-  private final Map<String, PluginInfo> pluginsInfo;
   private Timer autoUpdateTimer = null;
   private int autoUpdateTimerPeriod = 0;
-
   private SelectedItems<?> cachedSourceObjects = null;
   private boolean sourceObjectsFetched = false;
-
-  public ShowJob(IndexedJob job, Map<String, PluginInfo> pluginsInfo,
-                 List<FilterParameter> extraReportFilterParameters) {
+  public ShowJob(IndexedJob job, Map<String, PluginInfo> pluginsInfo, List<FilterParameter> extraReportFilterParameters,
+    String username) {
     this.job = job;
     this.pluginsInfo = pluginsInfo;
+    this.username = username;
     boolean isIngest = job.getPluginType().equals(PluginType.INGEST);
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -199,20 +210,20 @@ public class ShowJob extends Composite {
   private void addParameters() {
     PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
     if (pluginInfo != null && !pluginInfo.getParameters().isEmpty()) {
-      pluginParametersPanel.add(
-        new JobParametersPanel(job, pluginsInfo, pluginInfo.getParameters(), pluginNameAndVersion(pluginInfo.getName(), pluginInfo.getVersion())));
+      pluginParametersPanel.add(new JobParametersPanel(job, pluginsInfo, pluginInfo.getParameters(),
+        pluginNameAndVersion(pluginInfo.getName(), pluginInfo.getVersion())));
     }
   }
 
   private String pluginNameAndVersion(String pluginName, String version) {
-    return pluginName+ " (" + version + ")";
+    return pluginName + " (" + version + ")";
   }
 
   private void updateUi(final boolean isIngest) {
     // Refresh the content panel
     informationPanel.clear();
     informationPanel.addStyleName("mb-16");
-    informationPanel.add(new JobDetailsPanel(job, isIngest, isJobInFinalState(), cachedSourceObjects,
+    informationPanel.add(new JobDetailsPanel(job, username, isIngest, isJobInFinalState(), cachedSourceObjects,
       sourceObjectsFetched, fetchedData -> {
         this.cachedSourceObjects = fetchedData;
         this.sourceObjectsFetched = true;
@@ -322,5 +333,18 @@ public class ShowJob extends Composite {
   }
 
   interface MyUiBinder extends UiBinder<Widget, ShowJob> {
+  }
+
+  // Helper class to pass data cleanly through the Compose chain
+  private static class JobLoadContext {
+    final IndexedJob job;
+    final List<PluginInfo> pluginInfoList;
+    final String username;
+
+    JobLoadContext(IndexedJob job, List<PluginInfo> pluginInfoList, String username) {
+      this.job = job;
+      this.pluginInfoList = pluginInfoList;
+      this.username = username;
+    }
   }
 }

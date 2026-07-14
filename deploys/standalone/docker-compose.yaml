@@ -1,7 +1,7 @@
 services:
 
   zoo:
-    image: docker.io/zookeeper:3.9-jre-17
+    image: docker.io/zookeeper:3.9.5-jre-17
     restart: unless-stopped
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
@@ -10,7 +10,7 @@ services:
       - zookeeper_datalog:/datalog
 
   solr:
-    image: docker.io/solr:9.8.1
+    image: docker.io/solr:10.0.0
     restart: unless-stopped
     ports:
       - "8983:8983"
@@ -22,14 +22,14 @@ services:
       - solr_data:/var/solr
 
   clamd:
-    image: docker.io/clamav/clamav:1.4
+    image: docker.io/clamav/clamav:1.5.3-debian
     restart: unless-stopped
     volumes:
       - clam_data:/var/lib/clamav
       - roda_data:/roda/data/
 
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.11.0
+    image: ghcr.io/keeps/siegfried:v1.11.6
     restart: unless-stopped
     environment:
       SIEGFRIED_HOST: 0.0.0.0
@@ -49,7 +49,7 @@ services:
       - VALIDATOR_URL=none
 
   mailpit:
-    image: axllent/mailpit:v1.24
+    image: axllent/mailpit:v1.30.3
     restart: unless-stopped
     ports:
       - "1025:1025" # smtp server

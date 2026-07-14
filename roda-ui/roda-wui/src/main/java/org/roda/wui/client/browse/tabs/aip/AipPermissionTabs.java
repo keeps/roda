@@ -5,6 +5,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import org.roda.core.data.v2.generics.UpdatePermissionsRequest;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -24,7 +30,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -43,7 +48,7 @@ public class AipPermissionTabs extends GenericMetadataCardPanel<IndexedAIP> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private final AsyncCallback<Actionable.ActionImpact> parentCallback;
   private final boolean hasDips;
-  private IndexedAIP aip;
+  private final IndexedAIP aip;
 
   public AipPermissionTabs(IndexedAIP aip, boolean hasDips, AsyncCallback<Actionable.ActionImpact> parentCallback) {
     super();
@@ -115,7 +120,8 @@ public class AipPermissionTabs extends GenericMetadataCardPanel<IndexedAIP> {
     }
 
     BasicTablePanel<String> table = new BasicTablePanel<>(groupNames.iterator(),
-      new BasicTablePanel.ColumnInfo<String>(messages.groupName(), 15, getNameColumn()),
+      new BasicTablePanel.ColumnInfo<String>("", 0.8, getGroupTypeColumn()),
+      new BasicTablePanel.ColumnInfo<String>(messages.groupName(), 15, getGroupNameColumn()),
       new BasicTablePanel.ColumnInfo<String>(messages.userPermissions(), 20, getGroupPermissionsColumn()),
       new BasicTablePanel.ColumnInfo<String>(messages.actions(), 5, getGroupActionsColumn()));
 
@@ -138,7 +144,8 @@ public class AipPermissionTabs extends GenericMetadataCardPanel<IndexedAIP> {
     }
 
     BasicTablePanel<String> table = new BasicTablePanel<>(usernames.iterator(),
-      new BasicTablePanel.ColumnInfo<String>(messages.username(), 15, getNameColumn()),
+      new BasicTablePanel.ColumnInfo<String>("", 0.8, getUserTypeColumn()),
+      new BasicTablePanel.ColumnInfo<String>(messages.username(), 15, getUserNameColumn()),
       new BasicTablePanel.ColumnInfo<String>(messages.userPermissions(), 20, getUserPermissionsColumn()),
       new BasicTablePanel.ColumnInfo<String>(messages.actions(), 5, getUserActionsColumn()));
 
@@ -149,28 +156,103 @@ public class AipPermissionTabs extends GenericMetadataCardPanel<IndexedAIP> {
     return new ScrollPanel(panel);
   }
 
-  private TextColumn<String> getNameColumn() {
-    return new TextColumn<String>() {
+  private Column<String, SafeHtml> getGroupTypeColumn() {
+    return new Column<String, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(String name) {
-        return name;
+      public SafeHtml getValue(String object) {
+        return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-users'></i>");
       }
     };
   }
 
-  private TextColumn<String> getUserPermissionsColumn() {
-    return new TextColumn<String>() {
+  private Column<String, SafeHtml> getUserTypeColumn() {
+    return new Column<String, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(String username) {
+      public SafeHtml getValue(String object) {
+        return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>");
+      }
+    };
+  }
+
+  private Column<String, SafeHtml> getGroupNameColumn() {
+    return new Column<String, SafeHtml>(new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(String groupName) {
+        // Generate a unique ID for the DOM element to update later
+        String elementId = "user-cell-" + groupName + "-" + System.currentTimeMillis();
+
+        // Fire the async request using RODA's Services wrapper
+        Services services = new Services("Get group", "get");
+        services.membersResource(s -> s.getGroup(groupName)).whenComplete((group, throwable) -> {
+          if (throwable == null && group != null) {
+            Element element = Document.get().getElementById(elementId);
+            if (element != null) {
+              // Update the cell with the group's full name (or fallback to username)
+              String displayName = group.getFullName() != null && !group.getFullName().isEmpty()
+                ? group.getFullName() + " (" + groupName + ")"
+                : groupName;
+              element.setInnerText(displayName);
+            }
+          }
+        });
+
+        // Render a placeholder immediately while the request happens in the background
+        SafeHtmlBuilder builder = new SafeHtmlBuilder();
+        builder.appendHtmlConstant("<span id=\"" + elementId + "\">");
+        builder.appendEscaped(groupName); // Fallback text while loading
+        builder.appendHtmlConstant("</span>");
+
+        return builder.toSafeHtml();
+      }
+    };
+  }
+
+  private Column<String, SafeHtml> getUserNameColumn() {
+    return new Column<String, SafeHtml>(new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(String username) {
+        // Generate a unique ID for the DOM element to update later
+        String elementId = "user-cell-" + username + "-" + System.currentTimeMillis();
+
+        // Fire the async request using RODA's Services wrapper
+        Services services = new Services("Get user", "get");
+        services.membersResource(s -> s.getUser(username)).whenComplete((user, throwable) -> {
+          if (throwable == null && user != null) {
+            Element element = Document.get().getElementById(elementId);
+            if (element != null) {
+              // Update the cell with the user's full name (or fallback to username)
+              String displayName = user.getFullName() != null && !user.getFullName().isEmpty()
+                ? user.getFullName() + " (" + username + ")"
+                : username;
+              element.setInnerText(displayName);
+            }
+          }
+        });
+
+        // Render a placeholder immediately while the request happens in the background
+        SafeHtmlBuilder builder = new SafeHtmlBuilder();
+        builder.appendHtmlConstant("<span id=\"" + elementId + "\">");
+        builder.appendEscaped(username); // Fallback text while loading
+        builder.appendHtmlConstant("</span>");
+
+        return builder.toSafeHtml();
+      }
+    };
+  }
+
+  private Column<String, SafeHtml> getUserPermissionsColumn() {
+    return new Column<String, SafeHtml>(new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(String username) {
         return formatPermissions(aip.getPermissions().getUserPermissions(username));
       }
     };
   }
 
-  private TextColumn<String> getGroupPermissionsColumn() {
-    return new TextColumn<String>() {
+  private Column<String, SafeHtml> getGroupPermissionsColumn() {
+    return new Column<String, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(String groupname) {
+      public SafeHtml getValue(String groupname) {
         return formatPermissions(aip.getPermissions().getGroupPermissions(groupname));
       }
     };
@@ -198,16 +280,23 @@ public class AipPermissionTabs extends GenericMetadataCardPanel<IndexedAIP> {
     };
   }
 
-  private String formatPermissions(Set<Permissions.PermissionType> permissions) {
-    List<String> labels = new ArrayList<>();
+  private SafeHtml formatPermissions(Set<Permissions.PermissionType> permissions) {
+    SafeHtmlBuilder builder = new SafeHtmlBuilder();
 
     for (Permissions.PermissionType permission : Permissions.PermissionType.values()) {
       if (permissions.contains(permission)) {
-        labels.add(messages.objectPermission(permission));
+        if (Permissions.PermissionType.DELETE.equals(permission)
+          || Permissions.PermissionType.GRANT.equals(permission)) {
+          builder.appendHtmlConstant("<span class=\"label-danger\">");
+        } else {
+          builder.appendHtmlConstant("<span class=\"label-info\">");
+        }
+        builder.appendEscaped(messages.objectPermission(permission));
+        builder.appendHtmlConstant("</span> ");
       }
     }
 
-    return String.join(", ", labels);
+    return builder.toSafeHtml();
   }
 
   private AsyncCallback<Actionable.ActionImpact> createMemberPermissionsCallback() {
@@ -286,8 +375,8 @@ public class AipPermissionTabs extends GenericMetadataCardPanel<IndexedAIP> {
 
   private void removeUserPermission(IndexedAIP aip, String username) {
     Dialogs.showConfirmDialog(messages.removePermissionConfirmDialogTitle(),
-      messages.removeUserPermissionConfirmationMessage(username),
-      messages.cancelButton(), messages.confirmButton(), new NoAsyncCallback<Boolean>() {
+      messages.removeUserPermissionConfirmationMessage(username), messages.cancelButton(), messages.confirmButton(),
+      new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
@@ -301,8 +390,8 @@ public class AipPermissionTabs extends GenericMetadataCardPanel<IndexedAIP> {
 
   private void removeGroupPermission(IndexedAIP aip, String groupname) {
     Dialogs.showConfirmDialog(messages.removePermissionConfirmDialogTitle(),
-      messages.removeGroupPermissionConfirmationMessage(groupname),
-      messages.cancelButton(), messages.confirmButton(), new NoAsyncCallback<Boolean>() {
+      messages.removeGroupPermissionConfirmationMessage(groupname), messages.cancelButton(), messages.confirmButton(),
+      new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {

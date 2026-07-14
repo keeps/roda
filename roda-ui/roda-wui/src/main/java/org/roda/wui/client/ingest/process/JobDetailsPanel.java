@@ -61,15 +61,17 @@ public class JobDetailsPanel extends GenericMetadataCardPanel<IndexedJob> {
 
   private final boolean isIngest;
   private final boolean isJobInFinalState;
+  private final String username;
 
   private final SelectedItems<?> cachedSourceObjects;
   private final boolean sourceObjectsFetched;
   private final Consumer<SelectedItems<?>> sourceObjectsCallback;
 
-  public JobDetailsPanel(IndexedJob job, boolean isIngest, boolean isJobInFinalState,
+  public JobDetailsPanel(IndexedJob job, String username, boolean isIngest, boolean isJobInFinalState,
     SelectedItems<?> cachedSourceObjects, boolean sourceObjectsFetched,
     Consumer<SelectedItems<?>> sourceObjectsCallback) {
     this.isIngest = isIngest;
+    this.username = username;
     this.isJobInFinalState = isJobInFinalState;
     this.cachedSourceObjects = cachedSourceObjects;
     this.sourceObjectsFetched = sourceObjectsFetched;
@@ -89,7 +91,7 @@ public class JobDetailsPanel extends GenericMetadataCardPanel<IndexedJob> {
     buildInstanceArea(data);
 
     buildField(messages.jobName()).withValue(data.getName()).build();
-    buildField(messages.jobCreator()).withValue(data.getUsername()).build();
+    buildField(messages.jobCreator()).withValue(username).build();
 
     buildField(messages.joOrchestration())
       .withMultipleHtmlBadges(List.of(HtmlSnippetUtils.getJobPriorityHtml(data.getPriority(), true),
