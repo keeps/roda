@@ -212,7 +212,7 @@ public class RiskIncidenceRegister extends Composite {
         indexedRepresentationCompletableFuture);
 
       allFutures.thenRun(() -> {
-        breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(indexedAIPCompletableFuture.join(),
+        breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(new ArrayList<>(), indexedAIPCompletableFuture.join(),
           indexedRepresentationCompletableFuture.join(), indexedFile));
         breadcrumb.setVisible(true);
       });

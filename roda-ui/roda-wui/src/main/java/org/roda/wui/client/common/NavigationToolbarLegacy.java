@@ -323,7 +323,7 @@ public class NavigationToolbarLegacy<T extends IsIndexed> extends Composite impl
 
   public void updateBreadcrumb(IndexedAIP indexedAIP, IndexedRepresentation indexedRepresentation,
     IndexedFile indexedFile) {
-    breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(indexedAIP, indexedRepresentation, indexedFile));
+    breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(new ArrayList<>(), indexedAIP, indexedRepresentation, indexedFile));
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(indexedAIP.getState()));
     aipState.setVisible(AIPState.ACTIVE != indexedAIP.getState());
   }
@@ -334,7 +334,7 @@ public class NavigationToolbarLegacy<T extends IsIndexed> extends Composite impl
 
   public void updateBreadcrumb(BrowseDIPResponse response) {
     if (response.getReferred() instanceof IndexedFile) {
-      breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(response.getIndexedAIP(),
+      breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(new ArrayList<>(), response.getIndexedAIP(),
         response.getIndexedRepresentation(), response.getIndexedFile()));
     } else if (response.getReferred() instanceof IndexedRepresentation) {
       breadcrumb.updatePath(

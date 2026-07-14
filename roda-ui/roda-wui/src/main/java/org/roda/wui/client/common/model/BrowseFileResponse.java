@@ -26,10 +26,12 @@ public class BrowseFileResponse {
   private LongResponse riskCounterResponse;
   private LongResponse preservationCounterResponse;
   private List<String> representationInformationFields;
+  private List<IndexedAIP> ancestors;
   private TechnicalMetadataInfos technicalMetadataInfos;
 
   public BrowseFileResponse() {
     representationInformationFields = new ArrayList<>();
+    ancestors = new ArrayList<>();
   }
 
   public IndexedAIP getIndexedAIP() {
@@ -78,6 +80,14 @@ public class BrowseFileResponse {
 
   public void setRepresentationInformationFields(List<String> representationInformationFields) {
     this.representationInformationFields = representationInformationFields;
+  }
+
+  public List<IndexedAIP> getAncestors() {
+    return ancestors;
+  }
+
+  public void setAncestors(List<IndexedAIP> ancestors) {
+    this.ancestors = ancestors;
   }
 
   public TechnicalMetadataInfos getTechnicalMetadataInfos() {
