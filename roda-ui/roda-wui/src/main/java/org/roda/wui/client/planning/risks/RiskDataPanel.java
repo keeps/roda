@@ -6,13 +6,12 @@
  * https://github.com/keeps/roda
  */
 
-package org.roda.wui.client.planning;
+package org.roda.wui.client.planning.risks;
 
 import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskMitigationProperties;

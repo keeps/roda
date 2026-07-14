@@ -26,7 +26,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.EditMultipleRiskIncidenceDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.planning.EditRiskIncidence;
+import org.roda.wui.client.planning.risks.EditRiskIncidence;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;

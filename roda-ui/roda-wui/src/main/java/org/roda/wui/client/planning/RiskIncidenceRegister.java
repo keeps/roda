@@ -30,6 +30,8 @@ import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.planning.risks.EditRiskIncidence;
+import org.roda.wui.client.planning.risks.ShowRiskIncidence;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;

@@ -1,4 +1,4 @@
-package org.roda.wui.client.planning.tabs;
+package org.roda.wui.client.planning.ri.tabs;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
@@ -18,8 +18,8 @@ import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.planning.RepresentationInformationNetwork;
-import org.roda.wui.client.planning.ShowRepresentationInformation;
+import org.roda.wui.client.planning.ri.RepresentationInformationNetwork;
+import org.roda.wui.client.planning.ri.ShowRepresentationInformation;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.tools.HistoryUtils;

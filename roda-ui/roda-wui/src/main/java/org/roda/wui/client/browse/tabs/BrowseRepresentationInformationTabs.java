@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import org.roda.wui.client.planning.tabs.RepresentationInformationDetailsPanel;
+import org.roda.wui.client.planning.ri.tabs.RepresentationInformationDetailsPanel;
 
 /**
  *

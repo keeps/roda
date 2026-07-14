@@ -37,7 +37,7 @@ import org.roda.wui.client.management.distributed.DistributedInstancesManagement
 import org.roda.wui.client.management.distributed.LocalInstanceManagement;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.agents.PreservationAgents;
-import org.roda.wui.client.planning.RepresentationInformationNetwork;
+import org.roda.wui.client.planning.ri.RepresentationInformationNetwork;
 import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.IngestProcess;

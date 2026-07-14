@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.planning;
+package org.roda.wui.client.planning.risks;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +17,9 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.planning.ri.RepresentationInformationNetwork;
+import org.roda.wui.client.planning.RiskIncidenceRegister;
+import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;

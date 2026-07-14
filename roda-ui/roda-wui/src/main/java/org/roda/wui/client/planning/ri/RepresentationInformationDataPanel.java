@@ -1,4 +1,4 @@
-package org.roda.wui.client.planning;
+package org.roda.wui.client.planning.ri;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,13 +12,14 @@ import org.roda.core.data.v2.ri.RepresentationInformationFamily;
 import org.roda.core.data.v2.ri.RepresentationInformationFamilyOptions;
 import org.roda.core.data.v2.ri.RepresentationInformationSupport;
 import org.roda.wui.client.common.IncrementalFilterList;
-import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.client.common.IncrementalRelationList;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.forms.GenericDataForm;
 import org.roda.wui.client.common.forms.GenericDataPanel;
 import org.roda.wui.client.common.forms.TagInputWidget;
 import org.roda.wui.client.common.utils.FormUtilities;
+import org.roda.wui.client.planning.Planning;
+import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.client.services.Services;
 
 import com.google.gwt.core.client.GWT;
