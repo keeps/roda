@@ -8,7 +8,7 @@
 /**
  *
  */
-package org.roda.wui.client.planning;
+package org.roda.wui.client.planning.ri;
 
 import java.util.List;
 
@@ -20,6 +20,8 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.planning.Planning;
+import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;

@@ -5,25 +5,19 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.planning;
+package org.roda.wui.client.planning.ri;
 
 import java.util.List;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import config.i18n.client.ClientMessages;
-import org.roda.core.data.v2.disposal.schedule.DisposalSchedule;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationCreateRequest;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoActionsToolbar;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.disposal.hold.ShowDisposalHold;
-import org.roda.wui.client.disposal.hold.data.panels.DisposalHoldDataPanel;
-import org.roda.wui.client.disposal.policy.DisposalPolicy;
-import org.roda.wui.client.disposal.schedule.data.panels.DisposalScheduleDataPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
@@ -36,7 +30,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import org.roda.wui.common.client.widgets.Toast;
 
 public class CreateRepresentationInformation extends Composite {
 

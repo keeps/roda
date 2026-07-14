@@ -8,7 +8,7 @@
 /**
  *
  */
-package org.roda.wui.client.planning;
+package org.roda.wui.client.planning.risks;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +21,7 @@ import org.roda.wui.client.common.*;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -77,6 +78,7 @@ public class ShowRisk extends Composite {
       }
     }
   };
+
   @UiField
   FocusPanel keyboardFocus;
   @UiField
@@ -88,11 +90,9 @@ public class ShowRisk extends Composite {
   @UiField
   BrowseRiskActionsToolbar actionsToolbar;
   private IndexedRisk risk;
-  private RiskMitigationTerms riskMitigationTerms;
 
   public ShowRisk(IndexedRisk risk, RiskMitigationTerms terms) {
     this.risk = risk;
-    this.riskMitigationTerms = terms;
 
     riskTabs = new BrowseRiskTabs();
 
@@ -177,7 +177,6 @@ public class ShowRisk extends Composite {
 
   private void updateRiskUI(IndexedRisk updatedRisk, RiskMitigationTerms updatedTerms) {
     this.risk = updatedRisk;
-    this.riskMitigationTerms = updatedTerms;
     navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getRiskBreadCrumbs(updatedRisk));
     actionsToolbar.setObjectAndBuild(updatedRisk, null, handler);
     title.setText(StringUtils.isNotBlank(updatedRisk.getName()) ? updatedRisk.getName() : updatedRisk.getId());

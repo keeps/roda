@@ -32,6 +32,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
@@ -67,14 +68,14 @@ import org.roda.wui.client.management.members.EditGroup;
 import org.roda.wui.client.management.members.EditUser;
 import org.roda.wui.client.management.members.MemberManagement;
 import org.roda.wui.client.management.members.ShowMember;
-import org.roda.wui.client.planning.CreateRepresentationInformation;
-import org.roda.wui.client.planning.CreateRisk;
-import org.roda.wui.client.planning.EditRepresentationInformation;
-import org.roda.wui.client.planning.EditRisk;
-import org.roda.wui.client.planning.RepresentationInformationNetwork;
+import org.roda.wui.client.planning.ri.CreateRepresentationInformation;
+import org.roda.wui.client.planning.risks.CreateRisk;
+import org.roda.wui.client.planning.ri.EditRepresentationInformation;
+import org.roda.wui.client.planning.risks.EditRisk;
+import org.roda.wui.client.planning.ri.RepresentationInformationNetwork;
 import org.roda.wui.client.planning.RiskRegister;
-import org.roda.wui.client.planning.ShowRepresentationInformation;
-import org.roda.wui.client.planning.ShowRisk;
+import org.roda.wui.client.planning.ri.ShowRepresentationInformation;
+import org.roda.wui.client.planning.risks.ShowRisk;
 import org.roda.wui.client.planning.agents.PreservationAgents;
 import org.roda.wui.client.planning.agents.ShowPreservationAgent;
 import org.roda.wui.client.process.ActionProcess;
@@ -871,6 +872,23 @@ public class BreadcrumbUtils {
       List<String> path = new ArrayList<>(ShowPreservationAgent.RESOLVER.getHistoryPath());
       path.add(agent.getId());
       String label = agent.getName();
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
+    }
+
+    return ret;
+  }
+
+  public static List<BreadcrumbItem> getRiskIncidenceBreadcrumbs(RiskIncidence incidence) {
+    List<BreadcrumbItem> ret = new ArrayList<>();
+
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.riskRegisterTitle()),
+            messages.riskRegisterTitle(), RiskRegister.RESOLVER.getHistoryPath()));
+
+    if (incidence != null) {
+      List<String> path = new ArrayList<>(ShowRisk.RESOLVER.getHistoryPath());
+      path.add(incidence.getUUID());
+
+      String label = incidence.getId();
       ret.add(new BreadcrumbItem(SafeHtmlUtils.fromString(label), label, path));
     }
 

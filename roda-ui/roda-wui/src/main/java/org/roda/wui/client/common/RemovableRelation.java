@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
-import org.roda.wui.client.planning.ShowRepresentationInformation;
+import org.roda.wui.client.planning.ri.ShowRepresentationInformation;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 

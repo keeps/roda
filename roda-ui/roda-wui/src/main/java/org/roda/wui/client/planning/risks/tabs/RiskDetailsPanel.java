@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 
-package org.roda.wui.client.planning;
+package org.roda.wui.client.planning.risks.tabs;
 
 import java.util.List;
 import java.util.stream.Collectors;

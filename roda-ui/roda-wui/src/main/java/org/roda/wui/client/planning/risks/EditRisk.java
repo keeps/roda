@@ -5,25 +5,27 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.planning;
+package org.roda.wui.client.planning.risks;
 
 import java.util.List;
 
 import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoActionsToolbar;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -34,14 +36,25 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
-public class CreateRisk extends Composite {
+public class EditRisk extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
-
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      CreateRisk createRisk = new CreateRisk();
-      callback.onSuccess(createRisk);
+      if (historyTokens.size() == 1) {
+        Services services = new Services("Retrieve indexed risk", "get");
+
+        services
+          .rodaEntityRestService(s -> s.findByUuid(historyTokens.get(0), LocaleInfo.getCurrentLocale().getLocaleName()),
+            IndexedRisk.class)
+          .whenComplete((risk, throwable) -> {
+            if (throwable != null) {
+              callback.onFailure(throwable);
+            } else {
+              callback.onSuccess(new EditRisk(risk));
+            }
+          });
+      }
     }
 
     @Override
@@ -56,7 +69,7 @@ public class CreateRisk extends Composite {
 
     @Override
     public String getHistoryToken() {
-      return "create_risk";
+      return "edit_risk";
     }
   };
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -77,34 +90,38 @@ public class CreateRisk extends Composite {
   @UiField
   TitlePanel title;
 
-  public CreateRisk() {
+  /**
+   * Create a panel to edit Risk
+   *
+   * @param risk
+   *
+   */
+  public EditRisk(IndexedRisk risk) {
     initWidget(uiBinder.createAndBindUi(this));
-
-    RiskDataPanel dataPanel = new RiskDataPanel();
+    RiskDataPanel dataPanel = new RiskDataPanel(risk, true);
     riskDataPanel.add(dataPanel);
 
     dataPanel.setSaveHandler(() -> {
-      Risk risk = dataPanel.getValue();
-      Services services = new Services("Create a risk", "create");
-      services.riskResource(s -> s.createRisk(risk)).whenComplete((created, throwable) -> {
+      Services services = new Services("Update risk", "update");
+      services.riskResource(s -> s.updateRisk(dataPanel.getValue())).whenComplete((updated, throwable) -> {
         if (throwable != null) {
           AsyncCallbackUtils.defaultFailureTreatment(throwable);
         } else {
-          Toast.showInfo(messages.riskCreatedTitle(), messages.riskCreatedMessage());
-          HistoryUtils.newHistory(ShowRisk.RESOLVER, created.getUUID());
+          Toast.showInfo(messages.riskUpdatedTitle(), messages.riskUpdatedMessage());
+          HistoryUtils.newHistory(ShowRisk.RESOLVER, updated.getUUID());
         }
       });
     });
 
-    dataPanel.setCancelHandler(() -> HistoryUtils.newHistory(RiskRegister.RESOLVER));
+    dataPanel.setCancelHandler(() -> HistoryUtils.newHistory(ShowRisk.RESOLVER, risk.getUUID()));
 
     navigationToolbar.withoutButtons().build();
-    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getCreateRiskBreadCrumbs());
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getEditRiskBreadCrumbs(risk));
 
-    actionsToolbar.setLabel(messages.newRiskTitle());
+    actionsToolbar.setLabel(messages.editRiskTitle());
     actionsToolbar.build();
 
-    title.setText(messages.newRiskTitle());
+    title.setText(StringUtils.isNotBlank(risk.getName()) ? risk.getName() : risk.getId());
     title.setIconClass("IndexedRisk");
     title.addStyleName("mb-20");
 
@@ -112,7 +129,7 @@ public class CreateRisk extends Composite {
     keyboardFocus.addStyleName("browse");
   }
 
-  interface MyUiBinder extends UiBinder<Widget, CreateRisk> {
+  interface MyUiBinder extends UiBinder<Widget, EditRisk> {
   }
 
 }

@@ -11,7 +11,7 @@ import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
-import org.roda.wui.client.planning.RiskDetailsPanel;
+import org.roda.wui.client.planning.risks.tabs.RiskDetailsPanel;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
