@@ -1,5 +1,16 @@
 # Changelog
 
+## v5.8.1 (14/07/2026)
+#### Bug fixes
+
+- Fix false positive results when running File Integrity Verifier plugin on historic AIPs c28987b2049ce35568361353503c8d9205dfdaea
+- Fix historical date time zone; Replace DateBox with HTML5 date input for civil dates in create/edit descriptive metadata and advanced search 60532a0cdfbb186c26275e9a576bf69e9df4ae39
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.8.0 (29/06/2026)
 #### New features 
 - Added configuration for inventory report checksum algorithms (https://github.com/keeps/roda/commit/a51dddd2bd5b70731f3e06726d8570981692ad9a)
@@ -377,23 +388,6 @@ To try out this version, check the [install instructions](https://github.com/kee
 #### Bug fixes
 
 - Custom E-ARK SIP representation type not being set when ingesting a E-ARK SIP #3139
-
-#### Security
-- Several dependency major upgrades to fix security vulnerabilities
-
----
-
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
----
-
-## v5.6.0 (04/04/2024)
-#### New features 
-
-- Auto refresh after the session expires
-
-#### Enhancements 
-
-- Update representation information links
 
 #### Security
 - Several dependency major upgrades to fix security vulnerabilities
