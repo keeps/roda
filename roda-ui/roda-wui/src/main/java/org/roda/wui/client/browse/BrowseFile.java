@@ -172,11 +172,14 @@ public class BrowseFile extends Composite {
               .fileResource(s -> s.retrieveTechnicalMetadataInfos(indexedFile.getUUID(),
                 LocaleInfo.getCurrentLocale().getLocaleName()));
 
-            CompletableFuture.allOf(riskCounterCompletableFuture, preservationCounterCompletableFuture,
+            CompletableFuture<List<IndexedAIP>> ancestorsCompletableFuture = services.aipResource(s -> s.getAncestors(historyAipId));
+
+            CompletableFuture.allOf(riskCounterCompletableFuture, preservationCounterCompletableFuture, ancestorsCompletableFuture,
               dipCounterCompletableFuture, retrieveAIPCompletableFuture, retrieveRepresentationCompletableFuture,
               retrieveTechnicalMetadataCompletableFuture).thenApply(unused -> {
                 BrowseFileResponse response = new BrowseFileResponse();
                 response.setIndexedAIP(retrieveAIPCompletableFuture.join());
+                response.setAncestors(ancestorsCompletableFuture.join());
                 response.setIndexedRepresentation(retrieveRepresentationCompletableFuture.join());
                 response.setRiskCounterResponse(riskCounterCompletableFuture.join());
                 response.setDipCounterResponse(dipCounterCompletableFuture.join());
@@ -253,7 +256,7 @@ public class BrowseFile extends Composite {
       .withActionImpactHandler(Actionable.ActionImpact.DESTROYED, () -> HistoryUtils
         .newHistory(BrowseRepresentation.RESOLVER, indexedFile.getAipId(), indexedFile.getRepresentationId()))
       .build();
-    navigationToolbar.updateBreadcrumb(response.getIndexedAIP(), response.getIndexedRepresentation(), indexedFile);
+    navigationToolbar.updateBreadcrumb(response.getAncestors(), response.getIndexedAIP(), response.getIndexedRepresentation(), indexedFile);
 
     handlers = new HashMap<>();
 

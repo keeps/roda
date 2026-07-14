@@ -77,7 +77,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
-public class BrowseAIPPortal extends Composite {
+public class  BrowseAIPPortal extends Composite {
   private static final List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static SimplePanel container;

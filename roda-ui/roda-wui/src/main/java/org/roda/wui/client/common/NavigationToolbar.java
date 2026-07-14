@@ -198,9 +198,9 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(ancestors, indexedAIP, indexedRepresentation));
   }
 
-  public void updateBreadcrumb(IndexedAIP indexedAIP, IndexedRepresentation indexedRepresentation,
+  public void updateBreadcrumb(List<IndexedAIP> ancestors, IndexedAIP indexedAIP, IndexedRepresentation indexedRepresentation,
     IndexedFile indexedFile) {
-    breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(indexedAIP, indexedRepresentation, indexedFile));
+    breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(ancestors, indexedAIP, indexedRepresentation, indexedFile));
   }
 
   public void updateBreadcrumb(IndexedDIP dip, DIPFile dipFile, List<DIPFile> ancestors) {

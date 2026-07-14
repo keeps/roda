@@ -289,17 +289,18 @@ public class BreadcrumbUtils {
     return ret;
   }
 
-  public static List<BreadcrumbItem> getFileBreadcrumbs(IndexedAIP aip, IndexedRepresentation representation,
+  public static List<BreadcrumbItem> getFileBreadcrumbs(List<IndexedAIP> ancestors, IndexedAIP aip, IndexedRepresentation representation,
     IndexedFile file) {
 
-    List<BreadcrumbItem> fullBreadcrumb = new ArrayList<>();
+    List<BreadcrumbItem> fullBreadcrumb = getRepresentationBreadcrumbs(ancestors, aip, representation);
+
     List<BreadcrumbItem> fileBreadcrumb = new ArrayList<>();
 
     // AIP
-    fullBreadcrumb.add(getBreadcrumbItem(aip));
+    //fullBreadcrumb.add(getBreadcrumbItem(aip));
 
     // Representation
-    fullBreadcrumb.add(getBreadcrumbItem(representation));
+    //fullBreadcrumb.add(getBreadcrumbItem(representation));
 
     if (file != null) {
       // File directory path
