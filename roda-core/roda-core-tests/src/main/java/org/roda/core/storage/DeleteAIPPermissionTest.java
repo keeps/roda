@@ -36,7 +36,6 @@ import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
 import org.roda.core.security.LdapUtilityTestHelper;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageServiceTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
