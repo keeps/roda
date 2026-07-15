@@ -9,8 +9,12 @@ package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexedRepresentationRequest;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -57,7 +61,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -153,7 +157,8 @@ public class DescriptiveMetadataHistory extends Composite {
   private final String aipId;
   private final String representationId;
   private final String descriptiveMetadataId;
-
+  // UX Improvement: Track the new timeline nodes
+  private final Map<String, FlowPanel> timelineItemWidgets = new HashMap<>();
   @UiField
   ActionsToolbar actionsToolbar;
   @UiField
@@ -247,6 +252,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
   private void init() {
     radioContainer.clear();
+    timelineItemWidgets.clear();
 
     if (descriptiveMetadataVersions.getVersions() == null) {
       selectedVersion = null;
@@ -257,13 +263,13 @@ public class DescriptiveMetadataHistory extends Composite {
     List<ResourceVersion> versionList = new ArrayList<>(descriptiveMetadataVersions.getVersions());
     versionList.sort((v1, v2) -> (int) (v2.getCreatedDate().getTime() - v1.getCreatedDate().getTime()));
 
-    String radioGroupName = "versionsGroup_" + descriptiveMetadataId;
     boolean isFirst = true;
 
     for (ResourceVersion version : versionList) {
-      String versionKey = version.getId();
+      final String versionKey = version.getId();
       String message = "";
 
+      // 1. Build the "Action by User" string
       if (version.getProperties() != null) {
         message = messages.versionAction(version.getProperties().get(RodaConstants.VERSION_ACTION));
 
@@ -273,30 +279,68 @@ public class DescriptiveMetadataHistory extends Composite {
       }
 
       Date createdDate = version.getCreatedDate();
-      String labelText = messages.descriptiveMetadataHistoryLabel(message, createdDate);
-      RadioButton rb = new RadioButton(radioGroupName, labelText);
 
-      rb.addStyleName("mb-5 display-block my-custom-radio");
-      rb.addValueChangeHandler(event -> {
-        if (event.getValue()) {
-          selectedVersion = versionKey;
-          updateTabs();
-        }
-      });
+      // 2. Create the timeline item wrapper
+      final FlowPanel timelineItem = new FlowPanel();
+      timelineItem.addStyleName("history-timeline-item");
+
+      // 3. Create the circular node indicator
+      FlowPanel nodeIndicator = new FlowPanel();
+      nodeIndicator.addStyleName("history-timeline-node");
+
+      // 4. Create the Two-Line Text Wrapper
+      FlowPanel textWrapper = new FlowPanel();
+      textWrapper.addStyleName("history-timeline-text-wrapper");
+
+      // Primary Label: Formatted Date & Time
+      DateTimeFormat dtf = DateTimeFormat.getFormat("MMM dd, yyyy, h:mm a");
+      Label dateLabel = new Label(dtf.format(createdDate));
+      dateLabel.addStyleName("history-timeline-date");
+
+      // Secondary Label: Action & User
+      Label actorLabel = new Label(message);
+      actorLabel.addStyleName("history-timeline-actor");
+
+      // Assemble the hierarchy
+      textWrapper.add(dateLabel);
+      textWrapper.add(actorLabel);
+      timelineItem.add(nodeIndicator);
+      timelineItem.add(textWrapper);
+
+      // Handle the click interaction
+      timelineItem.addDomHandler(event -> selectVersionNode(versionKey), ClickEvent.getType());
 
       if (isFirst) {
-        rb.setValue(true);
         selectedVersion = versionKey;
         isFirst = false;
       }
 
-      radioContainer.add(rb);
+      timelineItemWidgets.put(versionKey, timelineItem);
+      radioContainer.add(timelineItem);
     }
 
     if (!versionList.isEmpty()) {
-      updateTabs();
+      selectVersionNode(selectedVersion);
+    }
+  }
+
+  /**
+   * UX Improvement: Manage visual selection state across timeline nodes
+   */
+  private void selectVersionNode(String versionKey) {
+    selectedVersion = versionKey;
+
+    for (Map.Entry<String, FlowPanel> entry : timelineItemWidgets.entrySet()) {
+      FlowPanel item = entry.getValue();
+
+      if (entry.getKey().equals(versionKey)) {
+        item.addStyleName("history-timeline-item--selected");
+      } else {
+        item.removeStyleName("history-timeline-item--selected");
+      }
     }
 
+    updateTabs();
   }
 
   private void cancel() {
@@ -320,6 +364,7 @@ public class DescriptiveMetadataHistory extends Composite {
       title.setText(aip.getId());
     }
   }
+
   private void getDescriptiveMetadata(final String aipId, final String representationId, final String descId,
     final String versionKey, final boolean inHTML, final AsyncCallback<SafeHtml> callback) {
 
@@ -372,7 +417,7 @@ public class DescriptiveMetadataHistory extends Composite {
             b.append(messages.descriptiveMetadataTransformToHTMLError());
             b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
             b.append(SafeHtmlUtils.fromString(message));
-            b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
+            b.append(SafeHtmlUtils.fromSafeConstant("</code></pre>"));
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
 
             callback.onSuccess(b.toSafeHtml());
@@ -384,11 +429,7 @@ public class DescriptiveMetadataHistory extends Composite {
           callback.onFailure(exception);
         }
       });
-    } catch (
-
-    RequestException e)
-
-    {
+    } catch (RequestException e) {
       callback.onFailure(e);
     }
 
@@ -490,6 +531,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
   protected void clean() {
     radioContainer.clear();
+    timelineItemWidgets.clear();
     selectedVersion = null;
     tabsContainer.clear();
   }
