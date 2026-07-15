@@ -7,8 +7,6 @@
  */
 package org.roda.wui.client.browse.tabs;
 
-import java.util.List;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -18,12 +16,9 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.browse.DipFilePreview;
 import org.roda.wui.client.browse.DipUrlPreview;
-import org.roda.wui.client.browse.EditPermissionsTab;
+import org.roda.wui.client.browse.DipPermissionsTab;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.actions.DisseminationActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
@@ -84,14 +79,21 @@ public class BrowseDIPTabs extends Tabs {
     }
 
     // Permissions
-    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.permissionsTab()), new TabContentBuilder() {
-      @Override
-      public Widget buildTabWidget() {
-        DisseminationActions dipToolbarActions = DisseminationActions.get(dip.getPermissions());
-        return new EditPermissionsTab(new ActionableWidgetBuilder<>(dipToolbarActions).buildGroupedListWithObjects(
-          new ActionableObject<>(dip), List.of(DisseminationActions.DisseminationAction.UPDATE_PERMISSIONS),
-          List.of(DisseminationActions.DisseminationAction.UPDATE_PERMISSIONS)), IndexedDIP.class.getName(), dip);
-      }
-    });
+    if (PermissionClientUtils.hasPermissions("org.roda.wui.api.controllers.Browser.verifyPermissions")) {
+      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.permissionsTab()), new TabContentBuilder() {
+        @Override
+        public Widget buildTabWidget() {
+          return new DipPermissionsTab(dip, actionCallback);
+          // DisseminationActions dipToolbarActions =
+          // DisseminationActions.get(dip.getPermissions());
+          // return new EditPermissionsTab(new
+          // ActionableWidgetBuilder<>(dipToolbarActions).buildGroupedListWithObjects(
+          // new ActionableObject<>(dip),
+          // List.of(DisseminationActions.DisseminationAction.UPDATE_PERMISSIONS),
+          // List.of(DisseminationActions.DisseminationAction.UPDATE_PERMISSIONS)),
+          // IndexedDIP.class.getName(), dip);
+        }
+      });
+    }
   }
 }

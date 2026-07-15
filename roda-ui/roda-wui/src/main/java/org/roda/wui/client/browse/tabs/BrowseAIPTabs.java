@@ -10,6 +10,7 @@ package org.roda.wui.client.browse.tabs;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
