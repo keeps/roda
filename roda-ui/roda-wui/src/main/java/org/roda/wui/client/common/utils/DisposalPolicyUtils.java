@@ -59,20 +59,20 @@ public class DisposalPolicyUtils {
         case CONFIRMATION:
         case OVERDUE:
         case ERROR:
-          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.DANGER_LIGHT, Tag.TagStyle.MONO));
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.DANGER));
         case REVIEW:
-          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.MONO, Tag.TagStyle.WARNING_LIGHT));
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.WARNING));
         case HOLD:
-          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.MONO, Tag.TagStyle.NEUTRAL));
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.NEUTRAL));
         case RETAIN:
-          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.MONO, Tag.TagStyle.SUCCESS));
+          return Tag.fromText(summary.getMessage(), List.of(Tag.TagStyle.INFO));
         case NONE:
         default:
           return null;
       }
     } else if (AIPState.DESTROYED.equals(aip.getState())) {
       String message = messages.disposalPolicyDestroyedAIPSummary(Humanize.formatDate(aip.getDestroyedOn()));
-      return Tag.fromText(message, List.of(Tag.TagStyle.DANGER_LIGHT, Tag.TagStyle.MONO));
+      return Tag.fromText(message, List.of(Tag.TagStyle.DANGER));
     }
 
     return null;

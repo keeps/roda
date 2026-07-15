@@ -20,6 +20,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.common.cards.utils.CardBuilder;
 import org.roda.wui.client.common.labels.Tag;
+import org.roda.wui.client.common.utils.RepresentationHelper;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -55,7 +56,7 @@ public class AIPRepresentationCardList extends ThumbnailCardList<IndexedRepresen
           // Tags
           List<Tag> tags = new ArrayList<>();
           for (String state : representation.getRepresentationStates()) {
-            tags.add(Tag.fromText(messages.statusLabel(state), Tag.TagStyle.SUCCESS));
+            tags.add(Tag.fromText(messages.statusLabel(state), RepresentationHelper.getTagStyle(state)));
           }
 
           // Attributes
