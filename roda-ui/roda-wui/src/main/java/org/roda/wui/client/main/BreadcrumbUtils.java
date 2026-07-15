@@ -34,6 +34,7 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.DescriptiveMetadataHistory;
@@ -67,6 +68,7 @@ import org.roda.wui.client.management.members.CreateUser;
 import org.roda.wui.client.management.members.EditGroup;
 import org.roda.wui.client.management.members.EditUser;
 import org.roda.wui.client.management.members.MemberManagement;
+import org.roda.wui.client.management.members.Profile;
 import org.roda.wui.client.management.members.ShowMember;
 import org.roda.wui.client.planning.ri.CreateRepresentationInformation;
 import org.roda.wui.client.planning.risks.CreateRisk;
@@ -1084,4 +1086,15 @@ public class BreadcrumbUtils {
 
     return ret;
   }
+
+    public static List<BreadcrumbItem> getProfileBreadcrumbs(User user) {
+      List<BreadcrumbItem> ret = new ArrayList<>();
+
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(messages.preferencesUserDataTitle()), messages.preferencesUserDataTitle(),
+              Profile.RESOLVER.getHistoryPath()));
+      ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(user.getFullName()), user.getFullName(),
+              Profile.RESOLVER.getHistoryPath()));
+
+      return ret;
+    }
 }

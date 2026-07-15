@@ -10,28 +10,23 @@
  */
 package org.roda.wui.client.management.members;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.common.SecureString;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.NotFoundException;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.data.v2.user.requests.UpdateUserRequest;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoActionsToolbar;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.services.Services;
-import org.roda.wui.client.welcome.Welcome;
+import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.management.members.tabs.RODAMemberDetailsPanel;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -44,7 +39,6 @@ import config.i18n.client.ClientMessages;
 public class Profile extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
-
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
@@ -60,7 +54,6 @@ public class Profile extends Composite {
           callback.onSuccess(preferences);
         }
       });
-
     }
 
     @Override
@@ -81,7 +74,7 @@ public class Profile extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return Arrays.asList(getHistoryToken());
+      return List.of(getHistoryToken());
     }
 
     @Override
@@ -89,90 +82,40 @@ public class Profile extends Composite {
       return "profile";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, Profile> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  private final User user;
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   @UiField
-  Button buttonApply;
-
+  FocusPanel keyboardFocus;
   @UiField
-  Button buttonCancel;
+  NavigationToolbar<User> navigationToolbar;
+  @UiField
+  NoActionsToolbar actionsToolbar;
+  @UiField
+  TitlePanel title;
+  @UiField
+  FlowPanel content;
 
-  @UiField(provided = true)
-  UserDataPanel userDataPanel;
-
-  /**
-   * Create a new panel to edit a user
-   *
-   * @param user
-   *          the user to edit
-   */
   public Profile(User user) {
-    this.user = user;
-
-    this.userDataPanel = new UserDataPanel(true, true);
-    this.userDataPanel.setUser(user);
-
     initWidget(uiBinder.createAndBindUi(this));
 
-    //userDataPanel.setUsernameReadOnly(true);
+    navigationToolbar.withObject(user);
+    navigationToolbar.updateBreadcrumbPath(BreadcrumbUtils.getProfileBreadcrumbs(user));
+    navigationToolbar.build();
+
+    actionsToolbar.setLabel(messages.preferencesUserDataTitle());
+    actionsToolbar.build();
+
+    title.setText(messages.preferencesUserDataTitle());
+    title.setIconClass("User");
+    title.addStyleName("mb-16");
+
+    content.add(new RODAMemberDetailsPanel(user));
+
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addStyleName("browse");
   }
 
-  private SecureString getPassword() {
-    if (userDataPanel.getPassword() != null) {
-      return new SecureString(userDataPanel.getPassword().toCharArray());
-    } else {
-      return null;
-    }
-  }
-
-  @UiHandler("buttonApply")
-  void buttonApplyHandler(ClickEvent e) {
-    if (userDataPanel.isChanged()) {
-      if (userDataPanel.isValid()) {
-        final User user = userDataPanel.getUser();
-        try (SecureString password = getPassword()) {
-          Services services = new Services("Update User", "update");
-          UpdateUserRequest userOperations = new UpdateUserRequest(user, password, userDataPanel.getUserExtra());
-          services.membersResource(s -> s.updateMyUser(userOperations)).whenComplete((updatedUser, error) -> {
-            if (error == null) {
-              UserLogin.getInstance().updateLoggedUser(updatedUser);
-              HistoryUtils.newHistory(Welcome.RESOLVER);
-            } else {
-              errorMessage(error);
-            }
-          });
-        }
-      }
-    } else {
-      HistoryUtils.newHistory(Welcome.RESOLVER);
-    }
-  }
-
-  @UiHandler("buttonCancel")
-  void buttonCancelHandler(ClickEvent e) {
-    cancel();
-  }
-
-  private void cancel() {
-    HistoryUtils.newHistory(Welcome.RESOLVER);
-  }
-
-  private void errorMessage(Throwable caught) {
-    if (caught instanceof NotFoundException) {
-      Toast.showError(messages.editUserNotFound(user.getName()));
-      cancel();
-    } else if (caught instanceof AlreadyExistsException) {
-      Toast.showError(messages.editUserEmailAlreadyExists(user.getEmail()));
-    } else {
-      Toast.showError(messages.editUserFailure(Profile.this.user.getName(), caught.getMessage()));
-    }
+  interface MyUiBinder extends UiBinder<Widget, Profile> {
   }
 }
