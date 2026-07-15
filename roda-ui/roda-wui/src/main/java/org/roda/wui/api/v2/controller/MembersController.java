@@ -19,7 +19,6 @@ import java.util.function.BiConsumer;
 
 import javax.crypto.SecretKey;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.commons.lang3.StringUtils;
 import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;

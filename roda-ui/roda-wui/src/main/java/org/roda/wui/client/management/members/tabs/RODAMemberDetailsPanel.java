@@ -47,7 +47,7 @@ public class RODAMemberDetailsPanel extends GenericMetadataCardPanel<RODAMember>
       buildField(messages.fullname()).withValue(data.getFullName()).build();
       buildField(messages.email()).withValue(user.getEmail()).build();
 
-      if (!user.getExtra().isEmpty()) {
+      if (user.getExtra() != null && !user.getExtra().isEmpty()) {
         String pendingSeparatorLabel = null;
 
         for (MetadataValue extra : user.getExtra()) {
