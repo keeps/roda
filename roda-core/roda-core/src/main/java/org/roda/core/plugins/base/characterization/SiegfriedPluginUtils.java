@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -72,15 +74,16 @@ public class SiegfriedPluginUtils {
 
   private static List<String> getBatchCommand(Path sourceDirectory) {
     List<String> command;
-    String siegfriedPath = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.tools.siegfried.binary", "sf");
+    String siegfriedPath = RodaCoreFactory.getConfigurationManager()
+      .getConfigurationString("core.tools.siegfried.binary", "sf");
     command = new ArrayList<>(
       Arrays.asList(siegfriedPath, "-json=true", "-z=false", sourceDirectory.toFile().getAbsolutePath()));
     return command;
   }
 
   private static String getSiegfriedServerEndpoint(Path sourceDirectory) {
-    String siegfriedServer = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.tools.siegfried.server",
-      "http://localhost:5138");
+    String siegfriedServer = RodaCoreFactory.getConfigurationManager()
+      .getConfigurationString("core.tools.siegfried.server", "http://localhost:5138");
 
     return String.format("%s/identify/%s?base64=true&format=json", siegfriedServer,
       new String(Base64.encode(sourceDirectory.toString().getBytes())));
@@ -88,7 +91,8 @@ public class SiegfriedPluginUtils {
 
   public static String runSiegfriedOnPath(Path sourceDirectory) throws PluginException {
     try {
-      String siegfriedMode = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.tools.siegfried.mode", "server");
+      String siegfriedMode = RodaCoreFactory.getConfigurationManager()
+        .getConfigurationString("core.tools.siegfried.mode", "server");
       if ("server".equalsIgnoreCase(siegfriedMode)) {
         LOGGER.debug("Running Siegfried on server mode");
         String endpoint = getSiegfriedServerEndpoint(sourceDirectory);
@@ -106,17 +110,16 @@ public class SiegfriedPluginUtils {
   public static String getVersion() {
     String version = null;
 
-    String siegfriedMode = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.tools.siegfried.mode", "server");
+    String siegfriedMode = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.tools.siegfried.mode",
+      "server");
     if ("server".equalsIgnoreCase(siegfriedMode)) {
       LOGGER.debug("Running Siegfried on server mode");
       String endpoint = getSiegfriedServerEndpoint(Paths.get("/dev/null"));
       try {
         String json = HTTPUtility.doGet(endpoint);
         JsonNode jn = JsonUtils.parseJson(json);
-        StringBuilder result = new StringBuilder();
-        result.append(jn.get("siegfried").asText());
 
-        version = result.toString();
+        version = jn.get("siegfried").asText();
       } catch (GenericException ce) {
         LOGGER.error("Error getting Siegfried version: " + ce.getMessage(), ce);
       }
@@ -295,7 +298,14 @@ public class SiegfriedPluginUtils {
       riskIncidence.setObjectClass(Representation.class.getSimpleName());
     }
     riskIncidence.setRiskId(RodaConstants.RISK_ID_SIEGFRIED_IDENTIFICATION_WARNING);
-    riskIncidence.setDetectedBy(SiegfriedPlugin.getStaticName());
+
+    String serverLanguage = RodaCoreFactory.getConfigurationManager().getConfigurationString("core.language.default",
+      "en");
+    Locale locale = Locale.forLanguageTag(serverLanguage);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    String translation = messages.getTranslation(SiegfriedPlugin.getStaticName(), "File format detector");
+
+    riskIncidence.setDetectedBy(translation);
     riskIncidence.setByPlugin(true);
     riskIncidence.setStatus(IncidenceStatus.UNMITIGATED);
     riskIncidence.setRepresentationId(representationId);
