@@ -57,7 +57,7 @@ public class Tag extends Composite {
   }
 
   public enum TagStyle {
-    INFO, SUCCESS, WARNING, DANGER, NEUTRAL, BORDER_BLACK, BORDER_DANGER, INGESTED, PRESERVATION, DISSEMINATION, ORIGINAL, CUSTOM;
+    INFO, SUCCESS, WARNING, DANGER, NEUTRAL, INGESTED, PRESERVATION, DISSEMINATION, ORIGINAL, CUSTOM;
 
     private static String toStyleName(TagStyle tagStyle) {
       switch (tagStyle) {
@@ -71,10 +71,6 @@ public class Tag extends Composite {
           return "tag-danger";
         case NEUTRAL:
           return "tag-default";
-        case BORDER_BLACK:
-          return "tagBorderBlack";
-        case BORDER_DANGER:
-          return "tagBorderRed";
         case ORIGINAL:
           return "tag-original";
         case PRESERVATION:

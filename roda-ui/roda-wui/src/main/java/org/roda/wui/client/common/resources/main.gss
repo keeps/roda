@@ -52,7 +52,6 @@
 @def COLOR_GREY_VERYLIGHTEST	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.lightest")');
 @def COLOR_GREY_BGDARKER eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.bgdarker")');
 @def COLOR_GREY_BGLIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.bglight")');
-@def COLOR_RED_LIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.red.light")');
 @def COLOR_BLUE_LIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.blue.light")');
 
 @def BACKGROUND_COLOR_TAG_REP_ORIGINAL eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.background.tag.original")');
@@ -3630,16 +3629,6 @@ td.datePickerMonth, td.datePickerYear {
 .tag-info {
     background-color: BACKGROUND_COLOR_LABEL_INFO;
     color: COLOR_LABEL_INFO;
-}
-
-.tagBorderBlack {
-    border: 1px solid black;
-    color: black;
-}
-
-.tagBorderRed  {
-    border: 1px solid COLOR_RED_LIGHT;
-    color: COLOR_RED_LIGHT;
 }
 
 .tag .gwt-Label {

@@ -14,7 +14,12 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.generics.DeleteRequest;
+import org.roda.core.data.v2.generics.UpdatePermissionsRequest;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.browse.BrowseTop;
@@ -24,6 +29,7 @@ import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.dialogs.MemberPermissionsSelectDialog;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.services.Services;
@@ -48,7 +54,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     Arrays.asList(DisseminationAction.values()));
 
   private static final Set<DisseminationAction> POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATIONS = new HashSet<>(
-    Arrays.asList(DisseminationAction.REMOVE, DisseminationAction.NEW_PROCESS, DisseminationAction.UPDATE_PERMISSIONS));
+    Arrays.asList(DisseminationAction.REMOVE, DisseminationAction.NEW_PROCESS));
 
   private final Permissions permissions;
 
@@ -112,8 +118,10 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
       remove(dissemination, callback);
     } else if (DisseminationAction.NEW_PROCESS.equals(action)) {
       newProcess(dissemination, callback);
-    } else if (DisseminationAction.UPDATE_PERMISSIONS.equals(action)) {
-      updatePermissions(dissemination, callback);
+    } else if (DisseminationAction.ADD_USER_PERMISSION.equals(action)) {
+      addUserPermissions(dissemination, callback);
+    } else if (DisseminationAction.ADD_GROUP_PERMISSION.equals(action)) {
+      addGroupPermissions(dissemination, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -129,8 +137,6 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
       remove(selectedItems, callback);
     } else if (DisseminationAction.NEW_PROCESS.equals(action)) {
       newProcess(selectedItems, callback);
-    } else if (DisseminationAction.UPDATE_PERMISSIONS.equals(action)) {
-      updatePermissions(selectedItems, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -209,19 +215,98 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     callback.onSuccess(ActionImpact.UPDATED);
   }
 
-  private void updatePermissions(IndexedDIP dip, AsyncCallback<ActionImpact> callback) {
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(BrowseTop.RESOLVER, EditPermissions.DIP_RESOLVER.getHistoryToken(), dip.getId());
-    callback.onSuccess(ActionImpact.UPDATED);
+  private void addGroupPermissions(final IndexedDIP dip, final AsyncCallback<ActionImpact> callback) {
+    MemberPermissionsSelectDialog dialog = new MemberPermissionsSelectDialog(messages.addGroupButton(),
+      getMembersFilter(dip.getPermissions(), false), new AsyncCallback<MemberPermissionsSelectDialog.Result>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onSuccess(ActionImpact.NONE);
+        }
+
+        @Override
+        public void onSuccess(MemberPermissionsSelectDialog.Result result) {
+          Permissions newPermissions = new Permissions(dip.getPermissions());
+
+          for (String groupName : result.getMemberNames()) {
+            newPermissions.setGroupPermissions(groupName, result.getPermissions());
+          }
+
+          saveNewPermissions(dip, newPermissions, callback);
+        }
+      });
+
+    dialog.showAndCenter();
   }
 
-  private void updatePermissions(SelectedItems<IndexedDIP> dips, AsyncCallback<ActionImpact> callback) {
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    LastSelectedItemsSingleton.getInstance().setSelectedItems(dips);
-    HistoryUtils.newHistory(BrowseTop.RESOLVER, EditPermissions.DIP_RESOLVER.getHistoryToken());
-    callback.onSuccess(ActionImpact.UPDATED);
+  private void addUserPermissions(final IndexedDIP dip, final AsyncCallback<ActionImpact> callback) {
+    MemberPermissionsSelectDialog dialog = new MemberPermissionsSelectDialog(messages.addUserButton(),
+      getMembersFilter(dip.getPermissions(), true), new AsyncCallback<MemberPermissionsSelectDialog.Result>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onSuccess(ActionImpact.NONE);
+        }
+
+        @Override
+        public void onSuccess(MemberPermissionsSelectDialog.Result result) {
+          Permissions newPermissions = new Permissions(dip.getPermissions());
+
+          for (String username : result.getMemberNames()) {
+            newPermissions.setUserPermissions(username, result.getPermissions());
+          }
+
+          saveNewPermissions(dip, newPermissions, callback);
+        }
+      });
+
+    dialog.showAndCenter();
+  }
+
+  private void saveNewPermissions(IndexedDIP dip, Permissions newPermissions, AsyncCallback<ActionImpact> callback) {
+    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, true,
+      new ActionNoAsyncCallback<String>(callback) {
+
+        @Override
+        public void onSuccess(String details) {
+          Services services = new Services("Update DIP permissions", "update");
+
+          UpdatePermissionsRequest request = new UpdatePermissionsRequest();
+          request.setPermissions(newPermissions);
+          request.setDetails(details);
+          request.setRecursive(false);
+          request.setSelectedItems(SelectedItemsList.create(IndexedDIP.class.getName(), dip.getId()));
+
+          services.dipResource(s -> s.updatePermissions(request)).whenComplete((job, throwable) -> {
+            if (throwable != null) {
+              callback.onFailure(throwable);
+            } else {
+              Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+              dip.setPermissions(newPermissions);
+              callback.onSuccess(ActionImpact.UPDATED);
+            }
+          });
+        }
+      });
+  }
+
+  // creates filter to remove any user or group already in dip's permissions
+  private Filter getMembersFilter(Permissions dipPermissions, boolean isUser) {
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
+
+    if (dipPermissions != null) {
+      if (isUser && dipPermissions.getUsernames() != null) {
+        for (String username : dipPermissions.getUsernames()) {
+          filter.add(new NotSimpleFilterParameter(RodaConstants.MEMBERS_ID, username));
+        }
+      } else if (!isUser && dipPermissions.getGroupnames() != null) {
+        for (String groupName : dipPermissions.getGroupnames()) {
+          filter.add(new NotSimpleFilterParameter(RodaConstants.MEMBERS_ID, groupName));
+        }
+      }
+    }
+
+    return filter;
   }
 
   @Override
@@ -234,8 +319,10 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     managementGroup.addButton(messages.downloadButton(), DisseminationAction.DOWNLOAD, ActionImpact.NONE,
       "btn-download");
     managementGroup.addButton(messages.removeButton(), DisseminationAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
-    managementGroup.addButton(messages.disseminationPermissions(), DisseminationAction.UPDATE_PERMISSIONS,
-      ActionImpact.UPDATED, "btn-edit");
+    managementGroup.addButton(messages.addUserButton(), DisseminationAction.ADD_USER_PERMISSION, ActionImpact.UPDATED,
+      "btn-plus-circle");
+    managementGroup.addButton(messages.addGroupButton(), DisseminationAction.ADD_GROUP_PERMISSION, ActionImpact.UPDATED,
+      "btn-plus-circle");
 
     // PRESERVATION
     ActionableGroup<IndexedDIP> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
@@ -249,7 +336,8 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   public enum DisseminationAction implements Action<IndexedDIP> {
     DOWNLOAD(), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_DIP),
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    UPDATE_PERMISSIONS(RodaConstants.PERMISSION_METHOD_UPDATE_DIP_PERMISSIONS);
+    ADD_USER_PERMISSION(RodaConstants.PERMISSION_METHOD_UPDATE_DIP_PERMISSIONS),
+    ADD_GROUP_PERMISSION(RodaConstants.PERMISSION_METHOD_UPDATE_DIP_PERMISSIONS);
 
     private List<String> methods;
 

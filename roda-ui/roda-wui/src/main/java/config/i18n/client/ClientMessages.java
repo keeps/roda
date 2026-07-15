@@ -2773,11 +2773,15 @@ public interface ClientMessages extends Messages {
 
   String editMemberPermissionsDialogTitle(String memberName);
 
-  String removePermissionConfirmDialogTitle();
+  String removePermissionConfirmDialogTitle(String username);
 
-  String removeUserPermissionConfirmationMessage(String username);
+  String removeUserPermissionConfirmationMessage();
 
-  String removeGroupPermissionConfirmationMessage(String groupname);
+  String removeGroupPermissionConfirmationMessage();
+
+  String removeUserDIPPermissionConfirmationMessage();
+
+  String removeGroupDIPPermissionConfirmationMessage();
 
   // ── Email viewer ──────────────────────────────────────────────────────────
 
