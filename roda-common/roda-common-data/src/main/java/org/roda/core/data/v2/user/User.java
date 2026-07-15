@@ -54,7 +54,7 @@ public class User extends RodaPrincipal {
   /** LDAP info. */
   private String emailConfirmationTokenExpirationDate = null;
 
-  private Set<MetadataValue> extra;
+  private Set<MetadataValue> extra = null;
 
   /**
    * Constructor.
@@ -105,7 +105,7 @@ public class User extends RodaPrincipal {
               final Set<String> allRoles, final Set<String> directRoles, final Set<String> groups,
               final String resetPasswordToken, final String resetPasswordTokenExpirationDate, final String emailConfirmationToken,
               final String emailConfirmationTokenExpirationDate) {
-    this(id, name, name, true, allRoles, directRoles, groups, email, guest, ipAddress, new HashSet<>(), resetPasswordToken,
+    this(id, name, name, true, allRoles, directRoles, groups, email, guest, ipAddress, null, resetPasswordToken,
       resetPasswordTokenExpirationDate, emailConfirmationToken, emailConfirmationTokenExpirationDate);
   }
 
