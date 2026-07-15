@@ -34,19 +34,17 @@ public class DisposalConfirmationActionsToolbar extends BrowseObjectActionsToolb
     Tag.TagStyle style;
     switch (object.getState()) {
       case PENDING:
-        style = Tag.TagStyle.WARNING_LIGHT;
+        style = Tag.TagStyle.WARNING;
         break;
       case APPROVED:
         style = Tag.TagStyle.SUCCESS;
         break;
       case RESTORED:
-        style = Tag.TagStyle.SUCCESS;
+        style = Tag.TagStyle.NEUTRAL;
         break;
       case PERMANENTLY_DELETED:
-        style = Tag.TagStyle.DANGER_LIGHT;
-        break;
       case EXECUTION_FAILED:
-        style = Tag.TagStyle.FAILURE;
+        style = Tag.TagStyle.DANGER;
         break;
       default:
         style =  Tag.TagStyle.NEUTRAL;

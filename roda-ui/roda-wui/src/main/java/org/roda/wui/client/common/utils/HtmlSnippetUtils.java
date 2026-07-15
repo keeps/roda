@@ -718,7 +718,7 @@ public class HtmlSnippetUtils {
         labelClass = "label-success";
         break;
       case RESTORED:
-        labelClass = "label-info";
+        labelClass = "label-default";
         break;
       case PERMANENTLY_DELETED:
         labelClass = "label-danger";

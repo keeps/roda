@@ -59,15 +59,14 @@ public abstract class BrowseObjectActionsToolbar<T extends IsIndexed> extends Ac
   protected Optional<Tag> getStateTag() {
     switch (state) {
       case ACTIVE:
-        return Optional.empty();
       case DESTROYED:
         return Optional.empty();
       case UNDER_APPRAISAL:
         return Optional
-          .of(Tag.fromText(messages.aipState(state), List.of(Tag.TagStyle.WARNING_LIGHT, Tag.TagStyle.MONO)));
+          .of(Tag.fromText(messages.aipState(state), List.of(Tag.TagStyle.WARNING)));
       default:
         return Optional
-          .of(Tag.fromText(messages.aipState(state), List.of(Tag.TagStyle.DANGER_LIGHT, Tag.TagStyle.MONO)));
+          .of(Tag.fromText(messages.aipState(state), List.of(Tag.TagStyle.DANGER)));
     }
   }
 }

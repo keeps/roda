@@ -24,43 +24,6 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Tag extends Composite {
   private static final Tag.MyUiBinder uiBinder = GWT.create(Tag.MyUiBinder.class);
-
-  public enum TagStyle {
-    DEFAULT, SUCCESS, FAILURE, WARNING_LIGHT, DANGER_LIGHT, NEUTRAL, MONO, ICON_CALENDAR, ICON_LOCK, ICON_CLOCK,
-    ICON_GAVEL, BORDER_BLACK, BORDER_DANGER;
-
-    private static String toStyleName(TagStyle tagStyle) {
-      switch (tagStyle) {
-        case SUCCESS:
-          return "tagGreen";
-        case FAILURE:
-          return "tagRed";
-        case WARNING_LIGHT:
-          return "tagLightYellow";
-        case DANGER_LIGHT:
-          return "tagLightRed";
-        case MONO:
-          return "tagMono";
-        case NEUTRAL:
-          return "tagGrey";
-        case ICON_CALENDAR:
-          return "tagIconCalendar";
-        case ICON_GAVEL:
-          return "tagIconGavel";
-        case ICON_LOCK:
-          return "tagIconLock";
-        case ICON_CLOCK:
-          return "tagIconClock";
-        case BORDER_BLACK:
-          return "tagBorderBlack";
-        case BORDER_DANGER:
-          return "tagBorderRed";
-        default:
-          return "";
-      }
-    }
-  }
-
   @UiField
   FocusPanel tagPanel;
   @UiField
@@ -68,13 +31,6 @@ public class Tag extends Composite {
 
   public Tag() {
     initWidget(uiBinder.createAndBindUi(this));
-  }
-
-  public static Tag fromText(String text) {
-    Tag tag = new Tag();
-    tag.label.setText(text);
-    tag.addStyleName(TagStyle.toStyleName(TagStyle.DEFAULT));
-    return tag;
   }
 
   public static Tag fromText(String text, TagStyle style) {
@@ -98,6 +54,41 @@ public class Tag extends Composite {
   public void addClickHandler(ClickHandler clickHandler) {
     tagPanel.addClickHandler(clickHandler);
     tagPanel.addStyleName("clickable");
+  }
+
+  public enum TagStyle {
+    INFO, SUCCESS, WARNING, DANGER, NEUTRAL, BORDER_BLACK, BORDER_DANGER, INGESTED, PRESERVATION, DISSEMINATION, ORIGINAL, CUSTOM;
+
+    private static String toStyleName(TagStyle tagStyle) {
+      switch (tagStyle) {
+        case INFO:
+          return "tag-info";
+        case SUCCESS:
+          return "tag-success";
+        case WARNING:
+          return "tag-warning";
+        case DANGER:
+          return "tag-danger";
+        case NEUTRAL:
+          return "tag-default";
+        case BORDER_BLACK:
+          return "tagBorderBlack";
+        case BORDER_DANGER:
+          return "tagBorderRed";
+        case ORIGINAL:
+          return "tag-original";
+        case PRESERVATION:
+          return "tag-preservation";
+        case DISSEMINATION:
+          return "tag-dissemination";
+        case INGESTED:
+          return "tag-ingested";
+        case CUSTOM:
+          return "tag-custom";
+        default:
+          return "";
+      }
+    }
   }
 
   interface MyUiBinder extends UiBinder<Widget, Tag> {

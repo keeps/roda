@@ -29,7 +29,7 @@ public class DisposalScheduleActionsToolbar extends BrowseObjectActionsToolbar<D
     this.tags.clear();
 
     if (object.isUsedInDisposalRule()) {
-      Tag tag = Tag.fromText(messages.disposalScheduleUsedInRule(), Tag.TagStyle.WARNING_LIGHT);
+      Tag tag = Tag.fromText(messages.disposalScheduleUsedInRule(), Tag.TagStyle.WARNING);
       tags.add(tag);
     }
   }

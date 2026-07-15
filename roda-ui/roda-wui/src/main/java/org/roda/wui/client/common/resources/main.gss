@@ -52,14 +52,20 @@
 @def COLOR_GREY_VERYLIGHTEST	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.lightest")');
 @def COLOR_GREY_BGDARKER eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.bgdarker")');
 @def COLOR_GREY_BGLIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.grey.bglight")');
-
 @def COLOR_RED_LIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.red.light")');
-
-@def COLOR_YELLOW_LIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.yellow.light")');
-
 @def COLOR_BLUE_LIGHT eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.blue.light")');
 
-@def COLOR_GREEN eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.green")');
+@def BACKGROUND_COLOR_TAG_REP_ORIGINAL eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.background.tag.original")');
+@def BACKGROUND_COLOR_TAG_REP_PRESERVATION eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.background.tag.preservation")');
+@def BACKGROUND_COLOR_TAG_REP_DISSEMINATION eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.background.tag.dissemination")');
+@def BACKGROUND_COLOR_TAG_REP_INGESTED eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.background.tag.ingested")');
+@def BACKGROUND_COLOR_TAG_REP_CUSTOM eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.background.tag.custom")');
+
+@def COLOR_TAG_REP_ORIGINAL eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.tag.original")');
+@def COLOR_TAG_REP_PRESERVATION eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.tag.preservation")');
+@def COLOR_TAG_REP_DISSEMINATION eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.tag.dissemination")');
+@def COLOR_TAG_REP_INGESTED eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.tag.ingested")');
+@def COLOR_TAG_REP_CUSTOM eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.tag.custom")');
 
 @def FONT_PRIMARY "Inter", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 @def FONT_MONOSPACED "RobotoMono", "UbuntuMono", "Lucida Console", Monaco, monospace;
@@ -3563,33 +3569,67 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .tag {
-    padding: 2px 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 6px;
     border-radius: 4px;
-    /*flex: 1;*/
-    text-transform: uppercase;
-    text-align: center;
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: bold;
+    line-height: 1.4;
+    text-transform: none;
+    white-space: nowrap;
 }
 
-.tagGrey {
-    background-color: COLOR_GREY_MEDIUM;
-    color: white;
+.tag-default {
+    background-color: BACKGROUND_COLOR_LABEL_DEFAULT;
+    color: COLOR_LABEL_DEFAULT;
 }
 
-.tagGreen {
-    background-color: COLOR_GREEN;
+.tag-original {
+    background-color: BACKGROUND_COLOR_TAG_REP_ORIGINAL;
+    color: COLOR_TAG_REP_ORIGINAL;
 }
 
-.tagLightRed, .tagRed {
-    background-color: COLOR_RED_LIGHT;
-    color: white;
+.tag-preservation {
+    background-color: BACKGROUND_COLOR_TAG_REP_PRESERVATION;
+    color: COLOR_TAG_REP_PRESERVATION;
 }
 
-.tagLightYellow {
-    background-color: COLOR_YELLOW_LIGHT;
+.tag-dissemination {
+    background-color: BACKGROUND_COLOR_TAG_REP_DISSEMINATION;
+    color: COLOR_TAG_REP_DISSEMINATION;
 }
 
-.tagMono {
-    font-family: FONT_MONOSPACED;
+.tag-ingested {
+    background-color: BACKGROUND_COLOR_TAG_REP_INGESTED;
+    color: COLOR_TAG_REP_INGESTED;
+}
+
+.tag-custom {
+    background-color: BACKGROUND_COLOR_TAG_REP_CUSTOM;
+    color: COLOR_TAG_REP_CUSTOM;
+}
+
+.tag-success {
+    background-color: BACKGROUND_COLOR_LABEL_SUCCESS;
+    color: COLOR_LABEL_SUCCESS;
+}
+
+.tag-danger {
+    background-color: BACKGROUND_COLOR_LABEL_DANGER;
+        color: COLOR_LABEL_DANGER;
+}
+
+.tag-warning {
+    background-color: BACKGROUND_COLOR_LABEL_WARNING;
+    color: COLOR_LABEL_WARNING;
+}
+
+.tag-info {
+    background-color: BACKGROUND_COLOR_LABEL_INFO;
+    color: COLOR_LABEL_INFO;
 }
 
 .tagBorderBlack {
@@ -8798,10 +8838,6 @@ span.code {
     gap: 8px;
 }
 
-.objectToolbarTags .tag {
-    font-size: 10px;
-}
-
 .objectToolbarActions {
     display: flex;
     flex-direction: row;
@@ -8826,8 +8862,7 @@ span.code {
 
 .objectToolbar button,
 .groupedActionableMenu button, .groupedActionableMenu .actionable-button,
-.groupedActionableDropdown button, .groupedActionableDropdown .actionable-button
- {
+.groupedActionableDropdown button, .groupedActionableDropdown .actionable-button {
     display: flex;
     flex-direction: row-reverse;
     flex: 1;

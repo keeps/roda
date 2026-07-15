@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.common;
 
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -15,6 +14,7 @@ import org.roda.wui.client.common.actions.RepresentationToolbarActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.labels.Tag;
+import org.roda.wui.client.common.utils.RepresentationHelper;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -38,7 +38,7 @@ public class BrowseRepresentationActionsToolbar extends BrowseObjectActionsToolb
     getStateTag().ifPresent(tag -> tags.add(tag));
 
     for (String state : object.getRepresentationStates()) {
-      Tag tag = Tag.fromText(messages.statusLabel(state), Tag.TagStyle.SUCCESS);
+      Tag tag = Tag.fromText(messages.statusLabel(state), RepresentationHelper.getTagStyle(state));
       final String filter = RepresentationInformationUtils.createRepresentationInformationFilter(
         RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_STATES, state);
       tag.addClickHandler(new ClickHandler() {
