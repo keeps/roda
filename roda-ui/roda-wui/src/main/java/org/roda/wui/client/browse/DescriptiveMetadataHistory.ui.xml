@@ -7,37 +7,22 @@
 
     <g:FocusPanel ui:field="keyboardFocus">
         <g:FlowPanel styleName="browse wui-browse-metadata-descriptive-versions" addStyleNames="wrapper skip_padding">
-
             <common:NavigationToolbar ui:field="navigationToolbar"/>
-
             <common:ActionsToolbar ui:field="actionsToolbar"/>
-
             <g:FlowPanel addStyleNames="row full_width skip_padding">
                 <g:FlowPanel addStyleNames="col_12 content">
-
                     <common:TitlePanel ui:field="title"/>
-
-                    <g:FlowPanel addStyleNames="roda6Card mb-20">
-
-                        <g:FlowPanel addStyleNames="generic-data-panel">
-                            <g:FlowPanel addStyleNames="generic-data-panel-fields">
-                                <g:Label addStyleNames="form-separator">
-                                    <ui:text from="{messages.descriptiveMetadataHistoryVersionsTitle}"/>
-                                </g:Label>
-                                <g:FlowPanel addStyleNames="generic-form-field">
-                                    <g:FlowPanel addStyleNames="generic-form-field-input-panel full_width">
-                                        <g:FlowPanel ui:field="radioContainer"
-                                                     addStyleNames="radio-group-container versions-timeline"/>
-                                    </g:FlowPanel>
-                                </g:FlowPanel>
-
-                            </g:FlowPanel>
+                    <g:FlowPanel addStyleNames="history-master-detail-layout mb-20">
+                        <g:FlowPanel addStyleNames="history-timeline-sidebar roda6Card">
+                            <g:Label addStyleNames="history-timeline-title mb-16">
+                                <ui:text from="{messages.descriptiveMetadataHistoryVersionsTitle}"/>
+                            </g:Label>
+                            <g:FlowPanel ui:field="radioContainer" addStyleNames="versions-timeline"/>
                         </g:FlowPanel>
-
-                        <g:SimplePanel ui:field="tabsContainer" addStyleNames="p-16 mb-20"/>
-
-                        <g:FlowPanel ui:field="versionActionsPanel" addStyleNames="alignButtonsPanel pt-16 mb-8"/>
-
+                        <g:FlowPanel addStyleNames="history-content-area roda6Card">
+                            <g:FlowPanel ui:field="versionActionsPanel" addStyleNames="alignButtonsPanel mb-16"/>
+                            <g:SimplePanel ui:field="tabsContainer"/>
+                        </g:FlowPanel>
                     </g:FlowPanel>
                 </g:FlowPanel>
             </g:FlowPanel>

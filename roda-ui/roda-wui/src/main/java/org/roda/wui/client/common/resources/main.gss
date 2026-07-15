@@ -10820,3 +10820,98 @@ wui-disposal-hold-data .form-textbox {
     margin-right: 0.8rem; /* Adjust this value to get the exact gap you want */
     cursor: pointer;
 }
+
+/* Master-Detail Wrapper */
+.history-master-detail-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 24px;
+    width: 100%;
+}
+
+/* Left Sidebar: Fixed Width & Scrollable */
+.history-timeline-sidebar {
+    flex: 0 0 320px;       /* Locks the sidebar to 320px wide */
+    max-height: 650px;     /* Prevents the card from growing infinitely */
+    overflow-y: auto;      /* Enables scrolling for 50+ versions */
+}
+
+/* Custom Scrollbar for the Sidebar (Webkit) */
+.history-timeline-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.history-timeline-sidebar::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
+
+.history-timeline-title {
+    color: COLOR_PRIMARY;
+	font-size: 1.4rem;
+	font-weight: bold;
+}
+
+/* Interactive Timeline Card */
+.history-timeline-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background-color 0.2s ease, border-left-color 0.2s ease;
+}
+
+/* Hover state for unselected items */
+.history-timeline-item:hover:not(.history-timeline-item--selected) {
+    background-color: COLOR_GREY_VERYLIGHT;
+}
+
+/* Selected state */
+.history-timeline-item--selected {
+    background-color: COLOR_BLUE_LIGHT; /* Uses your existing RODA variable */
+    border-left-color: COLOR_PRIMARY;
+}
+
+/* The circular node */
+.history-timeline-node {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: COLOR_GREY_MEDIUM;
+    margin-right: 12px;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease;
+}
+
+/* Turns the node blue when the card is selected */
+.history-timeline-item--selected .history-timeline-node {
+    background-color: COLOR_PRIMARY;
+}
+
+/* Text Formatting */
+.history-timeline-text-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.history-timeline-date {
+    font-weight: 600;
+    font-size: 14px;
+    color: #222;
+    margin-bottom: 2px;
+}
+
+.history-timeline-actor {
+    font-size: 12px;
+    font-weight: 400;
+    color: #666;
+}
+
+/* Right Content Area: Fluid Width */
+.history-content-area {
+    flex: 1;               /* Fills the rest of the screen */
+    min-width: 0;          /* Prevents large <pre> code blocks from breaking the flex container */
+}
