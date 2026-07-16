@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -32,6 +33,7 @@ import org.roda.wui.client.common.dialogs.EditPermissionsDialog;
 import org.roda.wui.client.common.lists.utils.ActionMenuCell;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.panels.GenericMetadataCardPanel;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.services.Services;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -93,6 +95,14 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
   }
 
   private ScrollPanel createUsersTable(Permissions permissions) {
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS)) {
+      return createUsersTableFullPermissions(permissions);
+    } else {
+      return createUsersTableReadOnly(permissions);
+    }
+  }
+
+  private ScrollPanel createUsersTableFullPermissions(Permissions permissions) {
     Set<String> usernames = permissions.getUsernames();
     if (usernames == null || usernames.isEmpty()) {
       return createEmptyPanel(messages.permissionAssignedUsersEmpty());
@@ -103,6 +113,23 @@ public abstract class AbstractPermissionsTab<T extends IsIndexed> extends Generi
       new BasicTablePanel.ColumnInfo<>(messages.username(), 15, getUserNameColumn()),
       new BasicTablePanel.ColumnInfo<>(messages.userPermissions(), 20, getUserPermissionsColumn()),
       new BasicTablePanel.ColumnInfo<>(messages.actions(), 5, getUserActionsColumn()));
+
+    table.removeSelectionModel();
+    FlowPanel panel = new FlowPanel();
+    panel.add(table);
+    return new ScrollPanel(panel);
+  }
+
+  private ScrollPanel createUsersTableReadOnly(Permissions permissions) {
+    Set<String> usernames = permissions.getUsernames();
+    if (usernames == null || usernames.isEmpty()) {
+      return createEmptyPanel(messages.permissionAssignedUsersEmpty());
+    }
+
+    BasicTablePanel<String> table = new BasicTablePanel<>(usernames.iterator(),
+      new BasicTablePanel.ColumnInfo<>("", 0.8, getUserTypeColumn()),
+      new BasicTablePanel.ColumnInfo<>(messages.username(), 15, getUserNameColumn()),
+      new BasicTablePanel.ColumnInfo<>(messages.userPermissions(), 20, getUserPermissionsColumn()));
 
     table.removeSelectionModel();
     FlowPanel panel = new FlowPanel();
