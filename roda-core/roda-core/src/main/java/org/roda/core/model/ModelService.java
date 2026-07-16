@@ -311,11 +311,11 @@ public interface ModelService extends ModelObservable {
   void deleteFile(String aipId, String representationId, List<String> directoryPath, String fileId, String deletedBy,
     boolean notify) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
 
+  File renameFolder(File folder, String newName, boolean reindexResources) throws AlreadyExistsException,
+          GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException;
+
   void deleteFile(File file, String deletedBy, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
-
-  File renameFolder(File folder, String newName, boolean reindexResources) throws AlreadyExistsException,
-    GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException;
 
   File moveFile(File file, String newAipId, String newRepresentationId, List<String> newDirectoryPath, String newId,
     boolean reindexResources) throws AlreadyExistsException, GenericException, NotFoundException,
