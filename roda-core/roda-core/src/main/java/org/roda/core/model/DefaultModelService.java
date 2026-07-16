@@ -756,6 +756,7 @@ public class DefaultModelService implements ModelService {
     AIP aip = retrieveAIP(aipId);
     aip.setType(type);
     AIP updatedAIP = updateAIPMetadata(aip, updatedBy);
+    //TODO: Create partial update to Type and then change to notifyAipUpdatedOnChanged
     notifyAipUpdated(updatedAIP).failOnError();
   }
 
@@ -859,9 +860,9 @@ public class DefaultModelService implements ModelService {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     aip.addDescriptiveMetadata(descriptiveMetadata);
     AIP updatedAIP = updateAIPMetadata(aip, createdBy);
-    notifyAipUpdated(updatedAIP).failOnError();
 
     if (notify) {
+      notifyAipUpdatedOnChanged(updatedAIP).failOnError();
       notifyDescriptiveMetadataCreated(descriptiveMetadata).failOnError();
     }
 
@@ -901,7 +902,7 @@ public class DefaultModelService implements ModelService {
       descriptiveMetadataVersion);
 
     AIP updateAIP = updateAIPMetadata(aip, updatedBy);
-    notifyAipUpdated(updateAIP).failOnError();
+    notifyAipUpdatedOnChanged(updateAIP).failOnError();
     notifyDescriptiveMetadataUpdated(ret).failOnError();
 
     return ret;
@@ -948,7 +949,7 @@ public class DefaultModelService implements ModelService {
     deleteDescriptiveMetadata(aip, representationId, descriptiveMetadataId);
 
     AIP updateAIP = updateAIPMetadata(aip, deletedBy);
-    notifyAipUpdated(updateAIP).failOnError();
+    notifyAipUpdatedOnChanged(updateAIP).failOnError();
     notifyDescriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataId).failOnError();
   }
 
@@ -1257,6 +1258,7 @@ public class DefaultModelService implements ModelService {
     AIP updatedAIP = updateAIPMetadata(aip, updatedBy);
 
     if (notify) {
+      //TODO: Create partial update to this flag and then change to notifyAipUpdatedOnChanged
       notifyAipUpdated(updatedAIP).failOnError();
     }
   }
@@ -4639,7 +4641,7 @@ public class DefaultModelService implements ModelService {
     disposal.addDisposalHold(disposalHoldAIPMetadata);
 
     AIP updatedAIP = updateAIPMetadata(aip, associatedBy);
-    notifyAipUpdated(updatedAIP.getId());
+    notifyAipUpdatedOnChanged(updatedAIP);
 
     return disposal;
   }
