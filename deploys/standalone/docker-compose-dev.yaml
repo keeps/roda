@@ -93,6 +93,7 @@ services:
       - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,pbkdf2
     volumes:
       - ./ldap/ldif/pbkdf2.ldif:/opt/bitnami/openldap/etc/schema/pbkdf2.ldif
+      - openldap_data:/bitnami/openldap
 
   postgres:
     image: postgres:17
@@ -129,4 +130,5 @@ volumes:
   clam_data:
   siegfried_data:
   pg_data:
+  openldap_data:
   dbgate-data:
