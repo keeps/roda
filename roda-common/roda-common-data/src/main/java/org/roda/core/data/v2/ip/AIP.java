@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.disposal.metadata.DisposalAIPMetadata;
@@ -26,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonFilter("aipPermissionFilter")
 public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasDisposal, HasInstanceID {
 
   @Serial

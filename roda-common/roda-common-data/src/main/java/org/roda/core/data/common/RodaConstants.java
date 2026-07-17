@@ -2144,6 +2144,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_FIND_LOG_ENTRY = "org.roda.wui.api.v2.services.IndexService.find(LogEntry)";
   public static final String PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION = "org.roda.wui.api.v2.services.IndexService.find(RepresentationInformation)";
   public static final String PERMISSION_METHOD_FIND_RISK = "org.roda.wui.api.v2.services.IndexService.find(IndexedRisk)";
+  public static final String PERMISSION_METHOD_FIND_DISPOSAL_CONFIRMATION = "org.roda.wui.api.v2.services.IndexService.find(DisposalConfirmation)";
 
   public static final String PERMISSION_METHOD_DELETE_AIP = "org.roda.wui.api.v2.controller.AIPController.deleteAIPs";
   public static final String PERMISSION_METHOD_DELETE_DIP = "org.roda.wui.api.v2.controller.DIPController.deleteDIPs";
@@ -2202,6 +2203,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_REGENERATE_ACCESS_TOKEN = "org.roda.wui.api.v2.controller.MembersController.regenerateAccessKey";
 
   public static final String PERMISSION_METHOD_CREATE_ACCESS_KEY = "org.roda.wui.api.v2.controller.MembersController.createAccessKey";
+  public static final String PERMISSION_METHOD_RETRIEVE_ACCESS_KEYS = "org.roda.wui.api.v2.controller.MembersController.getAccessKeysByUser";
 
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_RULE = "org.roda.wui.api.v2.controller.DisposalRuleController.createDisposalRule";
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_RULE = "org.roda.wui.api.v2.controller.DisposalRuleController.updateDisposalRule";

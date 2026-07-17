@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.descriptionlevels.DescriptionLevel;
 import org.roda.core.data.v2.disposal.schedule.DisposalActionCode;
@@ -33,6 +34,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonFilter("aipPermissionFilter")
 public class IndexedAIP
   implements IsIndexed, HasId, HasPermissions, HasState, HasDisposal, HasInstanceID, HasInstanceName {
 

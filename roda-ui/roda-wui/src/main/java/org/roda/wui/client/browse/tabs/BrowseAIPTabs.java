@@ -10,7 +10,6 @@ package org.roda.wui.client.browse.tabs;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -121,15 +120,13 @@ public class BrowseAIPTabs extends Tabs {
     }
 
     // Permissions
-    if (PermissionClientUtils.hasPermissions("org.roda.wui.api.controllers.Browser.verifyPermissions")) {
-      createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.permissionsTab()), new TabContentBuilder() {
-        @Override
-        public Widget buildTabWidget() {
-          boolean hasDips = browseAIPResponse.getDipCount() != null && browseAIPResponse.getDipCount().getResult() > 0;
-          return new AipPermissionTabs(aip, hasDips, actionCallback);
-        }
-      });
-    }
+    createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.permissionsTab()), new TabContentBuilder() {
+      @Override
+      public Widget buildTabWidget() {
+        boolean hasDips = browseAIPResponse.getDipCount() != null && browseAIPResponse.getDipCount().getResult() > 0;
+        return new AipPermissionTabs(aip, hasDips, actionCallback);
+      }
+    });
 
     // Details
     createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.detailsTab()), new TabContentBuilder() {

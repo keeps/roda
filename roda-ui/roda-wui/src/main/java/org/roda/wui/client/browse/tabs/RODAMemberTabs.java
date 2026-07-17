@@ -3,8 +3,10 @@ package org.roda.wui.client.browse.tabs;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.management.members.tabs.AccessKeysTab;
 import org.roda.wui.client.management.members.tabs.RODAMemberDetailsPanel;
 import org.roda.wui.client.management.members.tabs.RODAMemberGroupsTab;
@@ -41,7 +43,7 @@ public class RODAMemberTabs extends Tabs {
       }
     });
 
-    if (member.isUser()) {
+    if (member.isUser() && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_RETRIEVE_ACCESS_KEYS)) {
       createAndAddTab(SafeHtmlUtils.fromSafeConstant(messages.showAccessKeyTitle()), new TabContentBuilder() {
         @Override
         public Widget buildTabWidget() {

@@ -39,6 +39,8 @@ import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.accessKey.CreateAccessKeyRequest;
 import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.aip.MembersLookupRequest;
+import org.roda.core.data.v2.aip.MembersLookupResponse;
 import org.roda.core.data.v2.generics.LongResponse;
 import org.roda.core.data.v2.generics.MetadataValue;
 import org.roda.core.data.v2.generics.StringResponse;
@@ -517,6 +519,25 @@ public class MembersController implements MembersRestService, Exportable {
     } finally {
       controllerAssistant.registerAction(requestContext, state, RodaConstants.CONTROLLER_ACCESS_KEY_ID_PARAM,
         accessKeyId);
+    }
+  }
+
+  @Override
+  public MembersLookupResponse getMembersDisplayNames(@RequestBody MembersLookupRequest membersLookupRequest) {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    RequestContext requestContext = RequestUtils.parseHTTPRequest(request);
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      controllerAssistant.checkRoles(requestContext.getUser());
+      // delegate
+      return membersService.resolveMembersDisplayNames(membersLookupRequest);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw new RESTException(e);
+    } finally {
+      // register action
+      controllerAssistant.registerAction(requestContext, state);
     }
   }
 
